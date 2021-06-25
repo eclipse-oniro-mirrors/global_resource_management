@@ -18,6 +18,7 @@
 #include "res_desc.h"
 #include "res_config_impl.h"
 #include <string>
+#include <time.h>
 #include <vector>
 #include <map>
 
