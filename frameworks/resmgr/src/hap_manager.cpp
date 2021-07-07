@@ -15,7 +15,7 @@
 #include "hap_manager.h"
 
 #include <algorithm>
-#include <ohos/init_data.h>
+#include <types.h>
 
 #include "auto_mutex.h"
 #include "hilog_wrapper.h"
@@ -31,64 +31,74 @@ HapManager::HapManager(ResConfigImpl *resConfig)
 {
 }
 
-bool HapManager::icuInitialized = HapManager::Init();
-
-bool HapManager::Init()
+std::string ConvertToPluralStr(int idxRet)
 {
-    SetHwIcuDirectory();
-    return true;
+    switch (idxRet) {
+        case OHOS::I18N::PluralRuleType::ZERO:
+            return "zero";
+        case OHOS::I18N::PluralRuleType::ONE:
+            return "one";
+        case OHOS::I18N::PluralRuleType::TWO:
+            return "two";
+        case OHOS::I18N::PluralRuleType::FEW:
+            return "few";
+        case OHOS::I18N::PluralRuleType::MANY:
+            return "many";
+        case OHOS::I18N::PluralRuleType::OTHER:
+        default:
+            return "other";
+    }
 }
 
 std::string HapManager::GetPluralRulesAndSelect(int quantity)
 {
     AutoMutex mutex(this->lock_);
     std::string defaultRet("other");
-    if (this->resConfig_ == nullptr || this->resConfig_->GetLocaleInfo() == nullptr ||
-        this->resConfig_->GetLocaleInfo()->GetLanguage() == nullptr) {
+    if (this->resConfig_ == nullptr || this->resConfig_->GetResLocale() == nullptr ||
+        this->resConfig_->GetResLocale()->GetLanguage() == nullptr) {
         HILOG_ERROR("GetPluralRules language is null!");
         return defaultRet;
     }
-    std::string language = this->resConfig_->GetLocaleInfo()->GetLanguage();
+    std::string language = this->resConfig_->GetResLocale()->GetLanguage();
 
-    icu::PluralRules *pluralRules = nullptr;
+    OHOS::I18N::PluralFormat *pluralFormat = nullptr;
     for (uint32_t i = 0; i < plurRulesCache_.size(); i++) {
         auto pair = plurRulesCache_[i];
         if (language == pair.first) {
             // cache hit
-            pluralRules = pair.second;
+            pluralFormat = pair.second;
             break;
         }
     }
 
-    if (pluralRules == nullptr) {
+    OHOS::I18N::I18nStatus status = OHOS::I18N::I18nStatus::ISUCCESS;
+    if (pluralFormat == nullptr) {
         // no cache hit
-        icu::Locale locale(language.c_str());
-        if (locale.isBogus()) {
-            HILOG_ERROR("icu::Locale init error : %s", language.c_str());
+        OHOS::I18N::LocaleInfo locale(language.c_str(), "", "");
+        pluralFormat = new(std::nothrow) OHOS::I18N::PluralFormat(locale, status);
+        if (pluralFormat == nullptr) {
+            HILOG_ERROR("new PluralFormat failed");
             return defaultRet;
         }
-        UErrorCode status = U_ZERO_ERROR;
-        pluralRules = icu::PluralRules::forLocale(locale, status);
-        if (status != U_ZERO_ERROR) {
-            HILOG_ERROR("icu::PluralRules::forLocale error : %d", status);
+        if (status != OHOS::I18N::I18nStatus::ISUCCESS) {
+            HILOG_ERROR("PluralFormat init failed");
+            delete pluralFormat;
             return defaultRet;
         }
-        // after PluralRules created, we add it to cache, if > 3 delete oldest one
+        // after pluralFormat created, we add it to cache, if > 3 delete oldest one
         if (plurRulesCache_.size() >= PLURAL_CACHE_MAX_COUNT) {
             HILOG_DEBUG("cache rotate delete plurRulesMap_ %s", plurRulesCache_[0].first.c_str());
             delete (plurRulesCache_[0].second);
             plurRulesCache_.erase(plurRulesCache_.begin());
         }
-        auto plPair = std::make_pair(language, pluralRules);
+        auto plPair = std::make_pair(language, pluralFormat);
         plurRulesCache_.push_back(plPair);
     }
-    std::string converted;
-    icu::UnicodeString us = pluralRules->select(quantity);
-    us.toUTF8String(converted);
-    return converted;
+    int idxRet = pluralFormat->GetPluralRuleIndex(quantity, status);
+    return ConvertToPluralStr(idxRet);
 }
 
-const IdItem* HapManager::FindResourceById(uint32_t id)
+const IdItem *HapManager::FindResourceById(uint32_t id)
 {
     auto qualifierValue = FindQualifierValueById(id);
     if (qualifierValue == nullptr) {
@@ -97,7 +107,7 @@ const IdItem* HapManager::FindResourceById(uint32_t id)
     return qualifierValue->GetIdItem();
 }
 
-const IdItem* HapManager::FindResourceByName(const char *name, const ResType resType)
+const IdItem *HapManager::FindResourceByName(const char *name, const ResType resType)
 {
     auto qualifierValue = FindQualifierValueByName(name, resType);
     if (qualifierValue == nullptr) {
@@ -127,13 +137,11 @@ const HapResource::ValueUnderQualifierDir *HapManager::FindQualifierValueByName(
             if (bestResConfig == nullptr) {
                 bestIndex = i;
                 bestResConfig = resConfig;
+            } else if (bestResConfig->IsMoreSuitable(resConfig, currentResConfig)) {
+                continue;
             } else {
-                if (bestResConfig->IsMoreSuitable(resConfig, currentResConfig)) {
-                    continue;
-                } else {
-                    bestResConfig = resConfig;
-                    bestIndex = i;
-                }
+                bestResConfig = resConfig;
+                bestIndex = i;
             }
         }
     }
@@ -252,7 +260,7 @@ bool HapManager::AddResourcePath(const char *path)
     if (pResource == nullptr) {
         return false;
     }
-    this->hapResources_.push_back((HapResource *) pResource);
+    this->hapResources_.push_back((HapResource *)pResource);
     this->loadedHapPaths_.push_back(sPath);
     return true;
 }
@@ -271,7 +279,7 @@ RState HapManager::ReloadAll()
             }
             return HAP_INIT_FAILED;
         }
-        newResources.push_back((HapResource *) pResource);
+        newResources.push_back((HapResource *)pResource);
     }
     for (size_t i = 0; i < hapResources_.size(); ++i) {
         delete (hapResources_[i]);

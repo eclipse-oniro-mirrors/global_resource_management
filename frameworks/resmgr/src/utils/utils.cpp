@@ -66,17 +66,6 @@ void Utils::DecodeScript(uint32_t encodeScript, char *outValue)
     outValue[3] = (encodeScript & 0x000000FF);
 }
 
-void Utils::ToLower(char *s, int32_t len)
-{
-    if (s == nullptr) {
-        return;
-    }
-    int32_t i = 0;
-    for (i = 0; i < len; ++i) {
-        *(s + i) = tolower(*(s + i));
-    }
-};
-
 bool Utils::IsStrEmpty(const char *s)
 {
     return (s == nullptr || *s == '\0');
@@ -90,42 +79,12 @@ size_t Utils::StrLen(const char *s)
     return strlen(s);
 }
 
-int32_t Utils::FindIndex(const char * const *list,
-                         size_t listLen,
-                         const char *key,
-                         int32_t keyLen,
-                         bool isCaseSensitive)
-{
-    if (list == nullptr || key == nullptr) {
-        return -1;
-    }
-    if (listLen <= 0)
-        return -1;
-    if (keyLen < 0) {
-        keyLen = strlen(key);
-    }
-    for (size_t i = 0; i < listLen; ++i) {
-        if (Utils::StrCompare(*(list + i), key, keyLen, isCaseSensitive)) {
-            return i;
-        }
-    }
-    return -1;
-};
-
 uint16_t Utils::EncodeLanguage(const char *language)
 {
     if (Utils::IsStrEmpty(language)) {
         return NULL_LANGUAGE;
     }
     return Utils::EncodeLanguageOrRegion(language, 'a');
-}
-
-uint64_t Utils::EncodeLocaleByLocaleInfo(const LocaleInfo *locale)
-{
-    if (locale == nullptr) {
-        return NULL_LOCALE;
-    }
-    return Utils::EncodeLocale(locale->GetLanguage(), locale->GetScript(), locale->GetRegion());
 }
 
 /**
@@ -147,11 +106,11 @@ uint64_t Utils::EncodeLocale(const char *language,
     uint32_t scriptData = Utils::EncodeScript(script);
     uint16_t regionData = Utils::EncodeRegion(region);
 
-    return (uint64_t) (0xffff000000000000 & (((uint64_t) languageData) << 48)) |
-           (0x0000ffffffff0000 & (((uint64_t) scriptData) << 16)) | (0x000000000000ffff & (uint64_t) (regionData));
+    return (uint64_t) (0xffff000000000000 & (((uint64_t)languageData) << 48)) |
+           (0x0000ffffffff0000 & (((uint64_t)scriptData) << 16)) | (0x000000000000ffff & (uint64_t)(regionData));
 }
 
-uint16_t Utils::EncodeRegionByLocaleInfo(const LocaleInfo *locale)
+uint16_t Utils::EncodeRegionByResLocale(const ResLocale *locale)
 {
     if (locale == nullptr) {
         return NULL_REGION;
@@ -159,7 +118,7 @@ uint16_t Utils::EncodeRegionByLocaleInfo(const LocaleInfo *locale)
     return Utils::EncodeRegion(locale->GetRegion());
 }
 
-uint16_t Utils::EncodeLanguageByLocaleInfo(const LocaleInfo *locale)
+uint16_t Utils::EncodeLanguageByResLocale(const ResLocale *locale)
 {
     if (locale == nullptr) {
         return NULL_LANGUAGE;
@@ -167,7 +126,7 @@ uint16_t Utils::EncodeLanguageByLocaleInfo(const LocaleInfo *locale)
     return Utils::EncodeLanguage(locale->GetLanguage());
 }
 
-uint32_t Utils::EncodeScriptByLocaleInfo(const LocaleInfo *locale)
+uint32_t Utils::EncodeScriptByResLocale(const ResLocale *locale)
 {
     if (locale == nullptr) {
         return NULL_SCRIPT;
@@ -250,8 +209,8 @@ bool Utils::StrCompare(const char *left, const char *right, size_t len, bool isC
         int rc;
         unsigned char c1, c2;
         while (len--) {
-            c1 = (unsigned char) *left;
-            c2 = (unsigned char) *right;
+            c1 = (unsigned char)*left;
+            c2 = (unsigned char)*right;
             if (c1 == 0) {
                 if (c2 == 0) {
                     return true;
@@ -261,10 +220,10 @@ bool Utils::StrCompare(const char *left, const char *right, size_t len, bool isC
                 return false;
             } else {
                 if (isCaseSensitive) {
-                    rc = (int) (unsigned char) (c1) - (int) (unsigned char) (c2);
+                    rc = (int)(unsigned char)(c1) - (int)(unsigned char)(c2);
                 } else {
                     rc =
-                        (int) (unsigned char) tolower(c1) - (int) (unsigned char) tolower(c2);
+                        (int)(unsigned char)tolower(c1) - (int)(unsigned char)tolower(c2);
                 }
                 if (rc != 0) {
                     return false;

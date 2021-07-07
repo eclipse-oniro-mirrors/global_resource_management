@@ -16,9 +16,9 @@
 #define OHOS_RESOURCE_MANAGER_RESOURCEMANAGER_H
 
 #include "res_config.h"
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
 namespace OHOS {
 namespace Global {
@@ -36,15 +36,15 @@ public:
 
     virtual RState GetStringById(uint32_t id, std::string &outValue) = 0;
 
-    virtual RState GetStringByName(const char* name, std::string &outValue) = 0;
+    virtual RState GetStringByName(const char *name, std::string &outValue) = 0;
 
     virtual RState GetStringFormatById(std::string &outValue, uint32_t id, ...) = 0;
 
-    virtual RState GetStringFormatByName(std::string& outValue, const char* name, ...) = 0;
+    virtual RState GetStringFormatByName(std::string& outValue, const char *name, ...) = 0;
 
     virtual RState GetStringArrayById(uint32_t id, std::vector<std::string>& outValue) = 0;
 
-    virtual RState GetStringArrayByName(const char* name, std::vector<std::string>& outValue) = 0;
+    virtual RState GetStringArrayByName(const char *name, std::vector<std::string>& outValue) = 0;
 
     virtual RState GetPatternById(uint32_t id, std::map<std::string, std::string>& outValue) = 0;
 
@@ -60,11 +60,11 @@ public:
 
     virtual RState GetThemeById(uint32_t id, std::map<std::string, std::string> &outValue) = 0;
 
-    virtual RState GetThemeByName(const char* name, std::map<std::string, std::string> &outValue) = 0;
+    virtual RState GetThemeByName(const char *name, std::map<std::string, std::string> &outValue) = 0;
 
     virtual RState GetBooleanById(uint32_t id, bool& outValue) = 0;
 
-    virtual RState GetBooleanByName(const char* name, bool& outValue) = 0;
+    virtual RState GetBooleanByName(const char *name, bool& outValue) = 0;
 
     virtual RState GetIntegerById(uint32_t id, int& outValue) = 0;
 
@@ -72,11 +72,11 @@ public:
 
     virtual RState GetFloatById(uint32_t id, float& outValue) = 0;
 
-    virtual RState GetFloatByName(const char* name, float& outValue) = 0;
+    virtual RState GetFloatByName(const char *name, float& outValue) = 0;
 
     virtual RState GetIntArrayById(uint32_t id, std::vector<int>& outValue) = 0;
 
-    virtual RState GetIntArrayByName(const char* name, std::vector<int>& outValue) = 0;
+    virtual RState GetIntArrayByName(const char *name, std::vector<int>& outValue) = 0;
 
     virtual RState GetColorById(uint32_t id, uint32_t& outValue) = 0;
 
@@ -84,11 +84,11 @@ public:
 
     virtual RState GetProfileById(uint32_t id, std::string &outValue) = 0;
 
-    virtual RState GetProfileByName(const char* name, std::string &outValue) = 0;
+    virtual RState GetProfileByName(const char *name, std::string &outValue) = 0;
 
     virtual RState GetMediaById(uint32_t id, std::string &outValue) = 0;
 
-    virtual RState GetMediaByName(const char* name, std::string &outValue) = 0;
+    virtual RState GetMediaByName(const char *name, std::string &outValue) = 0;
 };
 
 ResourceManager *CreateResourceManager();

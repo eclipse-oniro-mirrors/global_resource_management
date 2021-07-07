@@ -43,6 +43,12 @@ public:
 
     void TearDown();
 
+    ResourceManagerTest() : rm(nullptr)
+    {}
+
+    ~ResourceManagerTest()
+    {}
+
 public:
     ResourceManager *rm;
 

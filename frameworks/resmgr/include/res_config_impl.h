@@ -14,12 +14,12 @@
  */
 #ifndef OHOS_RESOURCE_MANAGER_RESCONFIG_IMPL_H
 #define OHOS_RESOURCE_MANAGER_RESCONFIG_IMPL_H
-
-#include "locale_info_impl.h"
 #include <stdint.h>
+#include "locale_info.h"
+#include "res_locale.h"
 #include "res_common.h"
 #include "res_config.h"
-
+using OHOS::I18N::LocaleInfo;
 namespace OHOS {
 namespace Global {
 namespace Resource {
@@ -31,6 +31,8 @@ public:
 
     RState SetLocaleInfo(const char *language, const char *script, const char *region);
 
+    RState SetLocaleInfo(LocaleInfo& localeInfo);
+
     void SetDeviceType(DeviceType deviceType);
 
     void SetDirection(Direction direction);
@@ -39,7 +41,7 @@ public:
 
     const LocaleInfo *GetLocaleInfo() const;
 
-    const LocaleInfoImpl *GetLocaleInfoImpl() const;
+    const ResLocale *GetResLocale() const;
 
     Direction GetDirection() const;
 
@@ -59,13 +61,15 @@ public:
 
 private:
     bool IsMoreSpecificThan(const ResConfigImpl *other) const;
+    bool CopyLocale(ResConfig &other);
 
 private:
-    LocaleInfoImpl *localeInfo_;
+    ResLocale *resLocale_;
     Direction direction_;
     ScreenDensity screenDensity_;
     DeviceType deviceType_;
     bool isCompletedScript_;
+    LocaleInfo *localeInfo_;
 };
 } // namespace Resource
 } // namespace Global

@@ -13,19 +13,27 @@
  * limitations under the License.
  */
 #include "res_config_impl.h"
-#include "locale_info_impl.h"
+
+#include "locale_info.h"
 #include "locale_matcher.h"
+#include "res_locale.h"
 #include "utils/utils.h"
+
 namespace OHOS {
 namespace Global {
 namespace Resource {
 ResConfigImpl::ResConfigImpl()
-    : localeInfo_(nullptr),
+    : resLocale_(nullptr),
       direction_(DIRECTION_NOT_SET),
       screenDensity_(SCREEN_DENSITY_NOT_SET),
       deviceType_(DEVICE_NOT_SET),
-      isCompletedScript_(false)
+      isCompletedScript_(false), localeInfo_(nullptr)
 {}
+
+RState ResConfigImpl::SetLocaleInfo(LocaleInfo& localeInfo)
+{
+    return this->SetLocaleInfo(localeInfo.GetLanguage(), localeInfo.GetScript(), localeInfo.GetRegion());
+}
 
 RState ResConfigImpl::SetLocaleInfo(const char *language,
     const char *script,
@@ -33,25 +41,35 @@ RState ResConfigImpl::SetLocaleInfo(const char *language,
 {
     RState state = SUCCESS;
     if (Utils::IsStrEmpty(language)) {
+        delete this->resLocale_;
         delete this->localeInfo_;
+        this->resLocale_ = nullptr;
         this->localeInfo_ = nullptr;
         return state;
     }
-    LocaleInfoImpl *localeInfo =
-        LocaleInfoImpl::BuildFromParts(language, script, region, state);
+    ResLocale *resLocale =
+        ResLocale::BuildFromParts(language, script, region, state);
     if (state == SUCCESS) {
-        delete localeInfo_;
-        localeInfo_ = localeInfo;
         this->isCompletedScript_ = false;
         if (script == nullptr || script[0] == '\0') {
-            if (LocaleMatcher::Normalize(localeInfo_)) {
+            if (LocaleMatcher::Normalize(resLocale)) {
                 this->isCompletedScript_ = true;
             } else {
-                delete localeInfo_;
-                localeInfo_ = nullptr;
+                delete resLocale;
                 return NOT_ENOUGH_MEM;
             }
         }
+        LocaleInfo *tempLocale = new(std::nothrow) LocaleInfo(resLocale->GetLanguage(),
+            resLocale->GetScript(), resLocale->GetRegion());
+        if (tempLocale == nullptr) {
+            state = NOT_ENOUGH_MEM;
+            delete resLocale;
+            return state;
+        }
+        delete resLocale_;
+        delete localeInfo_;
+        resLocale_ = resLocale;
+        localeInfo_ = tempLocale;
     }
 
     return state;
@@ -74,12 +92,12 @@ void ResConfigImpl::SetScreenDensity(ScreenDensity screenDensity)
 
 const LocaleInfo *ResConfigImpl::GetLocaleInfo() const
 {
-    return this->localeInfo_;
+    return localeInfo_;
 }
 
-const LocaleInfoImpl *ResConfigImpl::GetLocaleInfoImpl() const
+const ResLocale *ResConfigImpl::GetResLocale() const
 {
-    return this->localeInfo_;
+    return this->resLocale_;
 }
 
 Direction ResConfigImpl::GetDirection() const
@@ -96,35 +114,58 @@ DeviceType ResConfigImpl::GetDeviceType() const
 {
     return this->deviceType_;
 }
-
-bool ResConfigImpl::Copy(ResConfig &other)
+bool ResConfigImpl::CopyLocale(ResConfig &other)
 {
+    bool needCopy = false;
     if (this->GetLocaleInfo() == nullptr && other.GetLocaleInfo() != nullptr) {
-        LocaleInfoImpl* temp = new(std::nothrow) LocaleInfoImpl;
-        if (temp == nullptr) {
-            return false;
-        }
-        RState rs = temp->Copy(other.GetLocaleInfo());
-        if (rs != SUCCESS) {
-            delete temp;
-            return false;
-        }
-        this->localeInfo_ = temp;
+        needCopy = true;
     }
     if (this->GetLocaleInfo() != nullptr && other.GetLocaleInfo() == nullptr) {
+        delete this->resLocale_;
         delete this->localeInfo_;
+        this->resLocale_ = nullptr;
         this->localeInfo_ = nullptr;
+        return true;
     }
-    if (this->GetLocaleInfo() != nullptr && other.GetLocaleInfo() != nullptr) {
+    if (this->GetResLocale() != nullptr && other.GetLocaleInfo() != nullptr) {
         uint64_t encodedLocale = Utils::EncodeLocale(
-            this->GetLocaleInfo()->GetLanguage(),
-            this->GetLocaleInfo()->GetScript(), this->GetLocaleInfo()->GetRegion());
+            this->GetResLocale()->GetLanguage(),
+            this->GetResLocale()->GetScript(), this->GetResLocale()->GetRegion());
         uint64_t otherEncodedLocale = Utils::EncodeLocale(
             other.GetLocaleInfo()->GetLanguage(),
             other.GetLocaleInfo()->GetScript(), other.GetLocaleInfo()->GetRegion());
         if (encodedLocale != otherEncodedLocale) {
-            this->localeInfo_->Copy(other.GetLocaleInfo());
+            needCopy = true;
         }
+    }
+    if (needCopy) {
+        ResLocale *temp = new(std::nothrow) ResLocale;
+        if (temp == nullptr) {
+            return false;
+        }
+        RState rs = temp->CopyFromLocaleInfo(other.GetLocaleInfo());
+        if (rs != SUCCESS) {
+            delete temp;
+            return false;
+        }
+        LocaleInfo *tempLocale = new(std::nothrow) LocaleInfo(*other.GetLocaleInfo());
+        if (tempLocale == nullptr) {
+            delete tempLocale;
+            delete temp;
+            return false;
+        }
+        delete this->resLocale_;
+        delete this->localeInfo_;
+        this->resLocale_ = temp;
+        this->localeInfo_ = tempLocale;
+    }
+    return true;
+}
+bool ResConfigImpl::Copy(ResConfig &other)
+{
+    bool isSuccess = this->CopyLocale(other);
+    if (!isSuccess) {
+        return false;
     }
     if (this->GetDeviceType() != other.GetDeviceType()) {
         this->SetDeviceType(other.GetDeviceType());
@@ -140,7 +181,7 @@ bool ResConfigImpl::Copy(ResConfig &other)
 
 bool ResConfigImpl::Match(const ResConfigImpl *other) const
 {
-    if (LocaleMatcher::Match(this->localeInfo_, other->GetLocaleInfoImpl()) ==
+    if (LocaleMatcher::Match(this->resLocale_, other->GetResLocale()) ==
         false) {
         return false;
     }
@@ -171,8 +212,8 @@ bool ResConfigImpl::IsMoreSuitable(const ResConfigImpl *other,
 {
     if (request != nullptr) {
         int8_t result =
-            LocaleMatcher::IsMoreSuitable(this->GetLocaleInfoImpl(), other->GetLocaleInfoImpl(),
-                                          request->GetLocaleInfoImpl());
+            LocaleMatcher::IsMoreSuitable(this->GetResLocale(), other->GetResLocale(),
+                                          request->GetResLocale());
         if (result > 0) {
             return true;
         }
@@ -207,13 +248,13 @@ bool ResConfigImpl::IsMoreSuitable(const ResConfigImpl *other,
             }
             return (thisDistance >= otherDistance);
         }
-        return true;
     }
     return this->IsMoreSpecificThan(other);
 }
 
 ResConfigImpl::~ResConfigImpl()
 {
+    delete resLocale_;
     delete localeInfo_;
 }
 
@@ -222,7 +263,7 @@ void ResConfigImpl::CompleteScript()
     if (isCompletedScript_) {
         return;
     }
-    if (LocaleMatcher::Normalize(this->localeInfo_)) {
+    if (LocaleMatcher::Normalize(this->resLocale_)) {
         isCompletedScript_ = true;
     }
 }
@@ -238,8 +279,8 @@ bool ResConfigImpl::IsMoreSpecificThan(const ResConfigImpl *other) const
         return true;
     }
     int8_t result = LocaleMatcher::IsMoreSpecificThan(
-        this->GetLocaleInfoImpl(),
-        (other == nullptr) ? nullptr : other->GetLocaleInfoImpl());
+        this->GetResLocale(),
+        (other == nullptr) ? nullptr : other->GetResLocale());
     if (result > 0) {
         return true;
     }
@@ -260,7 +301,7 @@ bool ResConfigImpl::IsMoreSpecificThan(const ResConfigImpl *other) const
 
 ResConfig *CreateResConfig()
 {
-    ResConfigImpl* temp = new(std::nothrow) ResConfigImpl;
+    ResConfigImpl *temp = new(std::nothrow) ResConfigImpl;
     return temp;
 }
 } // namespace Resource

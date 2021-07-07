@@ -30,7 +30,7 @@ bool Lock::lock()
 
 bool Lock::unlock()
 {
-    return false;
+    return true;
 }
 } // namespace Resource
 } // namespace Global

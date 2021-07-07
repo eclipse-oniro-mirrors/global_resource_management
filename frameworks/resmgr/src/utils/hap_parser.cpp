@@ -51,7 +51,7 @@ int32_t HapParser::ReadFileFromZip(const char *zipFile, const char *fileName, vo
     unz_file_info fileInfo;          // for unzGetCurrentFileInfo
 
     unzFile uf = unzOpen64(zipFile); // open zipfile stream
-    if (uf == NULL) {
+    if (uf == nullptr) {
         errInfo = FormatString("Cannot open %s", zipFile);
         return UNKNOWN_ERROR;
     } // file is open
@@ -63,21 +63,21 @@ int32_t HapParser::ReadFileFromZip(const char *zipFile, const char *fileName, vo
         return UNKNOWN_ERROR;
     } // file inside zip found
 
-    if (unzGetCurrentFileInfo(uf, &fileInfo, filenameInzip, sizeof(filenameInzip), NULL, 0, NULL, 0)) {
+    if (unzGetCurrentFileInfo(uf, &fileInfo, filenameInzip, sizeof(filenameInzip), nullptr, 0, nullptr, 0)) {
         unzClose(uf);
         errInfo = FormatString("Error %d with zipfile %s in unzGetCurrentFileInfo.", err, zipFile);
         return UNKNOWN_ERROR;
     } // obtained the necessary details about file inside zip
 
-    *buffer = (void *) malloc(fileInfo.uncompressed_size); // setup buffer
+    *buffer = (void *)malloc(fileInfo.uncompressed_size); // setup buffer
     bufLen = fileInfo.uncompressed_size;
-    if ((*buffer) == NULL) {
+    if ((*buffer) == nullptr) {
         unzClose(uf);
         errInfo = FormatString("Error allocating memory for read buffer");
         return UNKNOWN_ERROR;
     } // buffer ready
 
-    err = unzOpenCurrentFilePassword(uf, NULL); // Open the file inside the zip (password = NULL)
+    err = unzOpenCurrentFilePassword(uf, nullptr); // Open the file inside the zip (password = NULL)
     if (err != UNZ_OK) {
         errInfo = FormatString("Error %d with zipfile %s in unzOpenCurrentFilePassword.", err, zipFile);
         free(*buffer);
@@ -137,7 +137,7 @@ int32_t HapParser::ReadIndexFromFile(const char *zipFile, void **buffer,
     }
 
     // parse config.json
-    std::string mName = GetModuleName((char *) tmpBuf);
+    std::string mName = GetModuleName((char *)tmpBuf);
     if (mName.size() == 0) {
         errInfo = "parse moduleName from config.json error";
         free(tmpBuf);
@@ -167,7 +167,7 @@ int32_t ParseString(const char *buffer, uint32_t &offset, std::string &id, bool 
         return SYS_ERROR;
     }
     offset += 2;
-    std::string tmp = std::string((char *) buffer + offset, includeTemi ? (strLen - 1) : strLen);
+    std::string tmp = std::string((char *)buffer + offset, includeTemi ? (strLen - 1) : strLen);
     offset += includeTemi ? strLen : (strLen + 1);
     id = tmp;
     return OK;
@@ -294,7 +294,7 @@ bool IsLocaleMatch(const ResConfigImpl *defaultConfig, const std::vector<KeyPara
         if (config == nullptr) {
             return SYS_ERROR;
         }
-        if (!LocaleMatcher::Match(defaultConfig->GetLocaleInfoImpl(), config->GetLocaleInfoImpl())) {
+        if (!LocaleMatcher::Match(defaultConfig->GetResLocale(), config->GetResLocale())) {
             HILOG_DEBUG("mismatch, do not parse %s", HapParser::ToFolderPath(keyParams).c_str());
             delete (config);
             return false;

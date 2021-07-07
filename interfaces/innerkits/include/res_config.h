@@ -15,15 +15,19 @@
 #ifndef OHOS_RESOURCE_MANAGER_RESCONFIG_H
 #define OHOS_RESOURCE_MANAGER_RESCONFIG_H
 
+#include <vector>
 #include "locale_info.h"
 #include "res_common.h"
-
+#include "rstate.h"
+using OHOS::I18N::LocaleInfo;
 namespace OHOS {
 namespace Global {
 namespace Resource {
 class ResConfig {
 public:
     virtual RState SetLocaleInfo(const char *language, const char *script, const char *region) = 0;
+
+    virtual RState SetLocaleInfo(LocaleInfo& localeInfo) = 0;
 
     virtual void SetDeviceType(DeviceType deviceType) = 0;
 
@@ -44,6 +48,16 @@ public:
     virtual ~ResConfig() {}
 };
 ResConfig *CreateResConfig();
+
+const LocaleInfo* GetSysDefault();
+
+void UpdateSysDefault(const LocaleInfo& localeInfo, bool needNotify);
+
+LocaleInfo* BuildFromString(const char *str, char sep, RState& rState);
+
+LocaleInfo* BuildFromParts(const char *language, const char *script, const char *region, RState& rState);
+
+void FindAndSort(std::string localeStr, std::vector<std::string>& candidateLocale, std::vector<std::string>& outValue);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

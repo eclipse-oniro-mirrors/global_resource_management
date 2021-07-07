@@ -14,18 +14,18 @@
  */
 #ifndef OHOS_RESOURCE_MANAGER_LOCALEMATCHER_H
 #define OHOS_RESOURCE_MANAGER_LOCALEMATCHER_H
-#include "locale_info_impl.h"
+#include "res_locale.h"
 
 namespace OHOS {
 namespace Global {
 namespace Resource {
 class LocaleMatcher {
 public:
-    static int8_t IsMoreSuitable(const LocaleInfoImpl *current,
-        const LocaleInfoImpl *other,
-        const LocaleInfoImpl *request);
+    static int8_t IsMoreSuitable(const ResLocale *current,
+        const ResLocale *other,
+        const ResLocale *request);
 
-    static bool Match(const LocaleInfoImpl *current, const LocaleInfoImpl *other);
+    static bool Match(const ResLocale *current, const ResLocale *other);
 
     static bool IsLanguageTag(const char *str, int32_t len);
 
@@ -33,9 +33,9 @@ public:
 
     static bool IsRegionTag(const char *str, int32_t len);
 
-    static bool Normalize(LocaleInfoImpl *localeInfo);
+    static bool Normalize(ResLocale *resLocale);
 
-    static int8_t IsMoreSpecificThan(const LocaleInfoImpl *current, const LocaleInfoImpl *target);
+    static int8_t IsMoreSpecificThan(const ResLocale *current, const ResLocale *target);
 
 public:
     static uint64_t EN_US_ENCODE;

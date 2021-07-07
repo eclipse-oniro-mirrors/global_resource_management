@@ -57,7 +57,7 @@ void LocaleInfoTest::TearDown()
 
 /*
  * @tc.name: LocaleInfoFindAndSortTest001
- * @tc.desc: Test AddResource
+ * @tc.desc: Test FindAndSort
  * @tc.type: FUNC
  */
 HWTEST_F(LocaleInfoTest, LocaleInfoFindAndSortTest001, TestSize.Level1)
@@ -78,6 +78,11 @@ HWTEST_F(LocaleInfoTest, LocaleInfoFindAndSortTest001, TestSize.Level1)
     EXPECT_TRUE(outValue.at(4) == "en-GB");
 }
 
+/*
+ * @tc.name: LocaleInfoFindAndSortTest002
+ * @tc.desc: Test FindAndSort
+ * @tc.type: FUNC
+ */
 HWTEST_F(LocaleInfoTest, LocaleInfoFindAndSortTest002, TestSize.Level1)
 {
     std::vector<std::string> request;
@@ -94,6 +99,11 @@ HWTEST_F(LocaleInfoTest, LocaleInfoFindAndSortTest002, TestSize.Level1)
     EXPECT_TRUE(outValue.at(2) == "");
 }
 
+/*
+ * @tc.name: LocaleInfoFindAndSortTest003
+ * @tc.desc: Test FindAndSort
+ * @tc.type: FUNC
+ */
 HWTEST_F(LocaleInfoTest, LocaleInfoFindAndSortTest003, TestSize.Level1)
 {
     std::vector<std::string> request;
@@ -110,6 +120,11 @@ HWTEST_F(LocaleInfoTest, LocaleInfoFindAndSortTest003, TestSize.Level1)
     EXPECT_TRUE(outValue.at(3) == "en-GB");
 }
 
+/*
+ * @tc.name: LocaleInfoFindAndSortTest004
+ * @tc.desc: Test FindAndSort
+ * @tc.type: FUNC
+ */
 HWTEST_F(LocaleInfoTest, LocaleInfoFindAndSortTest004, TestSize.Level1)
 {
     std::vector<std::string> request;
@@ -126,6 +141,11 @@ HWTEST_F(LocaleInfoTest, LocaleInfoFindAndSortTest004, TestSize.Level1)
     EXPECT_TRUE(outValue.at(3) == "");
 }
 
+/*
+ * @tc.name: LocaleInfoFindAndSortTest005
+ * @tc.desc: Test FindAndSort
+ * @tc.type: FUNC
+ */
 HWTEST_F(LocaleInfoTest, LocaleInfoFindAndSortTest005, TestSize.Level1)
 {
     std::vector<std::string> request;
@@ -144,6 +164,11 @@ HWTEST_F(LocaleInfoTest, LocaleInfoFindAndSortTest005, TestSize.Level1)
     EXPECT_TRUE(outValue.at(4) == "");
 }
 
+/*
+ * @tc.name: LocaleInfoGetSysDefaultTest001
+ * @tc.desc: Test GetSysDefault
+ * @tc.type: FUNC
+ */
 HWTEST_F(LocaleInfoTest, LocaleInfoGetSysDefaultTest001, TestSize.Level1)
 {
     RState state = SUCCESS;
@@ -165,6 +190,11 @@ HWTEST_F(LocaleInfoTest, LocaleInfoGetSysDefaultTest001, TestSize.Level1)
     localeInfo = nullptr;
 }
 
+/*
+ * @tc.name: LocaleInfoUpdateSysDefaultTest001
+ * @tc.desc: Test UpdateSysDefault
+ * @tc.type: FUNC
+ */
 HWTEST_F(LocaleInfoTest, LocaleInfoUpdateSysDefaultTest001, TestSize.Level1)
 {
     RState state = SUCCESS;
@@ -213,6 +243,11 @@ HWTEST_F(LocaleInfoTest, LocaleInfoUpdateSysDefaultTest001, TestSize.Level1)
     localeInfo = nullptr;
 }
 
+/*
+ * @tc.name: LocaleInfoGetLanguageTest001
+ * @tc.desc: Test LocaleInfo GetLanguage
+ * @tc.type: FUNC
+ */
 HWTEST_F(LocaleInfoTest, LocaleInfoGetLanguageTest001, TestSize.Level1)
 {
     RState state = SUCCESS;
@@ -226,6 +261,11 @@ HWTEST_F(LocaleInfoTest, LocaleInfoGetLanguageTest001, TestSize.Level1)
     localeInfo = nullptr;
 }
 
+/*
+ * @tc.name: LocaleInfoGetRegionTest001
+ * @tc.desc: Test LocaleInfo GetRegion
+ * @tc.type: FUNC
+ */
 HWTEST_F(LocaleInfoTest, LocaleInfoGetRegionTest001, TestSize.Level1)
 {
     RState state = SUCCESS;
@@ -239,6 +279,11 @@ HWTEST_F(LocaleInfoTest, LocaleInfoGetRegionTest001, TestSize.Level1)
     localeInfo = nullptr;
 }
 
+/*
+ * @tc.name: LocaleInfoGetScriptTest001
+ * @tc.desc: Test LocaleInfo GetScript
+ * @tc.type: FUNC
+ */
 HWTEST_F(LocaleInfoTest, LocaleInfoGetScriptTest001, TestSize.Level1)
 {
     RState state = SUCCESS;
@@ -252,7 +297,12 @@ HWTEST_F(LocaleInfoTest, LocaleInfoGetScriptTest001, TestSize.Level1)
     localeInfo = nullptr;
 }
 
-HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromParsTest001, TestSize.Level1)
+/*
+ * @tc.name: LocaleInfoBuildFromPartsTest001
+ * @tc.desc: Test BuildFromParts
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromPartsTest001, TestSize.Level1)
 {
     RState state = SUCCESS;
     LocaleInfo* localeInfo = BuildFromParts("zh", "Hant", "CN", state);
@@ -268,7 +318,12 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromParsTest001, TestSize.Level1)
     localeInfo = nullptr;
 }
 
-HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromParsTest002, TestSize.Level1)
+/*
+ * @tc.name: LocaleInfoBuildFromPartsTest002
+ * @tc.desc: Test BuildFromParts
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromPartsTest002, TestSize.Level1)
 {
     RState state = SUCCESS;
     LocaleInfo* localeInfo = BuildFromParts("zh1", "Hant", "CN", state);
@@ -278,7 +333,12 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromParsTest002, TestSize.Level1)
     localeInfo = nullptr;
 }
 
-HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromParsTest003, TestSize.Level1)
+/*
+ * @tc.name: LocaleInfoBuildFromPartsTest003
+ * @tc.desc: Test BuildFromParts
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromPartsTest003, TestSize.Level1)
 {
     RState state = SUCCESS;
     LocaleInfo* localeInfo = BuildFromParts("zh", "Hants", "CN", state);
@@ -288,7 +348,12 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromParsTest003, TestSize.Level1)
     localeInfo = nullptr;
 }
 
-HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromParsTest004, TestSize.Level1)
+/*
+ * @tc.name: LocaleInfoBuildFromPartsTest004
+ * @tc.desc: Test BuildFromParts
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromPartsTest004, TestSize.Level1)
 {
     RState state = SUCCESS;
     LocaleInfo* localeInfo = BuildFromParts("zh", "Hant", "C", state);
@@ -298,7 +363,12 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromParsTest004, TestSize.Level1)
     localeInfo = nullptr;
 }
 
-HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromParsTest005, TestSize.Level1)
+/*
+ * @tc.name: LocaleInfoBuildFromPartsTest005
+ * @tc.desc: Test BuildFromParts
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromPartsTest005, TestSize.Level1)
 {
     RState state = SUCCESS;
     LocaleInfo* localeInfo = BuildFromParts(nullptr, "Hants", "CN", state);
@@ -308,7 +378,12 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromParsTest005, TestSize.Level1)
     localeInfo = nullptr;
 }
 
-HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromParsTest006, TestSize.Level1)
+/*
+ * @tc.name: LocaleInfoBuildFromPartsTest006
+ * @tc.desc: Test BuildFromParts
+ * @tc.type: FUNC
+ */
+HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromPartsTest006, TestSize.Level1)
 {
     RState state = SUCCESS;
     LocaleInfo* localeInfo = BuildFromParts("zh", nullptr, nullptr, state);
@@ -324,6 +399,11 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromParsTest006, TestSize.Level1)
     localeInfo = nullptr;
 }
 
+/*
+ * @tc.name: LocaleInfoBuildFromStringTest001
+ * @tc.desc: Test BuildFromString
+ * @tc.type: FUNC
+ */
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest001, TestSize.Level1)
 {
     RState state = SUCCESS;
@@ -340,6 +420,11 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest001, TestSize.Level1)
     localeInfo = nullptr;
 }
 
+/*
+ * @tc.name: LocaleInfoBuildFromStringTest002
+ * @tc.desc: Test BuildFromString
+ * @tc.type: FUNC
+ */
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest002, TestSize.Level1)
 {
     RState state = SUCCESS;
@@ -350,6 +435,11 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest002, TestSize.Level1)
     localeInfo = nullptr;
 }
 
+/*
+ * @tc.name: LocaleInfoBuildFromStringTest003
+ * @tc.desc: Test BuildFromString
+ * @tc.type: FUNC
+ */
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest003, TestSize.Level1)
 {
     RState state = SUCCESS;
@@ -360,6 +450,11 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest003, TestSize.Level1)
     localeInfo = nullptr;
 }
 
+/*
+ * @tc.name: LocaleInfoBuildFromStringTest004
+ * @tc.desc: Test BuildFromString
+ * @tc.type: FUNC
+ */
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest004, TestSize.Level1)
 {
     RState state = SUCCESS;
@@ -376,22 +471,32 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest004, TestSize.Level1)
     localeInfo = nullptr;
 }
 
+/*
+ * @tc.name: LocaleInfoBuildFromStringTest005
+ * @tc.desc: Test BuildFromString
+ * @tc.type: FUNC
+ */
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest005, TestSize.Level1)
 {
     RState state = SUCCESS;
-    LocaleInfo* localeInfo = BuildFromString("en_Latn_US", '_', state);
+    LocaleInfo* localeInfo = BuildFromString("en_US", '_', state);
     if (localeInfo == nullptr) {
         EXPECT_TRUE(false);
         return;
     }
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_TRUE(std::strcmp("en", localeInfo->GetLanguage()) == 0);
-    EXPECT_TRUE(std::strcmp("Latn", localeInfo->GetScript()) == 0);
+    EXPECT_TRUE(localeInfo->GetScript() == nullptr);
     EXPECT_TRUE(std::strcmp("US", localeInfo->GetRegion()) == 0);
     delete localeInfo;
     localeInfo = nullptr;
 }
 
+/*
+ * @tc.name: LocaleInfoBuildFromStringTest006
+ * @tc.desc: Test BuildFromString
+ * @tc.type: FUNC
+ */
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest006, TestSize.Level1)
 {
     RState state = SUCCESS;
@@ -402,6 +507,11 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest006, TestSize.Level1)
     localeInfo = nullptr;
 }
 
+/*
+ * @tc.name: LocaleInfoBuildFromStringTest007
+ * @tc.desc: Test BuildFromString
+ * @tc.type: FUNC
+ */
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest007, TestSize.Level1)
 {
     RState state = SUCCESS;
@@ -418,6 +528,11 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest007, TestSize.Level1)
     localeInfo = nullptr;
 }
 
+/*
+ * @tc.name: LocaleInfoBuildFromStringTest008
+ * @tc.desc: Test BuildFromString
+ * @tc.type: FUNC
+ */
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest008, TestSize.Level1)
 {
     RState state = SUCCESS;
@@ -428,6 +543,11 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest008, TestSize.Level1)
     localeInfo = nullptr;
 }
 
+/*
+ * @tc.name: LocaleInfoBuildFromStringTest009
+ * @tc.desc: Test BuildFromString
+ * @tc.type: FUNC
+ */
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest009, TestSize.Level1)
 {
     RState state = SUCCESS;
@@ -438,6 +558,11 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest009, TestSize.Level1)
     localeInfo = nullptr;
 }
 
+/*
+ * @tc.name: LocaleInfoBuildFromStringTest0010
+ * @tc.desc: Test BuildFromString
+ * @tc.type: FUNC
+ */
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest0010, TestSize.Level1)
 {
     RState state = SUCCESS;
@@ -454,6 +579,11 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest0010, TestSize.Level1)
     localeInfo = nullptr;
 }
 
+/*
+ * @tc.name: LocaleInfoPerformanceFuncTest001
+ * @tc.desc: Test FindAndSort Performance
+ * @tc.type: FUNC
+ */
 HWTEST_F(LocaleInfoTest, LocaleInfoPerformanceFuncTest001, TestSize.Level1)
 {
     unsigned long long total = 0;
@@ -474,6 +604,6 @@ HWTEST_F(LocaleInfoTest, LocaleInfoPerformanceFuncTest001, TestSize.Level1)
         total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
     }
     average = total / 1000.0;
-    HILOG_INFO("avg cost: %f us", average);
+    HILOG_DEBUG("avg cost FindAndSort: %f us", average);
     EXPECT_LT(average, 500);
 };

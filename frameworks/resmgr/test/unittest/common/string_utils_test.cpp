@@ -12,21 +12,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "res_config_test.h"
+
+#include "string_utils_test.h"
 
 #include <climits>
-#include <cstring>
 #include <gtest/gtest.h>
+#include <types.h>
 
-#include "hap_resource.h"
-#include "res_config.h"
-#include "resource_manager_impl.h"
 #include "test_common.h"
+#include "utils/string_utils.h"
 
 using namespace OHOS::Global::Resource;
 using namespace testing::ext;
+using namespace OHOS::I18N;
 
-class ResConfigTest : public testing::Test {
+class StringUtilsTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
 
@@ -37,41 +37,37 @@ public:
     void TearDown();
 };
 
-void ResConfigTest::SetUpTestCase(void)
+void StringUtilsTest::SetUpTestCase(void)
 {
     // step 1: input testsuit setup step
     g_logLevel = LOG_DEBUG;
 }
 
-void ResConfigTest::TearDownTestCase(void)
+void StringUtilsTest::TearDownTestCase(void)
 {
     // step 2: input testsuit teardown step
 }
 
-void ResConfigTest::SetUp()
+void StringUtilsTest::SetUp()
 {
+    // step 3: input testcase setup step
 }
 
-void ResConfigTest::TearDown()
+void StringUtilsTest::TearDown()
 {
+    // step 4: input testcase teardown step
 }
 
 /*
- * @tc.name: ResConfigFuncTest001
- * @tc.desc: Test Config function, non file case.
+ * @tc.name: StringUtilsFuncTest001
+ * @tc.desc: Test FormatString, none file case.
  * @tc.type: FUNC
  */
-HWTEST_F(ResConfigTest, ResConfigFuncTest001, TestSize.Level1)
+HWTEST_F(StringUtilsTest, StringUtilsFuncTest001, TestSize.Level1)
 {
-    ResConfigImpl *rc = new ResConfigImpl;
-    rc->SetLocaleInfo("en", nullptr, "AU");
-    ResConfigImpl *current = new ResConfigImpl;
-    current->SetLocaleInfo("en", nullptr, "GB");
-    ResConfigImpl *target = new ResConfigImpl;
-    target->SetLocaleInfo("zh", nullptr, "CN");
-    EXPECT_TRUE(rc->Match(current));
-    EXPECT_TRUE(rc->Match(target) == false);
-    delete target;
-    delete current;
-    delete rc;
-};
+    std::string result = FormatString("%d", 10001);
+    EXPECT_EQ("10001", result);
+
+    result = FormatString("I'm %s, I'm %d", "cici", 5);
+    EXPECT_EQ("I'm cici, I'm 5", result);
+}

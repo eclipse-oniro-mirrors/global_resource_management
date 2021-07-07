@@ -20,7 +20,8 @@
 #include "res_desc.h"
 #include "lock.h"
 
-#include <unicode/plurrule.h>
+#include <locale_info.h>
+#include <plural_format.h>
 #include <vector>
 
 namespace OHOS {
@@ -36,7 +37,7 @@ public:
 
     void GetResConfig(ResConfig& resConfig);
 
-    bool AddResource(const char* path);
+    bool AddResource(const char *path);
 
     const IdItem *FindResourceById(uint32_t id);
 
@@ -55,16 +56,12 @@ private:
 
     const HapResource::IdValues *GetResourceList(uint32_t ident) const;
 
-    const HapResource::IdValues *GetResourceListByName(const char* name, const ResType resType) const;
+    const HapResource::IdValues *GetResourceListByName(const char *name, const ResType resType) const;
 
-    bool AddResourcePath(const char* path);
+    bool AddResourcePath(const char *path);
 
     // when resConfig_ updated we must call ReloadAll()
     RState ReloadAll();
-
-    static bool Init();
-
-    static bool icuInitialized;
 
     // app res config
     ResConfigImpl *resConfig_;
@@ -76,7 +73,7 @@ private:
     std::vector<std::string> loadedHapPaths_;
 
     // key is language
-    std::vector<std::pair<std::string, icu::PluralRules *>> plurRulesCache_;
+    std::vector<std::pair<std::string, OHOS::I18N::PluralFormat *>> plurRulesCache_;
 
     Lock lock_;
 };

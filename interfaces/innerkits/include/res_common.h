@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_GLOBAL_H
-#define OHOS_GLOBAL_H
+#ifndef OHOS_RES_COMMON_H
+#define OHOS_RES_COMMON_H
 
 #include <stdint.h>
 
@@ -118,4 +118,4 @@ enum Direction {
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
-#endif // OHOS_GLOBAL_H
+#endif // OHOS_RES_COMMON_H

@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef RESOURCE_MANAGER_RES_CONFIG_TEST_H
-#define RESOURCE_MANAGER_RES_CONFIG_TEST_H
+#ifndef RESOURCE_MANAGER_STRING_UTILS_TEST_H
+#define RESOURCE_MANAGER_STRING_UTILS_TEST_H
 
-int ResConfigFuncTest001();
+int StringUtilsFuncTest001();
 
 #endif

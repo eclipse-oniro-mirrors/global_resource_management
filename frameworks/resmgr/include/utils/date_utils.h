@@ -33,7 +33,7 @@ namespace Resource {
 inline long CurrentTimeMillis()
 {
     struct timeval time;
-    gettimeofday(&time, NULL);
+    gettimeofday(&time, nullptr);
     return (time.tv_sec * KILO + time.tv_usec / KILO);
 }
 
@@ -46,7 +46,7 @@ inline long CurrentTimeMillis()
 inline long CurrentTimeUsec()
 {
     struct timeval time;
-    gettimeofday(&time, NULL);
+    gettimeofday(&time, nullptr);
     return (time.tv_sec * MILLION + time.tv_usec);
 }
 } // namespace Resource
