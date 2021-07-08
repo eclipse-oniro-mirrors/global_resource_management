@@ -17,14 +17,12 @@
 
 #include <climits>
 #include <gtest/gtest.h>
-#include <types.h>
 
 #include "test_common.h"
 #include "utils/string_utils.h"
 
 using namespace OHOS::Global::Resource;
 using namespace testing::ext;
-using namespace OHOS::I18N;
 
 class StringUtilsTest : public testing::Test {
 public:

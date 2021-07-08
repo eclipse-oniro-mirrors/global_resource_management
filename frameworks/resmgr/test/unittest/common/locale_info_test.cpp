@@ -20,7 +20,6 @@
 #include <gtest/gtest.h>
 
 #include "hilog_wrapper.h"
-#include "locale_info.h"
 #include "test_common.h"
 
 using namespace OHOS::Global::Resource;
