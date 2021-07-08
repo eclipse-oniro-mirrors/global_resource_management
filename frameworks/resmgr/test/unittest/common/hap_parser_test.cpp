@@ -94,9 +94,9 @@ HWTEST_F(HapParserTest, HapParserFuncTest001, TestSize.Level1)
     keyParams.push_back(kp);
     auto config = HapParser::CreateResConfigFromKeyParams(keyParams);
     if (config != nullptr) {
-        EXPECT_EQ(std::string("zh"), config->GetLocaleInfo()->GetLanguage());
-        EXPECT_EQ(std::string("CN"), config->GetLocaleInfo()->GetRegion());
-        EXPECT_EQ(std::string("Hans"), config->GetLocaleInfo()->GetScript());
+        EXPECT_EQ(std::string("zh"), config->GetLocaleInfo()->getLanguage());
+        EXPECT_EQ(std::string("CN"), config->GetLocaleInfo()->getCountry());
+        EXPECT_EQ(std::string("Hans"), config->GetLocaleInfo()->getScript());
         EXPECT_EQ(DEVICE_CAR, config->GetDeviceType());
         EXPECT_EQ(DIRECTION_VERTICAL, config->GetDirection());
         EXPECT_EQ(SCREEN_DENSITY_SDPI, config->GetScreenDensity());

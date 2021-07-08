@@ -19,7 +19,7 @@
 #include <cstdint>
 #include <cstring>
 #include <new>
-
+#include <unicode/localebuilder.h>
 #include "auto_mutex.h"
 #include "hilog_wrapper.h"
 #include "locale_matcher.h"
@@ -31,7 +31,7 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
-LocaleInfo *ResLocale::defaultLocale_ = nullptr;
+Locale *ResLocale::defaultLocale_ = nullptr;
 Lock ResLocale::lock_ = Lock();
 
 ResLocale::ResLocale() : language_(nullptr), region_(nullptr), script_(nullptr)
@@ -126,10 +126,10 @@ RState ResLocale::Init(const char *language, size_t languageLen, const char *scr
     return SUCCESS;
 }
 
-RState ResLocale::CopyFromLocaleInfo(const LocaleInfo *other)
+RState ResLocale::CopyFromLocaleInfo(const Locale *other)
 {
-    return this->Init(other->GetLanguage(), Utils::StrLen(other->GetLanguage()), other->GetScript(),
-        Utils::StrLen(other->GetScript()), other->GetRegion(), Utils::StrLen(other->GetRegion()));
+    return this->Init(other->getLanguage(), Utils::StrLen(other->getLanguage()), other->getScript(),
+        Utils::StrLen(other->getScript()), other->getCountry(), Utils::StrLen(other->getCountry()));
 }
 
 RState ResLocale::Copy(const ResLocale *other)
@@ -319,22 +319,22 @@ ResLocale *ResLocale::BuildFromParts(const char *language,
     return nullptr;
 };
 
-const LocaleInfo *ResLocale::GetDefault()
+const Locale *ResLocale::GetDefault()
 {
     AutoMutex mutex(ResLocale::lock_);
     return ResLocale::defaultLocale_;
 }
 
-bool ResLocale::UpdateDefault(const LocaleInfo& localeInfo, bool needNotify)
+bool ResLocale::UpdateDefault(const Locale& localeInfo, bool needNotify)
 {
     AutoMutex mutex(ResLocale::lock_);
-    LocaleInfo *temp = new(std::nothrow) LocaleInfo(localeInfo.GetLanguage(),
-        localeInfo.GetScript(), localeInfo.GetRegion());
-    if (temp == nullptr) {
+    UErrorCode errCode;
+    Locale temp = icu::LocaleBuilder().setLocale(localeInfo).build(errCode);
+    if (!U_SUCCESS(errCode)) {
         return false;
     }
     delete ResLocale::defaultLocale_;
-    ResLocale::defaultLocale_ = temp;
+    ResLocale::defaultLocale_ = &temp;
     return true;
 };
 
@@ -345,23 +345,25 @@ ResLocale::~ResLocale()
     delete this->region_;
 }
 
-LocaleInfo *BuildFromString(const char *str, char sep, RState& rState)
+Locale *BuildFromString(const char *str, char sep, RState& rState)
 {
     ResLocale *resLocale = ResLocale::BuildFromString(str, sep, rState);
     if (rState == SUCCESS) {
-        LocaleInfo *localeInfo = new(std::nothrow) LocaleInfo(resLocale->GetLanguage(),
-            resLocale->GetScript(), resLocale->GetRegion());
-        if (localeInfo == nullptr) {
+        UErrorCode errCode;
+        Locale temp =  icu::LocaleBuilder().setLanguage(resLocale->GetLanguage())
+                                 .setRegion(resLocale->GetRegion()).setScript(resLocale->GetScript()).build(errCode);
+            
+        if (!U_SUCCESS(errCode)) {
             delete resLocale;
             rState = ERROR;
             return nullptr;
         }
-        return localeInfo;
+        return &temp;
     }
     return nullptr;
 };
 
-LocaleInfo *BuildFromParts(const char *language, const char *script, const char *region, RState& rState)
+Locale *BuildFromParts(const char *language, const char *script, const char *region, RState& rState)
 {
     size_t len = Utils::StrLen(language);
     if (len == 0) {
@@ -387,20 +389,22 @@ LocaleInfo *BuildFromParts(const char *language, const char *script, const char 
             return nullptr;
         }
     }
-    LocaleInfo *localeInfo = new(std::nothrow) LocaleInfo(language, script, region);
-    if (localeInfo == nullptr) {
+    UErrorCode errCode;
+    Locale localeInfo =  icu::LocaleBuilder().setLanguage(language)
+                                 .setRegion(region).setScript(script).build(errCode);
+    if (!U_SUCCESS(errCode)) {
         rState = ERROR;
         return nullptr;
     }
-    return localeInfo;
+    return &localeInfo;
 }
 
-const LocaleInfo *GetSysDefault()
+const Locale *GetSysDefault()
 {
     return ResLocale::GetDefault();
 }
 
-void UpdateSysDefault(const LocaleInfo& localeInfo, bool needNotify)
+void UpdateSysDefault(const Locale& localeInfo, bool needNotify)
 {
     ResLocale::UpdateDefault(localeInfo, needNotify);
 }

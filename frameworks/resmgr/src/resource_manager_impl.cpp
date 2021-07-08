@@ -598,7 +598,7 @@ RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig)
     if (resConfig.GetLocaleInfo() == nullptr) {
         return LOCALEINFO_IS_NULL;
     }
-    if (resConfig.GetLocaleInfo()->GetLanguage() == nullptr) {
+    if (resConfig.GetLocaleInfo()->getLanguage() == nullptr) {
         return LOCALEINFO_IS_NULL;
     }
     return this->hapManager_->UpdateResConfig(resConfig);

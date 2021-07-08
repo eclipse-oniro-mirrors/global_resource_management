@@ -17,10 +17,11 @@
 #define OHOS_RESOURCE_MANAGER_RES_LOCALE_H
 #include <cstdint>
 #include <cstddef>
+#include <unicode/locid.h>
+
 #include "rstate.h"
 #include "lock.h"
-#include "locale_info.h"
-using OHOS::I18N::LocaleInfo;
+using icu::Locale;
 namespace OHOS {
 namespace Global {
 namespace Resource {
@@ -42,13 +43,13 @@ public:
 
     ResLocale();
 
-    RState CopyFromLocaleInfo(const LocaleInfo *other);
+    RState CopyFromLocaleInfo(const Locale *other);
 
     RState Copy(const ResLocale *other);
 
-    static const LocaleInfo* GetDefault();
+    static const Locale* GetDefault();
 
-    static bool UpdateDefault(const LocaleInfo& localeInfo, bool needNotify);
+    static bool UpdateDefault(const Locale& localeInfo, bool needNotify);
 
     static ResLocale* BuildFromString(const char *bcp47String, char sep, RState& rState);
 
@@ -86,7 +87,7 @@ private:
 
     const char *script_;
 
-    static LocaleInfo *defaultLocale_;
+    static Locale *defaultLocale_;
 
     static Lock lock_;
 

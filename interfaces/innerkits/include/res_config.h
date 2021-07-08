@@ -15,11 +15,11 @@
 #ifndef OHOS_RESOURCE_MANAGER_RESCONFIG_H
 #define OHOS_RESOURCE_MANAGER_RESCONFIG_H
 
+#include <unicode/locid.h>
 #include <vector>
-#include "locale_info.h"
 #include "res_common.h"
 #include "rstate.h"
-using OHOS::I18N::LocaleInfo;
+using icu::Locale;
 namespace OHOS {
 namespace Global {
 namespace Resource {
@@ -27,7 +27,7 @@ class ResConfig {
 public:
     virtual RState SetLocaleInfo(const char *language, const char *script, const char *region) = 0;
 
-    virtual RState SetLocaleInfo(LocaleInfo& localeInfo) = 0;
+    virtual RState SetLocaleInfo(Locale& localeInfo) = 0;
 
     virtual void SetDeviceType(DeviceType deviceType) = 0;
 
@@ -35,7 +35,7 @@ public:
 
     virtual void SetScreenDensity(ScreenDensity screenDensity) = 0;
 
-    virtual const LocaleInfo *GetLocaleInfo() const = 0;
+    virtual const Locale *GetLocaleInfo() const = 0;
 
     virtual Direction GetDirection() const = 0;
 
@@ -49,13 +49,13 @@ public:
 };
 ResConfig *CreateResConfig();
 
-const LocaleInfo* GetSysDefault();
+const Locale* GetSysDefault();
 
-void UpdateSysDefault(const LocaleInfo& localeInfo, bool needNotify);
+void UpdateSysDefault(const Locale& localeInfo, bool needNotify);
 
-LocaleInfo* BuildFromString(const char *str, char sep, RState& rState);
+Locale* BuildFromString(const char *str, char sep, RState& rState);
 
-LocaleInfo* BuildFromParts(const char *language, const char *script, const char *region, RState& rState);
+Locale* BuildFromParts(const char *language, const char *script, const char *region, RState& rState);
 
 void FindAndSort(std::string localeStr, std::vector<std::string>& candidateLocale, std::vector<std::string>& outValue);
 } // namespace Resource

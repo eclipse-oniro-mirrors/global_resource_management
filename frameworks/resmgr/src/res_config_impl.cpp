@@ -14,11 +14,13 @@
  */
 #include "res_config_impl.h"
 
-#include "locale_info.h"
+#include <unicode/locid.h>
+#include <unicode/localebuilder.h>
 #include "locale_matcher.h"
 #include "res_locale.h"
 #include "utils/utils.h"
-
+using icu::Locale;
+using icu::LocaleBuilder;
 namespace OHOS {
 namespace Global {
 namespace Resource {
@@ -30,9 +32,9 @@ ResConfigImpl::ResConfigImpl()
       isCompletedScript_(false), localeInfo_(nullptr)
 {}
 
-RState ResConfigImpl::SetLocaleInfo(LocaleInfo& localeInfo)
+RState ResConfigImpl::SetLocaleInfo(Locale& localeInfo)
 {
-    return this->SetLocaleInfo(localeInfo.GetLanguage(), localeInfo.GetScript(), localeInfo.GetRegion());
+    return this->SetLocaleInfo(localeInfo.getLanguage(), localeInfo.getScript(), localeInfo.getCountry());
 }
 
 RState ResConfigImpl::SetLocaleInfo(const char *language,
@@ -59,9 +61,11 @@ RState ResConfigImpl::SetLocaleInfo(const char *language,
                 return NOT_ENOUGH_MEM;
             }
         }
-        LocaleInfo *tempLocale = new(std::nothrow) LocaleInfo(resLocale->GetLanguage(),
-            resLocale->GetScript(), resLocale->GetRegion());
-        if (tempLocale == nullptr) {
+        UErrorCode errCode;
+        Locale temp =  icu::LocaleBuilder().setLanguage(resLocale->GetLanguage())
+                                 .setRegion(resLocale->GetRegion()).setScript(resLocale->GetScript()).build(errCode);
+            
+        if (!U_SUCCESS(errCode)) {
             state = NOT_ENOUGH_MEM;
             delete resLocale;
             return state;
@@ -69,7 +73,7 @@ RState ResConfigImpl::SetLocaleInfo(const char *language,
         delete resLocale_;
         delete localeInfo_;
         resLocale_ = resLocale;
-        localeInfo_ = tempLocale;
+        localeInfo_ = &temp;
     }
 
     return state;
@@ -90,7 +94,7 @@ void ResConfigImpl::SetScreenDensity(ScreenDensity screenDensity)
     this->screenDensity_ = screenDensity;
 }
 
-const LocaleInfo *ResConfigImpl::GetLocaleInfo() const
+const Locale *ResConfigImpl::GetLocaleInfo() const
 {
     return localeInfo_;
 }
@@ -132,8 +136,8 @@ bool ResConfigImpl::CopyLocale(ResConfig &other)
             this->GetResLocale()->GetLanguage(),
             this->GetResLocale()->GetScript(), this->GetResLocale()->GetRegion());
         uint64_t otherEncodedLocale = Utils::EncodeLocale(
-            other.GetLocaleInfo()->GetLanguage(),
-            other.GetLocaleInfo()->GetScript(), other.GetLocaleInfo()->GetRegion());
+            other.GetLocaleInfo()->getLanguage(),
+            other.GetLocaleInfo()->getScript(), other.GetLocaleInfo()->getCountry());
         if (encodedLocale != otherEncodedLocale) {
             needCopy = true;
         }
@@ -148,16 +152,17 @@ bool ResConfigImpl::CopyLocale(ResConfig &other)
             delete temp;
             return false;
         }
-        LocaleInfo *tempLocale = new(std::nothrow) LocaleInfo(*other.GetLocaleInfo());
-        if (tempLocale == nullptr) {
-            delete tempLocale;
+        UErrorCode errCode;
+        Locale tempLocale =  icu::LocaleBuilder().setLocale(*other.GetLocaleInfo()).build(errCode);
+            
+        if (!U_SUCCESS(errCode)) {
             delete temp;
             return false;
         }
         delete this->resLocale_;
         delete this->localeInfo_;
         this->resLocale_ = temp;
-        this->localeInfo_ = tempLocale;
+        this->localeInfo_ = &tempLocale;
     }
     return true;
 }
