@@ -61,7 +61,7 @@ RState ResConfigImpl::SetLocaleInfo(const char *language,
                 return NOT_ENOUGH_MEM;
             }
         }
-        UErrorCode errCode;
+        UErrorCode errCode = U_ZERO_ERROR;
         Locale temp =  icu::LocaleBuilder().setLanguage(resLocale->GetLanguage())
                                  .setRegion(resLocale->GetRegion()).setScript(resLocale->GetScript()).build(errCode);
             
@@ -73,7 +73,7 @@ RState ResConfigImpl::SetLocaleInfo(const char *language,
         delete resLocale_;
         delete localeInfo_;
         resLocale_ = resLocale;
-        localeInfo_ = &temp;
+        localeInfo_ = new Locale(temp);
     }
 
     return state;
@@ -152,7 +152,7 @@ bool ResConfigImpl::CopyLocale(ResConfig &other)
             delete temp;
             return false;
         }
-        UErrorCode errCode;
+        UErrorCode errCode = U_ZERO_ERROR;
         Locale tempLocale =  icu::LocaleBuilder().setLocale(*other.GetLocaleInfo()).build(errCode);
             
         if (!U_SUCCESS(errCode)) {
@@ -162,7 +162,7 @@ bool ResConfigImpl::CopyLocale(ResConfig &other)
         delete this->resLocale_;
         delete this->localeInfo_;
         this->resLocale_ = temp;
-        this->localeInfo_ = &tempLocale;
+        this->localeInfo_ = new Locale(tempLocale);
     }
     return true;
 }

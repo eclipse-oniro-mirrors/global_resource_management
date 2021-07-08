@@ -171,13 +171,13 @@ HWTEST_F(LocaleInfoTest, LocaleInfoFindAndSortTest005, TestSize.Level1)
 HWTEST_F(LocaleInfoTest, LocaleInfoGetSysDefaultTest001, TestSize.Level1)
 {
     RState state = SUCCESS;
-    Locale* localeInfo = BuildFromString("zh-CN", '-', state);
+    Locale *localeInfo = BuildFromString("zh-CN", '-', state);
     if (localeInfo == nullptr) {
         EXPECT_TRUE(false);
         return;
     }
     UpdateSysDefault(*localeInfo, false);
-    const Locale* currentLocaleInfo = GetSysDefault();
+    const Locale *currentLocaleInfo = GetSysDefault();
     if (currentLocaleInfo == nullptr) {
         EXPECT_TRUE(false);
         delete localeInfo;
@@ -197,13 +197,13 @@ HWTEST_F(LocaleInfoTest, LocaleInfoGetSysDefaultTest001, TestSize.Level1)
 HWTEST_F(LocaleInfoTest, LocaleInfoUpdateSysDefaultTest001, TestSize.Level1)
 {
     RState state = SUCCESS;
-    Locale* localeInfo = BuildFromString("zh-CN", '-', state);
+    Locale *localeInfo = BuildFromString("zh-CN", '-', state);
     if (localeInfo == nullptr) {
         EXPECT_TRUE(false);
         return;
     }
     UpdateSysDefault(*localeInfo, false);
-    const Locale* currentLocaleInfo = GetSysDefault();
+    const Locale *currentLocaleInfo = GetSysDefault();
     if (currentLocaleInfo == nullptr) {
         EXPECT_TRUE(false);
         delete localeInfo;
@@ -250,7 +250,7 @@ HWTEST_F(LocaleInfoTest, LocaleInfoUpdateSysDefaultTest001, TestSize.Level1)
 HWTEST_F(LocaleInfoTest, LocaleInfoGetLanguageTest001, TestSize.Level1)
 {
     RState state = SUCCESS;
-    Locale* localeInfo = BuildFromString("zh-CN", '-', state);
+    Locale *localeInfo = BuildFromString("zh-CN", '-', state);
     if (localeInfo == nullptr) {
         EXPECT_TRUE(false);
         return;
@@ -268,7 +268,7 @@ HWTEST_F(LocaleInfoTest, LocaleInfoGetLanguageTest001, TestSize.Level1)
 HWTEST_F(LocaleInfoTest, LocaleInfoGetRegionTest001, TestSize.Level1)
 {
     RState state = SUCCESS;
-    Locale* localeInfo = BuildFromString("zh-CN", '-', state);
+    Locale *localeInfo = BuildFromString("zh-CN", '-', state);
     if (localeInfo == nullptr) {
         EXPECT_TRUE(false);
         return;
@@ -286,7 +286,7 @@ HWTEST_F(LocaleInfoTest, LocaleInfoGetRegionTest001, TestSize.Level1)
 HWTEST_F(LocaleInfoTest, LocaleInfoGetScriptTest001, TestSize.Level1)
 {
     RState state = SUCCESS;
-    Locale* localeInfo = BuildFromString("zh-Hant-CN", '-', state);
+    Locale *localeInfo = BuildFromString("zh-Hant-CN", '-', state);
     if (localeInfo == nullptr) {
         EXPECT_TRUE(false);
         return;
@@ -304,7 +304,7 @@ HWTEST_F(LocaleInfoTest, LocaleInfoGetScriptTest001, TestSize.Level1)
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromPartsTest001, TestSize.Level1)
 {
     RState state = SUCCESS;
-    Locale* localeInfo = BuildFromParts("zh", "Hant", "CN", state);
+    Locale *localeInfo = BuildFromParts("zh", "Hant", "CN", state);
     if (localeInfo == nullptr) {
         EXPECT_TRUE(false);
         return;
@@ -325,7 +325,7 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromPartsTest001, TestSize.Level1)
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromPartsTest002, TestSize.Level1)
 {
     RState state = SUCCESS;
-    Locale* localeInfo = BuildFromParts("zh1", "Hant", "CN", state);
+    Locale *localeInfo = BuildFromParts("zh1", "Hant", "CN", state);
     EXPECT_TRUE(state == INVALID_BCP47_LANGUAGE_SUBTAG);
     EXPECT_TRUE(localeInfo == nullptr);
     delete localeInfo;
@@ -340,7 +340,7 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromPartsTest002, TestSize.Level1)
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromPartsTest003, TestSize.Level1)
 {
     RState state = SUCCESS;
-    Locale* localeInfo = BuildFromParts("zh", "Hants", "CN", state);
+    Locale *localeInfo = BuildFromParts("zh", "Hants", "CN", state);
     EXPECT_TRUE(state == INVALID_BCP47_SCRIPT_SUBTAG);
     EXPECT_TRUE(localeInfo == nullptr);
     delete localeInfo;
@@ -355,7 +355,7 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromPartsTest003, TestSize.Level1)
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromPartsTest004, TestSize.Level1)
 {
     RState state = SUCCESS;
-    Locale* localeInfo = BuildFromParts("zh", "Hant", "C", state);
+    Locale *localeInfo = BuildFromParts("zh", "Hant", "C", state);
     EXPECT_TRUE(state == INVALID_BCP47_REGION_SUBTAG);
     EXPECT_TRUE(localeInfo == nullptr);
     delete localeInfo;
@@ -370,7 +370,7 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromPartsTest004, TestSize.Level1)
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromPartsTest005, TestSize.Level1)
 {
     RState state = SUCCESS;
-    Locale* localeInfo = BuildFromParts(nullptr, "Hants", "CN", state);
+    Locale *localeInfo = BuildFromParts(nullptr, "Hants", "CN", state);
     EXPECT_TRUE(state == INVALID_BCP47_LANGUAGE_SUBTAG);
     EXPECT_TRUE(localeInfo == nullptr);
     delete localeInfo;
@@ -385,15 +385,15 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromPartsTest005, TestSize.Level1)
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromPartsTest006, TestSize.Level1)
 {
     RState state = SUCCESS;
-    Locale* localeInfo = BuildFromParts("zh", nullptr, nullptr, state);
+    Locale *localeInfo = BuildFromParts("zh", nullptr, nullptr, state);
     if (localeInfo == nullptr) {
         EXPECT_TRUE(false);
         return;
     }
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_TRUE(std::strcmp("zh", localeInfo->getLanguage()) == 0);
-    EXPECT_TRUE(localeInfo->getScript() == nullptr);
-    EXPECT_TRUE(localeInfo->getCountry() == nullptr);
+    EXPECT_TRUE(localeInfo->getScript()[0] == '\0');
+    EXPECT_TRUE(localeInfo->getCountry()[0] == '\0');
     delete localeInfo;
     localeInfo = nullptr;
 }
@@ -406,7 +406,7 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromPartsTest006, TestSize.Level1)
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest001, TestSize.Level1)
 {
     RState state = SUCCESS;
-    Locale* localeInfo = BuildFromString("zh-Hant-CN", '-', state);
+    Locale *localeInfo = BuildFromString("zh-Hant-CN", '-', state);
     if (localeInfo == nullptr) {
         EXPECT_TRUE(false);
         return;
@@ -427,7 +427,7 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest001, TestSize.Level1)
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest002, TestSize.Level1)
 {
     RState state = SUCCESS;
-    Locale* localeInfo = BuildFromString("zh1-Hant-CN", '-', state);
+    Locale *localeInfo = BuildFromString("zh1-Hant-CN", '-', state);
     EXPECT_TRUE(state == INVALID_BCP47_LANGUAGE_SUBTAG);
     EXPECT_TRUE(localeInfo == nullptr);
     delete localeInfo;
@@ -442,7 +442,7 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest002, TestSize.Level1)
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest003, TestSize.Level1)
 {
     RState state = SUCCESS;
-    Locale* localeInfo = BuildFromString("-Hant-CN", '-', state);
+    Locale *localeInfo = BuildFromString("-Hant-CN", '-', state);
     EXPECT_TRUE(state == INVALID_BCP47_LANGUAGE_SUBTAG);
     EXPECT_TRUE(localeInfo == nullptr);
     delete localeInfo;
@@ -457,15 +457,15 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest003, TestSize.Level1)
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest004, TestSize.Level1)
 {
     RState state = SUCCESS;
-    Locale* localeInfo = BuildFromString("zh", '-', state);
+    Locale *localeInfo = BuildFromString("zh", '-', state);
     if (localeInfo == nullptr) {
         EXPECT_TRUE(false);
         return;
     }
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_TRUE(std::strcmp("zh", localeInfo->getLanguage()) == 0);
-    EXPECT_TRUE(localeInfo->getScript() == nullptr);
-    EXPECT_TRUE(localeInfo->getCountry() == nullptr);
+    EXPECT_TRUE(localeInfo->getScript()[0] == '\0');
+    EXPECT_TRUE(localeInfo->getCountry()[0] == '\0');
     delete localeInfo;
     localeInfo = nullptr;
 }
@@ -478,14 +478,14 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest004, TestSize.Level1)
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest005, TestSize.Level1)
 {
     RState state = SUCCESS;
-    Locale* localeInfo = BuildFromString("en_US", '_', state);
+    Locale *localeInfo = BuildFromString("en_US", '_', state);
     if (localeInfo == nullptr) {
         EXPECT_TRUE(false);
         return;
     }
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_TRUE(std::strcmp("en", localeInfo->getLanguage()) == 0);
-    EXPECT_TRUE(localeInfo->getScript() == nullptr);
+    EXPECT_TRUE(localeInfo->getScript()[0] == '\0');
     EXPECT_TRUE(std::strcmp("US", localeInfo->getCountry()) == 0);
     delete localeInfo;
     localeInfo = nullptr;
@@ -499,7 +499,7 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest005, TestSize.Level1)
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest006, TestSize.Level1)
 {
     RState state = SUCCESS;
-    Locale* localeInfo = BuildFromString("en_Latn_US", '&', state);
+    Locale *localeInfo = BuildFromString("en_Latn_US", '&', state);
     EXPECT_TRUE(state == NOT_SUPPORT_SEP);
     EXPECT_TRUE(localeInfo == nullptr);
     delete localeInfo;
@@ -514,7 +514,7 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest006, TestSize.Level1)
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest007, TestSize.Level1)
 {
     RState state = SUCCESS;
-    Locale* localeInfo = BuildFromString("en_Latn_US", '_', state);
+    Locale *localeInfo = BuildFromString("en_Latn_US", '_', state);
     if (localeInfo == nullptr) {
         EXPECT_TRUE(false);
         return;
@@ -535,7 +535,7 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest007, TestSize.Level1)
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest008, TestSize.Level1)
 {
     RState state = SUCCESS;
-    Locale* localeInfo = BuildFromString("zh-Hants-CN", '-', state);
+    Locale *localeInfo = BuildFromString("zh-Hants-CN", '-', state);
     EXPECT_TRUE(state == INVALID_BCP47_SCRIPT_SUBTAG);
     EXPECT_TRUE(localeInfo == nullptr);
     delete localeInfo;
@@ -550,7 +550,7 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest008, TestSize.Level1)
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest009, TestSize.Level1)
 {
     RState state = SUCCESS;
-    Locale* localeInfo = BuildFromString("zh-Hant-C", '-', state);
+    Locale *localeInfo = BuildFromString("zh-Hant-C", '-', state);
     EXPECT_TRUE(state == INVALID_BCP47_REGION_SUBTAG);
     EXPECT_TRUE(localeInfo == nullptr);
     delete localeInfo;
@@ -565,14 +565,14 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest009, TestSize.Level1)
 HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest0010, TestSize.Level1)
 {
     RState state = SUCCESS;
-    Locale* localeInfo = BuildFromString("zh-CN-xxxx", '-', state);
+    Locale *localeInfo = BuildFromString("zh-CN-xxxx", '-', state);
     if (localeInfo == nullptr) {
         EXPECT_TRUE(false);
         return;
     }
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_TRUE(std::strcmp("zh", localeInfo->getLanguage()) == 0);
-    EXPECT_TRUE(localeInfo->getScript() == nullptr);
+    EXPECT_TRUE(localeInfo->getScript()[0] == '\0');
     EXPECT_TRUE(std::strcmp("CN", localeInfo->getCountry()) == 0);
     delete localeInfo;
     localeInfo = nullptr;

@@ -328,13 +328,13 @@ const Locale *ResLocale::GetDefault()
 bool ResLocale::UpdateDefault(const Locale& localeInfo, bool needNotify)
 {
     AutoMutex mutex(ResLocale::lock_);
-    UErrorCode errCode;
+    UErrorCode errCode = U_ZERO_ERROR;
     Locale temp = icu::LocaleBuilder().setLocale(localeInfo).build(errCode);
     if (!U_SUCCESS(errCode)) {
         return false;
     }
     delete ResLocale::defaultLocale_;
-    ResLocale::defaultLocale_ = &temp;
+    ResLocale::defaultLocale_ = new Locale(temp);
     return true;
 };
 
@@ -349,7 +349,7 @@ Locale *BuildFromString(const char *str, char sep, RState& rState)
 {
     ResLocale *resLocale = ResLocale::BuildFromString(str, sep, rState);
     if (rState == SUCCESS) {
-        UErrorCode errCode;
+        UErrorCode errCode = U_ZERO_ERROR;
         Locale temp =  icu::LocaleBuilder().setLanguage(resLocale->GetLanguage())
                                  .setRegion(resLocale->GetRegion()).setScript(resLocale->GetScript()).build(errCode);
             
@@ -358,7 +358,8 @@ Locale *BuildFromString(const char *str, char sep, RState& rState)
             rState = ERROR;
             return nullptr;
         }
-        return &temp;
+        Locale *retLocal = new Locale(temp);
+        return retLocal;
     }
     return nullptr;
 };
@@ -389,14 +390,15 @@ Locale *BuildFromParts(const char *language, const char *script, const char *reg
             return nullptr;
         }
     }
-    UErrorCode errCode;
+    UErrorCode errCode = U_ZERO_ERROR;
     Locale localeInfo =  icu::LocaleBuilder().setLanguage(language)
                                  .setRegion(region).setScript(script).build(errCode);
     if (!U_SUCCESS(errCode)) {
         rState = ERROR;
         return nullptr;
     }
-    return &localeInfo;
+    Locale *retLocal = new Locale(localeInfo);
+    return retLocal;
 }
 
 const Locale *GetSysDefault()
