@@ -19,10 +19,14 @@
 #include <climits>
 #include <cstring>
 #include <ctime>
+#include <fstream>
 #include <gtest/gtest.h>
+#include <iostream>
 
 #define private public
 
+#include "hap_parser.h"
+#include "hap_resource.h"
 #include "resource_manager.h"
 #include "resource_manager_impl.h"
 #include "test_common.h"
@@ -106,6 +110,80 @@ void ResourceManagerPerformanceTest::TearDown(void)
     }
 }
 
+// test HapResource::LoadFromIndex(), spilt to two parts: 1. read from file, 2. parse buf to HapResource
+int TestLoadFromIndex(const char *filePath)
+{
+    unsigned long long total = 0;
+    double average = 0;
+    std::string pstr = FormatFullPath(filePath);
+    const char *path = pstr.c_str();
+
+    auto start = std::chrono::high_resolution_clock::now();
+    std::ifstream inFile(path, std::ios::binary | std::ios::in);
+    if (!inFile.good()) {
+        return -1;
+    }
+    inFile.seekg(0, std::ios::end);
+    size_t bufLen = inFile.tellg();
+    inFile.close();
+    std::ifstream inFile2(path, std::ios::binary | std::ios::in);
+    void *buf = malloc(bufLen);
+    if (buf == nullptr) {
+        HILOG_ERROR("Error allocating memory");
+        return -1;
+    }
+    inFile2.read((char *)buf, bufLen);
+    inFile2.close();
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto readFilecost = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+
+    g_logLevel = LOG_DEBUG;
+    HILOG_DEBUG("read index file cost 001: %d us", readFilecost);
+    g_logLevel = LOG_INFO;
+
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        ResDesc *resDesc = new(std::nothrow) ResDesc();
+        if (resDesc == nullptr) {
+            HILOG_ERROR("new ResDesc failed when LoadFromIndex");
+            free(buf);
+            return -1;
+        }
+        int32_t out = HapParser::ParseResHex((char *) buf, bufLen, *resDesc, nullptr);
+        if (out != OK) {
+            delete (resDesc);
+            free(buf);
+            HILOG_ERROR("ParseResHex failed! retcode:%d", out);
+            return -1;
+        } else {
+            HILOG_DEBUG("ParseResHex success:\n%s", resDesc->ToString().c_str());
+        }
+
+        HapResource *pResource = new(std::nothrow) HapResource(std::string(path), 0, nullptr, resDesc);
+        if (pResource == nullptr) {
+            HILOG_ERROR("new HapResource failed when LoadFromIndex");
+            delete (resDesc);
+            free(buf);
+            return -1;
+        }
+        if (!pResource->Init()) {
+            delete (pResource);
+            free(buf);
+            return -1;
+        }
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+        delete pResource;
+    }
+    free(buf);
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    HILOG_DEBUG("parse index avg cost 001: %f us", average);
+    EXPECT_LT(average, 4000);
+    return OK;
+}
+
 /*
  * @tc.name: ResourceManagerPerformanceFuncTest001
  * @tc.desc: Test AddResource
@@ -113,24 +191,8 @@ void ResourceManagerPerformanceTest::TearDown(void)
  */
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest001, TestSize.Level1)
 {
-    unsigned long long total = 0;
-    double average = 0;
-    for (int k = 0; k < 1000; ++k) {
-        auto tmpRm = CreateResourceManager();
-        if (tmpRm == nullptr) {
-            EXPECT_TRUE(false);
-            return;
-        }
-        auto t1 = std::chrono::high_resolution_clock::now();
-        tmpRm->AddResource(FormatFullPath(g_resFilePath).c_str());
-        auto t2 = std::chrono::high_resolution_clock::now();
-        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-        delete tmpRm;
-    }
-    average = total / 1000.0;
-    g_logLevel = LOG_DEBUG;
-    HILOG_DEBUG("avg cost 001: %f us", average);
-    EXPECT_LT(average, 9000);
+    int ret = TestLoadFromIndex(g_resFilePath);
+    EXPECT_EQ(OK, ret);
 };
 
 /*
