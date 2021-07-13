@@ -14,6 +14,7 @@
  */
 #ifndef OHOS_RESOURCE_MANAGER_LOCK_H
 #define OHOS_RESOURCE_MANAGER_LOCK_H
+#include <mutex>
 
 namespace OHOS {
 namespace Global {
@@ -29,6 +30,8 @@ public:
     bool unlock();
 
 private:
+    std::mutex* mtx_;
+    
 };
 } // namespace Resource
 } // namespace Global

@@ -13,23 +13,28 @@
  * limitations under the License.
  */
 #include "lock.h"
+#include <mutex>
 
 namespace OHOS {
 namespace Global {
 namespace Resource {
-Lock::Lock()
+Lock::Lock():mtx_(new std::mutex)
 {}
 
 Lock::~Lock()
-{}
+{
+    delete mtx_;
+}
 
 bool Lock::lock()
 {
+    this->mtx_->lock();
     return true;
 }
 
 bool Lock::unlock()
 {
+    this->mtx_->unlock();
     return true;
 }
 } // namespace Resource

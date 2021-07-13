@@ -17,7 +17,9 @@
 
 #include <climits>
 #include <gtest/gtest.h>
+#include <thread>
 
+#include "auto_mutex.h"
 #include "test_common.h"
 #include "utils/string_utils.h"
 
@@ -68,4 +70,38 @@ HWTEST_F(StringUtilsTest, StringUtilsFuncTest001, TestSize.Level1)
 
     result = FormatString("I'm %s, I'm %d", "cici", 5);
     EXPECT_EQ("I'm cici, I'm 5", result);
+}
+
+void FuncMultiThread(int* num, Lock* lock)
+{
+    AutoMutex mtx(*lock);
+    auto tmp = (*num);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    (*num) = tmp + 1;
+}
+
+void TestThread(int* num, int threadNum, Lock* lock)
+{
+    std::vector<std::thread> threads;
+    for (int i = 0; i < threadNum; ++i) {
+        threads.push_back(std::thread(FuncMultiThread, num, lock));
+    }
+    for (auto &thread : threads) {
+        thread.join();
+    }
+}
+
+/*
+ * @tc.name: LockFuncTest001
+ * @tc.desc: Test lock, none file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(StringUtilsTest, LockFuncTest001, TestSize.Level1)
+{
+    int num = 0;
+    int threadNum = 3;
+    int result = num + threadNum;
+    Lock lock = Lock();
+    TestThread(&num, threadNum, &lock);
+    EXPECT_EQ(result, num);
 }

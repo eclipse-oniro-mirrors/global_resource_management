@@ -17,5 +17,6 @@
 #define RESOURCE_MANAGER_STRING_UTILS_TEST_H
 
 int StringUtilsFuncTest001();
+int LockFuncTest001();
 
 #endif
