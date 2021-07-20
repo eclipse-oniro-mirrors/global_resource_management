@@ -18,7 +18,6 @@
 #include <cstdint>
 #include <cstddef>
 #include <unicode/locid.h>
-
 #include "rstate.h"
 #include "lock.h"
 using icu::Locale;

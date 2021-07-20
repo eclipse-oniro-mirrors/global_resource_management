@@ -14,11 +14,9 @@
  */
 
 #include "string_utils_test.h"
-
 #include <climits>
 #include <gtest/gtest.h>
 #include <thread>
-
 #include "auto_mutex.h"
 #include "test_common.h"
 #include "utils/string_utils.h"
