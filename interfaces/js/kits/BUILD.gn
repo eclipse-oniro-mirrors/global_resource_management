@@ -23,7 +23,7 @@ ohos_shared_library("resmgr") {
 
   sources = [ "src/resource_manager_addon.cpp" ]
 
-  deps = [
+  public_deps = [
     "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/ace/napi:ace_napi",
