@@ -17,11 +17,13 @@
 
 #include <fstream>
 #include <memory>
+#include <unicode/locid.h>
 #include <vector>
 
 #include "hilog/log.h"
 #include "node_api.h"
 
+using icu::Locale;
 namespace OHOS {
 namespace Global {
 namespace Resource {
@@ -598,22 +600,22 @@ napi_value ResourceManagerAddon::GetMediaBase64(napi_env env, napi_callback_info
 std::string ResourceManagerAddon::GetLocale(std::unique_ptr<ResConfig> &cfg)
 {
     std::string result;
-    const LocaleInfo *localeInfo = cfg->GetLocaleInfo();
+    const Locale *localeInfo = cfg->GetLocaleInfo();
     if (localeInfo == nullptr) {
         return result;
     }
-    const char *lang = localeInfo->GetLanguage();
+    const char *lang = localeInfo->getLanguage();
     if (lang == nullptr) {
         return result;
     }
     result = lang;
 
-    const char *script = localeInfo->GetScript();
+    const char *script = localeInfo->getScript();
     if (script != nullptr) {
         result += std::string("_") + script;
     }
 
-    const char *region = localeInfo->GetRegion();
+    const char *region = localeInfo->getCountry();
     if (region != nullptr) {
         result += std::string("_") + region;
     }
