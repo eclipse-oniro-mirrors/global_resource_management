@@ -125,19 +125,20 @@ int TestLoadFromIndex(const char *filePath)
     }
     inFile.seekg(0, std::ios::end);
     size_t bufLen = inFile.tellg();
-    inFile.close();
     if (bufLen <= 0) {
         HILOG_ERROR("file size is zero");
+        inFile.close();
         return -1;
     }
     void *buf = malloc(bufLen);
     if (buf == nullptr) {
         HILOG_ERROR("Error allocating memory");
+        inFile.close();
         return -1;
     }
-    std::ifstream inFile2(path, std::ios::binary | std::ios::in);
-    inFile2.read((char *)buf, bufLen);
-    inFile2.close();
+    inFile.seekg(0, std::ios::beg);
+    inFile.read((char *)buf, bufLen);
+    inFile.close();
 
     auto end = std::chrono::high_resolution_clock::now();
     auto readFilecost = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();

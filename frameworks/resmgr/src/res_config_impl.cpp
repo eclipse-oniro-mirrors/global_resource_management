@@ -33,7 +33,7 @@ ResConfigImpl::ResConfigImpl()
       isCompletedScript_(false), localeInfo_(nullptr)
 {}
 
-RState ResConfigImpl::SetLocaleInfo(Locale& localeInfo)
+RState ResConfigImpl::SetLocaleInfo(Locale &localeInfo)
 {
     return this->SetLocaleInfo(localeInfo.getLanguage(), localeInfo.getScript(), localeInfo.getCountry());
 }
@@ -63,7 +63,7 @@ RState ResConfigImpl::SetLocaleInfo(const char *language,
             }
         }
         UErrorCode errCode = U_ZERO_ERROR;
-        Locale temp =  icu::LocaleBuilder().setLanguage(resLocale->GetLanguage())
+        Locale temp = icu::LocaleBuilder().setLanguage(resLocale->GetLanguage())
                                  .setRegion(resLocale->GetRegion()).setScript(resLocale->GetScript()).build(errCode);
             
         if (!U_SUCCESS(errCode)) {
@@ -154,7 +154,7 @@ bool ResConfigImpl::CopyLocale(ResConfig &other)
             return false;
         }
         UErrorCode errCode = U_ZERO_ERROR;
-        Locale tempLocale =  icu::LocaleBuilder().setLocale(*other.GetLocaleInfo()).build(errCode);
+        Locale tempLocale = icu::LocaleBuilder().setLocale(*other.GetLocaleInfo()).build(errCode);
             
         if (!U_SUCCESS(errCode)) {
             delete temp;
@@ -187,8 +187,7 @@ bool ResConfigImpl::Copy(ResConfig &other)
 
 bool ResConfigImpl::Match(const ResConfigImpl *other) const
 {
-    if (LocaleMatcher::Match(this->resLocale_, other->GetResLocale()) ==
-        false) {
+    if (LocaleMatcher::Match(this->resLocale_, other->GetResLocale()) == false) {
         return false;
     }
     if (this->direction_ != DIRECTION_NOT_SET &&

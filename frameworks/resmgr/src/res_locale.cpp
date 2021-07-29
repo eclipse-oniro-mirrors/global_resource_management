@@ -153,7 +153,7 @@ const char *ResLocale::GetScript() const
     return this->script_;
 }
 
-RState ProcessSubtag(const char *curPos,  int32_t subTagLen, uint16_t& nextType, ParseResult& r)
+RState ProcessSubtag(const char *curPos, int32_t subTagLen, uint16_t &nextType, ParseResult &r)
 {
     if ((ResLocale::LANG_TYPE & nextType) && (LocaleMatcher::IsLanguageTag(curPos, subTagLen))) {
         r.tempLanguage = curPos;
@@ -184,7 +184,7 @@ void CheckArg(char sep, RState &rState)
     }
 }
 
-ResLocale *ResLocale::CreateResLocale(ParseResult& r, RState& rState)
+ResLocale *ResLocale::CreateResLocale(ParseResult &r, RState &rState)
 {
     ResLocale *resLocale = new(std::nothrow) ResLocale;
     if (resLocale == nullptr) {
@@ -325,7 +325,7 @@ const Locale *ResLocale::GetDefault()
     return ResLocale::defaultLocale_;
 }
 
-bool ResLocale::UpdateDefault(const Locale& localeInfo, bool needNotify)
+bool ResLocale::UpdateDefault(const Locale &localeInfo, bool needNotify)
 {
     AutoMutex mutex(ResLocale::lock_);
     UErrorCode errCode = U_ZERO_ERROR;
@@ -345,12 +345,12 @@ ResLocale::~ResLocale()
     delete this->region_;
 }
 
-Locale *BuildFromString(const char *str, char sep, RState& rState)
+Locale *BuildFromString(const char *str, char sep, RState &rState)
 {
     ResLocale *resLocale = ResLocale::BuildFromString(str, sep, rState);
     if (rState == SUCCESS) {
         UErrorCode errCode = U_ZERO_ERROR;
-        Locale temp =  icu::LocaleBuilder().setLanguage(resLocale->GetLanguage())
+        Locale temp = icu::LocaleBuilder().setLanguage(resLocale->GetLanguage())
                                  .setRegion(resLocale->GetRegion()).setScript(resLocale->GetScript()).build(errCode);
             
         if (!U_SUCCESS(errCode)) {
@@ -364,7 +364,7 @@ Locale *BuildFromString(const char *str, char sep, RState& rState)
     return nullptr;
 };
 
-Locale *BuildFromParts(const char *language, const char *script, const char *region, RState& rState)
+Locale *BuildFromParts(const char *language, const char *script, const char *region, RState &rState)
 {
     size_t len = Utils::StrLen(language);
     if (len == 0) {
@@ -391,7 +391,7 @@ Locale *BuildFromParts(const char *language, const char *script, const char *reg
         }
     }
     UErrorCode errCode = U_ZERO_ERROR;
-    Locale localeInfo =  icu::LocaleBuilder().setLanguage(language)
+    Locale localeInfo = icu::LocaleBuilder().setLanguage(language)
                                  .setRegion(region).setScript(script).build(errCode);
     if (!U_SUCCESS(errCode)) {
         rState = ERROR;
@@ -406,12 +406,12 @@ const Locale *GetSysDefault()
     return ResLocale::GetDefault();
 }
 
-void UpdateSysDefault(const Locale& localeInfo, bool needNotify)
+void UpdateSysDefault(const Locale &localeInfo, bool needNotify)
 {
     ResLocale::UpdateDefault(localeInfo, needNotify);
 }
 
-void FindAndSort(std::string localeStr, std::vector<std::string>& candidateLocale, std::vector<std::string>& outValue)
+void FindAndSort(std::string localeStr, std::vector<std::string> &candidateLocale, std::vector<std::string> &outValue)
 {
     if (candidateLocale.size() == 0) {
         return;

@@ -106,7 +106,7 @@ uint64_t Utils::EncodeLocale(const char *language,
     uint32_t scriptData = Utils::EncodeScript(script);
     uint16_t regionData = Utils::EncodeRegion(region);
 
-    return (uint64_t) (0xffff000000000000 & (((uint64_t)languageData) << 48)) |
+    return (uint64_t)(0xffff000000000000 & (((uint64_t)languageData) << 48)) |
            (0x0000ffffffff0000 & (((uint64_t)scriptData) << 16)) | (0x000000000000ffff & (uint64_t)(regionData));
 }
 
@@ -220,10 +220,9 @@ bool Utils::StrCompare(const char *left, const char *right, size_t len, bool isC
                 return false;
             } else {
                 if (isCaseSensitive) {
-                    rc = (int)(unsigned char)(c1) - (int)(unsigned char)(c2);
+                    rc = (int)(c1) - (int)(c2);
                 } else {
-                    rc =
-                        (int)(unsigned char)tolower(c1) - (int)(unsigned char)tolower(c2);
+                    rc = tolower(c1) - tolower(c2);
                 }
                 if (rc != 0) {
                     return false;

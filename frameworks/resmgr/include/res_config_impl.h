@@ -14,11 +14,13 @@
  */
 #ifndef OHOS_RESOURCE_MANAGER_RESCONFIG_IMPL_H
 #define OHOS_RESOURCE_MANAGER_RESCONFIG_IMPL_H
+
 #include <stdint.h>
 #include <unicode/locid.h>
 #include "res_locale.h"
 #include "res_common.h"
 #include "res_config.h"
+
 using icu::Locale;
 namespace OHOS {
 namespace Global {
@@ -31,7 +33,7 @@ public:
 
     RState SetLocaleInfo(const char *language, const char *script, const char *region);
 
-    RState SetLocaleInfo(Locale& localeInfo);
+    RState SetLocaleInfo(Locale &localeInfo);
 
     void SetDeviceType(DeviceType deviceType);
 
@@ -61,6 +63,7 @@ public:
 
 private:
     bool IsMoreSpecificThan(const ResConfigImpl *other) const;
+
     bool CopyLocale(ResConfig &other);
 
 private:

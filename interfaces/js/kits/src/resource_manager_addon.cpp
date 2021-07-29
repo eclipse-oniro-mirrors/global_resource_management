@@ -64,7 +64,7 @@ void ResourceManagerAddon::Destructor(napi_env env, void *nativeObject, void *hi
     delete addonPtr;
 }
 
-void ResMgrAsyncContext::SetErrorMsg(const std::string& msg, bool withResId)
+void ResMgrAsyncContext::SetErrorMsg(const std::string &msg, bool withResId)
 {
     errMsg_ = msg;
     success_ = false;

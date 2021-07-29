@@ -186,7 +186,6 @@ HWTEST_F(LocaleInfoTest, LocaleInfoGetSysDefaultTest001, TestSize.Level1)
     EXPECT_TRUE(std::strcmp("zh", currentLocaleInfo->getLanguage()) == 0);
     EXPECT_TRUE(std::strcmp("CN", currentLocaleInfo->getCountry()) == 0);
     delete localeInfo;
-    localeInfo = nullptr;
 }
 
 /*

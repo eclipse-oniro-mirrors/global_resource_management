@@ -91,19 +91,20 @@ const HapResource *HapResource::LoadFromIndex(const char *path, const ResConfigI
     }
     inFile.seekg(0, std::ios::end);
     size_t bufLen = inFile.tellg();
-    inFile.close();
     if (bufLen <= 0) {
         HILOG_ERROR("file size is zero");
+        inFile.close();
         return nullptr;
     }
     void *buf = malloc(bufLen);
     if (buf == nullptr) {
         HILOG_ERROR("Error allocating memory");
+        inFile.close();
         return nullptr;
     }
-    std::ifstream inFile2(path, std::ios::binary | std::ios::in);
-    inFile2.read((char *)buf, bufLen);
-    inFile2.close();
+    inFile.seekg(0, std::ios::beg);
+    inFile.read((char *)buf, bufLen);
+    inFile.close();
 
     HILOG_DEBUG("extract success, bufLen:%zu", bufLen);
 
