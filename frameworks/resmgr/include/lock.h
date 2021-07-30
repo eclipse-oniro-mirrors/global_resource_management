@@ -31,7 +31,6 @@ public:
 
 private:
     std::mutex* mtx_;
-    
 };
 } // namespace Resource
 } // namespace Global
