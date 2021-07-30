@@ -13,7 +13,8 @@
  * limitations under the License.
  */
 
-#pragma once
+#ifndef OHOS_RESOURCE_MANAGER_ERRORS_H
+#define OHOS_RESOURCE_MANAGER_ERRORS_H
 
 #include <errno.h>
 #include <stdint.h>
@@ -34,3 +35,4 @@ enum InnerState {
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
+#endif

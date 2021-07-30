@@ -122,6 +122,11 @@ void TestKeyParam(KeyType keyType, int value, std::string expectStr)
     EXPECT_EQ(expectStr, keyParam.str_);
 }
 
+/*
+ * @tc.name: ResDescFuncTest002
+ * @tc.desc: Test IsRef function, non file case.
+ * @tc.type: FUNC
+ */
 HWTEST_F(ResDescTest, ResDescFuncTest002, TestSize.Level1)
 {
     TestKeyParam(KeyType::LANGUAGES, 25966, "en");

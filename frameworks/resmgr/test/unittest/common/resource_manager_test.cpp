@@ -43,6 +43,12 @@ public:
 
     void TearDown();
 
+    ResourceManagerTest() : rm(nullptr)
+    {}
+
+    ~ResourceManagerTest()
+    {}
+
 public:
     ResourceManager *rm;
 
@@ -363,7 +369,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigTest002, TestSize.Level
 
     ResConfigImpl rc;
     rm->GetResConfig(rc);
-    EXPECT_EQ("en", std::string(rc.GetLocaleInfo()->GetLanguage()));
+    EXPECT_EQ("en", std::string(rc.GetLocaleInfo()->getLanguage()));
     EXPECT_EQ(DEVICE_CAR, rc.GetDeviceType());
 }
 

@@ -15,7 +15,7 @@
 #include "locale_matcher.h"
 
 #include <cstring>
-
+#include <new>
 #include "likely_subtags_key_data.cpp"
 #include "likely_subtags_value_data.cpp"
 
@@ -56,10 +56,10 @@ uint64_t AddScript(uint64_t encodedLocale, uint32_t encodedScript)
  * @param encodedLocale locale encode
  * @return uint64_t  parent locale encode
  */
-uint64_t SearchParentLocale(uint64_t encodedLocale, const LocaleInfo *request)
+uint64_t SearchParentLocale(uint64_t encodedLocale, const ResLocale *request)
 {
     uint64_t tempEncodedLocale = encodedLocale;
-    if (Utils::EncodeScriptByLocaleInfo(request) == LocaleMatcher::HANT_ENCODE) {
+    if (Utils::EncodeScriptByResLocale(request) == LocaleMatcher::HANT_ENCODE) {
         tempEncodedLocale = AddScript(encodedLocale, LocaleMatcher::HANT_ENCODE);
         if (tempEncodedLocale == LocaleMatcher::ZH_HANT_MO_ENCODE) {
             return LocaleMatcher::ZH_HK_ENCODE;
@@ -84,7 +84,7 @@ uint64_t SearchParentLocale(uint64_t encodedLocale, const LocaleInfo *request)
  * @param len
  * @param encodedLocale
  */
-void FindTrackPath(uint64_t *result, size_t len, uint64_t encodedLocale, const LocaleInfo *request)
+void FindTrackPath(const ResLocale *request, size_t len, uint64_t encodedLocale, uint64_t *result)
 {
     uint64_t currentEncodedLocale = encodedLocale;
     size_t i = 0;
@@ -235,9 +235,9 @@ size_t ComputeTrackPathDistance(const uint64_t *requestPaths,
     return   len * 2;
 }
 
-int8_t CompareRegionWhenQaag(const LocaleInfo *current,
-    const LocaleInfo *other,
-    const LocaleInfo *request)
+int8_t CompareRegionWhenQaag(const ResLocale *current,
+    const ResLocale *other,
+    const ResLocale *request)
 {
     if ((request != nullptr) && (Utils::EncodeLocale(request->GetLanguage(), request->GetScript(),
         nullptr) == LocaleMatcher::EN_QAAG_ENCODE)) {
@@ -263,11 +263,11 @@ int8_t CompareRegionWhenQaag(const LocaleInfo *current,
  * @return true
  * @return false
  */
-bool CompareLanguage(const LocaleInfo *current, const LocaleInfo *other)
+bool CompareLanguage(const ResLocale *current, const ResLocale *other)
 {
     uint16_t currentEncodedLanguage =
-        Utils::EncodeLanguageByLocaleInfo(current);
-    uint16_t otherEncodedLanguage = Utils::EncodeLanguageByLocaleInfo(
+        Utils::EncodeLanguageByResLocale(current);
+    uint16_t otherEncodedLanguage = Utils::EncodeLanguageByResLocale(
         other);
     return ((currentEncodedLanguage == otherEncodedLanguage) ||
         ((currentEncodedLanguage == NEW_LANGUAGES_CODES[0])
@@ -292,7 +292,7 @@ bool CompareLanguage(const LocaleInfo *current, const LocaleInfo *other)
             && (currentEncodedLanguage == OLD_LANGUAGES_CODES[4])));
 }
 
-bool CompareScript(const LocaleInfo *current, const LocaleInfo *other)
+bool CompareScript(const ResLocale *current, const ResLocale *other)
 {
     uint32_t currentEncodedScript = 0;
     uint32_t otherEncodedScript = 0;
@@ -300,13 +300,13 @@ bool CompareScript(const LocaleInfo *current, const LocaleInfo *other)
         currentEncodedScript = FindDefaultScriptEncode(current->GetLanguage(),
             current->GetRegion());
     } else {
-        currentEncodedScript = Utils::EncodeScriptByLocaleInfo(current);
+        currentEncodedScript = Utils::EncodeScriptByResLocale(current);
     }
     if ((other != nullptr) && (other->GetScript() == nullptr)) {
         otherEncodedScript = FindDefaultScriptEncode(other->GetLanguage(),
             other->GetRegion());
     } else {
-        otherEncodedScript = Utils::EncodeScriptByLocaleInfo(other);
+        otherEncodedScript = Utils::EncodeScriptByResLocale(other);
     }
     if (current != nullptr && other != nullptr) {
         // when current locale is en-Qaag is equal en-Latn
@@ -319,31 +319,21 @@ bool CompareScript(const LocaleInfo *current, const LocaleInfo *other)
         }
     }
     bool compareRegion = false;
-    if (current == nullptr || (current->GetScript() == nullptr)) {
-    // if request script is null, region must be same
+    if ((currentEncodedScript == LocaleMatcher::NULL_SCRIPT) || (otherEncodedScript == LocaleMatcher::NULL_SCRIPT)) {
+        // if request script is null, region must be same
         compareRegion = true;
-    } else {
-        if (other == nullptr) {
-            compareRegion = true;
-        } else {
-            if (other->GetScript() == nullptr) {
-                if (currentEncodedScript == LocaleMatcher::NULL_SCRIPT) {
-                    compareRegion = true;
-                }
-            }
-        }
     }
     if (compareRegion) {
-        uint16_t currentRegionEncode = Utils::EncodeRegionByLocaleInfo(current);
-        uint16_t otherRegionEncode = Utils::EncodeRegionByLocaleInfo(other);
+        uint16_t currentRegionEncode = Utils::EncodeRegionByResLocale(current);
+        uint16_t otherRegionEncode = Utils::EncodeRegionByResLocale(other);
         return (otherRegionEncode == LocaleMatcher::NULL_REGION) || (currentRegionEncode == otherRegionEncode);
     }
     return currentEncodedScript == otherEncodedScript;
 }
 
-int8_t AlphabeticallyCompare(const LocaleInfo *current,
+int8_t AlphabeticallyCompare(const ResLocale *current,
     uint64_t currentEncodedLocale,
-    const LocaleInfo *other,
+    const ResLocale *other,
     uint64_t otherEncodedLocale)
 {
     if (currentEncodedLocale == otherEncodedLocale) {
@@ -377,9 +367,9 @@ int8_t AlphabeticallyCompare(const LocaleInfo *current,
 }
 
 int8_t CompareWhenRegionIsNull(uint16_t currentEncodedRegion, uint16_t otherEncodedRegion,
-    const LocaleInfo *current,
-    const LocaleInfo *other,
-    const LocaleInfo *request)
+    const ResLocale *current,
+    const ResLocale *other,
+    const ResLocale *request)
 {
     if (current == nullptr || current->GetRegion() == nullptr) {
         return 1;
@@ -410,12 +400,12 @@ int8_t CompareWhenRegionIsNull(uint16_t currentEncodedRegion, uint16_t otherEnco
 }
 
 int8_t CompareDistance(uint64_t currentEncodedLocale, uint64_t otherEncodedLocale,
-    const uint64_t *requestEncodedTrackPath, const LocaleInfo *request)
+    const uint64_t *requestEncodedTrackPath, const ResLocale *request)
 {
     uint64_t currentEncodedTrackPath[LocaleMatcher::TRACKPATH_ARRAY_SIZE] = {0, 0, 0, 0, 0};
-    FindTrackPath(currentEncodedTrackPath, LocaleMatcher::TRACKPATH_ARRAY_SIZE, currentEncodedLocale, request);
+    FindTrackPath(request, LocaleMatcher::TRACKPATH_ARRAY_SIZE, currentEncodedLocale, currentEncodedTrackPath);
     uint64_t otherEncodedTrackPath[LocaleMatcher::TRACKPATH_ARRAY_SIZE] = {0, 0, 0, 0, 0};
-    FindTrackPath(otherEncodedTrackPath, LocaleMatcher::TRACKPATH_ARRAY_SIZE, otherEncodedLocale, request);
+    FindTrackPath(request, LocaleMatcher::TRACKPATH_ARRAY_SIZE, otherEncodedLocale, otherEncodedTrackPath);
     const size_t currentDistance = ComputeTrackPathDistance(
         requestEncodedTrackPath, currentEncodedTrackPath, LocaleMatcher::TRACKPATH_ARRAY_SIZE);
     const size_t targetDistance = ComputeTrackPathDistance(
@@ -429,9 +419,9 @@ int8_t CompareDistance(uint64_t currentEncodedLocale, uint64_t otherEncodedLocal
     return 0;
 }
 
-int8_t CompareDefaultRegion(const LocaleInfo *current,
-    const LocaleInfo *other,
-    const LocaleInfo *request)
+int8_t CompareDefaultRegion(const ResLocale *current,
+    const ResLocale *other,
+    const ResLocale *request)
 {
     int8_t qaagResult = CompareRegionWhenQaag(current, other, request);
     if (qaagResult != 0) {
@@ -461,19 +451,19 @@ int8_t CompareDefaultRegion(const LocaleInfo *current,
  * @return int8_t if current region is better than target region,return 1. if current region is equal target region,
  *         return 0. If target region is better than current region, return -1.
  */
-int8_t CompareRegion(const LocaleInfo *current,
-                     const LocaleInfo *other,
-                     const LocaleInfo *request)
+int8_t CompareRegion(const ResLocale *current,
+                     const ResLocale *other,
+                     const ResLocale *request)
 {
-    uint16_t currentEncodedRegion = Utils::EncodeRegionByLocaleInfo(current);
-    uint16_t otherEncodedRegion = Utils::EncodeRegionByLocaleInfo(other);
+    uint16_t currentEncodedRegion = Utils::EncodeRegionByResLocale(current);
+    uint16_t otherEncodedRegion = Utils::EncodeRegionByResLocale(other);
     if (request == nullptr || request->GetRegion() == nullptr) {
         return CompareWhenRegionIsNull(currentEncodedRegion, otherEncodedRegion, current, other, request);
     }
     uint64_t requestEncodedLocale = Utils::EncodeLocale(
         request->GetLanguage(), nullptr, request->GetRegion());
     uint64_t requestEncodedTrackPath[LocaleMatcher::TRACKPATH_ARRAY_SIZE] = {0, 0, 0, 0, 0};
-    FindTrackPath(requestEncodedTrackPath, LocaleMatcher::TRACKPATH_ARRAY_SIZE, requestEncodedLocale, request);
+    FindTrackPath(request, LocaleMatcher::TRACKPATH_ARRAY_SIZE, requestEncodedLocale, requestEncodedTrackPath);
     uint64_t currentEncodedLocale = Utils::EncodeLocale(
         request->GetLanguage(), nullptr, (current == nullptr) ? nullptr : current->GetRegion());
     uint64_t otherEncodedLocale = Utils::EncodeLocale(
@@ -511,7 +501,7 @@ int8_t CompareRegion(const LocaleInfo *current,
     return AlphabeticallyCompare(current, currentEncodedLocale, other, otherEncodedLocale);
 }
 
-bool LocaleMatcher::Match(const LocaleInfoImpl *current, const LocaleInfoImpl *other)
+bool LocaleMatcher::Match(const ResLocale *current, const ResLocale *other)
 {
     if (current == nullptr || other == nullptr) {
         return true;
@@ -524,7 +514,7 @@ bool LocaleMatcher::Match(const LocaleInfoImpl *current, const LocaleInfoImpl *o
     return CompareScript(current, other);
 };
 
-bool LocaleMatcher::Normalize(LocaleInfoImpl *localeInfo)
+bool LocaleMatcher::Normalize(ResLocale *localeInfo)
 {
     if (localeInfo == nullptr) {
         return true;
@@ -547,23 +537,26 @@ bool LocaleMatcher::Normalize(LocaleInfoImpl *localeInfo)
     return true;
 }
 
-int8_t CompareLanguageIgnoreOldNewCode(const LocaleInfo *current, const LocaleInfo *other, const LocaleInfo *request)
+int8_t CompareLanguageIgnoreOldNewCode(const ResLocale *current, const ResLocale *other, const ResLocale *request)
 {
-    uint16_t currentLanguageEncode = Utils::EncodeLanguageByLocaleInfo(current);
-    uint16_t otherLanguageEncode = Utils::EncodeLanguageByLocaleInfo(other);
-    uint16_t requestLanguageEncode = Utils::EncodeLanguageByLocaleInfo(request);
+    uint16_t currentLanguageEncode = Utils::EncodeLanguageByResLocale(current);
+    uint16_t otherLanguageEncode = Utils::EncodeLanguageByResLocale(other);
+    uint16_t requestLanguageEncode = Utils::EncodeLanguageByResLocale(request);
     if ((currentLanguageEncode == requestLanguageEncode) && (otherLanguageEncode != requestLanguageEncode)) {
         return 1;
     }
-    return -1;
+    if ((otherLanguageEncode == requestLanguageEncode) && (currentLanguageEncode != requestLanguageEncode)) {
+        return -1;
+    }
+    return 0;
 }
 
-bool IsSimilarToUsEnglish(const LocaleInfoImpl *localeInfo)
+bool IsSimilarToUsEnglish(const ResLocale *localeInfo)
 {
     uint64_t localeEncode = Utils::EncodeLocale("en", nullptr,
         (localeInfo == nullptr) ? nullptr : localeInfo->GetRegion());
     uint64_t loclaeEncodedTrackPath[LocaleMatcher::TRACKPATH_ARRAY_SIZE] = {0, 0, 0, 0, 0};
-    FindTrackPath(loclaeEncodedTrackPath, LocaleMatcher::TRACKPATH_ARRAY_SIZE, localeEncode, nullptr);
+    FindTrackPath(nullptr, LocaleMatcher::TRACKPATH_ARRAY_SIZE, localeEncode, loclaeEncodedTrackPath);
     uint8_t len = LocaleMatcher::TRACKPATH_ARRAY_SIZE;
     for (uint8_t i = 0; i < len; ++i) {
         if (loclaeEncodedTrackPath[i] == Utils::EncodeLocale("en", nullptr, nullptr)) {
@@ -575,9 +568,9 @@ bool IsSimilarToUsEnglish(const LocaleInfoImpl *localeInfo)
     }
     return   false;
 }
-bool CompareRegionWhenLangIsNotEqual(const LocaleInfoImpl *current,
-    const LocaleInfoImpl *other,
-    const LocaleInfoImpl *request)
+bool CompareRegionWhenLangIsNotEqual(const ResLocale *current,
+    const ResLocale *other,
+    const ResLocale *request)
 {
     int8_t qaagResult = CompareRegionWhenQaag(current, other, request);
     if (qaagResult != 0) {
@@ -604,9 +597,9 @@ bool CompareRegionWhenLangIsNotEqual(const LocaleInfoImpl *current,
     return current != nullptr;
 }
 
-int8_t LocaleMatcher::IsMoreSuitable(const LocaleInfoImpl *current,
-    const LocaleInfoImpl *other,
-    const LocaleInfoImpl *request)
+int8_t LocaleMatcher::IsMoreSuitable(const ResLocale *current,
+    const ResLocale *other,
+    const ResLocale *request)
 {
     if (request == nullptr) {
         return 0;
@@ -621,15 +614,15 @@ int8_t LocaleMatcher::IsMoreSuitable(const LocaleInfoImpl *current,
         return (result == true) ? 1 : -1;
     }
     uint16_t currentEncodedRegion =
-        Utils::EncodeRegionByLocaleInfo(current);
+        Utils::EncodeRegionByResLocale(current);
     uint16_t otherEncodedRegion =
-        Utils::EncodeRegionByLocaleInfo(other);
+        Utils::EncodeRegionByResLocale(other);
     if (currentEncodedRegion == otherEncodedRegion) {
         // same language,same script,same region
         return CompareLanguageIgnoreOldNewCode(current, other, request);
     }
     // equal request region is better
-    uint16_t requestEncodedRegion = Utils::EncodeRegionByLocaleInfo(request);
+    uint16_t requestEncodedRegion = Utils::EncodeRegionByResLocale(request);
     if (currentEncodedRegion == requestEncodedRegion) {
         return 1;
     }
@@ -703,7 +696,7 @@ bool LocaleMatcher::IsRegionTag(const char *str, int32_t len)
     return false;
 }
 
-int8_t LocaleMatcher::IsMoreSpecificThan(const LocaleInfoImpl *current, const LocaleInfoImpl *other)
+int8_t LocaleMatcher::IsMoreSpecificThan(const ResLocale *current, const ResLocale *other)
 {
     // compare language
     if (current == nullptr && other == nullptr) {

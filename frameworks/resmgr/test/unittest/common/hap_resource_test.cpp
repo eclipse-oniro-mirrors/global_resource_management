@@ -255,7 +255,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest003, TestSize.Level1)
     PrintIdValues(idv);
 }
 
-ResDesc *LoadFromHap(const char *hapPath, const ResConfigImpl *defaultConfig, bool system = false)
+ResDesc *LoadFromHap(const char *hapPath, const ResConfigImpl *defaultConfig)
 {
     std::string errOut;
     void *buf = nullptr;
@@ -269,7 +269,7 @@ ResDesc *LoadFromHap(const char *hapPath, const ResConfigImpl *defaultConfig, bo
     HILOG_DEBUG("extract success, bufLen:%zu", bufLen);
 
     ResDesc *resDesc = new ResDesc();
-    out = HapParser::ParseResHex((char *) buf, bufLen, *resDesc, defaultConfig);
+    out = HapParser::ParseResHex((char *)buf, bufLen, *resDesc, defaultConfig);
     if (out != OK) {
         delete (resDesc);
         free(buf);

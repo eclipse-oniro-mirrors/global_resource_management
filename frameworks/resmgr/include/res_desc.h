@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-#ifndef RESOURCE_MANAGER_INDEXDESC_H
-#define RESOURCE_MANAGER_INDEXDESC_H
+#ifndef OHOS_RESOURCE_MANAGER_RES_DESC_H
+#define OHOS_RESOURCE_MANAGER_RES_DESC_H
 
 #include "res_common.h"
+#include <cstdint>
 #include <map>
 #include <string>
 #include <vector>
-#include <cstdint>
 
 namespace OHOS {
 namespace Global {

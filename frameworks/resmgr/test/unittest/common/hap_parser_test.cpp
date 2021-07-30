@@ -94,9 +94,9 @@ HWTEST_F(HapParserTest, HapParserFuncTest001, TestSize.Level1)
     keyParams.push_back(kp);
     auto config = HapParser::CreateResConfigFromKeyParams(keyParams);
     if (config != nullptr) {
-        EXPECT_EQ(std::string("zh"), config->GetLocaleInfo()->GetLanguage());
-        EXPECT_EQ(std::string("CN"), config->GetLocaleInfo()->GetRegion());
-        EXPECT_EQ(std::string("Hans"), config->GetLocaleInfo()->GetScript());
+        EXPECT_EQ(std::string("zh"), config->GetLocaleInfo()->getLanguage());
+        EXPECT_EQ(std::string("CN"), config->GetLocaleInfo()->getCountry());
+        EXPECT_EQ(std::string("Hans"), config->GetLocaleInfo()->getScript());
         EXPECT_EQ(DEVICE_CAR, config->GetDeviceType());
         EXPECT_EQ(DIRECTION_VERTICAL, config->GetDirection());
         EXPECT_EQ(SCREEN_DENSITY_SDPI, config->GetScreenDensity());
@@ -111,7 +111,7 @@ HWTEST_F(HapParserTest, HapParserFuncTest001, TestSize.Level1)
 }
 
 /*
- * @tc.name: GetDeviceType
+ * @tc.name: HapParserFuncTest002
  * @tc.desc: Test GetDeviceType
  * @tc.type: FUNC
  */
@@ -127,7 +127,7 @@ HWTEST_F(HapParserTest, HapParserFuncTest002, TestSize.Level1)
 }
 
 /*
- * @tc.name: GetScreenDensity
+ * @tc.name: HapParserFuncTest003
  * @tc.desc: Test GetScreenDensity
  * @tc.type: FUNC
  */
@@ -143,7 +143,7 @@ HWTEST_F(HapParserTest, HapParserFuncTest003, TestSize.Level1)
 }
 
 /*
- * @tc.name: ToFolderPath
+ * @tc.name: HapParserFuncTest004
  * @tc.desc: Test ToFolderPath
  * @tc.type: FUNC
  */

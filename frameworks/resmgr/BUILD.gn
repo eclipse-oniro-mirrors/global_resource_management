@@ -13,21 +13,7 @@
 
 import("//build/ohos.gni")
 
-ohos_shared_library("global_resmgr") {
-  sources = [
-    "src/hap_manager.cpp",
-    "src/hap_resource.cpp",
-    "src/locale_info_impl.cpp",
-    "src/locale_matcher.cpp",
-    "src/lock.cpp",
-    "src/res_config_impl.cpp",
-    "src/res_desc.cpp",
-    "src/resource_manager_impl.cpp",
-    "src/utils/hap_parser.cpp",
-    "src/utils/string_utils.cpp",
-    "src/utils/utils.cpp",
-  ]
-
+config("resmgr_config") {
   include_dirs = [
     "include",
     "//third_party/zlib",
@@ -38,7 +24,37 @@ ohos_shared_library("global_resmgr") {
     "//third_party/icu/icu4c/source/common",
     "//third_party/icu/icu4c/source/i18n",
   ]
-  public_deps = [
+}
+
+config("resmgr_public_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "//base/global/resmgr_standard/interfaces/innerkits/include",
+    "//third_party/icu/icu4c/source/common",
+  ]
+}
+
+ohos_shared_library("global_resmgr") {
+  sources = [
+    "src/hap_manager.cpp",
+    "src/hap_resource.cpp",
+    "src/locale_matcher.cpp",
+    "src/lock.cpp",
+    "src/res_config_impl.cpp",
+    "src/res_desc.cpp",
+    "src/res_locale.cpp",
+    "src/resource_manager_impl.cpp",
+    "src/utils/hap_parser.cpp",
+    "src/utils/string_utils.cpp",
+    "src/utils/utils.cpp",
+  ]
+
+  configs = [ ":resmgr_config" ]
+
+  public_configs = [ ":resmgr_public_config" ]
+
+  deps = [
     "//third_party/bounds_checking_function:libsec_static",
     "//third_party/icu/icu4c:shared_icui18n",
     "//third_party/icu/icu4c:shared_icuuc",

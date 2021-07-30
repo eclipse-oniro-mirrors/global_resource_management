@@ -88,7 +88,7 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest001, TestSize.Level1)
 
 /*
  * this test shows how to reload a hap
- * @tc.name: HapManagerFuncTest001
+ * @tc.name: HapManagerFuncTest002
  * @tc.desc: Test UpdateResConfig & AddResourcePath function, file case.
  * @tc.type: FUNC
  */

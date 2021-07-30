@@ -12,31 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "lock.h"
-#include <mutex>
 
-namespace OHOS {
-namespace Global {
-namespace Resource {
-Lock::Lock():mtx_(new std::mutex)
-{}
+#ifndef RESOURCE_MANAGER_STRING_UTILS_TEST_H
+#define RESOURCE_MANAGER_STRING_UTILS_TEST_H
 
-Lock::~Lock()
-{
-    delete mtx_;
-}
+int StringUtilsFuncTest001();
+int LockFuncTest001();
 
-bool Lock::lock()
-{
-    this->mtx_->lock();
-    return true;
-}
-
-bool Lock::unlock()
-{
-    this->mtx_->unlock();
-    return true;
-}
-} // namespace Resource
-} // namespace Global
-} // namespace OHOS
+#endif

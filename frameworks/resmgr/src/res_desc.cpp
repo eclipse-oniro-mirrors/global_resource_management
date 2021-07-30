@@ -21,7 +21,6 @@
 #include "utils/common.h"
 #include "utils/string_utils.h"
 
-
 namespace OHOS {
 namespace Global {
 namespace Resource {

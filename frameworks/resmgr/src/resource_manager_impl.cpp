@@ -31,7 +31,7 @@ namespace Resource {
 // default logLevel
 LogLevel g_logLevel = LOG_INFO;
 
-ResourceManager* CreateResourceManager()
+ResourceManager *CreateResourceManager()
 {
     ResourceManagerImpl *impl = new (std::nothrow) ResourceManagerImpl;
     if (impl == nullptr) {
@@ -255,14 +255,14 @@ RState ResourceManagerImpl::GetPluralString(const HapResource::ValueUnderQualifi
     }
 
     std::string converted = hapManager_->GetPluralRulesAndSelect(quantity);
-    auto iter = map.find(converted);
-    if (iter == map.end()) {
-        iter = map.find("other");
-        if (iter == map.end()) {
+    auto mapIter = map.find(converted);
+    if (mapIter == map.end()) {
+        mapIter = map.find("other");
+        if (mapIter == map.end()) {
             return NOT_FOUND;
         }
     }
-    outValue = iter->second;
+    outValue = mapIter->second;
 
     return SUCCESS;
 }
@@ -598,7 +598,7 @@ RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig)
     if (resConfig.GetLocaleInfo() == nullptr) {
         return LOCALEINFO_IS_NULL;
     }
-    if (resConfig.GetLocaleInfo()->GetLanguage() == nullptr) {
+    if (resConfig.GetLocaleInfo()->getLanguage() == nullptr) {
         return LOCALEINFO_IS_NULL;
     }
     return this->hapManager_->UpdateResConfig(resConfig);

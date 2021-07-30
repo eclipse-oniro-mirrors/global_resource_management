@@ -56,6 +56,11 @@ void ResConfigTest::TearDown()
 {
 }
 
+/*
+ * @tc.name: ResConfigFuncTest001
+ * @tc.desc: Test Config function, non file case.
+ * @tc.type: FUNC
+ */
 HWTEST_F(ResConfigTest, ResConfigFuncTest001, TestSize.Level1)
 {
     ResConfigImpl *rc = new ResConfigImpl;

@@ -13,14 +13,14 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_RESOURCE_MANAGER_LOCALEINFO_IMPL_H
-#define OHOS_RESOURCE_MANAGER_LOCALEINFO_IMPL_H
+#ifndef OHOS_RESOURCE_MANAGER_RES_LOCALE_H
+#define OHOS_RESOURCE_MANAGER_RES_LOCALE_H
 #include <cstdint>
 #include <cstddef>
+#include <unicode/locid.h>
 #include "rstate.h"
 #include "lock.h"
-#include "locale_info.h"
-
+using icu::Locale;
 namespace OHOS {
 namespace Global {
 namespace Resource {
@@ -32,29 +32,29 @@ struct ParseResult {
     int16_t scriptTagLen = 0;
     int16_t regionTagLen = 0;
 };
-class LocaleInfoImpl : public LocaleInfo {
+class ResLocale  {
 public:
-    virtual const char* GetLanguage() const;
+    const char* GetLanguage() const;
 
-    virtual const char* GetRegion() const;
+    const char* GetRegion() const;
 
-    virtual const char* GetScript() const;
+    const char* GetScript() const;
 
-    LocaleInfoImpl();
+    ResLocale();
 
-    RState CopyImpl(const LocaleInfoImpl* other);
+    RState CopyFromLocaleInfo(const Locale *other);
 
-    RState Copy(const LocaleInfo* other);
+    RState Copy(const ResLocale *other);
 
-    static const LocaleInfoImpl* GetSysDefault();
+    static const Locale* GetDefault();
 
-    static bool UpdateSysDefault(const LocaleInfo& LocaleInfo, bool needNotify);
+    static bool UpdateDefault(const Locale& localeInfo, bool needNotify);
 
-    static LocaleInfoImpl* BuildFromString(const char* bcp47String, char sep, RState& rState);
+    static ResLocale* BuildFromString(const char *bcp47String, char sep, RState& rState);
 
-    static LocaleInfoImpl* BuildFromParts(const char* language, const char* script, const char* region, RState& rState);
+    static ResLocale* BuildFromParts(const char *language, const char *script, const char *region, RState& rState);
 
-    virtual ~LocaleInfoImpl();
+    ~ResLocale();
 
     static constexpr uint16_t END_TYPE = 0x0000;
     // language parse
@@ -67,26 +67,26 @@ public:
     static constexpr size_t MIN_BCP47_STR_LEN = 2;
 
 private:
-    RState SetLanguage(const char* language, size_t len);
+    RState SetLanguage(const char *language, size_t len);
 
-    RState SetScript(const char* script, size_t len);
+    RState SetScript(const char *script, size_t len);
 
-    RState SetRegion(const char* region, size_t len);
+    RState SetRegion(const char *region, size_t len);
 
-    static LocaleInfoImpl* DoParse(const char* bcp47String, char sep, RState& rState);
+    static ResLocale* DoParse(const char *bcp47String, char sep, RState& rState);
 
-    static LocaleInfoImpl* CreateLocaleInfo(ParseResult& parseResult, RState& rState);
+    static ResLocale* CreateResLocale(ParseResult& parseResult, RState& rState);
 
-    RState Init(const char* language, size_t languageLen, const char* script, size_t scriptLen,
-        const char* region, size_t regionLen);
+    RState Init(const char *language, size_t languageLen, const char *script, size_t scriptLen,
+        const char *region, size_t regionLen);
 
-    const char* language_;
+    const char *language_;
 
-    const char* region_;
+    const char *region_;
 
-    const char* script_;
+    const char *script_;
 
-    static LocaleInfoImpl* defaultLocale_;
+    static Locale *defaultLocale_;
 
     static Lock lock_;
 
@@ -96,4 +96,3 @@ private:
 } // namespace Global
 } // namespace OHOS
 #endif
-

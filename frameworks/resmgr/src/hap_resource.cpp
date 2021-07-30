@@ -18,9 +18,6 @@
 #include <fstream>
 #include <iostream>
 
-#include <fstream>
-#include <iostream>
-
 #include "hap_parser.h"
 #include "hilog_wrapper.h"
 #include "locale_matcher.h"
@@ -94,15 +91,20 @@ const HapResource *HapResource::LoadFromIndex(const char *path, const ResConfigI
     }
     inFile.seekg(0, std::ios::end);
     size_t bufLen = inFile.tellg();
-    inFile.close();
-    std::ifstream inFile2(path, std::ios::binary | std::ios::in);
+    if (bufLen <= 0) {
+        HILOG_ERROR("file size is zero");
+        inFile.close();
+        return nullptr;
+    }
     void *buf = malloc(bufLen);
     if (buf == nullptr) {
         HILOG_ERROR("Error allocating memory");
+        inFile.close();
         return nullptr;
     }
-    inFile2.read((char *) buf, bufLen);
-    inFile2.close();
+    inFile.seekg(0, std::ios::beg);
+    inFile.read((char *)buf, bufLen);
+    inFile.close();
 
     HILOG_DEBUG("extract success, bufLen:%zu", bufLen);
 
@@ -111,7 +113,7 @@ const HapResource *HapResource::LoadFromIndex(const char *path, const ResConfigI
         HILOG_ERROR("new ResDesc failed when LoadFromIndex");
         return nullptr;
     }
-    int32_t out = HapParser::ParseResHex((char *) buf, bufLen, *resDesc, defaultConfig);
+    int32_t out = HapParser::ParseResHex((char *)buf, bufLen, *resDesc, defaultConfig);
     if (out != OK) {
         delete (resDesc);
         free(buf);
