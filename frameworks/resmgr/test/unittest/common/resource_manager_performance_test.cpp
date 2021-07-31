@@ -154,7 +154,7 @@ int TestLoadFromIndex(const char *filePath)
             free(buf);
             return -1;
         }
-        int32_t out = HapParser::ParseResHex((char *) buf, bufLen, *resDesc, nullptr);
+        int32_t out = HapParser::ParseResHex((char *)buf, bufLen, *resDesc, nullptr);
         if (out != OK) {
             delete (resDesc);
             free(buf);
