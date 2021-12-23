@@ -72,6 +72,10 @@ private:
 
     static napi_value New(napi_env env, napi_callback_info info);
 
+    static napi_value GetRawFile(napi_env env, napi_callback_info info);
+
+    static std::string GetRawFile(napi_env env, size_t argc, napi_value *argv);
+
     std::string bundleName_;
     napi_env env_;
     napi_ref wrapper_;
@@ -84,6 +88,7 @@ struct ResMgrAsyncContext {
     std::string bundleName_;
     int32_t resId_;
     int32_t param_;
+    std::string path_;
 
     typedef napi_value (*CreateNapiValue)(napi_env env, ResMgrAsyncContext &context);
     CreateNapiValue createValueFunc_;

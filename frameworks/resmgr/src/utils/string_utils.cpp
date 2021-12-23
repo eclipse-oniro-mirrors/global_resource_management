@@ -16,10 +16,15 @@
 #include "utils/string_utils.h"
 
 #include <cctype>
+#include <cstdarg>
 #include <cstdint>
 #include <vector>
 
+#if defined(__WINNT__)
+#include <cstring>
+#else
 #include "securec.h"
+#endif
 
 namespace OHOS {
 namespace Global {

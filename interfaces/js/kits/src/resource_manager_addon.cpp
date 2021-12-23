@@ -93,7 +93,8 @@ napi_value ResourceManagerAddon::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getMediaBase64", GetMediaBase64),
         DECLARE_NAPI_FUNCTION("getConfiguration", GetConfiguration),
         DECLARE_NAPI_FUNCTION("getDeviceCapability", GetDeviceCapability),
-        DECLARE_NAPI_FUNCTION("getPluralString", GetPluralString)
+        DECLARE_NAPI_FUNCTION("getPluralString", GetPluralString),
+        DECLARE_NAPI_FUNCTION("getRawFile", GetRawFile)
     };
 
     napi_value constructor;
@@ -355,6 +356,33 @@ int ResourceManagerAddon::GetResId(napi_env env, size_t argc, napi_value *argv)
     return resId;
 }
 
+std::string ResourceManagerAddon::GetRawFile(napi_env env, size_t argc, napi_value *argv)
+{
+    if (argc == 0 || argv == nullptr) {
+        return "";
+    }
+
+    napi_valuetype valuetype;
+    napi_typeof(env, argv[0], &valuetype);
+    if (valuetype != napi_string) {
+        HiLog::Error(LABEL, "Invalid param, not string");
+        return "";
+    }
+    size_t len = 0;
+    napi_status status = napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "Failed to get raw file path length");
+        return "";
+    }
+    std::vector<char> buf(len + 1);
+    status = napi_get_value_string_utf8(env, argv[0], buf.data(), len + 1, &len);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "Failed to get raw file path");
+        return "";
+    }
+    return buf.data();
+}
+
 napi_value ResourceManagerAddon::ProcessOnlyIdParam(napi_env env, napi_callback_info info, const std::string &name,
     napi_async_execute_callback execute)
 {
@@ -376,6 +404,8 @@ napi_value ResourceManagerAddon::ProcessOnlyIdParam(napi_env env, napi_callback_
         } else if (i == 1 && valueType == napi_function) {
             napi_create_reference(env, argv[i], 1, &asyncContext->callbackRef_);
             break;
+        } else if (i == 0 && valueType == napi_string) {
+            asyncContext->path_ = GetRawFile(env, argc, argv);
         } else {
             // self resourcemanager with promise
         }
@@ -520,19 +550,13 @@ std::unique_ptr<char[]> LoadResourceFile(std::string &path, ResMgrAsyncContext &
     return tempData;
 }
 
-auto getMediaFunc = [](napi_env env, void *data) {
-    ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
-    std::string path;
-    RState state = asyncContext->addon_->GetResMgr()->GetMediaById(asyncContext->resId_, path);
-    if (state != RState::SUCCESS) {
-        asyncContext->SetErrorMsg("GetMedia path failed", true);
+void GetResourcesBufferData(std::string path, ResMgrAsyncContext &asyncContext)
+{
+    asyncContext.mediaData = LoadResourceFile(path, asyncContext, asyncContext.len_);
+    if (asyncContext.mediaData == nullptr) {
         return;
     }
-    asyncContext->mediaData = LoadResourceFile(path, *asyncContext, asyncContext->len_);
-    if (asyncContext->mediaData == nullptr) {
-        return;
-    }
-    asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext& context) -> napi_value {
+    asyncContext.createValueFunc_ = [](napi_env env, ResMgrAsyncContext& context) -> napi_value {
         napi_value buffer;
         napi_status status = napi_create_external_arraybuffer(env, context.mediaData.get(), context.len_,
             [](napi_env env, void *data, void *hint) {
@@ -553,6 +577,17 @@ auto getMediaFunc = [](napi_env env, void *data) {
         context.mediaData.release();
         return result;
     };
+}
+
+auto getMediaFunc = [](napi_env env, void *data) {
+    ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
+    std::string path;
+    RState state = asyncContext->addon_->GetResMgr()->GetMediaById(asyncContext->resId_, path);
+    if (state != RState::SUCCESS) {
+        asyncContext->SetErrorMsg("GetMedia path failed", true);
+        return;
+    }
+    GetResourcesBufferData(path, *asyncContext);
 };
 
 napi_value ResourceManagerAddon::GetMedia(napi_env env, napi_callback_info info)
@@ -818,6 +853,22 @@ napi_value ResourceManagerAddon::GetPluralString(napi_env env, napi_callback_inf
     }
     asyncContext.release();
     return result;
+}
+
+auto g_getRawFileFunc = [](napi_env env, void* data) {
+    ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
+    std::string path;
+    asyncContext->addon_->GetResMgr()->GetRawFilePathByName(asyncContext->path_, path);
+    if (path.empty()) {
+        asyncContext->SetErrorMsg("GetRawFile path failed", true);
+        return;
+    }
+    GetResourcesBufferData(path, *asyncContext);
+};
+
+napi_value ResourceManagerAddon::GetRawFile(napi_env env, napi_callback_info info)
+{
+    return ProcessOnlyIdParam(env, info, "getRawFile", g_getRawFileFunc);
 }
 
 static napi_value ResMgrInit(napi_env env, napi_value exports)

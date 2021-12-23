@@ -4,7 +4,9 @@
     "resmgr_standard": {
       "module_list": [
         "//base/global/resmgr_standard/interfaces/js/kits:resourcemanager",
-        "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr"
+        "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
+        "//base/global/resmgr_standard/frameworks/resmgr:win_resmgr",
+        "//base/global/resmgr_standard/frameworks/resmgr:mac_resmgr"
       ],
       "inner_kits": [
         {
@@ -22,6 +24,11 @@
       ],
       "test_list": [
         "//base/global/resmgr_standard/frameworks/resmgr/test:unittest"
+      ]
+    },
+    "systemres": {
+      "module_list": [
+        "//utils/resources/systemres:systemres_hap"
       ]
     }
   }
