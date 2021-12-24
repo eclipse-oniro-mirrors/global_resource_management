@@ -49,15 +49,15 @@ public:
     virtual ~ResConfig() {}
 };
 
-ResConfig *CreateResConfig();
+EXPORT_FUNC ResConfig *CreateResConfig();
 
-const Locale *GetSysDefault();
+EXPORT_FUNC const Locale *GetSysDefault();
 
-void UpdateSysDefault(const Locale &localeInfo, bool needNotify);
+EXPORT_FUNC void UpdateSysDefault(const Locale &localeInfo, bool needNotify);
 
-Locale *BuildFromString(const char *str, char sep, RState &rState);
+EXPORT_FUNC Locale *BuildFromString(const char *str, char sep, RState &rState);
 
-Locale *BuildFromParts(const char *language, const char *script, const char *region, RState &rState);
+EXPORT_FUNC Locale *BuildFromParts(const char *language, const char *script, const char *region, RState &rState);
 
 void FindAndSort(std::string localeStr, std::vector<std::string> &candidateLocale, std::vector<std::string> &outValue);
 } // namespace Resource

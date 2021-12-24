@@ -15,11 +15,19 @@
 #include "hap_manager.h"
 
 #include <algorithm>
+#include <fstream>
 #include <ohos/init_data.h>
 
 #include "auto_mutex.h"
 #include "hilog_wrapper.h"
 #include "locale_matcher.h"
+
+#ifdef __WINNT__
+#include <shlwapi.h>
+#include <windows.h>
+#else
+#include <dlfcn.h>
+#endif
 
 namespace OHOS {
 namespace Global {
@@ -35,7 +43,32 @@ bool HapManager::icuInitialized = HapManager::Init();
 
 bool HapManager::Init()
 {
+#ifdef __IDE_PREVIEW__
+#ifdef __WINNT__
+    MEMORY_BASIC_INFORMATION mbi;
+    if (::VirtualQuery((LPCVOID)SetHwIcuDirectory, &mbi, sizeof(mbi)) != 0) {
+        char path[MAX_PATH] = { 0 };
+        GetModuleFileName((HMODULE)mbi.AllocationBase, path, MAX_PATH);
+        std::string tempPath(path);
+        auto pos = tempPath.rfind('\\');
+        if (pos != std::string::npos) {
+            u_setDataDirectory(tempPath.substr(0, pos).c_str());
+        }
+    }
+#else
+    Dl_info info;
+    if (dladdr((void*)SetHwIcuDirectory, &info) != 0) {
+        std::string tempPath(info.dli_fname);
+        auto pos = tempPath.rfind('/');
+        if (pos != std::string::npos) {
+            u_setDataDirectory(tempPath.substr(0, pos).c_str());
+        }
+    }
+#endif
+#else
     SetHwIcuDirectory();
+#endif
+
     return true;
 }
 
@@ -169,6 +202,49 @@ const HapResource::ValueUnderQualifierDir *HapManager::FindQualifierValueById(ui
         }
     }
     return paths[bestIndex];
+}
+
+RState HapManager::FindRawFile(const std::string &name, std::string &outValue)
+{
+#ifdef __WINNT__
+    char seperator = '\\';
+#else
+    char seperator = '/';
+#endif
+    for (auto iter = hapResources_.rbegin(); iter != hapResources_.rend(); iter++) {
+        std::string indexPath = (*iter)->GetIndexPath();
+        auto index = indexPath.rfind(seperator);
+        if (index == std::string::npos) {
+            HILOG_ERROR("index path format error, %s", indexPath.c_str());
+            continue;
+        }
+        std::string resourcesIndexPath = indexPath.substr(0, index);
+        char tmpPath[PATH_MAX] = {0};
+        std::string tempName = name;
+        if (tempName.find("rawfile/") != 0) {
+            tempName = "rawfile/" + tempName;
+        }
+#ifdef __WINNT__
+        if (!PathCanonicalizeA(tmpPath, (resourcesIndexPath + "/resources/" + tempName).c_str())) {
+            continue;
+        }
+#else
+        if (realpath((resourcesIndexPath + "/resources/" + tempName).c_str(), tmpPath) == nullptr) {
+            HILOG_ERROR("FindRawFile path to realpath error");
+            continue;
+        }
+#endif
+        const std::string realPath = tmpPath;
+        if (realPath.find(resourcesIndexPath) == 0) {
+            std::fstream inputFile;
+            inputFile.open(realPath, std::ios::in);
+            if (inputFile) {
+                outValue = realPath;
+                return SUCCESS;
+            }
+        }
+    }
+    return RState::NOT_FOUND;
 }
 
 RState HapManager::UpdateResConfig(ResConfig &resConfig)

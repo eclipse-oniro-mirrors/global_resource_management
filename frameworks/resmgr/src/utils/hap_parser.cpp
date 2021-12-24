@@ -25,7 +25,11 @@
 
 #include "hilog_wrapper.h"
 #include "locale_matcher.h"
+#if defined(__WINNT__)
+#include <cstring>
+#else
 #include "securec.h"
+#endif
 #include "utils/common.h"
 #include "utils/errors.h"
 #include "utils/string_utils.h"
@@ -163,7 +167,7 @@ int32_t ParseString(const char *buffer, uint32_t &offset, std::string &id, bool 
 {
     uint16_t strLen;
     errno_t eret = memcpy_s(&strLen, sizeof(strLen), buffer + offset, 2);
-    if (eret != EOK) {
+    if (eret != 0) {
         return SYS_ERROR;
     }
     offset += 2;
@@ -184,7 +188,7 @@ int32_t ParseStringArray(const char *buffer, uint32_t &offset, std::vector<std::
 {
     uint16_t arrLen;
     errno_t eret = memcpy_s(&arrLen, sizeof(arrLen), buffer + offset, 2);
-    if (eret != EOK) {
+    if (eret != 0) {
         return SYS_ERROR;
     }
     offset += 2;
@@ -215,7 +219,7 @@ int32_t ParseStringArray(const char *buffer, uint32_t &offset, std::vector<std::
 int32_t ParseIdItem(const char *buffer, uint32_t &offset, IdItem *idItem)
 {
     errno_t eret = memcpy_s(idItem, sizeof(IdItem), buffer + offset, IdItem::HEADER_LEN);
-    if (eret != EOK) {
+    if (eret != 0) {
         return SYS_ERROR;
     }
     offset += IdItem::HEADER_LEN;
@@ -247,7 +251,7 @@ int32_t ParseIdItem(const char *buffer, uint32_t &offset, IdItem *idItem)
 int32_t ParseId(const char *buffer, uint32_t &offset, ResId *id)
 {
     errno_t eret = memcpy_s(id, sizeof(ResId), buffer + offset, ResId::RESID_HEADER_LEN);
-    if (eret != EOK) {
+    if (eret != 0) {
         return SYS_ERROR;
     }
     offset += ResId::RESID_HEADER_LEN;
@@ -262,7 +266,7 @@ int32_t ParseId(const char *buffer, uint32_t &offset, ResId *id)
             return SYS_ERROR;
         }
         errno_t eret = memcpy_s(ip, sizeof(IdParam), buffer + offset, ResId::IDPARAM_HEADER_LEN);
-        if (eret != EOK) {
+        if (eret != 0) {
             delete (ip);
             return SYS_ERROR;
         }
@@ -308,7 +312,7 @@ int32_t ParseKey(const char *buffer, uint32_t &offset,  ResKey *key,
                  bool &match, const ResConfigImpl *defaultConfig)
 {
     errno_t eret = memcpy_s(key, sizeof(ResKey), buffer + offset, ResKey::RESKEY_HEADER_LEN);
-    if (eret != EOK) {
+    if (eret != 0) {
         return SYS_ERROR;
     }
     offset += ResKey::RESKEY_HEADER_LEN;
@@ -323,7 +327,7 @@ int32_t ParseKey(const char *buffer, uint32_t &offset,  ResKey *key,
             return SYS_ERROR;
         }
         errno_t eret = memcpy_s(kp, sizeof(KeyParam), buffer + offset, ResKey::KEYPARAM_HEADER_LEN);
-        if (eret != EOK) {
+        if (eret != 0) {
             delete (kp);
             return SYS_ERROR;
         }
@@ -361,7 +365,7 @@ int32_t HapParser::ParseResHex(const char *buffer, const size_t bufLen, ResDesc 
     }
     uint32_t offset = 0;
     errno_t eret = memcpy_s(resHeader, sizeof(ResHeader), buffer + offset, RES_HEADER_LEN);
-    if (eret != EOK) {
+    if (eret != 0) {
         delete (resHeader);
         return SYS_ERROR;
     }
@@ -450,8 +454,8 @@ DeviceType HapParser::GetDeviceType(uint32_t value)
     DeviceType deviceType = DEVICE_NOT_SET;
     if (value == DEVICE_CAR) {
         deviceType = DEVICE_CAR;
-    } else if (value == DEVICE_PC) {
-        deviceType = DEVICE_PC;
+    } else if (value == DEVICE_PAD) {
+        deviceType = DEVICE_PAD;
     } else if (value == DEVICE_PHONE) {
         deviceType = DEVICE_PHONE;
     } else if (value == DEVICE_TABLET) {
