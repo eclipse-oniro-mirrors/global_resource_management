@@ -17,7 +17,11 @@
 #include <cstdlib>
 
 #include "hilog_wrapper.h"
+#if defined(__WINNT__)
+#include <cstring>
+#else
 #include "securec.h"
+#endif
 #include "utils/common.h"
 #include "utils/string_utils.h"
 
@@ -67,8 +71,8 @@ std::string KeyParam::GetDeviceTypeStr() const
             case DeviceType::DEVICE_CAR:
                 ret = std::string(CAR_STR);
                 break;
-            case DeviceType::DEVICE_PC:
-                ret = std::string(PC_STR);
+            case DeviceType::DEVICE_PAD:
+                ret = std::string(PAD_STR);
                 break;
             case DeviceType::DEVICE_TV:
                 ret = std::string(TV_STR);
@@ -87,7 +91,7 @@ const std::string KeyParam::ConvertToStr() const
     if ((type_ == KeyType::LANGUAGES) || (type_ == KeyType::REGION) || (type_ == KeyType::SCRIPT)) {
         char tmp[4], tmp2[5];
         errno_t eret = memcpy_s(tmp, sizeof(tmp), &value_, 4);
-        if (eret != EOK) {
+        if (eret != 0) {
             HILOG_ERROR("memcpy_s error : %d", eret);
         }
         int j = 0;

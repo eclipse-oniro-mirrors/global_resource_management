@@ -118,7 +118,7 @@ HWTEST_F(HapParserTest, HapParserFuncTest001, TestSize.Level1)
 HWTEST_F(HapParserTest, HapParserFuncTest002, TestSize.Level1)
 {
     ASSERT_EQ(DEVICE_CAR, HapParser::GetDeviceType(DEVICE_CAR));
-    ASSERT_EQ(DEVICE_PC, HapParser::GetDeviceType(DEVICE_PC));
+    ASSERT_EQ(DEVICE_PAD, HapParser::GetDeviceType(DEVICE_PAD));
     ASSERT_EQ(DEVICE_PHONE, HapParser::GetDeviceType(DEVICE_PHONE));
     ASSERT_EQ(DEVICE_TABLET, HapParser::GetDeviceType(DEVICE_TABLET));
     ASSERT_EQ(DEVICE_TV, HapParser::GetDeviceType(DEVICE_TV));

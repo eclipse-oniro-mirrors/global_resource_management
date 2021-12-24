@@ -62,6 +62,8 @@ public:
 
     void TestPluralStringByName(int quantity, const char *cmp, bool format = false) const;
 
+    void TestGetRawFilePathByName(const std::string &name, const std::string cmp) const;
+
     void AddResource(const char *language, const char *script, const char *region);
 };
 
@@ -144,6 +146,14 @@ void ResourceManagerTest::TestPluralStringByName(int quantity, const char *cmp, 
 
     ASSERT_EQ(SUCCESS, ret);
     ASSERT_EQ(std::string(cmp), outValue);
+}
+
+void ResourceManagerTest::TestGetRawFilePathByName(const std::string &name, const std::string cmp) const
+{
+    std::string outValue;
+    rm->GetRawFilePathByName(name, outValue);
+    HILOG_DEBUG("%s : %s", name.c_str(), outValue.c_str());
+    ASSERT_EQ(cmp, outValue);
 }
 
 void ResourceManagerTest::SetUpTestCase(void)
@@ -995,7 +1005,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetThemeByNameTest001, TestSize.Lev
     ASSERT_EQ(SUCCESS, state);
     PrintMapString(outValue);
 
-    state = rm->GetThemeByName("activity_theme", outValue);
+    state = rm->GetThemeByName("test_theme", outValue);
     ASSERT_EQ(SUCCESS, state);
     PrintMapString(outValue);
 }
@@ -1700,4 +1710,20 @@ HWTEST_F(ResourceManagerTest, ResourceManagerSameNameTest001, TestSize.Level1)
     state = rm->GetIntegerByName("same_name", outValueI);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(999, outValueI);
+}
+
+/*
+ * test get raw file path interface
+ * @tc.name: RawFileTest001
+ * @tc.desc: Test GetRawFilePathByName, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, RawFileTest001, TestSize.Level1)
+{
+    rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    TestGetRawFilePathByName("rawfile/rawfiletest.xml",
+        "/data/test/all/assets/entry/resources/rawfile/rawfiletest.xml");
+
+    TestGetRawFilePathByName("rawfiletest.xml",
+        "/data/test/all/assets/entry/resources/rawfile/rawfiletest.xml");
 }

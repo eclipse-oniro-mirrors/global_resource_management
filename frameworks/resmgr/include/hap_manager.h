@@ -46,6 +46,8 @@ public:
 
     const HapResource::ValueUnderQualifierDir *FindQualifierValueByName(const char *name, const ResType resType);
 
+    RState FindRawFile(const std::string &name, std::string &outValue);
+
     std::string GetPluralRulesAndSelect(int quantity);
 
 private:

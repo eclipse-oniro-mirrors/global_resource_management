@@ -141,7 +141,7 @@ HWTEST_F(ResDescTest, ResDescFuncTest002, TestSize.Level1)
     TestKeyParam(KeyType::DEVICETYPE, DeviceType::DEVICE_PHONE, PHONE_STR);
     TestKeyParam(KeyType::DEVICETYPE, DeviceType::DEVICE_TABLET, TABLET_STR);
     TestKeyParam(KeyType::DEVICETYPE, DeviceType::DEVICE_CAR, CAR_STR);
-    TestKeyParam(KeyType::DEVICETYPE, DeviceType::DEVICE_PC, PC_STR);
+    TestKeyParam(KeyType::DEVICETYPE, DeviceType::DEVICE_PAD, PAD_STR);
     TestKeyParam(KeyType::DEVICETYPE, DeviceType::DEVICE_TV, TV_STR);
     TestKeyParam(KeyType::DEVICETYPE, DeviceType::DEVICE_WEARABLE, WEARABLE_STR);
     TestKeyParam(KeyType::DEVICETYPE, DeviceType::DEVICE_NOT_SET, "not_device_type");

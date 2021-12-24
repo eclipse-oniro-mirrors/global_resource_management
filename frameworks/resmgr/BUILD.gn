@@ -16,7 +16,6 @@ import("//build/ohos.gni")
 config("resmgr_config") {
   include_dirs = [
     "include",
-    "//third_party/zlib",
     "//third_party/zlib/contrib/minizip",
     "//base/global/resmgr_standard/interfaces/innerkits/include",
     "//third_party/bounds_checking_function/include",
@@ -25,6 +24,20 @@ config("resmgr_config") {
     "//third_party/icu/icu4c/source/i18n",
   ]
 }
+
+manager_sources = [
+  "src/hap_manager.cpp",
+  "src/hap_resource.cpp",
+  "src/locale_matcher.cpp",
+  "src/lock.cpp",
+  "src/res_config_impl.cpp",
+  "src/res_desc.cpp",
+  "src/res_locale.cpp",
+  "src/resource_manager_impl.cpp",
+  "src/utils/hap_parser.cpp",
+  "src/utils/string_utils.cpp",
+  "src/utils/utils.cpp",
+]
 
 config("resmgr_public_config") {
   visibility = [ ":*" ]
@@ -36,19 +49,9 @@ config("resmgr_public_config") {
 }
 
 ohos_shared_library("global_resmgr") {
-  sources = [
-    "src/hap_manager.cpp",
-    "src/hap_resource.cpp",
-    "src/locale_matcher.cpp",
-    "src/lock.cpp",
-    "src/res_config_impl.cpp",
-    "src/res_desc.cpp",
-    "src/res_locale.cpp",
-    "src/resource_manager_impl.cpp",
-    "src/utils/hap_parser.cpp",
-    "src/utils/string_utils.cpp",
-    "src/utils/utils.cpp",
-  ]
+  sources = manager_sources
+
+  defines = [ "CONFIG_HILOG" ]
 
   configs = [ ":resmgr_config" ]
 
@@ -64,4 +67,72 @@ ohos_shared_library("global_resmgr") {
 
   subsystem_name = "global"
   part_name = "resmgr_standard"
+}
+
+ohos_shared_library("global_resmgr_win") {
+  defines = [
+    "__WINNT__",
+    "__EXPORT_MGR__",
+    "__IDE_PREVIEW__",
+  ]
+  cflags = [
+    "-std=c++17",
+    "-Wno-implicit-fallthrough",
+    "-Wno-ignored-attributes",
+  ]
+
+  sources = manager_sources
+
+  configs = [ ":resmgr_config" ]
+
+  public_configs = [ ":resmgr_public_config" ]
+
+  deps = [
+    "//third_party/icu/icu4c:static_icui18n(//build/toolchain/mingw:mingw_x86_64)",
+    "//third_party/icu/icu4c:static_icuuc(//build/toolchain/mingw:mingw_x86_64)",
+    "//third_party/zlib:libz(//build/toolchain/mingw:mingw_x86_64)",
+  ]
+
+  libs = [ "shlwapi" ]
+
+  subsystem_name = "global"
+  part_name = "resmgr_standard"
+}
+
+group("win_resmgr") {
+  if (host_os != "mac") {
+    deps = [ ":global_resmgr_win(//build/toolchain/mingw:mingw_x86_64)" ]
+  }
+}
+
+ohos_shared_library("global_resmgr_mac") {
+  defines = [ "__IDE_PREVIEW__" ]
+  cflags = [
+    "-std=c++17",
+    "-Wno-implicit-fallthrough",
+    "-Wno-ignored-attributes",
+  ]
+
+  sources = manager_sources
+
+  configs = [ ":resmgr_config" ]
+
+  public_configs = [ ":resmgr_public_config" ]
+
+  if (host_os == "mac") {
+    deps = [
+      "//third_party/bounds_checking_function:libsec_static(//build/toolchain/mac:clang_x64)",
+      "//third_party/icu/icu4c:static_icui18n(//build/toolchain/mac:clang_x64)",
+      "//third_party/icu/icu4c:static_icuuc(//build/toolchain/mac:clang_x64)",
+      "//third_party/zlib:libz(//build/toolchain/mac:clang_x64)",
+    ]
+  }
+  subsystem_name = "global"
+  part_name = "resmgr_standard"
+}
+
+group("mac_resmgr") {
+  if (host_os == "mac") {
+    deps = [ ":global_resmgr_mac(//build/toolchain/mac:clang_x64)" ]
+  }
 }
