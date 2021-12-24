@@ -94,5 +94,6 @@ int ResourceManagerGetMediaByNameTest002();
 int ResourceManagerResolveReferenceTest001();
 int ResourceManagerResolveParentReferenceTest001();
 int ResourceManagerSameNameTest001();
+int RawFileTest001();
 
 #endif

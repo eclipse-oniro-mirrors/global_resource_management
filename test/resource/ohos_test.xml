@@ -20,6 +20,7 @@
             <option name="push" value="data/err-config.json-2.hap -> /data/test/" src="res"/>
             <option name="push" value="data/all/config.json -> /data/test/all/" src="res"/>
             <option name="push" value="data/all/assets/entry/resources.index -> /data/test/all/assets/entry/" src="res"/>
+            <option name="push" value="data/all/assets/entry/resources/rawfile/rawfiletest.xml -> /data/test/all/assets/entry/resources/rawfile/" src="res"/>
             <option name="push" value="data/all/assets/entry/resources/base/graphic/attributes.key -> /data/test/all/assets/entry/resources/base/graphic/" src="res"/>
             <option name="push" value="data/all/assets/entry/resources/base/graphic/back.sxml -> /data/test/all/assets/entry/resources/base/graphic/" src="res"/>
             <option name="push" value="data/all/assets/entry/resources/base/graphic/constants.key -> /data/test/all/assets/entry/resources/base/graphic/" src="res"/>

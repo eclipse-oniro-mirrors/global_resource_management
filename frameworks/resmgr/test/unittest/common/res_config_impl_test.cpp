@@ -342,7 +342,7 @@ HWTEST_F(ResConfigImplTest, ResConfigImplMatchTest020, TestSize.Level1)
     ResConfigImpl *other = CreateResConfigImpl("en", nullptr, nullptr);
     ResConfigImpl *current = CreateResConfigImpl("en", nullptr, nullptr);
     current->SetDeviceType(DeviceType::DEVICE_CAR);
-    other->SetDeviceType(DeviceType::DEVICE_PC);
+    other->SetDeviceType(DeviceType::DEVICE_PAD);
     EXPECT_FALSE(current->Match(other));
     delete current;
     delete other;
@@ -357,7 +357,7 @@ HWTEST_F(ResConfigImplTest, ResConfigImplMatchTest021, TestSize.Level1)
 {
     ResConfigImpl *other = CreateResConfigImpl("en", nullptr, nullptr);
     ResConfigImpl *current = CreateResConfigImpl("en", nullptr, nullptr);
-    other->SetDeviceType(DeviceType::DEVICE_PC);
+    other->SetDeviceType(DeviceType::DEVICE_PAD);
     EXPECT_TRUE(current->Match(other));
     delete current;
     delete other;
@@ -372,7 +372,7 @@ HWTEST_F(ResConfigImplTest, ResConfigImplMatchTest022, TestSize.Level1)
 {
     ResConfigImpl *other = CreateResConfigImpl("en", nullptr, nullptr);
     ResConfigImpl *current = CreateResConfigImpl("en", nullptr, nullptr);
-    current->SetDeviceType(DeviceType::DEVICE_PC);
+    current->SetDeviceType(DeviceType::DEVICE_PAD);
     EXPECT_TRUE(current->Match(other));
     delete current;
     delete other;

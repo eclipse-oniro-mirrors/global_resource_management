@@ -29,7 +29,9 @@ namespace OHOS {
 namespace Global {
 namespace Resource {
 // default logLevel
+#ifdef CONFIG_HILOG
 LogLevel g_logLevel = LOG_INFO;
+#endif
 
 ResourceManager *CreateResourceManager()
 {
@@ -65,6 +67,8 @@ bool ResourceManagerImpl::Init()
         HILOG_ERROR("new HapManager failed when ResourceManagerImpl::Init");
         return false;
     }
+    AddResource("/data/accounts/account_0/applications/ohos.global.systemres" \
+        "/ohos.global.systemres/assets/entry/resources.index");
     return true;
 }
 
@@ -577,8 +581,23 @@ RState ResourceManagerImpl::GetRawFile(const HapResource::ValueUnderQualifierDir
         return NOT_FOUND;
     }
     outValue = vuqd->GetHapResource()->GetResourcePath();
+#ifdef __IDE_PREVIEW__
+    auto index = idItem->value_.find('/');
+    if (index == std::string::npos) {
+        HILOG_ERROR("resource path format error, %s", idItem->value_.c_str());
+        return NOT_FOUND;
+    }
+    auto nameWithoutModule = idItem->value_.substr(index + 1);
+    outValue.append(nameWithoutModule);
+#else
     outValue.append(idItem->value_);
+#endif
     return SUCCESS;
+}
+
+RState ResourceManagerImpl::GetRawFilePathByName(const std::string &name, std::string &outValue)
+{
+    return hapManager_->FindRawFile(name, outValue);
 }
 
 ResourceManagerImpl::~ResourceManagerImpl()

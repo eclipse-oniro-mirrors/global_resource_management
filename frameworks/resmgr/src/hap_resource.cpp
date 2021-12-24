@@ -120,8 +120,6 @@ const HapResource *HapResource::LoadFromIndex(const char *path, const ResConfigI
         free(buf);
         HILOG_ERROR("ParseResHex failed! retcode:%d", out);
         return nullptr;
-    } else {
-        HILOG_DEBUG("ParseResHex success:\n%s", resDesc->ToString().c_str());
     }
     free(buf);
 
@@ -140,17 +138,26 @@ const HapResource *HapResource::LoadFromIndex(const char *path, const ResConfigI
 
 bool HapResource::Init()
 {
-    auto index = indexPath_.rfind('/');
+#ifdef __WINNT__
+    char seperator = '\\';
+#else
+    char seperator = '/';
+#endif
+    auto index = indexPath_.rfind(seperator);
     if (index == std::string::npos) {
         HILOG_ERROR("index path format error, %s", indexPath_.c_str());
         return false;
     }
-    index = indexPath_.rfind('/', index - 1);
+#ifdef __IDE_PREVIEW__
+    resourcePath_ = indexPath_.substr(0, index + 1);
+#else
+    index = indexPath_.rfind(seperator, index - 1);
     if (index == std::string::npos) {
         HILOG_ERROR("index path format error, %s", indexPath_.c_str());
         return false;
     }
     resourcePath_ = indexPath_.substr(0, index + 1);
+#endif
     for (int i = 0; i < ResType::MAX_RES_TYPE; ++i) {
         auto mptr = new (std::nothrow) std::map<std::string, IdValues *>();
         if (mptr == nullptr) {

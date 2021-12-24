@@ -94,6 +94,8 @@ public:
 
     virtual RState GetMediaByName(const char *name, std::string &outValue);
 
+    virtual RState GetRawFilePathByName(const std::string &name, std::string &outValue);
+
 private:
     RState GetString(const IdItem *idItem, std::string &outValue);
 
