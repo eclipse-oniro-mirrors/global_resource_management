@@ -35,7 +35,7 @@ namespace Resource {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "ResourceManagerJs" };
 using namespace OHOS::HiviewDFX;
 using namespace OHOS::AppExecFwk;
-static napi_ref* g_constructor = nullptr;
+static thread_local napi_ref* g_constructor = nullptr;
 std::vector<char> g_codes = {
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
     'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
