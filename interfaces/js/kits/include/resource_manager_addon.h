@@ -37,7 +37,8 @@ public:
 
     ~ResourceManagerAddon();
 
-    bool InitContext(napi_env env, const std::string bundleName, AppExecFwk::Ability *ability);
+    bool InitContext(napi_env env, const std::string bundleName, AppExecFwk::Ability *ability,
+        std::shared_ptr<AbilityRuntime::Context> context);
 
     inline std::shared_ptr<ResourceManager> GetResMgr()
     {
@@ -109,9 +110,10 @@ struct ResMgrAsyncContext {
 
     std::shared_ptr<ResourceManagerAddon> addon_;
     AppExecFwk::Ability *ability_;
+    std::shared_ptr<AbilityRuntime::Context> context_;
 
     ResMgrAsyncContext() : work_(nullptr), resId_(0), param_(0), createValueFunc_(nullptr), len_(0), deferred_(nullptr),
-        callbackRef_(nullptr), success_(true), addon_(nullptr), ability_(nullptr) {}
+        callbackRef_(nullptr), success_(true), addon_(nullptr), ability_(nullptr), context_(nullptr) {}
 
     void SetErrorMsg(const std::string &msg, bool withResId = false);
 };

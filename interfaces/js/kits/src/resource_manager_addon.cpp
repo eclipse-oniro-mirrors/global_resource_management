@@ -19,7 +19,9 @@
 #include <memory>
 #include <vector>
 
+#include "foundation/aafwk/standard/frameworks/kits/appkit/native/ability_runtime/context/context.h"
 #include "hilog/log.h"
+#include "js_runtime_utils.h"
 #include "node_api.h"
 
 namespace OHOS {
@@ -128,7 +130,7 @@ napi_async_execute_callback ResourceManagerAddon::GetResMgrExecute()
             asyncContext->SetErrorMsg("Failed to create ResourceManagerAddon");
             return;
         }
-        if (!obj->InitContext(env, asyncContext->bundleName_, asyncContext->ability_)) {
+        if (!obj->InitContext(env, asyncContext->bundleName_, asyncContext->ability_, asyncContext->context_)) {
             asyncContext->SetErrorMsg("InitContext failed");
             return;
         }
@@ -225,44 +227,65 @@ bool GetGlobalAbility(napi_env env, ResMgrAsyncContext &context)
 
     napi_value abilityObj;
     status = napi_get_named_property(env, global, "ability", &abilityObj);
-    if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to get ability property");
-        return false;
-    }
+    if (abilityObj != nullptr) {
+        if (status != napi_ok) {
+            HiLog::Error(LABEL, "Failed to get ability property");
+            return false;
+        }
 
-    Ability* ability = nullptr;
-    status = napi_get_value_external(env, abilityObj, (void **)&ability);
-    if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to get native ability");
-        return false;
+        Ability* ability = nullptr;
+        status = napi_get_value_external(env, abilityObj, (void **)&ability);
+        if (status != napi_ok) {
+            HiLog::Error(LABEL, "Failed to get native ability");
+            return false;
+        }
+        context.ability_ = ability;
     }
-    context.ability_ = ability;
     return true;
 }
 
 napi_value ResourceManagerAddon::GetResourceManager(napi_env env, napi_callback_info info)
 {
-    GET_PARAMS(env, info, 2);
+    GET_PARAMS(env, info, 3);
 
     std::unique_ptr<ResMgrAsyncContext> asyncContext = std::make_unique<ResMgrAsyncContext>();
     for (size_t i = 0; i < argc; i++) {
         napi_valuetype valueType;
         napi_typeof(env, argv[i], &valueType);
-        if (i == 0 && valueType == napi_string) {
+        if (i == 0 && valueType == napi_object) {
+            using WeakContextPtr = std::weak_ptr<AbilityRuntime::Context>* ;
+            WeakContextPtr objContext;
+            napi_status status = napi_unwrap(env, argv[0], reinterpret_cast<void **>(&objContext));
+            if (status != napi_ok || objContext == nullptr) {
+                HiLog::Error(LABEL, "Failed to get objContext");
+                return nullptr;
+            }
+            auto context = objContext->lock();
+            if (context == nullptr) {
+                HiLog::Error(LABEL, "Failed to get context");
+                return nullptr;
+            }
+            auto abilityContext = AbilityRuntime::Context::ConvertTo<AbilityRuntime::AbilityContext>(context);
+            if (abilityContext == nullptr) {
+                HiLog::Error(LABEL, "Failed to get AbilityContext");
+                return nullptr;
+            }
+            asyncContext->context_ = abilityContext;
+        } else if ((i == 0 || i == 1) && valueType == napi_string) {
             size_t len = 0;
-            napi_status status = napi_get_value_string_utf8(env, argv[0], nullptr, 0, &len);
+            napi_status status = napi_get_value_string_utf8(env, argv[i], nullptr, 0, &len);
             if (status != napi_ok) {
                 HiLog::Error(LABEL, "Failed to get bundle name length");
                 return nullptr;
             }
             std::vector<char> buf(len + 1);
-            status = napi_get_value_string_utf8(env, argv[0], buf.data(), len + 1, &len);
+            status = napi_get_value_string_utf8(env, argv[i], buf.data(), len + 1, &len);
             if (status != napi_ok) {
                 HiLog::Error(LABEL, "Failed to get bundle name");
                 return nullptr;
             }
             asyncContext->bundleName_ = buf.data();
-        } else if ((i == 0 || i == 1) && valueType == napi_function) {
+        } else if ((i == 0 || i == 1 || i == 2) && valueType == napi_function) {
             napi_create_reference(env, argv[i], 1, &asyncContext->callbackRef_);
             break;
         } else {
@@ -313,19 +336,31 @@ napi_value ResourceManagerAddon::New(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
-bool ResourceManagerAddon::InitContext(napi_env env, const std::string bundleName, Ability* ability)
+bool ResourceManagerAddon::InitContext(napi_env env, const std::string bundleName, Ability* ability,
+    std::shared_ptr<AbilityRuntime::Context> context)
 {
     env_ = env;
-    if (bundleName.length() == 0) {
-        resMgr_ = ability->GetResourceManager();
-    } else {
-        std::shared_ptr<Context> bundleConext = ability->CreateBundleContext(bundleName, 0);
-        if (bundleConext != nullptr) {
-            resMgr_ = bundleConext->GetResourceManager();
+    if (ability != nullptr) {
+        if (bundleName.empty()) {
+            resMgr_ = ability->GetResourceManager();
+        } else {
+            std::shared_ptr<Context> bundleContext = ability->CreateBundleContext(bundleName, 0);
+            if (bundleContext != nullptr) {
+                resMgr_ = bundleContext->GetResourceManager();
+            }
+            bundleName_ = bundleName;
+        }
+    } else if (context != nullptr) {
+        if (bundleName.empty()) {
+            resMgr_ = context->GetResourceManager();
+        } else {
+            std::shared_ptr<OHOS::AbilityRuntime::Context> bundleContext = context->CreateBundleContext(bundleName);
+            if (bundleContext != nullptr) {
+                resMgr_ = bundleContext->GetResourceManager();
+            }
+            bundleName_ = bundleName;
         }
     }
-
-    bundleName_ = bundleName;
     return resMgr_ != nullptr;
 }
 
