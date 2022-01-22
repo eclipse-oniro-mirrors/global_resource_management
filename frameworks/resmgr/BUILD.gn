@@ -145,3 +145,45 @@ group("mac_resmgr") {
     deps = [ ":global_resmgr_mac(//build/toolchain/mac:clang_x64)" ]
   }
 }
+
+ohos_shared_library("librawfile") {
+  output_name = "rawfile"
+  sources = [ "src/raw_file_manager.cpp" ]
+
+  include_dirs = [
+    "//base/global/resmgr_standard/frameworks/resmgr/include",
+    "//base/global/resmgr_standard/interfaces/native/resource/include",
+    "//base/global/resmgr_standard/interfaces/innerkits/include",
+    "//base/global/resmgr_standard/interfaces/js/kits/include",
+    "//third_party/node/src",
+    "//third_party/icu/icu4c/source/i18n",
+  ]
+
+  cflags = [ "-Wno-error=inconsistent-missing-override" ]
+
+  deps = [
+    "//base/global/resmgr_standard/interfaces/native/resource:librawfile_ndk",
+    "//utils/native/base:utils",
+  ]
+
+  public_deps = [
+    "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
+    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
+    "//foundation/ace/napi:ace_napi",
+  ]
+
+  external_deps = [
+    "ability_runtime:ability_manager",
+    "appexecfwk_standard:appexecfwk_base",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
+
+  version_script = get_label_info(
+                       "//base/global/resmgr_standard/interfaces/native/resource:librawfile_ndk",
+                       "target_gen_dir") + "/" + get_label_info(
+                       "//base/global/resmgr_standard/interfaces/native/resource:librawfile_ndk",
+                       "name") + version_script_suffix
+
+  subsystem_name = "global"
+  part_name = "resmgr_standard"
+}
