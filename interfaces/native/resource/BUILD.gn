@@ -13,7 +13,7 @@
 
 import("//build/ohos.gni")
 
-ohos_ndk_library("librawfile") {
+ohos_ndk_library("librawfile_ndk") {
   ndk_description_file = "./librawfile.ndk.json"
   min_compact_version = "1"
   output_name = "rawfile"
@@ -26,43 +26,4 @@ ohos_ndk_headers("rawfile_header") {
     "./include/raw_file.h",
     "./include/raw_file_manager.h",
   ]
-}
-
-ohos_shared_library("librawfile_ndk") {
-  output_name = "rawfile"
-  sources = [ "src/raw_file_manager.cpp" ]
-
-  include_dirs = [
-    "include",
-    "//base/global/resmgr_standard/frameworks/resmgr/include",
-    "//base/global/resmgr_standard/interfaces/innerkits/include",
-    "//base/global/resmgr_standard/interfaces/js/kits/include",
-    "//third_party/node/src",
-    "//third_party/icu/icu4c/source/i18n",
-  ]
-
-  cflags = [ "-Wno-error=inconsistent-missing-override" ]
-
-  deps = [
-    ":librawfile",
-    "//utils/native/base:utils",
-  ]
-
-  public_deps = [
-    "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
-    "//foundation/ace/napi:ace_napi",
-  ]
-
-  external_deps = [
-    "ability_runtime:ability_manager",
-    "appexecfwk_standard:appexecfwk_base",
-    "hiviewdfx_hilog_native:libhilog",
-  ]
-
-  version_script = get_label_info(":librawfile", "target_gen_dir") + "/" +
-                   get_label_info(":librawfile", "name") + version_script_suffix
-
-  subsystem_name = "global"
-  part_name = "resmgr_standard"
 }
