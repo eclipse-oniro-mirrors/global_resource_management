@@ -227,20 +227,17 @@ bool GetGlobalAbility(napi_env env, ResMgrAsyncContext &context)
 
     napi_value abilityObj;
     status = napi_get_named_property(env, global, "ability", &abilityObj);
-    if (abilityObj != nullptr) {
-        if (status != napi_ok) {
-            HiLog::Error(LABEL, "Failed to get ability property");
-            return false;
-        }
+    if (status != napi_ok || abilityObj == nullptr) {
+        HiLog::Warn(LABEL, "Failed to get ability property");
+        return true;
+    }
 
-        Ability* ability = nullptr;
-        status = napi_get_value_external(env, abilityObj, (void **)&ability);
-        if (status != napi_ok) {
-            HiLog::Error(LABEL, "Failed to get native ability");
-            return false;
-        }
+    Ability* ability = nullptr;
+    status = napi_get_value_external(env, abilityObj, (void **)&ability);
+    if (status == napi_ok && ability != nullptr) {
         context.ability_ = ability;
     }
+
     return true;
 }
 
@@ -265,12 +262,7 @@ napi_value ResourceManagerAddon::GetResourceManager(napi_env env, napi_callback_
                 HiLog::Error(LABEL, "Failed to get context");
                 return nullptr;
             }
-            auto abilityContext = AbilityRuntime::Context::ConvertTo<AbilityRuntime::AbilityContext>(context);
-            if (abilityContext == nullptr) {
-                HiLog::Error(LABEL, "Failed to get AbilityContext");
-                return nullptr;
-            }
-            asyncContext->context_ = abilityContext;
+            asyncContext->context_ = context;
         } else if ((i == 0 || i == 1) && valueType == napi_string) {
             size_t len = 0;
             napi_status status = napi_get_value_string_utf8(env, argv[i], nullptr, 0, &len);
