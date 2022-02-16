@@ -358,7 +358,7 @@ RState ResourceManagerImpl::ResolveParentReference(const IdItem *idItem, std::ma
         }
         if (haveParent) {
             // get parent
-            uint32_t id;
+            unsigned int id;
             ResType resType;
             bool isRef = IdItem::IsRef(currItem->values_[0], resType, id);
             if (!isRef) {
