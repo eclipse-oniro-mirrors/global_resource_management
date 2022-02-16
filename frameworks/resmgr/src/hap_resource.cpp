@@ -93,11 +93,8 @@ const HapResource *HapResource::LoadFromIndex(const char *path, const ResConfigI
     BYTRACE_NAME(BYTRACE_TAG_APP, __PRETTY_FUNCTION__);
 
 #endif
-    char paths[PATH_MAX] = {0};
-    if (strLen(path) > PATH_MAX) || realPath(path, paths) == NULL) {
-        return nullptr;
-    }
-    std::ifstream inFile(paths, std::ios::binary | std::ios::in);
+
+    std::ifstream inFile(path, std::ios::binary | std::ios::in);
     if (!inFile.good()) {
         return nullptr;
     }

@@ -53,12 +53,8 @@ struct RawFile {
     long offset;
     long length;
     FILE* pf;
-    char path[PATH_MAX] = {0};
-    explicit RawFile(const std::string &path) : filePath(path), offset(0L), length(0L), pf(nullptr) {
-        if (strLen(path) > PATH_MAX || realpath(path, filePath) == NULL) {
-            HiLog::Error(LABEL, "Failed to canonical file path");
-        }
-    }
+
+    explicit RawFile(const std::string &path) : filePath(path), offset(0L), length(0L), pf(nullptr) {}
 
     ~RawFile()
     {
