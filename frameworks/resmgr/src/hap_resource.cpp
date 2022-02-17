@@ -103,11 +103,11 @@ const HapResource *HapResource::LoadFromIndex(const char *path, const ResConfigI
     char paths[PATH_MAX] = {0};
 #ifdef __WINNT__
     if (!PathCanonicalizeA(paths, path)) {
-        HILOG_ERROR("failed the PathCanonicalize the path");
+        HILOG_ERROR("failed to PathCanonicalize the path");
     }
 #else
     if (realpath(path, paths) == nullptr) {
-        HILOG_ERROR("FindRawFile path to realpath error");
+        HILOG_ERROR("failed to realpath the path");
     }
 #endif
     std::ifstream inFile(paths, std::ios::binary | std::ios::in);

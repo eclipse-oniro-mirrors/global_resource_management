@@ -259,11 +259,11 @@ bool OH_ResourceManager_GetRawFileDescriptor(const RawFile *rawFile, RawFileDesc
     char paths[PATH_MAX] = {0};
 #ifdef __WINNT__
     if (!PathCanonicalizeA(paths, rawFile->filePath.c_str())) {
-        HiLog::Error(LABEL, "failed the PathCanonicalizeA the rawFile path");
+        HiLog::Error(LABEL, "failed to PathCanonicalizeA the rawFile path");
     }
 #else
     if (realpath(rawFile->filePath.c_str(), paths) == nullptr) {
-        HiLog::Error(LABEL, "failed the realpath the rawFile path");
+        HiLog::Error(LABEL, "failed to realpath the rawFile path");
     }
 #endif
     int fd = open(paths, O_RDONLY);
