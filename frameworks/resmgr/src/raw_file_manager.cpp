@@ -27,8 +27,12 @@
 #include "resource_manager_impl.h"
 #include "hilog/log.h"
 
+#ifdef __WINNT__
 #include <shlwapi.h>
 #include <windows.h>
+#else
+#include <dlfcn.h>
+#endif
 
 using namespace OHOS::Global::Resource;
 using namespace OHOS::HiviewDFX;
@@ -252,9 +256,16 @@ bool OH_ResourceManager_GetRawFileDescriptor(const RawFile *rawFile, RawFileDesc
     if (rawFile == nullptr) {
         return false;
     }
-    if (!PathCanonicalize(paths, rawFile->filePath.c_str())) {
-        return false;
+    char paths[PATH_MAX] = {0};
+#ifdef __WINNT__
+    if (!PathCanonicalizeA(paths, rawFile->filePath.c_str())) {
+        HiLog::Error(LABEL, "failed the PathCanonicalizeA the rawFile path");
     }
+#else
+    if (realpath(rawFile->filePath.c_str(), paths) == nullptr) {
+        HiLog::Error(LABEL, "failed the realpath the rawFile path");
+    }
+#endif
     int fd = open(paths, O_RDONLY);
     if (fd > 0) {
         descriptor.fd = fd;
