@@ -18,6 +18,13 @@
 #include <fstream>
 #include <iostream>
 
+#ifdef __WINNT__
+#include <shlwapi.h>
+#include <windows.h>
+#else
+#include <dlfcn.h>
+#endif
+
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
 #include "bytrace.h"
 #endif
@@ -92,7 +99,18 @@ const HapResource *HapResource::LoadFromIndex(const char *path, const ResConfigI
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
     BYTRACE_NAME(BYTRACE_TAG_APP, __PRETTY_FUNCTION__);
 #endif
-    std::ifstream inFile(path, std::ios::binary | std::ios::in);
+
+    char paths[PATH_MAX] = {0};
+#ifdef __WINNT__
+    if (!PathCanonicalizeA(paths, path)) {
+        HILOG_ERROR("failed to PathCanonicalize the path");
+    }
+#else
+    if (realpath(path, paths) == nullptr) {
+        HILOG_ERROR("failed to realpath the path");
+    }
+#endif
+    std::ifstream inFile(paths, std::ios::binary | std::ios::in);
     if (!inFile.good()) {
         return nullptr;
     }

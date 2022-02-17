@@ -27,6 +27,13 @@
 #include "resource_manager_impl.h"
 #include "hilog/log.h"
 
+#ifdef __WINNT__
+#include <shlwapi.h>
+#include <windows.h>
+#else
+#include <dlfcn.h>
+#endif
+
 using namespace OHOS::Global::Resource;
 using namespace OHOS::HiviewDFX;
 
@@ -170,7 +177,7 @@ const char *OH_ResourceManager_GetRawFileName(RawDir *rawDir, int index)
     if (rawDir == nullptr || index < 0) {
         return nullptr;
     }
-    int rawFileCount = rawDir->fileNameCache.names.size();
+    uint32_t rawFileCount = rawDir->fileNameCache.names.size();
     if (rawFileCount == 0 || index >= rawFileCount) {
         return nullptr;
     }
@@ -184,7 +191,7 @@ void OH_ResourceManager_CloseRawDir(RawDir *rawDir)
     }
 }
 
-int OH_ResourceManager_ReadRawFile(const RawFile *rawFile, void *buf, int length)
+int OH_ResourceManager_ReadRawFile(const RawFile *rawFile, void *buf, size_t length)
 {
     if (rawFile == nullptr || buf == nullptr || length == 0) {
         return 0;
@@ -249,7 +256,17 @@ bool OH_ResourceManager_GetRawFileDescriptor(const RawFile *rawFile, RawFileDesc
     if (rawFile == nullptr) {
         return false;
     }
-    int fd = open(rawFile->filePath.c_str(), O_RDONLY);
+    char paths[PATH_MAX] = {0};
+#ifdef __WINNT__
+    if (!PathCanonicalizeA(paths, rawFile->filePath.c_str())) {
+        HiLog::Error(LABEL, "failed to PathCanonicalizeA the rawFile path");
+    }
+#else
+    if (realpath(rawFile->filePath.c_str(), paths) == nullptr) {
+        HiLog::Error(LABEL, "failed to realpath the rawFile path");
+    }
+#endif
+    int fd = open(paths, O_RDONLY);
     if (fd > 0) {
         descriptor.fd = fd;
         descriptor.length = rawFile->length;
