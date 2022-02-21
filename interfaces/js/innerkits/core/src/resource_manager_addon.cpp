@@ -376,6 +376,7 @@ std::unique_ptr<char[]> EncodeBase64(std::unique_ptr<char[]> &data, int srcLen)
     char *dstData = result.get();
     int j = 0;
     int i = 0;
+    // There are 3 elements as a group£¬ 1 and 2 are the subscripts of the array
     for (; i < srcLen - 3; i += 3) {
         unsigned char byte1 = static_cast<unsigned char>(srcData[i]);
         unsigned char byte2 = static_cast<unsigned char>(srcData[i + 1]);
@@ -385,6 +386,7 @@ std::unique_ptr<char[]> EncodeBase64(std::unique_ptr<char[]> &data, int srcLen)
         dstData[j++] = g_codes[((byte2 & 0xF) << 2) | (byte3 >> 6)];
         dstData[j++] = g_codes[byte3 & 0x3F];
     }
+    // Handle the case where there is one element left
     if (srcLen % 3 == 1) {
         unsigned char byte1 = static_cast<unsigned char>(srcData[i]);
         dstData[j++] = g_codes[byte1 >> 2];
@@ -456,6 +458,7 @@ auto getMediaFunc = [](napi_env env, void *data) {
     ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
     std::string path;
     RState state = asyncContext->addon_->GetResMgr()->GetMediaById(asyncContext->resId_, path);
+    HiLog::Info(LABEL, "The getMedia outpath is %{public}s", path.c_str());
     if (state != RState::SUCCESS) {
         asyncContext->SetErrorMsg("GetMedia path failed", true);
         return;
@@ -473,6 +476,7 @@ auto getMediaBase64Func = [](napi_env env, void *data) {
     int len = 0;
     std::string path;
     RState state = asyncContext->addon_->GetResMgr()->GetMediaById(asyncContext->resId_, path);
+    HiLog::Info(LABEL, "The getMediaBase64 outpath is %{public}s", path.c_str());
     if (state != RState::SUCCESS) {
         asyncContext->SetErrorMsg("GetMedia path failed", true);
         return;
@@ -705,7 +709,7 @@ napi_value ResourceManagerAddon::GetPluralString(napi_env env, napi_callback_inf
 
         if (i == 0 && valueType == napi_number) {
             asyncContext->resId_ =  GetResId(env, argc, argv);
-        } else if (i == 1 && valueType == napi_number) {
+        } else if (i == 1 && valueType == napi_number) { // 1 is the subscript of parameter array
             napi_get_value_int32(env, argv[i], &asyncContext->param_);
         } else if (i == 2 && valueType == napi_function) { // the third callback param
             napi_create_reference(env, argv[i], 1, &asyncContext->callbackRef_);

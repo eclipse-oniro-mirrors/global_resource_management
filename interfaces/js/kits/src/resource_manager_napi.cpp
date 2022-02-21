@@ -39,9 +39,6 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "Res
 using namespace OHOS::HiviewDFX;
 using namespace OHOS::AppExecFwk;
 
-static bool InitAsyncContext(napi_env env, const std::string bundleName, Ability* ability,
-    const std::shared_ptr<AbilityRuntime::Context>& context, ResMgrAsyncContext &asyncContext);
-
 static void ExecuteGetResMgr(napi_env env, void* data)
 {
     ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
@@ -81,6 +78,35 @@ Ability* GetGlobalAbility(napi_env env)
     return nullptr;
 }
 
+static bool InitAsyncContext(napi_env env, const std::string bundleName, Ability* ability,
+    const std::shared_ptr<AbilityRuntime::Context>& context, ResMgrAsyncContext &asyncContext)
+{
+    std::shared_ptr<ResourceManager> resMgr;
+    if (ability != nullptr) {
+        if (bundleName.empty()) {
+            resMgr = ability->GetResourceManager();
+        } else {
+            std::shared_ptr<Context> bundleContext = ability->CreateBundleContext(bundleName, 0);
+            if (bundleContext != nullptr) {
+                resMgr = bundleContext->GetResourceManager();
+            }
+        }
+    } else if (context != nullptr) {
+        if (bundleName.empty()) {
+            resMgr = context->GetResourceManager();
+        } else {
+            std::shared_ptr<OHOS::AbilityRuntime::Context> bundleContext = context->CreateBundleContext(bundleName);
+            if (bundleContext != nullptr) {
+                resMgr = bundleContext->GetResourceManager();
+            }
+        }
+    }
+
+    asyncContext.resMgr_ = resMgr;
+    asyncContext.bundleName_ = bundleName;
+    return resMgr != nullptr;
+}
+
 static napi_value GetResourceManager(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, 3);
@@ -92,7 +118,7 @@ static napi_value GetResourceManager(napi_env env, napi_callback_info info)
         napi_valuetype valueType;
         napi_typeof(env, argv[i], &valueType);
         if (i == 0 && valueType == napi_object) {
-            using WeakContextPtr = std::weak_ptr<AbilityRuntime::Context>* ;
+            using WeakContextPtr = std::weak_ptr<AbilityRuntime::Context>*;
             WeakContextPtr objContext;
             napi_status status = napi_unwrap(env, argv[0], reinterpret_cast<void **>(&objContext));
             if (status != napi_ok || objContext == nullptr) {
@@ -119,6 +145,7 @@ static napi_value GetResourceManager(napi_env env, napi_callback_info info)
                 return nullptr;
             }
             bundleName = buf.data();
+            // 0 1 2 are the subscript of parameter array
         } else if ((i == 0 || i == 1 || i == 2) && valueType == napi_function) {
             napi_create_reference(env, argv[i], 1, &asyncContext->callbackRef_);
             break;
@@ -155,35 +182,6 @@ static napi_value GetResourceManager(napi_env env, napi_callback_info info)
 
     asyncContext.release();
     return result;
-}
-
-static bool InitAsyncContext(napi_env env, const std::string bundleName, Ability* ability,
-    const std::shared_ptr<AbilityRuntime::Context>& context, ResMgrAsyncContext &asyncContext)
-{
-    std::shared_ptr<ResourceManager> resMgr;
-    if (ability != nullptr) {
-        if (bundleName.empty()) {
-            resMgr = ability->GetResourceManager();
-        } else {
-            std::shared_ptr<Context> bundleContext = ability->CreateBundleContext(bundleName, 0);
-            if (bundleContext != nullptr) {
-                resMgr = bundleContext->GetResourceManager();
-            }
-        }
-    } else if (context != nullptr) {
-        if (bundleName.empty()) {
-            resMgr = context->GetResourceManager();
-        } else {
-            std::shared_ptr<OHOS::AbilityRuntime::Context> bundleContext = context->CreateBundleContext(bundleName);
-            if (bundleContext != nullptr) {
-                resMgr = bundleContext->GetResourceManager();
-            }
-        }
-    }
-
-    asyncContext.resMgr_ = resMgr;
-    asyncContext.bundleName_ = bundleName;
-    return resMgr != nullptr;
 }
 
 static napi_value ResMgrInit(napi_env env, napi_value exports)
