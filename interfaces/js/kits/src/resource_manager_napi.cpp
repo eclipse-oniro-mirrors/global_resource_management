@@ -118,7 +118,7 @@ static napi_value GetResourceManager(napi_env env, napi_callback_info info)
         napi_valuetype valueType;
         napi_typeof(env, argv[i], &valueType);
         if (i == 0 && valueType == napi_object) {
-            using WeakContextPtr = std::weak_ptr<AbilityRuntime::Context>*;
+            using WeakContextPtr = std::weak_ptr<AbilityRuntime::Context> *;
             WeakContextPtr objContext;
             napi_status status = napi_unwrap(env, argv[0], reinterpret_cast<void **>(&objContext));
             if (status != napi_ok || objContext == nullptr) {
