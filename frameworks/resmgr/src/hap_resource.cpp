@@ -94,11 +94,12 @@ HapResource::~HapResource()
     defaultConfig_ = nullptr;
 }
 
-static void CanonicalizePath(const char *path, char *outPath, int outPathLength) {
+const HapResource *HapResource::LoadFromIndex(const char *path, const ResConfigImpl *defaultConfig, bool system)
+{
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
     BYTRACE_NAME(BYTRACE_TAG_APP, __PRETTY_FUNCTION__);
 #endif
-    
+    char outPath[PATH_MAX] = {0};
 #ifdef __WINNT__
     if (!PathCanonicalizeA(outPath, path)) {
         HILOG_ERROR("failed to PathCanonicalize the path");
@@ -108,12 +109,6 @@ static void CanonicalizePath(const char *path, char *outPath, int outPathLength)
         HILOG_ERROR("failed to realpath the path");
     }
 #endif
-}
-
-const HapResource *HapResource::LoadFromIndex(const char *path, const ResConfigImpl *defaultConfig, bool system)
-{
-    char outPath[PATH_MAX] = {0};
-    CanonicalizePath(path, outPath, PATH_MAX);
     std::ifstream inFile(outPath, std::ios::binary | std::ios::in);
     if (!inFile.good()) {
         return nullptr;
@@ -299,8 +294,8 @@ bool HapResource::InitIdList()
                     HILOG_ERROR("new IdValues failed in HapResource::InitIdList");
                     return false;
                 }
-                ValueUnderQualifierDir* limitPath = new (std::nothrow) HapResource::ValueUnderQualifierDir(resKey->keyParams_,
-                    idParam->idItem_, this, false);
+                ValueUnderQualifierDir* limitPath = new (std::nothrow) HapResource::ValueUnderQualifierDir(
+                    resKey->keyParams_, idParam->idItem_, this, false);
                 if (limitPath == nullptr) {
                     HILOG_ERROR("new ValueUnderQualifierDir failed in HapResource::InitIdList");
                     delete (idValues);
@@ -312,8 +307,8 @@ bool HapResource::InitIdList()
                 idValuesNameMap_[idParam->idItem_->resType_]->insert(std::make_pair(name, idValues));
             } else {
                 HapResource::IdValues *idValues = iter->second;
-                ValueUnderQualifierDir* limitPath = new (std::nothrow) HapResource::ValueUnderQualifierDir(resKey->keyParams_,
-                    idParam->idItem_, this, false);
+                ValueUnderQualifierDir* limitPath = new (std::nothrow) HapResource::ValueUnderQualifierDir(
+                    resKey->keyParams_, idParam->idItem_, this, false);
                 if (limitPath == nullptr) {
                     HILOG_ERROR("new ValueUnderQualifierDir failed in HapResource::InitIdList");
                     return false;

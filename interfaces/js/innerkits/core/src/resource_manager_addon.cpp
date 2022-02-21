@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -376,7 +376,7 @@ std::unique_ptr<char[]> EncodeBase64(std::unique_ptr<char[]> &data, int srcLen)
     char *dstData = result.get();
     int j = 0;
     int i = 0;
-    // There are 3 elements as a group£¬ 1 and 2 are the subscripts of the array
+    // There are 3 elements as a groupï¿½ï¿½ 1 and 2 are the subscripts of the array
     for (; i < srcLen - 3; i += 3) {
         unsigned char byte1 = static_cast<unsigned char>(srcData[i]);
         unsigned char byte2 = static_cast<unsigned char>(srcData[i + 1]);
