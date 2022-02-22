@@ -94,23 +94,26 @@ HapResource::~HapResource()
     defaultConfig_ = nullptr;
 }
 
-const HapResource *HapResource::LoadFromIndex(const char *path, const ResConfigImpl *defaultConfig, bool system)
-{
+void CanonicalizePath(const char *path, char *outPath, size_t len) {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
     BYTRACE_NAME(BYTRACE_TAG_APP, __PRETTY_FUNCTION__);
 #endif
-    char outPath[PATH_MAX] = {0};
 
 #ifdef __WINNT__
     if (!PathCanonicalizeA(outPath, path)) {
         HILOG_ERROR("failed to PathCanonicalize the path");
     }
 #else
-    if (realpath(path, outPath) == nullptr) {
+    if (strlen(path) > len || realpath(path, outPath) == NULL) {
         HILOG_ERROR("failed to realpath the path");
     }
 #endif
+}
 
+const HapResource *HapResource::LoadFromIndex(const char *path, const ResConfigImpl *defaultConfig, bool system)
+{
+    char outPath[PATH_MAX] = {0};
+    CanonicalizePath(path, outPath, PATH_MAX);
     std::ifstream inFile(outPath, std::ios::binary | std::ios::in);
     if (!inFile.good()) {
         return nullptr;
