@@ -103,7 +103,7 @@ void CanonicalizePath(const char *path, char *outPath, size_t len)
         HILOG_ERROR("path is null");
         return;
     }
-    if (strlen(path) >= len ) {
+    if (strlen(path) >= len) {
         HILOG_ERROR("the length of path longer than len");
         return;
     }
