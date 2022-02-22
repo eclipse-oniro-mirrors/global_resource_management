@@ -104,7 +104,7 @@ void CanonicalizePath(const char *path, char *outPath, size_t len) {
         HILOG_ERROR("failed to PathCanonicalize the path");
     }
 #else
-    if (strlen(path) > len || realpath(path, outPath) == NULL) {
+    if (strlen(path) > (len - 1) || realpath(path, outPath) == NULL) {
         HILOG_ERROR("failed to realpath the path");
     }
 #endif
