@@ -145,7 +145,7 @@ const HapResource *HapResource::LoadFromIndex(const char *path, const ResConfigI
     inFile.read((char *)buf, bufLen);
     inFile.close();
 
-    HILOG_DEBUG("extract success, bufLen:%zu", bufLen);
+    HILOG_DEBUG("extract success, bufLen:%d", bufLen);
 
     ResDesc *resDesc = new (std::nothrow) ResDesc();
     if (resDesc == nullptr) {
