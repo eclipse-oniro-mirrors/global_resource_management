@@ -129,7 +129,7 @@ const HapResource *HapResource::LoadFromIndex(const char *path, const ResConfigI
         return nullptr;
     }
     inFile.seekg(0, std::ios::end);
-    size_t bufLen = inFile.tellg();
+    int bufLen = inFile.tellg();
     if (bufLen <= 0) {
         HILOG_ERROR("file size is zero");
         inFile.close();

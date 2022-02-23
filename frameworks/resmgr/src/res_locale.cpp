@@ -266,7 +266,7 @@ ResLocale *ResLocale::BuildFromParts(const char *language,
     const char *region,
     RState &rState)
 {
-    int32_t len = Utils::StrLen(language);
+    size_t len = Utils::StrLen(language);
     if (len == 0) {
         rState = INVALID_BCP47_LANGUAGE_SUBTAG;
         return nullptr;
