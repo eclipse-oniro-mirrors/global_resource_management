@@ -374,27 +374,36 @@ RState HapManager::ReloadAll()
         return SUCCESS;
     }
     std::vector<HapResource *> newResources;
-    do {
-        for (auto iter = loadedHapPaths_.begin(); iter != loadedHapPaths_.end(); iter++) {
-            std::vector<std::string> &overlayPaths = iter->second;
-            std::unordered_map<std::string, HapResource *> result = HapResource::LoadOverlays(iter->first.c_str(),
-                overlayPaths, resConfig_);
-            if (result.size() == 0) {
-                break;
+    for (auto iter = loadedHapPaths_.begin(); iter != loadedHapPaths_.end(); iter++) {
+        const HapResource *pResource = HapResource::LoadFromIndex(iter->first.c_str(), resConfig_);
+        if (pResource == nullptr) {
+            for (size_t i = 0; i < newResources.size(); ++i) {
+                delete (newResources[i]);
             }
-
-            for_each(overlayPaths.begin(), overlayPaths.end(), [&](auto &path) {
-                if (result.find(path) != result.end()) {
-                    newResources.push_back(result[path]);
-                }
-            });
+            return HAP_INIT_FAILED;
         }
-        return SUCCESS;
-    } while (false);
-    for (size_t i = 0; i < newResources.size(); ++i) {
-        delete (newResources[i]);
+        newResources.push_back((HapResource *)pResource);
+        std::vector<std::string> &overlayPaths = iter->second;
+        if (overlayPaths.size() == 0) {
+            continue;
+        }
+        std::unordered_map<std::string, HapResource *> result = HapResource::LoadOverlays(iter->first.c_str(),
+            overlayPaths, resConfig_);
+        if (result.size() == 0) {
+            continue;
+        }
+
+        for_each(overlayPaths.begin(), overlayPaths.end(), [&](auto &path) {
+            if (result.find(path) != result.end()) {
+                newResources.push_back(result[path]);
+            }
+        });
     }
-    return HAP_INIT_FAILED;
+    for (size_t i = 0; i < hapResources_.size(); ++i) {
+        delete (hapResources_[i]);
+    }
+    hapResources_ = newResources;
+    return SUCCESS;
 }
 
 std::vector<std::string> HapManager::GetResourcePaths()

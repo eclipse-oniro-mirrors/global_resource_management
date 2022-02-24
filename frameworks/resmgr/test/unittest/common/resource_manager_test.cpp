@@ -351,6 +351,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest005, TestSize.Le
     // make a fake hapResource, then reload will fail
     HapResource *hapResource = new HapResource("/data/test/non_exist", 0, nullptr, nullptr);
     ((ResourceManagerImpl *)rm)->hapManager_->hapResources_.push_back(hapResource);
+    ((ResourceManagerImpl *)rm)->hapManager_->loadedHapPaths_["/data/test/non_exist"] = std::vector<std::string>();
     RState state;
     ResConfig *rc = CreateResConfig();
     if (rc == nullptr) {
