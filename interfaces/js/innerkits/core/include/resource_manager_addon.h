@@ -75,6 +75,8 @@ private:
 
     static std::string GetRawFile(napi_env env, size_t argc, napi_value *argv);
 
+    static napi_value GetRawFileDescriptor(napi_env env, napi_callback_info info);
+
     static napi_value Release(napi_env env, napi_callback_info info);
 
     std::string bundleName_;

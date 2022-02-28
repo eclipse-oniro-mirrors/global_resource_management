@@ -102,6 +102,8 @@ public:
 
     virtual RState GetRawFilePathByName(const std::string &name, std::string &outValue);
 
+    virtual RState GetRawFileDescriptor(const std::string &name, RawFileDescriptor &descriptor);
+
     std::vector<std::string> GetResourcePaths();
 
 private:

@@ -116,6 +116,7 @@ bool ResourceManagerAddon::Init(napi_env env)
         DECLARE_NAPI_FUNCTION("getDeviceCapability", GetDeviceCapability),
         DECLARE_NAPI_FUNCTION("getPluralString", GetPluralString),
         DECLARE_NAPI_FUNCTION("getRawFile", GetRawFile),
+        DECLARE_NAPI_FUNCTION("getRawFileDescriptor", GetRawFileDescriptor),
         DECLARE_NAPI_FUNCTION("release", Release)
     };
 
@@ -753,6 +754,66 @@ auto g_getRawFileFunc = [](napi_env env, void* data) {
 napi_value ResourceManagerAddon::GetRawFile(napi_env env, napi_callback_info info)
 {
     return ProcessOnlyIdParam(env, info, "getRawFile", g_getRawFileFunc);
+}
+
+auto g_getRawFileDescriptorFunc = [](napi_env env, void* data) {
+    ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
+    asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext& context) -> napi_value {
+        ResourceManager::RawFileDescriptor descriptor;
+        RState state = context.addon_->GetResMgr()->GetRawFileDescriptor(context.path_, descriptor);
+        if (state != RState::SUCCESS) {
+            context.SetErrorMsg("GetRawFileDescriptor failed state", true);
+            return nullptr;
+        }
+        napi_value result;
+        napi_status status = napi_create_object(env, &result);
+        if (status != napi_ok) {
+            context.SetErrorMsg("Failed to create result");
+            return result;
+        }
+
+        napi_value fd;
+        status = napi_create_int32(env, descriptor.fd, &fd);
+        if (status != napi_ok) {
+            context.SetErrorMsg("Failed to create fd");
+            return result;
+        }
+        status = napi_set_named_property(env, result, "fd", fd);
+        if (status != napi_ok) {
+            context.SetErrorMsg("Failed to set fd");
+            return result;
+        }
+
+        napi_value offset;
+        status = napi_create_int64(env, descriptor.offset, &offset);
+        if (status != napi_ok) {
+            context.SetErrorMsg("Failed to create offset");
+            return result;
+        }
+        status = napi_set_named_property(env, result, "offset", offset);
+        if (status != napi_ok) {
+            context.SetErrorMsg("Failed to set offset");
+            return result;
+        }
+
+        napi_value length;
+        status = napi_create_int64(env, descriptor.length, &length);
+        if (status != napi_ok) {
+            context.SetErrorMsg("Failed to create length");
+            return result;
+        }
+        status = napi_set_named_property(env, result, "length", length);
+        if (status != napi_ok) {
+            context.SetErrorMsg("Failed to set length");
+            return result;
+        }
+        return result;
+    };
+};
+
+napi_value ResourceManagerAddon::GetRawFileDescriptor(napi_env env, napi_callback_info info)
+{
+    return ProcessOnlyIdParam(env, info, "getRawFileDescriptor", g_getRawFileDescriptorFunc);
 }
 } // namespace Resource
 } // namespace Global
