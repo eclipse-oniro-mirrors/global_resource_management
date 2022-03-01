@@ -26,6 +26,17 @@ namespace Resource {
 class ResourceManager {
 public:
 
+    typedef struct {
+        /** the raw file fd */
+        int fd;
+
+        /** the offset from where the raw file starts in the HAP */
+        long offset;
+
+        /** the length of the raw file in the HAP. */
+        long length;
+    } RawFileDescriptor;
+
     virtual ~ResourceManager() = 0;
 
     virtual bool AddResource(const char *path) = 0;
@@ -95,6 +106,8 @@ public:
     virtual RState GetMediaByName(const char *name, std::string &outValue) = 0;
 
     virtual RState GetRawFilePathByName(const std::string &name, std::string &outValue) = 0;
+
+    virtual RState GetRawFileDescriptor(const std::string &name, RawFileDescriptor &descriptor) = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();
