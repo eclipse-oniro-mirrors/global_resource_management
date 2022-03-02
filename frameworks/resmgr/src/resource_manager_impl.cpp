@@ -19,8 +19,11 @@
 #include <cstdarg>
 #include <cstdlib>
 #include <cstring>
+#include <fcntl.h>
 #include <regex>
 #include <sstream>
+#include <sys/types.h>
+#include <unistd.h>
 
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
 #include "bytrace.h"
@@ -660,6 +663,60 @@ RState ResourceManagerImpl::GetRawFile(const HapResource::ValueUnderQualifierDir
 RState ResourceManagerImpl::GetRawFilePathByName(const std::string &name, std::string &outValue)
 {
     return hapManager_->FindRawFile(name, outValue);
+}
+
+RState ResourceManagerImpl::GetRawFileDescriptor(const std::string &name, RawFileDescriptor &descriptor)
+{
+    std::string paths = "";
+    RState rState = GetRawFilePathByName(name, paths);
+    if (rState != SUCCESS) {
+        return rState;
+    }
+    auto it = rawFileDescriptor_.find(name);
+    if (it != rawFileDescriptor_.end()) {
+        descriptor.fd = rawFileDescriptor_[name];
+        descriptor.length = rawFileDescriptorCache_[name + "_length"];
+        descriptor.offset = 0;
+        return SUCCESS;
+    }
+    int fd = open(paths.c_str(), O_RDONLY);
+    if (fd > 0) {
+        long length = lseek(fd, 0, SEEK_END);
+        if (length == -1) {
+            close(fd);
+            return ERROR;
+        }
+        long begin = lseek(fd, 0, SEEK_SET);
+        if (begin == -1) {
+            close(fd);
+            return ERROR;
+        }
+        descriptor.fd = fd;
+        descriptor.length = length;
+        descriptor.offset = 0;
+        rawFileDescriptor_[name] = fd;
+        rawFileDescriptorCache_[name + "_length"] = length;
+        return SUCCESS;
+    }
+    return ERROR;
+}
+
+RState ResourceManagerImpl::CloseRawFileDescriptor(const std::string &name)
+{
+    auto it = rawFileDescriptor_.find(name);
+    if (it == rawFileDescriptor_.end()) {
+        return SUCCESS;
+    }
+    int fd = rawFileDescriptor_[name];
+    if (fd > 0) {
+        int result = close(fd);
+        if (result == -1) {
+            return ERROR;
+        }
+        rawFileDescriptor_.erase(name);
+        rawFileDescriptorCache_.erase(name + "_length");
+    }
+    return SUCCESS;
 }
 
 ResourceManagerImpl::~ResourceManagerImpl()
