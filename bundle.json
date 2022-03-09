@@ -38,7 +38,7 @@
     "component": {
         "name": "resmgr_standard",
         "subsystem": "global",
-        "syscap": [],
+        "syscap": [ "SystemCapability.Global.ResourceManager" ],
         "features": ["resmgr_standard_support_icu"],
         "adapted_system_type": [
             "standard"
