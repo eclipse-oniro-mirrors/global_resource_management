@@ -1023,7 +1023,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest029, 
     }
     unsigned long long total = 0;
     double average = 0;
-    int id = GetResId("test_common", ResType::PROF);
+    int id = GetResId("test_profile", ResType::PROF);
     ASSERT_TRUE(id > 0);
 
     string outValue;
