@@ -163,6 +163,7 @@ HWTEST_F(LocaleInfoTest, LocaleInfoFindAndSortTest005, TestSize.Level1)
     EXPECT_TRUE(outValue.at(4) == "");
 }
 
+#ifdef SUPPORT_GRAPHICS
 /*
  * @tc.name: LocaleInfoGetSysDefaultTest001
  * @tc.desc: Test GetSysDefault
@@ -576,6 +577,7 @@ HWTEST_F(LocaleInfoTest, LocaleInfoBuildFromStringTest0010, TestSize.Level1)
     delete localeInfo;
     localeInfo = nullptr;
 }
+#endif
 
 /*
  * @tc.name: LocaleInfoPerformanceFuncTest001

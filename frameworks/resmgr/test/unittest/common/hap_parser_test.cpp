@@ -59,6 +59,7 @@ void HapParserTest::TearDown()
     // step 4: input testcase teardown step
 }
 
+#ifdef SUPPORT_GRAPHICS
 /*
  * @tc.name: HapParserFuncTest001
  * @tc.desc: Test CreateResConfigFromKeyParams
@@ -115,6 +116,7 @@ HWTEST_F(HapParserTest, HapParserFuncTest001, TestSize.Level1)
     }
     delete config;
 }
+#endif
 
 /*
  * @tc.name: HapParserFuncTest002

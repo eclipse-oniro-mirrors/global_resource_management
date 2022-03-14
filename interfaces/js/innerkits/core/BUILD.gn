@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//base/global/resmgr_standard/resmgr.gni")
 import("//build/ohos.gni")
 
 config("resmgr_napi_core_public_config") {
@@ -33,6 +34,10 @@ ohos_shared_library("resmgr_napi_core") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]
+
+  if (resmgr_standard_support_icu) {
+    defines = [ "SUPPORT_GRAPHICS" ]
+  }
 
   subsystem_name = "global"
   part_name = "resmgr_standard"

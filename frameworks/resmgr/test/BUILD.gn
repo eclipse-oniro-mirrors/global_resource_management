@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//base/global/resmgr_standard/resmgr.gni")
 import("//build/test.gni")
 
 ohos_unittest("resmgr_test") {
@@ -36,10 +37,16 @@ ohos_unittest("resmgr_test") {
     "unittest/common",
     "//base/global/resmgr_standard/frameworks/resmgr/include",
     "//base/global/resmgr_standard/interfaces/innerkits/include",
-    "//third_party/icu/icu4c/source",
-    "//third_party/icu/icu4c/source/common",
-    "//third_party/icu/icu4c/source/i18n",
   ]
+
+  if (resmgr_standard_support_icu) {
+    include_dirs += [
+      "//third_party/icu/icu4c/source",
+      "//third_party/icu/icu4c/source/common",
+      "//third_party/icu/icu4c/source/i18n",
+    ]
+    defines += [ "SUPPORT_GRAPHICS" ]
+  }
 
   deps = [
     "//base/global/resmgr_standard/frameworks/resmgr:global_resmgr",

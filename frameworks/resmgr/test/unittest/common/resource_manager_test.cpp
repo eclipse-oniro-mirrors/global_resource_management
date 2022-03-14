@@ -374,7 +374,9 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigTest001, TestSize.Level
     // success cases
     ResConfigImpl rc;
     rm->GetResConfig(rc);
+#ifdef SUPPORT_GRAPHICS
     EXPECT_EQ(nullptr, rc.GetLocaleInfo());
+#endif
     EXPECT_EQ(DIRECTION_NOT_SET, rc.GetDirection());
     EXPECT_EQ(SCREEN_DENSITY_NOT_SET, rc.GetScreenDensity());
     EXPECT_EQ(DEVICE_NOT_SET, rc.GetDeviceType());
@@ -404,7 +406,9 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigTest002, TestSize.Level
 
     ResConfigImpl rc;
     rm->GetResConfig(rc);
+#ifdef SUPPORT_GRAPHICS
     EXPECT_EQ("en", std::string(rc.GetLocaleInfo()->getLanguage()));
+#endif
     EXPECT_EQ(DEVICE_CAR, rc.GetDeviceType());
 }
 

@@ -19,7 +19,9 @@
 #include <cstdint>
 #include <cstring>
 #include <new>
+#ifdef SUPPORT_GRAPHICS
 #include <unicode/localebuilder.h>
+#endif
 #include "auto_mutex.h"
 #include "hilog_wrapper.h"
 #include "locale_matcher.h"
@@ -31,7 +33,9 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
+#ifdef SUPPORT_GRAPHICS
 Locale *ResLocale::defaultLocale_ = nullptr;
+#endif
 Lock ResLocale::lock_;
 
 ResLocale::ResLocale() : language_(nullptr), region_(nullptr), script_(nullptr)
@@ -126,6 +130,7 @@ RState ResLocale::Init(const char *language, size_t languageLen, const char *scr
     return SUCCESS;
 }
 
+#ifdef SUPPORT_GRAPHICS
 RState ResLocale::CopyFromLocaleInfo(const Locale *other)
 {
     if (other == nullptr) {
@@ -134,6 +139,7 @@ RState ResLocale::CopyFromLocaleInfo(const Locale *other)
     return this->Init(other->getLanguage(), Utils::StrLen(other->getLanguage()), other->getScript(),
         Utils::StrLen(other->getScript()), other->getCountry(), Utils::StrLen(other->getCountry()));
 }
+#endif
 
 RState ResLocale::Copy(const ResLocale *other)
 {
@@ -325,6 +331,7 @@ ResLocale *ResLocale::BuildFromParts(const char *language,
     return nullptr;
 };
 
+#ifdef SUPPORT_GRAPHICS
 const Locale *ResLocale::GetDefault()
 {
     AutoMutex mutex(ResLocale::lock_);
@@ -333,7 +340,6 @@ const Locale *ResLocale::GetDefault()
 
 bool ResLocale::UpdateDefault(const Locale &localeInfo, bool needNotify)
 {
-#ifdef SUPPORT_GRAPHICS
     AutoMutex mutex(ResLocale::lock_);
     UErrorCode errCode = U_ZERO_ERROR;
     Locale temp = icu::LocaleBuilder().setLocale(localeInfo).build(errCode);
@@ -343,10 +349,8 @@ bool ResLocale::UpdateDefault(const Locale &localeInfo, bool needNotify)
     delete ResLocale::defaultLocale_;
     ResLocale::defaultLocale_ = new Locale(temp);
     return true;
-#else
-    return false;
-#endif
 };
+#endif
 
 ResLocale::~ResLocale()
 {
@@ -366,9 +370,9 @@ ResLocale::~ResLocale()
     }
 }
 
+#ifdef SUPPORT_GRAPHICS
 Locale *BuildFromString(const char *str, char sep, RState &rState)
 {
-#ifdef SUPPORT_GRAPHICS
     ResLocale *resLocale = ResLocale::BuildFromString(str, sep, rState);
     if (rState == SUCCESS && resLocale != nullptr) {
         UErrorCode errCode = U_ZERO_ERROR;
@@ -383,13 +387,11 @@ Locale *BuildFromString(const char *str, char sep, RState &rState)
         Locale *retLocal = new Locale(temp);
         return retLocal;
     }
-#endif
     return nullptr;
 };
 
 Locale *BuildFromParts(const char *language, const char *script, const char *region, RState &rState)
 {
-#ifdef SUPPORT_GRAPHICS
     size_t len = Utils::StrLen(language);
     if (len == 0) {
         rState = INVALID_BCP47_LANGUAGE_SUBTAG;
@@ -423,9 +425,6 @@ Locale *BuildFromParts(const char *language, const char *script, const char *reg
     }
     Locale *retLocal = new Locale(localeInfo);
     return retLocal;
-#else
-    return nullptr;
-#endif
 }
 
 const Locale *GetSysDefault()
@@ -437,6 +436,7 @@ void UpdateSysDefault(const Locale &localeInfo, bool needNotify)
 {
     ResLocale::UpdateDefault(localeInfo, needNotify);
 }
+#endif
 
 void FindAndSort(std::string localeStr, std::vector<std::string> &candidateLocale, std::vector<std::string> &outValue)
 {
