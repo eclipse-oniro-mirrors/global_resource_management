@@ -18,11 +18,15 @@
 
 #include <cstdint>
 #include <cstddef>
+#ifdef SUPPORT_GRAPHICS
 #include <unicode/locid.h>
+#endif
 #include "rstate.h"
 #include "lock.h"
 
+#ifdef SUPPORT_GRAPHICS
 using icu::Locale;
+#endif
 namespace OHOS {
 namespace Global {
 namespace Resource {
@@ -45,13 +49,17 @@ public:
 
     ResLocale();
 
+#ifdef SUPPORT_GRAPHICS
     RState CopyFromLocaleInfo(const Locale *other);
+#endif
 
     RState Copy(const ResLocale *other);
 
+#ifdef SUPPORT_GRAPHICS
     static const Locale *GetDefault();
 
     static bool UpdateDefault(const Locale &localeInfo, bool needNotify);
+#endif
 
     static ResLocale *BuildFromString(const char *bcp47String, char sep, RState &rState);
 
@@ -89,7 +97,9 @@ private:
 
     const char *script_;
 
+#ifdef SUPPORT_GRAPHICS
     static Locale *defaultLocale_;
+#endif
 
     static Lock lock_;
 

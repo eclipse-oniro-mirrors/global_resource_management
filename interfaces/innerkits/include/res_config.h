@@ -15,12 +15,15 @@
 #ifndef OHOS_RESOURCE_MANAGER_RESCONFIG_H
 #define OHOS_RESOURCE_MANAGER_RESCONFIG_H
 
+#ifdef SUPPORT_GRAPHICS
 #include <unicode/locid.h>
+#endif
 #include <vector>
 #include "res_common.h"
 #include "rstate.h"
-
+#ifdef SUPPORT_GRAPHICS
 using icu::Locale;
+#endif
 namespace OHOS {
 namespace Global {
 namespace Resource {
@@ -28,7 +31,9 @@ class ResConfig {
 public:
     virtual RState SetLocaleInfo(const char *language, const char *script, const char *region) = 0;
 
+#ifdef SUPPORT_GRAPHICS
     virtual RState SetLocaleInfo(Locale &localeInfo) = 0;
+#endif
 
     virtual void SetDeviceType(DeviceType deviceType) = 0;
 
@@ -38,7 +43,9 @@ public:
 
     virtual void SetColorMode(ColorMode colorMode) = 0;
 
+#ifdef SUPPORT_GRAPHICS
     virtual const Locale *GetLocaleInfo() const = 0;
+#endif
 
     virtual Direction GetDirection() const = 0;
 
@@ -55,6 +62,7 @@ public:
 
 EXPORT_FUNC ResConfig *CreateResConfig();
 
+#ifdef SUPPORT_GRAPHICS
 EXPORT_FUNC const Locale *GetSysDefault();
 
 EXPORT_FUNC void UpdateSysDefault(const Locale &localeInfo, bool needNotify);
@@ -62,6 +70,7 @@ EXPORT_FUNC void UpdateSysDefault(const Locale &localeInfo, bool needNotify);
 EXPORT_FUNC Locale *BuildFromString(const char *str, char sep, RState &rState);
 
 EXPORT_FUNC Locale *BuildFromParts(const char *language, const char *script, const char *region, RState &rState);
+#endif
 
 void FindAndSort(std::string localeStr, std::vector<std::string> &candidateLocale, std::vector<std::string> &outValue);
 } // namespace Resource

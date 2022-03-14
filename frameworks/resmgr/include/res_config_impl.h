@@ -16,12 +16,16 @@
 #define OHOS_RESOURCE_MANAGER_RESCONFIG_IMPL_H
 
 #include <stdint.h>
+#ifdef SUPPORT_GRAPHICS
 #include <unicode/locid.h>
+#endif
 #include "res_locale.h"
 #include "res_common.h"
 #include "res_config.h"
 
+#ifdef SUPPORT_GRAPHICS
 using icu::Locale;
+#endif
 namespace OHOS {
 namespace Global {
 namespace Resource {
@@ -33,7 +37,9 @@ public:
 
     RState SetLocaleInfo(const char *language, const char *script, const char *region);
 
+#ifdef SUPPORT_GRAPHICS
     RState SetLocaleInfo(Locale &localeInfo);
+#endif
 
     void SetDeviceType(DeviceType deviceType);
 
@@ -43,7 +49,9 @@ public:
 
     void SetScreenDensity(ScreenDensity screenDensity);
 
+#ifdef SUPPORT_GRAPHICS
     const Locale *GetLocaleInfo() const;
+#endif
 
     const ResLocale *GetResLocale() const;
 
@@ -76,8 +84,10 @@ private:
     ScreenDensity screenDensity_;
     ColorMode colorMode_;
     DeviceType deviceType_;
-    bool isCompletedScript_;
+#ifdef SUPPORT_GRAPHICS
     Locale *localeInfo_;
+#endif
+    bool isCompletedScript_;
 };
 } // namespace Resource
 } // namespace Global

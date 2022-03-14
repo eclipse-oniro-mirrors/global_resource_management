@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 #include "res_config_impl.h"
-
+#ifdef SUPPORT_GRAPHICS
 #include <unicode/localebuilder.h>
 #include <unicode/locid.h>
-
+#endif
 #include "locale_matcher.h"
 #include "res_locale.h"
 #include "utils/utils.h"
@@ -33,13 +33,18 @@ ResConfigImpl::ResConfigImpl()
       screenDensity_(SCREEN_DENSITY_NOT_SET),
       colorMode_(LIGHT),
       deviceType_(DEVICE_NOT_SET),
-      isCompletedScript_(false), localeInfo_(nullptr)
+#ifdef SUPPORT_GRAPHICS
+      localeInfo_(nullptr),
+#endif
+      isCompletedScript_(false)
 {}
 
+#ifdef SUPPORT_GRAPHICS
 RState ResConfigImpl::SetLocaleInfo(Locale &localeInfo)
 {
     return this->SetLocaleInfo(localeInfo.getLanguage(), localeInfo.getScript(), localeInfo.getCountry());
 }
+#endif
 
 RState ResConfigImpl::SetLocaleInfo(const char *language,
     const char *script,
@@ -107,10 +112,12 @@ void ResConfigImpl::SetScreenDensity(ScreenDensity screenDensity)
     this->screenDensity_ = screenDensity;
 }
 
+#ifdef SUPPORT_GRAPHICS
 const Locale *ResConfigImpl::GetLocaleInfo() const
 {
     return localeInfo_;
 }
+#endif
 
 const ResLocale *ResConfigImpl::GetResLocale() const
 {
@@ -138,6 +145,7 @@ DeviceType ResConfigImpl::GetDeviceType() const
 }
 bool ResConfigImpl::CopyLocale(ResConfig &other)
 {
+#ifdef SUPPORT_GRAPHICS
     bool needCopy = false;
     if (this->GetLocaleInfo() == nullptr && other.GetLocaleInfo() != nullptr) {
         needCopy = true;
@@ -183,6 +191,9 @@ bool ResConfigImpl::CopyLocale(ResConfig &other)
         this->localeInfo_ = new Locale(tempLocale);
     }
     return true;
+#else
+    return false;
+#endif
 }
 bool ResConfigImpl::Copy(ResConfig &other)
 {
@@ -290,7 +301,9 @@ bool ResConfigImpl::IsMoreSuitable(const ResConfigImpl *other,
 ResConfigImpl::~ResConfigImpl()
 {
     delete resLocale_;
+#ifdef SUPPORT_GRAPHICS
     delete localeInfo_;
+#endif
 }
 
 void ResConfigImpl::CompleteScript()

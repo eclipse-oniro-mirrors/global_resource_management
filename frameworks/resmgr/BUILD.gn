@@ -28,6 +28,7 @@ config("resmgr_config") {
       "//third_party/icu/icu4c/source/common",
       "//third_party/icu/icu4c/source/i18n",
     ]
+    defines = [ "SUPPORT_GRAPHICS" ]
   }
 }
 
@@ -53,6 +54,7 @@ config("resmgr_public_config") {
 
   if (resmgr_standard_support_icu) {
     include_dirs += [ "//third_party/icu/icu4c/source/common" ]
+    defines = [ "SUPPORT_GRAPHICS" ]
   }
 }
 
@@ -172,7 +174,6 @@ ohos_shared_library("librawfile") {
     "//base/global/resmgr_standard/interfaces/innerkits/include",
     "//base/global/resmgr_standard/interfaces/js/innerkits/core/include",
     "//third_party/node/src",
-    "//third_party/icu/icu4c/source/i18n",
   ]
 
   if (resmgr_standard_support_icu) {

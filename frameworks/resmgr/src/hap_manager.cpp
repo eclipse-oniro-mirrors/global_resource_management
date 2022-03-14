@@ -16,7 +16,9 @@
 
 #include <algorithm>
 #include <fstream>
+#ifdef SUPPORT_GRAPHICS
 #include <ohos/init_data.h>
+#endif
 
 #include "auto_mutex.h"
 #include "hilog_wrapper.h"
@@ -320,12 +322,14 @@ HapManager::~HapManager()
     }
     delete resConfig_;
 
+#ifdef SUPPORT_GRAPHICS
     auto iter = plurRulesCache_.begin();
     for (; iter != plurRulesCache_.end(); iter++) {
         HILOG_DEBUG("delete plurRulesMap_ %s", iter->first.c_str());
         auto ptr = iter->second;
         delete (ptr);
     }
+#endif
 }
 
 std::vector<const HapResource::IdValues *> HapManager::GetResourceList(uint32_t ident) const

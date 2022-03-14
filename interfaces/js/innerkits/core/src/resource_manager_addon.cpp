@@ -519,6 +519,7 @@ napi_value ResourceManagerAddon::Release(napi_env env, napi_callback_info info)
 std::string ResourceManagerAddon::GetLocale(std::unique_ptr<ResConfig> &cfg)
 {
     std::string result;
+#ifdef SUPPORT_GRAPHICS
     const icu::Locale *localeInfo = cfg->GetLocaleInfo();
     if (localeInfo == nullptr) {
         return result;
@@ -538,6 +539,7 @@ std::string ResourceManagerAddon::GetLocale(std::unique_ptr<ResConfig> &cfg)
     if (region != nullptr) {
         result += std::string("_") + region;
     }
+#endif
     return result;
 }
 

@@ -745,12 +745,14 @@ RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig)
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
     BYTRACE_NAME(BYTRACE_TAG_APP, __PRETTY_FUNCTION__);
 #endif
+#ifdef SUPPORT_GRAPHICS
     if (resConfig.GetLocaleInfo() == nullptr) {
         return LOCALEINFO_IS_NULL;
     }
     if (resConfig.GetLocaleInfo()->getLanguage() == nullptr) {
         return LOCALEINFO_IS_NULL;
     }
+#endif
     return this->hapManager_->UpdateResConfig(resConfig);
 }
 

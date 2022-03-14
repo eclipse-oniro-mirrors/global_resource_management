@@ -20,9 +20,9 @@
 #include "res_desc.h"
 #include "lock.h"
 
+#ifdef SUPPORT_GRAPHICS
 #include <unicode/plurrule.h>
-#include <unordered_map>
-#include <vector>
+#endif
 
 namespace OHOS {
 namespace Global {
@@ -82,8 +82,10 @@ private:
     // set of loaded hap path
     std::unordered_map<std::string, std::vector<std::string>> loadedHapPaths_;
 
+#ifdef SUPPORT_GRAPHICS
     // key is language
     std::vector<std::pair<std::string, icu::PluralRules *>> plurRulesCache_;
+#endif
 
     Lock lock_;
 };
