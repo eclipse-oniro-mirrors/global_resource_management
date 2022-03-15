@@ -76,7 +76,7 @@ bool ResourceManagerImpl::Init()
         HILOG_ERROR("new HapManager failed when ResourceManagerImpl::Init");
         return false;
     }
-    AddResource("/data/accounts/account_0/applications/ohos.global.systemres" \
+    AddResource("/data/storage/el1/bundle/ohos.global.systemres" \
         "/ohos.global.systemres/assets/entry/resources.index");
     return true;
 }
