@@ -50,17 +50,50 @@ public:
     static int32_t ReadIndexFromFile(const char *zipFile, void **buffer,
                                      size_t &bufLen, std::string &errInfo);
 
+    /**
+     * Parse resource hex to resDesc
+     * @param buffer the resource bytes
+     * @param bufLen length in bytes
+     * @param resDesc index file in hap
+     * @param defaultConfig the default config
+     * @return OK if the resource hex parse success, else SYS_ERROR
+     */
     static int32_t ParseResHex(const char *buffer, const size_t bufLen, ResDesc &resDesc,
                                const ResConfigImpl *defaultConfig = nullptr);
 
+    /**
+     * Create resource config from KeyParams
+     * @param keyParams the keyParams contain type and value
+     * @return the resource config related to the keyParams
+     */
     static ResConfigImpl *CreateResConfigFromKeyParams(const std::vector<KeyParam *> &keyParams);
 
+    /**
+     * To resource folder path
+     * @param keyParams the keyParams contain type and value
+     * @return the resources folder path
+     */
     static std::string ToFolderPath(const std::vector<KeyParam *> &keyParams);
 
+    /**
+     * Get screen density
+     * @param value the type of screen density
+     * @return the screen density related to the value
+     */
     static ScreenDensity GetScreenDensity(uint32_t value);
 
+    /**
+     * Get device type
+     * @param value the type of device
+     * @return the device type related to the value
+     */
     static DeviceType GetDeviceType(uint32_t value);
 
+    /**
+     * Get color mode
+     * @param value the type of device
+     * @return the color mode related to the value
+     */
     static ColorMode GetColorMode(uint32_t value);
 
 private:

@@ -29,30 +29,92 @@ namespace Global {
 namespace Resource {
 class HapManager {
 public:
+    /**
+     * The constructor of HapManager
+     */
     explicit HapManager(ResConfigImpl *resConfig);
 
+    /**
+     * The destructor of HapManager
+     */
     ~HapManager();
 
+    /**
+     * Update the resConfig
+     * @param resConfig the resource config
+     * @return SUCCESS if the resConfig updated success, else HAP_INIT_FAILED
+     */
     RState UpdateResConfig(ResConfig &resConfig);
 
+    /**
+     * Get the resConfig
+     * @param resConfig the resource config
+     */
     void GetResConfig(ResConfig &resConfig);
 
+    /**
+     * Add resource path to hap paths
+     * @param path the resource path
+     * @return true if add resource path success, else false
+     */
     bool AddResource(const char *path);
 
+    /**
+     * Add resource path to overlay paths
+     * @param path the resource path
+     * @param overlayPaths the exist overlay resource path
+     * @return true if add resource path success, else false
+     */
     bool AddResource(const std::string &path, const std::vector<std::string> &overlayPaths);
 
+    /**
+     * Find resource by resource id
+     * @param id the resource id
+     * @return the resources related to resource id
+     */
     const IdItem *FindResourceById(uint32_t id);
 
+    /**
+     * Find resource by resource name
+     * @param name the resource name
+     * @param resType the resource type
+     * @return the resources related to resource name
+     */
     const IdItem *FindResourceByName(const char *name, const ResType resType);
 
+    /**
+     * Find best resource path by resource id
+     * @param id the resource id
+     * @return the best resource path
+     */
     const HapResource::ValueUnderQualifierDir *FindQualifierValueById(uint32_t id);
-
+    
+    /**
+     * Find best resource path by resource name
+     * @param name the resource name
+     * @param resType the resource type
+     * @return the best resource path
+     */
     const HapResource::ValueUnderQualifierDir *FindQualifierValueByName(const char *name, const ResType resType);
 
+    /**
+     * Find the raw file path
+     * @param name the resource name
+     * @param outValue raw file path
+     * @return SUCCESS if find the raw file path success, else NOT_FOUND
+     */
     RState FindRawFile(const std::string &name, std::string &outValue);
 
+    /**
+     * Get the language pluralRule related to quantity
+     * @param quantity the language quantity
+     * @return the language pluralRule related to quantity
+     */
     std::string GetPluralRulesAndSelect(int quantity);
 
+    /**
+     * Get resource paths vector
+     */
     std::vector<std::string> GetResourcePaths();
 
 private:

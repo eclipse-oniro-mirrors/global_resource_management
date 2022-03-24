@@ -70,7 +70,7 @@ HWTEST_F(ResConfigTest, ResConfigFuncTest001, TestSize.Level1)
     ResConfigImpl *target = new ResConfigImpl;
     target->SetLocaleInfo("zh", nullptr, "CN");
     EXPECT_TRUE(rc->Match(current));
-    EXPECT_TRUE(rc->Match(target) == false);
+    EXPECT_TRUE(!(rc->Match(target)));
     delete target;
     delete current;
     delete rc;
