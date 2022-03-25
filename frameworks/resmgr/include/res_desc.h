@@ -48,6 +48,11 @@ class IdItem {
 public:
     static const uint32_t HEADER_LEN = 12;
 
+    /**
+     * Whether the resType is array or not
+     * @param type the resType
+     * @return true if the resType is array, else false
+     */
     static bool IsArrayOfType(ResType type)
     {
         if (type == ResType::STRINGARRAY || type == ResType::INTARRAY || type == ResType::THEME ||

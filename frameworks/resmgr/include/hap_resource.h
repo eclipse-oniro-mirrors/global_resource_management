@@ -43,25 +43,44 @@ public:
      */
     static const HapResource *LoadFromIndex(const char *path, const ResConfigImpl *defaultConfig, bool system = false);
 
+    /**
+     * Load overlay resources
+     * @param path the resources.index file path
+     * @param overlayPath  the resource overlay path
+     * @param defaultConfig the resource config
+     * @return the map of overlay resource path and resource info if success, else null
+     */
     static const std::unordered_map<std::string, HapResource *> LoadOverlays(const std::string &path,
         const std::vector<std::string> &overlayPath, const ResConfigImpl *defaultConfig);
 
+    /**
+     * The destructor of HapResource
+     */
     ~HapResource();
 
+    /**
+     * Get the resource.index file path
+     */
     inline const std::string GetIndexPath() const
     {
         return indexPath_;
     }
 
+    /**
+     * Get the resource path
+     */
     inline const std::string GetResourcePath() const
     {
         return resourcePath_;
     }
 
+    /**
+     * Get the resource infomation
+     */
     const std::vector<std::string> GetQualifiers() const;
 
     /**
-     * describe limitpath and value under the path
+     * Describe limitpath and value under the path
      */
     class ValueUnderQualifierDir {
     public:
@@ -147,10 +166,27 @@ public:
         std::vector<ValueUnderQualifierDir *> limitPaths_;
     };
 
+    /**
+     * Get the resource value by resource id
+     * @param id the resource id
+     * @return the resource value related to id
+     */
     const IdValues *GetIdValues(const uint32_t id) const;
 
+    /**
+     * Get the resource value by resource name
+     * @param name the resource name
+     * @param resType the resource type
+     * @return the resource value related to resource name
+     */
     const IdValues *GetIdValuesByName(const std::string name, const ResType resType) const;
 
+    /**
+     * Get the resource id by resource name
+     * @param name the resource name
+     * @param resType the resource type
+     * @return the resource id related to resource name
+     */
     int GetIdByName(const char *name, const ResType resType) const;
 
     size_t IdSize() const

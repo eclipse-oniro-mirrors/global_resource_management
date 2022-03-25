@@ -524,7 +524,7 @@ bool LocaleMatcher::Normalize(ResLocale *localeInfo)
     }
     uint32_t encodedScript = FindDefaultScriptEncode(localeInfo->GetLanguage(),
                                                      localeInfo->GetRegion());
-    if (encodedScript == NULL_SCRIPT) {
+    if (encodedScript == LocaleMatcher::NULL_SCRIPT) {
         return true;
     }
     char *tempScript = new(std::nothrow) char[SCRIPT_ARRAY_LEN];
@@ -608,10 +608,10 @@ int8_t LocaleMatcher::IsMoreSuitable(const ResLocale *current,
         return 0;
     }
     bool isLangEqual = CompareLanguage(current, other);
-    if (isLangEqual == false) {
+    if (!isLangEqual) {
         // current or other language is null, not null language is better
         bool result = CompareRegionWhenLangIsNotEqual(current, other, request);
-        return (result == true) ? 1 : -1;
+        return result ? 1 : -1;
     }
     uint16_t currentEncodedRegion =
         Utils::EncodeRegionByResLocale(current);

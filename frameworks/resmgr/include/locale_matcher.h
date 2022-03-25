@@ -25,16 +25,52 @@ public:
         const ResLocale *other,
         const ResLocale *request);
 
+    /**
+     * Whether the current ResLocale same to the other ResLocale
+     * @param current the current ResLocale
+     * @param other the other ResLocale
+     * @return true if the current ResLocale same to the other ResLocale, else false
+     */
     static bool Match(const ResLocale *current, const ResLocale *other);
 
+    /**
+     * Whether the string is the language tag
+     * @param str the tag string
+     * @param len the tag length
+     * @return true if the str is language tag, else false
+     */
     static bool IsLanguageTag(const char *str, int32_t len);
 
+    /**
+     * Whether the string is the script tag
+     * @param str the tag string
+     * @param len the tag length
+     * @return true if the str is script tag, else false
+     */
     static bool IsScriptTag(const char *str, int32_t len);
 
+    /**
+     * Whether the string is the Region tag
+     * @param str the tag string
+     * @param len the tag length
+     * @return true if the str is Region tag, else false
+     */
     static bool IsRegionTag(const char *str, int32_t len);
 
+    /**
+     * Get the resLocale script
+     * @param resLocale the resLocale infomation
+     * @return true if get the resLocale script, else false
+     */
     static bool Normalize(ResLocale *resLocale);
 
+    /**
+     * Whether the current resLocale more specific than target resLocale
+     * @param current the current resLocale
+     * @param target the target resLocale
+     * @return 0 means current resLocale same to target resLocale,
+     *         1 means current resLocale more specific than target resLocale, else -1
+     */
     static int8_t IsMoreSpecificThan(const ResLocale *current, const ResLocale *target);
 
 public:

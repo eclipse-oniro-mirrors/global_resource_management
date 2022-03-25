@@ -221,7 +221,7 @@ bool ResConfigImpl::Match(const ResConfigImpl *other) const
     if (other == nullptr) {
         return false;
     }
-    if (LocaleMatcher::Match(this->resLocale_, other->GetResLocale()) == false) {
+    if (!(LocaleMatcher::Match(this->resLocale_, other->GetResLocale()))) {
         return false;
     }
     if (this->direction_ != DIRECTION_NOT_SET &&

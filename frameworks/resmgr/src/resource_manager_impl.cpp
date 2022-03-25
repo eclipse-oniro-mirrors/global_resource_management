@@ -520,7 +520,7 @@ RState ResourceManagerImpl::GetInteger(const IdItem *idItem, int &outValue)
     std::string temp;
     RState state = ResolveReference(idItem->value_, temp);
     if (state == SUCCESS) {
-        outValue = atoi(temp.c_str());
+        outValue = stoi(temp);
         return SUCCESS;
     }
     return state;
@@ -578,7 +578,7 @@ RState ResourceManagerImpl::GetIntArray(const IdItem *idItem, std::vector<int> &
             HILOG_ERROR("ResolveReference failed, value:%s", idItem->values_[i].c_str());
             return ERROR;
         }
-        outValue.push_back(atoi(resolvedValue.c_str()));
+        outValue.push_back(stoi(resolvedValue));
     }
     return SUCCESS;
 }
