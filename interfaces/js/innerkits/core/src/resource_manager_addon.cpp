@@ -120,11 +120,15 @@ bool ResourceManagerAddon::Init(napi_env env)
         DECLARE_NAPI_FUNCTION("getDeviceCapability", GetDeviceCapability),
         DECLARE_NAPI_FUNCTION("getPluralString", GetPluralString),
         DECLARE_NAPI_FUNCTION("getPluralStringByName", GetPluralStringByName),
-        DECLARE_NAPI_FUNCTION("getFloat", GetFloat),
-        DECLARE_NAPI_FUNCTION("getFloatByName", GetFloatByName),
         DECLARE_NAPI_FUNCTION("getRawFile", GetRawFile),
         DECLARE_NAPI_FUNCTION("getRawFileDescriptor", GetRawFileDescriptor),
         DECLARE_NAPI_FUNCTION("closeRawFileDescriptor", CloseRawFileDescriptor),
+        DECLARE_NAPI_FUNCTION("getStringSync", GetStringSync),
+        DECLARE_NAPI_FUNCTION("getStringByNameSync", GetStringByNameSync),
+        DECLARE_NAPI_FUNCTION("getBoolean", GetBoolean),
+        DECLARE_NAPI_FUNCTION("getNumber", GetNumber),
+        DECLARE_NAPI_FUNCTION("getBooleanByName", GetBooleanByName),
+        DECLARE_NAPI_FUNCTION("getNumberByName", GetNumberByName),
         DECLARE_NAPI_FUNCTION("release", Release)
     };
 
@@ -930,37 +934,212 @@ napi_value ResourceManagerAddon::CloseRawFileDescriptor(napi_env env, napi_callb
     return ProcessOnlyIdParam(env, info, "closeRawFileDescriptor", closeRawFileDescriptorFunc);
 }
 
-auto getFloatFunc = [](napi_env env, void *data) {
-    ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
-    RState state;
-    if (asyncContext->resId_ != 0) {
-        state = asyncContext->addon_->GetResMgr()->GetFloatById(asyncContext->resId_, asyncContext->fValue_);
-    } else {
-        state = asyncContext->addon_->GetResMgr()->GetFloatByName(asyncContext->resName_.c_str(),
-            asyncContext->fValue_);
-    }
-    if (state != RState::SUCCESS) {
-        asyncContext->SetErrorMsg("GetFloat failed", true);
-        return;
-    }
-    asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext& context) {
-        napi_value jsValue = nullptr;
-        if (napi_create_double(env, context.fValue_, &jsValue) != napi_ok) {
-            context.SetErrorMsg("Failed to create result");
-            return jsValue;
-        }
-        return jsValue;
-    };
-};
-
-napi_value ResourceManagerAddon::GetFloat(napi_env env, napi_callback_info info)
+std::shared_ptr<ResourceManagerAddon> getResourceManagerAddon(napi_env env, napi_callback_info info)
 {
-    return ProcessOnlyIdParam(env, info, "getFloat", getFloatFunc);
+    GET_PARAMS(env, info, 2);
+
+    std::shared_ptr<ResourceManagerAddon> *addonPtr = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&addonPtr));
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "Failed to unwrap");
+        return nullptr;
+    }
+    return *addonPtr;
 }
 
-napi_value ResourceManagerAddon::GetFloatByName(napi_env env, napi_callback_info info)
+bool isNapiNumber(napi_env env, napi_callback_info info)
 {
-    return ProcessOnlyIdParam(env, info, "getFloatByName", getFloatFunc);
+    GET_PARAMS(env, info, 2);
+
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_typeof(env, argv[0], &valueType);
+    if (valueType != napi_number) {
+        HiLog::Error(LABEL, "Parameter type is not napi_number");
+        return false;
+    }
+    return true;
+}
+
+bool isNapiString(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, 2);
+
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_typeof(env, argv[0], &valueType);
+    if (valueType != napi_string) {
+        HiLog::Error(LABEL, "Parameter type is not napi_string");
+        return false;
+    }
+    return true;
+}
+
+napi_value ResourceManagerAddon::GetStringSync(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, 2);
+
+    if (!isNapiNumber(env, info)) {
+        return nullptr;
+    }
+
+    std::unique_ptr<ResMgrAsyncContext> asyncContext = std::make_unique<ResMgrAsyncContext>();
+    asyncContext->addon_ = getResourceManagerAddon(env, info);
+    asyncContext->resId_ = GetResId(env, argc, argv);
+
+    RState state = asyncContext->addon_->GetResMgr()->GetStringById(asyncContext->resId_, asyncContext->value_);
+    if (state != RState::SUCCESS) {
+        asyncContext->SetErrorMsg("GetStringSync failed state", true);
+        return nullptr;
+    }
+
+    napi_value jsValue = nullptr;
+    if (napi_create_string_utf8(env, asyncContext->value_.c_str(), NAPI_AUTO_LENGTH, &jsValue) != napi_ok) {
+        asyncContext->SetErrorMsg("Failed to create jsValue");
+    }
+    return jsValue;
+}
+
+napi_value ResourceManagerAddon::GetStringByNameSync(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, 2);
+
+    if (!isNapiString(env, info)) {
+        return nullptr;
+    }
+
+    std::unique_ptr<ResMgrAsyncContext> asyncContext = std::make_unique<ResMgrAsyncContext>();
+    asyncContext->addon_ = getResourceManagerAddon(env, info);
+    asyncContext->resName_ = GetResNameOrPath(env, argc, argv);
+
+    RState state = asyncContext->addon_->GetResMgr()->GetStringByName(asyncContext->resName_.c_str(),
+        asyncContext->value_);
+    if (state != RState::SUCCESS) {
+        asyncContext->SetErrorMsg("GetStringByNameSync failed state", true);
+        return nullptr;
+    }
+
+    napi_value jsValue = nullptr;
+    if (napi_create_string_utf8(env, asyncContext->value_.c_str(), NAPI_AUTO_LENGTH, &jsValue) != napi_ok) {
+        asyncContext->SetErrorMsg("Failed to create jsValue");
+    }
+    return jsValue;
+}
+
+napi_value ResourceManagerAddon::GetBoolean(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, 2);
+
+    if (!isNapiNumber(env, info)) {
+        return nullptr;
+    }
+
+    std::unique_ptr<ResMgrAsyncContext> asyncContext = std::make_unique<ResMgrAsyncContext>();
+    asyncContext->addon_ = getResourceManagerAddon(env, info);
+    asyncContext->resId_ = GetResId(env, argc, argv);
+
+    RState state = asyncContext->addon_->GetResMgr()->GetBooleanById(asyncContext->resId_, asyncContext->bValue_);
+    if (state != RState::SUCCESS) {
+        asyncContext->SetErrorMsg("GetBoolean failed state", true);
+        return nullptr;
+    }
+
+    napi_value jsValue = nullptr;
+    if (napi_get_boolean(env, asyncContext->bValue_, &jsValue) != napi_ok) {
+        asyncContext->SetErrorMsg("Failed to create result", true);
+    }
+    return jsValue;
+}
+
+napi_value ResourceManagerAddon::GetBooleanByName(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, 2);
+
+    if (!isNapiString(env, info)) {
+        return nullptr;
+    }
+
+    std::unique_ptr<ResMgrAsyncContext> asyncContext = std::make_unique<ResMgrAsyncContext>();
+    asyncContext->addon_ = getResourceManagerAddon(env, info);
+    asyncContext->resName_ = GetResNameOrPath(env, argc, argv);
+
+    RState state = asyncContext->addon_->GetResMgr()->GetBooleanByName(asyncContext->resName_.c_str(),
+        asyncContext->bValue_);
+    if (state != RState::SUCCESS) {
+        asyncContext->SetErrorMsg("GetBooleanByName failed state", true);
+        return nullptr;
+    }
+
+    napi_value jsValue = nullptr;
+    if (napi_get_boolean(env, asyncContext->bValue_, &jsValue) != napi_ok) {
+        asyncContext->SetErrorMsg("Failed to create result", true);
+    }
+    return jsValue;
+}
+
+napi_value ResourceManagerAddon::GetNumber(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, 2);
+
+    if (!isNapiNumber(env, info)) {
+        return nullptr;
+    }
+
+    std::unique_ptr<ResMgrAsyncContext> asyncContext = std::make_unique<ResMgrAsyncContext>();
+    asyncContext->addon_ = getResourceManagerAddon(env, info);
+    asyncContext->resId_ = GetResId(env, argc, argv);
+
+    RState state = asyncContext->addon_->GetResMgr()->GetIntegerById(asyncContext->resId_,
+        asyncContext->iValue_);
+    napi_value jsValue = nullptr;
+    if (state == RState::SUCCESS) {
+        if (napi_create_int32(env, asyncContext->iValue_, &jsValue) != napi_ok) {
+            asyncContext->SetErrorMsg("Failed to create result", true);
+        }
+    } else {
+        state = asyncContext->addon_->GetResMgr()->GetFloatById(asyncContext->resId_,
+        asyncContext->fValue_);
+        if (state != RState::SUCCESS) {
+            asyncContext->SetErrorMsg("GetFloat failed state", true);
+            return nullptr;
+        }
+        if (napi_create_double(env, asyncContext->fValue_, &jsValue) != napi_ok) {
+            asyncContext->SetErrorMsg("Failed to create result", true);
+        }
+    }
+    return jsValue;
+}
+
+napi_value ResourceManagerAddon::GetNumberByName(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, 2);
+
+    if (!isNapiString(env, info)) {
+        return nullptr;
+    }
+
+    std::unique_ptr<ResMgrAsyncContext> asyncContext = std::make_unique<ResMgrAsyncContext>();
+    asyncContext->addon_ = getResourceManagerAddon(env, info);
+    asyncContext->resName_ = GetResNameOrPath(env, argc, argv);
+
+    RState state;
+    napi_value jsValue = nullptr;
+    state = asyncContext->addon_->GetResMgr()->GetIntegerByName(asyncContext->resName_.c_str(),
+        asyncContext->iValue_);
+    if (state == RState::SUCCESS) {
+        if (napi_create_int32(env, asyncContext->iValue_, &jsValue) != napi_ok) {
+            asyncContext->SetErrorMsg("Failed to create result", true);
+        }
+    } else {
+        state = asyncContext->addon_->GetResMgr()->GetFloatByName(asyncContext->resName_.c_str(),
+        asyncContext->fValue_);
+        if (state != RState::SUCCESS) {
+            asyncContext->SetErrorMsg("GetFloat failed state", true);
+            return nullptr;
+        }
+        if (napi_create_double(env, asyncContext->fValue_, &jsValue) != napi_ok) {
+            asyncContext->SetErrorMsg("Failed to create result", true);
+        }
+    }
+    return jsValue;
 }
 } // namespace Resource
 } // namespace Global
