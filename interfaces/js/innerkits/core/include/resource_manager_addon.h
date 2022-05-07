@@ -96,9 +96,17 @@ private:
     static napi_value ProcessIdNameParam(napi_env env, napi_callback_info info, const std::string& name,
         napi_async_execute_callback execute);
 
-    static napi_value GetFloat(napi_env env, napi_callback_info info);
+    static napi_value GetNumber(napi_env env, napi_callback_info info);
 
-    static napi_value GetFloatByName(napi_env env, napi_callback_info info);
+    static napi_value GetNumberByName(napi_env env, napi_callback_info info);
+
+    static napi_value GetBoolean(napi_env env, napi_callback_info info);
+
+    static napi_value GetBooleanByName(napi_env env, napi_callback_info info);
+
+    static napi_value GetStringSync(napi_env env, napi_callback_info info);
+
+    static napi_value GetStringByNameSync(napi_env env, napi_callback_info info);
 
     std::string bundleName_;
     std::shared_ptr<ResourceManager> resMgr_;
@@ -112,7 +120,9 @@ struct ResMgrAsyncContext {
     int32_t param_;
     std::string path_;
     std::string resName_;
+    int iValue_;
     float fValue_;
+    bool bValue_;
 
     typedef napi_value (*CreateNapiValue)(napi_env env, ResMgrAsyncContext &context);
     CreateNapiValue createValueFunc_;
@@ -131,8 +141,8 @@ struct ResMgrAsyncContext {
     std::shared_ptr<ResourceManagerAddon> addon_;
     std::shared_ptr<ResourceManager> resMgr_;
 
-    ResMgrAsyncContext() : work_(nullptr), resId_(0), param_(0), fValue_(0.0f), createValueFunc_(nullptr), len_(0),
-        deferred_(nullptr), callbackRef_(nullptr), success_(true) {}
+    ResMgrAsyncContext() : work_(nullptr), resId_(0), param_(0),  iValue_(0), fValue_(0.0f), bValue_(false),
+        createValueFunc_(nullptr), len_(0), deferred_(nullptr), callbackRef_(nullptr), success_(true) {}
 
     void SetErrorMsg(const std::string &msg, bool withResId = false);
 
