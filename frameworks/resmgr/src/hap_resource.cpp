@@ -97,7 +97,7 @@ HapResource::~HapResource()
 void CanonicalizePath(const char *path, char *outPath, size_t len)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
-    BYTRACE_NAME(BYTRACE_TAG_APP, __PRETTY_FUNCTION__);
+    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
 #endif
     if (path == nullptr) {
         HILOG_ERROR("path is null");
@@ -260,7 +260,7 @@ void HapResource::UpdateOverlayInfo(std::unordered_map<std::string, std::unorder
 bool HapResource::Init()
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
-    BYTRACE_NAME(BYTRACE_TAG_APP, __PRETTY_FUNCTION__);
+    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
 #endif
 #ifdef __WINNT__
     char separator = '\\';

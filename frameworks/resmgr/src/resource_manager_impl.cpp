@@ -734,7 +734,7 @@ ResourceManagerImpl::~ResourceManagerImpl()
 bool ResourceManagerImpl::AddResource(const char *path)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
-    BYTRACE_NAME(BYTRACE_TAG_APP, __PRETTY_FUNCTION__);
+    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
 #endif
     return this->hapManager_->AddResource(path);
 }
@@ -747,7 +747,7 @@ bool ResourceManagerImpl::AddResource(const std::string &path, const std::vector
 RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
-    BYTRACE_NAME(BYTRACE_TAG_APP, __PRETTY_FUNCTION__);
+    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
 #endif
 #ifdef SUPPORT_GRAPHICS
     if (resConfig.GetLocaleInfo() == nullptr) {
