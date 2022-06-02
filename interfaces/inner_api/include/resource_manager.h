@@ -37,6 +37,17 @@ public:
         long length;
     } RawFileDescriptor;
 
+    struct Resource {
+        /** the hap bundle name */
+        std::string bundleName;
+
+        /** the hap module name */
+        std::string moduleName;
+
+        /** the resource id in hap */
+        int32_t id;
+    };
+
     virtual ~ResourceManager() = 0;
 
     virtual bool AddResource(const char *path) = 0;
