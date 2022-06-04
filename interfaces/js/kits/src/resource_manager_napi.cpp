@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "ability.h"
-#include "foundation/aafwk/standard/frameworks/kits/appkit/native/ability_runtime/context/context.h"
+#include "foundation/ability/ability_runtime/frameworks/kits/appkit/native/ability_runtime/context/context.h"
 #include "hilog/log.h"
 #include "js_runtime_utils.h"
 #include "node_api.h"
