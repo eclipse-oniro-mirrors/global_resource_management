@@ -47,7 +47,7 @@ static void ExecuteGetResMgr(napi_env env, void* data)
     ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
 
     asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext &context) -> napi_value {
-        napi_value result = ResourceManagerAddon::Create(env, context.bundleName_, context.resMgr_);
+        napi_value result = ResourceManagerAddon::Create(env, context.bundleName_, context.resMgr_, nullptr);
         if (result == nullptr) {
             context.SetErrorMsg("Failed to get ResourceManagerAddon");
             return nullptr;
@@ -104,7 +104,6 @@ static bool InitAsyncContext(napi_env env, const std::string &bundleName, Abilit
             }
         }
     }
-
     asyncContext.resMgr_ = resMgr;
     asyncContext.bundleName_ = bundleName;
     return resMgr != nullptr;

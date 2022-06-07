@@ -19,6 +19,7 @@
 #include <memory>
 #include <string>
 
+#include "foundation/ability/ability_runtime/frameworks/kits/appkit/native/ability_runtime/context/context.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "resource_manager.h"
@@ -29,19 +30,25 @@ namespace Resource {
 class ResourceManagerAddon {
 public:
     static napi_value Create(
-        napi_env env, const std::string& bundleName, const std::shared_ptr<ResourceManager>& resMgr);
-
+        napi_env env, const std::string& bundleName,
+            const std::shared_ptr<ResourceManager>& resMgr, std::shared_ptr<AbilityRuntime::Context> context);
     static bool Init(napi_env env);
 
     static void Destructor(napi_env env, void *nativeObject, void *finalize_hint);
 
-    ResourceManagerAddon(const std::string& bundleName, const std::shared_ptr<ResourceManager>& resMgr);
+    ResourceManagerAddon(const std::string& bundleName, const std::shared_ptr<ResourceManager>& resMgr,
+        const std::shared_ptr<AbilityRuntime::Context>& context);
 
     ~ResourceManagerAddon();
 
     inline std::shared_ptr<ResourceManager> GetResMgr()
     {
         return resMgr_;
+    }
+
+    inline std::shared_ptr<AbilityRuntime::Context> GetContext()
+    {
+        return context_;
     }
 
     std::string GetLocale(std::unique_ptr<ResConfig> &cfg);
@@ -108,8 +115,20 @@ private:
 
     static napi_value GetStringByNameSync(napi_env env, napi_callback_info info);
 
+    static bool GetResourceObject(napi_env env, std::shared_ptr<ResourceManager::Resource> &resourcePtr,
+        napi_value &value);
+
+    static napi_valuetype GetType(napi_env env, napi_value value);
+
+    static bool GetResourceObjectName(napi_env env, std::shared_ptr<ResourceManager::Resource> &resourcePtr,
+        napi_value &value, int32_t type);
+
+    static bool GetResourceObjectId(napi_env env, std::shared_ptr<ResourceManager::Resource> &resourcePtr,
+        napi_value &value);
+
     std::string bundleName_;
     std::shared_ptr<ResourceManager> resMgr_;
+    std::shared_ptr<AbilityRuntime::Context> context_;
 };
 
 struct ResMgrAsyncContext {
@@ -140,6 +159,7 @@ struct ResMgrAsyncContext {
 
     std::shared_ptr<ResourceManagerAddon> addon_;
     std::shared_ptr<ResourceManager> resMgr_;
+    std::shared_ptr<ResourceManager::Resource> resource_;
 
     ResMgrAsyncContext() : work_(nullptr), resId_(0), param_(0),  iValue_(0), fValue_(0.0f), bValue_(false),
         createValueFunc_(nullptr), len_(0), deferred_(nullptr), callbackRef_(nullptr), success_(true) {}
@@ -147,6 +167,12 @@ struct ResMgrAsyncContext {
     void SetErrorMsg(const std::string &msg, bool withResId = false);
 
     static void Complete(napi_env env, napi_status status, void* data);
+
+    static bool GetHapResourceManager(const ResMgrAsyncContext* asyncContext, std::shared_ptr<ResourceManager> &resMgr,
+        int32_t &resId);
+
+    static napi_value getResult(napi_env env, std::unique_ptr<ResMgrAsyncContext> &asyncContext,
+        const std::string &name, napi_async_execute_callback &execute);
 };
 } // namespace Resource
 } // namespace Global
