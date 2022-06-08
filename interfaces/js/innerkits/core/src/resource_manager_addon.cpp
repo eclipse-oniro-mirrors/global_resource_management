@@ -53,7 +53,6 @@ napi_value ResourceManagerAddon::Create(
     napi_env env, const std::string& bundleName, const std::shared_ptr<ResourceManager>& resMgr,
     std::shared_ptr<AbilityRuntime::Context> context)
 {
-    HiLog::Error(LABEL, "enter ResourceManagerAddon Create");
     std::shared_ptr<ResourceManagerAddon> addon = std::make_shared<ResourceManagerAddon>(bundleName, resMgr, context);
 
     if (!Init(env)) {
@@ -310,7 +309,6 @@ napi_value ResourceManagerAddon::ProcessOnlyIdParam(napi_env env, napi_callback_
                 asyncContext->path_ = GetResNameOrPath(env, argc, argv);
             }
         } else if (i == 0 && valueType == napi_object) {
-            HiLog::Info(LABEL, "ProcessOnlyIdParam resource object");
             std::shared_ptr<ResourceManager::Resource> resourcePtr = std::make_shared<ResourceManager::Resource>();
             bool ret = GetResourceObject(env, resourcePtr, argv[0]);
             if (!ret) {
@@ -356,7 +354,7 @@ auto getStringFunc = [](napi_env env, void* data) {
 
     bool ret = ResMgrAsyncContext::GetHapResourceManager(asyncContext, resMgr, resId);
     if (!ret) {
-        HiLog::Error(LABEL, "getStringFunc GetHapResourceManager faild.");
+        HiLog::Error(LABEL, "Failed to GetHapResourceManager in getStringFunc");
         return;
     }
     RState state = resMgr->GetStringById(resId, asyncContext->value_);
@@ -387,7 +385,7 @@ auto getStringArrayFunc = [](napi_env env, void* data) {
     if (asyncContext->resId_ != 0 || asyncContext->resource_ != nullptr) {
         bool ret = ResMgrAsyncContext::GetHapResourceManager(asyncContext, resMgr, resId);
         if (!ret) {
-            HiLog::Error(LABEL, "getStringArrayFunc GetHapResourceManager fail.");
+            HiLog::Error(LABEL, "Failed to GetHapResourceManager in getStringArrayFunc");
             return;
         }
         state = resMgr->GetStringArrayById(resId, asyncContext->arrayValue_);
@@ -544,7 +542,7 @@ auto getMediaFunc = [](napi_env env, void *data) {
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     bool ret = ResMgrAsyncContext::GetHapResourceManager(asyncContext, resMgr, resId);
     if (!ret) {
-        HiLog::Error(LABEL, "getMediaFunc getHapResourceManager fail.");
+        HiLog::Error(LABEL, "Failed to GetHapResourceManager in getMediaFunc");
         return;
     }
     RState state = resMgr->GetMediaById(resId, path);
@@ -570,7 +568,7 @@ auto getMediaBase64Func = [](napi_env env, void *data) {
         std::shared_ptr<ResourceManager> resMgr = nullptr;
         bool ret = ResMgrAsyncContext::GetHapResourceManager(asyncContext, resMgr, resId);
         if (!ret) {
-            HiLog::Error(LABEL, "getMediaBase64Func GetHapResourceManager fail.");
+            HiLog::Error(LABEL, "Failed to GetHapResourceManager in getMediaBase64Func");
             return;
         }
         state = resMgr->GetMediaById(resId, path);
@@ -787,7 +785,7 @@ auto getPluralCapFunc = [](napi_env env, void *data) {
         std::shared_ptr<ResourceManager> resMgr = nullptr;
         bool ret = ResMgrAsyncContext::GetHapResourceManager(asyncContext, resMgr, resId);
         if (!ret) {
-            HiLog::Error(LABEL, "getPluralCapFunc GetHapResourceManager fail.");
+            HiLog::Error(LABEL, "Failed to GetHapResourceManager in getPluralCapFunc");
             return;
         }
         state = resMgr->GetPluralStringByIdFormat(asyncContext->value_,
@@ -833,7 +831,6 @@ napi_value ResourceManagerAddon::ProcessIdNameParam(napi_env env, napi_callback_
         } else if (i == 0 && valueType == napi_string) {
             asyncContext->resName_ = GetResNameOrPath(env, argc, argv);
         } else if (i == 0 && valueType == napi_object) {
-            HiLog::Info(LABEL, "ProcessIdNameParam resource object");
             std::shared_ptr<ResourceManager::Resource> resourcePtr = std::make_shared<ResourceManager::Resource>();
             bool ret = GetResourceObject(env, resourcePtr, argv[0]);
             if (!ret) {
@@ -989,7 +986,6 @@ bool isNapiNumber(napi_env env, napi_callback_info info)
 
 bool isNapiObject(napi_env env, napi_callback_info info)
 {
-    HiLog::Error(LABEL, "enter isNapiObject napi_object");
     GET_PARAMS(env, info, 2);
 
     napi_valuetype valueType = napi_valuetype::napi_undefined;
@@ -1025,10 +1021,9 @@ napi_value ResourceManagerAddon::GetStringSync(napi_env env, napi_callback_info 
         asyncContext->resId_ = GetResId(env, argc, argv);
     } else if (isNapiObject(env, info)) {
         std::shared_ptr<ResourceManager::Resource> resourcePtr = std::make_shared<ResourceManager::Resource>();
-        HiLog::Info(LABEL, "GetStringSync napi_object");
         ret = GetResourceObject(env, resourcePtr, argv[0]);
         if (!ret) {
-            HiLog::Error(LABEL, "failed to get native Resource object");
+            HiLog::Error(LABEL, "Failed to get native Resource object");
             return nullptr;
         }
         asyncContext->resource_ = resourcePtr;
@@ -1041,7 +1036,7 @@ napi_value ResourceManagerAddon::GetStringSync(napi_env env, napi_callback_info 
     int32_t resId = 0;
     ret = ResMgrAsyncContext::GetHapResourceManager(asyncContext.get(), resMgr, resId);
     if (!ret) {
-        HiLog::Error(LABEL, "GetStringSync GetHapResourceManager fail.");
+        HiLog::Error(LABEL, "Failed to GetHapResourceManager in GetStringSync");
         return nullptr;
     }
     RState state = resMgr->GetStringById(resId, asyncContext->value_);
@@ -1093,11 +1088,10 @@ napi_value ResourceManagerAddon::GetBoolean(napi_env env, napi_callback_info inf
     if (isNapiNumber(env, info)) {
         asyncContext->resId_ = GetResId(env, argc, argv);
     } else if (isNapiObject(env, info)) {
-        HiLog::Info(LABEL, "GetBoolean napi_object");
         std::shared_ptr<ResourceManager::Resource> resourcePtr = std::make_shared<ResourceManager::Resource>();
         ret = GetResourceObject(env, resourcePtr, argv[0]);
         if (!ret) {
-            HiLog::Error(LABEL, "failed to get native Resource object");
+            HiLog::Error(LABEL, "Failed to get native Resource object");
             return nullptr;
         }
         asyncContext->resource_ = resourcePtr;
@@ -1109,7 +1103,7 @@ napi_value ResourceManagerAddon::GetBoolean(napi_env env, napi_callback_info inf
     int32_t resId = 0;
     ret = ResMgrAsyncContext::GetHapResourceManager(asyncContext.get(), resMgr, resId);
     if (!ret) {
-        HiLog::Error(LABEL, "GetBoolean GetHapResourceManager fail.");
+        HiLog::Error(LABEL, "Failed to GetHapResourceManager in GetBoolean");
         return nullptr;
     }
     RState state = resMgr->GetBooleanById(resId, asyncContext->bValue_);
@@ -1161,23 +1155,22 @@ napi_value ResourceManagerAddon::GetNumber(napi_env env, napi_callback_info info
     if (isNapiNumber(env, info)) {
         asyncContext->resId_ = GetResId(env, argc, argv);
     } else if (isNapiObject(env, info)) {
-        HiLog::Info(LABEL, "GetNumber napi_object");
         std::shared_ptr<ResourceManager::Resource> resourcePtr = std::make_shared<ResourceManager::Resource>();
         ret = GetResourceObject(env, resourcePtr, argv[0]);
         if (!ret) {
-            HiLog::Error(LABEL, "zx failed to get native Resource object");
+            HiLog::Error(LABEL, "Failed to get native Resource object");
             return nullptr;
         }
         asyncContext->resource_ = resourcePtr;
     } else {
-        HiLog::Error(LABEL, "zx GetNumber type is invalid");
+        HiLog::Error(LABEL, "GetNumber type is invalid");
         return nullptr;
     }
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     int32_t resId = 0;
     ret = ResMgrAsyncContext::GetHapResourceManager(asyncContext.get(), resMgr, resId);
     if (!ret) {
-        HiLog::Error(LABEL, "zx GetNumber GetHapResourceManager fail.");
+        HiLog::Error(LABEL, "Failed to GetHapResourceManager in GetNumber");
         return nullptr;
     }
 
@@ -1305,7 +1298,6 @@ bool ResourceManagerAddon::GetResourceObjectId(napi_env env, std::shared_ptr<Res
 bool ResourceManagerAddon::GetResourceObject(napi_env env, std::shared_ptr<ResourceManager::Resource> &resourcePtr,
     napi_value &value)
 {
-    HiLog::Error(LABEL, "enter GetResourceObject");
     if (resourcePtr == nullptr) {
         HiLog::Error(LABEL, "resourcePtr == nullptr");
         return false;
@@ -1330,7 +1322,6 @@ bool ResMgrAsyncContext::GetHapResourceManager(const ResMgrAsyncContext* asyncCo
 {
     std::shared_ptr<ResourceManager::Resource> resource = asyncContext->resource_;
     if (resource == nullptr) {
-        HiLog::Error(LABEL, "GetHapResourceManager resource == nullptr");
         resMgr = asyncContext->addon_->GetResMgr();
         resId = asyncContext->resId_;
         return true;
@@ -1341,7 +1332,6 @@ bool ResMgrAsyncContext::GetHapResourceManager(const ResMgrAsyncContext* asyncCo
     auto iter = g_resourceMgr.find(key);
     if (iter != g_resourceMgr.end()) {
         resMgr = g_resourceMgr[key];
-        HiLog::Info(LABEL, "GetHapResourceManager find resMgr");
         return true;
     }
     auto context = asyncContext->addon_->GetContext();
