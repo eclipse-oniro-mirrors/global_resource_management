@@ -27,11 +27,11 @@ ohos_shared_library("resmgr_napi_core") {
 
   public_deps = [
     "//base/global/resource_management/frameworks/resmgr:global_resmgr",
-    "//foundation/ability/ability_runtime/frameworks/kits/appkit:app_context",
     "//foundation/arkui/napi:ace_napi",
   ]
 
   external_deps = [
+    "ability_base:configuration",
     "bundle_framework:appexecfwk_base",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
