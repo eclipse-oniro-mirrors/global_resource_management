@@ -139,6 +139,20 @@ private:
 
     bool CopyLocale(ResConfig &other);
 
+    bool IsMccMncMatch(uint32_t mcc,  uint32_t mnc) const;
+
+    bool IsDirectionMatch(Direction direction) const;
+
+    bool IsDeviceTypeMatch(DeviceType deviceType) const;
+
+    bool IsColorModeMatch(ColorMode colorMode) const;
+
+    int IsMccMncMoreSuitable(uint32_t otherMcc, uint32_t otherMnc, uint32_t requestMcc, uint32_t requestMnc) const;
+
+    int IsDensityMoreSuitable(ScreenDensity otherDensity, ScreenDensity requestDensity) const;
+
+    bool IsDensityMoreSuitable(int thisDistance, int otherDistance) const;
+
 private:
     ResLocale *resLocale_;
     Direction direction_;

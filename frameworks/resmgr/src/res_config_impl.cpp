@@ -249,35 +249,64 @@ bool ResConfigImpl::Match(const ResConfigImpl *other) const
     if (other == nullptr) {
         return false;
     }
-    if (this->mcc_ != MCC_UNDEFINED && this->mnc_ != MNC_UNDEFINED) {
-        if (other->mcc_ != MCC_UNDEFINED && other->mnc_ != MNC_UNDEFINED) {
-            if (this->mcc_ != other->mcc_ || this->mnc_ != other->mnc_) {
-                return false;
-            }
-        }
-    } else if (this->mcc_ != MCC_UNDEFINED && this->mnc_ == MNC_UNDEFINED) {
-        if (other->mcc_ != MCC_UNDEFINED && this->mcc_ != other->mcc_) {
-            return false;
-        }
+    if (!IsMccMncMatch(other->mcc_, other->mnc_)) {
+        return false;
     }
     if (!(LocaleMatcher::Match(this->resLocale_, other->GetResLocale()))) {
         return false;
     }
-    if (this->direction_ != DIRECTION_NOT_SET &&
-        other->direction_ != DIRECTION_NOT_SET) {
-        if (this->direction_ != other->direction_) {
+    if (!IsDirectionMatch(other->direction_)) {
+        return false;
+    }
+    if (!IsDeviceTypeMatch(other->deviceType_)) {
+        return false;
+    }
+    if (!IsColorModeMatch(other->colorMode_)) {
+        return false;
+    }
+    return true;
+}
+
+bool ResConfigImpl::IsMccMncMatch(uint32_t mcc,  uint32_t mnc) const
+{
+    if (this->mcc_ != MCC_UNDEFINED && this->mnc_ != MNC_UNDEFINED) {
+        if (mcc != MCC_UNDEFINED && mnc != MNC_UNDEFINED) {
+            if (this->mcc_ != mcc || this->mnc_ != mnc) {
+                return false;
+            }
+        }
+    } else if (this->mcc_ != MCC_UNDEFINED && this->mnc_ == MNC_UNDEFINED) {
+        if (mcc != MCC_UNDEFINED && this->mcc_ != mcc) {
             return false;
         }
     }
-    if (this->deviceType_ != DEVICE_NOT_SET &&
-        other->deviceType_ != DEVICE_NOT_SET) {
-        if (this->deviceType_ != other->deviceType_) {
+    return true;
+}
+
+bool ResConfigImpl::IsDirectionMatch(Direction direction) const
+{
+    if (this->direction_ != DIRECTION_NOT_SET && direction != DIRECTION_NOT_SET) {
+        if (this->direction_ != direction) {
             return false;
         }
     }
-    if (this->colorMode_ != COLOR_MODE_NOT_SET &&
-        other->colorMode_ != COLOR_MODE_NOT_SET) {
-        if (this->colorMode_ != other->colorMode_) {
+    return true;
+}
+
+bool ResConfigImpl::IsDeviceTypeMatch(DeviceType deviceType) const
+{
+    if (this->deviceType_ != DEVICE_NOT_SET && deviceType != DEVICE_NOT_SET) {
+        if (this->deviceType_ != deviceType) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool ResConfigImpl::IsColorModeMatch(ColorMode colorMode) const
+{
+    if (this->colorMode_ != COLOR_MODE_NOT_SET && colorMode != COLOR_MODE_NOT_SET) {
+        if (this->colorMode_ != colorMode) {
             return false;
         }
     }
@@ -295,23 +324,14 @@ bool ResConfigImpl::IsMoreSuitable(const ResConfigImpl *other,
     const ResConfigImpl *request) const
 {
     if (request != nullptr && other != nullptr) {
-        if (request->mcc_ != MCC_UNDEFINED && request->mnc_ != MNC_UNDEFINED) {
-            if (this->mcc_ != other->mcc_ || this->mnc_ != other->mnc_) {
-                return (this->mcc_ != MCC_UNDEFINED) && (this->mnc_ != MNC_UNDEFINED);
-            }
-        } else if (request->mcc_ != MCC_UNDEFINED && request->mnc_ == MNC_UNDEFINED) {
-            if (this->mcc_ != other->mcc_) {
-                return this->mcc_ != MCC_UNDEFINED;
-            }
+        int ret = IsMccMncMoreSuitable(other->mcc_, other->mnc_, request->mcc_, request->mnc_);
+        if (ret != 0) {
+            return ret > 0;
         }
-        int8_t result =
-            LocaleMatcher::IsMoreSuitable(this->GetResLocale(), other->GetResLocale(),
-                                          request->GetResLocale());
-        if (result > 0) {
-            return true;
-        }
-        if (result < 0) {
-            return false;
+        int8_t result = LocaleMatcher::IsMoreSuitable(this->GetResLocale(), other->GetResLocale(),
+            request->GetResLocale());
+        if (result != 0) {
+            return result > 0;
         }
         /**
          * direction must full match.
@@ -330,23 +350,87 @@ bool ResConfigImpl::IsMoreSuitable(const ResConfigImpl *other,
             request->colorMode_ != ColorMode::COLOR_MODE_NOT_SET) {
             return this->colorMode_ != ColorMode::COLOR_MODE_NOT_SET;
         }
-        if (request->screenDensity_ != ScreenDensity::SCREEN_DENSITY_NOT_SET &&
-            this->screenDensity_ != other->screenDensity_) {
-            int thisDistance = this->screenDensity_ - request->screenDensity_;
-            int otherDistance = other->screenDensity_ - request->screenDensity_;
-            if (thisDistance >= 0 && otherDistance >= 0) {
-                return (thisDistance <= otherDistance);
-            }
-            if (thisDistance > 0) {
-                return true;
-            }
-            if (otherDistance > 0) {
-                return false;
-            }
-            return (thisDistance >= otherDistance);
+        ret = IsDensityMoreSuitable(other->screenDensity_, request->screenDensity_);
+        if (ret != 0) {
+            return ret > 0;
         }
     }
     return this->IsMoreSpecificThan(other);
+}
+
+/**
+ * compare this and target mcc/mnc
+ * if this more match other,then return 1, else if other more match this, return -1,
+ * else
+ * return 0
+ *
+ */
+int ResConfigImpl::IsMccMncMoreSuitable(uint32_t otherMcc, uint32_t otherMnc, uint32_t requestMcc,
+    uint32_t requestMnc) const
+{
+    int ret = 0;
+    bool defined = requestMcc != MCC_UNDEFINED && requestMnc != MNC_UNDEFINED;
+    bool mccDefined = requestMcc != MCC_UNDEFINED && requestMnc == MNC_UNDEFINED;
+    bool isMccOrMncDiff = this->mcc_ != otherMcc || this->mnc_ != otherMnc;
+    bool isMccDiff = this->mcc_ != otherMcc;
+    if (defined && isMccOrMncDiff) {
+        if ((this->mcc_ != MCC_UNDEFINED) && (this->mnc_ != MNC_UNDEFINED)) {
+            // the mcc/mnc of this resConfig is suitable than other resConfig
+            ret = 1;
+        } else {
+            // the mcc/mnc of other resConfig mcc/mnc is suitable than this resConfig
+            ret = -1;
+        }
+    } else if (mccDefined && isMccDiff) {
+        if (this->mcc_ != MCC_UNDEFINED) {
+            // the mcc of this resConfig is suitable than other resConfig
+            ret = 1;
+        } else {
+            // the mcc of other resConfig is suitable than this resConfig
+            ret = -1;
+        }
+    }
+    return ret;
+}
+
+/**
+ * compare this and target density
+ * if this more match other,then return 1, else if other more match this, return -1,
+ * else
+ * return 0
+ *
+ */
+int ResConfigImpl::IsDensityMoreSuitable(ScreenDensity otherDensity, ScreenDensity requestDensity) const
+{
+    int ret = 0;
+    if (requestDensity != ScreenDensity::SCREEN_DENSITY_NOT_SET &&
+        this->screenDensity_ != otherDensity) {
+        int thisDistance = this->screenDensity_ - requestDensity;
+        int otherDistance = otherDensity - requestDensity;
+        if (IsDensityMoreSuitable(thisDistance, otherDistance)) {
+            // the density of this resConfig is suitable than other resConfig
+            ret = 1;
+        } else {
+            // the density of other resConfig mcc/mnc is suitable than this resConfig
+            ret = -1;
+        }
+    }
+    
+    return ret;
+}
+
+bool ResConfigImpl::IsDensityMoreSuitable(int thisDistance, int otherDistance) const
+{
+    if (thisDistance >= 0 && otherDistance >= 0) {
+        return (thisDistance <= otherDistance);
+    }
+    if (thisDistance > 0) {
+        return true;
+    }
+    if (otherDistance > 0) {
+        return false;
+    }
+    return (thisDistance >= otherDistance);
 }
 
 ResConfigImpl::~ResConfigImpl()

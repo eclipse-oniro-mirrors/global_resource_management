@@ -415,52 +415,58 @@ ResConfigImpl *HapParser::CreateResConfigFromKeyParams(const std::vector<KeyPara
         return resConfig;
     }
     size_t i = 0;
-    const char *language = nullptr;
-    const char *script = nullptr;
-    const char *region = nullptr;
-    ScreenDensity screenDensity = SCREEN_DENSITY_NOT_SET;
-    Direction direction = DIRECTION_NOT_SET;
-    DeviceType deviceType = DEVICE_NOT_SET;
-    ColorMode colorMode = COLOR_MODE_NOT_SET;
-    uint32_t mcc = MCC_UNDEFINED;
-    uint32_t mnc = MNC_UNDEFINED;
-
+    ResConfigKey configKey;
     for (i = 0; i < len; ++i) {
         const KeyParam *kp = keyParams.at(i);
         if (kp->type_ == LANGUAGES) {
-            language = kp->GetStr().c_str();
+            configKey.language = kp->GetStr().c_str();
         } else if (kp->type_ == REGION) {
-            region = kp->GetStr().c_str();
+            configKey.region = kp->GetStr().c_str();
         } else if (kp->type_ == SCRIPT) {
-            script = kp->GetStr().c_str();
+            configKey.script = kp->GetStr().c_str();
         } else if (kp->type_ == SCREEN_DENSITY) {
-            screenDensity = GetScreenDensity(kp->value_);
+            configKey.screenDensity = GetScreenDensity(kp->value_);
         } else if (kp->type_ == DEVICETYPE) {
-            deviceType = GetDeviceType(kp->value_);
+            configKey.deviceType = GetDeviceType(kp->value_);
         } else if (kp->type_ == DIRECTION) {
             if (kp->value_ == 0) {
-                direction = DIRECTION_VERTICAL;
+                configKey.direction = DIRECTION_VERTICAL;
             } else {
-                direction = DIRECTION_HORIZONTAL;
+                configKey.direction = DIRECTION_HORIZONTAL;
             }
         } else if (kp->type_ == COLORMODE) {
-            colorMode = GetColorMode(kp->value_);
+            configKey.colorMode = GetColorMode(kp->value_);
         } else if (kp->type_ == MCC) {
-            mcc = GetMcc(kp->value_);
+            configKey.mcc = GetMcc(kp->value_);
         } else if (kp->type_ == MNC) {
-            mnc = GetMnc(kp->value_);
+            configKey.mnc = GetMnc(kp->value_);
         }
     }
-    resConfig->SetDeviceType(deviceType);
-    resConfig->SetDirection(direction);
-    resConfig->SetColorMode(colorMode);
-    resConfig->SetMcc(mcc);
-    resConfig->SetMnc(mnc);
-    resConfig->SetScreenDensity(screenDensity);
-    RState r = resConfig->SetLocaleInfo(language, script, region);
+
+    return BuildResConfig(&configKey);
+}
+
+ResConfigImpl *HapParser::BuildResConfig(ResConfigKey *configKey)
+{
+    if (configKey == nullptr) {
+        HILOG_ERROR("configKey is null");
+        return nullptr;
+    }
+    ResConfigImpl *resConfig = new (std::nothrow) ResConfigImpl;
+    if (resConfig == nullptr) {
+        HILOG_ERROR("new ResConfigImpl failed when BuildResConfig");
+        return nullptr;
+    }
+    resConfig->SetDeviceType(configKey->deviceType);
+    resConfig->SetDirection(configKey->direction);
+    resConfig->SetColorMode(configKey->colorMode);
+    resConfig->SetMcc(configKey->mcc);
+    resConfig->SetMnc(configKey->mnc);
+    resConfig->SetScreenDensity(configKey->screenDensity);
+    RState r = resConfig->SetLocaleInfo(configKey->language, configKey->script, configKey->region);
     if (r != SUCCESS) {
-        HILOG_ERROR("error set locale,lang %s,script %s,region %s", language, script,
-            region);
+        HILOG_ERROR("error set locale,lang %s,script %s,region %s", configKey->language, configKey->script,
+            configKey->region);
     }
 
     return resConfig;
@@ -541,70 +547,73 @@ std::string HapParser::ToFolderPath(const std::vector<KeyParam *> &keyParams)
         return std::string("default");
     }
     // mcc-mnc-language_script_region-direction-deviceType-colorMode-screenDensity
-    std::string mcc;
-    std::string mnc;
-    std::string language;
-    std::string script;
-    std::string region;
-    std::string direction;
-    std::string deviceType;
-    std::string colorMode;
-    std::string screenDensity;
+    Determiner determiner;
     for (size_t i = 0; i < keyParams.size(); ++i) {
         KeyParam *keyParam = keyParams[i];
         switch (keyParam->type_) {
             case KeyType::LANGUAGES:
-                language = keyParam->GetStr();
+                determiner.language = keyParam->GetStr();
                 break;
             case KeyType::SCRIPT:
-                script = keyParam->GetStr();
+                determiner.script = keyParam->GetStr();
                 break;
             case KeyType::REGION:
-                region = keyParam->GetStr();
+                determiner.region = keyParam->GetStr();
                 break;
             case KeyType::DIRECTION:
-                direction = keyParam->GetStr();
+                determiner.direction = keyParam->GetStr();
                 break;
             case KeyType::DEVICETYPE:
-                deviceType = keyParam->GetStr();
+                determiner.deviceType = keyParam->GetStr();
                 break;
             case KeyType::COLORMODE:
-                colorMode = keyParam->GetStr();
+                determiner.colorMode = keyParam->GetStr();
                 break;
             case KeyType::MCC:
-                mcc = keyParam->GetStr();
+                determiner.mcc = keyParam->GetStr();
                 break;
             case KeyType::MNC:
-                mnc = keyParam->GetStr();
+                determiner.mnc = keyParam->GetStr();
                 break;
             case KeyType::SCREEN_DENSITY:
-                screenDensity = keyParam->GetStr();
+                determiner.screenDensity = keyParam->GetStr();
                 break;
             default:
                 break;
         }
     }
+
+    return BuildFolderPath(&determiner);
+}
+
+std::string HapParser::BuildFolderPath(Determiner *determiner)
+{
     std::string path;
-    std::string c1("_"), c2("-");
-    if (mcc.size() > 0) {
-        path.append(mcc);
-        if (mnc.size() > 0) {
-            PathAppend(path, mnc, c1);
+    if (determiner == nullptr) {
+        HILOG_ERROR("determiner is null");
+        return path;
+    }
+    std::string connecter1("_");
+    std::string connecter2("-");
+    if (determiner->mcc.size() > 0) {
+        path.append(determiner->mcc);
+        if (determiner->mnc.size() > 0) {
+            PathAppend(path, determiner->mnc, connecter1);
         }
-        if (language.size() > 0) {
-            PathAppend(path, language, c2);
+        if (determiner->language.size() > 0) {
+            PathAppend(path, determiner->language, connecter2);
         }
     } else {
-        if (language.size() > 0) {
-            path.append(language);
+        if (determiner->language.size() > 0) {
+            path.append(determiner->language);
         }
     }
-    PathAppend(path, script, c1);
-    PathAppend(path, region, c1);
-    PathAppend(path, direction, c2);
-    PathAppend(path, deviceType, c2);
-    PathAppend(path, colorMode, c2);
-    PathAppend(path, screenDensity, c2);
+    PathAppend(path, determiner->script, connecter1);
+    PathAppend(path, determiner->region, connecter1);
+    PathAppend(path, determiner->direction, connecter2);
+    PathAppend(path, determiner->deviceType, connecter2);
+    PathAppend(path, determiner->colorMode, connecter2);
+    PathAppend(path, determiner->screenDensity, connecter2);
 
     return path;
 }
