@@ -62,6 +62,36 @@ void HapResourceTest::TearDown()
     // step 4: input testcase teardown step
 }
 
+void TestGetIdValuesByName(const HapResource *pResource)
+{
+    std::string name = std::string("app_name");
+    auto start = CurrentTimeUsec();
+    auto idValues = pResource->GetIdValuesByName(name, ResType::STRING);
+    auto cost = CurrentTimeUsec() - start;
+    // 3 compare with the size of LimitPaths
+    EXPECT_EQ(static_cast<size_t>(3), idValues->GetLimitPathsConst().size());
+    HILOG_DEBUG("GetIdValues by name cost: %ld us.", cost);
+    PrintIdValues(idValues);
+    {
+        auto limitPath = idValues->GetLimitPathsConst()[0];
+        EXPECT_TRUE(limitPath->GetFolder() == "en_US");
+        EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
+        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "App Name");
+    }
+    {
+        auto limitPath = idValues->GetLimitPathsConst()[1];
+        EXPECT_TRUE(limitPath->GetFolder() == "zh_CN");
+        EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
+        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "应用名称");
+    }
+    {
+        auto limitPath = idValues->GetLimitPathsConst()[2];
+        EXPECT_TRUE(limitPath->GetFolder() == "default");
+        EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
+        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "About");
+    }
+}
+
 /*
  * this test shows how to load a hap, defaultConfig set to null
  * @tc.name: HapResourceFuncTest001
@@ -106,32 +136,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest001, TestSize.Level0)
         EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
         EXPECT_TRUE(limitPath->GetIdItem()->value_ == "About");
     }
-
-    std::string name = std::string("app_name");
-    start = CurrentTimeUsec();
-    auto idValues2 = pResource->GetIdValuesByName(name, ResType::STRING);
-    cost = CurrentTimeUsec() - start;
-    EXPECT_EQ(static_cast<size_t>(3), idValues2->GetLimitPathsConst().size());
-    HILOG_DEBUG("GetIdValues by name cost: %ld us.", cost);
-    PrintIdValues(idValues);
-    {
-        auto limitPath = idValues->GetLimitPathsConst()[0];
-        EXPECT_TRUE(limitPath->GetFolder() == "en_US");
-        EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
-        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "App Name");
-    }
-    {
-        auto limitPath = idValues->GetLimitPathsConst()[1];
-        EXPECT_TRUE(limitPath->GetFolder() == "zh_CN");
-        EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
-        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "应用名称");
-    }
-    {
-        auto limitPath = idValues->GetLimitPathsConst()[2];
-        EXPECT_TRUE(limitPath->GetFolder() == "default");
-        EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
-        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "About");
-    }
+    TestGetIdValuesByName(pResource);
 
     delete (pResource);
 }

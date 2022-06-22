@@ -109,6 +109,38 @@ static bool InitAsyncContext(napi_env env, const std::string &bundleName, Abilit
     return resMgr != nullptr;
 }
 
+static napi_value getResult(napi_env env, std::unique_ptr<ResMgrAsyncContext> &asyncContext,
+    std::string &bundleName, std::shared_ptr<AbilityRuntime::Context> &abilityRuntimeContext)
+{
+    napi_value result = nullptr;
+    if (asyncContext->callbackRef_ == nullptr) {
+        napi_create_promise(env, &asyncContext->deferred_, &result);
+    } else {
+        napi_get_undefined(env, &result);
+    }
+
+    if (!InitAsyncContext(env, bundleName, GetGlobalAbility(env), abilityRuntimeContext, *asyncContext)) {
+        HiLog::Error(LABEL, "init async context failed");
+        return nullptr;
+    }
+
+    napi_value resource = nullptr;
+    napi_create_string_utf8(env, "getResourceManager", NAPI_AUTO_LENGTH, &resource);
+    napi_status status = napi_create_async_work(env, nullptr, resource, ExecuteGetResMgr,
+        ResMgrAsyncContext::Complete, static_cast<void*>(asyncContext.get()), &asyncContext->work_);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "Failed to create async work for getResourceManager %{public}d", status);
+        return result;
+    }
+    status = napi_queue_async_work(env, asyncContext->work_);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "Failed to queue async work for getResourceManager %{public}d", status);
+        return result;
+    }
+    asyncContext.release();
+    return result;
+}
+
 static napi_value GetResourceManager(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, 3);
@@ -147,7 +179,7 @@ static napi_value GetResourceManager(napi_env env, napi_callback_info info)
                 return nullptr;
             }
             bundleName = buf.data();
-        } else if ((i == 0 || i == 1 || i == 2) && valueType == napi_function) {
+        } else if ((i == 0 || i == 1 || i == 2) && valueType == napi_function) { // 2 means the third parameter
             napi_create_reference(env, argv[i], 1, &asyncContext->callbackRef_);
             break;
         } else {
@@ -155,33 +187,7 @@ static napi_value GetResourceManager(napi_env env, napi_callback_info info)
         }
     }
 
-    napi_value result = nullptr;
-    if (asyncContext->callbackRef_ == nullptr) {
-        napi_create_promise(env, &asyncContext->deferred_, &result);
-    } else {
-        napi_get_undefined(env, &result);
-    }
-
-    if (!InitAsyncContext(env, bundleName, GetGlobalAbility(env), abilityRuntimeContext, *asyncContext)) {
-        HiLog::Error(LABEL, "init async context failed");
-        return nullptr;
-    }
-
-    napi_value resource = nullptr;
-    napi_create_string_utf8(env, "getResourceManager", NAPI_AUTO_LENGTH, &resource);
-    napi_status status = napi_create_async_work(env, nullptr, resource, ExecuteGetResMgr,
-        ResMgrAsyncContext::Complete, static_cast<void*>(asyncContext.get()), &asyncContext->work_);
-    if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to create async work for getResourceManager %{public}d", status);
-        return result;
-    }
-    status = napi_queue_async_work(env, asyncContext->work_);
-    if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to queue async work for getResourceManager %{public}d", status);
-        return result;
-    }
-
-    asyncContext.release();
+    napi_value result = getResult(env, asyncContext, bundleName, abilityRuntimeContext);
     return result;
 }
 

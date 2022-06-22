@@ -184,7 +184,7 @@ int TestLoadFromIndex(const char *filePath)
     average = total / 1000.0;
     g_logLevel = LOG_DEBUG;
     HILOG_DEBUG("parse index avg cost 001: %f us", average);
-    EXPECT_LT(average, 2000);
+    EXPECT_LT(average, 2000); // 2000 means the cost of time
     return OK;
 }
 
