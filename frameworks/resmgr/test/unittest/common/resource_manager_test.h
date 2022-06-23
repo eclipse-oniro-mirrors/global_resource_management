@@ -16,6 +16,9 @@
 #ifndef RESOURCE_MANAGER_RESOURCE_MANANGER_TEST_H
 #define RESOURCE_MANAGER_RESOURCE_MANANGER_TEST_H
 
+namespace OHOS {
+namespace Global {
+namespace Resource {
 int ResourceManagerAddResourceTest001(void);
 int ResourceManagerAddResourceTest002(void);
 int ResourceManagerAddResourceTest003(void);
@@ -129,5 +132,7 @@ int ResourceManagerResolveReferenceTest001(void);
 int ResourceManagerResolveParentReferenceTest001(void);
 int ResourceManagerSameNameTest001(void);
 int RawFileTest001(void);
-
+} // namespace Resource
+} // namespace Global
+} // namespace OHOS
 #endif
