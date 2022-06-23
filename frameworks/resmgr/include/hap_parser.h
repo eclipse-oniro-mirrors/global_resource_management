@@ -112,6 +112,32 @@ public:
 
 private:
     static const char *RES_FILE_NAME;
+    struct Determiner {
+        std::string mcc;
+        std::string mnc;
+        std::string language;
+        std::string script;
+        std::string region;
+        std::string direction;
+        std::string deviceType;
+        std::string colorMode;
+        std::string screenDensity;
+    };
+
+    struct ResConfigKey {
+        const char *language = nullptr;
+        const char *script = nullptr;
+        const char *region = nullptr;
+        ScreenDensity screenDensity = SCREEN_DENSITY_NOT_SET;
+        Direction direction = DIRECTION_NOT_SET;
+        DeviceType deviceType = DEVICE_NOT_SET;
+        ColorMode colorMode = COLOR_MODE_NOT_SET;
+        uint32_t mcc = MCC_UNDEFINED;
+        uint32_t mnc = MNC_UNDEFINED;
+    };
+
+    static std::string BuildFolderPath(Determiner *determiner);
+    static ResConfigImpl *BuildResConfig(ResConfigKey *configKey);
 };
 } // namespace Resource
 } // namespace Global

@@ -199,15 +199,18 @@ const std::unordered_map<std::string, HapResource *> HapResource::LoadOverlays(c
             result[*iter] = const_cast<HapResource*>(overlayResource);
         }
 
-        if (success) {
-            for (auto iter = result.begin(); iter != result.end(); iter++) {
-                auto index = iter->first.find(path);
-                if (index == std::string::npos) {
-                    iter->second->UpdateOverlayInfo(mapping);
-                }
-            }
-            return result;
+        if (!success) {
+            HILOG_ERROR("load overlay failed");
+            break;
         }
+
+        for (auto iter = result.begin(); iter != result.end(); iter++) {
+            auto index = iter->first.find(path);
+            if (index == std::string::npos) {
+                iter->second->UpdateOverlayInfo(mapping);
+            }
+        }
+        return result;
     } while (false);
 
     for_each (result.begin(), result.end(), [](auto &iter) {
