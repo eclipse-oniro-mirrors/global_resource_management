@@ -31,6 +31,10 @@
 #include <dlfcn.h>
 #endif
 
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
+#include "hisysevent_adapter.h"
+#endif
+
 namespace OHOS {
 namespace Global {
 namespace Resource {
@@ -371,6 +375,9 @@ bool HapManager::AddResourcePath(const char *path)
     }
     const HapResource *pResource = HapResource::LoadFromIndex(path, resConfig_);
     if (pResource == nullptr) {
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
+        ReportAddResourcePathFail(path, "AddResourcePath failed");
+#endif
         return false;
     }
     this->hapResources_.push_back(const_cast<HapResource *>(pResource));

@@ -22,6 +22,9 @@
 #include "hilog/log.h"
 #include "node_api.h"
 
+#include "hisysevent_adapter.h"
+#include "hitrace_meter.h"
+
 namespace OHOS {
 namespace Global {
 namespace Resource {
@@ -330,6 +333,8 @@ auto getStringByNameFunc = [](napi_env env, void* data) {
         asyncContext->value_);
     if (state != RState::SUCCESS) {
         asyncContext->SetErrorMsg("GetStringByName failed state", true);
+        ReportGetResourceByNameFail(asyncContext->resName_, asyncContext->value_,
+            "failed in getStringByNameFunc");
         return;
     }
     asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext& context) {
@@ -360,6 +365,7 @@ auto getStringFunc = [](napi_env env, void* data) {
     RState state = resMgr->GetStringById(resId, asyncContext->value_);
     if (state != RState::SUCCESS) {
         asyncContext->SetErrorMsg("GetString failed state", true);
+        ReportGetResourceByIdFail(resId, asyncContext->value_, "failed in getStringFunc");
         return;
     }
     asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext& context) {
@@ -525,6 +531,7 @@ auto getMediaByNameFunc = [](napi_env env, void *data) {
     RState state = asyncContext->addon_->GetResMgr()->GetMediaByName(asyncContext->resName_.c_str(), path);
     if (state != RState::SUCCESS) {
         asyncContext->SetErrorMsg("GetMediabyName path failed", true);
+        ReportGetResourceByNameFail(asyncContext->resName_, path, "failed in getMediaByNameFunc");
         return;
     }
     GetResourcesBufferData(path, *asyncContext);
@@ -532,7 +539,11 @@ auto getMediaByNameFunc = [](napi_env env, void *data) {
 
 napi_value ResourceManagerAddon::GetMediaByName(napi_env env, napi_callback_info info)
 {
-    return ProcessOnlyIdParam(env, info, "getMediaByName", getMediaByNameFunc);
+    std::string traceVal = "ResourceManagerAddon::GetMediaByName";
+    StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
+    napi_value media = ProcessOnlyIdParam(env, info, "getMediaByName", getMediaByNameFunc);
+    FinishTrace(HITRACE_TAG_GLOBAL_RESMGR);
+    return media;
 }
 
 auto getMediaFunc = [](napi_env env, void *data) {
@@ -546,6 +557,7 @@ auto getMediaFunc = [](napi_env env, void *data) {
         return;
     }
     RState state = resMgr->GetMediaById(resId, path);
+    ReportGetResourceByIdFail(resId, path, "failed in getMediaFunc");
     if (state != RState::SUCCESS) {
         asyncContext->SetErrorMsg("GetMedia path failed", true);
         return;
@@ -555,7 +567,11 @@ auto getMediaFunc = [](napi_env env, void *data) {
 
 napi_value ResourceManagerAddon::GetMedia(napi_env env, napi_callback_info info)
 {
-    return ProcessOnlyIdParam(env, info, "getMedia", getMediaFunc);
+    std::string traceVal = "ResourceManagerAddon::GetMedia";
+    StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
+    napi_value media = ProcessOnlyIdParam(env, info, "getMedia", getMediaFunc);
+    FinishTrace(HITRACE_TAG_GLOBAL_RESMGR);
+    return media;
 }
 
 auto getMediaBase64Func = [](napi_env env, void *data) {
@@ -602,12 +618,20 @@ auto getMediaBase64Func = [](napi_env env, void *data) {
 
 napi_value ResourceManagerAddon::GetMediaBase64(napi_env env, napi_callback_info info)
 {
-    return ProcessOnlyIdParam(env, info, "GetMediaBase64", getMediaBase64Func);
+    std::string traceVal = "ResourceManagerAddon::GetMediaBase64";
+    StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
+    napi_value mediaBase64 = ProcessOnlyIdParam(env, info, "GetMediaBase64", getMediaBase64Func);
+    FinishTrace(HITRACE_TAG_GLOBAL_RESMGR);
+    return mediaBase64;
 }
 
 napi_value ResourceManagerAddon::GetMediaBase64ByName(napi_env env, napi_callback_info info)
 {
-    return ProcessOnlyIdParam(env, info, "GetMediaBase64ByName", getMediaBase64Func);
+    std::string traceVal = "ResourceManagerAddon::GetMediaBase64ByName";
+    StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
+    napi_value mediaBase64 = ProcessOnlyIdParam(env, info, "GetMediaBase64ByName", getMediaBase64Func);
+    FinishTrace(HITRACE_TAG_GLOBAL_RESMGR);
+    return mediaBase64;
 }
 
 napi_value ResourceManagerAddon::Release(napi_env env, napi_callback_info info)

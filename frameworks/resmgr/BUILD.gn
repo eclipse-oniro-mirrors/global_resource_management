@@ -61,9 +61,13 @@ config("resmgr_public_config") {
 ohos_shared_library("global_resmgr") {
   sources = manager_sources
 
+  sources += [ "//base/global/resource_management/dfx/hisysevent_adapter/hisysevent_adapter.cpp" ]
+
   defines = [ "CONFIG_HILOG" ]
 
   configs = [ ":resmgr_config" ]
+
+  include_dirs = [ "//base/global/resource_management/dfx/hisysevent_adapter" ]
 
   public_configs = [ ":resmgr_public_config" ]
 
@@ -81,6 +85,7 @@ ohos_shared_library("global_resmgr") {
   }
 
   external_deps = [
+    "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
   ]

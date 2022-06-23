@@ -15,11 +15,18 @@ import("//base/global/resource_management/resmgr.gni")
 import("//build/ohos.gni")
 
 config("resmgr_napi_core_public_config") {
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "//base/global/resource_management/dfx/hisysevent_adapter",
+    "//base/global/resource_management/frameworks/resmgr/include",
+  ]
 }
 
 ohos_shared_library("resmgr_napi_core") {
-  sources = [ "src/resource_manager_addon.cpp" ]
+  sources = [
+    "//base/global/resource_management/dfx/hisysevent_adapter/hisysevent_adapter.cpp",
+    "src/resource_manager_addon.cpp",
+  ]
 
   configs = [ ":resmgr_napi_core_public_config" ]
 
@@ -33,6 +40,8 @@ ohos_shared_library("resmgr_napi_core") {
   external_deps = [
     "ability_base:configuration",
     "bundle_framework:appexecfwk_base",
+    "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]
