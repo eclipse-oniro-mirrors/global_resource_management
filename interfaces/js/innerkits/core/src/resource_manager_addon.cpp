@@ -43,6 +43,7 @@ std::vector<char> g_codes = {
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
 };
 
+constexpr int BIT_SIX = 6;
 constexpr int BIT_FOUR = 4;
 constexpr int BIT_TWO = 2;
 constexpr int LEN_THREE = 3;
@@ -180,18 +181,18 @@ void ResMgrAsyncContext::Complete(napi_env env, napi_status status, void* data)
         napi_create_error(env, nullptr, message, &result[0]);
         napi_get_undefined(env, &result[1]);
     }
-    do {
-        if (asyncContext->deferred_) {
-            if (asyncContext->success_) {
-                if (napi_resolve_deferred(env, asyncContext->deferred_, result[1]) != napi_ok) {
-                    HiLog::Error(LABEL, "napi_resolve_deferred failed");
-                }
-            } else {
-                if (napi_reject_deferred(env, asyncContext->deferred_, result[0]) != napi_ok) {
-                    HiLog::Error(LABEL, "napi_reject_deferred failed");
-                }
+    if (asyncContext->deferred_) {
+        if (asyncContext->success_) {
+            if (napi_resolve_deferred(env, asyncContext->deferred_, result[1]) != napi_ok) {
+                HiLog::Error(LABEL, "napi_resolve_deferred failed");
             }
         } else {
+            if (napi_reject_deferred(env, asyncContext->deferred_, result[0]) != napi_ok) {
+                HiLog::Error(LABEL, "napi_reject_deferred failed");
+            }
+        }
+    } else {
+        do {
             napi_value callback = nullptr;
             napi_status status = napi_get_reference_value(env, asyncContext->callbackRef_, &callback);
             if (status != napi_ok) {
@@ -209,8 +210,8 @@ void ResMgrAsyncContext::Complete(napi_env env, napi_status status, void* data)
                 HiLog::Error(LABEL, "napi_call_function failed status=%{public}d", status);
                 break;
             }
-        }
-    } while (false);
+        } while (false);
+    }
     napi_delete_async_work(env, asyncContext->work_);
     delete asyncContext;
 };
@@ -290,7 +291,7 @@ napi_value ResourceManagerAddon::ProcessOnlyIdParam(napi_env env, napi_callback_
     std::shared_ptr<ResourceManagerAddon> *addonPtr = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&addonPtr));
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to unwrap %{public}s", name.c_str());
+        HiLog::Error(LABEL, "Failed to unwrap ProcessOnlyIdParam %{public}s", name.c_str());
         return nullptr;
     }
     asyncContext->addon_ = *addonPtr;
@@ -335,7 +336,7 @@ auto getStringByNameFunc = [](napi_env env, void* data) {
     asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext& context) {
         napi_value jsValue = nullptr;
         if (napi_create_string_utf8(env, context.value_.c_str(), NAPI_AUTO_LENGTH, &jsValue) != napi_ok) {
-            context.SetErrorMsg("Failed to create result");
+            context.SetErrorMsg("GetStringByName failed to create result");
             return jsValue;
         }
         return jsValue;
@@ -365,7 +366,7 @@ auto getStringFunc = [](napi_env env, void* data) {
     asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext& context) {
         napi_value jsValue = nullptr;
         if (napi_create_string_utf8(env, context.value_.c_str(), NAPI_AUTO_LENGTH, &jsValue) != napi_ok) {
-            context.SetErrorMsg("Failed to create result");
+            context.SetErrorMsg("GetString failed to create result");
             return jsValue;
         }
         return jsValue;
@@ -432,43 +433,38 @@ napi_value ResourceManagerAddon::GetStringArray(napi_env env, napi_callback_info
     return ProcessOnlyIdParam(env, info, "getStringArray", getStringArrayFunc);
 }
 
-std::unique_ptr<char[]> EncodeBase64(std::unique_ptr<char[]> &data, int srcLen)
+std::string EncodeBase64(std::unique_ptr<char[]> &data, int srcLen)
 {
-    int len = (srcLen / 3) * 4; // Split 3 bytes to 4 parts, each containing 6 bits.
-    int outLen = ((srcLen % 3) != 0) ? (len + 4) : len;
     const char *srcData = data.get();
-    std::unique_ptr<char[]>  result = std::make_unique<char[]>(outLen + 1);
-    char *dstData = result.get();
-    int j = 0;
+    std::string dstData;
     int i = 0;
 
+    // encode in groups of every 3 bytes
     for (; i < srcLen - 3; i += 3) {
         unsigned char byte1 = static_cast<unsigned char>(srcData[i]);
         unsigned char byte2 = static_cast<unsigned char>(srcData[i + 1]);
         unsigned char byte3 = static_cast<unsigned char>(srcData[i + 2]);
-        dstData[j++] = g_codes[byte1 >> 2];
-        dstData[j++] = g_codes[((byte1 & 0x3) << BIT_FOUR) | (byte2 >> BIT_FOUR)];
-        dstData[j++] = g_codes[((byte2 & 0xF) << 2) | (byte3 >> 6)];
-        dstData[j++] = g_codes[byte3 & 0x3F];
+        dstData += g_codes[byte1 >> BIT_TWO];
+        dstData += g_codes[((byte1 & 0x3) << BIT_FOUR) | (byte2 >> BIT_FOUR)];
+        dstData += g_codes[((byte2 & 0xF) << BIT_TWO) | (byte3 >> BIT_SIX)];
+        dstData += g_codes[byte3 & 0x3F];
     }
     // Handle the case where there is one element left
     if (srcLen % LEN_THREE == 1) {
         unsigned char byte1 = static_cast<unsigned char>(srcData[i]);
-        dstData[j++] = g_codes[byte1 >> BIT_TWO];
-        dstData[j++] = g_codes[(byte1 & 0x3) << BIT_FOUR];
-        dstData[j++] = '=';
-        dstData[j++] = '=';
+        dstData += g_codes[byte1 >> BIT_TWO];
+        dstData += g_codes[(byte1 & 0x3) << BIT_FOUR];
+        dstData += '=';
+        dstData += '=';
     } else {
         unsigned char byte1 = static_cast<unsigned char>(srcData[i]);
         unsigned char byte2 = static_cast<unsigned char>(srcData[i + 1]);
-        dstData[j++] = g_codes[byte1 >> 2];
-        dstData[j++] = g_codes[((byte1 & 0x3) << 4) | (byte2 >> 4)];
-        dstData[j++] = g_codes[(byte2 & 0xF) << 2];
-        dstData[j++] = '=';
+        dstData += g_codes[byte1 >> BIT_TWO];
+        dstData += g_codes[((byte1 & 0x3) << BIT_FOUR) | (byte2 >> BIT_FOUR)];
+        dstData += g_codes[(byte2 & 0xF) << BIT_TWO];
+        dstData += '=';
     }
-    dstData[outLen] = '\0';
-
-    return result;
+    return dstData;
 }
 
 std::unique_ptr<char[]> LoadResourceFile(std::string &path, ResMgrAsyncContext &asyncContext, int &len)
@@ -588,8 +584,8 @@ auto getMediaBase64Func = [](napi_env env, void *data) {
     if (pos != std::string::npos) {
         imgType = path.substr(pos + 1);
     }
-    std::unique_ptr<char[]> base64Data = EncodeBase64(tempData, len);
-    asyncContext->value_ = "data:image/" + imgType + ";base64," + base64Data.get();
+    std::string base64Data = EncodeBase64(tempData, len);
+    asyncContext->value_ = "data:image/" + imgType + ";base64," + base64Data;
     asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext &context) {
         napi_value result;
         if (napi_create_string_utf8(env, context.value_.c_str(), NAPI_AUTO_LENGTH, &result) != napi_ok) {
@@ -665,25 +661,7 @@ napi_value ResourceManagerAddon::ProcessNoParam(napi_env env, napi_callback_info
         napi_create_reference(env, argv[0], 1, &asyncContext->callbackRef_);
     }
 
-    napi_value result = nullptr;
-    if (asyncContext->callbackRef_ == nullptr) {
-        napi_create_promise(env, &asyncContext->deferred_, &result);
-    } else {
-        napi_get_undefined(env, &result);
-    }
-
-    napi_value resource = nullptr;
-    napi_create_string_utf8(env, name.c_str(), NAPI_AUTO_LENGTH, &resource);
-    if (napi_create_async_work(env, nullptr, resource, execute, ResMgrAsyncContext::Complete,
-        static_cast<void*>(asyncContext.get()), &asyncContext->work_) != napi_ok) {
-        HiLog::Error(LABEL, "Failed to create async work for %{public}s", name.c_str());
-        return result;
-    }
-    if (napi_queue_async_work(env, asyncContext->work_) != napi_ok) {
-        HiLog::Error(LABEL, "Failed to queue async work for %{public}s", name.c_str());
-        return result;
-    }
-    asyncContext.release();
+    napi_value result = ResMgrAsyncContext::getResult(env, asyncContext, name, execute);
     return result;
 }
 
@@ -818,7 +796,7 @@ napi_value ResourceManagerAddon::ProcessIdNameParam(napi_env env, napi_callback_
     std::shared_ptr<ResourceManagerAddon> *addonPtr = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&addonPtr));
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to unwrap %{public}s", name.c_str());
+        HiLog::Error(LABEL, "Failed to unwrap ProcessIdNameParam %{public}s", name.c_str());
         return nullptr;
     }
     asyncContext->addon_ = *addonPtr;
@@ -1023,7 +1001,7 @@ napi_value ResourceManagerAddon::GetStringSync(napi_env env, napi_callback_info 
         std::shared_ptr<ResourceManager::Resource> resourcePtr = std::make_shared<ResourceManager::Resource>();
         ret = GetResourceObject(env, resourcePtr, argv[0]);
         if (!ret) {
-            HiLog::Error(LABEL, "Failed to get native Resource object");
+            HiLog::Error(LABEL, "GetStringSync failed to get native Resource object");
             return nullptr;
         }
         asyncContext->resource_ = resourcePtr;
@@ -1091,7 +1069,7 @@ napi_value ResourceManagerAddon::GetBoolean(napi_env env, napi_callback_info inf
         std::shared_ptr<ResourceManager::Resource> resourcePtr = std::make_shared<ResourceManager::Resource>();
         ret = GetResourceObject(env, resourcePtr, argv[0]);
         if (!ret) {
-            HiLog::Error(LABEL, "Failed to get native Resource object");
+            HiLog::Error(LABEL, "GetBoolean failed to get native Resource object");
             return nullptr;
         }
         asyncContext->resource_ = resourcePtr;
@@ -1158,7 +1136,7 @@ napi_value ResourceManagerAddon::GetNumber(napi_env env, napi_callback_info info
         std::shared_ptr<ResourceManager::Resource> resourcePtr = std::make_shared<ResourceManager::Resource>();
         ret = GetResourceObject(env, resourcePtr, argv[0]);
         if (!ret) {
-            HiLog::Error(LABEL, "Failed to get native Resource object");
+            HiLog::Error(LABEL, "GetNumber failed to get native Resource object");
             return nullptr;
         }
         asyncContext->resource_ = resourcePtr;
@@ -1178,17 +1156,17 @@ napi_value ResourceManagerAddon::GetNumber(napi_env env, napi_callback_info info
     napi_value jsValue = nullptr;
     if (state == RState::SUCCESS) {
         if (napi_create_int32(env, asyncContext->iValue_, &jsValue) != napi_ok) {
-            asyncContext->SetErrorMsg("Failed to create result", true);
+            asyncContext->SetErrorMsg("GetIntegerById failed to create result", true);
         }
     } else {
         state = asyncContext->addon_->GetResMgr()->GetFloatById(asyncContext->resId_,
         asyncContext->fValue_);
         if (state != RState::SUCCESS) {
-            asyncContext->SetErrorMsg("GetFloat failed state", true);
+            asyncContext->SetErrorMsg("GetFloatById failed state", true);
             return nullptr;
         }
         if (napi_create_double(env, asyncContext->fValue_, &jsValue) != napi_ok) {
-            asyncContext->SetErrorMsg("Failed to create result", true);
+            asyncContext->SetErrorMsg("GetFloatById failed to create result", true);
         }
     }
     return jsValue;
@@ -1212,17 +1190,17 @@ napi_value ResourceManagerAddon::GetNumberByName(napi_env env, napi_callback_inf
         asyncContext->iValue_);
     if (state == RState::SUCCESS) {
         if (napi_create_int32(env, asyncContext->iValue_, &jsValue) != napi_ok) {
-            asyncContext->SetErrorMsg("Failed to create result", true);
+            asyncContext->SetErrorMsg("GetIntegerByName failed to create result", true);
         }
     } else {
         state = asyncContext->addon_->GetResMgr()->GetFloatByName(asyncContext->resName_.c_str(),
         asyncContext->fValue_);
         if (state != RState::SUCCESS) {
-            asyncContext->SetErrorMsg("GetFloat failed state", true);
+            asyncContext->SetErrorMsg("GetFloatByName failed state", true);
             return nullptr;
         }
         if (napi_create_double(env, asyncContext->fValue_, &jsValue) != napi_ok) {
-            asyncContext->SetErrorMsg("Failed to create result", true);
+            asyncContext->SetErrorMsg("GetFloatByName failed to create result", true);
         }
     }
     return jsValue;
