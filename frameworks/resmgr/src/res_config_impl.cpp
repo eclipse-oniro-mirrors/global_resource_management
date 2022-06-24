@@ -18,6 +18,7 @@
 #include <unicode/locid.h>
 #endif
 #include "locale_matcher.h"
+#include "res_common.h"
 #include "res_locale.h"
 #include "utils/utils.h"
 #ifdef SUPPORT_GRAPHICS
@@ -321,7 +322,7 @@ bool ResConfigImpl::IsColorModeMatch(ColorMode colorMode) const
  *
  */
 bool ResConfigImpl::IsMoreSuitable(const ResConfigImpl *other,
-    const ResConfigImpl *request) const
+    const ResConfigImpl *request, uint32_t density) const
 {
     if (request != nullptr && other != nullptr) {
         int ret = IsMccMncMoreSuitable(other->mcc_, other->mnc_, request->mcc_, request->mnc_);
@@ -350,12 +351,12 @@ bool ResConfigImpl::IsMoreSuitable(const ResConfigImpl *other,
             request->colorMode_ != ColorMode::COLOR_MODE_NOT_SET) {
             return this->colorMode_ != ColorMode::COLOR_MODE_NOT_SET;
         }
-        ret = IsDensityMoreSuitable(other->screenDensity_, request->screenDensity_);
+        ret = IsDensityMoreSuitable(other->screenDensity_, request->screenDensity_, density);
         if (ret != 0) {
             return ret > 0;
         }
     }
-    return this->IsMoreSpecificThan(other);
+    return this->IsMoreSpecificThan(other, density);
 }
 
 /**
@@ -400,22 +401,38 @@ int ResConfigImpl::IsMccMncMoreSuitable(uint32_t otherMcc, uint32_t otherMnc, ui
  * return 0
  *
  */
-int ResConfigImpl::IsDensityMoreSuitable(ScreenDensity otherDensity, ScreenDensity requestDensity) const
+int ResConfigImpl::IsDensityMoreSuitable(ScreenDensity otherDensity, ScreenDensity requestDensity,
+    uint32_t density) const
 {
     int ret = 0;
-    if (requestDensity != ScreenDensity::SCREEN_DENSITY_NOT_SET &&
-        this->screenDensity_ != otherDensity) {
-        int thisDistance = this->screenDensity_ - requestDensity;
-        int otherDistance = otherDensity - requestDensity;
-        if (IsDensityMoreSuitable(thisDistance, otherDistance)) {
-            // the density of this resConfig is suitable than other resConfig
-            ret = 1;
-        } else {
-            // the density of other resConfig mcc/mnc is suitable than this resConfig
-            ret = -1;
+    int thisDistance;
+    int otherDistance;
+    if (density == ScreenDensity::SCREEN_DENSITY_NOT_SET) {
+        if (requestDensity != ScreenDensity::SCREEN_DENSITY_NOT_SET &&
+            this->screenDensity_ != otherDensity) {
+            thisDistance = this->screenDensity_ - requestDensity;
+            otherDistance = otherDensity - requestDensity;
+            if (IsDensityMoreSuitable(thisDistance, otherDistance)) {
+                // the density of this resConfig is suitable than other resConfig
+                ret = 1;
+            } else {
+                // the density of other resConfig is suitable than this resConfig
+                ret = -1;
+            }
+        }
+    } else {
+        if (this->screenDensity_ != otherDensity) {
+            thisDistance = this->screenDensity_ - density;
+            otherDistance = otherDensity - density;
+            if (IsDensityMoreSuitable(thisDistance, otherDistance)) {
+                // the density of this resConfig is suitable than other resConfig
+                ret = 1;
+            } else {
+                // the density of other resConfig is suitable than this resConfig
+                ret = -1;
+            }
         }
     }
-    
     return ret;
 }
 
@@ -456,7 +473,7 @@ bool ResConfigImpl::IsCompletedScript() const
     return isCompletedScript_;
 }
 
-bool ResConfigImpl::IsMoreSpecificThan(const ResConfigImpl *other) const
+bool ResConfigImpl::IsMoreSpecificThan(const ResConfigImpl *other, uint32_t density) const
 {
     if (other == nullptr) {
         return true;
@@ -488,10 +505,51 @@ bool ResConfigImpl::IsMoreSpecificThan(const ResConfigImpl *other) const
     if (this->colorMode_ != other->colorMode_) {
         return (this->colorMode_ != ColorMode::COLOR_MODE_NOT_SET);
     }
-    if (this->screenDensity_ != other->screenDensity_) {
-        return  (this->screenDensity_ != ScreenDensity::SCREEN_DENSITY_NOT_SET);
+    int ret = IsDensityMoreSpecificThan(other->screenDensity_, density);
+    if (ret != 0) {
+        return ret > 0;
     }
+    
     return true;
+}
+
+int ResConfigImpl::IsDensityMoreSpecificThan(ScreenDensity otherDensity, uint32_t density) const
+{
+    int ret = 0;
+    if (density == SCREEN_DENSITY_NOT_SET) {
+        if (this->screenDensity_ != otherDensity) {
+            if (this->screenDensity_ != ScreenDensity::SCREEN_DENSITY_NOT_SET) {
+                // the density of this resConfig is suitable than other resConfig
+                ret = 1;
+            } else {
+                // the density of other resConfig is suitable than this resConfig
+                ret = -1;
+            }
+        }
+    } else {
+        if ((this->screenDensity_ != ScreenDensity::SCREEN_DENSITY_NOT_SET) &&
+                (otherDensity == ScreenDensity::SCREEN_DENSITY_NOT_SET)) {
+            // the density of this resConfig is suitable than other resConfig
+            ret = 1;
+        }
+        if ((this->screenDensity_ == ScreenDensity::SCREEN_DENSITY_NOT_SET) &&
+                (otherDensity != ScreenDensity::SCREEN_DENSITY_NOT_SET)) {
+            // the density of other resConfig is suitable than this resConfig
+            ret = -1;
+        }
+        if (this->screenDensity_ != otherDensity) {
+            int thisDistance = this->screenDensity_ - density;
+            int otherDistance = otherDensity - density;
+            if (IsDensityMoreSuitable(thisDistance, otherDistance)) {
+                // the density of this resConfig is suitable than other resConfig
+                ret = 1;
+            } else {
+                // the density of other resConfig is suitable than this resConfig
+                ret = -1;
+            }
+        }
+    }
+    return ret;
 }
 
 ResConfig *CreateResConfig()

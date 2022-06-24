@@ -148,7 +148,7 @@ const IdItem *HapManager::FindResourceByName(const char *name, const ResType res
 }
 
 const HapResource::ValueUnderQualifierDir *HapManager::FindQualifierValueByName(
-    const char *name, const ResType resType)
+    const char *name, const ResType resType, uint32_t density)
 {
     std::vector<const HapResource::IdValues *> candidates = this->GetResourceListByName(name, resType);
     if (candidates.size() == 0) {
@@ -172,7 +172,7 @@ const HapResource::ValueUnderQualifierDir *HapManager::FindQualifierValueByName(
                 result = paths[i];
                 continue;
             }
-            if (!bestResConfig->IsMoreSuitable(resConfig, currentResConfig)) {
+            if (!bestResConfig->IsMoreSuitable(resConfig, currentResConfig, density)) {
                 bestResConfig = resConfig;
                 result = paths[i];
             }
@@ -181,7 +181,7 @@ const HapResource::ValueUnderQualifierDir *HapManager::FindQualifierValueByName(
     return result;
 }
 
-const HapResource::ValueUnderQualifierDir *HapManager::FindQualifierValueById(uint32_t id)
+const HapResource::ValueUnderQualifierDir *HapManager::FindQualifierValueById(uint32_t id, uint32_t density)
 {
     std::vector<const HapResource::IdValues *> candidates = this->GetResourceList(id);
     if (candidates.size() == 0) {
@@ -209,7 +209,7 @@ const HapResource::ValueUnderQualifierDir *HapManager::FindQualifierValueById(ui
                 result = paths[i];
                 continue;
             }
-            if (!bestResConfig->IsMoreSuitable(resConfig, currentResConfig)) {
+            if (!bestResConfig->IsMoreSuitable(resConfig, currentResConfig, density)) {
                 bestResConfig = resConfig;
                 result = paths[i];
             }
