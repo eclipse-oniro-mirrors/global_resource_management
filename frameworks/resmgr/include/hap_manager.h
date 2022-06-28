@@ -85,17 +85,20 @@ public:
     /**
      * Find best resource path by resource id
      * @param id the resource id
+     * @param density the input screen density
      * @return the best resource path
      */
-    const HapResource::ValueUnderQualifierDir *FindQualifierValueById(uint32_t id);
+    const HapResource::ValueUnderQualifierDir *FindQualifierValueById(uint32_t id, uint32_t density = 0);
     
     /**
      * Find best resource path by resource name
      * @param name the resource name
      * @param resType the resource type
+     * @param density the input screen density
      * @return the best resource path
      */
-    const HapResource::ValueUnderQualifierDir *FindQualifierValueByName(const char *name, const ResType resType);
+    const HapResource::ValueUnderQualifierDir *FindQualifierValueByName(const char *name, const ResType resType,
+        uint32_t density = 0);
 
     /**
      * Find the raw file path

@@ -299,12 +299,30 @@ public:
     virtual RState GetMediaById(uint32_t id, std::string &outValue);
 
     /**
-     * Get the PROF resource by resource name
+     * Get the MEDIA resource by resource id with density
+     * @param id the resource id
+     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
+     * @param outValue the obtain resource path write to
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetMediaById(uint32_t id, uint32_t density, std::string &outValue);
+
+    /**
+     * Get the MEDIA resource by resource name
      * @param name the resource name
      * @param outValue the obtain resource path write to
      * @return SUCCESS if resource exist, else NOT_FOUND
      */
     virtual RState GetMediaByName(const char *name, std::string &outValue);
+
+    /**
+     * Get the MEDIA resource by resource name with density
+     * @param name the resource name
+     * @param density the screen density,  within the area of OHOS::Global::Resource::ScreenDensity
+     * @param outValue the obtain resource path write to
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetMediaByName(const char *name, uint32_t density, std::string &outValue);
 
     /**
      * Get the raw file path by resource name
@@ -365,6 +383,8 @@ private:
     RState GetRawFile(const HapResource::ValueUnderQualifierDir *vuqd, const ResType resType, std::string &outValue);
 
     RState ResolveParentReference(const IdItem *idItem, std::map<std::string, std::string> &outValue);
+
+    bool IsDensityValid(uint32_t density);
 
     HapManager *hapManager_;
 

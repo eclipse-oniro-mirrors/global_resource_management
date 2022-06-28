@@ -37,9 +37,10 @@ public:
      * Whether this resConfig more match request resConfig
      * @param other the other resConfig
      * @param request  the request resConfig
+     * @param density the input screen density
      * @return true if this resConfig more match request resConfig than other resConfig, else false
      */
-    bool IsMoreSuitable(const ResConfigImpl *other, const ResConfigImpl *request) const;
+    bool IsMoreSuitable(const ResConfigImpl *other, const ResConfigImpl *request, uint32_t density = 0) const;
 
     /**
      * Set locale information
@@ -135,7 +136,7 @@ public:
     virtual ~ResConfigImpl();
 
 private:
-    bool IsMoreSpecificThan(const ResConfigImpl *other) const;
+    bool IsMoreSpecificThan(const ResConfigImpl *other, uint32_t density = 0) const;
 
     bool CopyLocale(ResConfig &other);
 
@@ -149,9 +150,11 @@ private:
 
     int IsMccMncMoreSuitable(uint32_t otherMcc, uint32_t otherMnc, uint32_t requestMcc, uint32_t requestMnc) const;
 
-    int IsDensityMoreSuitable(ScreenDensity otherDensity, ScreenDensity requestDensity) const;
+    int IsDensityMoreSuitable(ScreenDensity otherDensity, ScreenDensity requestDensity, uint32_t density = 0) const;
 
     bool IsDensityMoreSuitable(int thisDistance, int otherDistance) const;
+
+    int IsDensityMoreSpecificThan(ScreenDensity otherDensity, uint32_t density = 0) const;
 
 private:
     ResLocale *resLocale_;
