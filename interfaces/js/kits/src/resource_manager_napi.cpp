@@ -24,6 +24,8 @@
 #include "hilog/log.h"
 #include "js_runtime_utils.h"
 #include "node_api.h"
+#include "hisysevent_adapter.h"
+#include "hitrace_meter.h"
 
 namespace OHOS {
 namespace Global {
@@ -47,9 +49,13 @@ static void ExecuteGetResMgr(napi_env env, void* data)
     ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
 
     asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext &context) -> napi_value {
+        std::string traceVal = "Create ResourceManager";
+        StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
         napi_value result = ResourceManagerAddon::Create(env, context.bundleName_, context.resMgr_, nullptr);
+        FinishTrace(HITRACE_TAG_GLOBAL_RESMGR);
         if (result == nullptr) {
             context.SetErrorMsg("Failed to get ResourceManagerAddon");
+            ReportInitResourceManagerFail(context.bundleName_, "failed to get ResourceManagerAddon");
             return nullptr;
         }
         return result;
@@ -121,6 +127,7 @@ static napi_value getResult(napi_env env, std::unique_ptr<ResMgrAsyncContext> &a
 
     if (!InitAsyncContext(env, bundleName, GetGlobalAbility(env), abilityRuntimeContext, *asyncContext)) {
         HiLog::Error(LABEL, "init async context failed");
+        ReportInitResourceManagerFail(bundleName, "failed to init async context");
         return nullptr;
     }
 
@@ -193,10 +200,13 @@ static napi_value GetResourceManager(napi_env env, napi_callback_info info)
 
 static napi_value ResMgrInit(napi_env env, napi_value exports)
 {
+    std::string traceVal = "GetResourceManager";
+    StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
     napi_property_descriptor creatorProp[] = {
         DECLARE_NAPI_FUNCTION("getResourceManager", GetResourceManager),
     };
     napi_status status = napi_define_properties(env, exports, 1, creatorProp);
+    FinishTrace(HITRACE_TAG_GLOBAL_RESMGR);
     if (status != napi_ok) {
         HiLog::Error(LABEL, "Failed to set getResourceManager at init");
         return nullptr;
