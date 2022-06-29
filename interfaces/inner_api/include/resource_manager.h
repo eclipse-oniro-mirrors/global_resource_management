@@ -114,7 +114,11 @@ public:
 
     virtual RState GetMediaById(uint32_t id, std::string &outValue) = 0;
 
+    virtual RState GetMediaById(uint32_t id, uint32_t density, std::string &outValue) = 0;
+
     virtual RState GetMediaByName(const char *name, std::string &outValue) = 0;
+
+    virtual RState GetMediaByName(const char *name, uint32_t density, std::string &outValue) = 0;
 
     virtual RState GetRawFilePathByName(const std::string &name, std::string &outValue) = 0;
 

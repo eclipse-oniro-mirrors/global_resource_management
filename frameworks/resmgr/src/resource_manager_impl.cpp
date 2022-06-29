@@ -631,6 +631,20 @@ RState ResourceManagerImpl::GetMediaById(uint32_t id, std::string &outValue)
     return GetRawFile(qd, ResType::MEDIA, outValue);
 }
 
+RState ResourceManagerImpl::GetMediaById(uint32_t id, uint32_t density, std::string &outValue)
+{
+    if (!IsDensityValid(density)) {
+        HILOG_ERROR("density invalid");
+        return NOT_SUPPORT_SEP;
+    }
+    auto qualifierDir = hapManager_->FindQualifierValueById(id, density);
+    if (qualifierDir == nullptr) {
+        HILOG_ERROR("find qualifier value by media id error");
+        return NOT_FOUND;
+    }
+    return GetRawFile(qualifierDir, ResType::MEDIA, outValue);
+}
+
 RState ResourceManagerImpl::GetMediaByName(const char *name, std::string &outValue)
 {
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA);
@@ -638,6 +652,20 @@ RState ResourceManagerImpl::GetMediaByName(const char *name, std::string &outVal
         return NOT_FOUND;
     }
     return GetRawFile(qd, ResType::MEDIA, outValue);
+}
+
+RState ResourceManagerImpl::GetMediaByName(const char *name, uint32_t density, std::string &outValue)
+{
+    if (!IsDensityValid(density)) {
+        HILOG_ERROR("density invalid");
+        return NOT_SUPPORT_SEP;
+    }
+    auto qualifierDir = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, density);
+    if (qualifierDir == nullptr) {
+        HILOG_ERROR("find qualifier value by media name error");
+        return NOT_FOUND;
+    }
+    return GetRawFile(qualifierDir, ResType::MEDIA, outValue);
 }
 
 RState ResourceManagerImpl::GetRawFile(const HapResource::ValueUnderQualifierDir *vuqd, const ResType resType,
@@ -768,6 +796,22 @@ void ResourceManagerImpl::GetResConfig(ResConfig &resConfig)
 std::vector<std::string> ResourceManagerImpl::GetResourcePaths()
 {
     return this->hapManager_->GetResourcePaths();
+}
+
+bool ResourceManagerImpl::IsDensityValid(uint32_t density)
+{
+    switch (density) {
+        case SCREEN_DENSITY_NOT_SET:
+        case SCREEN_DENSITY_SDPI:
+        case SCREEN_DENSITY_MDPI:
+        case SCREEN_DENSITY_LDPI:
+        case SCREEN_DENSITY_XLDPI:
+        case SCREEN_DENSITY_XXLDPI:
+        case SCREEN_DENSITY_XXXLDPI:
+            return true;
+        default:
+            return false;
+    }
 }
 } // namespace Resource
 } // namespace Global
