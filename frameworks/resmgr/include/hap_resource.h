@@ -75,7 +75,7 @@ public:
     }
 
     /**
-     * Get the resource infomation
+     * Get the resource information
      */
     const std::vector<std::string> GetQualifiers() const;
 
