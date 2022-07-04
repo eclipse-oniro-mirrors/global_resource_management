@@ -59,7 +59,7 @@ public:
 
     /**
      * Get the resLocale script
-     * @param resLocale the resLocale infomation
+     * @param resLocale the resLocale information
      * @return true if get the resLocale script, else false
      */
     static bool Normalize(ResLocale *resLocale);
