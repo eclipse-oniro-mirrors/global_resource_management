@@ -422,8 +422,8 @@ int ResConfigImpl::IsDensityMoreSuitable(ScreenDensity otherDensity, ScreenDensi
         }
     } else {
         if (this->screenDensity_ != otherDensity) {
-            thisDistance = this->screenDensity_ - density;
-            otherDistance = otherDensity - density;
+            thisDistance = static_cast<int>(this->screenDensity_ - density);
+            otherDistance = static_cast<int>(otherDensity - density);
             if (IsDensityMoreSuitable(thisDistance, otherDistance)) {
                 // the density of this resConfig is suitable than other resConfig
                 ret = 1;
@@ -538,8 +538,8 @@ int ResConfigImpl::IsDensityMoreSpecificThan(ScreenDensity otherDensity, uint32_
             ret = -1;
         }
         if (this->screenDensity_ != otherDensity) {
-            int thisDistance = this->screenDensity_ - density;
-            int otherDistance = otherDensity - density;
+            int thisDistance = static_cast<int>(this->screenDensity_ - density);
+            int otherDistance = static_cast<int>(otherDensity - density);
             if (IsDensityMoreSuitable(thisDistance, otherDistance)) {
                 // the density of this resConfig is suitable than other resConfig
                 ret = 1;
