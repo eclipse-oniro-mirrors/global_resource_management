@@ -148,10 +148,10 @@ ohos_shared_library("global_resmgr_mac") {
 
     if (host_os == "mac") {
       deps = [
-        "//third_party/bounds_checking_function:libsec_static(//build/toolchain/mac:clang_x64)",
-        "//third_party/icu/icu4c:static_icui18n(//build/toolchain/mac:clang_x64)",
-        "//third_party/icu/icu4c:static_icuuc(//build/toolchain/mac:clang_x64)",
-        "//third_party/zlib:libz(//build/toolchain/mac:clang_x64)",
+        "//third_party/bounds_checking_function:libsec_static",
+        "//third_party/icu/icu4c:static_icui18n",
+        "//third_party/icu/icu4c:static_icuuc",
+        "//third_party/zlib:libz",
       ]
     }
   }
@@ -162,7 +162,7 @@ ohos_shared_library("global_resmgr_mac") {
 group("mac_resmgr") {
   if (resource_management_support_icu) {
     if (host_os == "mac") {
-      deps = [ ":global_resmgr_mac(//build/toolchain/mac:clang_x64)" ]
+      deps = [ ":global_resmgr_mac" ]
     }
   }
 }
