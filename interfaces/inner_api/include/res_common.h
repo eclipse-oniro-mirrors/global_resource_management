@@ -43,6 +43,9 @@ static const char *WEARABLE_STR = "wearable";
 static const char *DARK_STR = "dark";
 static const char *LIGHT_STR = "light";
 
+// InputDevice
+static const char *POINTING_DEVICE_STR = "pointingdevice";
+
 // ScreenDensity
 static const char *RE_120_STR = "sdpi";
 static const char *RE_160_STR = "mdpi";
@@ -65,6 +68,8 @@ typedef enum KeyType {
     COLORMODE       = 6, // DARK = 0, LIGHT = 1
     MCC             = 7,
     MNC             = 8,
+    // RESERVER 9
+    INPUTDEVICE     = 10,
     KEY_TYPE_MAX,
 } KeyType;
 
@@ -111,6 +116,11 @@ enum ColorMode {
     COLOR_MODE_NOT_SET = -1,
     DARK               = 0,
     LIGHT              = 1,
+};
+
+enum InputDevice {
+    INPUTDEVICE_NOT_SET = -1,
+    INPUTDEVICE_POINTINGDEVICE = 0,
 };
 
 enum ScreenDensity {

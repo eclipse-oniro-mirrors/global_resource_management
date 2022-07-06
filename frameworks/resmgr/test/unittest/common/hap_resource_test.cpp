@@ -74,21 +74,21 @@ void TestGetIdValuesByName(const HapResource *pResource)
     PrintIdValues(idValues);
     {
         auto limitPath = idValues->GetLimitPathsConst()[0];
+        EXPECT_TRUE(limitPath->GetFolder() == "default");
+        EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
+        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "About");
+    }
+    {
+        auto limitPath = idValues->GetLimitPathsConst()[1];
         EXPECT_TRUE(limitPath->GetFolder() == "en_US");
         EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
         EXPECT_TRUE(limitPath->GetIdItem()->value_ == "App Name");
     }
     {
-        auto limitPath = idValues->GetLimitPathsConst()[1];
+        auto limitPath = idValues->GetLimitPathsConst()[2];
         EXPECT_TRUE(limitPath->GetFolder() == "zh_CN");
         EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
         EXPECT_TRUE(limitPath->GetIdItem()->value_ == "应用名称");
-    }
-    {
-        auto limitPath = idValues->GetLimitPathsConst()[2];
-        EXPECT_TRUE(limitPath->GetFolder() == "default");
-        EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
-        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "About");
     }
 }
 
@@ -109,7 +109,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest001, TestSize.Level0)
         EXPECT_TRUE(false);
         return;
     }
-    EXPECT_EQ(static_cast<size_t>(71), pResource->IdSize());
+    EXPECT_EQ(static_cast<size_t>(79), pResource->IdSize());
 
     int id = pResource->GetIdByName("app_name", ResType::STRING);
     start = CurrentTimeUsec();
@@ -120,21 +120,21 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest001, TestSize.Level0)
     PrintIdValues(idValues);
     {
         auto limitPath = idValues->GetLimitPathsConst()[0];
+        EXPECT_TRUE(limitPath->GetFolder() == "default");
+        EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
+        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "About");
+    }
+    {
+        auto limitPath = idValues->GetLimitPathsConst()[1];
         EXPECT_TRUE(limitPath->GetFolder() == "en_US");
         EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
         EXPECT_TRUE(limitPath->GetIdItem()->value_ == "App Name");
     }
     {
-        auto limitPath = idValues->GetLimitPathsConst()[1];
+        auto limitPath = idValues->GetLimitPathsConst()[2];
         EXPECT_TRUE(limitPath->GetFolder() == "zh_CN");
         EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
         EXPECT_TRUE(limitPath->GetIdItem()->value_ == "应用名称");
-    }
-    {
-        auto limitPath = idValues->GetLimitPathsConst()[2];
-        EXPECT_TRUE(limitPath->GetFolder() == "default");
-        EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
-        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "About");
     }
     TestGetIdValuesByName(pResource);
 
@@ -165,7 +165,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest002, TestSize.Level1)
         return;
     }
 
-    EXPECT_EQ(static_cast<size_t>(70), pResource->IdSize());
+    EXPECT_EQ(static_cast<size_t>(78), pResource->IdSize());
 
     int id = pResource->GetIdByName("app_name", ResType::STRING);
     start = CurrentTimeUsec();
@@ -177,16 +177,15 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest002, TestSize.Level1)
 
     {
         auto limitPath = idValues->GetLimitPathsConst()[0];
-        EXPECT_TRUE(limitPath->GetFolder() == "en_US");
-        EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
-        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "App Name");
-    }
-
-    {
-        auto limitPath = idValues->GetLimitPathsConst()[1];
         EXPECT_TRUE(limitPath->GetFolder() == "default");
         EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
         EXPECT_TRUE(limitPath->GetIdItem()->value_ == "About");
+    }
+    {
+        auto limitPath = idValues->GetLimitPathsConst()[1];
+        EXPECT_TRUE(limitPath->GetFolder() == "en_US");
+        EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
+        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "App Name");
     }
 
     std::string name = std::string("app_name");
@@ -198,18 +197,18 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest002, TestSize.Level1)
     PrintIdValues(idValues);
 
     {
-        auto limitPath = idValues2->GetLimitPathsConst()[0];
+        auto limitPath = idValues->GetLimitPathsConst()[0];
+        EXPECT_TRUE(limitPath->GetFolder() == "default");
+        EXPECT_TRUE(limitPath->GetIdItem()->id_ == static_cast<uint32_t>(id));
+        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "About");
+    }
+    {
+        auto limitPath = idValues2->GetLimitPathsConst()[1];
         EXPECT_TRUE(limitPath->GetFolder() == "en_US");
         EXPECT_TRUE(limitPath->GetIdItem()->id_ == static_cast<uint32_t>(id));
         EXPECT_TRUE(limitPath->GetIdItem()->value_ == "App Name");
     }
 
-    {
-        auto limitPath = idValues->GetLimitPathsConst()[1];
-        EXPECT_TRUE(limitPath->GetFolder() == "default");
-        EXPECT_TRUE(limitPath->GetIdItem()->id_ == static_cast<uint32_t>(id));
-        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "About");
-    }
     delete pResource;
     delete rc;
 }

@@ -157,6 +157,7 @@ private:
     std::string GetColorModeStr() const;
     std::string GetMccStr() const;
     std::string GetMncStr() const;
+    std::string GetInputDeviceStr() const;
 };
 
 /**

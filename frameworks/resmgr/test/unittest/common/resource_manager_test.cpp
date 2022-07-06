@@ -2390,11 +2390,11 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest001, TestSize.Level
     HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr, nullptr);
     tmp->Init();
     std::string res = tmp->GetResourcePath();
-    res.append("entry/resources/zh_CN-sdpi/media/icon.png");
+    res.append("entry/resources/base/media/icon1.png");
 
     std::string outValue;
     RState state;
-    int id = GetResId("icon", ResType::MEDIA);
+    int id = GetResId("icon1", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
     state = rm->GetMediaById(id, outValue);
     EXPECT_TRUE(state == SUCCESS);
@@ -3143,11 +3143,11 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest001, TestSize.Lev
     HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr, nullptr);
     tmp->Init();
     std::string res = tmp->GetResourcePath();
-    res.append("entry/resources/zh_CN-sdpi/media/icon.png");
+    res.append("entry/resources/base/media/icon1.png");
 
     std::string outValue;
     RState state;
-    state = rm->GetMediaByName("icon", outValue);
+    state = rm->GetMediaByName("icon1", outValue);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3841,6 +3841,626 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest022, TestSize.Lev
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByIdForInputDeviceTest001
+ * @tc.desc: Test GetStringById, to match pointingdevice directory which rc is set
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest001, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetDirection(DIRECTION_NOT_SET);
+    rc->SetDeviceType(DEVICE_NOT_SET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rc->SetInputDevice(INPUTDEVICE_POINTINGDEVICE);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    int id = GetResId("point_test", ResType::STRING);
+    EXPECT_TRUE(id > 0);
+    std::string outValue;
+    rState = rm->GetStringById(id, outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("pointing device test", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByIdForInputDeviceTest002
+ * @tc.desc: Test GetStringById, to match base directory which rc is not set
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest002, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetDirection(DIRECTION_NOT_SET);
+    rc->SetDeviceType(DEVICE_NOT_SET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rc->SetInputDevice(INPUTDEVICE_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    int id = GetResId("point_test", ResType::STRING);
+    EXPECT_TRUE(id > 0);
+    std::string outValue;
+    rState = rm->GetStringById(id, outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("default device test", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByIdForInputDeviceTest003
+ * @tc.desc: Test GetStringById, to match zh_CN-phone-pointingdevice directory which rc is set
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest003, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    rc->SetDirection(DIRECTION_NOT_SET);
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rc->SetInputDevice(INPUTDEVICE_POINTINGDEVICE);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    int id = GetResId("point_test", ResType::STRING);
+    EXPECT_TRUE(id > 0);
+    std::string outValue;
+    rState = rm->GetStringById(id, outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("zh_CN phone pointing device test", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByIdForInputDeviceTest004
+ * @tc.desc: Test GetStringById, not match zh_CN-phone-pointingdevice directory which language not match
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest004, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("en", nullptr, "US");
+    rc->SetDirection(DIRECTION_NOT_SET);
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rc->SetInputDevice(INPUTDEVICE_POINTINGDEVICE);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    int id = GetResId("point_test", ResType::STRING);
+    EXPECT_TRUE(id > 0);
+    std::string outValue;
+    rState = rm->GetStringById(id, outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("pointing device test", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForInputDeviceTest001
+ * @tc.desc: Test GetStringByName, to match pointingdevice directory which rc is set
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest001, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetDirection(DIRECTION_NOT_SET);
+    rc->SetDeviceType(DEVICE_NOT_SET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rc->SetInputDevice(INPUTDEVICE_POINTINGDEVICE);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("point_test", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("pointing device test", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForInputDeviceTest002
+ * @tc.desc: Test GetStringByName, to match base directory which rc is not set
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest002, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetDirection(DIRECTION_NOT_SET);
+    rc->SetDeviceType(DEVICE_NOT_SET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rc->SetInputDevice(INPUTDEVICE_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("point_test", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("default device test", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForInputDeviceTest003
+ * @tc.desc: Test GetStringByName, to match zh_CN-phone-pointingdevice directory which rc is set
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest003, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    rc->SetDirection(DIRECTION_NOT_SET);
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rc->SetInputDevice(INPUTDEVICE_POINTINGDEVICE);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("point_test", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("zh_CN phone pointing device test", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForInputDeviceTest004
+ * @tc.desc: Test GetStringByName, not match zh_CN-phone-pointingdevice directory which language not match
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest004, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("en", nullptr, "US");
+    rc->SetDirection(DIRECTION_NOT_SET);
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rc->SetInputDevice(INPUTDEVICE_POINTINGDEVICE);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("point_test", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("pointing device test", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForInputDeviceTest005
+ * @tc.desc: Test GetStringByName, not match zh_CN-phone-pointingdevice directory which devicetype not match
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest005, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    rc->SetDirection(DIRECTION_NOT_SET);
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rc->SetInputDevice(INPUTDEVICE_POINTINGDEVICE);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("point_test", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("pointing device test", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForInputDeviceTest006
+ * @tc.desc: Test GetStringByName,match base directory which pointingdevice directory not have res with name
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest006, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    rc->SetDirection(DIRECTION_NOT_SET);
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rc->SetInputDevice(INPUTDEVICE_POINTINGDEVICE);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("hello", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("Helloooo", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetIntegerByNameForInputDeviceTest001
+ * @tc.desc: Test GetStringByName, to match pointingdevice directory which rc is set
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest001, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetDirection(DIRECTION_NOT_SET);
+    rc->SetDeviceType(DEVICE_NOT_SET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rc->SetInputDevice(INPUTDEVICE_POINTINGDEVICE);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    int outValue;
+    rState = rm->GetIntegerByName("integer_input_device", outValue);;
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ(888, outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetIntegerByNameForInputDeviceTest002
+ * @tc.desc: Test GetIntegerByName, to match base directory which rc is not set
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest002, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetDirection(DIRECTION_NOT_SET);
+    rc->SetDeviceType(DEVICE_NOT_SET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rc->SetInputDevice(INPUTDEVICE_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    int outValue;
+    rState = rm->GetIntegerByName("integer_input_device", outValue);;
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ(999, outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetIntegerByNameForInputDeviceTest003
+ * @tc.desc: Test GetIntegerByName, to match zh_CN-phone-pointingdevice directory which rc is set
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest003, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    rc->SetDirection(DIRECTION_NOT_SET);
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rc->SetInputDevice(INPUTDEVICE_POINTINGDEVICE);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    int outValue;
+    rState = rm->GetIntegerByName("integer_input_device", outValue);;
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ(777, outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetIntegerByNameForInputDeviceTest004
+ * @tc.desc: Test GetIntegerByName, not match zh_CN-phone-pointingdevice directory which language not match
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest004, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("en", nullptr, "US");
+    rc->SetDirection(DIRECTION_NOT_SET);
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rc->SetInputDevice(INPUTDEVICE_POINTINGDEVICE);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    int outValue;
+    rState = rm->GetIntegerByName("integer_input_device", outValue);;
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ(888, outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetBooleanByNameForInputDeviceTest001
+ * @tc.desc: Test GetBooleanByName, to match pointingdevice directory which rc is set
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByNameForInputDeviceTest001, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetDirection(DIRECTION_NOT_SET);
+    rc->SetDeviceType(DEVICE_NOT_SET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rc->SetInputDevice(INPUTDEVICE_POINTINGDEVICE);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    bool outValue;
+    rState = rm->GetBooleanByName("boolean_input_device", outValue);;
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ(true, outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetBooleanByNameForInputDeviceTest002
+ * @tc.desc: Test GetBooleanByName, to match base directory which rc is not set
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByNameForInputDeviceTest002, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetDirection(DIRECTION_NOT_SET);
+    rc->SetDeviceType(DEVICE_NOT_SET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rc->SetInputDevice(INPUTDEVICE_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    bool outValue;
+    rState = rm->GetBooleanByName("boolean_input_device", outValue);;
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ(false, outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameForInputDeviceTest001
+ * @tc.desc: Test GetMediaByName, to match pointingdevice directory which rc is set
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest001, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    std::string res;
+    res.append("/data/test/all/assets/entry/resources/pointingdevice/media/input_device.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetDirection(DIRECTION_NOT_SET);
+    rc->SetDeviceType(DEVICE_NOT_SET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rc->SetInputDevice(INPUTDEVICE_POINTINGDEVICE);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("input_device", outValue);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameForInputDeviceTest002
+ * @tc.desc: Test GetMediaByName, to match base directory which rc is not set
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest002, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    std::string res;
+    res.append("/data/test/all/assets/entry/resources/base/media/input_device.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetDirection(DIRECTION_NOT_SET);
+    rc->SetDeviceType(DEVICE_NOT_SET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rc->SetInputDevice(INPUTDEVICE_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("input_device", outValue);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameForInputDeviceTest003
+ * @tc.desc: Test GetMediaByName, to match zh_CN-phone-pointingdevice directory which rc is set
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest003, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    std::string res;
+    res.append("/data/test/all/assets/entry/resources/zh_CN-phone-pointingdevice/media/input_device.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    rc->SetDirection(DIRECTION_NOT_SET);
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rc->SetInputDevice(INPUTDEVICE_POINTINGDEVICE);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("input_device", outValue);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameForInputDeviceTest004
+ * @tc.desc: Test GetMediaByName, not match zh_CN-phone-pointingdevice directory which language not match
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest004, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    std::string res;
+    res.append("/data/test/all/assets/entry/resources/pointingdevice/media/input_device.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("en", nullptr, "US");
+    rc->SetDirection(DIRECTION_NOT_SET);
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rc->SetInputDevice(INPUTDEVICE_POINTINGDEVICE);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("input_device", outValue);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
 }
 
 /*

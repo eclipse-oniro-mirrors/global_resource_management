@@ -132,6 +132,18 @@ public:
      * @return true if resLocal script completed, else false
      */
     bool IsCompletedScript() const;
+	
+    /**
+     * Set resConfig input device
+     * @param inputDevice the resConfig input device
+     */
+    void SetInputDevice(InputDevice inputDevice);
+	
+    /**
+     * Get resConfig input device
+     * @return the resConfig input device
+     */
+    InputDevice GetInputDevice() const;
 
     virtual ~ResConfigImpl();
 
@@ -147,6 +159,8 @@ private:
     bool IsDeviceTypeMatch(DeviceType deviceType) const;
 
     bool IsColorModeMatch(ColorMode colorMode) const;
+
+    bool IsInputDeviceMatch(InputDevice inputDevice) const;
 
     int IsMccMncMoreSuitable(uint32_t otherMcc, uint32_t otherMnc, uint32_t requestMcc, uint32_t requestMnc) const;
 
@@ -164,6 +178,7 @@ private:
     uint32_t mcc_;
     uint32_t mnc_;
     DeviceType deviceType_;
+    InputDevice inputDevice_;
 #ifdef SUPPORT_GRAPHICS
     Locale *localeInfo_;
 #endif

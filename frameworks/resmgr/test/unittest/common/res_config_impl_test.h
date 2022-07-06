@@ -109,5 +109,7 @@ int ResConfigImplIsMoreSuitableTest055(void);
 int ResConfigImplIsMoreSuitableTest056(void);
 int ResConfigImplIsMoreSuitableTest057(void);
 int ResConfigImplIsMoreSuitableTest058(void);
+int ResConfigImplIsMoreSuitableTest059(void);
+int ResConfigImplIsMoreSuitableTest060(void);
 
 #endif

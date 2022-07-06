@@ -109,6 +109,13 @@ public:
      * @return the mnc related to the value
      */
     static uint32_t GetMnc(uint32_t value);
+	
+    /**
+     * Get input device
+     * @param value the type of input device
+     * @return the input device related to the value
+     */
+    static InputDevice GetInputDevice(uint32_t value);
 
 private:
     static const char *RES_FILE_NAME;
@@ -121,6 +128,7 @@ private:
         std::string direction;
         std::string deviceType;
         std::string colorMode;
+        std::string inputDevice;
         std::string screenDensity;
     };
 
@@ -132,6 +140,7 @@ private:
         Direction direction = DIRECTION_NOT_SET;
         DeviceType deviceType = DEVICE_NOT_SET;
         ColorMode colorMode = COLOR_MODE_NOT_SET;
+        InputDevice inputDevice = INPUTDEVICE_NOT_SET;
         uint32_t mcc = MCC_UNDEFINED;
         uint32_t mnc = MNC_UNDEFINED;
     };

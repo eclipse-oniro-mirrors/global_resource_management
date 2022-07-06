@@ -64,6 +64,10 @@ public:
     virtual uint32_t GetMnc() const = 0;
 
     virtual bool Copy(ResConfig &other) = 0;
+	
+    virtual void SetInputDevice(InputDevice inputDevice) = 0;
+	
+    virtual InputDevice GetInputDevice() const = 0;
 
     virtual ~ResConfig() {}
 };

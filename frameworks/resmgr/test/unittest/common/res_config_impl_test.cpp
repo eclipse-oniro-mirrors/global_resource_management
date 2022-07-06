@@ -1654,4 +1654,50 @@ HWTEST_F(ResConfigImplTest, ResConfigImplIsMoreSuitableTest058, TestSize.Level1)
     delete current;
     delete other;
 }
+
+/*
+ * @tc.name: ResConfigImplIsMoreSuitableTest059
+ * @tc.desc: Test ResConfig IsMoreSuitable, match ColorMode earlier than InputDevice
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResConfigImplTest, ResConfigImplIsMoreSuitableTest059, TestSize.Level1)
+{
+    ResConfigImpl *request = CreateResConfigImpl("en", nullptr, "US");
+    ResConfigImpl *current = CreateResConfigImpl("en", nullptr, "US");
+    ResConfigImpl *other = CreateResConfigImpl("en", nullptr, "US");
+    request->SetColorMode(ColorMode::LIGHT);
+    request->SetInputDevice(InputDevice::INPUTDEVICE_POINTINGDEVICE);
+    current->SetColorMode(ColorMode::COLOR_MODE_NOT_SET);
+    current->SetInputDevice(InputDevice::INPUTDEVICE_POINTINGDEVICE);
+    other->SetColorMode(ColorMode::LIGHT);
+    other->SetInputDevice(InputDevice::INPUTDEVICE_NOT_SET);
+    EXPECT_FALSE(current->IsMoreSuitable(other, request));
+    EXPECT_TRUE(other->IsMoreSuitable(current, request));
+    delete request;
+    delete current;
+    delete other;
+}
+
+/*
+ * @tc.name: ResConfigImplIsMoreSuitableTest060
+ * @tc.desc: Test ResConfig IsMoreSuitable, match InputDevice earlier than ScreenDensity
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResConfigImplTest, ResConfigImplIsMoreSuitableTest060, TestSize.Level1)
+{
+    ResConfigImpl *request = CreateResConfigImpl("en", nullptr, "US");
+    ResConfigImpl *current = CreateResConfigImpl("en", nullptr, "US");
+    ResConfigImpl *other = CreateResConfigImpl("en", nullptr, "US");
+    request->SetInputDevice(InputDevice::INPUTDEVICE_POINTINGDEVICE);
+    request->SetScreenDensity(ScreenDensity::SCREEN_DENSITY_LDPI);
+    current->SetInputDevice(InputDevice::INPUTDEVICE_NOT_SET);
+    current->SetScreenDensity(ScreenDensity::SCREEN_DENSITY_LDPI);
+    other->SetInputDevice(InputDevice::INPUTDEVICE_POINTINGDEVICE);
+    other->SetScreenDensity(ScreenDensity::SCREEN_DENSITY_NOT_SET);
+    EXPECT_FALSE(current->IsMoreSuitable(other, request));
+    EXPECT_TRUE(other->IsMoreSuitable(current, request));
+    delete request;
+    delete current;
+    delete other;
+}
 }

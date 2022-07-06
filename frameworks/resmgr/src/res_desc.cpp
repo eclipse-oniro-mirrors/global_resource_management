@@ -106,6 +106,17 @@ std::string KeyParam::GetColorModeStr() const
     return ret;
 }
 
+std::string KeyParam::GetInputDeviceStr() const
+{
+    std::string ret("not_input_device");
+    if (type_ == KeyType::INPUTDEVICE) {
+        if (value_ == InputDevice::INPUTDEVICE_POINTINGDEVICE) {
+            ret = std::string(POINTING_DEVICE_STR);
+        }
+    }
+    return ret;
+}
+
 std::string KeyParam::GetMccStr() const
 {
     std::string ret("not_mcc");
@@ -151,6 +162,9 @@ const std::string KeyParam::ConvertToStr() const
     }
     if (type_ == KeyType::COLORMODE) {
         return GetColorModeStr();
+    }
+    if (type_ == KeyType::INPUTDEVICE) {
+        return GetInputDeviceStr();
     }
     if (type_ == KeyType::MCC) {
         return GetMccStr();
