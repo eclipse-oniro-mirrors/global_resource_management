@@ -16,6 +16,7 @@
 #ifndef RESOURCE_MANAGER_ADDON_H
 #define RESOURCE_MANAGER_ADDON_H
 
+#include <cstddef>
 #include <memory>
 #include <string>
 

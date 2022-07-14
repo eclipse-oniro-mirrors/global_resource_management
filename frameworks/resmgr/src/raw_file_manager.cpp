@@ -15,7 +15,9 @@
 
 #include "raw_file_manager.h"
 
+#include <climits>
 #include <cstdio>
+#include <cstdlib>
 #include <dirent.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -25,13 +27,12 @@
 #include "resource_manager.h"
 #include "resource_manager_addon.h"
 #include "resource_manager_impl.h"
-#include "hilog/log.h"
+#include "hilog/log_c.h"
+#include "hilog/log_cpp.h"
 
 #ifdef __WINNT__
 #include <shlwapi.h>
 #include <windows.h>
-#else
-#include <dlfcn.h>
 #endif
 
 using namespace OHOS::Global::Resource;

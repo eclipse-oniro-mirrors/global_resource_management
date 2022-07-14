@@ -15,14 +15,14 @@
 
 #include "hap_resource.h"
 
+#include <algorithm>
+#include <climits>
+#include <cstdlib>
 #include <fstream>
-#include <iostream>
 
 #ifdef __WINNT__
 #include <shlwapi.h>
 #include <windows.h>
-#else
-#include <dlfcn.h>
 #endif
 
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
@@ -30,13 +30,7 @@
 #endif
 #include "hap_parser.h"
 #include "hilog_wrapper.h"
-#include "locale_matcher.h"
 #include "utils/errors.h"
-#include "utils/string_utils.h"
-
-#if defined(__linux__)
-#include <malloc.h>
-#endif
 
 namespace OHOS {
 namespace Global {

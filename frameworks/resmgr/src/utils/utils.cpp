@@ -18,8 +18,6 @@
 #include <cstddef>
 #include <cstring>
 
-#include "utils/common.h"
-
 namespace OHOS {
 namespace Global {
 namespace Resource {

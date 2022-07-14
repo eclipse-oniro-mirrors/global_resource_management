@@ -16,9 +16,6 @@
 #define OHOS_RESOURCE_MANAGER_RESCONFIG_IMPL_H
 
 #include <stdint.h>
-#ifdef SUPPORT_GRAPHICS
-#include <unicode/locid.h>
-#endif
 #include "res_locale.h"
 #include "res_common.h"
 #include "res_config.h"
