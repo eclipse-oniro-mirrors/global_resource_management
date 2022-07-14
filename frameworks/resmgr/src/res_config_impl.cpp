@@ -30,16 +30,17 @@ namespace Global {
 namespace Resource {
 ResConfigImpl::ResConfigImpl()
     : resLocale_(nullptr),
-      direction_(DIRECTION_NOT_SET),
-      screenDensity_(SCREEN_DENSITY_NOT_SET),
-      colorMode_(LIGHT),
-      mcc_(MCC_UNDEFINED),
-      mnc_(MNC_UNDEFINED),
-      deviceType_(DEVICE_NOT_SET),
+    direction_(DIRECTION_NOT_SET),
+    screenDensity_(SCREEN_DENSITY_NOT_SET),
+    colorMode_(LIGHT),
+    mcc_(MCC_UNDEFINED),
+    mnc_(MNC_UNDEFINED),
+    deviceType_(DEVICE_NOT_SET),
+    inputDevice_(INPUTDEVICE_NOT_SET),
 #ifdef SUPPORT_GRAPHICS
-      localeInfo_(nullptr),
+    localeInfo_(nullptr),
 #endif
-      isCompletedScript_(false)
+    isCompletedScript_(false)
 {}
 
 #ifdef SUPPORT_GRAPHICS
@@ -110,6 +111,11 @@ void ResConfigImpl::SetColorMode(ColorMode colorMode)
     this->colorMode_ = colorMode;
 }
 
+void ResConfigImpl::SetInputDevice(InputDevice inputDevice)
+{
+    this->inputDevice_ = inputDevice;
+}
+
 void ResConfigImpl::SetMcc(uint32_t mcc)
 {
     this->mcc_ = mcc;
@@ -150,6 +156,11 @@ ScreenDensity ResConfigImpl::GetScreenDensity() const
 ColorMode ResConfigImpl::GetColorMode() const
 {
     return this->colorMode_;
+}
+
+InputDevice ResConfigImpl::GetInputDevice() const
+{
+    return this->inputDevice_;
 }
 
 uint32_t ResConfigImpl::GetMcc() const
@@ -233,6 +244,9 @@ bool ResConfigImpl::Copy(ResConfig &other)
     if (this->GetColorMode() != other.GetColorMode()) {
         this->SetColorMode(other.GetColorMode());
     }
+    if (this->GetInputDevice() != other.GetInputDevice()) {
+        this->SetInputDevice(other.GetInputDevice());
+    }
     if (this->GetMcc() != other.GetMcc()) {
         this->SetMcc(other.GetMcc());
     }
@@ -263,6 +277,9 @@ bool ResConfigImpl::Match(const ResConfigImpl *other) const
         return false;
     }
     if (!IsColorModeMatch(other->colorMode_)) {
+        return false;
+    }
+    if (!IsInputDeviceMatch(other->inputDevice_)) {
         return false;
     }
     return true;
@@ -314,6 +331,20 @@ bool ResConfigImpl::IsColorModeMatch(ColorMode colorMode) const
     return true;
 }
 
+bool ResConfigImpl::IsInputDeviceMatch(InputDevice inputDevice) const
+{
+    if (this->inputDevice_ == INPUTDEVICE_NOT_SET && inputDevice != INPUTDEVICE_NOT_SET) {
+        return false;
+    }
+    // reserve for future InputDevice expansion
+    if (this->inputDevice_ != INPUTDEVICE_NOT_SET && inputDevice != INPUTDEVICE_NOT_SET) {
+        if (this->inputDevice_ != inputDevice) {
+            return false;
+        }
+    }
+    return true;
+}
+
 /**
  * compare this  and target
  * if this more match request,then return true
@@ -350,6 +381,10 @@ bool ResConfigImpl::IsMoreSuitable(const ResConfigImpl *other,
         if (this->colorMode_ != other->colorMode_ &&
             request->colorMode_ != ColorMode::COLOR_MODE_NOT_SET) {
             return this->colorMode_ != ColorMode::COLOR_MODE_NOT_SET;
+        }
+        if (this->inputDevice_ != other->inputDevice_ &&
+            request->inputDevice_ != InputDevice::INPUTDEVICE_NOT_SET) {
+            return this->inputDevice_ != InputDevice::INPUTDEVICE_NOT_SET;
         }
         ret = IsDensityMoreSuitable(other->screenDensity_, request->screenDensity_, density);
         if (ret != 0) {
@@ -504,6 +539,9 @@ bool ResConfigImpl::IsMoreSpecificThan(const ResConfigImpl *other, uint32_t dens
     }
     if (this->colorMode_ != other->colorMode_) {
         return (this->colorMode_ != ColorMode::COLOR_MODE_NOT_SET);
+    }
+    if (this->inputDevice_ != other->inputDevice_) {
+        return (this->inputDevice_ == InputDevice::INPUTDEVICE_NOT_SET);
     }
     int ret = IsDensityMoreSpecificThan(other->screenDensity_, density);
     if (ret != 0) {

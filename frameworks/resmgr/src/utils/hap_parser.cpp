@@ -434,6 +434,8 @@ ResConfigImpl *HapParser::CreateResConfigFromKeyParams(const std::vector<KeyPara
             } else {
                 configKey.direction = DIRECTION_HORIZONTAL;
             }
+        } else if (kp->type_ == INPUTDEVICE) {
+            configKey.inputDevice = GetInputDevice(kp->value_);
         } else if (kp->type_ == COLORMODE) {
             configKey.colorMode = GetColorMode(kp->value_);
         } else if (kp->type_ == MCC) {
@@ -462,6 +464,7 @@ ResConfigImpl *HapParser::BuildResConfig(ResConfigKey *configKey)
     resConfig->SetColorMode(configKey->colorMode);
     resConfig->SetMcc(configKey->mcc);
     resConfig->SetMnc(configKey->mnc);
+    resConfig->SetInputDevice(configKey->inputDevice);
     resConfig->SetScreenDensity(configKey->screenDensity);
     RState r = resConfig->SetLocaleInfo(configKey->language, configKey->script, configKey->region);
     if (r != SUCCESS) {
@@ -512,6 +515,15 @@ ColorMode HapParser::GetColorMode(uint32_t value)
     return colorMode;
 }
 
+InputDevice HapParser::GetInputDevice(uint32_t value)
+{
+    InputDevice inputDevice = INPUTDEVICE_NOT_SET;
+    if (value == INPUTDEVICE_POINTINGDEVICE) {
+        inputDevice = INPUTDEVICE_POINTINGDEVICE;
+    }
+    return inputDevice;
+}
+
 ScreenDensity HapParser::GetScreenDensity(uint32_t value)
 {
     ScreenDensity screenDensity = SCREEN_DENSITY_NOT_SET;
@@ -546,7 +558,7 @@ std::string HapParser::ToFolderPath(const std::vector<KeyParam *> &keyParams)
     if (keyParams.size() == 0) {
         return std::string("default");
     }
-    // mcc-mnc-language_script_region-direction-deviceType-colorMode-screenDensity
+    // mcc-mnc-language_script_region-direction-deviceType-colorMode-inputDevice-screenDensity
     Determiner determiner;
     for (size_t i = 0; i < keyParams.size(); ++i) {
         KeyParam *keyParam = keyParams[i];
@@ -568,6 +580,9 @@ std::string HapParser::ToFolderPath(const std::vector<KeyParam *> &keyParams)
                 break;
             case KeyType::COLORMODE:
                 determiner.colorMode = keyParam->GetStr();
+                break;
+            case KeyType::INPUTDEVICE:
+                determiner.inputDevice = keyParam->GetStr();
                 break;
             case KeyType::MCC:
                 determiner.mcc = keyParam->GetStr();
@@ -613,6 +628,7 @@ std::string HapParser::BuildFolderPath(Determiner *determiner)
     PathAppend(path, determiner->direction, connecter2);
     PathAppend(path, determiner->deviceType, connecter2);
     PathAppend(path, determiner->colorMode, connecter2);
+    PathAppend(path, determiner->inputDevice, connecter2);
     PathAppend(path, determiner->screenDensity, connecter2);
 
     return path;
