@@ -48,7 +48,7 @@ extern LogLevel g_logLevel;
 } // namespace Global
 } // namespace OHOS
 
-static constexpr OHOS::HiviewDFX::HiLogLabel LOG_LABEL = {LOG_CORE, 0, "ResourceManager"};
+static constexpr OHOS::HiviewDFX::HiLogLabel LOG_LABEL = {LOG_CORE, 0xD001E00, "ResourceManager"};
 
 #define HILOG_FATAL(...) (void)OHOS::HiviewDFX::HiLog::Fatal(LOG_LABEL, __VA_ARGS__)
 #define HILOG_ERROR(...) (void)OHOS::HiviewDFX::HiLog::Error(LOG_LABEL, __VA_ARGS__)
