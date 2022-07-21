@@ -17,6 +17,7 @@
 
 #include <fstream>
 #include <memory>
+#include <mutex>
 #include <vector>
 
 #include "hilog/log.h"
@@ -52,6 +53,7 @@ constexpr int BIT_TWO = 2;
 constexpr int LEN_THREE = 3;
 
 std::map<std::string, std::shared_ptr<ResourceManager>> g_resourceMgr;
+std::mutex g_resMapLock;
 
 napi_value ResourceManagerAddon::Create(
     napi_env env, const std::string& bundleName, const std::shared_ptr<ResourceManager>& resMgr,
@@ -1331,6 +1333,7 @@ bool ResMgrAsyncContext::GetHapResourceManager(const ResMgrAsyncContext* asyncCo
 
     resId = resource->id;
     std::string key(resource->bundleName + "/" + resource->moduleName);
+    std::lock_guard<std::mutex> lock(g_resMapLock);
     auto iter = g_resourceMgr.find(key);
     if (iter != g_resourceMgr.end()) {
         resMgr = g_resourceMgr[key];
