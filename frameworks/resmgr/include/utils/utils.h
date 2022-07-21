@@ -52,6 +52,11 @@ public:
 
     static RState ConvertColorToUInt32(const char *s, uint32_t &outValue);
 
+    static std::unique_ptr<char[]> LoadResourceFile(const std::string &path, int &len);
+
+    static RState EncodeBase64(std::unique_ptr<char[]> &data, int srcLen,
+                              const std::string &imgType, std::string &outValue);
+
 private:
 
     static uint16_t EncodeLanguageOrRegion(const char *str, char base);

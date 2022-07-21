@@ -24,6 +24,7 @@
 
 #include "hisysevent_adapter.h"
 #include "hitrace_meter.h"
+#include "utils/utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -38,18 +39,6 @@ namespace Resource {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "ResourceManagerJs" };
 using namespace OHOS::HiviewDFX;
 static thread_local napi_ref* g_constructor = nullptr;
-std::vector<char> g_codes = {
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
-};
-
-constexpr int BIT_SIX = 6;
-constexpr int BIT_FOUR = 4;
-constexpr int BIT_TWO = 2;
-constexpr int LEN_THREE = 3;
 
 std::map<std::string, std::shared_ptr<ResourceManager>> g_resourceMgr;
 
@@ -439,62 +428,9 @@ napi_value ResourceManagerAddon::GetStringArray(napi_env env, napi_callback_info
     return ProcessOnlyIdParam(env, info, "getStringArray", getStringArrayFunc);
 }
 
-std::string EncodeBase64(std::unique_ptr<char[]> &data, int srcLen)
-{
-    const char *srcData = data.get();
-    std::string dstData;
-    int i = 0;
-
-    // encode in groups of every 3 bytes
-    for (; i < srcLen - 3; i += 3) {
-        unsigned char byte1 = static_cast<unsigned char>(srcData[i]);
-        unsigned char byte2 = static_cast<unsigned char>(srcData[i + 1]);
-        unsigned char byte3 = static_cast<unsigned char>(srcData[i + 2]);
-        dstData += g_codes[byte1 >> BIT_TWO];
-        dstData += g_codes[((byte1 & 0x3) << BIT_FOUR) | (byte2 >> BIT_FOUR)];
-        dstData += g_codes[((byte2 & 0xF) << BIT_TWO) | (byte3 >> BIT_SIX)];
-        dstData += g_codes[byte3 & 0x3F];
-    }
-    // Handle the case where there is one element left
-    if (srcLen % LEN_THREE == 1) {
-        unsigned char byte1 = static_cast<unsigned char>(srcData[i]);
-        dstData += g_codes[byte1 >> BIT_TWO];
-        dstData += g_codes[(byte1 & 0x3) << BIT_FOUR];
-        dstData += '=';
-        dstData += '=';
-    } else {
-        unsigned char byte1 = static_cast<unsigned char>(srcData[i]);
-        unsigned char byte2 = static_cast<unsigned char>(srcData[i + 1]);
-        dstData += g_codes[byte1 >> BIT_TWO];
-        dstData += g_codes[((byte1 & 0x3) << BIT_FOUR) | (byte2 >> BIT_FOUR)];
-        dstData += g_codes[(byte2 & 0xF) << BIT_TWO];
-        dstData += '=';
-    }
-    return dstData;
-}
-
-std::unique_ptr<char[]> LoadResourceFile(std::string &path, ResMgrAsyncContext &asyncContext, int &len)
-{
-    std::ifstream mediaStream(path, std::ios::binary);
-    if (!mediaStream.is_open()) {
-        asyncContext.SetErrorMsg("Failed to open media");
-        return nullptr;
-    }
-    mediaStream.seekg(0, std::ios::end);
-    len = mediaStream.tellg();
-    std::unique_ptr<char[]> tempData = std::make_unique<char[]>(len);
-    if (tempData == nullptr) {
-        asyncContext.SetErrorMsg("Failed to create media buffer");
-        return nullptr;
-    }
-    mediaStream.seekg(0, std::ios::beg);
-    mediaStream.read((tempData.get()), len);
-    return tempData;
-}
-
 void GetResourcesBufferData(std::string path, ResMgrAsyncContext &asyncContext)
 {
-    asyncContext.mediaData = LoadResourceFile(path, asyncContext, asyncContext.len_);
+    asyncContext.mediaData = Utils::LoadResourceFile(path, asyncContext.len_);
     if (asyncContext.mediaData == nullptr) {
         return;
     }
@@ -591,7 +527,7 @@ auto getMediaBase64Func = [](napi_env env, void *data) {
         asyncContext->SetErrorMsg("GetMedia path failed", true);
         return;
     }
-    std::unique_ptr<char[]> tempData = LoadResourceFile(path, *asyncContext, len);
+    std::unique_ptr<char[]> tempData = Utils::LoadResourceFile(path, len);
     if (tempData == nullptr) {
         return;
     }
@@ -600,8 +536,9 @@ auto getMediaBase64Func = [](napi_env env, void *data) {
     if (pos != std::string::npos) {
         imgType = path.substr(pos + 1);
     }
-    std::string base64Data = EncodeBase64(tempData, len);
-    asyncContext->value_ = "data:image/" + imgType + ";base64," + base64Data;
+    std::string base64Data;
+    Utils::EncodeBase64(tempData, len, imgType, base64Data);
+    asyncContext->value_ = base64Data;
     asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext &context) {
         napi_value result;
         if (napi_create_string_utf8(env, context.value_.c_str(), NAPI_AUTO_LENGTH, &result) != napi_ok) {

@@ -125,6 +125,10 @@ public:
     virtual RState GetRawFileDescriptor(const std::string &name, RawFileDescriptor &descriptor) = 0;
 
     virtual RState CloseRawFileDescriptor(const std::string &name) = 0;
+
+    virtual RState GetMediaBase64ByNameData(const char *name, uint32_t density, std::string &base64Data) = 0;
+
+    virtual RState GetMediaBase64ByIdData(uint32_t id, uint32_t density, std::string &base64Data) = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();

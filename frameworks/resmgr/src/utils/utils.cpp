@@ -14,15 +14,83 @@
  */
 #include "utils/utils.h"
 
-#include <cctype>
-#include <cstddef>
-#include <cstring>
+#include <fstream>
+#include <vector>
 
 #include "utils/common.h"
 
 namespace OHOS {
 namespace Global {
 namespace Resource {
+constexpr int BIT_SIX = 6;
+constexpr int BIT_FOUR = 4;
+constexpr int BIT_TWO = 2;
+constexpr int LEN_THREE = 3;
+
+std::vector<char> g_codes = {
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
+};
+
+std::unique_ptr<char[]> Utils::LoadResourceFile(const std::string &path, int &len)
+{
+    std::ifstream mediaStream(path, std::ios::binary);
+    if (!mediaStream.is_open()) {
+        return nullptr;
+    }
+    mediaStream.seekg(0, std::ios::end);
+    len = mediaStream.tellg();
+    std::unique_ptr<char[]> tempData = std::make_unique<char[]>(len);
+    if (tempData == nullptr) {
+        return nullptr;
+    }
+    mediaStream.seekg(0, std::ios::beg);
+    mediaStream.read((tempData.get()), len);
+    return tempData;
+}
+
+RState Utils::EncodeBase64(std::unique_ptr<char[]> &data, int srcLen,
+    const std::string &imgType, std::string &dstData)
+{
+    const char *srcData = data.get();
+    if (srcData == nullptr) {
+        return ERROR;
+    }
+    std::string base64data;
+    base64data += "data:image/" + imgType + ";base64,";
+    int i = 0;
+    // encode in groups of every 3 bytes
+    for (; i < srcLen - 3; i += 3) {
+        unsigned char byte1 = static_cast<unsigned char>(srcData[i]);
+        unsigned char byte2 = static_cast<unsigned char>(srcData[i + 1]);
+        unsigned char byte3 = static_cast<unsigned char>(srcData[i + 2]);
+        base64data += g_codes[byte1 >> BIT_TWO];
+        base64data += g_codes[((byte1 & 0x3) << BIT_FOUR) | (byte2 >> BIT_FOUR)];
+        base64data += g_codes[((byte2 & 0xF) << BIT_TWO) | (byte3 >> BIT_SIX)];
+        base64data += g_codes[byte3 & 0x3F];
+    }
+    // Handle the case where there is one element left
+    if (srcLen % LEN_THREE == 1) {
+        unsigned char byte1 = static_cast<unsigned char>(srcData[i]);
+        base64data += g_codes[byte1 >> BIT_TWO];
+        base64data += g_codes[(byte1 & 0x3) << BIT_FOUR];
+        base64data += '=';
+        base64data += '=';
+    } else {
+        unsigned char byte1 = static_cast<unsigned char>(srcData[i]);
+        unsigned char byte2 = static_cast<unsigned char>(srcData[i + 1]);
+        base64data += g_codes[byte1 >> BIT_TWO];
+        base64data += g_codes[((byte1 & 0x3) << BIT_FOUR) | (byte2 >> BIT_FOUR)];
+        base64data += g_codes[(byte2 & 0xF) << BIT_TWO];
+        base64data += '=';
+    }
+    dstData = base64data;
+    return SUCCESS;
+}
+
 bool Utils::IsAlphaString(const char *s, int32_t len)
 {
     if (s == nullptr) {
