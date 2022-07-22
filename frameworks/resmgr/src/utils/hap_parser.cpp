@@ -414,6 +414,7 @@ ResConfigImpl *HapParser::CreateResConfigFromKeyParams(const std::vector<KeyPara
         resConfig->SetColorMode(COLOR_MODE_NOT_SET);
         return resConfig;
     }
+    delete resConfig;
     size_t i = 0;
     ResConfigKey configKey;
     for (i = 0; i < len; ++i) {
