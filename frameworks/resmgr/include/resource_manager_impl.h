@@ -353,6 +353,24 @@ public:
      */
     std::vector<std::string> GetResourcePaths();
 
+    /**
+     * Get the MEDIA base64 data resource by resource id with density
+     * @param id the resource id
+     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
+     * @param base64Data the media base64 data
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetMediaBase64ByIdData(uint32_t id, uint32_t density, std::string &base64Data);
+
+    /**
+     * Get the MEDIA base64 data resource by resource id with density
+     * @param name the resource name
+     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
+     * @param base64Data the media base64 data
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetMediaBase64ByNameData(const char *name, uint32_t density, std::string &base64Data);
+
 private:
     RState GetString(const IdItem *idItem, std::string &outValue);
 

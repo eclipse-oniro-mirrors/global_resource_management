@@ -668,6 +668,45 @@ RState ResourceManagerImpl::GetMediaByName(const char *name, uint32_t density, s
     return GetRawFile(qualifierDir, ResType::MEDIA, outValue);
 }
 
+RState GetMediaBase64Data(const std::string& iconPath, std::string &base64Data)
+{
+    int len = 0;
+    auto tempData = Utils::LoadResourceFile(iconPath, len);
+    if (tempData == nullptr) {
+        HILOG_ERROR("get the tempData error");
+        return NOT_FOUND;
+    }
+    auto pos = iconPath.find_last_of('.');
+    std::string imgType;
+    if (pos != std::string::npos) {
+        imgType = iconPath.substr(pos + 1);
+    }
+    Utils::EncodeBase64(tempData, len, imgType, base64Data);
+    return SUCCESS;
+}
+
+RState ResourceManagerImpl::GetMediaBase64ByNameData(const char *name, uint32_t density, std::string &base64Data)
+{
+    std::string path;
+    RState state = ResourceManagerImpl::GetMediaByName(name, density, path);
+    if (state != SUCCESS) {
+        HILOG_ERROR("the resource path is not exist");
+        return NOT_FOUND;
+    }
+    return GetMediaBase64Data(path, base64Data);
+}
+
+RState ResourceManagerImpl::GetMediaBase64ByIdData(uint32_t id, uint32_t density, std::string &base64Data)
+{
+    std::string path;
+    RState state = ResourceManagerImpl::GetMediaById(id, density, path);
+    if (state != SUCCESS) {
+        HILOG_ERROR("the resource path is not exist");
+        return NOT_FOUND;
+    }
+    return GetMediaBase64Data(path, base64Data);
+}
+
 RState ResourceManagerImpl::GetRawFile(const HapResource::ValueUnderQualifierDir *vuqd, const ResType resType,
     std::string &outValue)
 {
