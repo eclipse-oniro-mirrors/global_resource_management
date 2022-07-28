@@ -16,19 +16,20 @@
 
 #include <algorithm>
 #include <fstream>
+#include <climits>
+#include <cstdlib>
 #ifdef SUPPORT_GRAPHICS
 #include <ohos/init_data.h>
+#include <unicode/unistr.h>
+#include <unicode/utypes.h>
 #endif
 
 #include "auto_mutex.h"
 #include "hilog_wrapper.h"
-#include "locale_matcher.h"
 
 #ifdef __WINNT__
 #include <shlwapi.h>
 #include <windows.h>
-#else
-#include <dlfcn.h>
 #endif
 
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)

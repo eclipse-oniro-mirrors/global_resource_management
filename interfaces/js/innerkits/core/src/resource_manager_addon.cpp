@@ -20,7 +20,10 @@
 #include <mutex>
 #include <vector>
 
-#include "hilog/log.h"
+#include "hilog/log_c.h"
+#include "hilog/log_cpp.h"
+#include "js_native_api.h"
+#include "napi/native_common.h"
 #include "node_api.h"
 
 #include "hisysevent_adapter.h"

@@ -22,7 +22,6 @@
 #else
 #include "securec.h"
 #endif
-#include "utils/common.h"
 #include "utils/errors.h"
 #include "utils/string_utils.h"
 

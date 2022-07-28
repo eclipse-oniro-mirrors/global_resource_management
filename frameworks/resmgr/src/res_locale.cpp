@@ -21,9 +21,9 @@
 #include <new>
 #ifdef SUPPORT_GRAPHICS
 #include <unicode/localebuilder.h>
+#include <unicode/utypes.h>
 #endif
 #include "auto_mutex.h"
-#include "hilog_wrapper.h"
 #include "locale_matcher.h"
 #include "res_config.h"
 #include "rstate.h"

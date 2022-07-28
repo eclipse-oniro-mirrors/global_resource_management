@@ -15,13 +15,9 @@
 
 #include "hap_parser.h"
 
-#include <algorithm>
 #include <cstdlib>
-#include <iostream>
 #include <string>
 #include <unzip.h>
-#include <zip.h>
-#include <zlib.h>
 
 #include "hilog_wrapper.h"
 #include "locale_matcher.h"
@@ -30,7 +26,6 @@
 #else
 #include "securec.h"
 #endif
-#include "utils/common.h"
 #include "utils/errors.h"
 #include "utils/string_utils.h"
 

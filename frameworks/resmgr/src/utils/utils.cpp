@@ -17,8 +17,6 @@
 #include <fstream>
 #include <vector>
 
-#include "utils/common.h"
-
 namespace OHOS {
 namespace Global {
 namespace Resource {

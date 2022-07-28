@@ -16,9 +16,9 @@
 #ifdef SUPPORT_GRAPHICS
 #include <unicode/localebuilder.h>
 #include <unicode/locid.h>
+#include <unicode/utypes.h>
 #endif
 #include "locale_matcher.h"
-#include "res_common.h"
 #include "res_locale.h"
 #include "utils/utils.h"
 #ifdef SUPPORT_GRAPHICS
