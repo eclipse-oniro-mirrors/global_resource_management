@@ -407,6 +407,8 @@ private:
     HapManager *hapManager_;
 
     float fontRatio_ = 0.0f;
+	
+	伪本地化成员变量
 
     const std::string VIRTUAL_PIXEL = "vp";
 

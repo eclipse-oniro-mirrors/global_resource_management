@@ -70,6 +70,7 @@ bool ResourceManagerImpl::Init()
         HILOG_ERROR("new ResConfigImpl failed when ResourceManagerImpl::Init");
         return false;
     }
+	从resConfig读取语言和国家，如果是en XA，伪本地化成员变量设置为True
     hapManager_ = new (std::nothrow) HapManager(resConfig);
     if (hapManager_ == nullptr) {
         delete (resConfig);
@@ -131,6 +132,11 @@ RState ResourceManagerImpl::GetString(const IdItem *idItem, std::string &outValu
     }
     RState ret = ResolveReference(idItem->value_, outValue);
     if (ret != SUCCESS) {
+		if (是伪本地化区域) {
+			进行伪本地化（outValue）
+			if (伪本地化成功)
+			   return 伪本地化淄川
+		}
         return ret;
     }
     return SUCCESS;
@@ -165,6 +171,9 @@ RState ResourceManagerImpl::GetStringArray(const IdItem *idItem, std::vector<std
         }
         outValue.push_back(resolvedValue);
     }
+	if (是伪本地化区域) {
+		进行伪本地化（outValue数组依次伪本地化）
+	}
     return SUCCESS;
 }
 
@@ -277,6 +286,10 @@ RState ResourceManagerImpl::GetPluralString(const HapResource::ValueUnderQualifi
         }
     }
     outValue = mapIter->second;
+	
+	if (是伪本地化区域) {
+		进行伪本地化（outValue）
+	}
 
     return SUCCESS;
 }
