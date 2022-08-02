@@ -30,6 +30,8 @@
 #ifdef __WINNT__
 #include <shlwapi.h>
 #include <windows.h>
+#else
+#include <dlfcn.h>
 #endif
 
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
