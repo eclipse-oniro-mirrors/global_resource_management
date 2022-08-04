@@ -16,6 +16,9 @@
 #ifndef RESOURCE_MANAGER_RESOURCE_MANANGER_PERF_TEST_H
 #define RESOURCE_MANAGER_RESOURCE_MANANGER_PERF_TEST_H
 
+namespace OHOS {
+namespace Global {
+namespace Resource {
 int ResourceManagerPerformanceFuncTest001(void);
 int ResourceManagerPerformanceFuncTest002(void);
 int ResourceManagerPerformanceFuncTest003(void);
@@ -48,5 +51,7 @@ int ResourceManagerPerformanceFuncTest029(void);
 int ResourceManagerPerformanceFuncTest030(void);
 int ResourceManagerPerformanceFuncTest031(void);
 int ResourceManagerPerformanceFuncTest032(void);
-
+} // namespace Resource
+} // namespace Global
+} // namespace OHOS
 #endif

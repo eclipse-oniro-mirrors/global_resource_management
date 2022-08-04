@@ -16,6 +16,9 @@
 #ifndef RESOURCE_MANAGER_RES_CONFIG_IMPL_TEST_H
 #define RESOURCE_MANAGER_RES_CONFIG_IMPL_TEST_H
 
+namespace OHOS {
+namespace Global {
+namespace Resource {
 int ResConfigImplMatchTest001(void);
 int ResConfigImplMatchTest002(void);
 int ResConfigImplMatchTest003(void);
@@ -111,5 +114,7 @@ int ResConfigImplIsMoreSuitableTest057(void);
 int ResConfigImplIsMoreSuitableTest058(void);
 int ResConfigImplIsMoreSuitableTest059(void);
 int ResConfigImplIsMoreSuitableTest060(void);
-
+} // namespace Resource
+} // namespace Global
+} // namespace OHOS
 #endif

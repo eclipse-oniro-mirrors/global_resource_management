@@ -16,7 +16,12 @@
 #ifndef RESOURCE_MANAGER_RES_DESC_TEST_H
 #define RESOURCE_MANAGER_RES_DESC_TEST_H
 
+namespace OHOS {
+namespace Global {
+namespace Resource {
 int ResDescFuncTest001(void);
 int ResDescFuncTest002(void);
-
+} // namespace Resource
+} // namespace Global
+} // namespace OHOS
 #endif
