@@ -16,7 +16,12 @@
 #ifndef RESOURCE_MANAGER_STRING_UTILS_TEST_H
 #define RESOURCE_MANAGER_STRING_UTILS_TEST_H
 
+namespace OHOS {
+namespace Global {
+namespace Resource {
 int StringUtilsFuncTest001(void);
 int LockFuncTest001(void);
-
+} // namespace Resource
+} // namespace Global
+} // namespace OHOS
 #endif
