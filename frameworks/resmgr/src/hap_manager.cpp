@@ -18,6 +18,9 @@
 #include <fstream>
 #include <climits>
 #include <cstdlib>
+#include <fcntl.h>
+#include <unistd.h>
+#include "utils/errors.h"
 #ifdef SUPPORT_GRAPHICS
 #include <ohos/init_data.h>
 #include <unicode/unistr.h>
@@ -26,6 +29,9 @@
 
 #include "auto_mutex.h"
 #include "hilog_wrapper.h"
+
+#include "hap_parser.h"
+#include "utils/utils.h"
 
 #ifdef __WINNT__
 #include <shlwapi.h>
@@ -376,7 +382,7 @@ bool HapManager::AddResourcePath(const char *path)
         HILOG_ERROR(" %s has already been loaded!", path);
         return false;
     }
-    const HapResource *pResource = HapResource::LoadFromIndex(path, resConfig_);
+    const HapResource *pResource = HapResource::Load(path, resConfig_);
     if (pResource == nullptr) {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
         ReportAddResourcePathFail(path, "AddResourcePath failed");
@@ -441,6 +447,158 @@ std::vector<std::string> HapManager::GetResourcePaths()
     }
 
     return result;
+}
+
+bool HapManager::isLoadHap()
+{
+    for (auto iter = hapResources_.rbegin(); iter != hapResources_.rend(); iter++) {
+        const std::string hapPath = (*iter)->GetIndexPath();
+        if (Utils::endWithTail(hapPath, "hap")) {
+            return true;
+        }
+    }
+    return false;
+}
+
+std::string GetFilePath(const HapResource::ValueUnderQualifierDir *qd, unzFile &uf, const ResType resType)
+{
+    std::string filePath;
+    if (qd == nullptr) {
+        return filePath;
+    }
+    const IdItem *idItem = qd->GetIdItem();
+    if (idItem == nullptr || idItem->resType_ != resType) {
+        return filePath;
+    }
+    if (HapParser::IsStageMode(uf)) {
+        std::string tempFilePath(idItem->value_);
+        auto index = tempFilePath.find('/');
+        if (index == std::string::npos) {
+            HILOG_ERROR("resource path format error, %s", tempFilePath.c_str());
+            return filePath;
+        }
+        filePath = idItem->value_.substr(index + 1);
+    } else {
+        // FA mode
+        std::string tempFilePath("assets/");
+        tempFilePath.append(idItem->value_);
+        filePath = tempFilePath;
+    }
+    return filePath;
+}
+
+std::string GetImageType(const std::string fileName)
+{
+    auto pos = fileName.find_last_of('.');
+    std::string imgType;
+    if (pos != std::string::npos) {
+        imgType = fileName.substr(pos + 1);
+    }
+    return imgType;
+}
+
+unzFile GetHapUf(const HapResource::ValueUnderQualifierDir *qd)
+{
+    std::string hapPath = qd->GetHapResource()->GetIndexPath();
+    unzFile uf = unzOpen64(hapPath.c_str()); // open zipfile stream
+    if (uf == nullptr) {
+        HILOG_ERROR("Open the %s failed in GetHapUf", hapPath.c_str());
+        return nullptr;
+    } // file is open
+    return uf;
+}
+
+RState HapManager::GetProfileData(const HapResource::ValueUnderQualifierDir *qd, std::unique_ptr<uint8_t[]> &outValue)
+{
+    unzFile uf = GetHapUf(qd);
+    if (uf == nullptr) {
+        return NOT_FOUND;
+    }
+    std::string filePath = GetFilePath(qd, uf, ResType::PROF);
+    size_t tmpLen;
+    int err = HapParser::ReadFileFromZip(uf, filePath.c_str(), outValue, tmpLen);
+    if (err < 0) {
+        unzCloseCurrentFile(uf);
+        return NOT_FOUND;
+    }
+    unzCloseCurrentFile(uf);
+    return SUCCESS;
+}
+
+RState HapManager::GetMediaData(const HapResource::ValueUnderQualifierDir *qd, size_t &len,
+    std::unique_ptr<uint8_t[]> &outValue)
+{
+    unzFile uf = GetHapUf(qd);
+    if (uf == nullptr) {
+        return NOT_FOUND;
+    }
+    std::string filePath = GetFilePath(qd, uf, ResType::MEDIA);
+    int err = HapParser::ReadFileFromZip(uf, filePath.c_str(), outValue, len);
+    if (err < 0) {
+        unzCloseCurrentFile(uf);
+        return NOT_FOUND;
+    }
+    unzCloseCurrentFile(uf);
+    return SUCCESS;
+}
+
+RState HapManager::GetMediaBase64Data(const HapResource::ValueUnderQualifierDir *qd, std::string &outValue)
+{
+    unzFile uf = GetHapUf(qd);
+    if (uf == nullptr) {
+        return NOT_FOUND;
+    }
+    std::string filePath = GetFilePath(qd, uf, ResType::MEDIA);
+    std::unique_ptr<uint8_t[]> buffer;
+    size_t tmpLen;
+    int err = HapParser::ReadFileFromZip(uf, filePath.c_str(), buffer, tmpLen);
+    if (err < 0) {
+        unzCloseCurrentFile(uf);
+        return NOT_FOUND;
+    }
+    std::string imgType = GetImageType(filePath);
+    Utils::EncodeBase64(buffer, tmpLen, imgType, outValue);
+    unzCloseCurrentFile(uf);
+    return SUCCESS;
+}
+
+int32_t GetFileFd(const char *zipFile, std::unique_ptr<ResourceManager::RawFile> &rawFile)
+{
+    int zipFd = open(zipFile, O_RDONLY);
+    if (zipFd < 0) {
+        HILOG_ERROR("open file failed in GetFileFd");
+        return UNKNOWN_ERROR;
+    }
+    FILE *file = fdopen(zipFd, "r");
+    if (file == nullptr) {
+        HILOG_ERROR("fdopen the fd failed in GetFileFd");
+        close(zipFd);
+        return UNKNOWN_ERROR;
+    }
+    rawFile->pf = file;
+    return OK;
+}
+
+RState HapManager::FindRawFileFromHap(const std::string &rawFileName,
+    std::unique_ptr<ResourceManager::RawFile> &rawFile)
+{
+    for (auto iter = hapResources_.rbegin(); iter != hapResources_.rend(); iter++) {
+        const std::string hapPath = (*iter)->GetIndexPath();
+        if (Utils::endWithTail(hapPath, "hap")) {
+            int32_t ret = GetFileFd(hapPath.c_str(), rawFile);
+            if (ret != OK) {
+                return NOT_FOUND;
+            }
+            size_t tmpLen;
+            ret = HapParser::ReadRawFileFromHap(hapPath.c_str(), rawFile->buffer, tmpLen, rawFileName, rawFile);
+            if (ret != OK) {
+                return NOT_FOUND;
+            }
+            rawFile->length = static_cast<long>(tmpLen);
+            return SUCCESS;
+        }
+    }
+    return NOT_FOUND;
 }
 } // namespace Resource
 } // namespace Global

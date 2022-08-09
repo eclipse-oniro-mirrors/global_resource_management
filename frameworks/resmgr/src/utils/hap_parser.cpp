@@ -17,7 +17,9 @@
 
 #include <cstdlib>
 #include <string>
+#include <fcntl.h>
 #include <unzip.h>
+#include <unistd.h>
 
 #include "hilog_wrapper.h"
 #include "locale_matcher.h"
@@ -34,73 +36,65 @@ namespace Global {
 namespace Resource {
 const char *HapParser::RES_FILE_NAME = "/resources.index";
 
-void UnzCloseFileAndLog(unzFile uf, const char *zipFile)
+int32_t LocateFile(unzFile &uf, const char *fileName)
 {
-    int err = unzCloseCurrentFile(uf); // close the zipfile
-    if (err != UNZ_OK) {
-        HILOG_ERROR("Error %d with zipfile %s in unzCloseCurrentFile", err, zipFile);
+    if (unzLocateFile2(uf, fileName, 1)) { // try to locate file inside zip, 1 = case sensitive
+        HILOG_ERROR("File %s not found in LocateFile", fileName);
+        return UNKNOWN_ERROR;
     }
+    return OK;
 }
 
-int32_t HapParser::ReadFileFromZip(const char *zipFile, const char *fileName, void **buffer, size_t &bufLen,
-                                   std::string &errInfo)
+int32_t GetCurrentFileInfo(unzFile &uf, unz_file_info &fileInfo)
 {
-    int err = UNZ_OK;                // error status
-    char filenameInzip[256];         // for unzGetCurrentFileInfo
-    unz_file_info fileInfo;          // for unzGetCurrentFileInfo
-
-    unzFile uf = unzOpen64(zipFile); // open zipfile stream
-    if (uf == nullptr) {
-        errInfo = FormatString("Cannot open %s", zipFile);
-        return UNKNOWN_ERROR;
-    } // file is open
-
-    if (unzLocateFile(uf, fileName, 1)) { // try to locate file inside zip
-        // second argument of unzLocateFile: 1 = case sensitive, 0 = case-insensitive
-        unzClose(uf);
-        errInfo = FormatString("File %s not found in %s", fileName, zipFile);
-        return UNKNOWN_ERROR;
-    } // file inside zip found
-
-    if (unzGetCurrentFileInfo(uf, &fileInfo, filenameInzip, sizeof(filenameInzip), nullptr, 0, nullptr, 0)) {
-        unzClose(uf);
-        errInfo = FormatString("Error %d with zipfile %s in unzGetCurrentFileInfo.", err, zipFile);
-        return UNKNOWN_ERROR;
-    } // obtained the necessary details about file inside zip
-
-    *buffer = static_cast<void *>(malloc(fileInfo.uncompressed_size)); // setup buffer
-    bufLen = fileInfo.uncompressed_size;
-    if ((*buffer) == nullptr) {
-        unzClose(uf);
-        errInfo = FormatString("Error allocating memory for read buffer");
-        return UNKNOWN_ERROR;
-    } // buffer ready
-
-    err = unzOpenCurrentFilePassword(uf, nullptr); // Open the file inside the zip (password = NULL)
+    // obtained the necessary details about file inside zip
+    char filenameInzip[256];  // for unzGetCurrentFileInfo
+    int err = unzGetCurrentFileInfo(uf, &fileInfo, filenameInzip, sizeof(filenameInzip), nullptr, 0, nullptr, 0);
     if (err != UNZ_OK) {
-        errInfo = FormatString("Error %d with zipfile %s in unzOpenCurrentFilePassword.", err, zipFile);
-        free(*buffer);
-        *buffer = nullptr;
-        unzClose(uf);
+        HILOG_ERROR("GetCurrentFileInfo failed");
+        return UNKNOWN_ERROR;
+    }
+    return OK;
+}
+
+int32_t ReadCurrentFile(unzFile &uf, unz_file_info &fileInfo, std::unique_ptr<uint8_t[]> &buffer,
+    size_t &bufLen)
+{
+    buffer = std::make_unique<uint8_t[]>(fileInfo.uncompressed_size);
+    bufLen = fileInfo.uncompressed_size;
+    if (buffer == nullptr) {
+        HILOG_ERROR("Error allocating memory for read buffer");
+        return UNKNOWN_ERROR;
+    }
+
+    int err = unzOpenCurrentFilePassword(uf, nullptr);
+    if (err != UNZ_OK) {
+        HILOG_ERROR("Error %d in unzOpenCurrentFilePassword.", err);
         return UNKNOWN_ERROR;
     } // file inside the zip is open
-    // Copy contents of the file inside the zip to the buffer
-    HILOG_DEBUG("Extracting: %s from %s, file size: %lu", filenameInzip, zipFile, fileInfo.uncompressed_size);
-    err = unzReadCurrentFile(uf, *buffer, bufLen);
+
+    err = unzReadCurrentFile(uf, buffer.get(), bufLen);
     if (err < 0) {
-        errInfo = FormatString("Error %d with zipfile %s in unzReadCurrentFile", err, zipFile);
-        free(*buffer);
-        *buffer = nullptr;
-        UnzCloseFileAndLog(uf, zipFile); // close the zipfile
-        unzClose(uf);
+        HILOG_ERROR("Error %d in unzReadCurrentFile", err);
         return UNKNOWN_ERROR;
     }
-    if ((*buffer) == nullptr) {
-        free(*buffer);
-        *buffer = nullptr;
+
+    return OK;
+}
+
+int32_t HapParser::ReadFileFromZip(unzFile &uf, const char *fileName, std::unique_ptr<uint8_t[]> &buffer,
+    size_t &bufLen)
+{
+    unz_file_info fileInfo;
+    if (LocateFile(uf, fileName) != OK) {
+        return UNKNOWN_ERROR;
     }
-    UnzCloseFileAndLog(uf, zipFile); // close the zipfile
-    unzClose(uf);
+    if (GetCurrentFileInfo(uf, fileInfo) != OK) {
+        return UNKNOWN_ERROR;
+    }
+    if (ReadCurrentFile(uf, fileInfo, buffer, bufLen) != OK) {
+        return UNKNOWN_ERROR;
+    }
     return OK;
 }
 
@@ -125,32 +119,119 @@ std::string GetModuleName(const char *configStr)
     return retStr;
 }
 
-int32_t HapParser::ReadIndexFromFile(const char *zipFile, void **buffer,
-                                     size_t &bufLen, std::string &errInfo)
+bool HapParser::IsStageMode(unzFile &uf)
 {
-    void *tmpBuf = nullptr;
-    size_t tmpLen;
-    std::string tmp;
-    int32_t ret = ReadFileFromZip(zipFile, "config.json", &tmpBuf, tmpLen, tmp);
-    if (ret != OK) {
-        errInfo = "read config.json error";
-        HILOG_ERROR("read config.json error");
-        return ret;
+    // stage mode contains "module.json", The 1 means the case sensitive
+    if (unzLocateFile2(uf, "module.json", 1) != UNZ_OK) {
+        return false;
     }
+    return true;
+}
 
-    // parse config.json
-    std::string mName = GetModuleName(static_cast<char *>(tmpBuf));
-    if (mName.size() == 0) {
-        errInfo = "parse moduleName from config.json error";
-        free(tmpBuf);
-        return UNKNOWN_ERROR;
+std::string ParseModuleName(unzFile &uf)
+{
+    std::unique_ptr<uint8_t[]> tmpBuf;
+    int32_t ret = UNZ_OK;
+    size_t tmpLen;
+    ret = HapParser::ReadFileFromZip(uf, "config.json", tmpBuf, tmpLen);
+    if (ret != OK) {
+        HILOG_ERROR("read config.json error");
+        return std::string();
     }
-    free(tmpBuf);
+    // parse config.json
+    std::string mName = GetModuleName(reinterpret_cast<char *>(tmpBuf.get()));
+    if (mName.size() == 0) {
+        HILOG_ERROR("parse moduleName from config.json error");
+        return std::string();
+    }
+    return mName;
+}
+
+std::string GetIndexFilePath(unzFile uf)
+{
+    std::string mName = ParseModuleName(uf);
     std::string indexFilePath = std::string("assets/");
     indexFilePath.append(mName);
-    indexFilePath.append(RES_FILE_NAME);
+    indexFilePath.append("/resources.index");
+    return indexFilePath;
+}
 
-    return ReadFileFromZip(zipFile, indexFilePath.c_str(), buffer, bufLen, errInfo);
+int32_t ReadFileInfoFromZip(unzFile &uf, const char *fileName, std::unique_ptr<uint8_t[]> &buffer, size_t &bufLen)
+{
+    int err = HapParser::ReadFileFromZip(uf, fileName, buffer, bufLen);
+    if (err < 0) {
+        unzCloseCurrentFile(uf);
+        return UNKNOWN_ERROR;
+    }
+    unzCloseCurrentFile(uf);
+    return OK;
+}
+
+int32_t HapParser::ReadIndexFromFile(const char *zipFile, std::unique_ptr<uint8_t[]> &buffer,
+    size_t &bufLen)
+{
+    unzFile uf = unzOpen64(zipFile);
+    if (uf == nullptr) {
+        HILOG_ERROR("Error open %s in ReadIndexFromFile %d", zipFile, errno);
+        return UNKNOWN_ERROR;
+    } // file is open
+    if (IsStageMode(uf)) {
+        return ReadFileInfoFromZip(uf, "resources.index", buffer, bufLen);
+    }
+    std::string indexFilePath = GetIndexFilePath(uf);
+    return ReadFileInfoFromZip(uf, indexFilePath.c_str(), buffer, bufLen);
+}
+
+int32_t ReadRawFileInfoFromHap(unzFile &uf, const char *fileName, std::unique_ptr<uint8_t[]> &buffer,
+    size_t &bufLen, std::unique_ptr<ResourceManager::RawFile> &rawFile)
+{
+    int err = HapParser::ReadFileFromZip(uf, fileName, buffer, bufLen);
+    if (err < 0) {
+        HILOG_ERROR("Error read rawfile info in ReadRawFileInfoFromHap");
+        unzCloseCurrentFile(uf);
+        return UNKNOWN_ERROR;
+    }
+    uLong offset = unzGetOffset(uf);
+    rawFile->offset = (long)offset;
+    unzCloseCurrentFile(uf);
+    return OK;
+}
+
+void GetRawFilePath(const std::string &rawFilePath, std::string &tempRawFilePath)
+{
+    std::string tempName = rawFilePath;
+    const std::string rawFileDirName = "rawfile/";
+    if (tempName.length() <= rawFileDirName.length()
+    || (tempName.compare(0, rawFileDirName.length(), rawFileDirName) != 0)) {
+        tempName = rawFileDirName + tempName;
+    }
+    tempRawFilePath.append(tempName);
+}
+
+std::string GetTempRawFilePath(unzFile uf)
+{
+    std::string mName = ParseModuleName(uf);
+    std::string tempRawFilePath("assets/");
+    tempRawFilePath.append(mName);
+    tempRawFilePath.append("/resources/");
+    return tempRawFilePath;
+}
+
+int32_t HapParser::ReadRawFileFromHap(const char *zipFile, std::unique_ptr<uint8_t[]> &buffer, size_t &bufLen,
+    const std::string &rawFilePath, std::unique_ptr<ResourceManager::RawFile> &rawFile)
+{
+    unzFile uf = unzOpen64(zipFile);
+    if (uf == nullptr) {
+        return UNKNOWN_ERROR;
+    }
+    if (IsStageMode(uf)) {
+        std::string tempRawFilePath("resources/");
+        GetRawFilePath(rawFilePath, tempRawFilePath);
+        return ReadRawFileInfoFromHap(uf, tempRawFilePath.c_str(), buffer, bufLen, rawFile);
+    }
+    std::string tempRawFilePath = GetTempRawFilePath(uf);
+    GetRawFilePath(rawFilePath, tempRawFilePath);
+    return ReadRawFileInfoFromHap(uf, tempRawFilePath.c_str(), buffer, bufLen, rawFile);
 }
 
 /**

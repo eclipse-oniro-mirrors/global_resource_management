@@ -19,8 +19,10 @@
 #include <cstdint>
 #include <cstdio>
 #include <string>
+#include <unzip.h>
 #include "res_desc.h"
 #include "res_config_impl.h"
+#include "resource_manager.h"
 
 namespace OHOS {
 namespace Global {
@@ -29,26 +31,42 @@ class HapParser {
 public:
     /**
      * Read specified file in zip to buffer
-     * @param zipFile
+     * @param uf
      * @param fileName  file name in zip which we will read
      * @param buffer    bytes will write to buffer
      * @param bufLen    the file length in bytes
-     * @param errInfo
      * @return
      */
-    static int32_t ReadFileFromZip(const char *zipFile, const char *fileName, void **buffer,
-                                  size_t &bufLen, std::string &errInfo);
+    static int32_t ReadFileFromZip(unzFile &uf, const char *fileName, std::unique_ptr<uint8_t[]> &buffer,
+                                  size_t &bufLen);
 
     /**
      * Read resource.index in hap to buffer
      * @param zipFile hap file path
      * @param buffer  bytes will write to buffer
      * @param bufLen  length in bytes
-     * @param errInfo
      * @return
      */
-    static int32_t ReadIndexFromFile(const char *zipFile, void **buffer,
-                                     size_t &bufLen, std::string &errInfo);
+    static int32_t ReadIndexFromFile(const char *zipFile, std::unique_ptr<uint8_t[]> &buffer, size_t &bufLen);
+
+    /**
+     * Read rawfile from hap
+     * @param zipFile hap file path
+     * @param buffer  bytes will write to buffer
+     * @param bufLen  length in bytes
+     * @param rawFilePath the path of rawfile
+     * @param rawFile the rawfile info write to
+     * @return
+     */
+    static int32_t ReadRawFileFromHap(const char *zipFile, std::unique_ptr<uint8_t[]> &buffer, size_t &bufLen,
+                            const std::string &rawFilePath, std::unique_ptr<ResourceManager::RawFile> &rawFile);
+
+    /**
+     * Whether the hap is STAGE MODE or not
+     * @param hapPath hap hap path
+     * @return true if the hap is STAGE MODE, else false
+     */
+    static bool IsStageMode(unzFile &uf);
 
     /**
      * Parse resource hex to resDesc

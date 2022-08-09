@@ -226,6 +226,15 @@ napi_value ResourceManagerAddon::New(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
+bool isLoadHap(ResMgrAsyncContext *asyncContext)
+{
+    RState state = asyncContext->addon_->GetResMgr()->isLoadHap();
+    if (state != RState::SUCCESS) {
+        return false;
+    }
+    return true;
+}
+
 int ResourceManagerAddon::GetResId(napi_env env, size_t argc, napi_value *argv)
 {
     if (argc == 0 || argv == nullptr) {
@@ -433,13 +442,9 @@ napi_value ResourceManagerAddon::GetStringArray(napi_env env, napi_callback_info
     return ProcessOnlyIdParam(env, info, "getStringArray", getStringArrayFunc);
 }
 
-void GetResourcesBufferData(std::string path, ResMgrAsyncContext &asyncContext)
+void CreateValue(ResMgrAsyncContext *asyncContext)
 {
-    asyncContext.mediaData = Utils::LoadResourceFile(path, asyncContext.len_);
-    if (asyncContext.mediaData == nullptr) {
-        return;
-    }
-    asyncContext.createValueFunc_ = [](napi_env env, ResMgrAsyncContext& context) -> napi_value {
+    asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext& context) -> napi_value {
         napi_value buffer;
         napi_status status = napi_create_external_arraybuffer(env, context.mediaData.get(), context.len_,
             [](napi_env env, void *data, void *hint) {
@@ -462,10 +467,32 @@ void GetResourcesBufferData(std::string path, ResMgrAsyncContext &asyncContext)
     };
 }
 
+void GetResourcesBufferData(std::string path, ResMgrAsyncContext &asyncContext)
+{
+    asyncContext.mediaData = Utils::LoadResourceFile(path, asyncContext.len_);
+    if (asyncContext.mediaData == nullptr) {
+        return;
+    }
+    CreateValue(&asyncContext);
+}
+
 auto getMediaByNameFunc = [](napi_env env, void *data) {
     ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
     std::string path;
-    RState state = asyncContext->addon_->GetResMgr()->GetMediaByName(asyncContext->resName_.c_str(), path);
+    RState state;
+    if (isLoadHap(asyncContext)) {
+        size_t tmpLen;
+        state = asyncContext->addon_->GetResMgr()->GetMediaDataByName(asyncContext->resName_.c_str(), tmpLen,
+            asyncContext->mediaData);
+        if (state != RState::SUCCESS) {
+            HiLog::Error(LABEL, "GetMediaData by %s failed", asyncContext->resName_.c_str());
+            return;
+        }
+        asyncContext->len_ = static_cast<int>(tmpLen);
+        CreateValue(asyncContext);
+        return;
+    }
+    state = asyncContext->addon_->GetResMgr()->GetMediaByName(asyncContext->resName_.c_str(), path);
     if (state != RState::SUCCESS) {
         asyncContext->SetErrorMsg("GetMediabyName path failed", true);
         ReportGetResourceByNameFail(asyncContext->resName_, path, "failed in getMediaByNameFunc");
@@ -487,13 +514,25 @@ auto getMediaFunc = [](napi_env env, void *data) {
     ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
     std::string path;
     int32_t resId = 0;
+    RState state;
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     bool ret = ResMgrAsyncContext::GetHapResourceManager(asyncContext, resMgr, resId);
     if (!ret) {
         HiLog::Error(LABEL, "Failed to GetHapResourceManager in getMediaFunc");
         return;
     }
-    RState state = resMgr->GetMediaById(resId, path);
+    if (isLoadHap(asyncContext)) {
+        size_t tmpLen;
+        state = resMgr->GetMediaDataById(resId, tmpLen, asyncContext->mediaData);
+        if (state != RState::SUCCESS) {
+            HiLog::Error(LABEL, "GetMediaData by %d failed", resId);
+            return;
+        }
+        asyncContext->len_ = static_cast<int>(tmpLen);
+        CreateValue(asyncContext);
+        return;
+    }
+    state = resMgr->GetMediaById(resId, path);
     ReportGetResourceByIdFail(resId, path, "failed in getMediaFunc");
     if (state != RState::SUCCESS) {
         asyncContext->SetErrorMsg("GetMedia path failed", true);
@@ -511,6 +550,18 @@ napi_value ResourceManagerAddon::GetMedia(napi_env env, napi_callback_info info)
     return media;
 }
 
+void CreateStringValue(ResMgrAsyncContext *asyncContext)
+{
+    asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext &context) {
+        napi_value result;
+        if (napi_create_string_utf8(env, context.value_.c_str(), NAPI_AUTO_LENGTH, &result) != napi_ok) {
+            context.SetErrorMsg("Failed to create result");
+            return result;
+        }
+        return result;
+    };
+}
+
 auto getMediaBase64Func = [](napi_env env, void *data) {
     ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
     int len = 0;
@@ -524,15 +575,34 @@ auto getMediaBase64Func = [](napi_env env, void *data) {
             HiLog::Error(LABEL, "Failed to GetHapResourceManager in getMediaBase64Func");
             return;
         }
+        if (isLoadHap(asyncContext)) {
+            state = resMgr->GetMediaBase64DataById(resId, asyncContext->value_);
+            if (state != RState::SUCCESS) {
+                HiLog::Error(LABEL, "Failed to GetMediaBase64DataById");
+                return;
+            }
+            CreateStringValue(asyncContext);
+            return;
+        }
         state = resMgr->GetMediaById(resId, path);
     } else {
+        if (isLoadHap(asyncContext)) {
+            state = asyncContext->addon_->GetResMgr()->GetMediaBase64DataByName(asyncContext->resName_.c_str(),
+                asyncContext->value_);
+            if (state != RState::SUCCESS) {
+                HiLog::Error(LABEL, "Failed to GetMediaBase64DataByName");
+                return;
+            }
+            CreateStringValue(asyncContext);
+            return;
+        }
         state = asyncContext->addon_->GetResMgr()->GetMediaByName(asyncContext->resName_.c_str(), path);
     }
     if (state != RState::SUCCESS) {
         asyncContext->SetErrorMsg("GetMedia path failed", true);
         return;
     }
-    std::unique_ptr<char[]> tempData = Utils::LoadResourceFile(path, len);
+    std::unique_ptr<uint8_t[]> tempData = Utils::LoadResourceFile(path, len);
     if (tempData == nullptr) {
         return;
     }
@@ -544,14 +614,7 @@ auto getMediaBase64Func = [](napi_env env, void *data) {
     std::string base64Data;
     Utils::EncodeBase64(tempData, len, imgType, base64Data);
     asyncContext->value_ = base64Data;
-    asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext &context) {
-        napi_value result;
-        if (napi_create_string_utf8(env, context.value_.c_str(), NAPI_AUTO_LENGTH, &result) != napi_ok) {
-            context.SetErrorMsg("Failed to create result");
-            return result;
-        }
-        return result;
-    };
+    CreateStringValue(asyncContext);
 };
 
 napi_value ResourceManagerAddon::GetMediaBase64(napi_env env, napi_callback_info info)
@@ -807,6 +870,14 @@ napi_value ResourceManagerAddon::GetPluralString(napi_env env, napi_callback_inf
 
 auto g_getRawFileFunc = [](napi_env env, void* data) {
     ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
+    auto rawFile = std::make_unique<ResourceManager::RawFile>();
+    if (isLoadHap(asyncContext)) {
+        asyncContext->addon_->GetResMgr()->GetRawFileFromHap(asyncContext->path_, rawFile);
+        asyncContext->len_ = static_cast<int>(rawFile->length);
+        asyncContext->mediaData = std::move(rawFile->buffer);
+        CreateValue(asyncContext);
+        return;
+    }
     std::string path;
     asyncContext->addon_->GetResMgr()->GetRawFilePathByName(asyncContext->path_, path);
     if (path.empty()) {
@@ -825,7 +896,12 @@ auto g_getRawFileDescriptorFunc = [](napi_env env, void* data) {
     ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
     asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext& context) -> napi_value {
         ResourceManager::RawFileDescriptor descriptor;
-        RState state = context.addon_->GetResMgr()->GetRawFileDescriptor(context.path_, descriptor);
+        RState state;
+        if (isLoadHap(&context)) {
+            state = context.addon_->GetResMgr()->GetRawFileDescriptorFromHap(context.path_, descriptor);
+        } else {
+            state = context.addon_->GetResMgr()->GetRawFileDescriptor(context.path_, descriptor);
+        }
         if (state != RState::SUCCESS) {
             context.SetErrorMsg("GetRawFileDescriptor failed state", true);
             return nullptr;

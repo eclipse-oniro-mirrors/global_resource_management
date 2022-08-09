@@ -37,6 +37,18 @@ public:
         long length;
     } RawFileDescriptor;
 
+    struct RawFile {
+        /** the offset from where the raw file starts in the HAP */
+        long offset;
+
+        /** the length of the raw file in the HAP. */
+        long length;
+
+        FILE *pf;
+
+        std::unique_ptr<uint8_t[]> buffer;
+    };
+
     struct Resource {
         /** the hap bundle name */
         std::string bundleName;
@@ -129,6 +141,34 @@ public:
     virtual RState GetMediaBase64ByNameData(const char *name, uint32_t density, std::string &base64Data) = 0;
 
     virtual RState GetMediaBase64ByIdData(uint32_t id, uint32_t density, std::string &base64Data) = 0;
+
+    virtual RState GetMediaDataById(uint32_t id, size_t& len, std::unique_ptr<uint8_t[]> &outValue) = 0;
+
+    virtual RState GetMediaDataByName(const char *name, size_t& len, std::unique_ptr<uint8_t[]> &outValue) = 0;
+
+    virtual RState GetMediaDataById(uint32_t id, uint32_t density, size_t& len,
+        std::unique_ptr<uint8_t[]> &outValue) = 0;
+
+    virtual RState GetMediaDataByName(const char *name, uint32_t density, size_t& len,
+        std::unique_ptr<uint8_t[]> &outValue) = 0;
+
+    virtual RState GetMediaBase64DataById(uint32_t id,  std::string &outValue) = 0;
+
+    virtual RState GetMediaBase64DataByName(const char *name,  std::string &outValue) = 0;
+
+    virtual RState GetMediaBase64DataById(uint32_t id, uint32_t density, std::string &outValue) = 0;
+
+    virtual RState GetMediaBase64DataByName(const char *name, uint32_t density, std::string &outValue) = 0;
+
+    virtual RState GetProfileDataById(uint32_t id, std::unique_ptr<uint8_t[]> &outValue) = 0;
+
+    virtual RState GetProfileDataByName(const char *name, std::unique_ptr<uint8_t[]> &outValue) = 0;
+
+    virtual RState GetRawFileFromHap(const std::string &rawFileName, std::unique_ptr<RawFile> &rawFile) = 0;
+
+    virtual RState GetRawFileDescriptorFromHap(const std::string &rawFileName, RawFileDescriptor &descriptor) = 0;
+
+    virtual RState isLoadHap() = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();

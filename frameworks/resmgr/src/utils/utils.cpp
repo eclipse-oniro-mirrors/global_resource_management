@@ -33,7 +33,7 @@ std::vector<char> g_codes = {
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
 };
 
-std::unique_ptr<char[]> Utils::LoadResourceFile(const std::string &path, int &len)
+std::unique_ptr<uint8_t[]> Utils::LoadResourceFile(const std::string &path, int &len)
 {
     std::ifstream mediaStream(path, std::ios::binary);
     if (!mediaStream.is_open()) {
@@ -41,19 +41,19 @@ std::unique_ptr<char[]> Utils::LoadResourceFile(const std::string &path, int &le
     }
     mediaStream.seekg(0, std::ios::end);
     len = mediaStream.tellg();
-    std::unique_ptr<char[]> tempData = std::make_unique<char[]>(len);
+    std::unique_ptr<uint8_t[]> tempData = std::make_unique<uint8_t[]>(len);
     if (tempData == nullptr) {
         return nullptr;
     }
     mediaStream.seekg(0, std::ios::beg);
-    mediaStream.read((tempData.get()), len);
+    mediaStream.read(reinterpret_cast<char *>(tempData.get()), len);
     return tempData;
 }
 
-RState Utils::EncodeBase64(std::unique_ptr<char[]> &data, int srcLen,
+RState Utils::EncodeBase64(std::unique_ptr<uint8_t[]> &data, int srcLen,
     const std::string &imgType, std::string &dstData)
 {
-    const char *srcData = data.get();
+    const unsigned char *srcData = data.get();
     if (srcData == nullptr) {
         return ERROR;
     }
@@ -390,6 +390,11 @@ RState Utils::ConvertColorToUInt32(const char *s, uint32_t &outValue)
     }
     outValue = color;
     return parseState;
+}
+
+bool Utils::endWithTail(const std::string& path, const std::string& tail)
+{
+    return path.compare(path.size() - tail.size(), tail.size(), tail) == 0;
 }
 } // namespace Resource
 } // namespace Global

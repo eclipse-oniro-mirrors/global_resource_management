@@ -21,6 +21,8 @@ namespace Global {
 namespace Resource {
 int HapManagerFuncTest001(void);
 int HapManagerFuncTest002(void);
+int HapManagerFuncTest003(void);
+int HapManagerFuncTest004(void);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

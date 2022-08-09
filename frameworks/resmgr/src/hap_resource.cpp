@@ -19,6 +19,7 @@
 #include <climits>
 #include <cstdlib>
 #include <fstream>
+#include "utils/utils.h"
 
 #ifdef __WINNT__
 #include <shlwapi.h>
@@ -108,13 +109,22 @@ void CanonicalizePath(const char *path, char *outPath, size_t len)
     }
 #else
     if (realpath(path, outPath) == nullptr) {
-        HILOG_ERROR("failed to realpath the path");
+        HILOG_ERROR("failed to realpath the path errno:%{public}d", errno);
         return;
     }
 #endif
 }
 
-const HapResource *HapResource::LoadFromIndex(const char *path, const ResConfigImpl *defaultConfig, bool system)
+const HapResource* HapResource::Load(const char *path, const ResConfigImpl* defaultConfig, bool system)
+{
+    if (Utils::endWithTail(path, "hap")) {
+        return LoadFromHap(path, defaultConfig, system);
+    } else {
+        return LoadFromIndex(path, defaultConfig, system);
+    }
+}
+
+const HapResource* HapResource::LoadFromIndex(const char *path, const ResConfigImpl *defaultConfig, bool system)
 {
     char outPath[PATH_MAX + 1] = {0};
     CanonicalizePath(path, outPath, PATH_MAX);
@@ -162,6 +172,40 @@ const HapResource *HapResource::LoadFromIndex(const char *path, const ResConfigI
         delete (resDesc);
         return nullptr;
     }
+    if (!pResource->Init()) {
+        delete (pResource);
+        return nullptr;
+    }
+    return pResource;
+}
+
+const HapResource* HapResource::LoadFromHap(const char *path, const ResConfigImpl *defaultConfig, bool system)
+{
+    std::unique_ptr<uint8_t[]> tmpBuf;
+    size_t tmpLen;
+    int32_t ret = HapParser::ReadIndexFromFile(path, tmpBuf, tmpLen);
+    if (ret != OK) {
+        HILOG_ERROR("read Index from file failed");
+        return nullptr;
+    }
+    ResDesc *resDesc = new (std::nothrow) ResDesc();
+    if (resDesc == nullptr) {
+        HILOG_ERROR("new ResDesc failed when LoadFromHap");
+        return nullptr;
+    }
+    int32_t out = HapParser::ParseResHex(reinterpret_cast<char *>(tmpBuf.get()), tmpLen, *resDesc, defaultConfig);
+    if (out != OK) {
+        HILOG_ERROR("ParseResHex failed! retcode:%d", out);
+        delete (resDesc);
+        return nullptr;
+    }
+
+    HapResource *pResource = new (std::nothrow) HapResource(path, 0, defaultConfig, resDesc);
+    if (pResource == nullptr) {
+        delete (resDesc);
+        return nullptr;
+    }
+
     if (!pResource->Init()) {
         delete (pResource);
         return nullptr;
