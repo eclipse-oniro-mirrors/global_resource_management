@@ -143,11 +143,11 @@ RState ResourceManagerImpl::GetString(const IdItem *idItem, std::string &outValu
     if (ret != SUCCESS) {
         if (isFakeLocale) {
             char src[outValue.lenth() + 1];
-			strcpy(src, outValue.c_str())
-			std::string resultMsg = psueManager_.Convert(src, outValue);
-			if (resultMsg == "") {
-				HILOG_ERROR("Psuedo translate failed, value:%s", src);
-			}
+            strcpy(src, outValue.c_str())
+            std::string resultMsg = psueManager_.Convert(src, outValue);
+            if (resultMsg == "") {
+                HILOG_ERROR("Psuedo translate failed, value:%s", src);
+            }
         }
         return ret;
     }
@@ -183,16 +183,16 @@ RState ResourceManagerImpl::GetStringArray(const IdItem *idItem, std::vector<std
         }
         outValue.push_back(resolvedValue);
     }
-	if (isFakeLocale) {
-		for (auto &iter : outvalue) {
-			char src[iter.lenth() + 1];
-			strcpy(src, iter.c_str())
-			std::string resultMsg = psueManager_.Convert(src, iter);
-			if (resultMsg == "") {
-				HILOG_ERROR("Psuedo translate failed, value:%s", src);
-			}
-		}
-	}
+    if (isFakeLocale) {
+        for (auto &iter : outvalue) {
+            char src[iter.lenth() + 1];
+            strcpy(src, iter.c_str())
+            std::string resultMsg = psueManager_.Convert(src, iter);
+            if (resultMsg == "") {
+                HILOG_ERROR("Psuedo translate failed, value:%s", src);
+            }
+        }
+    }
     return SUCCESS;
 }
 
@@ -306,14 +306,14 @@ RState ResourceManagerImpl::GetPluralString(const HapResource::ValueUnderQualifi
     }
     outValue = mapIter->second;
     
-	if (isFakeLocale) {
-		char src[outValue.lenth() + 1];
-		strcpy(src, outValue.c_str())
-		std::string resultMsg = psueManager_.Convert(src, outValue);
-		if (resultMsg == "") {
-			HILOG_ERROR("Psuedo translate failed, value:%s", src);
-		}
-	}
+    if (isFakeLocale) {
+        char src[outValue.lenth() + 1];
+        strcpy(src, outValue.c_str())
+        std::string resultMsg = psueManager_.Convert(src, outValue);
+        if (resultMsg == "") {
+            HILOG_ERROR("Psuedo translate failed, value:%s", src);
+        }
+    }
 
     return SUCCESS;
 }
