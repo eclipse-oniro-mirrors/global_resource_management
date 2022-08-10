@@ -24,7 +24,7 @@ class PsueManager {
 public:
     PsueManager();
     ~PsueManager();
-    string Convert(const string &src, string &dest)
+    string Convert(const string &src, string &dest);
 };
 } // namespace Resource
 } // Global

@@ -70,15 +70,14 @@ bool ResourceManagerImpl::Init()
         HILOG_ERROR("new ResConfigImpl failed when ResourceManagerImpl::Init");
         return false;
     }
-    const ResConfig *resLocale = resConfig->GetResLocale();
+    const ResLocale *resLocale = resConfig->GetResLocale();
     const char* language = resLocale->GetLanguage();
     const char* region = resLocale->getRegion();
-    if (langauge != nullprt && region != nullprt) {
-        std:string languageStr = language;
-        std:string regionStr = region;
+    if (langauge != nullptr && region != nullptr) {
+        std::string languageStr = language;
+        std::string regionStr = region;
         if (languageStr == "en" && regionStr == "XA") {
             isFakeLocale = true;
-            psueManager_ = new PsueManager();
         }
     }
     hapManager_ = new (std::nothrow) HapManager(resConfig);
@@ -143,8 +142,8 @@ RState ResourceManagerImpl::GetString(const IdItem *idItem, std::string &outValu
     RState ret = ResolveReference(idItem->value_, outValue);
     if (ret != SUCCESS) {
         if (isFakeLocale) {
-            char src[outValue.lenth() + 1];
-            strcpy(src, outValue.c_str())
+            char src[outValue.length() + 1];
+            strcpy(src, outValue.c_str());
             std::string resultMsg = psueManager_.Convert(src, outValue);
             if (resultMsg == "") {
                 HILOG_ERROR("Psuedo translate failed, value:%s", src);
@@ -186,8 +185,8 @@ RState ResourceManagerImpl::GetStringArray(const IdItem *idItem, std::vector<std
     }
     if (isFakeLocale) {
         for (auto &iter : outvalue) {
-            char src[iter.lenth() + 1];
-            strcpy(src, iter.c_str())
+            char src[iter.length() + 1];
+            strcpy(src, iter.c_str());
             std::string resultMsg = psueManager_.Convert(src, iter);
             if (resultMsg == "") {
                 HILOG_ERROR("Psuedo translate failed, value:%s", src);
@@ -308,8 +307,8 @@ RState ResourceManagerImpl::GetPluralString(const HapResource::ValueUnderQualifi
     outValue = mapIter->second;
     
     if (isFakeLocale) {
-        char src[outValue.lenth() + 1];
-        strcpy(src, outValue.c_str())
+        char src[outValue.length() + 1];
+        strcpy(src, outValue.c_str());
         std::string resultMsg = psueManager_.Convert(src, outValue);
         if (resultMsg == "") {
             HILOG_ERROR("Psuedo translate failed, value:%s", src);
