@@ -44,6 +44,7 @@ manager_sources = [
   "src/utils/hap_parser.cpp",
   "src/utils/string_utils.cpp",
   "src/utils/utils.cpp",
+  "src/utils/psue_manager.cpp",
 ]
 
 config("resmgr_public_config") {
