@@ -16,7 +16,7 @@
 #include "utils/psue_manager.h"
 
 #include "hilog_wrapper.h"
-#inlcude "map"
+#include "map"
 #include "utils/errors.h"
 
 namespace OHOS {
@@ -28,10 +28,10 @@ namespace {
 const float DEFAULT_EXTEND_RATIO = 0.3f;
 const int DEFAULT_PSUE_LEVEL = 3;
 
-stuct ExtendRatioTable {
+struct ExtendRatioTable {
     int32_t count;
     float ratio;
-}
+};
 const ExtendRatioTable EXTERN_RATIO_TABLE[] = {
     {10, 2.0f},
     {20, 1.0f},

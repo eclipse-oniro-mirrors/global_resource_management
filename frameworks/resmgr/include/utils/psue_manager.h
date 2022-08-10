@@ -18,13 +18,12 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
-using namespace std;
 
 class PsueManager {
 public:
     PsueManager();
     ~PsueManager();
-    string Convert(const string &src, string &dest);
+    string Convert(const std::string &src, std::string &dest);
 };
 } // namespace Resource
 } // Global
