@@ -15,6 +15,8 @@
 #ifndef UTILS_PSUE_MANAGER_H
 #define UTILS_PSUE_MANAGER_H
 
+#include <string>
+
 namespace OHOS {
 namespace Global {
 namespace Resource {

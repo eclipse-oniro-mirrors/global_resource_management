@@ -77,7 +77,7 @@ PsuedoTranslation level default value is 3
 
 std::string PsueManager::Convert(const std::string &src, std::string &dest)
 {
-    dest = '[' + dest + ']';
+    dest = "[" + dest + "]";
     return src;
 }
 } // namespace Resource
