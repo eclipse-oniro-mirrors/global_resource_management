@@ -78,7 +78,7 @@ bool ResourceManagerImpl::Init()
         std:string regionStr = region;
         if (languageStr == "en" && regionStr == "XA") {
             isFakeLocale = true;
-            psueManager_ = new psueManager_();
+            psueManager_ = new PsueManager();
         }
     }
     hapManager_ = new (std::nothrow) HapManager(resConfig);

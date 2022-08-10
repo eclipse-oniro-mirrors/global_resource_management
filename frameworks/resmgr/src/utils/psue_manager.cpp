@@ -15,10 +15,6 @@
 
 #include "utils/psue_manager.h"
 
-//#include <cstdlib>
-//#include <iostream>
-//#include <vector>
-
 #include "hilog_wrapper.h"
 #inlcude "map"
 #include "utils/errors.h"
@@ -84,7 +80,6 @@ std::string PsueManager::Convert(const std::string &src, std::string &dest)
     dest = '[' + dest + ']';
     return src;
 }
-
 } // namespace Resource
 } // Global
 } // OHOS

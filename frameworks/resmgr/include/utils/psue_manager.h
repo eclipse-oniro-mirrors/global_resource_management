@@ -12,11 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_RESOURCE_MANAGER_PSUEMANAGER_H
-#define OHOS_RESOURCE_MANAGER_PSUEMANAGER_H
- 
-//#include <cstdint>
-//#include <string>
+#ifndef UTILS_PSUE_MANAGER_H
+#define UTILS_PSUE_MANAGER_H
 
 namespace OHOS {
 namespace Global {
@@ -27,8 +24,9 @@ class PsueManager {
 public:
     PsueManager();
     ~PsueManager();
-    string Convert(const std::string &src, std::string &dest)
-}
+    string Convert(const string &src, string &dest)
+};
 } // namespace Resource
 } // Global
 } // OHOS
+#endif
