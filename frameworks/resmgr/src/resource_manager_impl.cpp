@@ -72,8 +72,8 @@ bool ResourceManagerImpl::Init()
     }
     const ResLocale *resLocale = resConfig->GetResLocale();
     const char* language = resLocale->GetLanguage();
-    const char* region = resLocale->getRegion();
-    if (langauge != nullptr && region != nullptr) {
+    const char* region = resLocale->GetRegion();
+    if (language != nullptr && region != nullptr) {
         std::string languageStr = language;
         std::string regionStr = region;
         if (languageStr == "en" && regionStr == "XA") {
@@ -184,7 +184,7 @@ RState ResourceManagerImpl::GetStringArray(const IdItem *idItem, std::vector<std
         outValue.push_back(resolvedValue);
     }
     if (isFakeLocale) {
-        for (auto &iter : outvalue) {
+        for (auto &iter : outValue) {
             char src[iter.length() + 1];
             strcpy(src, iter.c_str());
             std::string resultMsg = psueManager_.Convert(src, iter);
