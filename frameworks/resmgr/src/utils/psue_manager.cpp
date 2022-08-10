@@ -36,7 +36,7 @@ const int DEFAULT_PSUE_LEVEL = 3;
 
 stuct ExtendRatioTable {
     int32_t count;
-	float ratio;
+    float ratio;
 }
 const ExtendRatioTable EXTERN_RATIO_TABLE[] = {
     {10, 2.0f},
@@ -83,6 +83,7 @@ PsuedoTranslation level default value is 3
 
 std::string PsueManager::Convert(const std::string &src, std::string &dest)
 {
+	dest = '[' + dest + ']';
     return src;
 }
 
