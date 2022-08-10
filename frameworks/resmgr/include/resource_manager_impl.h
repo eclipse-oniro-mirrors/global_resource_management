@@ -20,7 +20,7 @@
 #include <vector>
 #include "hap_manager.h"
 #include "resource_manager.h"
-#include "utils/psue_namager.h"
+#include "utils/psue_manager.h"
 
 namespace OHOS {
 namespace Global {
