@@ -24,42 +24,6 @@ namespace Global {
 namespace Resource {
 using namespace std;
 
-namespace {
-const float DEFAULT_EXTEND_RATIO = 0.3f;
-const int DEFAULT_PSUE_LEVEL = 3;
-
-struct ExtendRatioTable {
-    int32_t count;
-    float ratio;
-};
-const ExtendRatioTable EXTERN_RATIO_TABLE[] = {
-    {10, 2.0f},
-    {20, 1.0f},
-    {30, 0.8f},
-    {50, 0.6f},
-    {70, 0.4f},
-};
-
-const map<wchar_t, wchar_t> REPLACE_TABLE {
-    {L'a', L'a'},
-    {L'A', L'a'},
-    {L'c', L'a'},
-    {L'C', L'a'},
-    {L'i', L'a'},
-    {L'I', L'a'},
-    {L'o', L'a'},
-    {L'O', L'a'},
-    {L'u', L'a'},
-    {L'U', L'a'},
-    {L'y', L'a'},
-    {L'Y', L'a'},
-    {L'z', L'a'},
-    {L'Z', L'a'},
-    {L's', L'a'},
-    {L'S', L'a'},
-};
-}
-
 PsueManager::PsueManager()
 {
 }
