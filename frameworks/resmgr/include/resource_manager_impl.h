@@ -409,7 +409,7 @@ private:
 
     float fontRatio_ = 0.0f;
 
-    bool isFakeLocale = false;
+    bool isFakeLocale = true;
 
     PsueManager psueManager_;
 
