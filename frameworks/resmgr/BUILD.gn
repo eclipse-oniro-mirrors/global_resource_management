@@ -42,9 +42,9 @@ manager_sources = [
   "src/res_locale.cpp",
   "src/resource_manager_impl.cpp",
   "src/utils/hap_parser.cpp",
+  "src/utils/psue_manager.cpp",
   "src/utils/string_utils.cpp",
   "src/utils/utils.cpp",
-  "src/utils/psue_manager.cpp",
 ]
 
 config("resmgr_public_config") {
