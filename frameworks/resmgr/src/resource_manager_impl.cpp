@@ -79,7 +79,6 @@ bool ResourceManagerImpl::Init()
     }
     AddResource("/data/storage/el1/bundle/ohos.global.systemres" \
         "/ohos.global.systemres/assets/entry/resources.index");
-
     return true;
 }
 
