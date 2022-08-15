@@ -409,9 +409,9 @@ private:
 
     float fontRatio_ = 0.0f;
 
-    bool isFakeLocale = true;
+    bool isFakeLocale = false;
 
-    PsueManager psueManager_;
+    PsueManager *psueManager_;
 
     const std::string VIRTUAL_PIXEL = "vp";
 

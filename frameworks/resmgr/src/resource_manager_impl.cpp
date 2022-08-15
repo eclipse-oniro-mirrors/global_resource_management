@@ -70,16 +70,7 @@ bool ResourceManagerImpl::Init()
         HILOG_ERROR("new ResConfigImpl failed when ResourceManagerImpl::Init");
         return false;
     }
-    const ResLocale *resLocale = resConfig->GetResLocale();
-    const char* language = resLocale->GetLanguage();
-    const char* region = resLocale->GetRegion();
-    if (language != nullptr && region != nullptr) {
-        std::string languageStr = language;
-        std::string regionStr = region;
-        if (languageStr == "en" && regionStr == "XA") {
-            isFakeLocale = true;
-        }
-    }
+    psueManager_ = new (std::nothrow) PsueManager();
     hapManager_ = new (std::nothrow) HapManager(resConfig);
     if (hapManager_ == nullptr) {
         delete (resConfig);
@@ -88,6 +79,7 @@ bool ResourceManagerImpl::Init()
     }
     AddResource("/data/storage/el1/bundle/ohos.global.systemres" \
         "/ohos.global.systemres/assets/entry/resources.index");
+
     return true;
 }
 
@@ -140,15 +132,15 @@ RState ResourceManagerImpl::GetString(const IdItem *idItem, std::string &outValu
         return NOT_FOUND;
     }
     RState ret = ResolveReference(idItem->value_, outValue);
-    if (ret != SUCCESS) {
-        if (isFakeLocale) {
-            char src[outValue.length() + 1];
-            strcpy(src, outValue.c_str());
-            std::string resultMsg = psueManager_.Convert(src, outValue);
-            if (resultMsg == "") {
-                HILOG_ERROR("Psuedo translate failed, value:%s", src);
-            }
+    if (isFakeLocale && outValue.find("_") == outValue.npos) {
+        char src[outValue.length() + 1];
+        strcpy(src, outValue.c_str());
+        std::string resultMsg = psueManager_->Convert(src, outValue);
+        if (resultMsg != "") {
+            HILOG_ERROR("Psuedo translate failed, value:%s", src);
         }
+    }
+    if (ret != SUCCESS) {
         return ret;
     }
     return SUCCESS;
@@ -187,9 +179,9 @@ RState ResourceManagerImpl::GetStringArray(const IdItem *idItem, std::vector<std
         for (auto &iter : outValue) {
             char src[iter.length() + 1];
             strcpy(src, iter.c_str());
-            std::string resultMsg = psueManager_.Convert(src, iter);
+            std::string resultMsg = psueManager_->Convert(src, iter);
             if (resultMsg == "") {
-                HILOG_ERROR("Psuedo translate failed, value:%s", src);
+                HILOG_ERROR("Psuedo translate failed,array value:%s", src);
             }
         }
     }
@@ -305,16 +297,14 @@ RState ResourceManagerImpl::GetPluralString(const HapResource::ValueUnderQualifi
         }
     }
     outValue = mapIter->second;
-    
     if (isFakeLocale) {
         char src[outValue.length() + 1];
         strcpy(src, outValue.c_str());
-        std::string resultMsg = psueManager_.Convert(src, outValue);
+        std::string resultMsg = psueManager_->Convert(src, outValue);
         if (resultMsg == "") {
-            HILOG_ERROR("Psuedo translate failed, value:%s", src);
+            HILOG_ERROR("Psuedo translate failed,plural value:%s", src);
         }
     }
-
     return SUCCESS;
 }
 
@@ -859,6 +849,17 @@ RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig)
     }
     if (resConfig.GetLocaleInfo()->getLanguage() == nullptr) {
         return LOCALEINFO_IS_NULL;
+    }
+    const char* language = resConfig.GetLocaleInfo()->getLanguage();
+    const char* region = resConfig.GetLocaleInfo()->getCountry();
+    if (language != nullptr && region != nullptr) {
+        std::string languageStr = language;
+        std::string regionStr = region;
+        if (languageStr == "en" && regionStr == "XA") {
+            isFakeLocale = true;
+        } else {
+            isFakeLocale = false;
+        }
     }
 #endif
     return this->hapManager_->UpdateResConfig(resConfig);
