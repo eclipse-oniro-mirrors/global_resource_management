@@ -70,6 +70,7 @@ bool ResourceManagerImpl::Init()
         HILOG_ERROR("new ResConfigImpl failed when ResourceManagerImpl::Init");
         return false;
     }
+    psueManager_ = new (std::nothrow) PsueManager();
     hapManager_ = new (std::nothrow) HapManager(resConfig);
     if (hapManager_ == nullptr) {
         delete (resConfig);
@@ -130,6 +131,14 @@ RState ResourceManagerImpl::GetString(const IdItem *idItem, std::string &outValu
         return NOT_FOUND;
     }
     RState ret = ResolveReference(idItem->value_, outValue);
+    if (isFakeLocale && outValue.find("_") == outValue.npos) {
+        char src[outValue.length() + 1];
+        strcpy(src, outValue.c_str());
+        std::string resultMsg = psueManager_->Convert(src, outValue);
+        if (resultMsg != "") {
+            HILOG_ERROR("Psuedo translate failed, value:%s", src);
+        }
+    }
     if (ret != SUCCESS) {
         return ret;
     }
@@ -164,6 +173,16 @@ RState ResourceManagerImpl::GetStringArray(const IdItem *idItem, std::vector<std
             return ERROR;
         }
         outValue.push_back(resolvedValue);
+    }
+    if (isFakeLocale) {
+        for (auto &iter : outValue) {
+            char src[iter.length() + 1];
+            strcpy(src, iter.c_str());
+            std::string resultMsg = psueManager_->Convert(src, iter);
+            if (resultMsg == "") {
+                HILOG_ERROR("Psuedo translate failed,array value:%s", src);
+            }
+        }
     }
     return SUCCESS;
 }
@@ -277,7 +296,14 @@ RState ResourceManagerImpl::GetPluralString(const HapResource::ValueUnderQualifi
         }
     }
     outValue = mapIter->second;
-
+    if (isFakeLocale) {
+        char src[outValue.length() + 1];
+        strcpy(src, outValue.c_str());
+        std::string resultMsg = psueManager_->Convert(src, outValue);
+        if (resultMsg == "") {
+            HILOG_ERROR("Psuedo translate failed,plural value:%s", src);
+        }
+    }
     return SUCCESS;
 }
 
@@ -822,6 +848,17 @@ RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig)
     }
     if (resConfig.GetLocaleInfo()->getLanguage() == nullptr) {
         return LOCALEINFO_IS_NULL;
+    }
+    const char* language = resConfig.GetLocaleInfo()->getLanguage();
+    const char* region = resConfig.GetLocaleInfo()->getCountry();
+    if (language != nullptr && region != nullptr) {
+        std::string languageStr = language;
+        std::string regionStr = region;
+        if (languageStr == "en" && regionStr == "XA") {
+            isFakeLocale = true;
+        } else {
+            isFakeLocale = false;
+        }
     }
 #endif
     return this->hapManager_->UpdateResConfig(resConfig);

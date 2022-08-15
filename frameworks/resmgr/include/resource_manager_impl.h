@@ -20,6 +20,7 @@
 #include <vector>
 #include "hap_manager.h"
 #include "resource_manager.h"
+#include "utils/psue_manager.h"
 
 namespace OHOS {
 namespace Global {
@@ -407,6 +408,10 @@ private:
     HapManager *hapManager_;
 
     float fontRatio_ = 0.0f;
+
+    bool isFakeLocale = false;
+
+    PsueManager *psueManager_;
 
     const std::string VIRTUAL_PIXEL = "vp";
 
