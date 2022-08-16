@@ -129,8 +129,7 @@ std::string PsueManager::Convert(const std::string &src, std::string &dest)
 
 bool PsueManager::isDigit(const std::string src)
 {
-    for (int i = 0 ; i < src.size() ; i++)
-    {
+    for (int i = 0 ; i < src.size() ; i++) {
         if (!isdigit(src[i])) {
             return false;
         }
