@@ -186,7 +186,7 @@ std::string PsueManager::ToString(std::string &dest, const std::wstring &src)
 
 void PsueManager::SetFakeLocaleLevel(const int level)
 {
-    if (level <= 3 && level >= 1) {
+    if (level <= LEVEL_FOR_APPEND && level >= LEVEL_FOR_ADD_BRACKET) {
         FAKE_LOCALE_LEVEL = level;
     }
 }
