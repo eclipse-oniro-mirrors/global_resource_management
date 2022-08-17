@@ -34,6 +34,7 @@ private:
     void ToAccent(wstring &ws) const;
     std::string ToWstring(wstring &dest, const string &src);
     std::string ToString(string &dest, const wstring &src);
+    bool isDigit(const string src);
 };
 } // namespace Resource
 } // namespace Global

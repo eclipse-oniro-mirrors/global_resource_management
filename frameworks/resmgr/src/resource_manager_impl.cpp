@@ -131,7 +131,7 @@ RState ResourceManagerImpl::GetString(const IdItem *idItem, std::string &outValu
         return NOT_FOUND;
     }
     RState ret = ResolveReference(idItem->value_, outValue);
-    if (isFakeLocale && outValue.find("_") == outValue.npos) {
+    if (isFakeLocale) {
         char src[outValue.length() + 1];
         strcpy(src, outValue.c_str());
         std::string resultMsg = psueManager_->Convert(src, outValue);
