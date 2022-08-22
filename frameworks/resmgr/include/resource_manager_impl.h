@@ -401,6 +401,8 @@ private:
 
     RState GetRawFile(const HapResource::ValueUnderQualifierDir *vuqd, const ResType resType, std::string &outValue);
 
+    void ProcessPsuedoTranslate(std::string &outValue);
+
     RState ResolveParentReference(const IdItem *idItem, std::map<std::string, std::string> &outValue);
 
     bool IsDensityValid(uint32_t density);
