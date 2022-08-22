@@ -59,11 +59,7 @@ ResourceManager *CreateResourceManager()
 }
 
 ResourceManager::~ResourceManager()
-{
-    if (psueManager_ != nullptr) {
-        delete (psueManager_);
-    }
-}
+{}
 
 ResourceManagerImpl::ResourceManagerImpl() : hapManager_(nullptr)
 {
@@ -808,7 +804,8 @@ RState ResourceManagerImpl::CloseRawFileDescriptor(const std::string &name)
     return ERROR;
 }
 
-void ProcessPsuedoTranslate(std::string &outValue) {
+void ResourceManagerImpl::ProcessPsuedoTranslate(std::string &outValue)
+{
     int len = outValue.length() + 1;
     char src[len];
     if (strcpy_s(src, len, outValue.c_str()) == EOK) {
@@ -823,6 +820,9 @@ ResourceManagerImpl::~ResourceManagerImpl()
 {
     if (hapManager_ != nullptr) {
         delete hapManager_;
+    }
+    if (psueManager_ != nullptr) {
+        delete (psueManager_);
     }
 }
 
