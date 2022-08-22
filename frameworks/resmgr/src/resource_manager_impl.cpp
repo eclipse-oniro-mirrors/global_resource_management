@@ -138,7 +138,7 @@ RState ResourceManagerImpl::GetString(const IdItem *idItem, std::string &outValu
     }
     RState ret = ResolveReference(idItem->value_, outValue);
     if (isFakeLocale) {
-        ProcessPsuedoTanslate(outValue);
+        ProcessPsuedoTranslate(outValue);
     }
     if (ret != SUCCESS) {
         return ret;
@@ -177,7 +177,7 @@ RState ResourceManagerImpl::GetStringArray(const IdItem *idItem, std::vector<std
     }
     if (isFakeLocale) {
         for (auto &iter : outValue) {
-            ProcessPsuedoTanslate(iter);
+            ProcessPsuedoTranslate(iter);
         }
     }
     return SUCCESS;
@@ -293,7 +293,7 @@ RState ResourceManagerImpl::GetPluralString(const HapResource::ValueUnderQualifi
     }
     outValue = mapIter->second;
     if (isFakeLocale) {
-        ProcessPsuedoTanslate(outValue);
+        ProcessPsuedoTranslate(outValue);
     }
     return SUCCESS;
 }
@@ -808,7 +808,7 @@ RState ResourceManagerImpl::CloseRawFileDescriptor(const std::string &name)
     return ERROR;
 }
 
-void ProcessPsuedoTanslate(std::string &outValue) {
+void ProcessPsuedoTranslate(std::string &outValue) {
     int len = outValue.length() + 1;
     char src[len];
     if (strcpy_s(src, len, outValue.c_str()) == EOK) {
