@@ -59,7 +59,11 @@ ResourceManager *CreateResourceManager()
 }
 
 ResourceManager::~ResourceManager()
-{}
+{
+    if (psueManager_ != nullptr) {
+        delete (psueManager_);
+    }
+}
 
 ResourceManagerImpl::ResourceManagerImpl() : hapManager_(nullptr)
 {
@@ -133,15 +137,8 @@ RState ResourceManagerImpl::GetString(const IdItem *idItem, std::string &outValu
         return NOT_FOUND;
     }
     RState ret = ResolveReference(idItem->value_, outValue);
-    if (isFakeLocale && outValue.find("_") == outValue.npos) {
-        int len = outValue.length() + 1;
-        char src[len];
-        if (strcpy_s(src, len, outValue.c_str()) == EOK) {
-            std::string resultMsg = psueManager_->Convert(src, outValue);
-            if (resultMsg != "") {
-                HILOG_ERROR("Psuedo translate failed, value:%s", src);
-            }
-        }
+    if (isFakeLocale) {
+        ProcessPsuedoTanslate(outValue);
     }
     if (ret != SUCCESS) {
         return ret;
@@ -180,14 +177,7 @@ RState ResourceManagerImpl::GetStringArray(const IdItem *idItem, std::vector<std
     }
     if (isFakeLocale) {
         for (auto &iter : outValue) {
-            int len = iter.length() + 1;
-            char src[len];
-            if (strcpy_s(src, len, iter.c_str()) == EOK) {
-                std::string resultMsg = psueManager_->Convert(src, iter);
-                if (resultMsg == "") {
-                    HILOG_ERROR("Psuedo translate failed,array value:%s", src);
-                }
-            }
+            ProcessPsuedoTanslate(iter);
         }
     }
     return SUCCESS;
@@ -303,14 +293,7 @@ RState ResourceManagerImpl::GetPluralString(const HapResource::ValueUnderQualifi
     }
     outValue = mapIter->second;
     if (isFakeLocale) {
-        int len = outValue.length() + 1;
-        char src[len];
-        if (strcpy_s(src, len, outValue.c_str()) == EOK) {
-            std::string resultMsg = psueManager_->Convert(src, outValue);
-            if (resultMsg == "") {
-                HILOG_ERROR("Psuedo translate failed,plural value:%s", src);
-            }
-        }
+        ProcessPsuedoTanslate(outValue);
     }
     return SUCCESS;
 }
@@ -823,6 +806,17 @@ RState ResourceManagerImpl::CloseRawFileDescriptor(const std::string &name)
         return SUCCESS;
     }
     return ERROR;
+}
+
+void ProcessPsuedoTanslate(std::string &outValue) {
+    int len = outValue.length() + 1;
+    char src[len];
+    if (strcpy_s(src, len, outValue.c_str()) == EOK) {
+        std::string resultMsg = psueManager_->Convert(src, outValue);
+        if (resultMsg != "") {
+            HILOG_ERROR("Psuedo translate failed, value:%s", src);
+        }
+    }
 }
 
 ResourceManagerImpl::~ResourceManagerImpl()
