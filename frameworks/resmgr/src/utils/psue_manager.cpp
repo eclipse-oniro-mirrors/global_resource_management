@@ -15,6 +15,7 @@
 
 #include "utils/psue_manager.h"
 
+#include <cctype>
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -90,6 +91,9 @@ int LEVEL_FOR_ADD_BRACKET = 1;
 
 std::string PsueManager::Convert(const std::string &src, std::string &dest)
 {
+    if (isDigit(src)) {
+        return "";
+    }
     std::wstring ws;
     std::string wsStr = ToWstring(ws, src);
     if (wsStr != "") {
@@ -121,6 +125,16 @@ std::string PsueManager::Convert(const std::string &src, std::string &dest)
         dest = '[' + dest + ']';
     }
     return "";
+}
+
+bool PsueManager::isDigit(const std::string src)
+{
+    for (int i = 0 ; i < src.size() ; i++) {
+        if (!isdigit(src[i])) {
+            return false;
+        }
+    }
+    return true;
 }
 
 float PsueManager::GetExtendRatio(int32_t len) const

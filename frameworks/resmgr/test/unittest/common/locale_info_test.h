@@ -16,6 +16,9 @@
 #ifndef RESOURCE_MANAGER_LOCALE_INFO_TEST_H
 #define RESOURCE_MANAGER_LOCALE_INFO_TEST_H
 
+namespace OHOS {
+namespace Global {
+namespace Resource {
 int LocaleInfoFindAndSortTest001(void);
 int LocaleInfoFindAndSortTest002(void);
 int LocaleInfoFindAndSortTest003(void);
@@ -43,5 +46,7 @@ int LocaleInfoBuildFromStringTest008(void);
 int LocaleInfoBuildFromStringTest009(void);
 int LocaleInfoBuildFromStringTest0010(void);
 int LocaleInfoPerformanceFuncTest001(void);
-
+} // namespace Resource
+} // namespace Global
+} // namespace OHOS
 #endif // RESOURCE_MANAGER_LOCALE_INFO_TEST_H

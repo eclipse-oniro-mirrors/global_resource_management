@@ -16,9 +16,14 @@
 #ifndef RESOURCE_MANAGER_HAP_RESOURCE_TEST_H
 #define RESOURCE_MANAGER_HAP_RESOURCE_TEST_H
 
+namespace OHOS {
+namespace Global {
+namespace Resource {
 int HapResourceFuncTest001(void);
 int HapResourceFuncTest002(void);
 int HapResourceFuncTest003(void);
 int HapResourceFuncTest004(void);
-
+} // namespace Resource
+} // namespace Global
+} // namespace OHOS
 #endif
