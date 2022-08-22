@@ -102,7 +102,7 @@ std::string PsueManager::Convert(const std::string &src, std::string &dest)
     if (FAKE_LOCALE_LEVEL == LEVEL_FOR_APPEND) {
         // enhance length
         int32_t len = src.length();
-        int32_t extendCount = len * GetExtendRatio(len);
+        unsigned int extendCount = len * GetExtendRatio(len);
         int32_t loop = extendCount / PsueConfigChars.length();
         int32_t left = extendCount % PsueConfigChars.length();
         for (int32_t i = 0; i < loop ; i++) {
@@ -154,7 +154,7 @@ void PsueManager::ToAccent(wstring &ws) const
 
 std::string PsueManager::ToWstring(std::wstring &dest, const std::string &src)
 {
-    char* result = setlocale(LC_CTYPE, "");
+    std::string result = setlocale(LC_CTYPE, "");
     size_t destSize = mbstowcs(NULL, src.c_str(), 0);
     if (destSize == size_t(-1)) {
         cout << result << endl;
