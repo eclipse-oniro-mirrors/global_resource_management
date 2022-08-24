@@ -3847,7 +3847,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest022, TestSize.Lev
  * @tc.name: ResourceManagerGetStringByIdForInputDeviceTest001
  * @tc.desc: Test GetStringById, to match pointingdevice directory which rc is set
  * @tc.type: FUNC
- * @tc.require: issueI581UL
+ * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest001, TestSize.Level1)
 {
@@ -3880,7 +3880,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest001,
  * @tc.name: ResourceManagerGetStringByIdForInputDeviceTest002
  * @tc.desc: Test GetStringById, to match base directory which rc is not set
  * @tc.type: FUNC
- * @tc.require: issueI581UL
+ * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest002, TestSize.Level1)
 {
@@ -3913,7 +3913,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest002,
  * @tc.name: ResourceManagerGetStringByIdForInputDeviceTest003
  * @tc.desc: Test GetStringById, to match zh_CN-phone-pointingdevice directory which rc is set
  * @tc.type: FUNC
- * @tc.require: issueI581UL
+ * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest003, TestSize.Level1)
 {
@@ -3946,7 +3946,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest003,
  * @tc.name: ResourceManagerGetStringByIdForInputDeviceTest004
  * @tc.desc: Test GetStringById, not match zh_CN-phone-pointingdevice directory which language not match
  * @tc.type: FUNC
- * @tc.require: issueI581UL
+ * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest004, TestSize.Level1)
 {
@@ -3979,7 +3979,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest004,
  * @tc.name: ResourceManagerGetStringByNameForInputDeviceTest001
  * @tc.desc: Test GetStringByName, to match pointingdevice directory which rc is set
  * @tc.type: FUNC
- * @tc.require: issueI581UL
+ * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest001, TestSize.Level1)
 {
@@ -4010,7 +4010,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest00
  * @tc.name: ResourceManagerGetStringByNameForInputDeviceTest002
  * @tc.desc: Test GetStringByName, to match base directory which rc is not set
  * @tc.type: FUNC
- * @tc.require: issueI581UL
+ * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest002, TestSize.Level1)
 {
@@ -4041,7 +4041,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest00
  * @tc.name: ResourceManagerGetStringByNameForInputDeviceTest003
  * @tc.desc: Test GetStringByName, to match zh_CN-phone-pointingdevice directory which rc is set
  * @tc.type: FUNC
- * @tc.require: issueI581UL
+ * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest003, TestSize.Level1)
 {
@@ -4072,7 +4072,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest00
  * @tc.name: ResourceManagerGetStringByNameForInputDeviceTest004
  * @tc.desc: Test GetStringByName, not match zh_CN-phone-pointingdevice directory which language not match
  * @tc.type: FUNC
- * @tc.require: issueI581UL
+ * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest004, TestSize.Level1)
 {
@@ -4103,7 +4103,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest00
  * @tc.name: ResourceManagerGetStringByNameForInputDeviceTest005
  * @tc.desc: Test GetStringByName, not match zh_CN-phone-pointingdevice directory which devicetype not match
  * @tc.type: FUNC
- * @tc.require: issueI581UL
+ * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest005, TestSize.Level1)
 {
@@ -4134,7 +4134,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest00
  * @tc.name: ResourceManagerGetStringByNameForInputDeviceTest006
  * @tc.desc: Test GetStringByName,match base directory which pointingdevice directory not have res with name
  * @tc.type: FUNC
- * @tc.require: issueI581UL
+ * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest006, TestSize.Level1)
 {
@@ -4165,7 +4165,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest00
  * @tc.name: ResourceManagerGetIntegerByNameForInputDeviceTest001
  * @tc.desc: Test GetStringByName, to match pointingdevice directory which rc is set
  * @tc.type: FUNC
- * @tc.require: issueI581UL
+ * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest001, TestSize.Level1)
 {
@@ -4196,7 +4196,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest0
  * @tc.name: ResourceManagerGetIntegerByNameForInputDeviceTest002
  * @tc.desc: Test GetIntegerByName, to match base directory which rc is not set
  * @tc.type: FUNC
- * @tc.require: issueI581UL
+ * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest002, TestSize.Level1)
 {
@@ -4227,7 +4227,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest0
  * @tc.name: ResourceManagerGetIntegerByNameForInputDeviceTest003
  * @tc.desc: Test GetIntegerByName, to match zh_CN-phone-pointingdevice directory which rc is set
  * @tc.type: FUNC
- * @tc.require: issueI581UL
+ * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest003, TestSize.Level1)
 {
@@ -4258,7 +4258,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest0
  * @tc.name: ResourceManagerGetIntegerByNameForInputDeviceTest004
  * @tc.desc: Test GetIntegerByName, not match zh_CN-phone-pointingdevice directory which language not match
  * @tc.type: FUNC
- * @tc.require: issueI581UL
+ * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest004, TestSize.Level1)
 {
@@ -4289,7 +4289,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest0
  * @tc.name: ResourceManagerGetBooleanByNameForInputDeviceTest001
  * @tc.desc: Test GetBooleanByName, to match pointingdevice directory which rc is set
  * @tc.type: FUNC
- * @tc.require: issueI581UL
+ * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByNameForInputDeviceTest001, TestSize.Level1)
 {
@@ -4320,7 +4320,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByNameForInputDeviceTest0
  * @tc.name: ResourceManagerGetBooleanByNameForInputDeviceTest002
  * @tc.desc: Test GetBooleanByName, to match base directory which rc is not set
  * @tc.type: FUNC
- * @tc.require: issueI581UL
+ * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByNameForInputDeviceTest002, TestSize.Level1)
 {
@@ -4351,7 +4351,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByNameForInputDeviceTest0
  * @tc.name: ResourceManagerGetMediaByNameForInputDeviceTest001
  * @tc.desc: Test GetMediaByName, to match pointingdevice directory which rc is set
  * @tc.type: FUNC
- * @tc.require: issueI581UL
+ * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest001, TestSize.Level1)
 {
@@ -4385,7 +4385,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest001
  * @tc.name: ResourceManagerGetMediaByNameForInputDeviceTest002
  * @tc.desc: Test GetMediaByName, to match base directory which rc is not set
  * @tc.type: FUNC
- * @tc.require: issueI581UL
+ * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest002, TestSize.Level1)
 {
@@ -4419,7 +4419,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest002
  * @tc.name: ResourceManagerGetMediaByNameForInputDeviceTest003
  * @tc.desc: Test GetMediaByName, to match zh_CN-phone-pointingdevice directory which rc is set
  * @tc.type: FUNC
- * @tc.require: issueI581UL
+ * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest003, TestSize.Level1)
 {
@@ -4453,7 +4453,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest003
  * @tc.name: ResourceManagerGetMediaByNameForInputDeviceTest004
  * @tc.desc: Test GetMediaByName, not match zh_CN-phone-pointingdevice directory which language not match
  * @tc.type: FUNC
- * @tc.require: issueI581UL
+ * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest004, TestSize.Level1)
 {
