@@ -891,6 +891,164 @@ bool ResourceManagerImpl::IsDensityValid(uint32_t density)
             return false;
     }
 }
+
+RState ResourceManagerImpl::GetMediaDataById(uint32_t id, size_t &len, std::unique_ptr<uint8_t[]> &outValue)
+{
+    auto qd = hapManager_->FindQualifierValueById(id);
+    if (qd == nullptr) {
+        HILOG_ERROR("find qualifier value by media id error");
+        return NOT_FOUND;
+    }
+    return hapManager_->GetMediaData(qd, len, outValue);
+}
+
+RState ResourceManagerImpl::GetMediaDataByName(const char *name, size_t &len, std::unique_ptr<uint8_t[]> &outValue)
+{
+    auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA);
+    if (qd == nullptr) {
+        HILOG_ERROR("find qualifier value by media name error");
+        return NOT_FOUND;
+    }
+    return hapManager_->GetMediaData(qd, len, outValue);
+}
+
+RState ResourceManagerImpl::GetMediaDataById(uint32_t id, uint32_t density, size_t &len,
+    std::unique_ptr<uint8_t[]> &outValue)
+{
+    if (!IsDensityValid(density)) {
+        HILOG_ERROR("density invalid");
+        return NOT_SUPPORT_SEP;
+    }
+    auto qd = hapManager_->FindQualifierValueById(id, density);
+    if (qd == nullptr) {
+        HILOG_ERROR("find qualifier value by media id error");
+        return NOT_FOUND;
+    }
+    return hapManager_->GetMediaData(qd, len, outValue);
+}
+
+RState ResourceManagerImpl::GetMediaDataByName(const char *name, uint32_t density, size_t &len,
+    std::unique_ptr<uint8_t[]> &outValue)
+{
+    if (!IsDensityValid(density)) {
+        HILOG_ERROR("density invalid");
+        return NOT_SUPPORT_SEP;
+    }
+    auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, density);
+    if (qd == nullptr) {
+        HILOG_ERROR("find qualifier value by media name error");
+        return NOT_FOUND;
+    }
+    return hapManager_->GetMediaData(qd, len, outValue);
+}
+
+RState ResourceManagerImpl::GetMediaBase64DataById(uint32_t id, std::string &outValue)
+{
+    auto qd = hapManager_->FindQualifierValueById(id);
+    if (qd == nullptr) {
+        HILOG_ERROR("find qualifier value by media id error");
+        return NOT_FOUND;
+    }
+    return hapManager_->GetMediaBase64Data(qd, outValue);
+}
+
+RState ResourceManagerImpl::GetMediaBase64DataByName(const char *name,  std::string &outValue)
+{
+    auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA);
+    if (qd == nullptr) {
+        HILOG_ERROR("find qualifier value by media name error");
+        return NOT_FOUND;
+    }
+    return hapManager_->GetMediaBase64Data(qd, outValue);
+}
+
+RState ResourceManagerImpl::GetMediaBase64DataById(uint32_t id, uint32_t density, std::string &outValue)
+{
+    if (!IsDensityValid(density)) {
+        HILOG_ERROR("density invalid");
+        return NOT_SUPPORT_SEP;
+    }
+    auto qd = hapManager_->FindQualifierValueById(id, density);
+    if (qd == nullptr) {
+        HILOG_ERROR("find qualifier value by media id error");
+        return NOT_FOUND;
+    }
+    return hapManager_->GetMediaBase64Data(qd, outValue);
+}
+
+RState ResourceManagerImpl::GetMediaBase64DataByName(const char *name, uint32_t density, std::string &outValue)
+{
+    if (!IsDensityValid(density)) {
+        HILOG_ERROR("density invalid");
+        return NOT_SUPPORT_SEP;
+    }
+    auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, density);
+    if (qd == nullptr) {
+        HILOG_ERROR("find qualifier value by media name error");
+        return NOT_FOUND;
+    }
+    return hapManager_->GetMediaBase64Data(qd, outValue);
+}
+
+RState ResourceManagerImpl::GetProfileDataById(uint32_t id, std::unique_ptr<uint8_t[]> &outValue)
+{
+    auto qd = hapManager_->FindQualifierValueById(id);
+    if (qd == nullptr) {
+        HILOG_ERROR("find qualifier value by profile id error");
+        return NOT_FOUND;
+    }
+    return hapManager_->GetProfileData(qd, outValue);
+}
+
+RState ResourceManagerImpl::GetProfileDataByName(const char *name, std::unique_ptr<uint8_t[]> &outValue)
+{
+    auto qd = hapManager_->FindQualifierValueByName(name, ResType::PROF);
+    if (qd == nullptr) {
+        HILOG_ERROR("find qualifier value by profile name error");
+        return NOT_FOUND;
+    }
+    return hapManager_->GetProfileData(qd, outValue);
+}
+
+RState ResourceManagerImpl::GetRawFileFromHap(const std::string &rawFileName, std::unique_ptr<RawFile> &rawFile)
+{
+    return hapManager_->FindRawFileFromHap(rawFileName, rawFile);
+}
+
+RState ResourceManagerImpl::GetRawFileDescriptorFromHap(const std::string &rawFileName, RawFileDescriptor &descriptor)
+{
+    auto it = rawFileDescriptor_.find(rawFileName);
+    if (it != rawFileDescriptor_.end()) {
+        descriptor.fd = rawFileDescriptor_[rawFileName].fd;
+        descriptor.length = rawFileDescriptor_[rawFileName].length;
+        descriptor.offset = rawFileDescriptor_[rawFileName].offset;
+        return SUCCESS;
+    }
+    auto rawFile = std::make_unique<RawFile>();
+    ResourceManagerImpl::GetRawFileFromHap(rawFileName, rawFile);
+    if (rawFile->pf == nullptr) {
+        HILOG_ERROR("failed to get rawfile pf");
+        return ERROR;
+    }
+    int fd = fileno(rawFile->pf);
+    if (fd < 0) {
+        HILOG_ERROR("failed to get fd in GetRawFileDescriptorFromHap");
+        return ERROR;
+    }
+    descriptor.fd = fd;
+    descriptor.length = rawFile->length;
+    descriptor.offset = rawFile->offset;
+    rawFileDescriptor_[rawFileName] = descriptor;
+    return SUCCESS;
+}
+
+RState ResourceManagerImpl::isLoadHap()
+{
+    if (hapManager_->isLoadHap()) {
+        return SUCCESS;
+    }
+    return NOT_FOUND;
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

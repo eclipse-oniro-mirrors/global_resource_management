@@ -18,6 +18,7 @@
 #include "res_config_impl.h"
 #include "hap_resource.h"
 #include "res_desc.h"
+#include "resource_manager.h"
 #include "lock.h"
 
 #ifdef SUPPORT_GRAPHICS
@@ -119,6 +120,45 @@ public:
      * Get resource paths vector
      */
     std::vector<std::string> GetResourcePaths();
+
+    /**
+     * Get the media data
+     * @param qd the QualifierDir
+     * @param len the data len
+     * @param outValue the media data
+     * @return SUCCESS if get the media data success, else NOT_FOUND
+     */
+    RState GetMediaData(const HapResource::ValueUnderQualifierDir *qd, size_t& len,
+        std::unique_ptr<uint8_t[]> &outValue);
+
+    /**
+     * Get the mediabase64 data
+     * @param qd the QualifierDir
+     * @param outValue the mediabase64 data
+     * @return SUCCESS if get the mediabase64 data success, else NOT_FOUND
+     */
+    RState GetMediaBase64Data(const HapResource::ValueUnderQualifierDir *qd, std::string &outValue);
+
+    /**
+     * Get the Profile data
+     * @param qd the QualifierDir
+     * @param outValue the profile data
+     * @return SUCCESS if get the profile data success, else NOT_FOUND
+     */
+    RState GetProfileData(const HapResource::ValueUnderQualifierDir *qd, std::unique_ptr<uint8_t[]> &outValue);
+
+    /**
+     * Find raw file from hap
+     * @param rawFileName the rawFileName
+     * @param rawFile the raw file infomation about offset, length, data write to
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    RState FindRawFileFromHap(const std::string &rawFileName, std::unique_ptr<ResourceManager::RawFile> &rawFile);
+
+    /**
+     * Is load hap
+     */
+    bool isLoadHap();
 
 private:
     void UpdateResConfigImpl(ResConfigImpl &resConfig);

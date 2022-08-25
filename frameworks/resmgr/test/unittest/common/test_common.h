@@ -25,6 +25,7 @@
 
 // this is relative path
 static const char *g_resFilePath = "all/assets/entry/resources.index";
+static const char *g_hapPath = "all.hap";
 
 namespace OHOS {
 namespace Global {

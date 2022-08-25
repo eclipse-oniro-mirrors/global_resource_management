@@ -27,6 +27,7 @@
 using namespace OHOS::Global::Resource;
 using namespace testing::ext;
 namespace {
+static const int NON_EXIST_ID = 1111;
 class HapManagerTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -151,5 +152,87 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest002, TestSize.Level1)
     delete (hapManager);
     delete (rc2);
     delete (rc);
+}
+
+/*
+ * this test shows how to load resources from hap, then find value list by id
+ * @tc.name: HapManagerFuncTest003
+ * @tc.desc: Test AddResourcePath & GetResourceList function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapManagerTest, HapManagerFuncTest003, TestSize.Level1)
+{
+    ResConfig *rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    HapManager *hapManager = new HapManager(new ResConfigImpl);
+    hapManager->UpdateResConfig(*rc);
+    if (hapManager == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    bool ret = hapManager->AddResourcePath(FormatFullPath(g_hapPath).c_str());
+
+    EXPECT_TRUE(ret);
+
+    int id = 16777219; // 16777219 means 'aboutPage_title_primary'
+    std::vector<const HapResource::IdValues *> idValues = hapManager->GetResourceList(id);
+    if (idValues.size() == 0) {
+        delete hapManager;
+        EXPECT_TRUE(false);
+        return;
+    }
+    PrintIdValues(idValues[0]);
+
+    idValues = hapManager->GetResourceList(NON_EXIST_ID);
+    if (idValues.size() == 0) {
+        delete hapManager;
+        EXPECT_TRUE(true);
+        return;
+    }
+    delete hapManager;
+}
+
+/*
+ * this test shows how to load resources from hap, then find value list by id
+ * @tc.name: HapManagerFuncTest004
+ * @tc.desc: Test AddResourcePath & GetResourceList function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapManagerTest, HapManagerFuncTest004, TestSize.Level1)
+{
+    ResConfig *rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("en", nullptr, "US");
+    HapManager *hapManager = new HapManager(new ResConfigImpl);
+    hapManager->UpdateResConfig(*rc);
+    if (hapManager == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    bool ret = hapManager->AddResourcePath(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    int id = 16777219; // 16777219 means 'AboutPageFA' 'aboutPage_title_primary'
+    std::vector<const HapResource::IdValues *> idValues = hapManager->GetResourceList(id);
+    if (idValues.size() == 0) {
+        delete hapManager;
+        EXPECT_TRUE(false);
+        return;
+    }
+    PrintIdValues(idValues[0]);
+
+    idValues = hapManager->GetResourceList(NON_EXIST_ID);
+    if (idValues.size() == 0) {
+        delete hapManager;
+        EXPECT_TRUE(true);
+        return;
+    }
+    delete hapManager;
 }
 }

@@ -372,6 +372,115 @@ public:
      */
     virtual RState GetMediaBase64ByNameData(const char *name, uint32_t density, std::string &base64Data);
 
+    /**
+     * Get the MEDIA data by resource id
+     * @param id the resource id
+     * @param len the data len write to
+     * @param outValue the obtain resource path write to
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetMediaDataById(uint32_t id, size_t &len, std::unique_ptr<uint8_t[]> &outValue);
+
+    /**
+     * Get the MEDIA data by resource name
+     * @param name the resource name
+     * @param len the data len write to
+     * @param outValue the obtain resource path write to
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetMediaDataByName(const char *name, size_t &len, std::unique_ptr<uint8_t[]> &outValue);
+
+        /**
+     * Get the MEDIA data by resource id with density
+     * @param id the resource id
+     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
+     * @param len the data len write to
+     * @param outValue the obtain resource path write to
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetMediaDataById(uint32_t id, uint32_t density, size_t &len, std::unique_ptr<uint8_t[]> &outValue);
+
+    /**
+     * Get the MEDIA data by resource name with density
+     * @param name the resource name
+     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
+     * @param len the data len write to
+     * @param outValue the obtain resource path write to
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetMediaDataByName(const char *name, uint32_t density, size_t &len,
+        std::unique_ptr<uint8_t[]> &outValue);
+
+    /**
+     * Get the MEDIA base64 data resource by resource id
+     * @param id the resource id
+     * @param outValue the media base64 data
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetMediaBase64DataById(uint32_t id, std::string &outValue);
+
+    /**
+     * Get the MEDIA base64 data resource by resource id
+     * @param name the resource name
+     * @param outValue the media base64 data
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetMediaBase64DataByName(const char *name, std::string &outValue);
+
+    /**
+     * Get the MEDIA base64 data resource by resource id with density
+     * @param id the resource id
+     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
+     * @param outValue the media base64 data
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetMediaBase64DataById(uint32_t id, uint32_t density, std::string &outValue);
+
+    /**
+     * Get the MEDIA base64 data resource by resource id with density
+     * @param name the resource name
+     * @param outValue the media base64 data
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetMediaBase64DataByName(const char *name, uint32_t density, std::string &outValue);
+
+    /**
+     * Get the PROF resource by resource id
+     * @param name the resource id
+     * @param outValue the obtain resource path write to
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetProfileDataById(uint32_t id, std::unique_ptr<uint8_t[]> &outValue);
+
+    /**
+     * Get the PROF resource by resource name
+     * @param name the resource name
+     * @param outValue the obtain resource path write to
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetProfileDataByName(const char *name, std::unique_ptr<uint8_t[]> &outValue);
+
+    /**
+     * Get the rawFile base64 from hap by rawFile name
+     * @param rawFileName the rawFile name
+     * @param rawFile the raw file infomation about offset, length, buffer write to
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetRawFileFromHap(const std::string &rawFileName, std::unique_ptr<RawFile> &rawFile);
+
+    /**
+     * Get the rawFile Descriptor from hap by rawFile name
+     * @param rawFileName the rawFile name
+     * @param descriptor the raw file member fd, length, offet write to
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetRawFileDescriptorFromHap(const std::string &rawFileName, RawFileDescriptor &descriptor);
+
+    /**
+     * Is load hap
+     */
+    virtual RState isLoadHap();
+
 private:
     RState GetString(const IdItem *idItem, std::string &outValue);
 

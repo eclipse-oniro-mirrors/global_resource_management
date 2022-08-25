@@ -39,9 +39,33 @@ public:
      *                       'null' means parse all keys.
      * @param system If `system` is true, the package is marked as a system package, and allows some functions to
      *               filter out this package when computing what configurations/resources are available.
-     * @return
+     * @return pResource if create pResource success, else nullptr
      */
     static const HapResource *LoadFromIndex(const char *path, const ResConfigImpl *defaultConfig, bool system = false);
+
+    /**
+     * Creates an HapResource.
+     *
+     * @param path hap file path
+     * @param defaultConfig  match defaultConfig to keys of index file, only parse the matched keys.
+     *                       'null' means parse all keys.
+     * @param system If `system` is true, the package is marked as a system package, and allows some functions to
+     *               filter out this package when computing what configurations/resources are available.
+     * @return pResource if create pResource success, else nullptr
+     */
+    static const HapResource *LoadFromHap(const char *path, const ResConfigImpl *defaultConfig, bool system = false);
+
+    /**
+     * Creates an HapResource.
+     *
+     * @param path hap file path
+     * @param defaultConfig  match defaultConfig to keys of index file, only parse the matched keys.
+     *                       'null' means parse all keys.
+     * @param system If `system` is true, the package is marked as a system package, and allows some functions to
+     *               filter out this package when computing what configurations/resources are available.
+     * @return pResource if create pResource success, else nullptr
+     */
+    static const HapResource *Load(const char* path, const ResConfigImpl* defaultConfig, bool system = false);
 
     /**
      * Load overlay resources

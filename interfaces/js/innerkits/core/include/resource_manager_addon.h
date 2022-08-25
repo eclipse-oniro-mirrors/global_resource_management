@@ -149,7 +149,7 @@ struct ResMgrAsyncContext {
     std::string value_;
     std::vector<std::string> arrayValue_;
 
-    std::unique_ptr<char[]> mediaData;
+    std::unique_ptr<uint8_t[]> mediaData;
     int len_;
 
     napi_deferred deferred_;

@@ -72,7 +72,74 @@ public:
     void AddResource(const char *language, const char *script, const char *region);
 
     void AddColorModeResource(DeviceType deviceType, ColorMode colorMode, ScreenDensity screenDensity) const;
+
+    void AddHapResource(const char *language, const char *script, const char *region);
+
+    void TestGetStringArrayById(const char *name) const;
+
+    void TestGetStringArrayByName(const char *name) const;
+
+    void TestGetStringFormatById(const char *name, const char *cmp) const;
+
+    void TestGetStringFormatByName(const char *name, const char *cmp) const;
+
+    void TestGetPatternById(const char *name) const;
+
+    void TestGetPatternByName(const char *name) const;
+
+    void TestGetThemeById(const char *name) const;
+
+    void TestGetThemeByName(const char *app_theme, const char *test_theme) const;
+
+    void TestGetBooleanByName(const char *boolean_1, const char *boolean_ref) const;
+
+    void TestGetBooleanById(const char *boolean_1, const char *boolean_ref) const;
+
+    void TestGetIntegerByName(const char* integer_1, const char* integer_ref) const;
+
+    void TestGetIntegerById(const char* integer_1, const char* integer_ref) const;
+
+    void TestGetFloatByName(const char* touchTarget, const char* float_ref) const;
+
+    void TestGetFloatById(const char* touchTarget, const char* float_ref) const;
+
+    void TestGetIntArrayById(const char* intarray_1) const;
+
+    void TestGetIntArrayByName(const char* intarray_1) const;
+
+    void TestGetProfileById(HapResource *tmp) const;
+
+    void TestGetProfileByName(HapResource *tmp) const;
+
+    void TestGetMediaWithDensityById(HapResource *tmp) const;
+
+    void TestGetMediaById(HapResource *tmp) const;
+
+    void TestGetMediaWithDensityByName(HapResource *tmp) const;
+
+    void TestGetMediaByName(HapResource *tmp) const;
 };
+
+void ResourceManagerTest::SetUpTestCase(void)
+{
+    // step 1: input testsuit setup step
+    g_logLevel = LOG_DEBUG;
+}
+
+void ResourceManagerTest::TearDownTestCase(void)
+{
+    // step 2: input testsuit teardown step
+}
+
+void ResourceManagerTest::SetUp(void)
+{
+    this->rm = CreateResourceManager();
+}
+
+void ResourceManagerTest::TearDown(void)
+{
+    delete this->rm;
+}
 
 int ResourceManagerTest::GetResId(std::string name, ResType resType) const
 {
@@ -122,6 +189,22 @@ void ResourceManagerTest::AddResource(const char *language, const char *script, 
         delete rc;
     }
     bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+}
+
+void ResourceManagerTest::AddHapResource(const char *language, const char *script, const char *region)
+{
+    if (language != nullptr || region != nullptr) {
+        auto rc = CreateResConfig();
+        if (rc == nullptr) {
+            EXPECT_TRUE(false);
+            return;
+        }
+        rc->SetLocaleInfo(language, script, region);
+        rm->UpdateResConfig(*rc);
+        delete rc;
+    }
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     ASSERT_TRUE(ret);
 }
 
@@ -182,25 +265,323 @@ void ResourceManagerTest::TestGetRawFilePathByName(const std::string &name, cons
     ASSERT_EQ(cmp, outValue);
 }
 
-void ResourceManagerTest::SetUpTestCase(void)
+void ResourceManagerTest::TestGetProfileById(HapResource *tmp) const
 {
-    // step 1: input testsuit setup step
-    g_logLevel = LOG_DEBUG;
+    tmp->Init();
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/base/profile/test_profile.json");
+
+    std::string outValue;
+    RState state;
+    int id = GetResId("test_profile", ResType::PROF);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetProfileById(id, outValue);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
 }
 
-void ResourceManagerTest::TearDownTestCase(void)
+void ResourceManagerTest::TestGetProfileByName(HapResource *tmp) const
 {
-    // step 2: input testsuit teardown step
+    tmp->Init();
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/base/profile/test_profile.json");
+
+    std::string outValue;
+    RState state;
+    state = rm->GetProfileByName("test_profile", outValue);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
 }
 
-void ResourceManagerTest::SetUp(void)
+void ResourceManagerTest::TestGetMediaById(HapResource *tmp) const
 {
-    this->rm = CreateResourceManager();
+    tmp->Init();
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/base/media/icon1.png");
+
+    std::string outValue;
+    RState state;
+    int id = GetResId("icon1", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetMediaById(id, outValue);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
 }
 
-void ResourceManagerTest::TearDown(void)
+void ResourceManagerTest::TestGetMediaWithDensityById(HapResource *tmp) const
 {
-    delete this->rm;
+    tmp->Init();
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/sdpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 120;
+    std::string outValue;
+    RState state;
+    int id = GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetMediaById(id, density, outValue);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+}
+
+void ResourceManagerTest::TestGetMediaByName(HapResource *tmp) const
+{
+    tmp->Init();
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/base/media/icon1.png");
+
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("icon1", outValue);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+}
+
+void ResourceManagerTest::TestGetMediaWithDensityByName(HapResource *tmp) const
+{
+    tmp->Init();
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/sdpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    uint32_t density = 120;
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("icon", density, outValue);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+}
+
+void ResourceManagerTest::TestGetStringFormatById(const char *name, const char *cmp) const
+{
+    int id = GetResId(name, ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::string outValue;
+    RState state = rm->GetStringFormatById(outValue, id, 101);
+    ASSERT_EQ(SUCCESS, state);
+    ASSERT_EQ(cmp, outValue);
+}
+
+void ResourceManagerTest::TestGetStringFormatByName(const char *name, const char *cmp) const
+{
+    std::string outValue;
+    RState state;
+    state = rm->GetStringFormatByName(outValue, name, 101);
+    ASSERT_EQ(SUCCESS, state);
+    ASSERT_EQ(cmp, outValue);
+}
+
+void ResourceManagerTest::TestGetStringArrayById(const char *name) const
+{
+    std::vector<std::string> outValue;
+    int id = GetResId(name, ResType::STRINGARRAY);
+    RState state;
+    state = rm->GetStringArrayById(id, outValue);
+    ASSERT_EQ(SUCCESS, state);
+    ASSERT_EQ(static_cast<size_t>(4), outValue.size());
+    PrintVectorString(outValue);
+}
+
+void ResourceManagerTest::TestGetStringArrayByName(const char *name) const
+{
+    std::vector<std::string> outValue;
+    RState state;
+    state = rm->GetStringArrayByName(name, outValue);
+    ASSERT_EQ(SUCCESS, state);
+    ASSERT_EQ(static_cast<size_t>(4), outValue.size());
+    PrintVectorString(outValue);
+}
+
+void ResourceManagerTest::TestGetPatternById(const char *name) const
+{
+    std::map<std::string, std::string> outValue;
+    int id = GetResId(name, ResType::PATTERN);
+    RState state;
+    state = rm->GetPatternById(id, outValue);
+    ASSERT_EQ(SUCCESS, state);
+    ASSERT_EQ(static_cast<size_t>(3), outValue.size());
+    PrintMapString(outValue);
+}
+
+void ResourceManagerTest::TestGetPatternByName(const char *name) const
+{
+    std::map<std::string, std::string> outValue;
+    RState state;
+    state = rm->GetPatternByName(name, outValue);
+    ASSERT_EQ(SUCCESS, state);
+    ASSERT_EQ(static_cast<size_t>(3), outValue.size());
+    PrintMapString(outValue);
+}
+
+void ResourceManagerTest::TestGetThemeById(const char *name) const
+{
+    std::map<std::string, std::string> outValue;
+    RState state;
+    int id = GetResId(name, ResType::THEME);
+    ASSERT_TRUE(id > 0);
+    state = rm->GetThemeById(id, outValue);
+    ASSERT_EQ(SUCCESS, state);
+}
+
+void ResourceManagerTest::TestGetThemeByName(const char *app_theme, const char *test_theme) const
+{
+    std::map<std::string, std::string> outValue;
+    RState state;
+    state = rm->GetThemeByName(app_theme, outValue);
+    ASSERT_EQ(SUCCESS, state);
+    PrintMapString(outValue);
+
+    state = rm->GetThemeByName(test_theme, outValue);
+    ASSERT_EQ(SUCCESS, state);
+}
+
+void ResourceManagerTest::TestGetBooleanById(const char* boolean_1, const char* boolean_ref) const
+{
+    bool outValue = true;
+    RState state;
+    int id = GetResId(boolean_1, ResType::BOOLEAN);
+    ASSERT_TRUE(id > 0);
+    state = rm->GetBooleanById(id, outValue);
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_TRUE(outValue);
+
+    id = GetResId(boolean_ref, ResType::BOOLEAN);
+    ASSERT_TRUE(id > 0);
+    state = rm->GetBooleanById(id, outValue);
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_TRUE(outValue);
+}
+
+void ResourceManagerTest::TestGetBooleanByName(const char* boolean_1, const char* boolean_ref) const
+{
+    bool outValue = true;
+    RState state;
+    state = rm->GetBooleanByName(boolean_1, outValue);
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_TRUE(outValue);
+
+    state = rm->GetBooleanByName(boolean_ref, outValue);
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_TRUE(outValue);
+}
+
+void ResourceManagerTest::TestGetIntegerById(const char* integer_1, const char* integer_ref) const
+{
+    int outValue;
+    RState state;
+    int id = GetResId(integer_1, ResType::INTEGER);
+    ASSERT_TRUE(id > 0);
+    state = rm->GetIntegerById(id, outValue);
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_EQ(101, outValue);
+
+    id = GetResId(integer_ref, ResType::INTEGER);
+    ASSERT_TRUE(id > 0);
+    state = rm->GetIntegerById(id, outValue);
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_EQ(101, outValue);
+}
+
+void ResourceManagerTest::TestGetIntegerByName(const char* integer_1, const char* integer_ref) const
+{
+    int outValue;
+    RState state;
+    state = rm->GetIntegerByName(integer_1, outValue);
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_EQ(101, outValue);
+
+    state = rm->GetIntegerByName(integer_ref, outValue);
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_EQ(101, outValue);
+}
+
+void ResourceManagerTest::TestGetFloatById(const char* touchTarget, const char* float_ref) const
+{
+    float outValue;
+    RState state;
+    int id = GetResId(touchTarget, ResType::FLOAT);
+    ASSERT_TRUE(id > 0);
+    state = rm->GetFloatById(id, outValue);
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_EQ(48, outValue); // 48vp
+
+    std::string unit;
+    state = rm->GetFloatById(id, outValue, unit);
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_EQ(48, outValue); // 48vp
+    EXPECT_EQ("vp", unit);
+
+    id = GetResId(float_ref, ResType::FLOAT);
+    ASSERT_TRUE(id > 0);
+    state = rm->GetFloatById(id, outValue);
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_EQ(707, outValue); // 707vp
+}
+
+void ResourceManagerTest::TestGetFloatByName(const char* touchTarget, const char* float_ref) const
+{
+    float outValue;
+    RState state;
+    state = rm->GetFloatByName(touchTarget, outValue);
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_EQ(48, outValue); // 48vp
+
+    std::string unit;
+    state = rm->GetFloatByName(touchTarget, outValue, unit);
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_EQ(48, outValue); // 48vp
+    EXPECT_EQ("vp", unit);
+
+    state = rm->GetFloatByName(float_ref, outValue);
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_EQ(707, outValue); // 707vp
+}
+
+void ResourceManagerTest::TestGetIntArrayById(const char* intarray_1) const
+{
+    std::vector<int> outValue;
+    RState state;
+    int id = GetResId(intarray_1, ResType::INTARRAY);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetIntArrayById(id, outValue);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(static_cast<uint32_t>(3), outValue.size());
+    EXPECT_EQ(100, outValue[0]);
+    EXPECT_EQ(200, outValue[1]);
+    EXPECT_EQ(101, outValue[2]);
+}
+
+void ResourceManagerTest::TestGetIntArrayByName(const char* intarray_1) const
+{
+    std::vector<int> outValue;
+    RState state;
+    state = rm->GetIntArrayByName(intarray_1, outValue);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(static_cast<uint32_t>(3), outValue.size());
+    EXPECT_EQ(100, outValue[0]);
+    EXPECT_EQ(200, outValue[1]);
+    EXPECT_EQ(101, outValue[2]);
 }
 
 /*
@@ -585,21 +966,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringArrayByIdTest001, TestSize
 {
     AddResource("zh", nullptr, nullptr);
 
-    int id;
-    std::vector<std::string> outValue;
-    RState state;
-
-    id = GetResId("size", ResType::STRINGARRAY);
-    state = rm->GetStringArrayById(id, outValue);
-    ASSERT_EQ(SUCCESS, state);
-    ASSERT_EQ(static_cast<size_t>(4), outValue.size());
-    PrintVectorString(outValue);
-
-    // by name
-    state = rm->GetStringArrayByName("size", outValue);
-    ASSERT_EQ(SUCCESS, state);
-    ASSERT_EQ(static_cast<size_t>(4), outValue.size());
-    PrintVectorString(outValue);
+    TestGetStringArrayById("size");
 }
 
 /*
@@ -628,14 +995,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringArrayByNameTest001, TestSi
 {
     AddResource("zh", nullptr, nullptr);
 
-    std::vector<std::string> outValue;
-    RState state;
-
-    // by name
-    state = rm->GetStringArrayByName("size", outValue);
-    ASSERT_EQ(SUCCESS, state);
-    ASSERT_EQ(static_cast<size_t>(4), outValue.size());
-    PrintVectorString(outValue);
+    TestGetStringArrayByName("size");
 }
 
 /*
@@ -664,15 +1024,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPatternByIdTest001, TestSize.Lev
 {
     AddResource("zh", nullptr, nullptr);
 
-    int id;
-    std::map<std::string, std::string> outValue;
-    RState state;
-
-    id = GetResId("base", ResType::PATTERN);
-    state = rm->GetPatternById(id, outValue);
-    ASSERT_EQ(SUCCESS, state);
-    ASSERT_EQ(static_cast<size_t>(3), outValue.size());
-    PrintMapString(outValue);
+    TestGetPatternById("base");
 }
 
 /*
@@ -741,13 +1093,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPatternByNameTest001, TestSize.L
 {
     AddResource("zh", nullptr, nullptr);
 
-    std::map<std::string, std::string> outValue;
-    RState state;
-
-    state = rm->GetPatternByName("base", outValue);
-    ASSERT_EQ(SUCCESS, state);
-    ASSERT_EQ(static_cast<size_t>(3), outValue.size());
-    PrintMapString(outValue);
+    TestGetPatternByName("base");
 }
 
 /*
@@ -997,13 +1343,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetThemeByIdTest001, TestSize.Level
 {
     AddResource("zh", nullptr, "CN");
 
-    std::map<std::string, std::string> outValue;
-    RState state;
-    int id = GetResId("app_theme", ResType::THEME);
-    ASSERT_TRUE(id > 0);
-    state = rm->GetThemeById(id, outValue);
-    ASSERT_EQ(SUCCESS, state);
-    PrintMapString(outValue);
+    TestGetThemeById("app_theme");
 }
 
 /*
@@ -1030,15 +1370,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetThemeByNameTest001, TestSize.Lev
 {
     AddResource("zh", nullptr, "CN");
 
-    std::map<std::string, std::string> outValue;
-    RState state;
-    state = rm->GetThemeByName("app_theme", outValue);
-    ASSERT_EQ(SUCCESS, state);
-    PrintMapString(outValue);
-
-    state = rm->GetThemeByName("test_theme", outValue);
-    ASSERT_EQ(SUCCESS, state);
-    PrintMapString(outValue);
+    TestGetThemeByName("app_theme", "test_theme");
 }
 
 /*
@@ -1065,19 +1397,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByIdTest001, TestSize.Lev
 {
     AddResource("zh", nullptr, "CN");
 
-    bool outValue = true;
-    RState state;
-    int id = GetResId("boolean_1", ResType::BOOLEAN);
-    ASSERT_TRUE(id > 0);
-    state = rm->GetBooleanById(id, outValue);
-    ASSERT_EQ(SUCCESS, state);
-    EXPECT_TRUE(outValue);
-
-    id = GetResId("boolean_ref", ResType::BOOLEAN);
-    ASSERT_TRUE(id > 0);
-    state = rm->GetBooleanById(id, outValue);
-    ASSERT_EQ(SUCCESS, state);
-    EXPECT_TRUE(outValue);
+    TestGetBooleanById("boolean_1", "boolean_ref");
 }
 
 /*
@@ -1104,15 +1424,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByNameTest001, TestSize.L
 {
     AddResource("zh", nullptr, "CN");
 
-    bool outValue = true;
-    RState state;
-    state = rm->GetBooleanByName("boolean_1", outValue);
-    ASSERT_EQ(SUCCESS, state);
-    EXPECT_TRUE(outValue);
-
-    state = rm->GetBooleanByName("boolean_ref", outValue);
-    ASSERT_EQ(SUCCESS, state);
-    EXPECT_TRUE(outValue);
+    TestGetBooleanByName("boolean_1", "boolean_ref");
 }
 
 /*
@@ -1139,19 +1451,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByIdTest001, TestSize.Lev
 {
     AddResource("zh", nullptr, "CN");
 
-    int outValue;
-    RState state;
-    int id = GetResId("integer_1", ResType::INTEGER);
-    ASSERT_TRUE(id > 0);
-    state = rm->GetIntegerById(id, outValue);
-    ASSERT_EQ(SUCCESS, state);
-    EXPECT_EQ(101, outValue);
-
-    id = GetResId("integer_ref", ResType::INTEGER);
-    ASSERT_TRUE(id > 0);
-    state = rm->GetIntegerById(id, outValue);
-    ASSERT_EQ(SUCCESS, state);
-    EXPECT_EQ(101, outValue);
+    TestGetIntegerById("integer_1", "integer_ref");
 }
 
 /*
@@ -1178,15 +1478,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameTest001, TestSize.L
 {
     AddResource("zh", nullptr, "CN");
 
-    int outValue;
-    RState state;
-    state = rm->GetIntegerByName("integer_1", outValue);
-    ASSERT_EQ(SUCCESS, state);
-    EXPECT_EQ(101, outValue);
-
-    state = rm->GetIntegerByName("integer_ref", outValue);
-    ASSERT_EQ(SUCCESS, state);
-    EXPECT_EQ(101, outValue);
+    TestGetIntegerByName("integer_1", "integer_ref");
 }
 
 /*
@@ -1213,25 +1505,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetFloatByIdTest001, TestSize.Level
 {
     AddResource("zh", nullptr, "CN");
 
-    float outValue;
-    RState state;
-    int id = GetResId("width_appBar_backButton_touchTarget", ResType::FLOAT);
-    ASSERT_TRUE(id > 0);
-    state = rm->GetFloatById(id, outValue);
-    ASSERT_EQ(SUCCESS, state);
-    EXPECT_EQ(48, outValue); // 48vp
-
-    std::string unit;
-    state = rm->GetFloatById(id, outValue, unit);
-    ASSERT_EQ(SUCCESS, state);
-    EXPECT_EQ(48, outValue); // 48vp
-    EXPECT_EQ("vp", unit);
-
-    id = GetResId("float_ref", ResType::FLOAT);
-    ASSERT_TRUE(id > 0);
-    state = rm->GetFloatById(id, outValue);
-    ASSERT_EQ(SUCCESS, state);
-    EXPECT_EQ(707, outValue); // 707vp
+    TestGetFloatById("width_appBar_backButton_touchTarget", "float_ref");
 }
 
 /*
@@ -1258,21 +1532,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetFloatByNameTest001, TestSize.Lev
 {
     AddResource("zh", nullptr, "CN");
 
-    float outValue;
-    RState state;
-    state = rm->GetFloatByName("width_appBar_backButton_touchTarget", outValue);
-    ASSERT_EQ(SUCCESS, state);
-    EXPECT_EQ(48, outValue); // 48vp
-
-    std::string unit;
-    state = rm->GetFloatByName("width_appBar_backButton_touchTarget", outValue, unit);
-    ASSERT_EQ(SUCCESS, state);
-    EXPECT_EQ(48, outValue); // 48vp
-    EXPECT_EQ("vp", unit);
-
-    state = rm->GetFloatByName("float_ref", outValue);
-    ASSERT_EQ(SUCCESS, state);
-    EXPECT_EQ(707, outValue); // 707vp
+    TestGetFloatByName("width_appBar_backButton_touchTarget", "float_ref");
 }
 
 /*
@@ -1299,16 +1559,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntArrayByIdTest001, TestSize.Le
 {
     AddResource("zh", nullptr, "CN");
 
-    std::vector<int> outValue;
-    RState state;
-    int id = GetResId("intarray_1", ResType::INTARRAY);
-    EXPECT_TRUE(id > 0);
-    state = rm->GetIntArrayById(id, outValue);
-    EXPECT_TRUE(state == SUCCESS);
-    EXPECT_EQ(static_cast<uint32_t>(3), outValue.size());
-    EXPECT_EQ(100, outValue[0]);
-    EXPECT_EQ(200, outValue[1]);
-    EXPECT_EQ(101, outValue[2]);
+    TestGetIntArrayById("intarray_1");
 }
 
 /*
@@ -1335,14 +1586,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntArrayByNameTest001, TestSize.
 {
     AddResource("zh", nullptr, "CN");
 
-    std::vector<int> outValue;
-    RState state;
-    state = rm->GetIntArrayByName("intarray_1", outValue);
-    EXPECT_TRUE(state == SUCCESS);
-    EXPECT_EQ(static_cast<uint32_t>(3), outValue.size());
-    EXPECT_EQ(100, outValue[0]);
-    EXPECT_EQ(200, outValue[1]);
-    EXPECT_EQ(101, outValue[2]);
+    TestGetIntArrayByName("intarray_1");
 }
 
 /*
@@ -2312,17 +2556,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileByIdTest001, TestSize.Lev
     AddResource("zh", nullptr, "CN");
 
     HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr, nullptr);
-    tmp->Init();
-    std::string res = tmp->GetResourcePath();
-    res.append("entry/resources/base/profile/test_profile.json");
-
-    std::string outValue;
-    RState state;
-    int id = GetResId("test_profile", ResType::PROF);
-    EXPECT_TRUE(id > 0);
-    state = rm->GetProfileById(id, outValue);
-    EXPECT_TRUE(state == SUCCESS);
-    EXPECT_EQ(res, outValue);
+    TestGetProfileById(tmp);
     delete tmp;
 }
 
@@ -2351,15 +2585,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileByNameTest001, TestSize.L
     AddResource("zh", nullptr, "CN");
 
     HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr, nullptr);
-    tmp->Init();
-    std::string res = tmp->GetResourcePath();
-    res.append("entry/resources/base/profile/test_profile.json");
-
-    std::string outValue;
-    RState state;
-    state = rm->GetProfileByName("test_profile", outValue);
-    EXPECT_TRUE(state == SUCCESS);
-    EXPECT_EQ(res, outValue);
+    TestGetProfileByName(tmp);
     delete tmp;
 }
 
@@ -2388,17 +2614,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest001, TestSize.Level
     AddResource("zh", nullptr, "CN");
 
     HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr, nullptr);
-    tmp->Init();
-    std::string res = tmp->GetResourcePath();
-    res.append("entry/resources/base/media/icon1.png");
-
-    std::string outValue;
-    RState state;
-    int id = GetResId("icon1", ResType::MEDIA);
-    EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, outValue);
-    EXPECT_TRUE(state == SUCCESS);
-    EXPECT_EQ(res, outValue);
+    TestGetMediaById(tmp);
     delete tmp;
 }
 
@@ -2427,29 +2643,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest003, TestSize.Level
     AddResource("en", nullptr, "US");
 
     HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr, nullptr);
-    tmp->Init();
-    std::string res = tmp->GetResourcePath();
-    res.append("entry/resources/sdpi/media/icon.png");
-
-    auto rc = CreateResConfig();
-    if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
-    }
-    rc->SetDeviceType(DEVICE_TV);
-    rc->SetColorMode(COLOR_MODE_NOT_SET);
-    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
-    rm->UpdateResConfig(*rc);
-    delete rc;
-
-    int density = 120;
-    std::string outValue;
-    RState state;
-    int id = GetResId("icon", ResType::MEDIA);
-    EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, density, outValue);
-    EXPECT_TRUE(state == SUCCESS);
-    EXPECT_EQ(res, outValue);
+    TestGetMediaWithDensityById(tmp);
     delete tmp;
 }
 
@@ -3141,15 +3335,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest001, TestSize.Lev
     AddResource("zh", nullptr, "CN");
 
     HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr, nullptr);
-    tmp->Init();
-    std::string res = tmp->GetResourcePath();
-    res.append("entry/resources/base/media/icon1.png");
-
-    std::string outValue;
-    RState state;
-    state = rm->GetMediaByName("icon1", outValue);
-    EXPECT_TRUE(state == SUCCESS);
-    EXPECT_EQ(res, outValue);
+    TestGetMediaByName(tmp);
     delete tmp;
 }
 
@@ -3178,27 +3364,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest003, TestSize.Lev
     AddResource("en", nullptr, "US");
 
     HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr, nullptr);
-    tmp->Init();
-    std::string res = tmp->GetResourcePath();
-    res.append("entry/resources/sdpi/media/icon.png");
-
-    auto rc = CreateResConfig();
-    if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
-    }
-    rc->SetDeviceType(DEVICE_PHONE);
-    rc->SetColorMode(COLOR_MODE_NOT_SET);
-    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
-    rm->UpdateResConfig(*rc);
-    delete rc;
-
-    uint32_t density = 120;
-    std::string outValue;
-    RState state;
-    state = rm->GetMediaByName("icon", density, outValue);
-    EXPECT_TRUE(state == SUCCESS);
-    EXPECT_EQ(res, outValue);
+    TestGetMediaWithDensityByName(tmp);
     delete tmp;
 }
 
@@ -3847,7 +4013,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest022, TestSize.Lev
  * @tc.name: ResourceManagerGetStringByIdForInputDeviceTest001
  * @tc.desc: Test GetStringById, to match pointingdevice directory which rc is set
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest001, TestSize.Level1)
 {
@@ -3880,7 +4045,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest001,
  * @tc.name: ResourceManagerGetStringByIdForInputDeviceTest002
  * @tc.desc: Test GetStringById, to match base directory which rc is not set
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest002, TestSize.Level1)
 {
@@ -3913,7 +4077,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest002,
  * @tc.name: ResourceManagerGetStringByIdForInputDeviceTest003
  * @tc.desc: Test GetStringById, to match zh_CN-phone-pointingdevice directory which rc is set
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest003, TestSize.Level1)
 {
@@ -3946,7 +4109,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest003,
  * @tc.name: ResourceManagerGetStringByIdForInputDeviceTest004
  * @tc.desc: Test GetStringById, not match zh_CN-phone-pointingdevice directory which language not match
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest004, TestSize.Level1)
 {
@@ -3979,7 +4141,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest004,
  * @tc.name: ResourceManagerGetStringByNameForInputDeviceTest001
  * @tc.desc: Test GetStringByName, to match pointingdevice directory which rc is set
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest001, TestSize.Level1)
 {
@@ -4010,7 +4171,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest00
  * @tc.name: ResourceManagerGetStringByNameForInputDeviceTest002
  * @tc.desc: Test GetStringByName, to match base directory which rc is not set
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest002, TestSize.Level1)
 {
@@ -4041,7 +4201,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest00
  * @tc.name: ResourceManagerGetStringByNameForInputDeviceTest003
  * @tc.desc: Test GetStringByName, to match zh_CN-phone-pointingdevice directory which rc is set
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest003, TestSize.Level1)
 {
@@ -4072,7 +4231,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest00
  * @tc.name: ResourceManagerGetStringByNameForInputDeviceTest004
  * @tc.desc: Test GetStringByName, not match zh_CN-phone-pointingdevice directory which language not match
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest004, TestSize.Level1)
 {
@@ -4103,7 +4261,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest00
  * @tc.name: ResourceManagerGetStringByNameForInputDeviceTest005
  * @tc.desc: Test GetStringByName, not match zh_CN-phone-pointingdevice directory which devicetype not match
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest005, TestSize.Level1)
 {
@@ -4134,7 +4291,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest00
  * @tc.name: ResourceManagerGetStringByNameForInputDeviceTest006
  * @tc.desc: Test GetStringByName,match base directory which pointingdevice directory not have res with name
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest006, TestSize.Level1)
 {
@@ -4165,7 +4321,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest00
  * @tc.name: ResourceManagerGetIntegerByNameForInputDeviceTest001
  * @tc.desc: Test GetStringByName, to match pointingdevice directory which rc is set
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest001, TestSize.Level1)
 {
@@ -4196,7 +4351,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest0
  * @tc.name: ResourceManagerGetIntegerByNameForInputDeviceTest002
  * @tc.desc: Test GetIntegerByName, to match base directory which rc is not set
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest002, TestSize.Level1)
 {
@@ -4227,7 +4381,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest0
  * @tc.name: ResourceManagerGetIntegerByNameForInputDeviceTest003
  * @tc.desc: Test GetIntegerByName, to match zh_CN-phone-pointingdevice directory which rc is set
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest003, TestSize.Level1)
 {
@@ -4258,7 +4411,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest0
  * @tc.name: ResourceManagerGetIntegerByNameForInputDeviceTest004
  * @tc.desc: Test GetIntegerByName, not match zh_CN-phone-pointingdevice directory which language not match
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest004, TestSize.Level1)
 {
@@ -4289,7 +4441,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest0
  * @tc.name: ResourceManagerGetBooleanByNameForInputDeviceTest001
  * @tc.desc: Test GetBooleanByName, to match pointingdevice directory which rc is set
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByNameForInputDeviceTest001, TestSize.Level1)
 {
@@ -4320,7 +4471,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByNameForInputDeviceTest0
  * @tc.name: ResourceManagerGetBooleanByNameForInputDeviceTest002
  * @tc.desc: Test GetBooleanByName, to match base directory which rc is not set
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByNameForInputDeviceTest002, TestSize.Level1)
 {
@@ -4351,7 +4501,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByNameForInputDeviceTest0
  * @tc.name: ResourceManagerGetMediaByNameForInputDeviceTest001
  * @tc.desc: Test GetMediaByName, to match pointingdevice directory which rc is set
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest001, TestSize.Level1)
 {
@@ -4385,7 +4534,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest001
  * @tc.name: ResourceManagerGetMediaByNameForInputDeviceTest002
  * @tc.desc: Test GetMediaByName, to match base directory which rc is not set
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest002, TestSize.Level1)
 {
@@ -4419,7 +4567,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest002
  * @tc.name: ResourceManagerGetMediaByNameForInputDeviceTest003
  * @tc.desc: Test GetMediaByName, to match zh_CN-phone-pointingdevice directory which rc is set
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest003, TestSize.Level1)
 {
@@ -4453,7 +4600,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest003
  * @tc.name: ResourceManagerGetMediaByNameForInputDeviceTest004
  * @tc.desc: Test GetMediaByName, not match zh_CN-phone-pointingdevice directory which language not match
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest004, TestSize.Level1)
 {
@@ -4667,5 +4813,710 @@ HWTEST_F(ResourceManagerTest, RawFileTest001, TestSize.Level1)
 
     TestGetRawFilePathByName("test_rawfile.txt",
         "/data/test/all/assets/entry/resources/rawfile/test_rawfile.txt");
+}
+
+HWTEST_F(ResourceManagerTest, ResourceManagerAddResourceFromHapTest001, TestSize.Level1)
+{
+    // error cases
+    // file not exist
+    bool ret = rm->AddResource("/data/test/do_not_exist.hap");
+    ASSERT_TRUE(!ret);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByIdFromHapTest002
+ * @tc.desc: Test GetStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdFromHapTest002, TestSize.Level1)
+{
+    AddHapResource("en", nullptr, "US");
+
+    TestStringById("app_name", "App Name");
+    TestStringById("copyright_text", "XXXXXX All rights reserved. ©2011-2019");
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByIdFromHapTest003
+ * @tc.desc: Test GetStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdFromHapTest003, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, nullptr);
+
+    TestStringById("app_name", "应用名称");
+    TestStringById("copyright_text", "版权所有 ©2011-2019 XXXX有限公司保留一切权利");
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameFromHapTest004
+ * @tc.desc: Test GetStringByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameFromHapTest004, TestSize.Level1)
+{
+    AddHapResource("en", nullptr, nullptr);
+
+    TestStringByName("app_name", "App Name");
+    TestStringByName("copyright_text", "XXXXXX All rights reserved. ©2011-2019");
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameFromHapTest005
+ * @tc.desc: Test GetStringByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameFromHapTest005, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, nullptr);
+
+    TestStringByName("app_name", "应用名称");
+    TestStringByName("copyright_text", "版权所有 ©2011-2019 XXXX有限公司保留一切权利");
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdFromHapTest006
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetStringFormatByIdFromHapTest006, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, nullptr);
+
+    TestGetStringFormatById("app_name", "应用名称");
+}
+
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameFromHapTest007
+ * @tc.desc: Test GetStringFormatByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetStringFormatByNameFromHapTest007, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, nullptr);
+    TestGetStringFormatByName("app_name", "应用名称");
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringArrayByIdFromHapTest008
+ * @tc.desc: Test GetStringArrayById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetStringArrayByIdFromHapTest008, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, nullptr);
+    TestGetStringArrayById("size");
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringArrayByNameFromHapTest009
+ * @tc.desc: Test GetStringArrayByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetStringArrayByNameFromHapTest009, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, nullptr);
+    TestGetStringArrayByName("size");
+}
+
+/*
+ * @tc.name: ResourceManagerGetPatternByIdFromHapTest0010
+ * @tc.desc: Test GetPatternById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetPatternByIdFromHapTest0010, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, nullptr);
+    TestGetPatternById("base");
+}
+
+/*
+ * @tc.name: ResourceManagerGetPatternByNameFromHapTest0011
+ * @tc.desc: Test GetPatternByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetPatternByNameFromHapTest0011, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, nullptr);
+    TestGetPatternByName("base");
+}
+
+/*
+ * @tc.name: ResourceManagerGetPluralStringByIdFromHapTest0012
+ * @tc.desc: Test GetPluralStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFromHapTest0012, TestSize.Level1)
+{
+    AddHapResource("en", nullptr, "US");
+
+    int quantity = 1;
+    TestPluralStringById(quantity, "%d apple", false);
+    quantity = 101;
+    TestPluralStringById(quantity, "%d apples", false);
+}
+
+/*
+ * @tc.name: ResourceManagerGetPluralStringByIdFromHapTest0013
+ * @tc.desc: Test GetPluralStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFromHapTest0013, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    int quantity = 1;
+    TestPluralStringById(quantity, "%d apples", false);
+    quantity = 101;
+    TestPluralStringById(quantity, "%d apples", false);
+}
+
+/*
+ * @tc.name: ResourceManagerGetPluralStringByIdFromHapTest0014
+ * @tc.desc: Test GetPluralStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFromHapTest0014, TestSize.Level1)
+{
+    AddHapResource("ar", nullptr, "SA");
+
+    int quantity = 0;
+    TestPluralStringById(quantity, "zero-0");
+    quantity = 1;
+    TestPluralStringById(quantity, "one-1");
+    quantity = 5;
+    TestPluralStringById(quantity, "few-%d");
+    quantity = 500;
+    TestPluralStringById(quantity, "other-%d");
+}
+
+/*
+ * @tc.name: ResourceManagerGetPluralStringByIdFromHapTest0015
+ * @tc.desc: Test GetPluralStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFromHapTest0015, TestSize.Level1)
+{
+    AddHapResource("pl", nullptr, "PL");
+
+    int quantity = 1;
+    TestPluralStringById(quantity, "1 jabłko");
+    quantity = 2;
+    TestPluralStringById(quantity, "%d jabłka");
+}
+
+/*
+ * @tc.name: ResourceManagerGetPluralStringByNameFromHapTest0016
+ * @tc.desc: Test GetPluralStringByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByNameFromHapTest0016, TestSize.Level1)
+{
+    AddHapResource("en", nullptr, "US");
+
+    int quantity = 1;
+    TestPluralStringByName(quantity, "%d apple", false);
+    quantity = 101;
+    TestPluralStringByName(quantity, "%d apples", false);
+}
+
+/*
+ * @tc.name: ResourceManagerGetPluralStringByIdFormatFromHapTest0017
+ * @tc.desc: Test GetPluralStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFormatFromHapTest0017, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    int quantity = 1;
+    TestPluralStringById(quantity, "1 apples", true);
+    quantity = 101;
+    TestPluralStringById(quantity, "101 apples", true);
+}
+
+/*
+ * @tc.name: ResourceManagerGetPluralStringByNameFormatFromHapTest0018
+ * @tc.desc: Test GetPluralStringByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByNameFormatFromHapTest0018, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    int quantity = 1;
+    TestPluralStringByName(quantity, "1 apples", true);
+    quantity = 101;
+    TestPluralStringByName(quantity, "101 apples", true);
+}
+
+/*
+ * @tc.name: ResourceManagerGetThemeByIdFromHapTest0019
+ * @tc.desc: Test GetThemeById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetThemeByIdFromHapTest0019, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    TestGetThemeById("app_theme");
+}
+
+/*
+ * @tc.name: ResourceManagerGetThemeByNameFromHapTest0020
+ * @tc.desc: Test GetThemeByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetThemeByNameFromHapTest0020, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    TestGetThemeByName("app_theme", "test_theme");
+}
+
+/*
+ * @tc.name: ResourceManagerGetBooleanByIdFromHapTest0021
+ * @tc.desc: Test GetBooleanById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByIdFromHapTest0021, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    TestGetBooleanById("boolean_1", "boolean_ref");
+}
+
+/*
+ * @tc.name: ResourceManagerGetBooleanByNameFromHapTest0022
+ * @tc.desc: Test GetBooleanByName
+ * @tc.type: FUNC
+ * @tc.require: issueI5NXZ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByNameFromHapTest0022, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    TestGetBooleanByName("boolean_1", "boolean_ref");
+}
+
+/*
+ * @tc.name: ResourceManagerGetIntegerByIdFromHapTest0023
+ * @tc.desc: Test GetIntegerById
+ * @tc.type: FUNC
+ * @tc.require: issueI5NXZ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByIdFromHapTest0023, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    TestGetIntegerById("integer_1", "integer_ref");
+}
+
+/*
+ * @tc.name: ResourceManagerGetIntegerByNameFromHapTest0024
+ * @tc.desc: Test GetIntegerByName
+ * @tc.type: FUNC
+ * @tc.require: issueI5NXZ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameFromHapTest0024, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    TestGetIntegerByName("integer_1", "integer_ref");
+}
+
+/*
+ * @tc.name: ResourceManagerGetFloatByIdFromHapTest0025
+ * @tc.desc: Test GetFloatById
+ * @tc.type: FUNC
+ * @tc.require: issueI5NXZ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetFloatByIdFromHapTest0025, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    TestGetFloatById("width_appBar_backButton_touchTarget", "float_ref");
+}
+
+/*
+ * @tc.name: ResourceManagerGetFloatByNameFromHapTest0026
+ * @tc.desc: Test GetFloatByName
+ * @tc.type: FUNC
+ * @tc.require: issueI5NXZ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetFloatByNameFromHapTest0026, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    TestGetFloatByName("width_appBar_backButton_touchTarget", "float_ref");
+}
+
+/*
+ * @tc.name: ResourceManagerGetIntArrayByIdFromHapTest0027
+ * @tc.desc: Test GetIntArrayById
+ * @tc.type: FUNC
+ * @tc.require: issueI5NXZ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetIntArrayByIdFromHapTest0027, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    TestGetIntArrayById("intarray_1");
+}
+
+/*
+ * @tc.name: ResourceManagerGetIntArrayByNameFromHapTest0028
+ * @tc.desc: Test GetIntArrayByName
+ * @tc.type: FUNC
+ * @tc.require: issueI5NXZ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetIntArrayByNameFromHapTest0028, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    TestGetIntArrayByName("intarray_1");
+}
+
+/*
+ * @tc.name: ResourceManagerGetProfileByIdFromHapTest0029
+ * @tc.desc: Test GetProfileById
+ * @tc.type: FUNC
+ * @tc.require: issueI5NXZ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileByIdFromHapTest0029, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    HapResource *tmp = new HapResource(FormatFullPath(g_hapPath).c_str(), 0, nullptr, nullptr);
+    TestGetProfileById(tmp);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetProfileByNameFromHapTest0030
+ * @tc.desc: Test GetProfileByName
+ * @tc.type: FUNC
+ * @tc.require: issueI5NXZ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileByNameFromHapTest0030, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    HapResource *tmp = new HapResource(FormatFullPath(g_hapPath).c_str(), 0, nullptr, nullptr);
+    TestGetProfileByName(tmp);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdFromHapTest0031
+ * @tc.desc: Test GetMediaById
+ * @tc.type: FUNC
+ * @tc.require: issueI5NXZ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdFromHapTest0031, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    HapResource *tmp = new HapResource(FormatFullPath(g_hapPath).c_str(), 0, nullptr, nullptr);
+    TestGetMediaById(tmp);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdFromHapTest0032
+ * @tc.desc: Test GetMediaById, to match sdpi determinder
+ * @tc.type: FUNC
+ * @tc.require: issueI5NXZ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdFromHapTest0032, TestSize.Level1)
+{
+    AddHapResource("en", nullptr, "US");
+
+    HapResource *tmp = new HapResource(FormatFullPath(g_hapPath).c_str(), 0, nullptr, nullptr);
+    TestGetMediaWithDensityById(tmp);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameFromHapTest0033
+ * @tc.desc: Test GetMediaByName
+ * @tc.type: FUNC
+ * @tc.require: issueI5NXZ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameFromHapTest0033, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    HapResource *tmp = new HapResource(FormatFullPath(g_hapPath).c_str(), 0, nullptr, nullptr);
+    TestGetMediaByName(tmp);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameFromHapTest0034
+ * @tc.desc: Test GetMediaByName, to match sdpi determinder
+ * @tc.type: FUNC
+ * @tc.require: issueI5NXZ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameFromHapTest0034, TestSize.Level1)
+{
+    AddHapResource("en", nullptr, "US");
+
+    HapResource *tmp = new HapResource(FormatFullPath(g_hapPath).c_str(), 0, nullptr, nullptr);
+    TestGetMediaWithDensityByName(tmp);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetProfileDataByIdeFromHapTest0035
+ * @tc.desc: Test GetProfileDataByName
+ * @tc.type: FUNC
+ * @tc.require: issueI5NXZ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileDataByIdeFromHapTest0035, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    std::unique_ptr<uint8_t[]> outValue;
+    RState state;
+    state = rm->GetProfileDataByName("test_profile", outValue);
+    EXPECT_TRUE(state == SUCCESS);
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaDataByNameFromHapTest0036
+ * @tc.desc: Test GetMediaDataByName
+ * @tc.type: FUNC
+ * @tc.require: issueI5NXZ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByNameFromHapTest0036, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    std::unique_ptr<uint8_t[]> outValue;
+    RState state;
+    size_t len;
+    state = rm->GetMediaDataByName("icon1", len, outValue);
+    EXPECT_EQ(len, 5997); // the length of icon1
+    EXPECT_TRUE(state == SUCCESS);
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaDataByIdFromHapTest0037
+ * @tc.desc: Test GetMediaDataById
+ * @tc.type: FUNC
+ * @tc.require: issueI5NXZ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByIdFromHapTest0037, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    std::unique_ptr<uint8_t[]> outValue;
+    RState state;
+    int id = GetResId("icon1", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    size_t len;
+    state = rm->GetMediaDataById(id, len, outValue);
+    EXPECT_EQ(len, 5997); // the length of icon1
+    EXPECT_TRUE(state == SUCCESS);
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaDataBase64ByNameFromHapTest0038
+ * @tc.desc: Test GetMediaBase64DataByName
+ * @tc.type: FUNC
+ * @tc.require: issueI5NXZ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataBase64ByNameFromHapTest0038, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaBase64DataByName("icon1", outValue);
+    EXPECT_TRUE(state == SUCCESS);
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaDataBase64ByIdFromHapTest0039
+ * @tc.desc: Test GetMediaDataBase64ById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataBase64ByIdFromHapTest0039, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    std::string outValue;
+    int id = GetResId("icon1", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    RState state;
+    state = rm->GetMediaBase64DataById(id, outValue);
+    EXPECT_TRUE(state == SUCCESS);
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaDataByIdFromHapTest0040
+ * @tc.desc: Test GetMediaDataById, to match sdpi determinder
+ * @tc.type: FUNC
+ * @tc.require: issueI5NXZ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByIdFromHapTest0040, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 120;
+    std::unique_ptr<uint8_t[]> outValue;
+    RState state;
+    int id = GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    size_t len;
+    state = rm->GetMediaDataById(id, density, len, outValue);
+    EXPECT_EQ(len, 6790); // the length of icon
+    EXPECT_TRUE(state == SUCCESS);
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaDataByNameFromHapTest0041
+ * @tc.desc: Test GetMediaBase64DataByName, to match sdpi determinder
+ * @tc.type: FUNC
+ * @tc.require: issueI5NXZ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByNameFromHapTest0041, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 120;
+    std::unique_ptr<uint8_t[]> outValue;
+    RState state;
+    size_t len;
+    state = rm->GetMediaDataByName("icon", density, len, outValue);
+    EXPECT_EQ(len, 6790); // the length of icon
+    EXPECT_TRUE(state == SUCCESS);
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaBase64DataByIdFromHapTest0042
+ * @tc.desc: Test GetMediaBase64DataById, to match sdpi determinder
+ * @tc.type: FUNC
+ * @tc.require: issueI5NXZ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaBase64DataByIdFromHapTest0042, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 120;
+    std::string outValue;
+    RState state;
+    int id = GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetMediaBase64DataById(id, density, outValue);
+    EXPECT_TRUE(state == SUCCESS);
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaBase64DataByNameFromHapTest0043
+ * @tc.desc: Test GetMediaDataById, to match sdpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaBase64DataByNameFromHapTest0043, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 120;
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaBase64DataByName("icon", density, outValue);
+    EXPECT_TRUE(state == SUCCESS);
+}
+
+/*
+ * test get raw file path interface
+ * @tc.name: RawFileTestFromHap0044
+ * @tc.desc: Test GetRawFileFromHap & AddResource function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, RawFileTestFromHap0044, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    auto rawFile = std::make_unique<ResourceManager::RawFile>();
+    RState state;
+    state = rm->GetRawFileFromHap("test_rawfile.txt", rawFile);
+    ASSERT_EQ(rawFile->length, 17); // 17 means the length of "for raw file test"
+    EXPECT_TRUE(state == SUCCESS);
+    state = rm->GetRawFileFromHap("rawfile/test_rawfile.txt", rawFile);
+    ASSERT_EQ(rawFile->length, 17); // 17 means the length of "for raw file test"
+    EXPECT_TRUE(state == SUCCESS);
+}
+
+/*
+ * test get raw file path interface
+ * @tc.name: RawFileTestFromHap0045
+ * @tc.desc: Test GetRawFileFromHap & AddResource function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, RawFileTestFromHap0045, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    ResourceManager::RawFileDescriptor descriptor;
+    RState state;
+    state = rm->GetRawFileDescriptorFromHap("test_rawfile.txt", descriptor);
+    EXPECT_TRUE(state == SUCCESS);
+    ASSERT_EQ(descriptor.length, 17); // 17 means the length of "for raw file test"
+    state = rm->CloseRawFileDescriptor("test_rawfile.txt");
+    EXPECT_TRUE(state == SUCCESS);
+
+    state = rm->GetRawFileDescriptorFromHap("rawfile/test_rawfile.txt", descriptor);
+    EXPECT_TRUE(state == SUCCESS);
+    ASSERT_EQ(descriptor.length, 17); // 17 means the length of "for raw file test"
+    state = rm->CloseRawFileDescriptor("rawfile/test_rawfile.txt");
+    EXPECT_TRUE(state == SUCCESS);
 }
 }

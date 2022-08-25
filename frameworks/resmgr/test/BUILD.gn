@@ -44,6 +44,7 @@ ohos_unittest("resmgr_test") {
       "//third_party/icu/icu4c/source",
       "//third_party/icu/icu4c/source/common",
       "//third_party/icu/icu4c/source/i18n",
+      "//third_party/zlib/contrib/minizip",
     ]
     defines += [ "SUPPORT_GRAPHICS" ]
   }
@@ -51,6 +52,7 @@ ohos_unittest("resmgr_test") {
   deps = [
     "//base/global/resource_management/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gtest_main",
+    "//third_party/zlib:libz",
   ]
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 

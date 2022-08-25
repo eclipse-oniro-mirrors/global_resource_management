@@ -261,28 +261,24 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest003, TestSize.Level1)
 
 ResDesc *LoadFromHap(const char *hapPath, const ResConfigImpl *defaultConfig)
 {
-    std::string errOut;
-    void *buf = nullptr;
+    std::unique_ptr<uint8_t[]> buf;
     size_t bufLen;
-    int32_t out = HapParser::ReadIndexFromFile(hapPath,
-                                               &buf, bufLen, errOut);
+    int32_t out = HapParser::ReadIndexFromFile(hapPath, buf, bufLen);
     if (out != OK) {
-        HILOG_ERROR("ReadIndexFromFile failed! retcode:%d,err:%s", out, errOut.c_str());
+        HILOG_ERROR("ReadIndexFromFile failed! retcode:%d", out);
         return nullptr;
     }
     HILOG_DEBUG("extract success, bufLen:%zu", bufLen);
 
     ResDesc *resDesc = new ResDesc();
-    out = HapParser::ParseResHex((char *)buf, bufLen, *resDesc, defaultConfig);
+    out = HapParser::ParseResHex(reinterpret_cast<char *>(buf.get()), bufLen, *resDesc, defaultConfig);
     if (out != OK) {
         delete (resDesc);
-        free(buf);
         HILOG_ERROR("ParseResHex failed! retcode:%d", out);
         return nullptr;
     } else {
         HILOG_DEBUG("ParseResHex success:\n%s", resDesc->ToString().c_str());
     }
-    free(buf);
     // construct hapresource
     return resDesc;
 }
