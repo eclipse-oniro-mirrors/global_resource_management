@@ -105,11 +105,11 @@ std::string PsueManager::Convert(const std::string &src, std::string &dest)
     }
     if (FAKE_LOCALE_LEVEL == LEVEL_FOR_APPEND) {
         // enhance length
-        int32_t len = src.length();
+        unsigned int len = src.length();
         unsigned int extendCount = len * GetExtendRatio(len);
-        int32_t loop = extendCount / PsueConfigChars.length();
-        int32_t left = extendCount % PsueConfigChars.length();
-        for (int32_t i = 0; i < loop ; i++) {
+        unsigned int loop = extendCount / PsueConfigChars.length();
+        unsigned int left = extendCount % PsueConfigChars.length();
+        for (unsigned int i = 0; i < loop ; i++) {
             ws += PsueConfigChars;
         }
         if (left > 0) {
@@ -129,7 +129,7 @@ std::string PsueManager::Convert(const std::string &src, std::string &dest)
 
 bool PsueManager::isDigit(const std::string src)
 {
-    for (int i = 0 ; i < src.size() ; i++) {
+    for (unsigned int i = 0 ; i < src.size() ; i++) {
         if (!isdigit(src[i])) {
             return false;
         }
