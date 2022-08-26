@@ -196,8 +196,8 @@ ohos_shared_library("librawfile") {
   external_deps = [
     "ability_base:configuration",
     "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
-    "utils_base:utils",
   ]
 
   version_script = get_label_info(
