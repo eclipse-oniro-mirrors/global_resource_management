@@ -160,9 +160,9 @@ public:
 
     virtual RState GetMediaBase64DataByName(const char *name, uint32_t density, std::string &outValue) = 0;
 
-    virtual RState GetProfileDataById(uint32_t id, std::unique_ptr<uint8_t[]> &outValue) = 0;
+    virtual RState GetProfileDataById(uint32_t id, size_t &len, std::unique_ptr<uint8_t[]> &outValue) = 0;
 
-    virtual RState GetProfileDataByName(const char *name, std::unique_ptr<uint8_t[]> &outValue) = 0;
+    virtual RState GetProfileDataByName(const char *name, size_t &len, std::unique_ptr<uint8_t[]> &outValue) = 0;
 
     virtual RState GetRawFileFromHap(const std::string &rawFileName, std::unique_ptr<RawFile> &rawFile) = 0;
 
