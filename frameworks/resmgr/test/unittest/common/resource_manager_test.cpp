@@ -5270,28 +5270,46 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameFromHapTest0034, Test
 }
 
 /*
- * @tc.name: ResourceManagerGetProfileDataByIdeFromHapTest0035
+ * @tc.name: ResourceManagerGetProfileDataByIdFromHapTest0035
  * @tc.desc: Test GetProfileDataByName
  * @tc.type: FUNC
  * @tc.require: issueI5NXZ8
  */
-HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileDataByIdeFromHapTest0035, TestSize.Level1)
+HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileDataByIdFromHapTest0035, TestSize.Level1)
 {
     AddHapResource("zh", nullptr, "CN");
 
     std::unique_ptr<uint8_t[]> outValue;
-    RState state;
-    state = rm->GetProfileDataByName("test_profile", outValue);
+    int id = GetResId("test_profile", ResType::PROF);
+    EXPECT_TRUE(id > 0);
+    size_t len;
+    RState state = rm->GetProfileDataById(id, len, outValue);
     EXPECT_TRUE(state == SUCCESS);
 }
 
 /*
- * @tc.name: ResourceManagerGetMediaDataByNameFromHapTest0036
+ * @tc.name: ResourceManagerGetProfileDataByNameFromHapTest0036
+ * @tc.desc: Test GetProfileDataByName
+ * @tc.type: FUNC
+ * @tc.require: issueI5NXZ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileDataByNameFromHapTest0036, TestSize.Level1)
+{
+    AddHapResource("zh", nullptr, "CN");
+
+    std::unique_ptr<uint8_t[]> outValue;
+    size_t len;
+    RState state = rm->GetProfileDataByName("test_profile", len, outValue);
+    EXPECT_TRUE(state == SUCCESS);
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaDataByNameFromHapTest0037
  * @tc.desc: Test GetMediaDataByName
  * @tc.type: FUNC
  * @tc.require: issueI5NXZ8
  */
-HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByNameFromHapTest0036, TestSize.Level1)
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByNameFromHapTest0037, TestSize.Level1)
 {
     AddHapResource("zh", nullptr, "CN");
 
@@ -5304,12 +5322,12 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByNameFromHapTest0036, 
 }
 
 /*
- * @tc.name: ResourceManagerGetMediaDataByIdFromHapTest0037
+ * @tc.name: ResourceManagerGetMediaDataByIdFromHapTest0038
  * @tc.desc: Test GetMediaDataById
  * @tc.type: FUNC
  * @tc.require: issueI5NXZ8
  */
-HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByIdFromHapTest0037, TestSize.Level1)
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByIdFromHapTest0038, TestSize.Level1)
 {
     AddHapResource("zh", nullptr, "CN");
 
@@ -5324,12 +5342,12 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByIdFromHapTest0037, Te
 }
 
 /*
- * @tc.name: ResourceManagerGetMediaDataBase64ByNameFromHapTest0038
+ * @tc.name: ResourceManagerGetMediaDataBase64ByNameFromHapTest0039
  * @tc.desc: Test GetMediaBase64DataByName
  * @tc.type: FUNC
  * @tc.require: issueI5NXZ8
  */
-HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataBase64ByNameFromHapTest0038, TestSize.Level1)
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataBase64ByNameFromHapTest0039, TestSize.Level1)
 {
     AddHapResource("zh", nullptr, "CN");
 
@@ -5340,11 +5358,11 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataBase64ByNameFromHapTest
 }
 
 /*
- * @tc.name: ResourceManagerGetMediaDataBase64ByIdFromHapTest0039
+ * @tc.name: ResourceManagerGetMediaDataBase64ByIdFromHapTest0040
  * @tc.desc: Test GetMediaDataBase64ById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataBase64ByIdFromHapTest0039, TestSize.Level1)
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataBase64ByIdFromHapTest0040, TestSize.Level1)
 {
     AddHapResource("zh", nullptr, "CN");
 
@@ -5357,12 +5375,12 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataBase64ByIdFromHapTest00
 }
 
 /*
- * @tc.name: ResourceManagerGetMediaDataByIdFromHapTest0040
+ * @tc.name: ResourceManagerGetMediaDataByIdFromHapTest0041
  * @tc.desc: Test GetMediaDataById, to match sdpi determinder
  * @tc.type: FUNC
  * @tc.require: issueI5NXZ8
  */
-HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByIdFromHapTest0040, TestSize.Level1)
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByIdFromHapTest0041, TestSize.Level1)
 {
     AddHapResource("zh", nullptr, "CN");
 
@@ -5389,12 +5407,12 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByIdFromHapTest0040, Te
 }
 
 /*
- * @tc.name: ResourceManagerGetMediaDataByNameFromHapTest0041
+ * @tc.name: ResourceManagerGetMediaDataByNameFromHapTest0042
  * @tc.desc: Test GetMediaBase64DataByName, to match sdpi determinder
  * @tc.type: FUNC
  * @tc.require: issueI5NXZ8
  */
-HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByNameFromHapTest0041, TestSize.Level1)
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByNameFromHapTest0042, TestSize.Level1)
 {
     AddHapResource("zh", nullptr, "CN");
 
@@ -5419,12 +5437,12 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByNameFromHapTest0041, 
 }
 
 /*
- * @tc.name: ResourceManagerGetMediaBase64DataByIdFromHapTest0042
+ * @tc.name: ResourceManagerGetMediaBase64DataByIdFromHapTest0043
  * @tc.desc: Test GetMediaBase64DataById, to match sdpi determinder
  * @tc.type: FUNC
  * @tc.require: issueI5NXZ8
  */
-HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaBase64DataByIdFromHapTest0042, TestSize.Level1)
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaBase64DataByIdFromHapTest0043, TestSize.Level1)
 {
     AddHapResource("zh", nullptr, "CN");
 
@@ -5449,11 +5467,11 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaBase64DataByIdFromHapTest00
 }
 
 /*
- * @tc.name: ResourceManagerGetMediaBase64DataByNameFromHapTest0043
+ * @tc.name: ResourceManagerGetMediaBase64DataByNameFromHapTest0044
  * @tc.desc: Test GetMediaDataById, to match sdpi determinder
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaBase64DataByNameFromHapTest0043, TestSize.Level1)
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaBase64DataByNameFromHapTest0044, TestSize.Level1)
 {
     AddHapResource("zh", nullptr, "CN");
 
@@ -5477,11 +5495,11 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaBase64DataByNameFromHapTest
 
 /*
  * test get raw file path interface
- * @tc.name: RawFileTestFromHap0044
+ * @tc.name: RawFileTestFromHap0045
  * @tc.desc: Test GetRawFileFromHap & AddResource function, file case.
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerTest, RawFileTestFromHap0044, TestSize.Level1)
+HWTEST_F(ResourceManagerTest, RawFileTestFromHap0045, TestSize.Level1)
 {
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     EXPECT_TRUE(ret);
@@ -5497,11 +5515,11 @@ HWTEST_F(ResourceManagerTest, RawFileTestFromHap0044, TestSize.Level1)
 
 /*
  * test get raw file path interface
- * @tc.name: RawFileTestFromHap0045
+ * @tc.name: RawFileTestFromHap0046
  * @tc.desc: Test GetRawFileFromHap & AddResource function, file case.
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerTest, RawFileTestFromHap0045, TestSize.Level1)
+HWTEST_F(ResourceManagerTest, RawFileTestFromHap0046, TestSize.Level1)
 {
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     EXPECT_TRUE(ret);

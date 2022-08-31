@@ -447,18 +447,20 @@ public:
     /**
      * Get the PROF resource by resource id
      * @param name the resource id
+     * @param len the data len write to
      * @param outValue the obtain resource path write to
      * @return SUCCESS if resource exist, else NOT_FOUND
      */
-    virtual RState GetProfileDataById(uint32_t id, std::unique_ptr<uint8_t[]> &outValue);
+    virtual RState GetProfileDataById(uint32_t id, size_t &len, std::unique_ptr<uint8_t[]> &outValue);
 
     /**
      * Get the PROF resource by resource name
      * @param name the resource name
+     * @param len the data len write to
      * @param outValue the obtain resource path write to
      * @return SUCCESS if resource exist, else NOT_FOUND
      */
-    virtual RState GetProfileDataByName(const char *name, std::unique_ptr<uint8_t[]> &outValue);
+    virtual RState GetProfileDataByName(const char *name, size_t &len, std::unique_ptr<uint8_t[]> &outValue);
 
     /**
      * Get the rawFile base64 from hap by rawFile name

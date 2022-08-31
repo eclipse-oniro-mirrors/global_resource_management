@@ -401,7 +401,7 @@ RState HapManager::ReloadAll()
     }
     std::vector<HapResource *> newResources;
     for (auto iter = loadedHapPaths_.begin(); iter != loadedHapPaths_.end(); iter++) {
-        const HapResource *pResource = HapResource::LoadFromIndex(iter->first.c_str(), resConfig_);
+        const HapResource *pResource = HapResource::Load(iter->first.c_str(), resConfig_);
         if (pResource == nullptr) {
             for (size_t i = 0; i < newResources.size(); ++i) {
                 delete (newResources[i]);
@@ -502,21 +502,21 @@ unzFile GetHapUf(const HapResource::ValueUnderQualifierDir *qd)
     std::string hapPath = qd->GetHapResource()->GetIndexPath();
     unzFile uf = unzOpen64(hapPath.c_str()); // open zipfile stream
     if (uf == nullptr) {
-        HILOG_ERROR("Open the %s failed in GetHapUf", hapPath.c_str());
+        HILOG_ERROR("Open the %{public}s failed in GetHapUf", hapPath.c_str());
         return nullptr;
     } // file is open
     return uf;
 }
 
-RState HapManager::GetProfileData(const HapResource::ValueUnderQualifierDir *qd, std::unique_ptr<uint8_t[]> &outValue)
+RState HapManager::GetProfileData(const HapResource::ValueUnderQualifierDir *qd, size_t &len,
+    std::unique_ptr<uint8_t[]> &outValue)
 {
     unzFile uf = GetHapUf(qd);
     if (uf == nullptr) {
         return NOT_FOUND;
     }
     std::string filePath = GetFilePath(qd, uf, ResType::PROF);
-    size_t tmpLen;
-    int err = HapParser::ReadFileFromZip(uf, filePath.c_str(), outValue, tmpLen);
+    int err = HapParser::ReadFileFromZip(uf, filePath.c_str(), outValue, len);
     if (err < 0) {
         unzCloseCurrentFile(uf);
         return NOT_FOUND;

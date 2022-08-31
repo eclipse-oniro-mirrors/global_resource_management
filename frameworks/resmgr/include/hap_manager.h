@@ -142,10 +142,12 @@ public:
     /**
      * Get the Profile data
      * @param qd the QualifierDir
+     * @param len the data len write to
      * @param outValue the profile data
      * @return SUCCESS if get the profile data success, else NOT_FOUND
      */
-    RState GetProfileData(const HapResource::ValueUnderQualifierDir *qd, std::unique_ptr<uint8_t[]> &outValue);
+    RState GetProfileData(const HapResource::ValueUnderQualifierDir *qd, size_t &len,
+        std::unique_ptr<uint8_t[]> &outValue);
 
     /**
      * Find raw file from hap

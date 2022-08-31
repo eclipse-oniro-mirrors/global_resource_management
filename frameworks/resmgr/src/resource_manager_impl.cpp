@@ -990,24 +990,24 @@ RState ResourceManagerImpl::GetMediaBase64DataByName(const char *name, uint32_t 
     return hapManager_->GetMediaBase64Data(qd, outValue);
 }
 
-RState ResourceManagerImpl::GetProfileDataById(uint32_t id, std::unique_ptr<uint8_t[]> &outValue)
+RState ResourceManagerImpl::GetProfileDataById(uint32_t id, size_t &len, std::unique_ptr<uint8_t[]> &outValue)
 {
     auto qd = hapManager_->FindQualifierValueById(id);
     if (qd == nullptr) {
         HILOG_ERROR("find qualifier value by profile id error");
         return NOT_FOUND;
     }
-    return hapManager_->GetProfileData(qd, outValue);
+    return hapManager_->GetProfileData(qd, len, outValue);
 }
 
-RState ResourceManagerImpl::GetProfileDataByName(const char *name, std::unique_ptr<uint8_t[]> &outValue)
+RState ResourceManagerImpl::GetProfileDataByName(const char *name, size_t &len, std::unique_ptr<uint8_t[]> &outValue)
 {
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::PROF);
     if (qd == nullptr) {
         HILOG_ERROR("find qualifier value by profile name error");
         return NOT_FOUND;
     }
-    return hapManager_->GetProfileData(qd, outValue);
+    return hapManager_->GetProfileData(qd, len, outValue);
 }
 
 RState ResourceManagerImpl::GetRawFileFromHap(const std::string &rawFileName, std::unique_ptr<RawFile> &rawFile)
