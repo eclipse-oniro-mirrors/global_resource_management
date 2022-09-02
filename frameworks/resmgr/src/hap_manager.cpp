@@ -40,7 +40,7 @@
 #include <dlfcn.h>
 #endif
 
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI__)
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 #include "hisysevent_adapter.h"
 #endif
 
@@ -83,7 +83,7 @@ bool HapManager::Init()
     }
 #endif
 #else
-#if !defined(__ARKUI__)
+#if !defined(__ARKUI_CROSS__)
     SetHwIcuDirectory();
 #endif
 #endif
@@ -386,7 +386,7 @@ bool HapManager::AddResourcePath(const char *path)
     }
     const HapResource *pResource = HapResource::Load(path, resConfig_);
     if (pResource == nullptr) {
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI__)
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
         ReportAddResourcePathFail(path, "AddResourcePath failed");
 #endif
         return false;

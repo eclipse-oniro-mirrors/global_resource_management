@@ -26,7 +26,7 @@
 #include <windows.h>
 #endif
 
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI__)
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 #include "hitrace_meter.h"
 #endif
 #include "hap_parser.h"
@@ -91,7 +91,7 @@ HapResource::~HapResource()
 
 void CanonicalizePath(const char *path, char *outPath, size_t len)
 {
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI__)
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
 #endif
     if (path == nullptr) {
@@ -300,7 +300,7 @@ void HapResource::UpdateOverlayInfo(std::unordered_map<std::string, std::unorder
 
 bool HapResource::Init()
 {
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI__)
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
 #endif
 #ifdef __WINNT__
@@ -313,7 +313,7 @@ bool HapResource::Init()
         HILOG_ERROR("index path format error, %s", indexPath_.c_str());
         return false;
     }
-#if defined(__IDE_PREVIEW__) || defined(__ARKUI__)
+#if defined(__IDE_PREVIEW__) || defined(__ARKUI_CROSS__)
     resourcePath_ = indexPath_.substr(0, index + 1);
 #else
     index = indexPath_.rfind(separator, index - 1);

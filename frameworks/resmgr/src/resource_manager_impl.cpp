@@ -25,7 +25,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI__)
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 #include "hitrace_meter.h"
 #endif
 #include "hilog_wrapper.h"
@@ -732,7 +732,7 @@ RState ResourceManagerImpl::GetRawFile(const HapResource::ValueUnderQualifierDir
         return NOT_FOUND;
     }
     outValue = vuqd->GetHapResource()->GetResourcePath();
-#if defined(__IDE_PREVIEW__) || defined(__ARKUI__)
+#if defined(__IDE_PREVIEW__) || defined(__ARKUI_CROSS__)
     auto index = idItem->value_.find('/');
     if (index == std::string::npos) {
         HILOG_ERROR("resource path format error, %s", idItem->value_.c_str());
@@ -828,7 +828,7 @@ ResourceManagerImpl::~ResourceManagerImpl()
 
 bool ResourceManagerImpl::AddResource(const char *path)
 {
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI__)
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
 #endif
     return this->hapManager_->AddResource(path);
@@ -841,7 +841,7 @@ bool ResourceManagerImpl::AddResource(const std::string &path, const std::vector
 
 RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig)
 {
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI__)
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
 #endif
 #ifdef SUPPORT_GRAPHICS
