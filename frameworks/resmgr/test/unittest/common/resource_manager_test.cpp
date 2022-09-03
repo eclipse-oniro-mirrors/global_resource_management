@@ -89,23 +89,23 @@ public:
 
     void TestGetThemeById(const char *name) const;
 
-    void TestGetThemeByName(const char *app_theme, const char *test_theme) const;
+    void TestGetThemeByName(const char *appTheme, const char *testTheme) const;
 
-    void TestGetBooleanByName(const char *boolean_1, const char *boolean_ref) const;
+    void TestGetBooleanByName(const char *boolean1, const char *booleanRef) const;
 
-    void TestGetBooleanById(const char *boolean_1, const char *boolean_ref) const;
+    void TestGetBooleanById(const char *boolean1, const char *booleanRef) const;
 
-    void TestGetIntegerByName(const char* integer_1, const char* integer_ref) const;
+    void TestGetIntegerByName(const char* integer1, const char* integerRef) const;
 
-    void TestGetIntegerById(const char* integer_1, const char* integer_ref) const;
+    void TestGetIntegerById(const char* integer1, const char* integerRef) const;
 
-    void TestGetFloatByName(const char* touchTarget, const char* float_ref) const;
+    void TestGetFloatByName(const char* touchTarget, const char* floatRef) const;
 
-    void TestGetFloatById(const char* touchTarget, const char* float_ref) const;
+    void TestGetFloatById(const char* touchTarget, const char* floatRef) const;
 
-    void TestGetIntArrayById(const char* intarray_1) const;
+    void TestGetIntArrayById(const char* intarray1) const;
 
-    void TestGetIntArrayByName(const char* intarray_1) const;
+    void TestGetIntArrayByName(const char* intarray1) const;
 
     void TestGetProfileById(HapResource *tmp) const;
 
@@ -444,79 +444,79 @@ void ResourceManagerTest::TestGetThemeById(const char *name) const
     ASSERT_EQ(SUCCESS, state);
 }
 
-void ResourceManagerTest::TestGetThemeByName(const char *app_theme, const char *test_theme) const
+void ResourceManagerTest::TestGetThemeByName(const char *appTheme, const char *testTheme) const
 {
     std::map<std::string, std::string> outValue;
     RState state;
-    state = rm->GetThemeByName(app_theme, outValue);
+    state = rm->GetThemeByName(appTheme, outValue);
     ASSERT_EQ(SUCCESS, state);
     PrintMapString(outValue);
 
-    state = rm->GetThemeByName(test_theme, outValue);
+    state = rm->GetThemeByName(testTheme, outValue);
     ASSERT_EQ(SUCCESS, state);
 }
 
-void ResourceManagerTest::TestGetBooleanById(const char* boolean_1, const char* boolean_ref) const
+void ResourceManagerTest::TestGetBooleanById(const char* boolean1, const char* booleanRef) const
 {
     bool outValue = true;
     RState state;
-    int id = GetResId(boolean_1, ResType::BOOLEAN);
+    int id = GetResId(boolean1, ResType::BOOLEAN);
     ASSERT_TRUE(id > 0);
     state = rm->GetBooleanById(id, outValue);
     ASSERT_EQ(SUCCESS, state);
     EXPECT_TRUE(outValue);
 
-    id = GetResId(boolean_ref, ResType::BOOLEAN);
+    id = GetResId(booleanRef, ResType::BOOLEAN);
     ASSERT_TRUE(id > 0);
     state = rm->GetBooleanById(id, outValue);
     ASSERT_EQ(SUCCESS, state);
     EXPECT_TRUE(outValue);
 }
 
-void ResourceManagerTest::TestGetBooleanByName(const char* boolean_1, const char* boolean_ref) const
+void ResourceManagerTest::TestGetBooleanByName(const char* boolean1, const char* booleanRef) const
 {
     bool outValue = true;
     RState state;
-    state = rm->GetBooleanByName(boolean_1, outValue);
+    state = rm->GetBooleanByName(boolean1, outValue);
     ASSERT_EQ(SUCCESS, state);
     EXPECT_TRUE(outValue);
 
-    state = rm->GetBooleanByName(boolean_ref, outValue);
+    state = rm->GetBooleanByName(booleanRef, outValue);
     ASSERT_EQ(SUCCESS, state);
     EXPECT_TRUE(outValue);
 }
 
-void ResourceManagerTest::TestGetIntegerById(const char* integer_1, const char* integer_ref) const
+void ResourceManagerTest::TestGetIntegerById(const char* integer1, const char* integerRef) const
 {
     int outValue;
     RState state;
-    int id = GetResId(integer_1, ResType::INTEGER);
+    int id = GetResId(integer1, ResType::INTEGER);
     ASSERT_TRUE(id > 0);
     state = rm->GetIntegerById(id, outValue);
     ASSERT_EQ(SUCCESS, state);
     EXPECT_EQ(101, outValue);
 
-    id = GetResId(integer_ref, ResType::INTEGER);
+    id = GetResId(integerRef, ResType::INTEGER);
     ASSERT_TRUE(id > 0);
     state = rm->GetIntegerById(id, outValue);
     ASSERT_EQ(SUCCESS, state);
     EXPECT_EQ(101, outValue);
 }
 
-void ResourceManagerTest::TestGetIntegerByName(const char* integer_1, const char* integer_ref) const
+void ResourceManagerTest::TestGetIntegerByName(const char* integer1, const char* integerRef) const
 {
     int outValue;
     RState state;
-    state = rm->GetIntegerByName(integer_1, outValue);
+    state = rm->GetIntegerByName(integer1, outValue);
     ASSERT_EQ(SUCCESS, state);
     EXPECT_EQ(101, outValue);
 
-    state = rm->GetIntegerByName(integer_ref, outValue);
+    state = rm->GetIntegerByName(integerRef, outValue);
     ASSERT_EQ(SUCCESS, state);
     EXPECT_EQ(101, outValue);
 }
 
-void ResourceManagerTest::TestGetFloatById(const char* touchTarget, const char* float_ref) const
+void ResourceManagerTest::TestGetFloatById(const char* touchTarget, const char* floatRef) const
 {
     float outValue;
     RState state;
@@ -532,14 +532,14 @@ void ResourceManagerTest::TestGetFloatById(const char* touchTarget, const char* 
     EXPECT_EQ(48, outValue); // 48vp
     EXPECT_EQ("vp", unit);
 
-    id = GetResId(float_ref, ResType::FLOAT);
+    id = GetResId(floatRef, ResType::FLOAT);
     ASSERT_TRUE(id > 0);
     state = rm->GetFloatById(id, outValue);
     ASSERT_EQ(SUCCESS, state);
     EXPECT_EQ(707, outValue); // 707vp
 }
 
-void ResourceManagerTest::TestGetFloatByName(const char* touchTarget, const char* float_ref) const
+void ResourceManagerTest::TestGetFloatByName(const char* touchTarget, const char* floatRef) const
 {
     float outValue;
     RState state;
@@ -553,16 +553,16 @@ void ResourceManagerTest::TestGetFloatByName(const char* touchTarget, const char
     EXPECT_EQ(48, outValue); // 48vp
     EXPECT_EQ("vp", unit);
 
-    state = rm->GetFloatByName(float_ref, outValue);
+    state = rm->GetFloatByName(floatRef, outValue);
     ASSERT_EQ(SUCCESS, state);
     EXPECT_EQ(707, outValue); // 707vp
 }
 
-void ResourceManagerTest::TestGetIntArrayById(const char* intarray_1) const
+void ResourceManagerTest::TestGetIntArrayById(const char* intarray1) const
 {
     std::vector<int> outValue;
     RState state;
-    int id = GetResId(intarray_1, ResType::INTARRAY);
+    int id = GetResId(intarray1, ResType::INTARRAY);
     EXPECT_TRUE(id > 0);
     state = rm->GetIntArrayById(id, outValue);
     EXPECT_TRUE(state == SUCCESS);
@@ -572,11 +572,11 @@ void ResourceManagerTest::TestGetIntArrayById(const char* intarray_1) const
     EXPECT_EQ(101, outValue[2]);
 }
 
-void ResourceManagerTest::TestGetIntArrayByName(const char* intarray_1) const
+void ResourceManagerTest::TestGetIntArrayByName(const char* intarray1) const
 {
     std::vector<int> outValue;
     RState state;
-    state = rm->GetIntArrayByName(intarray_1, outValue);
+    state = rm->GetIntArrayByName(intarray1, outValue);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(static_cast<uint32_t>(3), outValue.size());
     EXPECT_EQ(100, outValue[0]);
@@ -4815,6 +4815,12 @@ HWTEST_F(ResourceManagerTest, RawFileTest001, TestSize.Level1)
         "/data/test/all/assets/entry/resources/rawfile/test_rawfile.txt");
 }
 
+/*
+ * @tc.name: ResourceManagerAddResourceFromHapTest001
+ * @tc.desc: Test AddResource function
+ * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
+ */
 HWTEST_F(ResourceManagerTest, ResourceManagerAddResourceFromHapTest001, TestSize.Level1)
 {
     // error cases
@@ -4827,6 +4833,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerAddResourceFromHapTest001, TestSize
  * @tc.name: ResourceManagerGetStringByIdFromHapTest002
  * @tc.desc: Test GetStringById function
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdFromHapTest002, TestSize.Level1)
 {
@@ -4840,6 +4847,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdFromHapTest002, TestSi
  * @tc.name: ResourceManagerGetStringByIdFromHapTest003
  * @tc.desc: Test GetStringById function
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdFromHapTest003, TestSize.Level1)
 {
@@ -4853,6 +4861,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdFromHapTest003, TestSi
  * @tc.name: ResourceManagerGetStringByNameFromHapTest004
  * @tc.desc: Test GetStringByName function
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameFromHapTest004, TestSize.Level1)
 {
@@ -4866,6 +4875,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameFromHapTest004, Test
  * @tc.name: ResourceManagerGetStringByNameFromHapTest005
  * @tc.desc: Test GetStringByName function
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameFromHapTest005, TestSize.Level1)
 {
@@ -4879,6 +4889,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameFromHapTest005, Test
  * @tc.name: ResourceManagerGetStringFormatByIdFromHapTest006
  * @tc.desc: Test GetStringFormatById function
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringFormatByIdFromHapTest006, TestSize.Level1)
 {
@@ -4892,6 +4903,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringFormatByIdFromHapTest006, 
  * @tc.name: ResourceManagerGetStringFormatByNameFromHapTest007
  * @tc.desc: Test GetStringFormatByName function
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringFormatByNameFromHapTest007, TestSize.Level1)
 {
@@ -4903,6 +4915,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringFormatByNameFromHapTest007
  * @tc.name: ResourceManagerGetStringArrayByIdFromHapTest008
  * @tc.desc: Test GetStringArrayById function
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringArrayByIdFromHapTest008, TestSize.Level1)
 {
@@ -4914,6 +4927,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringArrayByIdFromHapTest008, T
  * @tc.name: ResourceManagerGetStringArrayByNameFromHapTest009
  * @tc.desc: Test GetStringArrayByName function
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringArrayByNameFromHapTest009, TestSize.Level1)
 {
@@ -4925,6 +4939,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringArrayByNameFromHapTest009,
  * @tc.name: ResourceManagerGetPatternByIdFromHapTest0010
  * @tc.desc: Test GetPatternById function
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetPatternByIdFromHapTest0010, TestSize.Level1)
 {
@@ -4936,6 +4951,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPatternByIdFromHapTest0010, Test
  * @tc.name: ResourceManagerGetPatternByNameFromHapTest0011
  * @tc.desc: Test GetPatternByName function
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetPatternByNameFromHapTest0011, TestSize.Level1)
 {
@@ -4947,6 +4963,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPatternByNameFromHapTest0011, Te
  * @tc.name: ResourceManagerGetPluralStringByIdFromHapTest0012
  * @tc.desc: Test GetPluralStringById function
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFromHapTest0012, TestSize.Level1)
 {
@@ -4962,6 +4979,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFromHapTest0012,
  * @tc.name: ResourceManagerGetPluralStringByIdFromHapTest0013
  * @tc.desc: Test GetPluralStringById function
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFromHapTest0013, TestSize.Level1)
 {
@@ -4977,6 +4995,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFromHapTest0013,
  * @tc.name: ResourceManagerGetPluralStringByIdFromHapTest0014
  * @tc.desc: Test GetPluralStringById function
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFromHapTest0014, TestSize.Level1)
 {
@@ -4996,6 +5015,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFromHapTest0014,
  * @tc.name: ResourceManagerGetPluralStringByIdFromHapTest0015
  * @tc.desc: Test GetPluralStringById function
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFromHapTest0015, TestSize.Level1)
 {
@@ -5011,6 +5031,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFromHapTest0015,
  * @tc.name: ResourceManagerGetPluralStringByNameFromHapTest0016
  * @tc.desc: Test GetPluralStringByName function
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByNameFromHapTest0016, TestSize.Level1)
 {
@@ -5026,6 +5047,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByNameFromHapTest001
  * @tc.name: ResourceManagerGetPluralStringByIdFormatFromHapTest0017
  * @tc.desc: Test GetPluralStringById function
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFormatFromHapTest0017, TestSize.Level1)
 {
@@ -5041,6 +5063,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFormatFromHapTes
  * @tc.name: ResourceManagerGetPluralStringByNameFormatFromHapTest0018
  * @tc.desc: Test GetPluralStringByName function
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByNameFormatFromHapTest0018, TestSize.Level1)
 {
@@ -5056,6 +5079,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByNameFormatFromHapT
  * @tc.name: ResourceManagerGetThemeByIdFromHapTest0019
  * @tc.desc: Test GetThemeById
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetThemeByIdFromHapTest0019, TestSize.Level1)
 {
@@ -5068,6 +5092,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetThemeByIdFromHapTest0019, TestSi
  * @tc.name: ResourceManagerGetThemeByNameFromHapTest0020
  * @tc.desc: Test GetThemeByName
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetThemeByNameFromHapTest0020, TestSize.Level1)
 {
@@ -5080,6 +5105,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetThemeByNameFromHapTest0020, Test
  * @tc.name: ResourceManagerGetBooleanByIdFromHapTest0021
  * @tc.desc: Test GetBooleanById
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByIdFromHapTest0021, TestSize.Level1)
 {
@@ -5092,7 +5118,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByIdFromHapTest0021, Test
  * @tc.name: ResourceManagerGetBooleanByNameFromHapTest0022
  * @tc.desc: Test GetBooleanByName
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByNameFromHapTest0022, TestSize.Level1)
 {
@@ -5105,7 +5131,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByNameFromHapTest0022, Te
  * @tc.name: ResourceManagerGetIntegerByIdFromHapTest0023
  * @tc.desc: Test GetIntegerById
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByIdFromHapTest0023, TestSize.Level1)
 {
@@ -5118,7 +5144,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByIdFromHapTest0023, Test
  * @tc.name: ResourceManagerGetIntegerByNameFromHapTest0024
  * @tc.desc: Test GetIntegerByName
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameFromHapTest0024, TestSize.Level1)
 {
@@ -5131,7 +5157,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameFromHapTest0024, Te
  * @tc.name: ResourceManagerGetFloatByIdFromHapTest0025
  * @tc.desc: Test GetFloatById
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetFloatByIdFromHapTest0025, TestSize.Level1)
 {
@@ -5144,7 +5170,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetFloatByIdFromHapTest0025, TestSi
  * @tc.name: ResourceManagerGetFloatByNameFromHapTest0026
  * @tc.desc: Test GetFloatByName
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetFloatByNameFromHapTest0026, TestSize.Level1)
 {
@@ -5157,7 +5183,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetFloatByNameFromHapTest0026, Test
  * @tc.name: ResourceManagerGetIntArrayByIdFromHapTest0027
  * @tc.desc: Test GetIntArrayById
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetIntArrayByIdFromHapTest0027, TestSize.Level1)
 {
@@ -5170,7 +5196,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntArrayByIdFromHapTest0027, Tes
  * @tc.name: ResourceManagerGetIntArrayByNameFromHapTest0028
  * @tc.desc: Test GetIntArrayByName
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetIntArrayByNameFromHapTest0028, TestSize.Level1)
 {
@@ -5183,7 +5209,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntArrayByNameFromHapTest0028, T
  * @tc.name: ResourceManagerGetProfileByIdFromHapTest0029
  * @tc.desc: Test GetProfileById
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileByIdFromHapTest0029, TestSize.Level1)
 {
@@ -5198,7 +5224,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileByIdFromHapTest0029, Test
  * @tc.name: ResourceManagerGetProfileByNameFromHapTest0030
  * @tc.desc: Test GetProfileByName
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileByNameFromHapTest0030, TestSize.Level1)
 {
@@ -5213,7 +5239,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileByNameFromHapTest0030, Te
  * @tc.name: ResourceManagerGetMediaByIdFromHapTest0031
  * @tc.desc: Test GetMediaById
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdFromHapTest0031, TestSize.Level1)
 {
@@ -5228,7 +5254,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdFromHapTest0031, TestSi
  * @tc.name: ResourceManagerGetMediaByIdFromHapTest0032
  * @tc.desc: Test GetMediaById, to match sdpi determinder
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdFromHapTest0032, TestSize.Level1)
 {
@@ -5243,7 +5269,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdFromHapTest0032, TestSi
  * @tc.name: ResourceManagerGetMediaByNameFromHapTest0033
  * @tc.desc: Test GetMediaByName
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameFromHapTest0033, TestSize.Level1)
 {
@@ -5258,7 +5284,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameFromHapTest0033, Test
  * @tc.name: ResourceManagerGetMediaByNameFromHapTest0034
  * @tc.desc: Test GetMediaByName, to match sdpi determinder
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameFromHapTest0034, TestSize.Level1)
 {
@@ -5273,7 +5299,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameFromHapTest0034, Test
  * @tc.name: ResourceManagerGetProfileDataByIdFromHapTest0035
  * @tc.desc: Test GetProfileDataByName
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileDataByIdFromHapTest0035, TestSize.Level1)
 {
@@ -5291,7 +5317,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileDataByIdFromHapTest0035, 
  * @tc.name: ResourceManagerGetProfileDataByNameFromHapTest0036
  * @tc.desc: Test GetProfileDataByName
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileDataByNameFromHapTest0036, TestSize.Level1)
 {
@@ -5307,7 +5333,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileDataByNameFromHapTest0036
  * @tc.name: ResourceManagerGetMediaDataByNameFromHapTest0037
  * @tc.desc: Test GetMediaDataByName
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByNameFromHapTest0037, TestSize.Level1)
 {
@@ -5325,7 +5351,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByNameFromHapTest0037, 
  * @tc.name: ResourceManagerGetMediaDataByIdFromHapTest0038
  * @tc.desc: Test GetMediaDataById
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByIdFromHapTest0038, TestSize.Level1)
 {
@@ -5345,7 +5371,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByIdFromHapTest0038, Te
  * @tc.name: ResourceManagerGetMediaDataBase64ByNameFromHapTest0039
  * @tc.desc: Test GetMediaBase64DataByName
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataBase64ByNameFromHapTest0039, TestSize.Level1)
 {
@@ -5361,6 +5387,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataBase64ByNameFromHapTest
  * @tc.name: ResourceManagerGetMediaDataBase64ByIdFromHapTest0040
  * @tc.desc: Test GetMediaDataBase64ById
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataBase64ByIdFromHapTest0040, TestSize.Level1)
 {
@@ -5378,7 +5405,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataBase64ByIdFromHapTest00
  * @tc.name: ResourceManagerGetMediaDataByIdFromHapTest0041
  * @tc.desc: Test GetMediaDataById, to match sdpi determinder
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByIdFromHapTest0041, TestSize.Level1)
 {
@@ -5410,7 +5437,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByIdFromHapTest0041, Te
  * @tc.name: ResourceManagerGetMediaDataByNameFromHapTest0042
  * @tc.desc: Test GetMediaBase64DataByName, to match sdpi determinder
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByNameFromHapTest0042, TestSize.Level1)
 {
@@ -5440,7 +5467,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByNameFromHapTest0042, 
  * @tc.name: ResourceManagerGetMediaBase64DataByIdFromHapTest0043
  * @tc.desc: Test GetMediaBase64DataById, to match sdpi determinder
  * @tc.type: FUNC
- * @tc.require: issueI5NXZ8
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaBase64DataByIdFromHapTest0043, TestSize.Level1)
 {
@@ -5470,6 +5497,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaBase64DataByIdFromHapTest00
  * @tc.name: ResourceManagerGetMediaBase64DataByNameFromHapTest0044
  * @tc.desc: Test GetMediaDataById, to match sdpi determinder
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaBase64DataByNameFromHapTest0044, TestSize.Level1)
 {
@@ -5498,6 +5526,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaBase64DataByNameFromHapTest
  * @tc.name: RawFileTestFromHap0045
  * @tc.desc: Test GetRawFileFromHap & AddResource function, file case.
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, RawFileTestFromHap0045, TestSize.Level1)
 {
@@ -5518,6 +5547,7 @@ HWTEST_F(ResourceManagerTest, RawFileTestFromHap0045, TestSize.Level1)
  * @tc.name: RawFileTestFromHap0046
  * @tc.desc: Test GetRawFileFromHap & AddResource function, file case.
  * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
  */
 HWTEST_F(ResourceManagerTest, RawFileTestFromHap0046, TestSize.Level1)
 {
