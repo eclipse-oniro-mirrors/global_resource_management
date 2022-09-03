@@ -28,20 +28,15 @@ ohos_shared_library("resourcemanager") {
     "src/resource_manager_napi.cpp",
   ]
 
-  public_deps = [
-    "//base/global/resource_management/frameworks/resmgr:global_resmgr",
-    "//foundation/arkui/napi:ace_napi",
-  ]
+  public_deps = [ "//foundation/arkui/napi:ace_napi" ]
 
   external_deps = [
     "ability_base:want",
     "ability_runtime:abilitykit_native",
     "ability_runtime:runtime",
-    "eventhandler:libeventhandler",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
     "resource_management:resmgr_napi_core",
   ]
 
