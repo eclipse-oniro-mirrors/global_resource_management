@@ -26,6 +26,10 @@
 #include <windows.h>
 #endif
 
+#ifdef __LINUX__
+#include <cstring>
+#endif
+
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 #include "hitrace_meter.h"
 #endif
