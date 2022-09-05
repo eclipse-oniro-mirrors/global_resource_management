@@ -17,6 +17,10 @@
 #include <fstream>
 #include <vector>
 
+#ifdef __LINUX__
+#include <cstring>
+#endif
+
 namespace OHOS {
 namespace Global {
 namespace Resource {

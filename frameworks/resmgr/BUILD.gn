@@ -168,6 +168,42 @@ group("mac_resmgr") {
   }
 }
 
+ohos_shared_library("global_resmgr_linux") {
+  if (resource_management_support_icu) {
+    defines = [
+      "__IDE_PREVIEW__",
+      "__LINUX__",
+    ]
+    cflags = [
+      "-std=c++17",
+      "-Wno-ignored-attributes",
+    ]
+
+    sources = manager_sources
+
+    configs = [ ":resmgr_config" ]
+
+    public_configs = [ ":resmgr_public_config" ]
+
+    deps = [
+      "//third_party/bounds_checking_function:libsec_static",
+      "//third_party/icu/icu4c:static_icui18n",
+      "//third_party/icu/icu4c:static_icuuc",
+      "//third_party/zlib:libz",
+    ]
+  }
+  subsystem_name = "global"
+  part_name = "resource_management"
+}
+
+group("linux_resmgr") {
+  if (resource_management_support_icu) {
+    if (host_os != "mac") {
+      deps = [ ":global_resmgr_linux" ]
+    }
+  }
+}
+
 ohos_shared_library("librawfile") {
   output_name = "rawfile"
   sources = [ "src/raw_file_manager.cpp" ]
