@@ -39,7 +39,6 @@ const char *HapParser::RES_FILE_NAME = "/resources.index";
 int32_t LocateFile(unzFile &uf, const char *fileName)
 {
     if (unzLocateFile2(uf, fileName, 1)) { // try to locate file inside zip, 1 = case sensitive
-        HILOG_ERROR("File %s not found in LocateFile", fileName);
         return UNKNOWN_ERROR;
     }
     return OK;
@@ -172,7 +171,7 @@ int32_t HapParser::ReadIndexFromFile(const char *zipFile, std::unique_ptr<uint8_
 {
     unzFile uf = unzOpen64(zipFile);
     if (uf == nullptr) {
-        HILOG_ERROR("Error open %s in ReadIndexFromFile %d", zipFile, errno);
+        HILOG_ERROR("Error open %{public}s in ReadIndexFromFile %{public}d", zipFile, errno);
         return UNKNOWN_ERROR;
     } // file is open
     if (IsStageMode(uf)) {
@@ -182,12 +181,12 @@ int32_t HapParser::ReadIndexFromFile(const char *zipFile, std::unique_ptr<uint8_
     return ReadFileInfoFromZip(uf, indexFilePath.c_str(), buffer, bufLen);
 }
 
-int32_t ReadRawFileInfoFromHap(unzFile &uf, const char *fileName, std::unique_ptr<uint8_t[]> &buffer,
-    size_t &bufLen, std::unique_ptr<ResourceManager::RawFile> &rawFile)
+int32_t ReadRawFileInfoFromHap(const char *zipFile, unzFile &uf, const char *fileName,
+    std::unique_ptr<uint8_t[]> &buffer, size_t &bufLen, std::unique_ptr<ResourceManager::RawFile> &rawFile)
 {
     int err = HapParser::ReadFileFromZip(uf, fileName, buffer, bufLen);
     if (err < 0) {
-        HILOG_ERROR("Error read rawfile info in ReadRawFileInfoFromHap");
+        HILOG_ERROR("Error read %{public}s from %{public}s", fileName, zipFile);
         unzCloseCurrentFile(uf);
         return UNKNOWN_ERROR;
     }
@@ -227,11 +226,11 @@ int32_t HapParser::ReadRawFileFromHap(const char *zipFile, std::unique_ptr<uint8
     if (IsStageMode(uf)) {
         std::string tempRawFilePath("resources/");
         GetRawFilePath(rawFilePath, tempRawFilePath);
-        return ReadRawFileInfoFromHap(uf, tempRawFilePath.c_str(), buffer, bufLen, rawFile);
+        return ReadRawFileInfoFromHap(zipFile, uf, tempRawFilePath.c_str(), buffer, bufLen, rawFile);
     }
     std::string tempRawFilePath = GetTempRawFilePath(uf);
     GetRawFilePath(rawFilePath, tempRawFilePath);
-    return ReadRawFileInfoFromHap(uf, tempRawFilePath.c_str(), buffer, bufLen, rawFile);
+    return ReadRawFileInfoFromHap(zipFile, uf, tempRawFilePath.c_str(), buffer, bufLen, rawFile);
 }
 
 /**
