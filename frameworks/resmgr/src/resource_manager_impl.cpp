@@ -732,7 +732,7 @@ RState ResourceManagerImpl::GetRawFile(const HapResource::ValueUnderQualifierDir
         return NOT_FOUND;
     }
     outValue = vuqd->GetHapResource()->GetResourcePath();
-#if defined(__IDE_PREVIEW__) || defined(__ARKUI_CROSS__)
+#if defined(__ARKUI_CROSS__)
     auto index = idItem->value_.find('/');
     if (index == std::string::npos) {
         HILOG_ERROR("resource path format error, %s", idItem->value_.c_str());
@@ -740,6 +740,8 @@ RState ResourceManagerImpl::GetRawFile(const HapResource::ValueUnderQualifierDir
     }
     auto nameWithoutModule = idItem->value_.substr(index + 1);
     outValue.append(nameWithoutModule);
+#elif defined(__IDE_PREVIEW__)
+    outValue = idItem->value_;
 #else
     outValue.append(idItem->value_);
 #endif
