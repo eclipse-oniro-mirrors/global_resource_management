@@ -584,15 +584,22 @@ int32_t GetFileFd(const char *zipFile, std::unique_ptr<ResourceManager::RawFile>
 RState HapManager::FindRawFileFromHap(const std::string &rawFileName,
     std::unique_ptr<ResourceManager::RawFile> &rawFile)
 {
+    if (rawFile == nullptr) {
+        rawFile = std::make_unique<ResourceManager::RawFile>();
+    }
+    const std::string sysResHap = "SystemResources.hap";
     for (auto iter = hapResources_.rbegin(); iter != hapResources_.rend(); iter++) {
         const std::string hapPath = (*iter)->GetIndexPath();
+        if (hapPath.find(sysResHap) != std::string::npos) {
+            continue;
+        }
         if (Utils::endWithTail(hapPath, "hap")) {
-            int32_t ret = GetFileFd(hapPath.c_str(), rawFile);
-            if (ret != OK) {
-                return NOT_FOUND;
-            }
             size_t tmpLen;
-            ret = HapParser::ReadRawFileFromHap(hapPath.c_str(), rawFile->buffer, tmpLen, rawFileName, rawFile);
+            int32_t ret = HapParser::ReadRawFileFromHap(hapPath.c_str(), rawFile->buffer, tmpLen, rawFileName, rawFile);
+            if (ret != OK) {
+                continue;
+            }
+            ret = GetFileFd(hapPath.c_str(), rawFile);
             if (ret != OK) {
                 return NOT_FOUND;
             }

@@ -5532,7 +5532,7 @@ HWTEST_F(ResourceManagerTest, RawFileTestFromHap0045, TestSize.Level1)
 {
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     EXPECT_TRUE(ret);
-    auto rawFile = std::make_unique<ResourceManager::RawFile>();
+    std::unique_ptr<ResourceManager::RawFile> rawFile;
     RState state;
     state = rm->GetRawFileFromHap("test_rawfile.txt", rawFile);
     ASSERT_EQ(rawFile->length, 17); // 17 means the length of "for raw file test"
