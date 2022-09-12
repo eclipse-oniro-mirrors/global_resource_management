@@ -741,7 +741,13 @@ RState ResourceManagerImpl::GetRawFile(const HapResource::ValueUnderQualifierDir
     auto nameWithoutModule = idItem->value_.substr(index + 1);
     outValue.append(nameWithoutModule);
 #elif defined(__IDE_PREVIEW__)
-    outValue = idItem->value_;
+    auto index = idItem->value_.find('/');
+    if (index == std::string::npos) {
+        HILOG_ERROR("resource path format error, %s", idItem->value_.c_str());
+        return NOT_FOUND;
+    }
+    auto nameWithoutModule = idItem->value_.substr(index + 1);
+    outValue.append(nameWithoutModule);
 #else
     outValue.append(idItem->value_);
 #endif
