@@ -99,6 +99,9 @@ int32_t HapParser::ReadFileFromZip(unzFile &uf, const char *fileName, std::uniqu
 
 std::string GetModuleName(const char *configStr)
 {
+    if (configStr == nullptr) {
+        return std::string();
+    }
     std::string config(configStr);
     static const char *key = "\"moduleName\"";
     auto idx = config.find(key);
