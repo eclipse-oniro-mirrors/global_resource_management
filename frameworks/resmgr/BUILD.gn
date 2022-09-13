@@ -59,6 +59,11 @@ config("resmgr_public_config") {
   }
 }
 
+config("global_resmgr_all_deps_config") {
+  include_dirs =
+      [ "//base/global/resource_management/interfaces/inner_api/include" ]
+}
+
 ohos_shared_library("global_resmgr") {
   sources = manager_sources
 
@@ -71,6 +76,8 @@ ohos_shared_library("global_resmgr") {
   include_dirs = [ "//base/global/resource_management/dfx/hisysevent_adapter" ]
 
   public_configs = [ ":resmgr_public_config" ]
+
+  all_dependent_configs = [ ":global_resmgr_all_deps_config" ]
 
   deps = [
     "//third_party/bounds_checking_function:libsec_shared",
