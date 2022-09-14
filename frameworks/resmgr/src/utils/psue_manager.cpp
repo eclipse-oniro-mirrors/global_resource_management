@@ -154,8 +154,10 @@ void PsueManager::ToAccent(wstring &ws) const
         if (ws[i] == L'%') {
             i++;
         } else if (ws[i] == L'{') {
-            while (ws[++i] != L'}') {
-                // do nothing
+            while (i < ws.length() - 1) {
+                if (ws[++i] != L'}') {
+                    break;
+                }
             }
         } else {
             auto iter = REPLACE_TABLE.find(ws[i]);
