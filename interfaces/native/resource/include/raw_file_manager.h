@@ -26,7 +26,7 @@
  */
 
 /**
- * @file resource_manager.h
+ * @file raw_file_manager.h
  *
  * @brief Declares native functions for the resource manager.
  *

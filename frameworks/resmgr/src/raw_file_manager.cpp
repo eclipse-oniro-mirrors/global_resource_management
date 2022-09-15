@@ -20,6 +20,7 @@
 #include <cstdlib>
 #include <dirent.h>
 #include <fcntl.h>
+#include <securec.h>
 #include <unistd.h>
 
 #include "raw_dir.h"
@@ -61,11 +62,17 @@ struct RawFile {
     long offset;
     long length;
     FILE* pf;
+    uint8_t* buffer;
 
-    explicit RawFile(const std::string &path) : filePath(path), offset(0L), length(0L), pf(nullptr) {}
+    explicit RawFile(const std::string &path) : filePath(path), offset(0L), length(0L),
+        pf(nullptr), buffer(nullptr) {}
 
     ~RawFile()
     {
+        if (buffer != nullptr) {
+            delete buffer;
+            buffer = nullptr;
+        }
         if (pf != nullptr) {
             fclose(pf);
             pf = nullptr;
@@ -143,10 +150,47 @@ RawDir *OH_ResourceManager_OpenRawDir(const NativeResourceManager *mgr, const ch
     return result.release();
 }
 
+bool isLoadHap(const NativeResourceManager *mgr)
+{
+    RState state = mgr->resManager->isLoadHap();
+    if (state != RState::SUCCESS) {
+        return false;
+    }
+    return true;
+}
+
+RawFile *LoadRawFileFromHap(const NativeResourceManager *mgr, const char *fileName)
+{
+    auto rawFile = std::make_unique<ResourceManager::RawFile>();
+    RState state = mgr->resManager->GetRawFileFromHap(fileName, rawFile);
+    if (state != SUCCESS) {
+        HiLog::Error(LABEL, "failed to get %{public}s rawfile", fileName);
+        return nullptr;
+    }
+    auto result = std::make_unique<RawFile>(fileName);
+    result->buffer = reinterpret_cast<uint8_t*>(malloc(rawFile->length));
+    if (result->buffer == nullptr) {
+        HiLog::Error(LABEL, "failed to malloc");
+        return nullptr;
+    }
+    int ret = memcpy_s(result->buffer, rawFile->length, rawFile->buffer.get(), rawFile->length);
+    if (ret != 0) {
+        free(result->buffer);
+        HiLog::Error(LABEL, "failed to memcpy_s");
+        return nullptr;
+    }
+
+    result->length = rawFile->length;
+    return result.release();
+}
+
 RawFile *OH_ResourceManager_OpenRawFile(const NativeResourceManager *mgr, const char *fileName)
 {
     if (mgr == nullptr || fileName == nullptr) {
         return nullptr;
+    }
+    if (isLoadHap(mgr)) {
+        return LoadRawFileFromHap(mgr, fileName);
     }
 
     std::string filePath;
@@ -197,7 +241,16 @@ int OH_ResourceManager_ReadRawFile(const RawFile *rawFile, void *buf, size_t len
     if (rawFile == nullptr || buf == nullptr || length == 0) {
         return 0;
     }
-    return std::fread(buf, 1, length, rawFile->pf);
+    if (rawFile->buffer != nullptr) {
+        int ret = memcpy_s(buf, length, rawFile->buffer, rawFile->length);
+        if (ret != 0) {
+            HiLog::Error(LABEL, "failed to copy to buf");
+            return 0;
+        }
+        return rawFile->length;
+    } else {
+        return std::fread(buf, 1, length, rawFile->pf);
+    }
 }
 
 int OH_ResourceManager_SeekRawFile(const RawFile *rawFile, long offset, int whence)
