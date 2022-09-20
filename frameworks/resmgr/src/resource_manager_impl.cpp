@@ -24,6 +24,7 @@
 #include <sstream>
 #include <sys/types.h>
 #include <unistd.h>
+#include <fstream>
 
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 #include "hitrace_meter.h"
@@ -741,6 +742,10 @@ RState ResourceManagerImpl::GetRawFile(const HapResource::ValueUnderQualifierDir
     auto nameWithoutModule = idItem->value_.substr(index + 1);
     outValue.append(nameWithoutModule);
 #elif defined(__IDE_PREVIEW__)
+    if (IsFileExist(idItem->value_)) {
+        outValue = idItem->value_;
+        return SUCCESS;
+    }
     auto index = idItem->value_.find('/');
     if (index == std::string::npos) {
         HILOG_ERROR("resource path format error, %s", idItem->value_.c_str());
@@ -1056,6 +1061,16 @@ RState ResourceManagerImpl::isLoadHap()
         return SUCCESS;
     }
     return NOT_FOUND;
+}
+
+bool ResourceManagerImpl::IsFileExist(const std::string& path)
+{
+    std::fstream inputFile;
+    inputFile.open(path, std::ios::in);
+    if (inputFile) {
+        return true;
+    }
+    return false;
 }
 } // namespace Resource
 } // namespace Global
