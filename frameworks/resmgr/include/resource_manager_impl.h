@@ -518,6 +518,8 @@ private:
 
     bool IsDensityValid(uint32_t density);
 
+    bool IsFileExist(const std::string& path);
+
     HapManager *hapManager_;
 
     float fontRatio_ = 0.0f;
