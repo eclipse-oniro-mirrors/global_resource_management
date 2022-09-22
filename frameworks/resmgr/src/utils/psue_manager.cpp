@@ -49,7 +49,7 @@ const ExtendRatioTable EXTEND_RATIO_RABLE[] = {
     {50, 0.6f},
     {70, 0.4f},
 };
-const std::wstring PsueConfigChars = {L"ReÇÉÄßÑ¿ÃóèìжДﺥ"};
+const std::wstring PSUE_CONFIG_CHARS = {L"ReÇÉÄßÑ¿ÃóèìжДﺥ"};
 
 const map<wchar_t, wchar_t> REPLACE_TABLE {
     {L'a', L'à'},
@@ -83,11 +83,11 @@ PsueManager::~PsueManager()
   2. Letter replacement
   3. Lengthen string
 */
-int FAKE_LOCALE_LEVEL = 3;
+int g_fakeLocaleLevel = 3;
 
-int LEVEL_FOR_REPLACE = 2;
-int LEVEL_FOR_APPEND = 3;
-int LEVEL_FOR_ADD_BRACKET = 1;
+int g_levelForReplace = 2;
+int g_levelForAppend = 3;
+int g_levelForAddBracket = 1;
 
 std::string PsueManager::Convert(const std::string &src, std::string &dest)
 {
@@ -99,28 +99,28 @@ std::string PsueManager::Convert(const std::string &src, std::string &dest)
     if (wsStr != "") {
         return wsStr;
     }
-    if (FAKE_LOCALE_LEVEL >= LEVEL_FOR_REPLACE) {
+    if (g_fakeLocaleLevel >= g_levelForReplace) {
         // char replace
         ToAccent(ws);
     }
-    if (FAKE_LOCALE_LEVEL == LEVEL_FOR_APPEND) {
+    if (g_fakeLocaleLevel == g_levelForAppend) {
         // enhance length
         unsigned int len = src.length();
         unsigned int extendCount = len * GetExtendRatio(len);
-        unsigned int loop = extendCount / PsueConfigChars.length();
-        unsigned int left = extendCount % PsueConfigChars.length();
+        unsigned int loop = extendCount / PSUE_CONFIG_CHARS.length();
+        unsigned int left = extendCount % PSUE_CONFIG_CHARS.length();
         for (unsigned int i = 0; i < loop ; i++) {
-            ws += PsueConfigChars;
+            ws += PSUE_CONFIG_CHARS;
         }
         if (left > 0) {
-            ws += PsueConfigChars.substr(0, left);
+            ws += PSUE_CONFIG_CHARS.substr(0, left);
         }
     }
     std::string tsStr = ToString(dest, ws);
     if (tsStr != "") {
         return tsStr;
     }
-    if (FAKE_LOCALE_LEVEL >= LEVEL_FOR_ADD_BRACKET) {
+    if (g_fakeLocaleLevel >= g_levelForAddBracket) {
         // add brackets
         dest = '[' + dest + ']';
     }
@@ -200,8 +200,8 @@ std::string PsueManager::ToString(std::string &dest, const std::wstring &src)
 
 void PsueManager::SetFakeLocaleLevel(const int level)
 {
-    if (level <= LEVEL_FOR_APPEND && level >= LEVEL_FOR_ADD_BRACKET) {
-        FAKE_LOCALE_LEVEL = level;
+    if (level <= g_levelForAppend && level >= g_levelForAddBracket) {
+        g_fakeLocaleLevel = level;
     }
 }
 } // namespace Resource
