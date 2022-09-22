@@ -18,6 +18,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 #include "res_config.h"
 
 namespace OHOS {
