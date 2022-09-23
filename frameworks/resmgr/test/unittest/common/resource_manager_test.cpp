@@ -5567,4 +5567,21 @@ HWTEST_F(ResourceManagerTest, RawFileTestFromHap0046, TestSize.Level1)
     state = rm->CloseRawFileDescriptor("rawfile/test_rawfile.txt");
     EXPECT_TRUE(state == SUCCESS);
 }
+
+/*
+ * test get raw file path interface
+ * @tc.name: RawFileTestFromHap0047
+ * @tc.desc: Test GetRawFileFromHap & AddResource function, file case.
+ * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
+ */
+HWTEST_F(ResourceManagerTest, RawFileTestFromHap0047, TestSize.Level1)
+{
+    bool ret = rm->AddResource("/system/app/ohos.global.systemres/SystemResources.hap");
+    EXPECT_TRUE(ret);
+    std::unique_ptr<ResourceManager::RawFile> rawFile;
+    RState state;
+    state = rm->GetRawFileFromHap("test_rawfile.txt", rawFile);
+    EXPECT_FALSE(state == SUCCESS);
+}
 }
