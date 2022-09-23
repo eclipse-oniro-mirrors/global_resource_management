@@ -226,17 +226,19 @@ int ResourceManagerGetMediaByIdFromHapTest0031(void);
 int ResourceManagerGetMediaByIdFromHapTest0032(void);
 int ResourceManagerGetMediaByNameFromHapTest0033(void);
 int ResourceManagerGetMediaByNameFromHapTest0034(void);
-int ResourceManagerGetProfileDataByIdeFromHapTest0035(void);
-int ResourceManagerGetMediaDataByNameFromHapTest0036(void);
-int ResourceManagerGetMediaDataByIdFromHapTest0037(void);
-int ResourceManagerGetMediaDataBase64ByNameFromHapTest0038(void);
-int ResourceManagerGetMediaDataBase64ByIdFromHapTest0039(void);
-int ResourceManagerGetMediaDataByIdFromHapTest0040(void);
-int ResourceManagerGetMediaDataByNameFromHapTest0041(void);
-int ResourceManagerGetMediaBase64DataByIdFromHapTest0042(void);
-int ResourceManagerGetMediaBase64DataByNameFromHapTest0043(void);
-int RawFileTestFromHap0044(void);
+int ResourceManagerGetProfileDataByIdFromHapTest0035(void);
+int ResourceManagerGetProfileDataByNameFromHapTest0036(void);
+int ResourceManagerGetMediaDataByNameFromHapTest0037(void);
+int ResourceManagerGetMediaDataByIdFromHapTest0038(void);
+int ResourceManagerGetMediaDataBase64ByNameFromHapTest0039(void);
+int ResourceManagerGetMediaDataBase64ByIdFromHapTest0040(void);
+int ResourceManagerGetMediaDataByIdFromHapTest0041(void);
+int ResourceManagerGetMediaDataByNameFromHapTest0042(void);
+int ResourceManagerGetMediaBase64DataByIdFromHapTest0043(void);
+int ResourceManagerGetMediaBase64DataByNameFromHapTest0044(void);
 int RawFileTestFromHap0045(void);
+int RawFileTestFromHap0046(void);
+int RawFileTestFromHap0047(void);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
