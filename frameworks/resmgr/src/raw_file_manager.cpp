@@ -48,7 +48,6 @@ struct NativeResourceManager {
 };
 
 struct FileNameCache {
-    int maxCount = 0;
     std::vector<std::string> names;
 };
 
@@ -175,7 +174,6 @@ RawFile *LoadRawFileFromHap(const NativeResourceManager *mgr, const char *fileNa
     }
     int ret = memcpy_s(result->buffer, rawFile->length, rawFile->buffer.get(), rawFile->length);
     if (ret != 0) {
-        free(result->buffer);
         HiLog::Error(LABEL, "failed to memcpy_s");
         return nullptr;
     }
