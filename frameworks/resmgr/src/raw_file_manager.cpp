@@ -47,7 +47,6 @@ struct NativeResourceManager {
 };
 
 struct FileNameCache {
-    int maxCount = 0;
     std::vector<std::string> names;
 };
 

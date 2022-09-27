@@ -116,7 +116,7 @@ static bool InitAsyncContext(napi_env env, const std::string &bundleName, Abilit
 }
 
 static napi_value getResult(napi_env env, std::unique_ptr<ResMgrAsyncContext> &asyncContext,
-    std::string &bundleName, std::shared_ptr<AbilityRuntime::Context> &abilityRuntimeContext)
+    std::string &bundleName, const std::shared_ptr<AbilityRuntime::Context> &abilityRuntimeContext)
 {
     napi_value result = nullptr;
     if (asyncContext->callbackRef_ == nullptr) {
