@@ -282,7 +282,7 @@ RState HapManager::FindRawFile(const std::string &name, std::string &outValue)
             }
         }
     }
-    return RState::NOT_FOUND;
+    return ERROR_CODE_RES_PATH_INVALID;
 }
 
 RState HapManager::UpdateResConfig(ResConfig &resConfig)
@@ -601,13 +601,13 @@ RState HapManager::FindRawFileFromHap(const std::string &rawFileName,
             }
             ret = GetFileFd(hapPath.c_str(), rawFile);
             if (ret != OK) {
-                return NOT_FOUND;
+                return ERROR_CODE_RES_PATH_INVALID;
             }
             rawFile->length = static_cast<long>(tmpLen);
             return SUCCESS;
         }
     }
-    return NOT_FOUND;
+    return ERROR_CODE_RES_PATH_INVALID;
 }
 } // namespace Resource
 } // namespace Global
