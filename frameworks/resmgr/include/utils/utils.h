@@ -59,6 +59,8 @@ public:
 
     static bool endWithTail(const std::string& path, const std::string& tail);
 
+    static bool isFileExit(const std::string& filePath);
+
 private:
 
     static uint16_t EncodeLanguageOrRegion(const char *str, char base);

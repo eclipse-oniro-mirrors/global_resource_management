@@ -532,6 +532,12 @@ private:
 
     const std::string FONT_SIZE_PIXEL = "fp";
 
+    const std::string SYSTEM_RESOURCE_PATH = "/data/storage/el1/bundle/ohos.global.systemres" \
+                                        "/ohos.global.systemres/assets/entry/resources.index";
+
+    const std::string SYSTEM_RESOURCE_PATH_COMPRESSED = "/data/storage/el1/bundle/" \
+                                                "systemResources/SystemResources.hap";
+
     const float DEFAULT_DENSITY = 160.0f;
 
     std::unordered_map<std::string, RawFileDescriptor> rawFileDescriptor_;
