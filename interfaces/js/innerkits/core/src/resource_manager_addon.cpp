@@ -47,6 +47,17 @@ static thread_local napi_ref* g_constructor = nullptr;
 std::map<std::string, std::shared_ptr<ResourceManager>> g_resourceMgr;
 std::mutex g_resMapLock;
 
+static const std::unordered_map<int32_t, std::string> ErrorCodeToMsg {
+    {ERROR_CODE_INVALID_INPUT_PARAMETER, "Invalid input parameter"},
+    {ERROR_CODE_RES_ID_NOT_FOUND, "Resource id invalid"},
+    {ERROR_CODE_RES_NAME_NOT_FOUND, "Resource name invalid"},
+    {ERROR_CODE_RES_NOT_FOUND_BY_ID, "Resource not found by id"},
+    {ERROR_CODE_RES_NOT_FOUND_BY_NAME, "Resource not found by name"},
+    {ERROR_CODE_RES_PATH_INVALID, "Rawfile path is invalid"},
+    {ERROR_CODE_RES_REF_TOO_MUCH, "Resource re-ref too much"},
+    {ERROR, "Unknow error"}
+};
+
 napi_value ResourceManagerAddon::Create(
     napi_env env, const std::string& bundleName, const std::shared_ptr<ResourceManager>& resMgr,
     std::shared_ptr<AbilityRuntime::Context> context)
@@ -96,14 +107,15 @@ void ResourceManagerAddon::Destructor(napi_env env, void *nativeObject, void *hi
     addonPtr.reset(static_cast<std::shared_ptr<ResourceManagerAddon>*>(nativeObject));
 }
 
-void ResMgrAsyncContext::SetErrorMsg(const std::string &msg, bool withResId)
+void ResMgrAsyncContext::SetErrorMsg(const std::string &msg, bool withResId, int32_t errCode)
 {
     errMsg_ = msg;
     success_ = false;
+    errCode_ = errCode;
     if (withResId) {
         HiLog::Error(LABEL, "%{public}s id = %{public}d", msg.c_str(), resId_);
     } else {
-        HiLog::Error(LABEL, "%{public}s", msg.c_str());
+        HiLog::Error(LABEL, "%{public}s name = %{public}s", msg.c_str(), resName_.c_str());
     }
 }
 
@@ -135,7 +147,16 @@ bool ResourceManagerAddon::Init(napi_env env)
         DECLARE_NAPI_FUNCTION("getNumber", GetNumber),
         DECLARE_NAPI_FUNCTION("getBooleanByName", GetBooleanByName),
         DECLARE_NAPI_FUNCTION("getNumberByName", GetNumberByName),
-        DECLARE_NAPI_FUNCTION("release", Release)
+        DECLARE_NAPI_FUNCTION("release", Release),
+        DECLARE_NAPI_FUNCTION("getStringValue", GetStringValue),
+        DECLARE_NAPI_FUNCTION("getStringArrayValue", GetStringArrayValue),
+        DECLARE_NAPI_FUNCTION("getPluralStringValue", GetPluralStringValue),
+        DECLARE_NAPI_FUNCTION("getMediaContent", GetMediaContent),
+        DECLARE_NAPI_FUNCTION("getMediaContentBase64", GetMediaContentBase64),
+        DECLARE_NAPI_FUNCTION("getRawFileContent", GetRawFileContent),
+        DECLARE_NAPI_FUNCTION("getRawFd", GetRawFd),
+        DECLARE_NAPI_FUNCTION("closeRawFd", CloseRawFd)
+        
     };
 
     napi_value constructor;
@@ -159,6 +180,41 @@ bool ResourceManagerAddon::Init(napi_env env)
     return true;
 }
 
+std::string FindErrMsg(int32_t errCode)
+{
+    auto iter = ErrorCodeToMsg.find(errCode);
+    std::string errMsg = iter != ErrorCodeToMsg.end() ? iter->second : "";
+    return errMsg;
+}
+
+void ResMgrAsyncContext::NapiThrow(napi_env env, int32_t errCode)
+{
+    napi_value code = nullptr;
+    napi_create_string_latin1(env, std::to_string(errCode).c_str(), NAPI_AUTO_LENGTH, &code);
+
+    napi_value message = nullptr;
+    std::string errMsg = FindErrMsg(errCode);
+    napi_create_string_latin1(env, errMsg.c_str(), NAPI_AUTO_LENGTH, &message);
+    if (errMsg != "") {
+        napi_value error = nullptr;
+        napi_create_error(env, code, message, &error);
+        napi_throw(env, error);
+    }
+}
+
+napi_value GetCallbackErrorCode(napi_env env, const int32_t errCode, const std::string errMsg)
+{
+    napi_value error = nullptr;
+    napi_value eCode = nullptr;
+    napi_value eMsg = nullptr;
+    napi_create_int32(env, errCode, &eCode);
+    napi_create_string_utf8(env, errMsg.c_str(), NAPI_AUTO_LENGTH, &eMsg);
+    napi_create_object(env, &error);
+    napi_set_named_property(env, error, "code", eCode);
+    napi_set_named_property(env, error, "message", eMsg);
+    return error;
+}
+
 void ResMgrAsyncContext::Complete(napi_env env, napi_status status, void* data)
 {
     ResMgrAsyncContext* asyncContext = static_cast<ResMgrAsyncContext*>(data);
@@ -173,9 +229,7 @@ void ResMgrAsyncContext::Complete(napi_env env, napi_status status, void* data)
         napi_get_undefined(env, &result[0]);
         result[1] = finalResult;
     } else {
-        napi_value message = nullptr;
-        napi_create_string_utf8(env, asyncContext->errMsg_.c_str(), NAPI_AUTO_LENGTH, &message);
-        napi_create_error(env, nullptr, message, &result[0]);
+        result[0] = GetCallbackErrorCode(env, asyncContext->errCode_, asyncContext->errMsg_.c_str());
         napi_get_undefined(env, &result[1]);
     }
     if (asyncContext->deferred_) {
@@ -184,6 +238,7 @@ void ResMgrAsyncContext::Complete(napi_env env, napi_status status, void* data)
                 HiLog::Error(LABEL, "napi_resolve_deferred failed");
             }
         } else {
+            result[0] = GetCallbackErrorCode(env, asyncContext->errCode_, asyncContext->errMsg_.c_str());
             if (napi_reject_deferred(env, asyncContext->deferred_, result[0]) != napi_ok) {
                 HiLog::Error(LABEL, "napi_reject_deferred failed");
             }
@@ -230,6 +285,32 @@ bool isLoadHap(ResMgrAsyncContext *asyncContext)
 {
     RState state = asyncContext->addon_->GetResMgr()->isLoadHap();
     if (state != RState::SUCCESS) {
+        return false;
+    }
+    return true;
+}
+
+std::shared_ptr<ResourceManagerAddon> getResourceManagerAddon(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, 2);
+
+    std::shared_ptr<ResourceManagerAddon> *addonPtr = nullptr;
+    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&addonPtr));
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "Failed to unwrap");
+        return nullptr;
+    }
+    return *addonPtr;
+}
+
+bool isNapiNumber(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, 2);
+
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_typeof(env, argv[0], &valueType);
+    if (valueType != napi_number) {
+        HiLog::Error(LABEL, "Parameter type is not napi_number");
         return false;
     }
     return true;
@@ -288,19 +369,109 @@ std::string ResourceManagerAddon::GetResNameOrPath(napi_env env, size_t argc, na
     return buf.data();
 }
 
+napi_value ResourceManagerAddon::ProcessNameParamV9(napi_env env, napi_callback_info info, const std::string &name,
+    napi_async_execute_callback execute)
+{
+    GET_PARAMS(env, info, 2);
+    std::unique_ptr<ResMgrAsyncContext> asyncContext = std::make_unique<ResMgrAsyncContext>();
+    asyncContext->addon_ = getResourceManagerAddon(env, info);
+    if (asyncContext->addon_ == nullptr) {
+        return nullptr;
+    }
+    for (size_t i = 0; i < argc; i++) {
+        napi_valuetype valueType;
+        napi_typeof(env, argv[i], &valueType);
+        if (i == 0 && valueType != napi_string) {
+            ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+            return nullptr;
+        } else if (i == 0 && valueType == napi_string) {
+            asyncContext->resName_ = GetResNameOrPath(env, argc, argv);
+        } else if (i == 1 && valueType == napi_function) {
+            napi_create_reference(env, argv[i], 1, &asyncContext->callbackRef_);
+            break;
+        } else {
+            // self resourcemanager with promise
+        }
+    }
+
+    napi_value result = ResMgrAsyncContext::getResult(env, asyncContext, name, execute);
+    return result;
+}
+
+napi_value ResourceManagerAddon::ProcessIdParamV9(napi_env env, napi_callback_info info, const std::string &name,
+    napi_async_execute_callback execute)
+{
+    GET_PARAMS(env, info, 2);
+
+    std::unique_ptr<ResMgrAsyncContext> asyncContext = std::make_unique<ResMgrAsyncContext>();
+    asyncContext->addon_ = getResourceManagerAddon(env, info);
+    if (asyncContext->addon_ == nullptr) {
+        return nullptr;
+    }
+    for (size_t i = 0; i < argc; i++) {
+        napi_valuetype valueType;
+        napi_typeof(env, argv[i], &valueType);
+        if (i == 0 && valueType != napi_number) {
+            ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+            return nullptr;
+        } else if (i == 0 && valueType == napi_number) {
+            asyncContext->resId_ = GetResId(env, argc, argv);
+        } else if (i == 1 && valueType == napi_function) {
+            napi_create_reference(env, argv[i], 1, &asyncContext->callbackRef_);
+            break;
+        } else {
+            // self resourcemanager with promise
+        }
+    }
+
+    napi_value result = ResMgrAsyncContext::getResult(env, asyncContext, name, execute);
+    return result;
+}
+
+napi_value ResourceManagerAddon::ProcessResourceParamV9(napi_env env, napi_callback_info info, const std::string &name,
+    napi_async_execute_callback execute)
+{
+    GET_PARAMS(env, info, 2);
+
+    std::unique_ptr<ResMgrAsyncContext> asyncContext = std::make_unique<ResMgrAsyncContext>();
+    asyncContext->addon_ = getResourceManagerAddon(env, info);
+    if (asyncContext->addon_ == nullptr) {
+        return nullptr;
+    }
+    for (size_t i = 0; i < argc; i++) {
+        napi_valuetype valueType;
+        napi_typeof(env, argv[i], &valueType);
+        if (i == 0 && valueType == napi_object) {
+            auto resourcePtr = std::make_shared<ResourceManager::Resource>();
+            int32_t retCode = GetResourceObject(env, resourcePtr, argv[0]);
+            if (retCode != SUCCESS) {
+                HiLog::Error(LABEL, "Failed to get native Resource object");
+                ResMgrAsyncContext::NapiThrow(env, retCode);
+                return nullptr;
+            }
+            asyncContext->resource_ = resourcePtr;
+        } else if (i == 1 && valueType == napi_function) {
+            napi_create_reference(env, argv[i], 1, &asyncContext->callbackRef_);
+            break;
+        } else {
+            // self resourcemanager with promise
+        }
+    }
+
+    napi_value result = ResMgrAsyncContext::getResult(env, asyncContext, name, execute);
+    return result;
+}
+
 napi_value ResourceManagerAddon::ProcessOnlyIdParam(napi_env env, napi_callback_info info, const std::string &name,
     napi_async_execute_callback execute)
 {
     GET_PARAMS(env, info, 2);
 
     std::unique_ptr<ResMgrAsyncContext> asyncContext = std::make_unique<ResMgrAsyncContext>();
-    std::shared_ptr<ResourceManagerAddon> *addonPtr = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&addonPtr));
-    if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to unwrap ProcessOnlyIdParam %{public}s", name.c_str());
+    asyncContext->addon_ = getResourceManagerAddon(env, info);
+    if (asyncContext->addon_ == nullptr) {
         return nullptr;
     }
-    asyncContext->addon_ = *addonPtr;
     for (size_t i = 0; i < argc; i++) {
         napi_valuetype valueType;
         napi_typeof(env, argv[i], &valueType);
@@ -310,16 +481,12 @@ napi_value ResourceManagerAddon::ProcessOnlyIdParam(napi_env env, napi_callback_
             napi_create_reference(env, argv[i], 1, &asyncContext->callbackRef_);
             break;
         } else if (i == 0 && valueType == napi_string) {
-            if (name.find("Name") != std::string::npos) {
-                asyncContext->resName_ = GetResNameOrPath(env, argc, argv);
-            } else {
-                asyncContext->path_ = GetResNameOrPath(env, argc, argv);
-            }
+            asyncContext->path_ = GetResNameOrPath(env, argc, argv);
         } else if (i == 0 && valueType == napi_object) {
             std::shared_ptr<ResourceManager::Resource> resourcePtr = std::make_shared<ResourceManager::Resource>();
-            bool ret = GetResourceObject(env, resourcePtr, argv[0]);
-            if (!ret) {
-                HiLog::Error(LABEL, "Failed to get native Resource object");
+            int32_t retCode = GetResourceObject(env, resourcePtr, argv[0]);
+            if (retCode != SUCCESS) {
+                ResMgrAsyncContext::NapiThrow(env, retCode);
                 return nullptr;
             }
             asyncContext->resource_ = resourcePtr;
@@ -336,7 +503,7 @@ auto getStringByNameFunc = [](napi_env env, void* data) {
     RState state = asyncContext->addon_->GetResMgr()->GetStringByName(asyncContext->resName_.c_str(),
         asyncContext->value_);
     if (state != RState::SUCCESS) {
-        asyncContext->SetErrorMsg("GetStringByName failed state", true);
+        asyncContext->SetErrorMsg("GetStringByName failed state", false, state);
         ReportGetResourceByNameFail(asyncContext->resName_, asyncContext->value_,
             "failed in getStringByNameFunc");
         return;
@@ -353,7 +520,7 @@ auto getStringByNameFunc = [](napi_env env, void* data) {
 
 napi_value ResourceManagerAddon::GetStringByName(napi_env env, napi_callback_info info)
 {
-    return ProcessOnlyIdParam(env, info, "getStringByName", getStringByNameFunc);
+    return ProcessNameParamV9(env, info, "getStringByName", getStringByNameFunc);
 }
 
 auto getStringFunc = [](napi_env env, void* data) {
@@ -368,14 +535,14 @@ auto getStringFunc = [](napi_env env, void* data) {
     }
     RState state = resMgr->GetStringById(resId, asyncContext->value_);
     if (state != RState::SUCCESS) {
-        asyncContext->SetErrorMsg("GetString failed state", true);
+        asyncContext->SetErrorMsg("GetStringById failed state", true, state);
         ReportGetResourceByIdFail(resId, asyncContext->value_, "failed in getStringFunc");
         return;
     }
     asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext& context) {
         napi_value jsValue = nullptr;
         if (napi_create_string_utf8(env, context.value_.c_str(), NAPI_AUTO_LENGTH, &jsValue) != napi_ok) {
-            context.SetErrorMsg("GetString failed to create result");
+            context.SetErrorMsg("GetStringById failed to create result");
             return jsValue;
         }
         return jsValue;
@@ -399,13 +566,17 @@ auto getStringArrayFunc = [](napi_env env, void* data) {
             return;
         }
         state = resMgr->GetStringArrayById(resId, asyncContext->arrayValue_);
+        if (state != RState::SUCCESS) {
+            asyncContext->SetErrorMsg("GetStringArrayById failed state", true, state);
+            return;
+        }
     } else {
         state = asyncContext->addon_->GetResMgr()->GetStringArrayByName(asyncContext->resName_.c_str(),
             asyncContext->arrayValue_);
-    }
-    if (state != RState::SUCCESS) {
-        asyncContext->SetErrorMsg("GetStringArray failed state", true);
-        return;
+        if (state != RState::SUCCESS) {
+            asyncContext->SetErrorMsg("GetStringArrayByName failed state", false, state);
+            return;
+        }
     }
     asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext &context) -> napi_value {
         napi_value result;
@@ -434,7 +605,7 @@ auto getStringArrayFunc = [](napi_env env, void* data) {
 
 napi_value ResourceManagerAddon::GetStringArrayByName(napi_env env, napi_callback_info info)
 {
-    return ProcessOnlyIdParam(env, info, "GetStringArrayByName", getStringArrayFunc);
+    return ProcessNameParamV9(env, info, "GetStringArrayByName", getStringArrayFunc);
 }
 
 napi_value ResourceManagerAddon::GetStringArray(napi_env env, napi_callback_info info)
@@ -485,7 +656,7 @@ auto getMediaByNameFunc = [](napi_env env, void *data) {
         state = asyncContext->addon_->GetResMgr()->GetMediaDataByName(asyncContext->resName_.c_str(), tmpLen,
             asyncContext->mediaData);
         if (state != RState::SUCCESS) {
-            HiLog::Error(LABEL, "GetMediaData by %s failed", asyncContext->resName_.c_str());
+            asyncContext->SetErrorMsg("GetMedia path byName failed", false, state);
             return;
         }
         asyncContext->len_ = static_cast<int>(tmpLen);
@@ -494,7 +665,7 @@ auto getMediaByNameFunc = [](napi_env env, void *data) {
     }
     state = asyncContext->addon_->GetResMgr()->GetMediaByName(asyncContext->resName_.c_str(), path);
     if (state != RState::SUCCESS) {
-        asyncContext->SetErrorMsg("GetMediabyName path failed", true);
+        asyncContext->SetErrorMsg("GetMediabyName path failed", false, state);
         ReportGetResourceByNameFail(asyncContext->resName_, path, "failed in getMediaByNameFunc");
         return;
     }
@@ -505,7 +676,7 @@ napi_value ResourceManagerAddon::GetMediaByName(napi_env env, napi_callback_info
 {
     std::string traceVal = "ResourceManagerAddon::GetMediaByName";
     StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
-    napi_value media = ProcessOnlyIdParam(env, info, "getMediaByName", getMediaByNameFunc);
+    napi_value media = ProcessNameParamV9(env, info, "getMediaByName", getMediaByNameFunc);
     FinishTrace(HITRACE_TAG_GLOBAL_RESMGR);
     return media;
 }
@@ -525,7 +696,7 @@ auto getMediaFunc = [](napi_env env, void *data) {
         size_t tmpLen;
         state = resMgr->GetMediaDataById(resId, tmpLen, asyncContext->mediaData);
         if (state != RState::SUCCESS) {
-            HiLog::Error(LABEL, "GetMediaData by %d failed", resId);
+            asyncContext->SetErrorMsg("GetMedia path by id failed", true, state);
             return;
         }
         asyncContext->len_ = static_cast<int>(tmpLen);
@@ -533,9 +704,9 @@ auto getMediaFunc = [](napi_env env, void *data) {
         return;
     }
     state = resMgr->GetMediaById(resId, path);
-    ReportGetResourceByIdFail(resId, path, "failed in getMediaFunc");
     if (state != RState::SUCCESS) {
-        asyncContext->SetErrorMsg("GetMedia path failed", true);
+        asyncContext->SetErrorMsg("GetMedia path by id failed", true, state);
+        ReportGetResourceByIdFail(resId, path, "failed in getMediaFunc");
         return;
     }
     GetResourcesBufferData(path, *asyncContext);
@@ -564,7 +735,6 @@ void CreateStringValue(ResMgrAsyncContext *asyncContext)
 
 auto getMediaBase64Func = [](napi_env env, void *data) {
     ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
-    int len = 0;
     std::string path;
     RState state;
     if (asyncContext->resId_ != 0 || asyncContext->resource_ != nullptr) {
@@ -578,30 +748,35 @@ auto getMediaBase64Func = [](napi_env env, void *data) {
         if (isLoadHap(asyncContext)) {
             state = resMgr->GetMediaBase64DataById(resId, asyncContext->value_);
             if (state != RState::SUCCESS) {
-                HiLog::Error(LABEL, "Failed to GetMediaBase64DataById");
+                asyncContext->SetErrorMsg("GetMedia path failed", true, state);
                 return;
             }
             CreateStringValue(asyncContext);
             return;
         }
         state = resMgr->GetMediaById(resId, path);
+        if (state != RState::SUCCESS) {
+            asyncContext->SetErrorMsg("GetMedia path failed", true, state);
+            return;
+        }
     } else {
         if (isLoadHap(asyncContext)) {
             state = asyncContext->addon_->GetResMgr()->GetMediaBase64DataByName(asyncContext->resName_.c_str(),
                 asyncContext->value_);
             if (state != RState::SUCCESS) {
-                HiLog::Error(LABEL, "Failed to GetMediaBase64DataByName");
+                asyncContext->SetErrorMsg("GetMedia path failed", false, state);
                 return;
             }
             CreateStringValue(asyncContext);
             return;
         }
         state = asyncContext->addon_->GetResMgr()->GetMediaByName(asyncContext->resName_.c_str(), path);
+        if (state != RState::SUCCESS) {
+            asyncContext->SetErrorMsg("GetMedia path failed", false, state);
+            return;
+        }
     }
-    if (state != RState::SUCCESS) {
-        asyncContext->SetErrorMsg("GetMedia path failed", true);
-        return;
-    }
+    int len = 0;
     std::unique_ptr<uint8_t[]> tempData = Utils::LoadResourceFile(path, len);
     if (tempData == nullptr) {
         return;
@@ -630,7 +805,7 @@ napi_value ResourceManagerAddon::GetMediaBase64ByName(napi_env env, napi_callbac
 {
     std::string traceVal = "ResourceManagerAddon::GetMediaBase64ByName";
     StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
-    napi_value mediaBase64 = ProcessOnlyIdParam(env, info, "GetMediaBase64ByName", getMediaBase64Func);
+    napi_value mediaBase64 = ProcessNameParamV9(env, info, "GetMediaBase64ByName", getMediaBase64Func);
     FinishTrace(HITRACE_TAG_GLOBAL_RESMGR);
     return mediaBase64;
 }
@@ -797,13 +972,17 @@ auto getPluralCapFunc = [](napi_env env, void *data) {
         }
         state = resMgr->GetPluralStringByIdFormat(asyncContext->value_,
             resId, asyncContext->param_, asyncContext->param_);
+        if (state != RState::SUCCESS) {
+            asyncContext->SetErrorMsg("GetPluralString failed", true, state);
+            return;
+        }
     } else {
         state = asyncContext->addon_->GetResMgr()->GetPluralStringByNameFormat(asyncContext->value_,
             asyncContext->resName_.c_str(), asyncContext->param_, asyncContext->param_);
-    }
-    if (state != RState::SUCCESS) {
-        asyncContext->SetErrorMsg("GetPluralString failed", true);
-        return;
+        if (state != RState::SUCCESS) {
+            asyncContext->SetErrorMsg("GetPluralString failed", false, state);
+            return;
+        }
     }
     asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext& context) -> napi_value {
         napi_value result;
@@ -822,13 +1001,7 @@ napi_value ResourceManagerAddon::ProcessIdNameParam(napi_env env, napi_callback_
     GET_PARAMS(env, info, 3);
 
     std::unique_ptr<ResMgrAsyncContext> asyncContext = std::make_unique<ResMgrAsyncContext>();
-    std::shared_ptr<ResourceManagerAddon> *addonPtr = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&addonPtr));
-    if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to unwrap ProcessIdNameParam %{public}s", name.c_str());
-        return nullptr;
-    }
-    asyncContext->addon_ = *addonPtr;
+    asyncContext->addon_ = getResourceManagerAddon(env, info);
     for (size_t i = 0; i < argc; i++) {
         napi_valuetype valueType;
         napi_typeof(env, argv[i], &valueType);
@@ -839,8 +1012,8 @@ napi_value ResourceManagerAddon::ProcessIdNameParam(napi_env env, napi_callback_
             asyncContext->resName_ = GetResNameOrPath(env, argc, argv);
         } else if (i == 0 && valueType == napi_object) {
             std::shared_ptr<ResourceManager::Resource> resourcePtr = std::make_shared<ResourceManager::Resource>();
-            bool ret = GetResourceObject(env, resourcePtr, argv[0]);
-            if (!ret) {
+            int32_t retCode = GetResourceObject(env, resourcePtr, argv[0]);
+            if (retCode != SUCCESS) {
                 HiLog::Error(LABEL, "Failed to get native Resource object");
                 return nullptr;
             }
@@ -879,9 +1052,9 @@ auto g_getRawFileFunc = [](napi_env env, void* data) {
         return;
     }
     std::string path;
-    asyncContext->addon_->GetResMgr()->GetRawFilePathByName(asyncContext->path_, path);
+    RState state = asyncContext->addon_->GetResMgr()->GetRawFilePathByName(asyncContext->path_, path);
     if (path.empty()) {
-        asyncContext->SetErrorMsg("GetRawFile path failed", true);
+        asyncContext->SetErrorMsg("GetRawFile path failed", true, state);
         return;
     }
     GetResourcesBufferData(path, *asyncContext);
@@ -903,7 +1076,7 @@ auto g_getRawFileDescriptorFunc = [](napi_env env, void* data) {
             state = context.addon_->GetResMgr()->GetRawFileDescriptor(context.path_, descriptor);
         }
         if (state != RState::SUCCESS) {
-            context.SetErrorMsg("GetRawFileDescriptor failed state", true);
+            context.SetErrorMsg("GetRawFileDescriptor failed state", true, state);
             return nullptr;
         }
         napi_value result;
@@ -978,32 +1151,6 @@ napi_value ResourceManagerAddon::CloseRawFileDescriptor(napi_env env, napi_callb
     return ProcessOnlyIdParam(env, info, "closeRawFileDescriptor", closeRawFileDescriptorFunc);
 }
 
-std::shared_ptr<ResourceManagerAddon> getResourceManagerAddon(napi_env env, napi_callback_info info)
-{
-    GET_PARAMS(env, info, 2);
-
-    std::shared_ptr<ResourceManagerAddon> *addonPtr = nullptr;
-    napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&addonPtr));
-    if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to unwrap");
-        return nullptr;
-    }
-    return *addonPtr;
-}
-
-bool isNapiNumber(napi_env env, napi_callback_info info)
-{
-    GET_PARAMS(env, info, 2);
-
-    napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
-    if (valueType != napi_number) {
-        HiLog::Error(LABEL, "Parameter type is not napi_number");
-        return false;
-    }
-    return true;
-}
-
 bool isNapiObject(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, 2);
@@ -1036,25 +1183,26 @@ napi_value ResourceManagerAddon::GetStringSync(napi_env env, napi_callback_info 
 
     std::unique_ptr<ResMgrAsyncContext> asyncContext = std::make_unique<ResMgrAsyncContext>();
     asyncContext->addon_ = getResourceManagerAddon(env, info);
-    bool ret;
     if (isNapiNumber(env, info)) {
         asyncContext->resId_ = GetResId(env, argc, argv);
     } else if (isNapiObject(env, info)) {
         std::shared_ptr<ResourceManager::Resource> resourcePtr = std::make_shared<ResourceManager::Resource>();
-        ret = GetResourceObject(env, resourcePtr, argv[0]);
-        if (!ret) {
+        int32_t retCode = GetResourceObject(env, resourcePtr, argv[0]);
+        if (retCode != SUCCESS) {
             HiLog::Error(LABEL, "GetStringSync failed to get native Resource object");
+            ResMgrAsyncContext::NapiThrow(env, retCode);
             return nullptr;
         }
         asyncContext->resource_ = resourcePtr;
     } else {
         HiLog::Error(LABEL, "GetStringSync type is invalid");
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     int32_t resId = 0;
-    ret = ResMgrAsyncContext::GetHapResourceManager(asyncContext.get(), resMgr, resId);
+    bool ret = ResMgrAsyncContext::GetHapResourceManager(asyncContext.get(), resMgr, resId);
     if (!ret) {
         HiLog::Error(LABEL, "Failed to GetHapResourceManager in GetStringSync");
         return nullptr;
@@ -1062,6 +1210,7 @@ napi_value ResourceManagerAddon::GetStringSync(napi_env env, napi_callback_info 
     RState state = resMgr->GetStringById(resId, asyncContext->value_);
     if (state != RState::SUCCESS) {
         asyncContext->SetErrorMsg("GetStringSync failed state", true);
+        ResMgrAsyncContext::NapiThrow(env, state);
         return nullptr;
     }
 
@@ -1077,6 +1226,7 @@ napi_value ResourceManagerAddon::GetStringByNameSync(napi_env env, napi_callback
     GET_PARAMS(env, info, 2);
 
     if (!isNapiString(env, info)) {
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
 
@@ -1088,6 +1238,7 @@ napi_value ResourceManagerAddon::GetStringByNameSync(napi_env env, napi_callback
         asyncContext->value_);
     if (state != RState::SUCCESS) {
         asyncContext->SetErrorMsg("GetStringByNameSync failed state", true);
+        ResMgrAsyncContext::NapiThrow(env, state);
         return nullptr;
     }
 
@@ -1104,24 +1255,25 @@ napi_value ResourceManagerAddon::GetBoolean(napi_env env, napi_callback_info inf
 
     std::unique_ptr<ResMgrAsyncContext> asyncContext = std::make_unique<ResMgrAsyncContext>();
     asyncContext->addon_ = getResourceManagerAddon(env, info);
-    bool ret;
     if (isNapiNumber(env, info)) {
         asyncContext->resId_ = GetResId(env, argc, argv);
     } else if (isNapiObject(env, info)) {
         std::shared_ptr<ResourceManager::Resource> resourcePtr = std::make_shared<ResourceManager::Resource>();
-        ret = GetResourceObject(env, resourcePtr, argv[0]);
-        if (!ret) {
+        int32_t retCode = GetResourceObject(env, resourcePtr, argv[0]);
+        if (retCode != SUCCESS) {
             HiLog::Error(LABEL, "GetBoolean failed to get native Resource object");
+            ResMgrAsyncContext::NapiThrow(env, retCode);
             return nullptr;
         }
         asyncContext->resource_ = resourcePtr;
     } else {
         HiLog::Error(LABEL, "GetBoolean type is invalid");
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     int32_t resId = 0;
-    ret = ResMgrAsyncContext::GetHapResourceManager(asyncContext.get(), resMgr, resId);
+    bool ret = ResMgrAsyncContext::GetHapResourceManager(asyncContext.get(), resMgr, resId);
     if (!ret) {
         HiLog::Error(LABEL, "Failed to GetHapResourceManager in GetBoolean");
         return nullptr;
@@ -1129,6 +1281,7 @@ napi_value ResourceManagerAddon::GetBoolean(napi_env env, napi_callback_info inf
     RState state = resMgr->GetBooleanById(resId, asyncContext->bValue_);
     if (state != RState::SUCCESS) {
         asyncContext->SetErrorMsg("GetBoolean failed state", true);
+        ResMgrAsyncContext::NapiThrow(env, state);
         return nullptr;
     }
 
@@ -1144,6 +1297,7 @@ napi_value ResourceManagerAddon::GetBooleanByName(napi_env env, napi_callback_in
     GET_PARAMS(env, info, 2);
 
     if (!isNapiString(env, info)) {
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
 
@@ -1155,6 +1309,7 @@ napi_value ResourceManagerAddon::GetBooleanByName(napi_env env, napi_callback_in
         asyncContext->bValue_);
     if (state != RState::SUCCESS) {
         asyncContext->SetErrorMsg("GetBooleanByName failed state", true);
+        ResMgrAsyncContext::NapiThrow(env, state);
         return nullptr;
     }
 
@@ -1171,24 +1326,25 @@ napi_value ResourceManagerAddon::GetNumber(napi_env env, napi_callback_info info
 
     std::unique_ptr<ResMgrAsyncContext> asyncContext = std::make_unique<ResMgrAsyncContext>();
     asyncContext->addon_ = getResourceManagerAddon(env, info);
-    bool ret;
     if (isNapiNumber(env, info)) {
         asyncContext->resId_ = GetResId(env, argc, argv);
     } else if (isNapiObject(env, info)) {
         std::shared_ptr<ResourceManager::Resource> resourcePtr = std::make_shared<ResourceManager::Resource>();
-        ret = GetResourceObject(env, resourcePtr, argv[0]);
-        if (!ret) {
+        int32_t retCode = GetResourceObject(env, resourcePtr, argv[0]);
+        if (retCode != SUCCESS) {
             HiLog::Error(LABEL, "GetNumber failed to get native Resource object");
+            ResMgrAsyncContext::NapiThrow(env, retCode);
             return nullptr;
         }
         asyncContext->resource_ = resourcePtr;
     } else {
         HiLog::Error(LABEL, "GetNumber type is invalid");
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     int32_t resId = 0;
-    ret = ResMgrAsyncContext::GetHapResourceManager(asyncContext.get(), resMgr, resId);
+    bool ret = ResMgrAsyncContext::GetHapResourceManager(asyncContext.get(), resMgr, resId);
     if (!ret) {
         HiLog::Error(LABEL, "Failed to GetHapResourceManager in GetNumber");
         return nullptr;
@@ -1205,6 +1361,7 @@ napi_value ResourceManagerAddon::GetNumber(napi_env env, napi_callback_info info
         asyncContext->fValue_);
         if (state != RState::SUCCESS) {
             asyncContext->SetErrorMsg("GetFloatById failed state", true);
+            ResMgrAsyncContext::NapiThrow(env, state);
             return nullptr;
         }
         if (napi_create_double(env, asyncContext->fValue_, &jsValue) != napi_ok) {
@@ -1219,6 +1376,7 @@ napi_value ResourceManagerAddon::GetNumberByName(napi_env env, napi_callback_inf
     GET_PARAMS(env, info, 2);
 
     if (!isNapiString(env, info)) {
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
 
@@ -1238,7 +1396,8 @@ napi_value ResourceManagerAddon::GetNumberByName(napi_env env, napi_callback_inf
         state = asyncContext->addon_->GetResMgr()->GetFloatByName(asyncContext->resName_.c_str(),
         asyncContext->fValue_);
         if (state != RState::SUCCESS) {
-            asyncContext->SetErrorMsg("GetFloatByName failed state", true);
+            asyncContext->SetErrorMsg("GetFloatByName failed state", false);
+            ResMgrAsyncContext::NapiThrow(env, state);
             return nullptr;
         }
         if (napi_create_double(env, asyncContext->fValue_, &jsValue) != napi_ok) {
@@ -1315,26 +1474,27 @@ bool ResourceManagerAddon::GetResourceObjectId(napi_env env, std::shared_ptr<Res
     return true;
 }
 
-bool ResourceManagerAddon::GetResourceObject(napi_env env, std::shared_ptr<ResourceManager::Resource> &resourcePtr,
+int32_t ResourceManagerAddon::GetResourceObject(napi_env env, std::shared_ptr<ResourceManager::Resource> &resourcePtr,
     napi_value &value)
 {
     if (resourcePtr == nullptr) {
         HiLog::Error(LABEL, "resourcePtr == nullptr");
-        return false;
+        return ERROR;
     }
     if (!GetResourceObjectName(env, resourcePtr, value, 0)) {
         HiLog::Error(LABEL, "Failed to get bundleName");
-        return false;
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     if (!GetResourceObjectName(env, resourcePtr, value, 1)) {
         HiLog::Error(LABEL, "Failed to get moduleName");
-        return false;
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     if (!GetResourceObjectId(env, resourcePtr, value)) {
         HiLog::Error(LABEL, "Failed to get id");
-        return false;
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    return true;
+
+    return SUCCESS;
 }
 
 bool ResMgrAsyncContext::GetHapResourceManager(const ResMgrAsyncContext* asyncContext,
@@ -1393,6 +1553,63 @@ napi_value ResMgrAsyncContext::getResult(napi_env env, std::unique_ptr<ResMgrAsy
     asyncContext.release();
     return result;
 }
+
+napi_value ResourceManagerAddon::GetStringValue(napi_env env, napi_callback_info info)
+{
+    if (isNapiNumber(env, info)) {
+        return ProcessIdParamV9(env, info, "getStringValue", getStringFunc);
+    } else {
+        return ProcessResourceParamV9(env, info, "getStringValue", getStringFunc);
+    }
+}
+
+napi_value ResourceManagerAddon::GetStringArrayValue(napi_env env, napi_callback_info info)
+{
+    if (isNapiNumber(env, info)) {
+        return ProcessIdParamV9(env, info, "getStringArrayValue", getStringArrayFunc);
+    } else {
+        return ProcessResourceParamV9(env, info, "getStringArrayValue", getStringArrayFunc);
+    }
+}
+
+napi_value ResourceManagerAddon::GetMediaContent(napi_env env, napi_callback_info info)
+{
+    if (isNapiNumber(env, info)) {
+        return ProcessIdParamV9(env, info, "getMediaContent", getMediaFunc);
+    } else {
+        return ProcessResourceParamV9(env, info, "getMediaContent", getMediaFunc);
+    }
+}
+
+napi_value ResourceManagerAddon::GetMediaContentBase64(napi_env env, napi_callback_info info)
+{
+    if (isNapiNumber(env, info)) {
+        return ProcessIdParamV9(env, info, "getMediaContentBase64", getMediaBase64Func);
+    } else {
+        return ProcessResourceParamV9(env, info, "getMediaContentBase64", getMediaBase64Func);
+    }
+}
+
+napi_value ResourceManagerAddon::GetPluralStringValue(napi_env env, napi_callback_info info)
+{
+    return ProcessIdNameParam(env, info, "getPluralStringValue", getPluralCapFunc);
+}
+
+napi_value ResourceManagerAddon::GetRawFileContent(napi_env env, napi_callback_info info)
+{
+    return ProcessOnlyIdParam(env, info, "getRawFileContent", g_getRawFileFunc);
+}
+
+napi_value ResourceManagerAddon::GetRawFd(napi_env env, napi_callback_info info)
+{
+    return ProcessOnlyIdParam(env, info, "getRawFd", g_getRawFileDescriptorFunc);
+}
+
+napi_value ResourceManagerAddon::CloseRawFd(napi_env env, napi_callback_info info)
+{
+    return ProcessOnlyIdParam(env, info, "closeRawFd", closeRawFileDescriptorFunc);
+}
+
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

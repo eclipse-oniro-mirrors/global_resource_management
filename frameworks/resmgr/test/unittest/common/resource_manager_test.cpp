@@ -842,7 +842,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdTest003, TestSize.Leve
 
     std::string outValue;
     RState state = rm->GetStringById(NON_EXIST_ID, outValue);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_ID_NOT_FOUND, state);
 }
 
 /*
@@ -892,7 +892,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameTest003, TestSize.Le
 
     std::string outValue;
     RState state = rm->GetStringByName(g_nonExistName, outValue);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_NOT_FOUND, state);
 }
 
 /*
@@ -983,7 +983,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringArrayByIdTest002, TestSize
     // not found case
     std::vector<std::string> outValue;
     state = rm->GetStringArrayById(NON_EXIST_ID, outValue);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_ID_NOT_FOUND, state);
 }
 
 /*
@@ -1012,7 +1012,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringArrayByNameTest002, TestSi
     // not found case
     std::vector<std::string> outValue;
     state = rm->GetStringArrayByName(g_nonExistName, outValue);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_NOT_FOUND, state);
 }
 
 /*
@@ -1300,7 +1300,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFormatTest002, T
     RState state;
     std::string outValue;
     state = rm->GetPluralStringByIdFormat(outValue, NON_EXIST_ID, 1, 1);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_ID_NOT_FOUND, state);
 }
 
 /*
@@ -1331,7 +1331,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByNameFormatTest002,
     RState state;
     std::string outValue;
     state = rm->GetPluralStringByNameFormat(outValue, g_nonExistName, 1, 1);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_NOT_FOUND, state);
 }
 
 /*
@@ -1412,7 +1412,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByIdTest002, TestSize.Lev
     bool outValue = true;
     RState state;
     state = rm->GetBooleanById(NON_EXIST_ID, outValue);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_ID_NOT_FOUND, state);
 }
 
 /*
@@ -1439,7 +1439,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByNameTest002, TestSize.L
     bool outValue = true;
     RState state;
     state = rm->GetBooleanByName(g_nonExistName, outValue);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_NOT_FOUND, state);
 }
 
 /*
@@ -1466,7 +1466,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByIdTest002, TestSize.Lev
     int outValue;
     RState state;
     state = rm->GetIntegerById(NON_EXIST_ID, outValue);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_ID_NOT_FOUND, state);
 }
 
 /*
@@ -1493,7 +1493,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameTest002, TestSize.L
     int outValue;
     RState state;
     state = rm->GetIntegerByName(g_nonExistName, outValue);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_NOT_FOUND, state);
 }
 
 /*
@@ -1520,7 +1520,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetFloatByIdTest002, TestSize.Level
     float outValue;
     RState state;
     state = rm->GetFloatById(NON_EXIST_ID, outValue);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_ID_NOT_FOUND, state);
 }
 
 /*
@@ -1547,7 +1547,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetFloatByNameTest002, TestSize.Lev
     float outValue;
     RState state;
     state = rm->GetFloatByName(g_nonExistName, outValue);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_NOT_FOUND, state);
 }
 
 /*
@@ -2630,7 +2630,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest002, TestSize.Level
     std::string outValue;
     RState state;
     state = rm->GetMediaById(NON_EXIST_ID, outValue);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_ID_NOT_FOUND, state);
 }
 
 /*
@@ -2848,9 +2848,9 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest009, TestSize.Level
     state1 = rm->GetMediaById(id, density1, outValue);
     state2 = rm->GetMediaById(id, density2, outValue);
     state3 = rm->GetMediaById(id, density3, outValue);
-    EXPECT_TRUE(state1 == NOT_SUPPORT_SEP);
-    EXPECT_TRUE(state2 == NOT_SUPPORT_SEP);
-    EXPECT_TRUE(state3 == NOT_SUPPORT_SEP);
+    EXPECT_TRUE(state1 == ERROR_CODE_INVALID_INPUT_PARAMETER);
+    EXPECT_TRUE(state2 == ERROR_CODE_INVALID_INPUT_PARAMETER);
+    EXPECT_TRUE(state3 == ERROR_CODE_INVALID_INPUT_PARAMETER);
 }
 
 /*
@@ -3351,7 +3351,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest002, TestSize.Lev
     std::string outValue;
     RState state;
     state = rm->GetMediaByName(g_nonExistName, outValue);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_NOT_FOUND, state);
 }
 
 /*
@@ -3557,9 +3557,9 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest009, TestSize.Lev
     state1 = rm->GetMediaByName("icon", density1, outValue);
     state2 = rm->GetMediaByName("icon", density2, outValue);
     state3 = rm->GetMediaByName("icon", density3, outValue);
-    EXPECT_TRUE(state1 == NOT_SUPPORT_SEP);
-    EXPECT_TRUE(state2 == NOT_SUPPORT_SEP);
-    EXPECT_TRUE(state3 == NOT_SUPPORT_SEP);
+    EXPECT_TRUE(state1 == ERROR_CODE_INVALID_INPUT_PARAMETER);
+    EXPECT_TRUE(state2 == ERROR_CODE_INVALID_INPUT_PARAMETER);
+    EXPECT_TRUE(state3 == ERROR_CODE_INVALID_INPUT_PARAMETER);
 }
 
 /*

@@ -116,7 +116,7 @@ private:
 
     static napi_value GetStringByNameSync(napi_env env, napi_callback_info info);
 
-    static bool GetResourceObject(napi_env env, std::shared_ptr<ResourceManager::Resource> &resourcePtr,
+    static int32_t GetResourceObject(napi_env env, std::shared_ptr<ResourceManager::Resource> &resourcePtr,
         napi_value &value);
 
     static napi_valuetype GetType(napi_env env, napi_value value);
@@ -126,6 +126,31 @@ private:
 
     static bool GetResourceObjectId(napi_env env, std::shared_ptr<ResourceManager::Resource> &resourcePtr,
         napi_value &value);
+
+    static napi_value ProcessIdParamV9(napi_env env, napi_callback_info info, const std::string &name,
+        napi_async_execute_callback execute);
+
+    static napi_value ProcessNameParamV9(napi_env env, napi_callback_info info, const std::string &name,
+        napi_async_execute_callback execute);
+
+    static napi_value ProcessResourceParamV9(napi_env env, napi_callback_info info, const std::string &name,
+        napi_async_execute_callback execute);
+
+    static napi_value GetStringValue(napi_env env, napi_callback_info info);
+
+    static napi_value GetStringArrayValue(napi_env env, napi_callback_info info);
+
+    static napi_value GetPluralStringValue(napi_env env, napi_callback_info info);
+
+    static napi_value GetMediaContent(napi_env env, napi_callback_info info);
+
+    static napi_value GetMediaContentBase64(napi_env env, napi_callback_info info);
+
+    static napi_value GetRawFileContent(napi_env env, napi_callback_info info);
+
+    static napi_value GetRawFd(napi_env env, napi_callback_info info);
+
+    static napi_value CloseRawFd(napi_env env, napi_callback_info info);
 
     std::string bundleName_;
     std::shared_ptr<ResourceManager> resMgr_;
@@ -138,6 +163,7 @@ struct ResMgrAsyncContext {
     std::string bundleName_;
     int32_t resId_;
     int32_t param_;
+
     std::string path_;
     std::string resName_;
     int iValue_;
@@ -157,15 +183,16 @@ struct ResMgrAsyncContext {
 
     std::string errMsg_;
     int success_;
+    int errCode_;
 
     std::shared_ptr<ResourceManagerAddon> addon_;
     std::shared_ptr<ResourceManager> resMgr_;
     std::shared_ptr<ResourceManager::Resource> resource_;
 
-    ResMgrAsyncContext() : work_(nullptr), resId_(0), param_(0),  iValue_(0), fValue_(0.0f), bValue_(false),
+    ResMgrAsyncContext() : work_(nullptr), resId_(0), param_(0), iValue_(0), fValue_(0.0f), bValue_(false),
         createValueFunc_(nullptr), len_(0), deferred_(nullptr), callbackRef_(nullptr), success_(true) {}
 
-    void SetErrorMsg(const std::string &msg, bool withResId = false);
+    void SetErrorMsg(const std::string &msg, bool withResId = false, int32_t errCode = 0);
 
     static void Complete(napi_env env, napi_status status, void* data);
 
@@ -174,6 +201,8 @@ struct ResMgrAsyncContext {
 
     static napi_value getResult(napi_env env, std::unique_ptr<ResMgrAsyncContext> &asyncContext,
         const std::string &name, napi_async_execute_callback &execute);
+    
+    static void NapiThrow(napi_env env, int32_t errCode);
 };
 } // namespace Resource
 } // namespace Global
