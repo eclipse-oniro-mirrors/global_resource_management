@@ -169,31 +169,7 @@ const HapResource::ValueUnderQualifierDir *HapManager::FindQualifierValueByName(
     if (candidates.size() == 0) {
         return nullptr;
     }
-    const ResConfigImpl *bestResConfig = nullptr;
-    const HapResource::ValueUnderQualifierDir *result = nullptr;
-    for (auto iter = candidates.begin(); iter != candidates.end(); iter++) {
-        const std::vector<HapResource::ValueUnderQualifierDir *> paths = (*iter)->GetLimitPathsConst();
-        size_t len = paths.size();
-        size_t i = 0;
-        const ResConfigImpl *currentResConfig = this->resConfig_;
-        for (i = 0; i < len; i++) {
-            HapResource::ValueUnderQualifierDir *path = paths[i];
-            const ResConfigImpl *resConfig = path->GetResConfig();
-            if (!this->resConfig_->Match(resConfig)) {
-                continue;
-            }
-            if (bestResConfig == nullptr) {
-                bestResConfig = resConfig;
-                result = paths[i];
-                continue;
-            }
-            if (!bestResConfig->IsMoreSuitable(resConfig, currentResConfig, density)) {
-                bestResConfig = resConfig;
-                result = paths[i];
-            }
-        }
-    }
-    return result;
+    return this->GetBestMatchResource(candidates, density);
 }
 
 const HapResource::ValueUnderQualifierDir *HapManager::FindQualifierValueById(uint32_t id, uint32_t density)
@@ -202,38 +178,54 @@ const HapResource::ValueUnderQualifierDir *HapManager::FindQualifierValueById(ui
     if (candidates.size() == 0) {
         return nullptr;
     }
+    return this->GetBestMatchResource(candidates, density);
+}
+
+const HapResource::ValueUnderQualifierDir *HapManager::GetBestMatchResource(std::vector<const HapResource::IdValues *> candidates,
+    uint32_t density)
+{
     const ResConfigImpl *bestResConfig = nullptr;
+    const ResConfigImpl *bestOverlayResConfig = nullptr;
     const HapResource::ValueUnderQualifierDir *result = nullptr;
-    bool isOverlayChange = false;
+    const HapResource::ValueUnderQualifierDir *overlayResult = nullptr;
+    const ResConfigImpl *currentResConfig = this->resConfig_;
     for (auto iter = candidates.begin(); iter != candidates.end(); iter++) {
         const std::vector<HapResource::ValueUnderQualifierDir *> paths = (*iter)->GetLimitPathsConst();
         size_t len = paths.size();
         size_t i = 0;
-        const ResConfigImpl *currentResConfig = this->resConfig_;
-        if (isOverlayChange) {
-            break;
-        }
+        bool isOverlayHapResource = paths[0]->IsOverlay();
         for (i = 0; i < len; i++) {
             HapResource::ValueUnderQualifierDir *path = paths[i];
             const ResConfigImpl *resConfig = path->GetResConfig();
             if (!this->resConfig_->Match(resConfig)) {
                 continue;
             }
-            if (bestResConfig == nullptr) {
-                bestResConfig = resConfig;
-                result = paths[i];
-                continue;
+            if (isOverlayHapResource) {
+                if (bestOverlayResConfig == nullptr) {
+                    bestOverlayResConfig = resConfig;
+                    overlayResult = paths[i];
+                    continue;
+                }
+                if (!bestOverlayResConfig->IsMoreSuitable(resConfig, currentResConfig, density)) {
+                    bestOverlayResConfig = resConfig;
+                    overlayResult = paths[i];
+                }
+            } else {
+               if (bestResConfig == nullptr) {
+                    bestResConfig = resConfig;
+                    result = paths[i];
+                    continue;
+                }
+                if (!bestResConfig->IsMoreSuitable(resConfig, currentResConfig, density)) {
+                    bestResConfig = resConfig;
+                    result = paths[i];
+                }
             }
-            if (!bestResConfig->IsMoreSuitable(resConfig, currentResConfig, density)) {
-                bestResConfig = resConfig;
-                result = paths[i];
-            }
-            if (path->IsOverlay()) {
-                bestResConfig = resConfig;
-                result = paths[i];
-                isOverlayChange = true;
-                break;
-            }
+        }
+    }
+    if (bestOverlayResConfig != nullptr && result->IsSystemResource()) {
+        if(bestOverlayResConfig->IsMoreSuitable(bestResConfig, currentResConfig, density)){
+            return overlayResult;
         }
     }
     return result;

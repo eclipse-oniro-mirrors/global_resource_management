@@ -41,12 +41,13 @@ namespace OHOS {
 namespace Global {
 namespace Resource {
 HapResource::ValueUnderQualifierDir::ValueUnderQualifierDir(const std::vector<KeyParam *> &keyParams, IdItem *idItem,
-    HapResource *hapResource, bool isOverlay) : hapResource_(hapResource)
+    HapResource *hapResource, bool isOverlay, bool systemResource) : hapResource_(hapResource)
 {
     keyParams_ = keyParams;
     folder_ = HapParser::ToFolderPath(keyParams_);
     idItem_ = idItem;
     isOverlay_ = isOverlay;
+    isSystemResource_ = systemResource;
     InitResConfig();
 }
 
@@ -121,6 +122,10 @@ void CanonicalizePath(const char *path, char *outPath, size_t len)
 
 const HapResource* HapResource::Load(const char *path, const ResConfigImpl* defaultConfig, bool system)
 {
+    if (strcmp(path, "/data/storage/el1/bundle/ohos.global.systemres/"
+        "ohos.global.systemres/assets/entry/resources.index") == 0) {
+        system = true;
+    }
     if (Utils::endWithTail(path, "hap")) {
         return LoadFromHap(path, defaultConfig, system);
     } else {
@@ -176,7 +181,7 @@ const HapResource* HapResource::LoadFromIndex(const char *path, const ResConfigI
         delete (resDesc);
         return nullptr;
     }
-    if (!pResource->Init()) {
+    if (!pResource->Init(system)) {
         delete (pResource);
         return nullptr;
     }
@@ -210,7 +215,7 @@ const HapResource* HapResource::LoadFromHap(const char *path, const ResConfigImp
         return nullptr;
     }
 
-    if (!pResource->Init()) {
+    if (!pResource->Init(system)) {
         delete (pResource);
         return nullptr;
     }
@@ -302,7 +307,7 @@ void HapResource::UpdateOverlayInfo(std::unordered_map<std::string, std::unorder
     idValuesMap_.swap(newIdValuesMap);
 }
 
-bool HapResource::Init()
+bool HapResource::Init(bool system)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
@@ -335,10 +340,10 @@ bool HapResource::Init()
         }
         idValuesNameMap_.push_back(mptr);
     }
-    return InitIdList();
+    return InitIdList(system);
 }
 
-bool HapResource::InitIdList()
+bool HapResource::InitIdList(bool system)
 {
     if (resDesc_ == nullptr) {
         HILOG_ERROR("resDesc_ is null ! InitIdList failed");
@@ -358,7 +363,7 @@ bool HapResource::InitIdList()
                     return false;
                 }
                 auto limitPath = new (std::nothrow) HapResource::ValueUnderQualifierDir(resKey->keyParams_,
-                    idParam->idItem_, this, false);
+                    idParam->idItem_, this, false, system);
                 if (limitPath == nullptr) {
                     HILOG_ERROR("new ValueUnderQualifierDir failed in HapResource::InitIdList");
                     delete (idValues);
@@ -371,7 +376,7 @@ bool HapResource::InitIdList()
             } else {
                 HapResource::IdValues *idValues = iter->second;
                 auto limitPath = new (std::nothrow) HapResource::ValueUnderQualifierDir(resKey->keyParams_,
-                    idParam->idItem_, this, false);
+                    idParam->idItem_, this, false, system);
                 if (limitPath == nullptr) {
                     HILOG_ERROR("new ValueUnderQualifierDir failed in HapResource::InitIdList");
                     return false;
