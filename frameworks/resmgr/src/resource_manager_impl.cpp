@@ -80,8 +80,11 @@ bool ResourceManagerImpl::Init()
         HILOG_ERROR("new HapManager failed when ResourceManagerImpl::Init");
         return false;
     }
-    AddResource("/data/storage/el1/bundle/ohos.global.systemres" \
-        "/ohos.global.systemres/assets/entry/resources.index");
+    if (Utils::isFileExit(SYSTEM_RESOURCE_PATH)) {
+        AddResource(SYSTEM_RESOURCE_PATH.c_str());
+    } else {
+        AddResource(SYSTEM_RESOURCE_PATH_COMPRESSED.c_str());
+    }
     return true;
 }
 

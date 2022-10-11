@@ -16,6 +16,7 @@
 
 #include <fstream>
 #include <vector>
+#include <sys/stat.h>
 
 #ifdef __LINUX__
 #include <cstring>
@@ -400,6 +401,13 @@ bool Utils::endWithTail(const std::string& path, const std::string& tail)
 {
     return path.compare(path.size() - tail.size(), tail.size(), tail) == 0;
 }
+
+bool Utils::isFileExit(const std::string& filePath)
+{
+    struct stat buffer;
+    return (stat(filePath.c_str(), &buffer) == 0);
+}
+
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
