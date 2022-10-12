@@ -59,7 +59,7 @@ public:
 
     static bool endWithTail(const std::string& path, const std::string& tail);
 
-    static bool isFileExit(const std::string& filePath);
+    static bool isFileExist(const std::string& filePath);
 
 private:
 
