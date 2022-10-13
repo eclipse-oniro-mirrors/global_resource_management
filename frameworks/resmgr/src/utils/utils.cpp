@@ -402,7 +402,7 @@ bool Utils::endWithTail(const std::string& path, const std::string& tail)
     return path.compare(path.size() - tail.size(), tail.size(), tail) == 0;
 }
 
-bool Utils::isFileExit(const std::string& filePath)
+bool Utils::isFileExist(const std::string& filePath)
 {
     struct stat buffer;
     return (stat(filePath.c_str(), &buffer) == 0);

@@ -538,6 +538,9 @@ private:
     const std::string SYSTEM_RESOURCE_PATH_COMPRESSED = "/data/storage/el1/bundle/" \
                                                 "systemResources/SystemResources.hap";
 
+    const std::string SYSTEM_RESOURCE_OVERLAY_PATH = "/data/storage/el1/bundle/" \
+         "ohos.global.systemres.overlay/ohos.global.systemres.overlay/assets/entry/resources.index";
+
     const float DEFAULT_DENSITY = 160.0f;
 
     std::unordered_map<std::string, RawFileDescriptor> rawFileDescriptor_;

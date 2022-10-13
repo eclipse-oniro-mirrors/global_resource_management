@@ -138,8 +138,13 @@ public:
             return isOverlay_;
         }
 
+        inline bool IsSystemResource() const
+        {
+            return isSystemResource_;
+        }
+
         ValueUnderQualifierDir(const std::vector<KeyParam *> &keyParams, IdItem *idItem,
-            HapResource *hapResource, bool isOverlay = false);
+            HapResource *hapResource, bool isOverlay = false, bool isSystemResource = false);
 
         ~ValueUnderQualifierDir();
 
@@ -166,6 +171,8 @@ public:
         friend class HapResource;
 
         bool isOverlay_;
+
+        bool isSystemResource_;
     };
 
     /**
@@ -226,10 +233,10 @@ private:
     void UpdateOverlayInfo(std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> &nameTypeId);
 
     // must call Init() after constructor
-    bool Init();
+    bool Init(bool system = false);
 
     // step of Init(), called in Init()
-    bool InitIdList();
+    bool InitIdList(bool system = false);
 
     // resources.index file path
     const std::string indexPath_;
