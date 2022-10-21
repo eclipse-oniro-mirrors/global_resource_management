@@ -80,7 +80,11 @@ bool ResourceManagerImpl::Init()
         HILOG_ERROR("new HapManager failed when ResourceManagerImpl::Init");
         return false;
     }
-    AddResource(SYSTEM_RESOURCE_PATH_COMPRESSED.c_str());
+    if (Utils::isFileExist(SYSTEM_RESOURCE_PATH)) {
+        AddResource(SYSTEM_RESOURCE_PATH.c_str());
+    } else {
+        AddResource(SYSTEM_RESOURCE_PATH_COMPRESSED.c_str());
+    }
 
     bool overlay_hap_exist = Utils::isFileExist(SYSTEM_RESOURCE_OVERLAY_PATH);
     if (overlay_hap_exist) {
