@@ -316,6 +316,32 @@ bool isNapiNumber(napi_env env, napi_callback_info info)
     return true;
 }
 
+bool isNapiObject(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, 2);
+
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_typeof(env, argv[0], &valueType);
+    if (valueType != napi_object) {
+        HiLog::Error(LABEL, "Parameter type is not napi_object");
+        return false;
+    }
+    return true;
+}
+
+bool isNapiString(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, 2);
+
+    napi_valuetype valueType = napi_valuetype::napi_undefined;
+    napi_typeof(env, argv[0], &valueType);
+    if (valueType != napi_string) {
+        HiLog::Error(LABEL, "Parameter type is not napi_string");
+        return false;
+    }
+    return true;
+}
+
 int ResourceManagerAddon::GetResId(napi_env env, size_t argc, napi_value *argv)
 {
     if (argc == 0 || argv == nullptr) {
@@ -381,10 +407,7 @@ napi_value ResourceManagerAddon::ProcessNameParamV9(napi_env env, napi_callback_
     for (size_t i = 0; i < argc; i++) {
         napi_valuetype valueType;
         napi_typeof(env, argv[i], &valueType);
-        if (i == 0 && valueType != napi_string) {
-            ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
-            return nullptr;
-        } else if (i == 0 && valueType == napi_string) {
+        if (i == 0 && valueType == napi_string) {
             asyncContext->resName_ = GetResNameOrPath(env, argc, argv);
         } else if (i == 1 && valueType == napi_function) {
             napi_create_reference(env, argv[i], 1, &asyncContext->callbackRef_);
@@ -411,10 +434,7 @@ napi_value ResourceManagerAddon::ProcessIdParamV9(napi_env env, napi_callback_in
     for (size_t i = 0; i < argc; i++) {
         napi_valuetype valueType;
         napi_typeof(env, argv[i], &valueType);
-        if (i == 0 && valueType != napi_number) {
-            ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
-            return nullptr;
-        } else if (i == 0 && valueType == napi_number) {
+        if (i == 0 && valueType == napi_number) {
             asyncContext->resId_ = GetResId(env, argc, argv);
         } else if (i == 1 && valueType == napi_function) {
             napi_create_reference(env, argv[i], 1, &asyncContext->callbackRef_);
@@ -520,6 +540,10 @@ auto getStringByNameFunc = [](napi_env env, void* data) {
 
 napi_value ResourceManagerAddon::GetStringByName(napi_env env, napi_callback_info info)
 {
+    if (!isNapiString(env, info)) {
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
     return ProcessNameParamV9(env, info, "getStringByName", getStringByNameFunc);
 }
 
@@ -605,6 +629,10 @@ auto getStringArrayFunc = [](napi_env env, void* data) {
 
 napi_value ResourceManagerAddon::GetStringArrayByName(napi_env env, napi_callback_info info)
 {
+    if (!isNapiString(env, info)) {
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
     return ProcessNameParamV9(env, info, "GetStringArrayByName", getStringArrayFunc);
 }
 
@@ -674,6 +702,10 @@ auto getMediaByNameFunc = [](napi_env env, void *data) {
 
 napi_value ResourceManagerAddon::GetMediaByName(napi_env env, napi_callback_info info)
 {
+    if (!isNapiString(env, info)) {
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
     std::string traceVal = "ResourceManagerAddon::GetMediaByName";
     StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
     napi_value media = ProcessNameParamV9(env, info, "getMediaByName", getMediaByNameFunc);
@@ -803,6 +835,10 @@ napi_value ResourceManagerAddon::GetMediaBase64(napi_env env, napi_callback_info
 
 napi_value ResourceManagerAddon::GetMediaBase64ByName(napi_env env, napi_callback_info info)
 {
+    if (!isNapiString(env, info)) {
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
     std::string traceVal = "ResourceManagerAddon::GetMediaBase64ByName";
     StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
     napi_value mediaBase64 = ProcessNameParamV9(env, info, "GetMediaBase64ByName", getMediaBase64Func);
@@ -1033,6 +1069,10 @@ napi_value ResourceManagerAddon::ProcessIdNameParam(napi_env env, napi_callback_
 
 napi_value ResourceManagerAddon::GetPluralStringByName(napi_env env, napi_callback_info info)
 {
+    if (!isNapiString(env, info)) {
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
     return ProcessIdNameParam(env, info, "GetPluralStringByName", getPluralCapFunc);
 }
 
@@ -1139,7 +1179,7 @@ auto closeRawFileDescriptorFunc = [](napi_env env, void* data) {
         }
         RState state = context.addon_->GetResMgr()->CloseRawFileDescriptor(context.path_);
         if (state != RState::SUCCESS) {
-            context.SetErrorMsg("CloseRawFileDescriptor failed state", true);
+            context.SetErrorMsg("CloseRawFileDescriptor failed state", true, state);
             return nullptr;
         }
         return undefined;
@@ -1149,32 +1189,6 @@ auto closeRawFileDescriptorFunc = [](napi_env env, void* data) {
 napi_value ResourceManagerAddon::CloseRawFileDescriptor(napi_env env, napi_callback_info info)
 {
     return ProcessOnlyIdParam(env, info, "closeRawFileDescriptor", closeRawFileDescriptorFunc);
-}
-
-bool isNapiObject(napi_env env, napi_callback_info info)
-{
-    GET_PARAMS(env, info, 2);
-
-    napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
-    if (valueType != napi_object) {
-        HiLog::Error(LABEL, "Parameter type is not napi_object");
-        return false;
-    }
-    return true;
-}
-
-bool isNapiString(napi_env env, napi_callback_info info)
-{
-    GET_PARAMS(env, info, 2);
-
-    napi_valuetype valueType = napi_valuetype::napi_undefined;
-    napi_typeof(env, argv[0], &valueType);
-    if (valueType != napi_string) {
-        HiLog::Error(LABEL, "Parameter type is not napi_string");
-        return false;
-    }
-    return true;
 }
 
 napi_value ResourceManagerAddon::GetStringSync(napi_env env, napi_callback_info info)
@@ -1558,8 +1572,11 @@ napi_value ResourceManagerAddon::GetStringValue(napi_env env, napi_callback_info
 {
     if (isNapiNumber(env, info)) {
         return ProcessIdParamV9(env, info, "getStringValue", getStringFunc);
-    } else {
+    } else if (isNapiObject(env, info)) {
         return ProcessResourceParamV9(env, info, "getStringValue", getStringFunc);
+    } else {
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
     }
 }
 
@@ -1567,8 +1584,11 @@ napi_value ResourceManagerAddon::GetStringArrayValue(napi_env env, napi_callback
 {
     if (isNapiNumber(env, info)) {
         return ProcessIdParamV9(env, info, "getStringArrayValue", getStringArrayFunc);
-    } else {
+    } else if (isNapiObject(env, info)) {
         return ProcessResourceParamV9(env, info, "getStringArrayValue", getStringArrayFunc);
+    } else {
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
     }
 }
 
@@ -1576,8 +1596,11 @@ napi_value ResourceManagerAddon::GetMediaContent(napi_env env, napi_callback_inf
 {
     if (isNapiNumber(env, info)) {
         return ProcessIdParamV9(env, info, "getMediaContent", getMediaFunc);
-    } else {
+    } else if (isNapiObject(env, info)) {
         return ProcessResourceParamV9(env, info, "getMediaContent", getMediaFunc);
+    } else {
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
     }
 }
 
@@ -1585,28 +1608,47 @@ napi_value ResourceManagerAddon::GetMediaContentBase64(napi_env env, napi_callba
 {
     if (isNapiNumber(env, info)) {
         return ProcessIdParamV9(env, info, "getMediaContentBase64", getMediaBase64Func);
-    } else {
+    } else if (isNapiObject(env, info)) {
         return ProcessResourceParamV9(env, info, "getMediaContentBase64", getMediaBase64Func);
+    } else {
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
     }
 }
 
 napi_value ResourceManagerAddon::GetPluralStringValue(napi_env env, napi_callback_info info)
 {
+    if (!isNapiNumber(env, info)) {
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
     return ProcessIdNameParam(env, info, "getPluralStringValue", getPluralCapFunc);
 }
 
 napi_value ResourceManagerAddon::GetRawFileContent(napi_env env, napi_callback_info info)
 {
+    if (!isNapiString(env, info)) {
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
     return ProcessOnlyIdParam(env, info, "getRawFileContent", g_getRawFileFunc);
 }
 
 napi_value ResourceManagerAddon::GetRawFd(napi_env env, napi_callback_info info)
 {
+    if (!isNapiString(env, info)) {
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
     return ProcessOnlyIdParam(env, info, "getRawFd", g_getRawFileDescriptorFunc);
 }
 
 napi_value ResourceManagerAddon::CloseRawFd(napi_env env, napi_callback_info info)
 {
+    if (!isNapiString(env, info)) {
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
     return ProcessOnlyIdParam(env, info, "closeRawFd", closeRawFileDescriptorFunc);
 }
 
