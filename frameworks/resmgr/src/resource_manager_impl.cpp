@@ -265,8 +265,8 @@ RState ResourceManagerImpl::GetPluralStringByIdFormat(std::string &outValue, uin
     }
     std::string temp;
     RState rState = GetPluralString(vuqd, quantity, temp);
-    if (rState != SUCCESS) {
-        return rState;
+    if (rState != SUCCESS && rState != ERROR_CODE_RES_REF_TOO_MUCH) {
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
 
     va_list args;
@@ -287,8 +287,8 @@ RState ResourceManagerImpl::GetPluralStringByNameFormat(std::string &outValue, c
     }
     std::string temp;
     RState rState = GetPluralString(vuqd, quantity, temp);
-    if (rState != SUCCESS) {
-        return rState;
+    if (rState != SUCCESS && rState != ERROR_CODE_RES_REF_TOO_MUCH) {
+        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
     }
 
     va_list args;
@@ -739,7 +739,11 @@ RState ResourceManagerImpl::GetMediaById(uint32_t id, std::string &outValue)
         HILOG_ERROR("find qualifier value by Media id error");
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
-    return GetRawFile(qd, ResType::MEDIA, outValue);
+    RState state = GetRawFile(qd, ResType::MEDIA, outValue);
+    if (state != SUCCESS) {
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+    return state;
 }
 
 RState ResourceManagerImpl::GetMediaById(uint32_t id, uint32_t density, std::string &outValue)
@@ -909,18 +913,18 @@ RState ResourceManagerImpl::CloseRawFileDescriptor(const std::string &name)
 {
     auto it = rawFileDescriptor_.find(name);
     if (it == rawFileDescriptor_.end()) {
-        return SUCCESS;
+        return ERROR_CODE_RES_PATH_INVALID;
     }
     int fd = rawFileDescriptor_[name].fd;
     if (fd > 0) {
         int result = close(fd);
         if (result == -1) {
-            return ERROR;
+            return ERROR_CODE_RES_PATH_INVALID;
         }
         rawFileDescriptor_.erase(name);
         return SUCCESS;
     }
-    return ERROR;
+    return ERROR_CODE_RES_PATH_INVALID;
 }
 
 void ResourceManagerImpl::ProcessPsuedoTranslate(std::string &outValue)
