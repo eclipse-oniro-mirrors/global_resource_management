@@ -22,6 +22,7 @@ namespace Resource {
 int ResourceManagerAddResourceTest001(void);
 int ResourceManagerAddResourceTest002(void);
 int ResourceManagerAddResourceTest003(void);
+int ResourceManagerAddResourceTest004(void);
 int ResourceManagerUpdateResConfigTest001(void);
 int ResourceManagerUpdateResConfigTest002(void);
 int ResourceManagerUpdateResConfigTest003(void);
@@ -32,6 +33,7 @@ int ResourceManagerGetResConfigTest002(void);
 int ResourceManagerGetStringByIdTest001(void);
 int ResourceManagerGetStringByIdTest002(void);
 int ResourceManagerGetStringByIdTest003(void);
+int ResourceManagerGetStringByIdTest004(void);
 int ResourceManagerGetStringByNameTest001(void);
 int ResourceManagerGetStringByNameTest002(void);
 int ResourceManagerGetStringByNameTest003(void);

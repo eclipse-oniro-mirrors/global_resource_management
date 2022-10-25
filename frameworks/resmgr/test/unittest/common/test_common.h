@@ -27,6 +27,10 @@
 static const char *g_resFilePath = "all/assets/entry/resources.index";
 static const char *g_hapPath = "all.hap";
 
+// this is overlay relative path
+static const char *g_system_resFilePath = "system/assets/entry/resources.index";
+static const char *g_overlay_resFilePath = "overlay/assets/entry/resources.index";
+
 namespace OHOS {
 namespace Global {
 namespace Resource {

@@ -539,7 +539,10 @@ private:
                                                 "systemResources/SystemResources.hap";
 
     const std::string SYSTEM_RESOURCE_OVERLAY_PATH = "/data/storage/el1/bundle/" \
-         "ohos.global.systemres.overlay/ohos.global.systemres.overlay/assets/entry/resources.index";
+            "ohos.global.systemres.overlay/ohos.global.systemres.overlay/assets/entry/resources.index";
+
+    const std::string SYSTEM_RESOURCE_OVERLAY_PATH_COMPRESSED = "/data/storage/el1/bundle/" \
+            "ohos.global.systemres.overlay/ohos.global.systemres.overlay/SystemResourcesOverlay.hap";
 
     const float DEFAULT_DENSITY = 160.0f;
 
