@@ -1,0 +1,13 @@
+{
+    "theme": [
+        {
+            "name": "ohos_theme",
+            "value": [
+                {
+                    "name": "bg_color",
+                    "value": "$color:ohos_id_color_background"
+                }
+            ]
+        }
+    ]
+}

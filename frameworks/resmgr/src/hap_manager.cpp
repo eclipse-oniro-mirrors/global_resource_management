@@ -181,8 +181,8 @@ const HapResource::ValueUnderQualifierDir *HapManager::FindQualifierValueById(ui
     return this->GetBestMatchResource(candidates, density);
 }
 
-const HapResource::ValueUnderQualifierDir *HapManager::GetBestMatchResource(std::vector<const HapResource::IdValues *> candidates,
-    uint32_t density)
+const HapResource::ValueUnderQualifierDir *HapManager::GetBestMatchResource(std::vector<const HapResource::IdValues *>
+    candidates, uint32_t density)
 {
     const ResConfigImpl *bestResConfig = nullptr;
     const ResConfigImpl *bestOverlayResConfig = nullptr;
@@ -211,7 +211,7 @@ const HapResource::ValueUnderQualifierDir *HapManager::GetBestMatchResource(std:
                     overlayResult = paths[i];
                 }
             } else {
-               if (bestResConfig == nullptr) {
+                if (bestResConfig == nullptr) {
                     bestResConfig = resConfig;
                     result = paths[i];
                     continue;
@@ -223,8 +223,8 @@ const HapResource::ValueUnderQualifierDir *HapManager::GetBestMatchResource(std:
             }
         }
     }
-    if (bestOverlayResConfig != nullptr && result->IsSystemResource()) {
-        if(bestOverlayResConfig->IsMoreSuitable(bestResConfig, currentResConfig, density)){
+    if (bestOverlayResConfig != nullptr && result != nullptr && result->IsSystemResource()) {
+        if (bestOverlayResConfig->IsMoreSuitable(bestResConfig, currentResConfig, density)) {
             return overlayResult;
         }
     }

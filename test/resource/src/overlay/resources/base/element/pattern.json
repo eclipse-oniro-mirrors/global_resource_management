@@ -1,0 +1,14 @@
+{
+    "pattern": [
+        {
+            "name": "ohos_button_pattern",
+            "value": [
+                {
+                    "name": "bg_color",
+                    "value": "$color:ohos_id_color_emphasize"
+                }
+            ]
+        }
+
+    ]
+}
