@@ -171,8 +171,8 @@ private:
 
     std::vector<const HapResource::IdValues *> GetResourceListByName(const char *name, const ResType resType) const;
 
-    const HapResource::ValueUnderQualifierDir *GetBestMatchResource(std::vector<const HapResource::IdValues *> candidates,
-        uint32_t density);
+    const HapResource::ValueUnderQualifierDir *GetBestMatchResource(std::vector<const HapResource::IdValues *>
+        candidates, uint32_t density);
 
     bool AddResourcePath(const char *path);
 

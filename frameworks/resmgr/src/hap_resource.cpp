@@ -122,10 +122,6 @@ void CanonicalizePath(const char *path, char *outPath, size_t len)
 
 const HapResource* HapResource::Load(const char *path, const ResConfigImpl* defaultConfig, bool system)
 {
-    if (strcmp(path, "/data/storage/el1/bundle/ohos.global.systemres/"
-        "ohos.global.systemres/assets/entry/resources.index") == 0) {
-        system = true;
-    }
     if (Utils::endWithTail(path, "hap")) {
         return LoadFromHap(path, defaultConfig, system);
     } else {
@@ -227,7 +223,7 @@ const std::unordered_map<std::string, HapResource *> HapResource::LoadOverlays(c
 {
     std::unordered_map<std::string, HapResource *> result;
     do {
-        const HapResource *targetResource = LoadFromIndex(path.c_str(), defaultConfig);
+        const HapResource *targetResource = Load(path.c_str(), defaultConfig, true);
         if (targetResource == nullptr) {
             HILOG_ERROR("load target failed");
             break;
@@ -237,7 +233,7 @@ const std::unordered_map<std::string, HapResource *> HapResource::LoadOverlays(c
         std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> mapping =
             targetResource->BuildNameTypeIdMapping();
         for (auto iter = overlayPaths.begin(); iter != overlayPaths.end(); iter++) {
-            const HapResource *overlayResource = LoadFromIndex(iter->c_str(), defaultConfig);
+            const HapResource *overlayResource = Load(iter->c_str(), defaultConfig);
             if (overlayResource == nullptr) {
                 HILOG_ERROR("load overlay failed");
                 success = false;
