@@ -190,7 +190,7 @@ struct ResMgrAsyncContext {
     std::shared_ptr<ResourceManager::Resource> resource_;
 
     ResMgrAsyncContext() : work_(nullptr), resId_(0), param_(0), iValue_(0), fValue_(0.0f), bValue_(false),
-        createValueFunc_(nullptr), len_(0), deferred_(nullptr), callbackRef_(nullptr), success_(true) {}
+        createValueFunc_(nullptr), len_(0), deferred_(nullptr), callbackRef_(nullptr), success_(true), errCode_(0) {}
 
     void SetErrorMsg(const std::string &msg, bool withResId = false, int32_t errCode = 0);
 

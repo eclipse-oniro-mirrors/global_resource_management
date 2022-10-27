@@ -25,6 +25,8 @@
             <option name="push" value="data/all/assets/entry/resources/base/profile/test_profile.json -> /data/test/all/assets/entry/resources/base/profile/" src="res"/>
             <option name="push" value="data/colormode/assets/entry/resources.index -> /data/test/colormode/assets/entry/" src="res"/>
             <option name="push" value="data/mccmnc/assets/entry/resources.index -> /data/test/mccmnc/assets/entry/" src="res"/>
+            <option name="push" value="data/overlay/assets/entry/resources.index -> /data/test/overlay/assets/entry/" src="res"/>
+            <option name="push" value="data/system/assets/entry/resources.index -> /data/test/system/assets/entry/" src="res"/>
         </preparer>
     </target>
 </configuration>
