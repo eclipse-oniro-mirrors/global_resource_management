@@ -638,6 +638,36 @@ HWTEST_F(ResourceManagerTest, ResourceManagerAddResourceTest004, TestSize.Level1
 }
 
 /*
+ * @tc.name: ResourceManagerAddResourceTest005
+ * @tc.desc: Test GetStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerAddResourceTest005, TestSize.Level1)
+{
+    AddResource("zh", nullptr, nullptr);
+
+    std::vector<std::string> overlayPaths;
+    overlayPaths.push_back(FormatFullPath(g_overlay_resFilePath).c_str());
+    bool ret = ((ResourceManagerImpl* )rm)->AddResource("notexist/resources.index", overlayPaths);
+    ASSERT_FALSE(ret);
+}
+
+/*
+ * @tc.name: ResourceManagerAddResourceTest006
+ * @tc.desc: Test GetStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerAddResourceTest006, TestSize.Level1)
+{
+    AddResource("zh", nullptr, nullptr);
+
+    std::vector<std::string> overlayPaths;
+    overlayPaths.push_back(FormatFullPath("notexist/resources.index"));
+    bool ret = ((ResourceManagerImpl* )rm)->AddResource(FormatFullPath(g_system_resFilePath).c_str(), overlayPaths);
+    ASSERT_FALSE(ret);
+}
+
+/*
  * @tc.name: ResourceManagerUpdateResConfigTest001
  * @tc.desc: Test UpdateResConfig function
  * @tc.type: FUNC
@@ -871,6 +901,22 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdTest004, TestSize.Leve
     bool ret = ((ResourceManagerImpl* )rm)->AddResource(FormatFullPath(g_system_resFilePath).c_str(), overlayPaths);
     ASSERT_TRUE(ret);
     TestStringById("ohos_app_name", "SystemOverlay");
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByIdTest005
+ * @tc.desc: Test GetStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdTest005, TestSize.Level1)
+{
+    AddResource("zh", nullptr, nullptr);
+
+    std::vector<std::string> overlayPaths;
+    overlayPaths.push_back(FormatFullPath(g_overlay_resFilePath).c_str());
+    bool ret = ((ResourceManagerImpl* )rm)->AddResource(FormatFullPath(g_system_resFilePath).c_str(), overlayPaths);
+    ASSERT_TRUE(ret);
+    TestStringById("ohos_lab_answer_call", "overlay接听电话");
 }
 
 /*
@@ -1332,6 +1378,22 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFormatTest002, T
 }
 
 /*
+ * @tc.name: ResourceManagerGetPluralStringByIdFormatTest003
+ * @tc.desc: Test GetPluralStringByIdFormat function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFormatTest003, TestSize.Level1)
+{
+    AddResource("ar", nullptr, "SA");
+
+    RState state;
+    std::string outValue;
+    int id = GetResId("app_name", ResType::STRING);
+    state = rm->GetPluralStringByIdFormat(outValue, id, 1, 1);
+    ASSERT_EQ(ERROR_CODE_RES_NOT_FOUND_BY_ID, state);
+}
+
+/*
  * @tc.name: ResourceManagerGetPluralStringByNameFormatTest001
  * @tc.desc: Test GetPluralStringByNameFormat function, file case.
  * @tc.type: FUNC
@@ -1360,6 +1422,21 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByNameFormatTest002,
     std::string outValue;
     state = rm->GetPluralStringByNameFormat(outValue, g_nonExistName, 1, 1);
     ASSERT_EQ(ERROR_CODE_RES_NAME_NOT_FOUND, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetPluralStringByNameFormatTest003
+ * @tc.desc: Test GetPluralStringByNameFormat function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByNameFormatTest003, TestSize.Level1)
+{
+    bool ret = ((ResourceManagerImpl* )rm)->AddResource(FormatFullPath(g_overlay_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    const char* eat_apple = "eat_apple";
+    RState state = rm->GetPluralStringByNameFormat(outValue, eat_apple, 1, 1);
+    ASSERT_EQ(ERROR_CODE_RES_NOT_FOUND_BY_NAME, state);
 }
 
 /*
@@ -3351,6 +3428,22 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest022, TestSize.Level
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdTest023
+ * @tc.desc: Test GetMediaById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest023, TestSize.Level1)
+{
+    AddResource("en", nullptr, nullptr);
+
+    int id = GetResId("app_name", ResType::STRING);
+    EXPECT_TRUE(id > 0);
+    std::string outValue;
+    RState state = rm->GetMediaById(id, outValue);
+    EXPECT_EQ(state, ERROR_CODE_RES_NOT_FOUND_BY_ID);
 }
 
 /*
@@ -5594,6 +5687,9 @@ HWTEST_F(ResourceManagerTest, RawFileTestFromHap0046, TestSize.Level1)
     ASSERT_EQ(descriptor.length, 17); // 17 means the length of "for raw file test"
     state = rm->CloseRawFileDescriptor("rawfile/test_rawfile.txt");
     EXPECT_TRUE(state == SUCCESS);
+
+    state = rm->CloseRawFileDescriptor("noexist.txt");
+    EXPECT_EQ(state, ERROR_CODE_RES_PATH_INVALID);
 }
 
 /*
