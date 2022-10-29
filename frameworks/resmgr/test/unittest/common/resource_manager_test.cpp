@@ -38,6 +38,10 @@ static const char *g_colorModeResFilePath = "colormode/assets/entry/resources.in
 
 static const char *g_mccMncResFilePath = "mccmnc/assets/entry/resources.index";
 
+static const char *g_systemResFilePath = "system/assets/entry/resources.index";
+
+static const char *g_overlayResFilePath = "overlay/assets/entry/resources.index";
+
 class ResourceManagerTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -632,8 +636,8 @@ HWTEST_F(ResourceManagerTest, ResourceManagerAddResourceTest003, TestSize.Level1
 HWTEST_F(ResourceManagerTest, ResourceManagerAddResourceTest004, TestSize.Level1)
 {
     std::vector<std::string> overlayPaths;
-    overlayPaths.push_back(FormatFullPath(g_overlay_resFilePath).c_str());
-    bool ret = ((ResourceManagerImpl *)rm)->AddResource(FormatFullPath(g_system_resFilePath).c_str(), overlayPaths);
+    overlayPaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
+    bool ret = ((ResourceManagerImpl *)rm)->AddResource(FormatFullPath(g_systemResFilePath).c_str(), overlayPaths);
     ASSERT_TRUE(ret);
 }
 
@@ -647,7 +651,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerAddResourceTest005, TestSize.Level1
     AddResource("zh", nullptr, nullptr);
 
     std::vector<std::string> overlayPaths;
-    overlayPaths.push_back(FormatFullPath(g_overlay_resFilePath).c_str());
+    overlayPaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
     bool ret = ((ResourceManagerImpl* )rm)->AddResource("notexist/resources.index", overlayPaths);
     ASSERT_FALSE(ret);
 }
@@ -663,7 +667,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerAddResourceTest006, TestSize.Level1
 
     std::vector<std::string> overlayPaths;
     overlayPaths.push_back(FormatFullPath("notexist/resources.index"));
-    bool ret = ((ResourceManagerImpl* )rm)->AddResource(FormatFullPath(g_system_resFilePath).c_str(), overlayPaths);
+    bool ret = ((ResourceManagerImpl* )rm)->AddResource(FormatFullPath(g_systemResFilePath).c_str(), overlayPaths);
     ASSERT_FALSE(ret);
 }
 
@@ -896,9 +900,10 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdTest003, TestSize.Leve
 HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdTest004, TestSize.Level1)
 {
     AddResource("en", nullptr, nullptr);
+
     std::vector<std::string> overlayPaths;
-    overlayPaths.push_back(FormatFullPath(g_overlay_resFilePath).c_str());
-    bool ret = ((ResourceManagerImpl* )rm)->AddResource(FormatFullPath(g_system_resFilePath).c_str(), overlayPaths);
+    overlayPaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
+    bool ret = ((ResourceManagerImpl* )rm)->AddResource(FormatFullPath(g_systemResFilePath).c_str(), overlayPaths);
     ASSERT_TRUE(ret);
     TestStringById("ohos_app_name", "SystemOverlay");
 }
@@ -913,8 +918,8 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdTest005, TestSize.Leve
     AddResource("zh", nullptr, nullptr);
 
     std::vector<std::string> overlayPaths;
-    overlayPaths.push_back(FormatFullPath(g_overlay_resFilePath).c_str());
-    bool ret = ((ResourceManagerImpl* )rm)->AddResource(FormatFullPath(g_system_resFilePath).c_str(), overlayPaths);
+    overlayPaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
+    bool ret = ((ResourceManagerImpl* )rm)->AddResource(FormatFullPath(g_systemResFilePath).c_str(), overlayPaths);
     ASSERT_TRUE(ret);
     TestStringById("ohos_lab_answer_call", "overlay接听电话");
 }
@@ -1431,7 +1436,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByNameFormatTest002,
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByNameFormatTest003, TestSize.Level1)
 {
-    bool ret = ((ResourceManagerImpl* )rm)->AddResource(FormatFullPath(g_overlay_resFilePath).c_str());
+    bool ret = ((ResourceManagerImpl* )rm)->AddResource(FormatFullPath(g_overlayResFilePath).c_str());
     ASSERT_TRUE(ret);
     std::string outValue;
     const char* eat_apple = "eat_apple";
