@@ -59,6 +59,17 @@ namespace OHOS {
         return result;
     }
 
+    bool GetIntegerByNameFuzzTest(const char* data, size_t size, ResourceManager *rm)
+    {
+        bool result = false;
+        if (size > 0) {
+            std::string testName(reinterpret_cast<const char*>(data), size);
+            int outValue;
+            result = rm->GetIntegerByName(testName, outValue);
+        }
+        return result;
+    }
+
     bool GetBooleanByIdFuzzTest(const char* data, size_t size, ResourceManager *rm)
     {
         bool result = false;
@@ -81,6 +92,50 @@ namespace OHOS {
         return result;
     }
 
+    bool GetMediaByIdFuzzTest(const char* data, size_t size, ResourceManager *rm)
+    {
+        bool result = false;
+        if (size > 0) {
+            uint32_t testId = reinterpret_cast<uint32_t>(data);
+            std::string outValue = "";
+            result = rm->GetMediaById(testId, outValue);
+        }
+        return result;
+    }
+
+    bool GetMediaByNameFuzzTest(const char* data, size_t size, ResourceManager *rm)
+    {
+        bool result = false;
+        if (size > 0) {
+            std::string testName(reinterpret_cast<const char*>(data), size);
+            std::string outValue = "";
+            result = rm->GetMediaByName(testName, outValue);
+        }
+        return result;
+    }
+
+    bool GetStringFormatByIdFuzzTest(const char* data, size_t size, ResourceManager *rm)
+    {
+        bool result = false;
+        if (size > 0) {
+            uint32_t testId = reinterpret_cast<uint32_t>(data);
+            std::string outValue = "";
+            result = rm->GetStringFormatById(outValue, testId);
+        }
+        return result;
+    }
+
+    bool GetColorByIdFuzzTest(const char* data, size_t size, ResourceManager *rm)
+    {
+        bool result = false;
+        if (size > 0) {
+            uint32_t testId = reinterpret_cast<uint32_t>(data);
+            uint32_t outValue = 0;
+            result = rm->GetColorById(testId, outValue);
+        }
+        return result;
+    }
+
     void ResourceManagerImplFuzzTest(const char* data, size_t size)
     {
         ResourceManager *rm = CreateResourceManager();
@@ -90,8 +145,13 @@ namespace OHOS {
         GetStringByIdFuzzTest(data, size, rm);
         GetStringArrayByIdFuzzTest(data, size, rm);
         GetIntegerByIdFuzzTest(data, size, rm);
+        GetIntegerByNameFuzzTest(data, size, rm);
         GetBooleanByIdFuzzTest(data, size, rm);
         GetFloatByIdFuzzTest(data, size, rm);
+        GetMediaByIdFuzzTest(data, size, rm);
+        GetMediaByNameFuzzTest(data, size, rm);
+        GetStringFormatByIdFuzzTest(data, size, rm);
+        GetColorByIdFuzzTest(data, size, rm);
         delete rm;
         return;
     }
