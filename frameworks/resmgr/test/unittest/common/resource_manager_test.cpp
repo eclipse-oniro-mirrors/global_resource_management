@@ -652,7 +652,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerAddResourceTest005, TestSize.Level1
 
     std::vector<std::string> overlayPaths;
     overlayPaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
-    bool ret = ((ResourceManagerImpl* )rm)->AddResource("notexist/resources.index", overlayPaths);
+    bool ret = ((ResourceManagerImpl*)rm)->AddResource("notexist/resources.index", overlayPaths);
     ASSERT_FALSE(ret);
 }
 
@@ -667,7 +667,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerAddResourceTest006, TestSize.Level1
 
     std::vector<std::string> overlayPaths;
     overlayPaths.push_back(FormatFullPath("notexist/resources.index"));
-    bool ret = ((ResourceManagerImpl* )rm)->AddResource(FormatFullPath(g_systemResFilePath).c_str(), overlayPaths);
+    bool ret = ((ResourceManagerImpl*)rm)->AddResource(FormatFullPath(g_systemResFilePath).c_str(), overlayPaths);
     ASSERT_FALSE(ret);
 }
 
@@ -903,7 +903,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdTest004, TestSize.Leve
 
     std::vector<std::string> overlayPaths;
     overlayPaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
-    bool ret = ((ResourceManagerImpl* )rm)->AddResource(FormatFullPath(g_systemResFilePath).c_str(), overlayPaths);
+    bool ret = ((ResourceManagerImpl*)rm)->AddResource(FormatFullPath(g_systemResFilePath).c_str(), overlayPaths);
     ASSERT_TRUE(ret);
     TestStringById("ohos_app_name", "SystemOverlay");
 }
@@ -919,7 +919,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdTest005, TestSize.Leve
 
     std::vector<std::string> overlayPaths;
     overlayPaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
-    bool ret = ((ResourceManagerImpl* )rm)->AddResource(FormatFullPath(g_systemResFilePath).c_str(), overlayPaths);
+    bool ret = ((ResourceManagerImpl*)rm)->AddResource(FormatFullPath(g_systemResFilePath).c_str(), overlayPaths);
     ASSERT_TRUE(ret);
     TestStringById("ohos_lab_answer_call", "overlay接听电话");
 }
@@ -1436,11 +1436,11 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByNameFormatTest002,
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByNameFormatTest003, TestSize.Level1)
 {
-    bool ret = ((ResourceManagerImpl* )rm)->AddResource(FormatFullPath(g_overlayResFilePath).c_str());
+    bool ret = ((ResourceManagerImpl*)rm)->AddResource(FormatFullPath(g_overlayResFilePath).c_str());
     ASSERT_TRUE(ret);
     std::string outValue;
-    const char* eat_apple = "eat_apple";
-    RState state = rm->GetPluralStringByNameFormat(outValue, eat_apple, 1, 1);
+    const char* eatApple = "eat_apple";
+    RState state = rm->GetPluralStringByNameFormat(outValue, eatApple, 1, 1);
     ASSERT_EQ(ERROR_CODE_RES_NOT_FOUND_BY_NAME, state);
 }
 
