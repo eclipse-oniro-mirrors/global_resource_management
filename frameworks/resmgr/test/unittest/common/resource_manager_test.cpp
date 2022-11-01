@@ -975,6 +975,48 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameTest003, TestSize.Le
 }
 
 /*
+ * @tc.name: ResourceManagerGetStringByNameTest004
+ * @tc.desc: Test GetStringByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameTest004, TestSize.Level1)
+{
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    rc->SetDirection(DIRECTION_VERTICAL);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+    std::vector<std::string> overlayPaths;
+    overlayPaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
+    bool ret = ((ResourceManagerImpl *)rm)->AddResource(FormatFullPath(g_systemResFilePath).c_str(), overlayPaths);
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    ((ResourceManagerImpl *)rm)->GetStringByName("ohos_desc_camera", outValue);
+    ASSERT_EQ(outValue, "允许应用拍摄照片和视频。");
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameTest005
+ * @tc.desc: Test GetStringByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameTest005, TestSize.Level1)
+{
+    AddResource("en", nullptr, nullptr);
+    std::vector<std::string> overlayPaths;
+    overlayPaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
+    bool ret = ((ResourceManagerImpl *)rm)->AddResource(FormatFullPath(g_systemResFilePath).c_str(), overlayPaths);
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    ((ResourceManagerImpl *)rm)->GetStringByName("hello", outValue);
+    ASSERT_EQ(outValue, "Helloooo");
+}
+
+/*
  * @tc.name: ResourceManagerGetStringFormatByIdTest001
  * @tc.desc: Test GetStringFormatById function
  * @tc.type: FUNC

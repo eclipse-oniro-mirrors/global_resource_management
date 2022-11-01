@@ -40,6 +40,8 @@ int ResourceManagerGetStringByIdTest005(void);
 int ResourceManagerGetStringByNameTest001(void);
 int ResourceManagerGetStringByNameTest002(void);
 int ResourceManagerGetStringByNameTest003(void);
+int ResourceManagerGetStringByNameTest004(void);
+int ResourceManagerGetStringByNameTest005(void);
 int ResourceManagerGetStringFormatByIdTest001(void);
 int ResourceManagerGetStringFormatByIdTest002(void);
 int ResourceManagerGetStringFormatByNameTest001(void);
