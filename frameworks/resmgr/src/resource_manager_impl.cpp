@@ -218,7 +218,7 @@ RState ResourceManagerImpl::GetStringArray(const IdItem *idItem, std::vector<std
         RState rrRet = ResolveReference(idItem->values_[i], resolvedValue);
         if (rrRet != SUCCESS) {
             HILOG_ERROR("ResolveReference failed, value:%s", idItem->values_[i].c_str());
-            return ERROR;
+            return rrRet;
         }
         outValue.push_back(resolvedValue);
     }
@@ -273,7 +273,10 @@ RState ResourceManagerImpl::GetPluralStringByIdFormat(std::string &outValue, uin
     }
     std::string temp;
     RState rState = GetPluralString(vuqd, quantity, temp);
-    if (rState != SUCCESS && rState != ERROR_CODE_RES_REF_TOO_MUCH) {
+    if (rState == ERROR_CODE_RES_REF_TOO_MUCH) {
+        return rState;
+    }
+    if (rState != SUCCESS) {
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
 
@@ -295,7 +298,10 @@ RState ResourceManagerImpl::GetPluralStringByNameFormat(std::string &outValue, c
     }
     std::string temp;
     RState rState = GetPluralString(vuqd, quantity, temp);
-    if (rState != SUCCESS && rState != ERROR_CODE_RES_REF_TOO_MUCH) {
+    if (rState == ERROR_CODE_RES_REF_TOO_MUCH) {
+        return rState;
+    }
+    if (rState != SUCCESS) {
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
     }
 
