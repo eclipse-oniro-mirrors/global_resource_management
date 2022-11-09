@@ -487,9 +487,15 @@ bool ResConfigImpl::IsDensityMoreSuitable(int thisDistance, int otherDistance) c
 
 ResConfigImpl::~ResConfigImpl()
 {
-    delete resLocale_;
+    if (resLocale_ != nullptr) {
+        delete resLocale_;
+        resLocale_ = nullptr;
+    }
 #ifdef SUPPORT_GRAPHICS
-    delete localeInfo_;
+    if (localeInfo_ != nullptr) {
+        delete localeInfo_;
+        localeInfo_ = nullptr;
+    }
 #endif
 }
 
