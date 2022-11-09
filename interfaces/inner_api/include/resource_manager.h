@@ -169,7 +169,7 @@ public:
 
     virtual RState GetRawFileDescriptorFromHap(const std::string &rawFileName, RawFileDescriptor &descriptor) = 0;
 
-    virtual RState isLoadHap() = 0;
+    virtual RState IsLoadHap() = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();
