@@ -247,6 +247,7 @@ int ResourceManagerGetMediaBase64DataByNameFromHapTest0044(void);
 int RawFileTestFromHap0045(void);
 int RawFileTestFromHap0046(void);
 int RawFileTestFromHap0047(void);
+int ResourceManagerOverlayTest001(void);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
