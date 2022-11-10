@@ -5755,4 +5755,27 @@ HWTEST_F(ResourceManagerTest, RawFileTestFromHap0047, TestSize.Level1)
     state = rm->GetRawFileFromHap("test_rawfile.txt", rawFile);
     EXPECT_FALSE(state == SUCCESS);
 }
+
+/*
+ * @tc.name: ResourceManagerOverlayTest001
+ * @tc.desc: Test overlay AddResource & UpdateResConfig function, file case.
+ * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerOverlayTest001, TestSize.Level1)
+{
+    std::vector<std::string> overlayPaths;
+    overlayPaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
+    bool ret = ((ResourceManagerImpl *)rm)->AddResource(FormatFullPath(g_systemResFilePath).c_str(), overlayPaths);
+    ASSERT_TRUE(ret);
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("en", nullptr, "US");
+    rm->UpdateResConfig(*rc);
+    delete rc;
+}
 }
