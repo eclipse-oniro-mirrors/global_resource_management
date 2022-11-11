@@ -27,6 +27,10 @@
 #include "hisysevent_adapter.h"
 #include "hitrace_meter.h"
 
+#include "napi/native_api.h"
+#include "napi/native_common.h"
+#include "res_common.h"
+
 namespace OHOS {
 namespace Global {
 namespace Resource {
@@ -198,6 +202,59 @@ static napi_value GetResourceManager(napi_env env, napi_callback_info info)
     return result;
 }
 
+static napi_status SetEnumItem(napi_env env, napi_value object, const char* name, int32_t value)
+{
+    napi_status status;
+    napi_value itemName;
+    napi_value itemValue;
+
+    NAPI_CALL_BASE(env, status = napi_create_string_utf8(env, name, NAPI_AUTO_LENGTH, &itemName), status);
+    NAPI_CALL_BASE(env, status = napi_create_int32(env, value, &itemValue), status);
+
+    NAPI_CALL_BASE(env, status = napi_set_property(env, object, itemName, itemValue), status);
+    NAPI_CALL_BASE(env, status = napi_set_property(env, object, itemValue, itemName), status);
+
+    return napi_ok;
+}
+
+static napi_value InitDirectionObject(napi_env env)
+{
+    napi_value object;
+    NAPI_CALL(env, napi_create_object(env, &object));
+
+    NAPI_CALL(env, SetEnumItem(env, object, "DIRECTION_VERTICAL", DIRECTION_VERTICAL));
+    NAPI_CALL(env, SetEnumItem(env, object, "DIRECTION_HORIZONTAL", DIRECTION_HORIZONTAL));
+    return object;
+}
+
+static napi_value InitDeviceTypeObject(napi_env env)
+{
+    napi_value object;
+    NAPI_CALL(env, napi_create_object(env, &object));
+
+    NAPI_CALL(env, SetEnumItem(env, object, "DEVICE_TYPE_PHONE", DEVICE_PHONE));
+    NAPI_CALL(env, SetEnumItem(env, object, "DEVICE_TYPE_TABLET", DEVICE_TABLET));
+    NAPI_CALL(env, SetEnumItem(env, object, "DEVICE_TYPE_CAR", DEVICE_CAR));
+    NAPI_CALL(env, SetEnumItem(env, object, "DEVICE_TYPE_PC", DEVICE_PAD));
+    NAPI_CALL(env, SetEnumItem(env, object, "DEVICE_TYPE_TV", DEVICE_TV));
+    NAPI_CALL(env, SetEnumItem(env, object, "DEVICE_TYPE_WEARABLE", DEVICE_WEARABLE));
+    return object;
+}
+
+static napi_value InitScreenDensityObject(napi_env env)
+{
+    napi_value object;
+    NAPI_CALL(env, napi_create_object(env, &object));
+
+    NAPI_CALL(env, SetEnumItem(env, object, "SCREEN_SDPI", SCREEN_DENSITY_SDPI));
+    NAPI_CALL(env, SetEnumItem(env, object, "SCREEN_MDPI", SCREEN_DENSITY_MDPI));
+    NAPI_CALL(env, SetEnumItem(env, object, "SCREEN_LDPI", SCREEN_DENSITY_LDPI));
+    NAPI_CALL(env, SetEnumItem(env, object, "SCREEN_XLDPI", SCREEN_DENSITY_XLDPI));
+    NAPI_CALL(env, SetEnumItem(env, object, "SCREEN_XXLDPI", SCREEN_DENSITY_XXLDPI));
+    NAPI_CALL(env, SetEnumItem(env, object, "SCREEN_XXXLDPI", SCREEN_DENSITY_XXXLDPI));
+    return object;
+}
+
 static napi_value ResMgrInit(napi_env env, napi_value exports)
 {
     std::string traceVal = "GetResourceManager";
@@ -211,6 +268,19 @@ static napi_value ResMgrInit(napi_env env, napi_value exports)
         HiLog::Error(LABEL, "Failed to set getResourceManager at init");
         return nullptr;
     }
+
+    napi_property_descriptor static_prop[] = {
+        DECLARE_NAPI_PROPERTY("Direction", InitDirectionObject(env)),
+        DECLARE_NAPI_PROPERTY("DeviceType", InitDeviceTypeObject(env)),
+        DECLARE_NAPI_PROPERTY("ScreenDensity", InitScreenDensityObject(env))
+    };
+
+    status = napi_define_properties(env, exports, sizeof(static_prop) / sizeof(static_prop[0]), static_prop);
+    if (status != napi_ok) {
+        HiLog::Error(LABEL, "failed to define properties for exports");
+        return nullptr;
+    }
+
     return exports;
 }
 
