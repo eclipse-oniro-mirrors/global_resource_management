@@ -149,9 +149,9 @@ RawDir *OH_ResourceManager_OpenRawDir(const NativeResourceManager *mgr, const ch
     return result.release();
 }
 
-bool isLoadHap(const NativeResourceManager *mgr)
+bool IsLoadHap(const NativeResourceManager *mgr)
 {
-    RState state = mgr->resManager->isLoadHap();
+    RState state = mgr->resManager->IsLoadHap();
     if (state != RState::SUCCESS) {
         return false;
     }
@@ -187,7 +187,7 @@ RawFile *OH_ResourceManager_OpenRawFile(const NativeResourceManager *mgr, const 
     if (mgr == nullptr || fileName == nullptr) {
         return nullptr;
     }
-    if (isLoadHap(mgr)) {
+    if (IsLoadHap(mgr)) {
         return LoadRawFileFromHap(mgr, fileName);
     }
 

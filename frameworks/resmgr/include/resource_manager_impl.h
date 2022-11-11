@@ -481,7 +481,7 @@ public:
     /**
      * Is load hap
      */
-    virtual RState isLoadHap();
+    virtual RState IsLoadHap();
 
 private:
     RState GetString(const IdItem *idItem, std::string &outValue);

@@ -324,17 +324,25 @@ bool HapManager::AddResource(const std::string &path, const std::vector<std::str
 HapManager::~HapManager()
 {
     for (size_t i = 0; i < hapResources_.size(); ++i) {
-        auto ptr = hapResources_[i];
-        delete (ptr);
+        if (hapResources_[i] != nullptr) {
+            delete hapResources_[i];
+            hapResources_[i] = nullptr;
+        }
     }
-    delete resConfig_;
+    if (resConfig_ != nullptr) {
+        delete resConfig_;
+        resConfig_ = nullptr;
+    }
 
 #ifdef SUPPORT_GRAPHICS
     auto iter = plurRulesCache_.begin();
     for (; iter != plurRulesCache_.end(); iter++) {
         HILOG_DEBUG("delete plurRulesMap_ %s", iter->first.c_str());
-        auto ptr = iter->second;
-        delete (ptr);
+        if (iter->second != nullptr) {
+            auto ptr = iter->second;
+            delete (ptr);
+            iter->second = nullptr;
+        }
     }
 #endif
 }
@@ -448,9 +456,13 @@ std::vector<std::string> HapManager::GetResourcePaths()
     return result;
 }
 
-bool HapManager::isLoadHap()
+bool HapManager::IsLoadHap()
 {
     for (auto iter = hapResources_.rbegin(); iter != hapResources_.rend(); iter++) {
+        if ((*iter) == nullptr) {
+            HILOG_ERROR("the hapResource_ is nullptr");
+            return false;
+        }
         const std::string hapPath = (*iter)->GetIndexPath();
         if (Utils::endWithTail(hapPath, "hap")) {
             return true;

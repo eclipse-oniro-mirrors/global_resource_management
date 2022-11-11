@@ -281,9 +281,9 @@ napi_value ResourceManagerAddon::New(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
-bool isLoadHap(ResMgrAsyncContext *asyncContext)
+bool IsLoadHap(ResMgrAsyncContext *asyncContext)
 {
-    RState state = asyncContext->addon_->GetResMgr()->isLoadHap();
+    RState state = asyncContext->addon_->GetResMgr()->IsLoadHap();
     if (state != RState::SUCCESS) {
         return false;
     }
@@ -679,7 +679,7 @@ auto getMediaByNameFunc = [](napi_env env, void *data) {
     ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
     std::string path;
     RState state;
-    if (isLoadHap(asyncContext)) {
+    if (IsLoadHap(asyncContext)) {
         size_t tmpLen;
         state = asyncContext->addon_->GetResMgr()->GetMediaDataByName(asyncContext->resName_.c_str(), tmpLen,
             asyncContext->mediaData);
@@ -724,7 +724,7 @@ auto getMediaFunc = [](napi_env env, void *data) {
         HiLog::Error(LABEL, "Failed to GetHapResourceManager in getMediaFunc");
         return;
     }
-    if (isLoadHap(asyncContext)) {
+    if (IsLoadHap(asyncContext)) {
         size_t tmpLen;
         state = resMgr->GetMediaDataById(resId, tmpLen, asyncContext->mediaData);
         if (state != RState::SUCCESS) {
@@ -777,7 +777,7 @@ auto getMediaBase64Func = [](napi_env env, void *data) {
             HiLog::Error(LABEL, "Failed to GetHapResourceManager in getMediaBase64Func");
             return;
         }
-        if (isLoadHap(asyncContext)) {
+        if (IsLoadHap(asyncContext)) {
             state = resMgr->GetMediaBase64DataById(resId, asyncContext->value_);
             if (state != RState::SUCCESS) {
                 asyncContext->SetErrorMsg("GetMedia path failed", true, state);
@@ -792,7 +792,7 @@ auto getMediaBase64Func = [](napi_env env, void *data) {
             return;
         }
     } else {
-        if (isLoadHap(asyncContext)) {
+        if (IsLoadHap(asyncContext)) {
             state = asyncContext->addon_->GetResMgr()->GetMediaBase64DataByName(asyncContext->resName_.c_str(),
                 asyncContext->value_);
             if (state != RState::SUCCESS) {
@@ -1084,7 +1084,7 @@ napi_value ResourceManagerAddon::GetPluralString(napi_env env, napi_callback_inf
 auto g_getRawFileFunc = [](napi_env env, void* data) {
     ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
     auto rawFile = std::make_unique<ResourceManager::RawFile>();
-    if (isLoadHap(asyncContext)) {
+    if (IsLoadHap(asyncContext)) {
         asyncContext->addon_->GetResMgr()->GetRawFileFromHap(asyncContext->path_, rawFile);
         asyncContext->len_ = static_cast<int>(rawFile->length);
         asyncContext->mediaData = std::move(rawFile->buffer);
@@ -1110,7 +1110,7 @@ auto g_getRawFileDescriptorFunc = [](napi_env env, void* data) {
     asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext& context) -> napi_value {
         ResourceManager::RawFileDescriptor descriptor;
         RState state;
-        if (isLoadHap(&context)) {
+        if (IsLoadHap(&context)) {
             state = context.addon_->GetResMgr()->GetRawFileDescriptorFromHap(context.path_, descriptor);
         } else {
             state = context.addon_->GetResMgr()->GetRawFileDescriptor(context.path_, descriptor);

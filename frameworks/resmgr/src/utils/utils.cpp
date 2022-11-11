@@ -17,6 +17,7 @@
 #include <fstream>
 #include <vector>
 #include <sys/stat.h>
+#include "hilog_wrapper.h"
 
 #ifdef __LINUX__
 #include <cstring>
@@ -399,6 +400,10 @@ RState Utils::ConvertColorToUInt32(const char *s, uint32_t &outValue)
 
 bool Utils::endWithTail(const std::string& path, const std::string& tail)
 {
+    if (path.size() < tail.size()) {
+        HILOG_ERROR("the path is shorter than tail");
+        return false;
+    }
     return path.compare(path.size() - tail.size(), tail.size(), tail) == 0;
 }
 
