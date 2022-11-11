@@ -1371,7 +1371,7 @@ napi_value ResourceManagerAddon::GetNumber(napi_env env, napi_callback_info info
             asyncContext->SetErrorMsg("GetIntegerById failed to create result", true);
         }
     } else {
-        state = asyncContext->addon_->GetResMgr()->GetFloatById(asyncContext->resId_,
+        state = asyncContext->addon_->GetResMgr()->GetFloatById(resId,
         asyncContext->fValue_);
         if (state != RState::SUCCESS) {
             asyncContext->SetErrorMsg("GetFloatById failed state", true);
@@ -1618,7 +1618,7 @@ napi_value ResourceManagerAddon::GetMediaContentBase64(napi_env env, napi_callba
 
 napi_value ResourceManagerAddon::GetPluralStringValue(napi_env env, napi_callback_info info)
 {
-    if (!isNapiNumber(env, info)) {
+    if (isNapiString(env, info)) {
         ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
