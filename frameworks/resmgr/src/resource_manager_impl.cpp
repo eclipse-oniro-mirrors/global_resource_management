@@ -951,9 +951,11 @@ ResourceManagerImpl::~ResourceManagerImpl()
 {
     if (hapManager_ != nullptr) {
         delete hapManager_;
+        hapManager_ = nullptr;
     }
     if (psueManager_ != nullptr) {
         delete (psueManager_);
+        psueManager_ = nullptr;
     }
 }
 
@@ -1189,9 +1191,9 @@ RState ResourceManagerImpl::GetRawFileDescriptorFromHap(const std::string &rawFi
     return SUCCESS;
 }
 
-RState ResourceManagerImpl::isLoadHap()
+RState ResourceManagerImpl::IsLoadHap()
 {
-    if (hapManager_->isLoadHap()) {
+    if (hapManager_->IsLoadHap()) {
         return SUCCESS;
     }
     return NOT_FOUND;

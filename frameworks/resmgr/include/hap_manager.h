@@ -160,7 +160,7 @@ public:
     /**
      * Is load hap
      */
-    bool isLoadHap();
+    bool IsLoadHap();
 
 private:
     void UpdateResConfigImpl(ResConfigImpl &resConfig);

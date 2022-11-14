@@ -54,7 +54,10 @@ HapResource::ValueUnderQualifierDir::ValueUnderQualifierDir(const std::vector<Ke
 HapResource::ValueUnderQualifierDir::~ValueUnderQualifierDir()
 {
     // keyParams_ idItem_ was passed into this, we don't delete them because someone will do
-    delete (resConfig_);
+    if (resConfig_ != nullptr) {
+        delete (resConfig_);
+        resConfig_ = nullptr;
+    }
 }
 
 void HapResource::ValueUnderQualifierDir::InitResConfig()
@@ -66,8 +69,10 @@ void HapResource::ValueUnderQualifierDir::InitResConfig()
 HapResource::IdValues::~IdValues()
 {
     for (size_t i = 0; i < limitPaths_.size(); ++i) {
-        auto path = limitPaths_[i];
-        delete (path);
+        if (limitPaths_[i] != nullptr) {
+            delete limitPaths_[i];
+            limitPaths_[i] = nullptr;
+        }
     }
 }
 
@@ -79,15 +84,24 @@ HapResource::HapResource(const std::string path, time_t lastModTime, const ResCo
 
 HapResource::~HapResource()
 {
-    delete (resDesc_);
+    if (resDesc_ != nullptr) {
+        delete (resDesc_);
+        resDesc_ = nullptr;
+    }
     std::map<uint32_t, IdValues *>::iterator iter;
     for (iter = idValuesMap_.begin(); iter != idValuesMap_.end(); ++iter) {
-        IdValues *ptr = iter->second;
-        delete (ptr);
+        if (iter->second != nullptr) {
+            IdValues *ptr = iter->second;
+            delete (ptr);
+            iter->second = nullptr;
+        }
     }
 
     for (size_t i = 0; i < idValuesNameMap_.size(); ++i) {
-        delete (idValuesNameMap_[i]);
+        if (idValuesNameMap_[i] != nullptr) {
+            delete (idValuesNameMap_[i]);
+            idValuesNameMap_[i] = nullptr;
+        }
     }
     lastModTime_ = 0;
     // defaultConfig_ was passed by constructor, we do not delete it here
@@ -280,7 +294,6 @@ void HapResource::UpdateOverlayInfo(std::unordered_map<std::string, std::unorder
     std::map<uint32_t, IdValues *> newIdValuesMap;
     for (auto iter = idValuesMap_.begin(); iter != idValuesMap_.end(); iter++) {
         const std::vector<ValueUnderQualifierDir *> &limitPaths = iter->second->GetLimitPathsConst();
-        uint32_t newId = 0;
         if (limitPaths.size() > 0) {
             ValueUnderQualifierDir *value = limitPaths[0];
             std::string name = value->idItem_->name_;
@@ -292,7 +305,7 @@ void HapResource::UpdateOverlayInfo(std::unordered_map<std::string, std::unorder
             if (typeId.find(type) == typeId.end()) {
                 continue;
             }
-            newId = typeId[type];
+            uint32_t newId = typeId[type];
             for_each(limitPaths.begin(), limitPaths.end(), [&](auto &item) {
                 item->idItem_->id_ = newId;
                 item->isOverlay_ = true;
@@ -386,6 +399,10 @@ bool HapResource::InitIdList(bool system)
 
 const HapResource::IdValues *HapResource::GetIdValues(const uint32_t id) const
 {
+    if (idValuesMap_.empty()) {
+        HILOG_ERROR("idValuesMap_ is empty");
+        return nullptr;
+    }
     uint32_t uid = id;
     std::map<uint32_t, IdValues *>::const_iterator iter = idValuesMap_.find(uid);
     if (iter == idValuesMap_.end()) {
