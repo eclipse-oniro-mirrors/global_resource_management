@@ -388,6 +388,16 @@ bool HapManager::AddResourcePath(const char *path)
     return true;
 }
 
+void DeleteNewResource(std::vector<HapResource *> &newResources)
+{
+    for (size_t i = 0; i < newResources.size(); ++i) {
+        if (newResources[i] != nullptr) {
+            delete (newResources[i]);
+            newResources[i] = nullptr;
+        }
+    }
+}
+
 RState HapManager::ReloadAll()
 {
     if (hapResources_.size() == 0) {
@@ -395,16 +405,14 @@ RState HapManager::ReloadAll()
     }
     std::vector<HapResource *> newResources;
     for (auto iter = loadedHapPaths_.begin(); iter != loadedHapPaths_.end(); iter++) {
-        const HapResource *pResource = HapResource::Load(iter->first.c_str(), resConfig_);
-        if (pResource == nullptr) {
-            for (size_t i = 0; i < newResources.size(); ++i) {
-                delete (newResources[i]);
-            }
-            return HAP_INIT_FAILED;
-        }
-        newResources.push_back(const_cast<HapResource *>(pResource));
         std::vector<std::string> &overlayPaths = iter->second;
         if (overlayPaths.size() == 0) {
+            const HapResource *pResource = HapResource::Load(iter->first.c_str(), resConfig_);
+            if (pResource == nullptr) {
+                DeleteNewResource(newResources);
+                return HAP_INIT_FAILED;
+            }
+            newResources.push_back(const_cast<HapResource *>(pResource));
             continue;
         }
         std::unordered_map<std::string, HapResource *> result = HapResource::LoadOverlays(iter->first.c_str(),
@@ -412,12 +420,9 @@ RState HapManager::ReloadAll()
         if (result.size() == 0) {
             continue;
         }
-
-        for_each(overlayPaths.begin(), overlayPaths.end(), [&](auto &path) {
-            if (result.find(path) != result.end()) {
-                newResources.push_back(result[path]);
-            }
-        });
+        for (auto iter = result.begin(); iter != result.end(); iter++) {
+            newResources.push_back(iter->second);
+        }
     }
     for (size_t i = 0; i < hapResources_.size(); ++i) {
         delete (hapResources_[i]);
