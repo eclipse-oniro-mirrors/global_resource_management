@@ -84,7 +84,8 @@ EXPORT_FUNC Locale *BuildFromString(const char *str, char sep, RState &rState);
 EXPORT_FUNC Locale *BuildFromParts(const char *language, const char *script, const char *region, RState &rState);
 #endif
 
-void FindAndSort(const std::string localeStr, std::vector<std::string> &candidateLocale, std::vector<std::string> &outValue);
+void FindAndSort(const std::string localeStr, std::vector<std::string> &candidateLocale,
+    std::vector<std::string> &outValue);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
