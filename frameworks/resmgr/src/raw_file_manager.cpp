@@ -149,7 +149,7 @@ RawDir *OH_ResourceManager_OpenRawDir(const NativeResourceManager *mgr, const ch
     return result.release();
 }
 
-bool IsLoadHap(const NativeResourceManager *mgr)
+static bool IsLoadHap(const NativeResourceManager *mgr)
 {
     RState state = mgr->resManager->IsLoadHap();
     if (state != RState::SUCCESS) {
