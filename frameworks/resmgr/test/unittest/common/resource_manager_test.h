@@ -68,9 +68,11 @@ int ResourceManagerGetPluralStringByNameTest002(void);
 int ResourceManagerGetPluralStringByIdFormatTest001(void);
 int ResourceManagerGetPluralStringByIdFormatTest002(void);
 int ResourceManagerGetPluralStringByIdFormatTest003(void);
+int ResourceManagerGetPluralStringByIdFormatTest004(void);
 int ResourceManagerGetPluralStringByNameFormatTest001(void);
 int ResourceManagerGetPluralStringByNameFormatTest002(void);
 int ResourceManagerGetPluralStringByNameFormatTest003(void);
+int ResourceManagerGetPluralStringByNameFormatTest004(void);
 int ResourceManagerGetThemeByIdTest001(void);
 int ResourceManagerGetThemeByIdTest002(void);
 int ResourceManagerGetThemeByNameTest001(void);
@@ -250,6 +252,7 @@ int RawFileTestFromHap0045(void);
 int RawFileTestFromHap0046(void);
 int RawFileTestFromHap0047(void);
 int ResourceManagerOverlayTest001(void);
+int ResourceManagerUtilsTest001(void);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
