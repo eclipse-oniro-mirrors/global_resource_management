@@ -69,7 +69,7 @@ struct RawFile {
     ~RawFile()
     {
         if (buffer != nullptr) {
-            delete buffer;
+            free(buffer);
             buffer = nullptr;
         }
         if (pf != nullptr) {
