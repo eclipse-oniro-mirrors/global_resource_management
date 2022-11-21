@@ -26,6 +26,7 @@
 #include "test_common.h"
 #include "utils/errors.h"
 #include "utils/string_utils.h"
+#include "utils/utils.h"
 
 using namespace OHOS::Global::Resource;
 using namespace testing::ext;
@@ -1441,6 +1442,23 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFormatTest003, T
 }
 
 /*
+ * @tc.name: ResourceManagerGetPluralStringByIdFormatTest004
+ * @tc.desc: Test GetPluralStringByIdFormat function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFormatTest004, TestSize.Level1)
+{
+    AddColorModeResource(DEVICE_PHONE, LIGHT, SCREEN_DENSITY_LDPI);
+
+    RState state;
+    std::string outValue;
+    int quantity = 1;
+    int id = GetResId("eat_apple", ResType::PLURALS);
+    state = rm->GetPluralStringByIdFormat(outValue, id, quantity);
+    ASSERT_EQ(ERROR_CODE_RES_REF_TOO_MUCH, state);
+}
+
+/*
  * @tc.name: ResourceManagerGetPluralStringByNameFormatTest001
  * @tc.desc: Test GetPluralStringByNameFormat function, file case.
  * @tc.type: FUNC
@@ -1484,6 +1502,22 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByNameFormatTest003,
     const char* eatApple = "eat_apple";
     RState state = rm->GetPluralStringByNameFormat(outValue, eatApple, 1, 1);
     ASSERT_EQ(ERROR_CODE_RES_NOT_FOUND_BY_NAME, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetPluralStringByNameFormatTest004
+ * @tc.desc: Test GetPluralStringByNameFormat function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByNameFormatTest004, TestSize.Level1)
+{
+    AddColorModeResource(DEVICE_PHONE, LIGHT, SCREEN_DENSITY_LDPI);
+
+    std::string outValue;
+    const char* eatApple = "eat_apple";
+    int quantity = 1;
+    RState state = rm->GetPluralStringByNameFormat(outValue, eatApple, quantity);
+    ASSERT_EQ(ERROR_CODE_RES_REF_TOO_MUCH, state);
 }
 
 /*
@@ -4570,7 +4604,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest0
 
     RState rState;
     int outValue;
-    rState = rm->GetIntegerByName("integer_input_device", outValue);;
+    rState = rm->GetIntegerByName("integer_input_device", outValue);
     ASSERT_EQ(SUCCESS, rState);
     ASSERT_EQ(777, outValue);
 }
@@ -5777,5 +5811,19 @@ HWTEST_F(ResourceManagerTest, ResourceManagerOverlayTest001, TestSize.Level1)
     rc->SetLocaleInfo("en", nullptr, "US");
     rm->UpdateResConfig(*rc);
     delete rc;
+}
+
+/*
+ * @tc.name: ResourceManagerUtilsTest001
+ * @tc.desc: Test endWithTail;
+ * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerUtilsTest001, TestSize.Level1)
+{
+    std::string path = "";
+    std::string tail = ".hap";
+    bool ret = Utils::endWithTail(path, tail);
+    ASSERT_FALSE(ret);
 }
 }
