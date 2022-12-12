@@ -162,10 +162,10 @@ int32_t ReadFileInfoFromZip(unzFile &uf, const char *fileName, std::unique_ptr<u
 {
     int err = HapParser::ReadFileFromZip(uf, fileName, buffer, bufLen);
     if (err < 0) {
-        unzCloseCurrentFile(uf);
+        unzClose(uf);
         return UNKNOWN_ERROR;
     }
-    unzCloseCurrentFile(uf);
+    unzClose(uf);
     return OK;
 }
 
@@ -190,12 +190,12 @@ int32_t ReadRawFileInfoFromHap(const char *zipFile, unzFile &uf, const char *fil
     int err = HapParser::ReadFileFromZip(uf, fileName, buffer, bufLen);
     if (err < 0) {
         HILOG_ERROR("Error read %{public}s from %{public}s", fileName, zipFile);
-        unzCloseCurrentFile(uf);
+        unzClose(uf);
         return UNKNOWN_ERROR;
     }
     uLong offset = unzGetOffset(uf);
     rawFile->offset = (long)offset;
-    unzCloseCurrentFile(uf);
+    unzClose(uf);
     return OK;
 }
 

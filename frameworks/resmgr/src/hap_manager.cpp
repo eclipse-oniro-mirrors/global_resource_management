@@ -529,10 +529,10 @@ RState HapManager::GetProfileData(const HapResource::ValueUnderQualifierDir *qd,
     std::string filePath = GetFilePath(qd, uf, ResType::PROF);
     int err = HapParser::ReadFileFromZip(uf, filePath.c_str(), outValue, len);
     if (err < 0) {
-        unzCloseCurrentFile(uf);
+        unzClose(uf);
         return NOT_FOUND;
     }
-    unzCloseCurrentFile(uf);
+    unzClose(uf);
     return SUCCESS;
 }
 
@@ -546,10 +546,10 @@ RState HapManager::GetMediaData(const HapResource::ValueUnderQualifierDir *qd, s
     std::string filePath = GetFilePath(qd, uf, ResType::MEDIA);
     int err = HapParser::ReadFileFromZip(uf, filePath.c_str(), outValue, len);
     if (err < 0) {
-        unzCloseCurrentFile(uf);
+        unzClose(uf);
         return NOT_FOUND;
     }
-    unzCloseCurrentFile(uf);
+    unzClose(uf);
     return SUCCESS;
 }
 
@@ -564,12 +564,12 @@ RState HapManager::GetMediaBase64Data(const HapResource::ValueUnderQualifierDir 
     size_t tmpLen;
     int err = HapParser::ReadFileFromZip(uf, filePath.c_str(), buffer, tmpLen);
     if (err < 0) {
-        unzCloseCurrentFile(uf);
+        unzClose(uf);
         return NOT_FOUND;
     }
     std::string imgType = GetImageType(filePath);
     Utils::EncodeBase64(buffer, tmpLen, imgType, outValue);
-    unzCloseCurrentFile(uf);
+    unzClose(uf);
     return SUCCESS;
 }
 
