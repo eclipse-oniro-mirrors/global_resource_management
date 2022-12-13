@@ -142,6 +142,7 @@ const IdItem *HapManager::FindResourceByName(const char *name, const ResType res
 const HapResource::ValueUnderQualifierDir *HapManager::FindQualifierValueByName(
     const char *name, const ResType resType)
 {
+    AutoMutex mutex(this->lock_);
     std::vector<const HapResource::IdValues *> candidates = this->GetResourceListByName(name, resType);
     if (candidates.size() == 0) {
         return nullptr;
@@ -175,6 +176,7 @@ const HapResource::ValueUnderQualifierDir *HapManager::FindQualifierValueByName(
 
 const HapResource::ValueUnderQualifierDir *HapManager::FindQualifierValueById(uint32_t id)
 {
+    AutoMutex mutex(this->lock_);
     std::vector<const HapResource::IdValues *> candidates = this->GetResourceList(id);
     if (candidates.size() == 0) {
         return nullptr;
