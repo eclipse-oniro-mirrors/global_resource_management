@@ -31,6 +31,11 @@ constexpr int BIT_FOUR = 4;
 constexpr int BIT_TWO = 2;
 constexpr int LEN_THREE = 3;
 
+const std::set<std::string> Utils::tailSet {
+    ".hap",
+    ".hsp",
+};
+
 std::vector<char> g_codes = {
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
     'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
@@ -413,6 +418,15 @@ bool Utils::isFileExist(const std::string& filePath)
     return (stat(filePath.c_str(), &buffer) == 0);
 }
 
+bool Utils::ContainsTail(std::string hapPath, std::set<std::string> tailSet)
+{
+    for (auto tail : tailSet) {
+        if (Utils::endWithTail(hapPath, tail)) {
+            return true;
+        }
+    }
+    return false;
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

@@ -20,7 +20,7 @@
 #include <cstdlib>
 #include <fstream>
 #include "utils/utils.h"
-
+#include <set>
 #ifdef __WINNT__
 #include <shlwapi.h>
 #include <windows.h>
@@ -32,6 +32,8 @@
 
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 #include "hitrace_meter.h"
+#include "file_mapper.h"
+#include "extractor.h"
 #endif
 #include "hap_parser.h"
 #include "hilog_wrapper.h"
@@ -136,7 +138,7 @@ void CanonicalizePath(const char *path, char *outPath, size_t len)
 
 const HapResource* HapResource::Load(const char *path, const ResConfigImpl* defaultConfig, bool system)
 {
-    if (Utils::endWithTail(path, "hap")) {
+    if (Utils::ContainsTail(path, Utils::tailSet)) {
         return LoadFromHap(path, defaultConfig, system);
     } else {
         return LoadFromIndex(path, defaultConfig, system);
@@ -198,13 +200,47 @@ const HapResource* HapResource::LoadFromIndex(const char *path, const ResConfigI
     return pResource;
 }
 
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+std::string GetIndexFilePath(std::shared_ptr<AbilityBase::Extractor> &extractor)
+{
+    std::string mName = HapParser::ParseModuleName(extractor);
+    std::string indexFilePath = std::string("assets/");
+    indexFilePath.append(mName);
+    indexFilePath.append("/resources.index");
+    return indexFilePath;
+}
+#endif
+
+bool GetIndexData(const char *path, std::unique_ptr<uint8_t[]> &tmpBuf, size_t &len)
+{
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    bool isNewExtractor = false;
+    std::shared_ptr<AbilityBase::Extractor> extractor = AbilityBase::ExtractorUtil::GetExtractor(path, isNewExtractor);
+    if (extractor == nullptr) {
+        return false;
+    }
+    std::string indexFilePath;
+    if (extractor->IsStageModel()) {
+        indexFilePath = "resources.index";
+    } else {
+        indexFilePath = GetIndexFilePath(extractor);
+    }
+    bool ret = extractor->ExtractToBufByName(indexFilePath, tmpBuf, len);
+    if (!ret) {
+        HILOG_ERROR("failed to get buf data indexFilePath, %{public}s", indexFilePath.c_str());
+        return false;
+    }
+#endif
+    return true;
+}
+
 const HapResource* HapResource::LoadFromHap(const char *path, const ResConfigImpl *defaultConfig, bool system)
 {
     std::unique_ptr<uint8_t[]> tmpBuf;
-    size_t tmpLen;
-    int32_t ret = HapParser::ReadIndexFromFile(path, tmpBuf, tmpLen);
-    if (ret != OK) {
-        HILOG_ERROR("read Index from file failed");
+    size_t tmpLen = 0;
+    bool ret = GetIndexData(path, tmpBuf, tmpLen);
+    if (!ret) {
+        HILOG_ERROR("read Index from file failed path, %{public}s", path);
         return nullptr;
     }
     ResDesc *resDesc = new (std::nothrow) ResDesc();

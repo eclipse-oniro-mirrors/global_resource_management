@@ -283,7 +283,8 @@ napi_value ResourceManagerAddon::New(napi_env env, napi_callback_info info)
 
 bool IsLoadHap(ResMgrAsyncContext *asyncContext)
 {
-    RState state = asyncContext->addon_->GetResMgr()->IsLoadHap();
+    std::string hapPath;
+    RState state = asyncContext->addon_->GetResMgr()->IsLoadHap(hapPath);
     if (state != RState::SUCCESS) {
         return false;
     }
@@ -1083,11 +1084,12 @@ napi_value ResourceManagerAddon::GetPluralString(napi_env env, napi_callback_inf
 
 auto g_getRawFileFunc = [](napi_env env, void* data) {
     ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
-    auto rawFile = std::make_unique<ResourceManager::RawFile>();
     if (IsLoadHap(asyncContext)) {
-        asyncContext->addon_->GetResMgr()->GetRawFileFromHap(asyncContext->path_, rawFile);
-        asyncContext->len_ = static_cast<int>(rawFile->length);
-        asyncContext->mediaData = std::move(rawFile->buffer);
+        std::unique_ptr<uint8_t[]> buffer;
+        size_t len;
+        asyncContext->addon_->GetResMgr()->GetRawFileFromHap(asyncContext->path_,
+            len, asyncContext->mediaData);
+        asyncContext->len_ = static_cast<int>(len);
         CreateValue(asyncContext);
         return;
     }

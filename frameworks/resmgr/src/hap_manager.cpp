@@ -42,6 +42,8 @@
 
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 #include "hisysevent_adapter.h"
+#include "file_mapper.h"
+#include "extractor.h"
 #endif
 
 namespace OHOS {
@@ -456,32 +458,41 @@ std::vector<std::string> HapManager::GetResourcePaths()
     return result;
 }
 
-bool HapManager::IsLoadHap()
+bool HapManager::IsLoadHap(std::string &hapPath)
 {
     for (auto iter = hapResources_.rbegin(); iter != hapResources_.rend(); iter++) {
         if ((*iter) == nullptr) {
             HILOG_ERROR("the hapResource_ is nullptr");
             return false;
         }
-        const std::string hapPath = (*iter)->GetIndexPath();
-        if (Utils::endWithTail(hapPath, "hap")) {
+        hapPath = (*iter)->GetIndexPath();
+        if (Utils::ContainsTail(hapPath, Utils::tailSet)) {
             return true;
         }
     }
     return false;
 }
 
-std::string GetFilePath(const HapResource::ValueUnderQualifierDir *qd, unzFile &uf, const ResType resType)
+std::string GetImageType(const std::string fileName)
+{
+    auto pos = fileName.find_last_of('.');
+    std::string imgType;
+    if (pos != std::string::npos) {
+        imgType = fileName.substr(pos + 1);
+    }
+    return imgType;
+}
+
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+std::string GetFilePath(std::shared_ptr<AbilityBase::Extractor> &extractor,
+    const HapResource::ValueUnderQualifierDir *qd, const ResType resType)
 {
     std::string filePath;
-    if (qd == nullptr) {
-        return filePath;
-    }
     const IdItem *idItem = qd->GetIdItem();
     if (idItem == nullptr || idItem->resType_ != resType) {
         return filePath;
     }
-    if (HapParser::IsStageMode(uf)) {
+    if (extractor->IsStageModel()) {
         std::string tempFilePath(idItem->value_);
         auto index = tempFilePath.find('/');
         if (index == std::string::npos) {
@@ -498,123 +509,105 @@ std::string GetFilePath(const HapResource::ValueUnderQualifierDir *qd, unzFile &
     return filePath;
 }
 
-std::string GetImageType(const std::string fileName)
-{
-    auto pos = fileName.find_last_of('.');
-    std::string imgType;
-    if (pos != std::string::npos) {
-        imgType = fileName.substr(pos + 1);
-    }
-    return imgType;
-}
-
-unzFile GetHapUf(const HapResource::ValueUnderQualifierDir *qd)
+std::shared_ptr<AbilityBase::Extractor> GetAbilityExtractor(const HapResource::ValueUnderQualifierDir *qd)
 {
     std::string hapPath = qd->GetHapResource()->GetIndexPath();
-    unzFile uf = unzOpen64(hapPath.c_str()); // open zipfile stream
-    if (uf == nullptr) {
-        HILOG_ERROR("Open the %{public}s failed in GetHapUf", hapPath.c_str());
-        return nullptr;
-    } // file is open
-    return uf;
+    bool isNewExtractor = false;
+    auto extractor = AbilityBase::ExtractorUtil::GetExtractor(hapPath, isNewExtractor);
+    return extractor;
 }
+#endif
 
 RState HapManager::GetProfileData(const HapResource::ValueUnderQualifierDir *qd, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue)
 {
-    unzFile uf = GetHapUf(qd);
-    if (uf == nullptr) {
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    auto extractor = GetAbilityExtractor(qd);
+    std::string filePath = GetFilePath(extractor, qd, ResType::PROF);
+    if (filePath.empty()) {
+        HILOG_ERROR("get file path failed in GetProfileData");
         return NOT_FOUND;
     }
-    std::string filePath = GetFilePath(qd, uf, ResType::PROF);
-    int err = HapParser::ReadFileFromZip(uf, filePath.c_str(), outValue, len);
-    if (err < 0) {
-        unzClose(uf);
+    bool ret = extractor->ExtractToBufByName(filePath, outValue, len);
+    if (!ret) {
+        HILOG_ERROR("failed to get config data from ability");
         return NOT_FOUND;
     }
-    unzClose(uf);
+#endif
     return SUCCESS;
 }
 
 RState HapManager::GetMediaData(const HapResource::ValueUnderQualifierDir *qd, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue)
 {
-    unzFile uf = GetHapUf(qd);
-    if (uf == nullptr) {
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    auto extractor = GetAbilityExtractor(qd);
+    std::string filePath = GetFilePath(extractor, qd, ResType::MEDIA);
+    if (filePath.empty()) {
+        HILOG_ERROR("get file path failed in GetMediaData");
         return NOT_FOUND;
     }
-    std::string filePath = GetFilePath(qd, uf, ResType::MEDIA);
-    int err = HapParser::ReadFileFromZip(uf, filePath.c_str(), outValue, len);
-    if (err < 0) {
-        unzClose(uf);
+    bool ret = extractor->ExtractToBufByName(filePath, outValue, len);
+    if (!ret) {
+        HILOG_ERROR("failed to get media data from ability");
         return NOT_FOUND;
     }
-    unzClose(uf);
+#endif
     return SUCCESS;
 }
 
 RState HapManager::GetMediaBase64Data(const HapResource::ValueUnderQualifierDir *qd, std::string &outValue)
 {
-    unzFile uf = GetHapUf(qd);
-    if (uf == nullptr) {
-        return NOT_FOUND;
-    }
-    std::string filePath = GetFilePath(qd, uf, ResType::MEDIA);
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    auto extractor = GetAbilityExtractor(qd);
+    std::string filePath = GetFilePath(extractor, qd, ResType::MEDIA);
     std::unique_ptr<uint8_t[]> buffer;
     size_t tmpLen;
-    int err = HapParser::ReadFileFromZip(uf, filePath.c_str(), buffer, tmpLen);
-    if (err < 0) {
-        unzClose(uf);
+    bool ret = extractor->ExtractToBufByName(filePath, buffer, tmpLen);
+    if (!ret) {
+        HILOG_ERROR("failed to get mediabase64 data from ability");
         return NOT_FOUND;
     }
     std::string imgType = GetImageType(filePath);
     Utils::EncodeBase64(buffer, tmpLen, imgType, outValue);
-    unzClose(uf);
+#endif
     return SUCCESS;
 }
 
-int32_t GetFileFd(const char *zipFile, std::unique_ptr<ResourceManager::RawFile> &rawFile)
+int32_t HapManager::GetValidHapPath(std::string &hapPath)
 {
-    int zipFd = open(zipFile, O_RDONLY);
-    if (zipFd < 0) {
-        HILOG_ERROR("open file failed in GetFileFd");
-        return UNKNOWN_ERROR;
-    }
-    FILE *file = fdopen(zipFd, "r");
-    if (file == nullptr) {
-        HILOG_ERROR("fdopen the fd failed in GetFileFd");
-        close(zipFd);
-        return UNKNOWN_ERROR;
-    }
-    rawFile->pf = file;
-    return OK;
-}
-
-RState HapManager::FindRawFileFromHap(const std::string &rawFileName,
-    std::unique_ptr<ResourceManager::RawFile> &rawFile)
-{
-    if (rawFile == nullptr) {
-        rawFile = std::make_unique<ResourceManager::RawFile>();
-    }
     const std::string sysResHap = "SystemResources.hap";
     for (auto iter = hapResources_.rbegin(); iter != hapResources_.rend(); iter++) {
-        const std::string hapPath = (*iter)->GetIndexPath();
-        if (hapPath.find(sysResHap) != std::string::npos) {
+        const std::string tempPath = (*iter)->GetIndexPath();
+        if (tempPath.find(sysResHap) != std::string::npos) {
             continue;
         }
-        if (Utils::endWithTail(hapPath, "hap")) {
-            size_t tmpLen;
-            int32_t ret = HapParser::ReadRawFileFromHap(hapPath.c_str(), rawFile->buffer, tmpLen, rawFileName, rawFile);
-            if (ret != OK) {
-                continue;
-            }
-            ret = GetFileFd(hapPath.c_str(), rawFile);
-            if (ret != OK) {
-                return ERROR_CODE_RES_PATH_INVALID;
-            }
-            rawFile->length = static_cast<long>(tmpLen);
-            return SUCCESS;
+        if (Utils::ContainsTail(tempPath, Utils::tailSet)) {
+            hapPath = tempPath;
+            return OK;
         }
+    }
+    return NOT_FOUND;
+}
+
+RState HapManager::FindRawFileFromHap(const std::string rawFileName, size_t &len,
+    std::unique_ptr<uint8_t[]> &outValue)
+{
+    std::string hapPath;
+    int32_t ret = HapManager::GetValidHapPath(hapPath);
+    if (ret == OK) {
+       return HapParser::ReadRawFileFromHap(hapPath, rawFileName, len, outValue);
+    }
+    return ERROR_CODE_RES_PATH_INVALID;
+}
+
+RState HapManager::FindRawFileDescriptorFromHap(const std::string rawFileName,
+    ResourceManager::RawFileDescriptor &descriptor)
+{
+    std::string hapPath;
+    int32_t ret = HapManager::GetValidHapPath(hapPath);
+    if (ret == OK) {
+        return HapParser::ReadRawFileDescriptor(hapPath.c_str(), rawFileName, descriptor);
     }
     return ERROR_CODE_RES_PATH_INVALID;
 }

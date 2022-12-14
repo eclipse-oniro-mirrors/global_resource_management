@@ -1165,9 +1165,10 @@ RState ResourceManagerImpl::GetProfileDataByName(const char *name, size_t &len, 
     return hapManager_->GetProfileData(qd, len, outValue);
 }
 
-RState ResourceManagerImpl::GetRawFileFromHap(const std::string &rawFileName, std::unique_ptr<RawFile> &rawFile)
+RState ResourceManagerImpl::GetRawFileFromHap(const std::string &rawFileName, size_t &len,
+    std::unique_ptr<uint8_t[]> &outValue)
 {
-    return hapManager_->FindRawFileFromHap(rawFileName, rawFile);
+    return hapManager_->FindRawFileFromHap(rawFileName, len, outValue);
 }
 
 RState ResourceManagerImpl::GetRawFileDescriptorFromHap(const std::string &rawFileName, RawFileDescriptor &descriptor)
@@ -1179,27 +1180,18 @@ RState ResourceManagerImpl::GetRawFileDescriptorFromHap(const std::string &rawFi
         descriptor.offset = rawFileDescriptor_[rawFileName].offset;
         return SUCCESS;
     }
-    auto rawFile = std::make_unique<RawFile>();
-    ResourceManagerImpl::GetRawFileFromHap(rawFileName, rawFile);
-    if (rawFile->pf == nullptr) {
-        HILOG_ERROR("failed to get rawfile pf");
+
+    int32_t ret = hapManager_->FindRawFileDescriptorFromHap(rawFileName, descriptor);
+    if (ret != 0) {
         return ERROR_CODE_RES_PATH_INVALID;
     }
-    int fd = fileno(rawFile->pf);
-    if (fd < 0) {
-        HILOG_ERROR("failed to get fd in GetRawFileDescriptorFromHap");
-        return ERROR_CODE_RES_PATH_INVALID;
-    }
-    descriptor.fd = fd;
-    descriptor.length = rawFile->length;
-    descriptor.offset = rawFile->offset;
     rawFileDescriptor_[rawFileName] = descriptor;
     return SUCCESS;
 }
 
-RState ResourceManagerImpl::IsLoadHap()
+RState ResourceManagerImpl::IsLoadHap(std::string &hapPath)
 {
-    if (hapManager_->IsLoadHap()) {
+    if (hapManager_->IsLoadHap(hapPath)) {
         return SUCCESS;
     }
     return NOT_FOUND;
