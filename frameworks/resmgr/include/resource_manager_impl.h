@@ -465,10 +465,12 @@ public:
     /**
      * Get the rawFile base64 from hap by rawFile name
      * @param rawFileName the rawFile name
-     * @param rawFile the raw file infomation about offset, length, buffer write to
+     * @param len the data len write to
+     * @param outValue the obtain resource path write to
      * @return SUCCESS if resource exist, else NOT_FOUND
      */
-    virtual RState GetRawFileFromHap(const std::string &rawFileName, std::unique_ptr<RawFile> &rawFile);
+    virtual RState GetRawFileFromHap(const std::string &rawFileName, size_t &len,
+        std::unique_ptr<uint8_t[]> &outValue);
 
     /**
      * Get the rawFile Descriptor from hap by rawFile name
@@ -480,8 +482,9 @@ public:
 
     /**
      * Is load hap
+     * @param hapPath the hap path
      */
-    virtual RState IsLoadHap();
+    virtual RState IsLoadHap(std::string &hapPath);
 
 private:
     RState GetString(const IdItem *idItem, std::string &outValue);

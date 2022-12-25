@@ -97,12 +97,12 @@ int32_t HapParser::ReadFileFromZip(unzFile &uf, const char *fileName, std::uniqu
     return OK;
 }
 
-std::string GetModuleName(const char *configStr)
+std::string GetModuleName(const char *configStr, size_t len)
 {
     if (configStr == nullptr) {
         return std::string();
     }
-    std::string config(configStr);
+    std::string config(configStr, len);
     static const char *key = "\"moduleName\"";
     auto idx = config.find(key);
     if (idx == std::string::npos) {
@@ -130,7 +130,7 @@ bool HapParser::IsStageMode(unzFile &uf)
     return true;
 }
 
-std::string ParseModuleName(unzFile &uf)
+std::string ParseModuleNameFromHap(unzFile &uf)
 {
     std::unique_ptr<uint8_t[]> tmpBuf;
     int32_t ret = UNZ_OK;
@@ -141,7 +141,7 @@ std::string ParseModuleName(unzFile &uf)
         return std::string();
     }
     // parse config.json
-    std::string mName = GetModuleName(reinterpret_cast<char *>(tmpBuf.get()));
+    std::string mName = GetModuleName(reinterpret_cast<char *>(tmpBuf.get()), tmpLen);
     if (mName.size() == 0) {
         HILOG_ERROR("parse moduleName from config.json error");
         return std::string();
@@ -151,7 +151,7 @@ std::string ParseModuleName(unzFile &uf)
 
 std::string GetIndexFilePath(unzFile uf)
 {
-    std::string mName = ParseModuleName(uf);
+    std::string mName = ParseModuleNameFromHap(uf);
     std::string indexFilePath = std::string("assets/");
     indexFilePath.append(mName);
     indexFilePath.append("/resources.index");
@@ -184,56 +184,119 @@ int32_t HapParser::ReadIndexFromFile(const char *zipFile, std::unique_ptr<uint8_
     return ReadFileInfoFromZip(uf, indexFilePath.c_str(), buffer, bufLen);
 }
 
-int32_t ReadRawFileInfoFromHap(const char *zipFile, unzFile &uf, const char *fileName,
-    std::unique_ptr<uint8_t[]> &buffer, size_t &bufLen, std::unique_ptr<ResourceManager::RawFile> &rawFile)
+std::string HapParser::GetPath(const std::string filePath, std::string &rawFilePath)
 {
-    int err = HapParser::ReadFileFromZip(uf, fileName, buffer, bufLen);
-    if (err < 0) {
-        HILOG_ERROR("Error read %{public}s from %{public}s", fileName, zipFile);
-        unzClose(uf);
-        return UNKNOWN_ERROR;
-    }
-    uLong offset = unzGetOffset(uf);
-    rawFile->offset = (long)offset;
-    unzClose(uf);
-    return OK;
-}
-
-void GetRawFilePath(const std::string &rawFilePath, std::string &tempRawFilePath)
-{
-    std::string tempName = rawFilePath;
+    std::string tempName = filePath;
     const std::string rawFileDirName = "rawfile/";
     if (tempName.length() <= rawFileDirName.length()
     || (tempName.compare(0, rawFileDirName.length(), rawFileDirName) != 0)) {
         tempName = rawFileDirName + tempName;
     }
-    tempRawFilePath.append(tempName);
+    rawFilePath.append(tempName);
+    return rawFilePath;
 }
 
-std::string GetTempRawFilePath(unzFile uf)
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+std::string HapParser::ParseModuleName(std::shared_ptr<AbilityBase::Extractor> &extractor)
 {
-    std::string mName = ParseModuleName(uf);
-    std::string tempRawFilePath("assets/");
-    tempRawFilePath.append(mName);
-    tempRawFilePath.append("/resources/");
-    return tempRawFilePath;
+    if (extractor == nullptr) {
+        return std::string();
+    }
+    std::unique_ptr<uint8_t[]> configBuf;
+    size_t len;
+    bool ret = extractor->ExtractToBufByName("config.json", configBuf, len);
+    if (!ret) {
+        HILOG_ERROR("failed to get config data from ability");
+        return std::string();
+    }
+    // parse config.json
+    std::string mName = GetModuleName(reinterpret_cast<char *>(configBuf.get()), len);
+    if (mName.size() == 0) {
+        HILOG_ERROR("parse moduleName from config.json error");
+        return std::string();
+    }
+    return mName;
 }
 
-int32_t HapParser::ReadRawFileFromHap(const char *zipFile, std::unique_ptr<uint8_t[]> &buffer, size_t &bufLen,
-    const std::string &rawFilePath, std::unique_ptr<ResourceManager::RawFile> &rawFile)
+std::string GetRawFilePathFromFA(std::shared_ptr<AbilityBase::Extractor> &extractor,
+    const std::string &filePath)
 {
-    unzFile uf = unzOpen64(zipFile);
-    if (uf == nullptr) {
-        return UNKNOWN_ERROR;
+    std::string moduleName = HapParser::ParseModuleName(extractor);
+    std::string rawFilePath("assets/");
+    rawFilePath.append(moduleName);
+    rawFilePath.append("/resources/");
+    HapParser::GetPath(filePath, rawFilePath);
+    return rawFilePath;
+}
+
+std::string GetRawFilePathFromStage(const std::string filePath)
+{
+    std::string rawFilePath("resources/");
+    HapParser::GetPath(filePath, rawFilePath);
+    return rawFilePath;
+}
+
+std::string HapParser::GetRawFilePath(std::shared_ptr<AbilityBase::Extractor> &extractor,
+    const std::string rawFileName)
+{
+    std::string rawfilePath;
+    if (extractor->IsStageModel()) {
+        rawfilePath = GetRawFilePathFromStage(rawFileName);
+    } else {
+        rawfilePath = GetRawFilePathFromFA(extractor, rawFileName);
     }
-    if (IsStageMode(uf)) {
-        std::string tempRawFilePath("resources/");
-        GetRawFilePath(rawFilePath, tempRawFilePath);
-        return ReadRawFileInfoFromHap(zipFile, uf, tempRawFilePath.c_str(), buffer, bufLen, rawFile);
+    return rawfilePath;
+}
+#endif
+
+RState HapParser::ReadRawFileFromHap(const std::string hapPath, const std::string rawFileName, size_t &len,
+    std::unique_ptr<uint8_t[]> &outValue)
+{
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    bool isNewExtractor = false;
+    auto extractor = AbilityBase::ExtractorUtil::GetExtractor(hapPath, isNewExtractor);
+    if (extractor == nullptr) {
+        HILOG_ERROR("failed to get extractor hapPath, %{public}s", hapPath.c_str());
+        return NOT_FOUND;
     }
-    std::string tempRawFilePath = GetTempRawFilePath(uf);
-    GetRawFilePath(rawFilePath, tempRawFilePath);
-    return ReadRawFileInfoFromHap(zipFile, uf, tempRawFilePath.c_str(), buffer, bufLen, rawFile);
+    std::string rawfilePath = HapParser::GetRawFilePath(extractor, rawFileName);
+    bool ret = extractor->ExtractToBufByName(rawfilePath, outValue, len);
+    if (!ret) {
+        HILOG_ERROR("failed to get rawfile data rawfilePath, %{public}s, hapPath, %{public}s",
+            rawfilePath.c_str(), hapPath.c_str());
+        return NOT_FOUND;
+    }
+#endif
+    return SUCCESS;
+}
+
+RState HapParser::ReadRawFileDescriptor(const char *hapPath, const std::string rawFileName,
+    ResourceManager::RawFileDescriptor &descriptor)
+{
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    int zipFd = open(hapPath, O_RDONLY);
+    if (zipFd < 0) {
+        HILOG_ERROR("failed open file %{public}s", hapPath);
+        return NOT_FOUND;
+    }
+    bool isNewExtractor = false;
+    auto extractor = AbilityBase::ExtractorUtil::GetExtractor(hapPath, isNewExtractor);
+    if (extractor == nullptr) {
+        HILOG_ERROR("failed to get extractor in ReadRawFileDescriptor hapPath, %{public}s", hapPath);
+        return NOT_FOUND;
+    }
+    std::string rawfilePath = HapParser::GetRawFilePath(extractor, rawFileName);
+    AbilityBase::FileInfo fileInfo;
+    bool ret = extractor->GetFileInfo(rawfilePath, fileInfo);
+    if (!ret) {
+        HILOG_ERROR("failed to get rawFileDescriptor rawfilePath, %{public}s", rawfilePath.c_str());
+        return NOT_FOUND;
+    }
+    descriptor.offset = static_cast<long>(fileInfo.offset);
+    descriptor.length = static_cast<long>(fileInfo.length);
+    descriptor.fd = zipFd;
+#endif
+    return SUCCESS;
 }
 
 /**

@@ -24,6 +24,11 @@
 #include "res_config_impl.h"
 #include "resource_manager.h"
 
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+#include "file_mapper.h"
+#include "extractor.h"
+#endif
+
 namespace OHOS {
 namespace Global {
 namespace Resource {
@@ -50,23 +55,58 @@ public:
     static int32_t ReadIndexFromFile(const char *zipFile, std::unique_ptr<uint8_t[]> &buffer, size_t &bufLen);
 
     /**
-     * Read rawfile from hap
-     * @param zipFile hap file path
-     * @param buffer  bytes will write to buffer
-     * @param bufLen  length in bytes
-     * @param rawFilePath the path of rawfile
-     * @param rawFile the rawfile info write to
-     * @return
-     */
-    static int32_t ReadRawFileFromHap(const char *zipFile, std::unique_ptr<uint8_t[]> &buffer, size_t &bufLen,
-                            const std::string &rawFilePath, std::unique_ptr<ResourceManager::RawFile> &rawFile);
-
-    /**
      * Whether the hap is STAGE MODE or not
-     * @param hapPath hap hap path
+     * @param uf the hap fd
      * @return true if the hap is STAGE MODE, else false
      */
     static bool IsStageMode(unzFile &uf);
+
+    /**
+     * Get the rawfile path
+     * @param filePath the hap path
+     * @param rawFilePath the rawFile path
+     * @return the rawFile path
+     */
+    static std::string GetPath(const std::string filePath, std::string &rawFilePath);
+
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    /**
+     * Parse modulename of FA Model
+     * @param extractor the ability extractor
+     * @return the modulename
+     */
+    static std::string ParseModuleName(std::shared_ptr<AbilityBase::Extractor> &extractor);
+
+    /**
+     * Get the raw file path
+     * @param extractor the ability extractor
+     * @param rawFilePath the rawFile path
+     * @return the rawFile path
+     */
+    static std::string GetRawFilePath(std::shared_ptr<AbilityBase::Extractor> &extractor,
+        const std::string rawFileName);
+#endif
+
+    /**
+     * Get the raw file data from hap
+     * @param hapPath the hap path
+     * @param rawFileName the rawFile path
+     * @param len the rawFile path
+     * @param outValue the rawFile path
+     * @return the rawFile path
+     */
+    static RState ReadRawFileFromHap(const std::string hapPath, const std::string rawFileName,
+        size_t &len, std::unique_ptr<uint8_t[]> &outValue);
+
+    /**
+     * Get the raw file descriptor
+     * @param hapPath the hap path
+     * @param rawFileName the rawFile path
+     * @param descriptor the rawFile path
+     * @return the rawFile path
+     */
+    static RState ReadRawFileDescriptor(const char *hapPath, const std::string rawFileName,
+        ResourceManager::RawFileDescriptor &descriptor);
 
     /**
      * Parse resource hex to resDesc

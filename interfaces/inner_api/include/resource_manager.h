@@ -165,11 +165,12 @@ public:
 
     virtual RState GetProfileDataByName(const char *name, size_t &len, std::unique_ptr<uint8_t[]> &outValue) = 0;
 
-    virtual RState GetRawFileFromHap(const std::string &rawFileName, std::unique_ptr<RawFile> &rawFile) = 0;
+    virtual RState GetRawFileFromHap(const std::string &rawFileName, size_t &len,
+        std::unique_ptr<uint8_t[]> &outValue) = 0;
 
     virtual RState GetRawFileDescriptorFromHap(const std::string &rawFileName, RawFileDescriptor &descriptor) = 0;
 
-    virtual RState IsLoadHap() = 0;
+    virtual RState IsLoadHap(std::string &hapPath) = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();

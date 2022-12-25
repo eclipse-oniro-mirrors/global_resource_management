@@ -20,6 +20,7 @@
 #include "res_desc.h"
 #include "resource_manager.h"
 #include "lock.h"
+#include <set>
 
 #ifdef SUPPORT_GRAPHICS
 #include <unicode/plurrule.h>
@@ -152,15 +153,33 @@ public:
     /**
      * Find raw file from hap
      * @param rawFileName the rawFileName
-     * @param rawFile the raw file infomation about offset, length, data write to
+     * @param len the data len write to
+     * @param outValue the rawfile data
      * @return SUCCESS if resource exist, else NOT_FOUND
      */
-    RState FindRawFileFromHap(const std::string &rawFileName, std::unique_ptr<ResourceManager::RawFile> &rawFile);
+    RState FindRawFileFromHap(const std::string rawFileName, size_t &len,
+        std::unique_ptr<uint8_t[]> &outValue);
+
+    /**
+     * Find raw file descriptor from hap
+     * @param rawFileName the rawFileName
+     * @param descriptor the rawfile descriptor
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    RState FindRawFileDescriptorFromHap(const std::string rawFileName, ResourceManager::RawFileDescriptor &descriptor);
 
     /**
      * Is load hap
+     * @param hapPath the hap path
      */
-    bool IsLoadHap();
+    bool IsLoadHap(std::string &hapPath);
+
+    /**
+     * Get the valid hapPath
+     * @param hapPath the hap path
+     * @return OK if the hapPath exist, else NOT_FOUND
+     */
+    int32_t GetValidHapPath(std::string& hapPath);
 
 private:
     void UpdateResConfigImpl(ResConfigImpl &resConfig);

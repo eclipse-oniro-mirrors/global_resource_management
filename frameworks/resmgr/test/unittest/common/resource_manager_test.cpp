@@ -5734,13 +5734,17 @@ HWTEST_F(ResourceManagerTest, RawFileTestFromHap0045, TestSize.Level1)
 {
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     EXPECT_TRUE(ret);
-    std::unique_ptr<ResourceManager::RawFile> rawFile;
     RState state;
-    state = rm->GetRawFileFromHap("test_rawfile.txt", rawFile);
-    ASSERT_EQ(rawFile->length, 17); // 17 means the length of "for raw file test"
+    size_t len;
+    std::unique_ptr<uint8_t[]> outValue;
+    state = rm->GetRawFileFromHap("test_rawfile.txt", len, outValue);
+    ASSERT_EQ(len, 17); // 17 means the length of "for raw file test" in "test_rawfile.txt"
     EXPECT_TRUE(state == SUCCESS);
-    state = rm->GetRawFileFromHap("rawfile/test_rawfile.txt", rawFile);
-    ASSERT_EQ(rawFile->length, 17); // 17 means the length of "for raw file test"
+
+    size_t len2;
+    std::unique_ptr<uint8_t[]> outValue2;
+    state = rm->GetRawFileFromHap("rawfile/test_rawfile.txt", len2, outValue2);
+    ASSERT_EQ(len, 17); // 17 means the length of "for raw file test" in "test_rawfile.txt"
     EXPECT_TRUE(state == SUCCESS);
 }
 
@@ -5759,13 +5763,13 @@ HWTEST_F(ResourceManagerTest, RawFileTestFromHap0046, TestSize.Level1)
     RState state;
     state = rm->GetRawFileDescriptorFromHap("test_rawfile.txt", descriptor);
     EXPECT_TRUE(state == SUCCESS);
-    ASSERT_EQ(descriptor.length, 17); // 17 means the length of "for raw file test"
+    ASSERT_EQ(descriptor.length, 19); // 19 means the length of test_rawfile.txt after compressed
     state = rm->CloseRawFileDescriptor("test_rawfile.txt");
     EXPECT_TRUE(state == SUCCESS);
 
     state = rm->GetRawFileDescriptorFromHap("rawfile/test_rawfile.txt", descriptor);
     EXPECT_TRUE(state == SUCCESS);
-    ASSERT_EQ(descriptor.length, 17); // 17 means the length of "for raw file test"
+    ASSERT_EQ(descriptor.length, 19); // 19 means the length of test_rawfile.txt after compressed
     state = rm->CloseRawFileDescriptor("rawfile/test_rawfile.txt");
     EXPECT_TRUE(state == SUCCESS);
 
@@ -5784,10 +5788,14 @@ HWTEST_F(ResourceManagerTest, RawFileTestFromHap0047, TestSize.Level1)
 {
     bool ret = rm->AddResource("/system/app/ohos.global.systemres/SystemResources.hap");
     EXPECT_TRUE(ret);
-    std::unique_ptr<ResourceManager::RawFile> rawFile;
-    RState state;
-    state = rm->GetRawFileFromHap("test_rawfile.txt", rawFile);
-    EXPECT_FALSE(state == SUCCESS);
+    size_t len;
+    std::unique_ptr<uint8_t[]> outValue;
+    RState state = rm->GetRawFileFromHap("test_rawfile.txt", len, outValue);
+    EXPECT_EQ(state, ERROR_CODE_RES_PATH_INVALID);
+
+    ResourceManager::RawFileDescriptor descriptor;
+    state = rm->GetRawFileDescriptorFromHap("test_rawfile.txt", descriptor);
+    EXPECT_EQ(state, ERROR_CODE_RES_PATH_INVALID);
 }
 
 /*

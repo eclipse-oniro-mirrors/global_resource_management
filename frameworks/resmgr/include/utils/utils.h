@@ -18,6 +18,7 @@
 #include <cstdint>
 #include "res_locale.h"
 #include "rstate.h"
+#include <set>
 
 namespace OHOS {
 namespace Global {
@@ -60,6 +61,10 @@ public:
     static bool endWithTail(const std::string& path, const std::string& tail);
 
     static bool isFileExist(const std::string& filePath);
+
+    static bool ContainsTail(std::string hapPath, std::set<std::string> tailSet);
+
+    static const std::set<std::string> tailSet;
 
 private:
 
