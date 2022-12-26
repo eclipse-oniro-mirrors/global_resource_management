@@ -25,13 +25,13 @@ INIT_RESMGR_FAILED:
 GET_RES_BY_ID_FAILED:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: app, desc: resmgr get resource by id failed}
   ID: {type: INT32, desc: resource id}
-  RESULT: {type: STRING, desc: result}
+  RESULT: {type: STRING, desc: the resource result}
   ERROR_MSG: {type: STRING, desc: error message}
 
 GET_RES_BY_NAME_FAILED:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: app, desc: resmgr get resource by name failed}
   NAME: {type: STRING, desc: resource name}
-  RESULT: {type: STRING, desc: result}
+  RESULT: {type: STRING, desc: the resource result}
   ERROR_MSG: {type: STRING, desc: error message}
 
 ADD_RES_PATH_FAILED:
