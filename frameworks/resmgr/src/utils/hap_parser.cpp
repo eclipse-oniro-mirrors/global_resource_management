@@ -20,6 +20,7 @@
 #include <fcntl.h>
 #include <unzip.h>
 #include <unistd.h>
+#include <set>
 
 #include "hilog_wrapper.h"
 #include "locale_matcher.h"
@@ -295,6 +296,30 @@ RState HapParser::ReadRawFileDescriptor(const char *hapPath, const std::string r
     descriptor.offset = static_cast<long>(fileInfo.offset);
     descriptor.length = static_cast<long>(fileInfo.length);
     descriptor.fd = zipFd;
+#endif
+    return SUCCESS;
+}
+
+RState HapParser::GetRawFileList(const std::string hapPath, const std::string rawDirPath,
+    std::vector<std::string>& fileList)
+{
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    bool isNewExtractor = false;
+    auto extractor = AbilityBase::ExtractorUtil::GetExtractor(hapPath, isNewExtractor);
+    if (extractor == nullptr) {
+        HILOG_ERROR("failed to get extractor from ability in GetFileList");
+        return NOT_FOUND;
+    }
+    std::set<std::string> fileSet;
+    std::string rawfilePath = HapParser::GetRawFilePath(extractor, rawDirPath);
+    bool ret = extractor->GetFileList(rawfilePath, fileSet);
+    if (!ret) {
+        HILOG_ERROR("failed to get fileSet from ability rawfilePath, %{public}s", rawfilePath.c_str());
+        return NOT_FOUND;
+    }
+    for (auto it = fileSet.begin(); it != fileSet.end(); it++) {
+        fileList.emplace_back(*it);
+    }
 #endif
     return SUCCESS;
 }

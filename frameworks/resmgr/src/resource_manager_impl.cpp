@@ -1206,6 +1206,12 @@ bool ResourceManagerImpl::IsFileExist(const std::string& path)
     }
     return false;
 }
+
+RState ResourceManagerImpl::GetRawFileList(const std::string rawDirPath, std::vector<std::string>& rawfileList)
+{
+    return hapManager_->GetRawFileList(rawDirPath, rawfileList);
+}
+
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
