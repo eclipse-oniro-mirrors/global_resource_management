@@ -117,10 +117,30 @@ void OH_ResourceManager_ReleaseNativeResourceManager(NativeResourceManager *resM
     }
 }
 
+static bool IsLoadHap(const NativeResourceManager *mgr, std::string &hapPath)
+{
+    return mgr->resManager->IsLoadHap(hapPath) == RState::SUCCESS ? true : false;
+}
+
+RawDir *LoadRawDirFromHap(const NativeResourceManager *mgr, const std::string dirName)
+{
+    std::unique_ptr<RawDir> result = std::make_unique<RawDir>();
+    RState state = mgr->resManager->GetRawFileList(dirName, result->fileNameCache.names);
+    if (state != RState::SUCCESS) {
+        HiLog::Error(LABEL, "failed to get RawDir dirName, %{public}s", dirName.c_str());
+        return nullptr;
+    }
+    return result.release();
+}
+
 RawDir *OH_ResourceManager_OpenRawDir(const NativeResourceManager *mgr, const char *dirName)
 {
     if (mgr == nullptr || dirName == nullptr) {
         return nullptr;
+    }
+    std::string hapPath;
+    if (IsLoadHap(mgr, hapPath)) {
+        return LoadRawDirFromHap(mgr, dirName);
     }
     ResourceManagerImpl* impl = static_cast<ResourceManagerImpl *>(mgr->resManager.get());
     std::string tempName = dirName;
@@ -153,15 +173,6 @@ RawDir *OH_ResourceManager_OpenRawDir(const NativeResourceManager *mgr, const ch
         closedir(dir);
     }
     return result.release();
-}
-
-static bool IsLoadHap(const NativeResourceManager *mgr, std::string &hapPath)
-{
-    RState state = mgr->resManager->IsLoadHap(hapPath);
-    if (state != RState::SUCCESS) {
-        return false;
-    }
-    return true;
 }
 
 RawFile *LoadRawFileFromHap(const NativeResourceManager *mgr, const char *fileName, const std::string hapPath)

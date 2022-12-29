@@ -460,21 +460,6 @@ std::vector<std::string> HapManager::GetResourcePaths()
     return result;
 }
 
-bool HapManager::IsLoadHap(std::string &hapPath)
-{
-    for (auto iter = hapResources_.rbegin(); iter != hapResources_.rend(); iter++) {
-        if ((*iter) == nullptr) {
-            HILOG_ERROR("the hapResource_ is nullptr");
-            return false;
-        }
-        hapPath = (*iter)->GetIndexPath();
-        if (Utils::ContainsTail(hapPath, Utils::tailSet)) {
-            return true;
-        }
-    }
-    return false;
-}
-
 std::string GetImageType(const std::string fileName)
 {
     auto pos = fileName.find_last_of('.');
@@ -612,6 +597,18 @@ RState HapManager::FindRawFileDescriptorFromHap(const std::string rawFileName,
         return HapParser::ReadRawFileDescriptor(hapPath.c_str(), rawFileName, descriptor);
     }
     return ERROR_CODE_RES_PATH_INVALID;
+}
+
+RState HapManager::GetRawFileList(const std::string rawDirPath, std::vector<std::string>& fileList)
+{
+    std::string hapPath;
+    return HapManager::GetValidHapPath(hapPath) == OK ? HapParser::GetRawFileList(hapPath, rawDirPath, fileList)
+        : ERROR_CODE_RES_PATH_INVALID;
+}
+
+bool HapManager::IsLoadHap(std::string &hapPath)
+{
+    return HapManager::GetValidHapPath(hapPath) == OK ? true : false;
 }
 } // namespace Resource
 } // namespace Global

@@ -107,6 +107,16 @@ public:
      */
     static RState ReadRawFileDescriptor(const char *hapPath, const std::string rawFileName,
         ResourceManager::RawFileDescriptor &descriptor);
+    
+    /**
+     * Get the raw file list
+     * @param hapPath the hap path
+     * @param rawDirPath the rawfile directory path
+     * @param fileList the rawfile list write to
+     * @return SUCCESS if resource exist, else not found
+     */
+    static RState GetRawFileList(const std::string hapPath, const std::string rawDirPath,
+        std::vector<std::string>& fileList);
 
     /**
      * Parse resource hex to resDesc

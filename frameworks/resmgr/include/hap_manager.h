@@ -181,6 +181,14 @@ public:
      */
     int32_t GetValidHapPath(std::string& hapPath);
 
+    /**
+     * Get the raw file list
+     * @param rawDirPath the rawfile directory path
+     * @param rawfileList the rawfile list write to
+     * @return SUCCESS if resource exist, else not found
+     */
+    RState GetRawFileList(const std::string rawDirPath, std::vector<std::string>& rawfileList);
+
 private:
     void UpdateResConfigImpl(ResConfigImpl &resConfig);
 

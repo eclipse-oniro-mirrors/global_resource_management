@@ -486,6 +486,14 @@ public:
      */
     virtual RState IsLoadHap(std::string &hapPath);
 
+    /**
+     * Get the raw file list
+     * @param rawDirPath the rawfile directory path
+     * @param rawfileList the rawfile list write to
+     * @return SUCCESS if resource exist, else not found
+     */
+    virtual RState GetRawFileList(const std::string rawDirPath, std::vector<std::string>& rawfileList);
+
 private:
     RState GetString(const IdItem *idItem, std::string &outValue);
 
