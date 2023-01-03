@@ -610,6 +610,17 @@ bool HapManager::IsLoadHap(std::string &hapPath)
 {
     return HapManager::GetValidHapPath(hapPath) == OK ? true : false;
 }
+
+bool HapManager::IsLoadHap()
+{
+    for (auto iter = hapResources_.rbegin(); iter != hapResources_.rend(); iter++) {
+        const std::string tempPath = (*iter)->GetIndexPath();
+        if (Utils::ContainsTail(tempPath, Utils::tailSet)) {
+            return true;
+        }
+    }
+    return false;
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

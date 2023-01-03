@@ -283,12 +283,7 @@ napi_value ResourceManagerAddon::New(napi_env env, napi_callback_info info)
 
 bool IsLoadHap(ResMgrAsyncContext *asyncContext)
 {
-    std::string hapPath;
-    RState state = asyncContext->addon_->GetResMgr()->IsLoadHap(hapPath);
-    if (state != RState::SUCCESS) {
-        return false;
-    }
-    return true;
+    return asyncContext->addon_->GetResMgr()->IsLoadHap() == RState::SUCCESS ? true : false;
 }
 
 std::shared_ptr<ResourceManagerAddon> getResourceManagerAddon(napi_env env, napi_callback_info info)

@@ -494,6 +494,11 @@ public:
      */
     virtual RState GetRawFileList(const std::string rawDirPath, std::vector<std::string>& rawfileList);
 
+    /**
+     * Is load hap
+     */
+    virtual RState IsLoadHap();
+
 private:
     RState GetString(const IdItem *idItem, std::string &outValue);
 
