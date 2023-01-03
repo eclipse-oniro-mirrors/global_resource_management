@@ -173,6 +173,8 @@ public:
     virtual RState IsLoadHap(std::string &hapPath) = 0;
 
     virtual RState GetRawFileList(const std::string rawDirPath, std::vector<std::string>& rawfileList) = 0;
+
+    virtual RState IsLoadHap() = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();

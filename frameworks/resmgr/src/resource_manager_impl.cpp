@@ -1212,6 +1212,10 @@ RState ResourceManagerImpl::GetRawFileList(const std::string rawDirPath, std::ve
     return hapManager_->GetRawFileList(rawDirPath, rawfileList);
 }
 
+RState ResourceManagerImpl::IsLoadHap()
+{
+    return hapManager_->IsLoadHap() ? SUCCESS : NOT_FOUND;
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

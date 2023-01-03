@@ -189,6 +189,11 @@ public:
      */
     RState GetRawFileList(const std::string rawDirPath, std::vector<std::string>& rawfileList);
 
+    /**
+     * Is load hap
+     */
+    bool IsLoadHap();
+
 private:
     void UpdateResConfigImpl(ResConfigImpl &resConfig);
 
