@@ -560,8 +560,6 @@ private:
     const std::string SYSTEM_RESOURCE_OVERLAY_PATH_COMPRESSED = "/data/storage/el1/bundle/" \
             "ohos.global.systemres.overlay/ohos.global.systemres.overlay/SystemResourcesOverlay.hap";
 
-    const float DEFAULT_DENSITY = 160.0f;
-
     std::unordered_map<std::string, RawFileDescriptor> rawFileDescriptor_;
 };
 } // namespace Resource

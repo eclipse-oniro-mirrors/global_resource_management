@@ -126,7 +126,7 @@ void ResConfigImpl::SetMnc(uint32_t mnc)
     this->mnc_ = mnc;
 }
 
-void ResConfigImpl::SetScreenDensity(ScreenDensity screenDensity)
+void ResConfigImpl::SetScreenDensity(float screenDensity)
 {
     this->screenDensity_ = screenDensity;
 }
@@ -148,7 +148,7 @@ Direction ResConfigImpl::GetDirection() const
     return this->direction_;
 }
 
-ScreenDensity ResConfigImpl::GetScreenDensity() const
+float ResConfigImpl::GetScreenDensity() const
 {
     return this->screenDensity_;
 }
@@ -436,7 +436,7 @@ int ResConfigImpl::IsMccMncMoreSuitable(uint32_t otherMcc, uint32_t otherMnc, ui
  * return 0
  *
  */
-int ResConfigImpl::IsDensityMoreSuitable(ScreenDensity otherDensity, ScreenDensity requestDensity,
+int ResConfigImpl::IsDensityMoreSuitable(float otherDensity, float requestDensity,
     uint32_t density) const
 {
     int ret = 0;
@@ -445,8 +445,8 @@ int ResConfigImpl::IsDensityMoreSuitable(ScreenDensity otherDensity, ScreenDensi
     if (density == ScreenDensity::SCREEN_DENSITY_NOT_SET) {
         if (requestDensity != ScreenDensity::SCREEN_DENSITY_NOT_SET &&
             this->screenDensity_ != otherDensity) {
-            thisDistance = this->screenDensity_ - requestDensity;
-            otherDistance = otherDensity - requestDensity;
+            thisDistance = static_cast<int>(this->screenDensity_ - requestDensity);
+            otherDistance = static_cast<int>(otherDensity - requestDensity);
             if (IsDensityMoreSuitable(thisDistance, otherDistance)) {
                 // the density of this resConfig is suitable than other resConfig
                 ret = 1;
@@ -553,11 +553,11 @@ bool ResConfigImpl::IsMoreSpecificThan(const ResConfigImpl *other, uint32_t dens
     if (ret != 0) {
         return ret > 0;
     }
-    
+
     return true;
 }
 
-int ResConfigImpl::IsDensityMoreSpecificThan(ScreenDensity otherDensity, uint32_t density) const
+int ResConfigImpl::IsDensityMoreSpecificThan(float otherDensity, uint32_t density) const
 {
     int ret = 0;
     if (density == SCREEN_DENSITY_NOT_SET) {

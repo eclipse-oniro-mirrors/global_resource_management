@@ -632,7 +632,7 @@ ResConfigImpl *HapParser::BuildResConfig(ResConfigKey *configKey)
     resConfig->SetMcc(configKey->mcc);
     resConfig->SetMnc(configKey->mnc);
     resConfig->SetInputDevice(configKey->inputDevice);
-    resConfig->SetScreenDensity(configKey->screenDensity);
+    resConfig->SetScreenDensity(static_cast<float>(configKey->screenDensity));
     RState r = resConfig->SetLocaleInfo(configKey->language, configKey->script, configKey->region);
     if (r != SUCCESS) {
         HILOG_ERROR("error set locale,lang %s,script %s,region %s", configKey->language, configKey->script,
