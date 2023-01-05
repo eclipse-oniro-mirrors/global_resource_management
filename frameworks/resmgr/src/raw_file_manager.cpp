@@ -77,10 +77,6 @@ struct RawFile {
             fclose(pf);
             pf = nullptr;
         }
-        if (resMgr != nullptr) {
-            delete resMgr;
-            resMgr = nullptr;
-        }
     }
 
     bool open()
