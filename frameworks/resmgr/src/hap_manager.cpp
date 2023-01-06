@@ -510,6 +510,10 @@ RState HapManager::GetProfileData(const HapResource::ValueUnderQualifierDir *qd,
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     auto extractor = GetAbilityExtractor(qd);
+    if (extractor == nullptr) {
+        HILOG_ERROR("failed to get extractor from ability");
+        return NOT_FOUND;
+    }
     std::string filePath = GetFilePath(extractor, qd, ResType::PROF);
     if (filePath.empty()) {
         HILOG_ERROR("get file path failed in GetProfileData");
@@ -529,6 +533,10 @@ RState HapManager::GetMediaData(const HapResource::ValueUnderQualifierDir *qd, s
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     auto extractor = GetAbilityExtractor(qd);
+    if (extractor == nullptr) {
+        HILOG_ERROR("failed to get extractor from ability");
+        return NOT_FOUND;
+    }
     std::string filePath = GetFilePath(extractor, qd, ResType::MEDIA);
     if (filePath.empty()) {
         HILOG_ERROR("get file path failed in GetMediaData");
@@ -547,6 +555,10 @@ RState HapManager::GetMediaBase64Data(const HapResource::ValueUnderQualifierDir 
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     auto extractor = GetAbilityExtractor(qd);
+    if (extractor == nullptr) {
+        HILOG_ERROR("failed to get extractor from ability");
+        return NOT_FOUND;
+    }
     std::string filePath = GetFilePath(extractor, qd, ResType::MEDIA);
     std::unique_ptr<uint8_t[]> buffer;
     size_t tmpLen;
@@ -613,7 +625,7 @@ bool HapManager::IsLoadHap(std::string &hapPath)
 
 bool HapManager::IsLoadHap()
 {
-    for (auto iter = hapResources_.rbegin(); iter != hapResources_.rend(); iter++) {
+    for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
         const std::string tempPath = (*iter)->GetIndexPath();
         if (Utils::ContainsTail(tempPath, Utils::tailSet)) {
             return true;
