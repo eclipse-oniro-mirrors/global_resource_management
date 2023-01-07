@@ -28,10 +28,21 @@ using icu::LocaleBuilder;
 namespace OHOS {
 namespace Global {
 namespace Resource {
+
+static const std::vector<std::pair<float, ScreenDensity>> resolutions = {
+    { 0.0, ScreenDensity::SCREEN_DENSITY_NOT_SET },
+    { 120.0, ScreenDensity::SCREEN_DENSITY_SDPI },
+    { 160.0, ScreenDensity::SCREEN_DENSITY_MDPI },
+    { 240.0, ScreenDensity::SCREEN_DENSITY_LDPI },
+    { 320.0, ScreenDensity::SCREEN_DENSITY_XLDPI },
+    { 480.0, ScreenDensity::SCREEN_DENSITY_XXLDPI },
+    { 640.0, ScreenDensity::SCREEN_DENSITY_XXXLDPI },
+};
+
 ResConfigImpl::ResConfigImpl()
     : resLocale_(nullptr),
     direction_(DIRECTION_NOT_SET),
-    screenDensity_(SCREEN_DENSITY_NOT_SET),
+    screenDensityDpi_(SCREEN_DENSITY_NOT_SET),
     colorMode_(LIGHT),
     mcc_(MCC_UNDEFINED),
     mnc_(MNC_UNDEFINED),
@@ -126,9 +137,23 @@ void ResConfigImpl::SetMnc(uint32_t mnc)
     this->mnc_ = mnc;
 }
 
-void ResConfigImpl::SetScreenDensity(ScreenDensity screenDensity)
+ScreenDensity ResConfigImpl::ConvertDensity(float density)
 {
-    this->screenDensity_ = screenDensity;
+    float deviceDpi = density * Utils::DPI_BASE;
+    auto resolution = SCREEN_DENSITY_NOT_SET;
+    for (const auto& [dpi, value] : resolutions) {
+        resolution = value;
+        if (deviceDpi <= dpi) {
+            break;
+        }
+    }
+    return resolution;
+}
+
+void ResConfigImpl::SetScreenDensity(float screenDensity)
+{
+    this->density_ = screenDensity;
+    this->screenDensityDpi_ = ConvertDensity(screenDensity);
 }
 
 #ifdef SUPPORT_GRAPHICS
@@ -148,9 +173,9 @@ Direction ResConfigImpl::GetDirection() const
     return this->direction_;
 }
 
-ScreenDensity ResConfigImpl::GetScreenDensity() const
+float ResConfigImpl::GetScreenDensity() const
 {
-    return this->screenDensity_;
+    return this->density_;
 }
 
 ColorMode ResConfigImpl::GetColorMode() const
@@ -386,7 +411,7 @@ bool ResConfigImpl::IsMoreSuitable(const ResConfigImpl *other,
             request->inputDevice_ != InputDevice::INPUTDEVICE_NOT_SET) {
             return this->inputDevice_ != InputDevice::INPUTDEVICE_NOT_SET;
         }
-        ret = IsDensityMoreSuitable(other->screenDensity_, request->screenDensity_, density);
+        ret = IsDensityMoreSuitable(other->screenDensityDpi_, request->screenDensityDpi_, density);
         if (ret != 0) {
             return ret > 0;
         }
@@ -444,8 +469,8 @@ int ResConfigImpl::IsDensityMoreSuitable(ScreenDensity otherDensity, ScreenDensi
     int otherDistance;
     if (density == ScreenDensity::SCREEN_DENSITY_NOT_SET) {
         if (requestDensity != ScreenDensity::SCREEN_DENSITY_NOT_SET &&
-            this->screenDensity_ != otherDensity) {
-            thisDistance = this->screenDensity_ - requestDensity;
+            this->screenDensityDpi_ != otherDensity) {
+            thisDistance = this->screenDensityDpi_ - requestDensity;
             otherDistance = otherDensity - requestDensity;
             if (IsDensityMoreSuitable(thisDistance, otherDistance)) {
                 // the density of this resConfig is suitable than other resConfig
@@ -456,8 +481,8 @@ int ResConfigImpl::IsDensityMoreSuitable(ScreenDensity otherDensity, ScreenDensi
             }
         }
     } else {
-        if (this->screenDensity_ != otherDensity) {
-            thisDistance = static_cast<int>(this->screenDensity_ - density);
+        if (this->screenDensityDpi_ != otherDensity) {
+            thisDistance = static_cast<int>(this->screenDensityDpi_ - density);
             otherDistance = static_cast<int>(otherDensity - density);
             if (IsDensityMoreSuitable(thisDistance, otherDistance)) {
                 // the density of this resConfig is suitable than other resConfig
@@ -549,7 +574,7 @@ bool ResConfigImpl::IsMoreSpecificThan(const ResConfigImpl *other, uint32_t dens
     if (this->inputDevice_ != other->inputDevice_) {
         return (this->inputDevice_ == InputDevice::INPUTDEVICE_NOT_SET);
     }
-    int ret = IsDensityMoreSpecificThan(other->screenDensity_, density);
+    int ret = IsDensityMoreSpecificThan(other->screenDensityDpi_, density);
     if (ret != 0) {
         return ret > 0;
     }
@@ -561,8 +586,8 @@ int ResConfigImpl::IsDensityMoreSpecificThan(ScreenDensity otherDensity, uint32_
 {
     int ret = 0;
     if (density == SCREEN_DENSITY_NOT_SET) {
-        if (this->screenDensity_ != otherDensity) {
-            if (this->screenDensity_ != ScreenDensity::SCREEN_DENSITY_NOT_SET) {
+        if (this->screenDensityDpi_ != otherDensity) {
+            if (this->screenDensityDpi_ != ScreenDensity::SCREEN_DENSITY_NOT_SET) {
                 // the density of this resConfig is suitable than other resConfig
                 ret = 1;
             } else {
@@ -571,18 +596,18 @@ int ResConfigImpl::IsDensityMoreSpecificThan(ScreenDensity otherDensity, uint32_
             }
         }
     } else {
-        if ((this->screenDensity_ != ScreenDensity::SCREEN_DENSITY_NOT_SET) &&
+        if ((this->screenDensityDpi_ != ScreenDensity::SCREEN_DENSITY_NOT_SET) &&
                 (otherDensity == ScreenDensity::SCREEN_DENSITY_NOT_SET)) {
             // the density of this resConfig is suitable than other resConfig
             ret = 1;
         }
-        if ((this->screenDensity_ == ScreenDensity::SCREEN_DENSITY_NOT_SET) &&
+        if ((this->screenDensityDpi_ == ScreenDensity::SCREEN_DENSITY_NOT_SET) &&
                 (otherDensity != ScreenDensity::SCREEN_DENSITY_NOT_SET)) {
             // the density of other resConfig is suitable than this resConfig
             ret = -1;
         }
-        if (this->screenDensity_ != otherDensity) {
-            int thisDistance = static_cast<int>(this->screenDensity_ - density);
+        if (this->screenDensityDpi_ != otherDensity) {
+            int thisDistance = static_cast<int>(this->screenDensityDpi_ - density);
             int otherDistance = static_cast<int>(otherDensity - density);
             if (IsDensityMoreSuitable(thisDistance, otherDistance)) {
                 // the density of this resConfig is suitable than other resConfig

@@ -57,10 +57,11 @@ public:
     static RState EncodeBase64(std::unique_ptr<uint8_t[]> &data, int srcLen,
                               const std::string &imgType, std::string &outValue);
 
+    static constexpr float DPI_BASE = 160.0f;
+
     static bool endWithTail(const std::string& path, const std::string& tail);
 
     static bool isFileExist(const std::string& filePath);
-
 private:
 
     static uint16_t EncodeLanguageOrRegion(const char *str, char base);

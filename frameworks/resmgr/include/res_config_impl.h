@@ -85,7 +85,7 @@ public:
      * Set resConfig screenDensity
      * @param screenDensity the resConfig screenDensity
      */
-    void SetScreenDensity(ScreenDensity screenDensity);
+    void SetScreenDensity(float screenDensity);
 
 #ifdef SUPPORT_GRAPHICS
     const Locale *GetLocaleInfo() const;
@@ -95,7 +95,7 @@ public:
 
     Direction GetDirection() const;
 
-    ScreenDensity GetScreenDensity() const;
+    float GetScreenDensity() const;
 
     ColorMode GetColorMode() const;
 
@@ -167,10 +167,12 @@ private:
 
     int IsDensityMoreSpecificThan(ScreenDensity otherDensity, uint32_t density = 0) const;
 
+    ScreenDensity ConvertDensity(float density);
 private:
     ResLocale *resLocale_;
     Direction direction_;
-    ScreenDensity screenDensity_;
+    float density_;
+    ScreenDensity screenDensityDpi_;
     ColorMode colorMode_;
     uint32_t mcc_;
     uint32_t mnc_;
