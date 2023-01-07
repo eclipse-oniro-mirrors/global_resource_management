@@ -161,16 +161,18 @@ private:
 
     int IsMccMncMoreSuitable(uint32_t otherMcc, uint32_t otherMnc, uint32_t requestMcc, uint32_t requestMnc) const;
 
-    int IsDensityMoreSuitable(float otherDensity, float requestDensity, uint32_t density = 0) const;
+    int IsDensityMoreSuitable(ScreenDensity otherDensity, ScreenDensity requestDensity, uint32_t density = 0) const;
 
     bool IsDensityMoreSuitable(int thisDistance, int otherDistance) const;
 
-    int IsDensityMoreSpecificThan(float otherDensity, uint32_t density = 0) const;
+    int IsDensityMoreSpecificThan(ScreenDensity otherDensity, uint32_t density = 0) const;
 
+    ScreenDensity ConvertDensity(float density);
 private:
     ResLocale *resLocale_;
     Direction direction_;
-    float screenDensity_;
+    float density_;
+    ScreenDensity screenDensityDpi_;
     ColorMode colorMode_;
     uint32_t mcc_;
     uint32_t mnc_;
