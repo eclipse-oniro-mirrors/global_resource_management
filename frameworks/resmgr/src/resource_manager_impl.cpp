@@ -563,15 +563,15 @@ RState ResourceManagerImpl::RecalculateFloat(const std::string &unit, float &res
 {
     ResConfigImpl rc;
     GetResConfig(rc);
-    float srcDensity = rc.GetScreenDensity();
-    if (srcDensity == SCREEN_DENSITY_NOT_SET) {
+    float density = rc.GetScreenDensity();
+    if (density == SCREEN_DENSITY_NOT_SET) {
         HILOG_INFO("RecalculateFloat srcDensity SCREEN_DENSITY_NOT_SET ");
         return SUCCESS;
     }
     if (unit == VIRTUAL_PIXEL) {
-        result = result * srcDensity;
+        result = result * density;
     } else if (unit == FONT_SIZE_PIXEL) {
-        float fontSizeDensity = srcDensity * ((fabs(fontRatio_) <= 1E-6) ? 1.0f : fontRatio_);
+        float fontSizeDensity = density * ((fabs(fontRatio_) <= 1E-6) ? 1.0f : fontRatio_);
         result = result * fontSizeDensity;
     } else {
         // no unit
