@@ -81,7 +81,7 @@ ohos_shared_library("global_resmgr") {
 
   deps = [
     "//third_party/bounds_checking_function:libsec_shared",
-    "//third_party/zlib:libz",
+    "//third_party/zlib:shared_libz",
   ]
 
   if (resource_management_support_icu) {
@@ -193,10 +193,10 @@ ohos_shared_library("global_resmgr_linux") {
     public_configs = [ ":resmgr_public_config" ]
 
     deps = [
-      "//third_party/bounds_checking_function:libsec_static",
-      "//third_party/icu/icu4c:static_icui18n",
-      "//third_party/icu/icu4c:static_icuuc",
-      "//third_party/zlib:libz",
+      "//third_party/bounds_checking_function:libsec_shared",
+      "//third_party/icu/icu4c:shared_icui18n",
+      "//third_party/icu/icu4c:shared_icuuc",
+      "//third_party/zlib:shared_libz",
     ]
   }
   subsystem_name = "global"
