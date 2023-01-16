@@ -76,7 +76,7 @@ public:
 
     void AddResource(const char *language, const char *script, const char *region);
 
-    void AddColorModeResource(DeviceType deviceType, ColorMode colorMode, ScreenDensity screenDensity) const;
+    void AddColorModeResource(DeviceType deviceType, ColorMode colorMode, float screenDensity) const;
 
     void AddHapResource(const char *language, const char *script, const char *region);
 
@@ -214,7 +214,7 @@ void ResourceManagerTest::AddHapResource(const char *language, const char *scrip
 }
 
 void ResourceManagerTest::AddColorModeResource(DeviceType deviceType, ColorMode colorMode,
-                                               ScreenDensity screenDensity) const
+                                               float screenDensity) const
 {
     auto rc = CreateResConfig();
     if (rc == nullptr) {
@@ -1448,7 +1448,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFormatTest003, T
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByIdFormatTest004, TestSize.Level1)
 {
-    AddColorModeResource(DEVICE_PHONE, LIGHT, SCREEN_DENSITY_LDPI);
+    AddColorModeResource(DEVICE_PHONE, LIGHT, SCREEN_DENSITY_LDPI / BASE_DPI);
 
     RState state;
     std::string outValue;
@@ -1511,7 +1511,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByNameFormatTest003,
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetPluralStringByNameFormatTest004, TestSize.Level1)
 {
-    AddColorModeResource(DEVICE_PHONE, LIGHT, SCREEN_DENSITY_LDPI);
+    AddColorModeResource(DEVICE_PHONE, LIGHT, SCREEN_DENSITY_LDPI / BASE_DPI);
 
     std::string outValue;
     const char* eatApple = "eat_apple";
@@ -1871,7 +1871,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByNameTest002, TestSize.Lev
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByNameTest003, TestSize.Level1)
 {
-    AddColorModeResource(DEVICE_PHONE, LIGHT, SCREEN_DENSITY_LDPI);
+    AddColorModeResource(DEVICE_PHONE, LIGHT, SCREEN_DENSITY_LDPI / BASE_DPI);
 
     uint32_t outValue;
     RState state;
@@ -1887,7 +1887,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByNameTest003, TestSize.Lev
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByNameTest004, TestSize.Level1)
 {
-    AddColorModeResource(DEVICE_PHONE, LIGHT, SCREEN_DENSITY_LDPI);
+    AddColorModeResource(DEVICE_PHONE, LIGHT, SCREEN_DENSITY_LDPI / BASE_DPI);
 
     uint32_t outValue;
     RState state;
@@ -1903,7 +1903,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByNameTest004, TestSize.Lev
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByNameTest005, TestSize.Level1)
 {
-    AddColorModeResource(DEVICE_PHONE, LIGHT, SCREEN_DENSITY_LDPI);
+    AddColorModeResource(DEVICE_PHONE, LIGHT, SCREEN_DENSITY_LDPI / BASE_DPI);
 
     uint32_t outValue;
     RState state;
@@ -1919,7 +1919,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByNameTest005, TestSize.Lev
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByNameTest006, TestSize.Level1)
 {
-    AddColorModeResource(DEVICE_PHONE, LIGHT, SCREEN_DENSITY_LDPI);
+    AddColorModeResource(DEVICE_PHONE, LIGHT, SCREEN_DENSITY_LDPI / BASE_DPI);
 
     uint32_t outValue;
     RState state;
@@ -1935,7 +1935,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByNameTest006, TestSize.Lev
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByNameTest007, TestSize.Level1)
 {
-    AddColorModeResource(DEVICE_PHONE, DARK, SCREEN_DENSITY_LDPI);
+    AddColorModeResource(DEVICE_PHONE, DARK, SCREEN_DENSITY_LDPI / BASE_DPI);
 
     uint32_t outValue;
     RState state;
@@ -1951,7 +1951,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByNameTest007, TestSize.Lev
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByNameTest008, TestSize.Level1)
 {
-    AddColorModeResource(DEVICE_PHONE, DARK, SCREEN_DENSITY_LDPI);
+    AddColorModeResource(DEVICE_PHONE, DARK, SCREEN_DENSITY_LDPI / BASE_DPI);
 
     uint32_t outValue;
     RState state;
@@ -1967,7 +1967,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByNameTest008, TestSize.Lev
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByNameTest009, TestSize.Level1)
 {
-    AddColorModeResource(DEVICE_PHONE, DARK, SCREEN_DENSITY_LDPI);
+    AddColorModeResource(DEVICE_PHONE, DARK, SCREEN_DENSITY_LDPI / BASE_DPI);
 
     uint32_t outValue;
     RState state;
@@ -1983,7 +1983,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByNameTest009, TestSize.Lev
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByNameTest010, TestSize.Level1)
 {
-    AddColorModeResource(DEVICE_PHONE, DARK, SCREEN_DENSITY_LDPI);
+    AddColorModeResource(DEVICE_PHONE, DARK, SCREEN_DENSITY_LDPI / BASE_DPI);
 
     uint32_t outValue;
     RState state;
@@ -1999,7 +1999,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByNameTest010, TestSize.Lev
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByNameTest011, TestSize.Level1)
 {
-    AddColorModeResource(DEVICE_PHONE, LIGHT, SCREEN_DENSITY_LDPI);
+    AddColorModeResource(DEVICE_PHONE, LIGHT, SCREEN_DENSITY_LDPI / BASE_DPI);
 
     uint32_t outValue;
     RState state;
@@ -2015,7 +2015,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByNameTest011, TestSize.Lev
  */
 HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByNameTest012, TestSize.Level1)
 {
-    AddColorModeResource(DEVICE_PHONE, LIGHT, SCREEN_DENSITY_LDPI);
+    AddColorModeResource(DEVICE_PHONE, LIGHT, SCREEN_DENSITY_LDPI / BASE_DPI);
 
     uint32_t outValue;
     RState state;
@@ -2041,7 +2041,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest001, Te
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(LIGHT);
-    rc->SetScreenDensity(SCREEN_DENSITY_SDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2069,7 +2069,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest002, Te
     rc->SetLocaleInfo("zh", nullptr, nullptr);
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(LIGHT);
-    rc->SetScreenDensity(SCREEN_DENSITY_SDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2098,7 +2098,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest003, Te
     rc->SetMcc(460);
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(LIGHT);
-    rc->SetScreenDensity(SCREEN_DENSITY_SDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
 
     rm->UpdateResConfig(*rc);
     delete rc;
@@ -2128,7 +2128,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest004, Te
     rc->SetMcc(1);
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(LIGHT);
-    rc->SetScreenDensity(SCREEN_DENSITY_SDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2157,7 +2157,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest005, Te
     rc->SetMcc(10);
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(LIGHT);
-    rc->SetScreenDensity(SCREEN_DENSITY_SDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2188,7 +2188,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest006, Te
     rc->SetMnc(1);
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(LIGHT);
-    rc->SetScreenDensity(SCREEN_DENSITY_SDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2219,7 +2219,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest007, Te
     rc->SetMnc(10);
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(LIGHT);
-    rc->SetScreenDensity(SCREEN_DENSITY_SDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2250,7 +2250,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest008, Te
     rc->SetMnc(101);
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(LIGHT);
-    rc->SetScreenDensity(SCREEN_DENSITY_SDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2281,7 +2281,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest009, Te
     rc->SetMnc(101);
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(LIGHT);
-    rc->SetScreenDensity(SCREEN_DENSITY_SDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2312,7 +2312,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest010, Te
     rc->SetMnc(101);
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(LIGHT);
-    rc->SetScreenDensity(SCREEN_DENSITY_SDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2343,7 +2343,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest011, Te
     rc->SetMnc(101);
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(LIGHT);
-    rc->SetScreenDensity(SCREEN_DENSITY_SDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2371,7 +2371,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest012, Te
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(LIGHT);
-    rc->SetScreenDensity(SCREEN_DENSITY_SDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2399,7 +2399,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest013, Te
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDeviceType(DEVICE_CAR);
     rc->SetColorMode(LIGHT);
-    rc->SetScreenDensity(SCREEN_DENSITY_SDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2429,7 +2429,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest014, Te
     rc->SetMnc(101);
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(LIGHT);
-    rc->SetScreenDensity(SCREEN_DENSITY_SDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2459,7 +2459,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest015, Te
     rc->SetMnc(101);
     rc->SetDeviceType(DEVICE_CAR);
     rc->SetColorMode(LIGHT);
-    rc->SetScreenDensity(SCREEN_DENSITY_SDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2487,7 +2487,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest016, Te
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(DARK);
-    rc->SetScreenDensity(SCREEN_DENSITY_SDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2515,7 +2515,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest017, Te
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(LIGHT);
-    rc->SetScreenDensity(SCREEN_DENSITY_SDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2545,7 +2545,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest018, Te
     rc->SetMnc(101);
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(DARK);
-    rc->SetScreenDensity(SCREEN_DENSITY_SDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2575,7 +2575,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest019, Te
     rc->SetMnc(101);
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(LIGHT);
-    rc->SetScreenDensity(SCREEN_DENSITY_SDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2603,7 +2603,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest020, Te
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(LIGHT);
-    rc->SetScreenDensity(SCREEN_DENSITY_LDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_LDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2631,7 +2631,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest021, Te
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(LIGHT);
-    rc->SetScreenDensity(SCREEN_DENSITY_XLDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_XLDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2661,7 +2661,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest022, Te
     rc->SetMnc(101);
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(LIGHT);
-    rc->SetScreenDensity(SCREEN_DENSITY_LDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_LDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2691,7 +2691,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest023, Te
     rc->SetMnc(101);
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(LIGHT);
-    rc->SetScreenDensity(SCREEN_DENSITY_XLDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_XLDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -2721,7 +2721,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForMccMncTest024, Te
     rc->SetMnc(101);
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(DARK);
-    rc->SetScreenDensity(SCREEN_DENSITY_XLDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_XLDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -3301,7 +3301,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest017, TestSize.Level
     rc->SetMnc(101);
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(DARK);
-    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -3340,7 +3340,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest018, TestSize.Level
     rc->SetMnc(101);
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(DARK);
-    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -3379,7 +3379,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest019, TestSize.Level
     rc->SetMnc(101);
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(DARK);
-    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -3418,7 +3418,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest020, TestSize.Level
     rc->SetMnc(101);
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(DARK);
-    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -3457,7 +3457,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest021, TestSize.Level
     rc->SetMnc(101);
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(DARK);
-    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -3496,7 +3496,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest022, TestSize.Level
     rc->SetMnc(101);
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(DARK);
-    rc->SetScreenDensity(SCREEN_DENSITY_XXLDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXLDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -4013,7 +4013,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest017, TestSize.Lev
     rc->SetLocaleInfo("zh", nullptr, "CN");
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(DARK);
-    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -4050,7 +4050,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest018, TestSize.Lev
     rc->SetLocaleInfo("zh", nullptr, "CN");
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(DARK);
-    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -4087,7 +4087,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest019, TestSize.Lev
     rc->SetLocaleInfo("zh", nullptr, "CN");
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(DARK);
-    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -4124,7 +4124,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest020, TestSize.Lev
     rc->SetLocaleInfo("zh", nullptr, "CN");
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(DARK);
-    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -4161,7 +4161,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest021, TestSize.Lev
     rc->SetLocaleInfo("zh", nullptr, "CN");
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(DARK);
-    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -4198,7 +4198,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest022, TestSize.Lev
     rc->SetLocaleInfo("zh", nullptr, "CN");
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(DARK);
-    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
     delete rc;
 
@@ -5771,23 +5771,6 @@ HWTEST_F(ResourceManagerTest, RawFileTestFromHap0046, TestSize.Level1)
 
     state = rm->CloseRawFileDescriptor("noexist.txt");
     EXPECT_EQ(state, ERROR_CODE_RES_PATH_INVALID);
-}
-
-/*
- * test get raw file path interface
- * @tc.name: RawFileTestFromHap0047
- * @tc.desc: Test GetRawFileFromHap & AddResource function, file case.
- * @tc.type: FUNC
- * @tc.require: issueI5LHLP
- */
-HWTEST_F(ResourceManagerTest, RawFileTestFromHap0047, TestSize.Level1)
-{
-    bool ret = rm->AddResource("/system/app/ohos.global.systemres/SystemResources.hap");
-    EXPECT_TRUE(ret);
-    std::unique_ptr<ResourceManager::RawFile> rawFile;
-    RState state;
-    state = rm->GetRawFileFromHap("test_rawfile.txt", rawFile);
-    EXPECT_FALSE(state == SUCCESS);
 }
 
 /*
