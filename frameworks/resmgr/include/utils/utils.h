@@ -16,6 +16,7 @@
 #define OHOS_RESOURCE_MANAGER_UTILS_H
 #include <cstddef>
 #include <cstdint>
+#include <set>
 #include "res_locale.h"
 #include "rstate.h"
 
@@ -61,6 +62,9 @@ public:
 
     static bool isFileExist(const std::string& filePath);
 
+    static bool ContainsTail(std::string hapPath, std::set<std::string> tailSet);
+
+    static const std::set<std::string> tailSet;
 private:
 
     static uint16_t EncodeLanguageOrRegion(const char *str, char base);
