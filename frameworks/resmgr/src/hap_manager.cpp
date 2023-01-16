@@ -471,7 +471,7 @@ std::string GetImageType(const std::string fileName)
 }
 
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-std::string GetFilePath(std::shared_ptr<AbilityBase::Extractor> &extractor,
+std::string GetFilePathFromHap(std::shared_ptr<AbilityBase::Extractor> &extractor,
     const HapResource::ValueUnderQualifierDir *qd, const ResType resType)
 {
     std::string filePath;
@@ -514,7 +514,7 @@ RState HapManager::GetProfileData(const HapResource::ValueUnderQualifierDir *qd,
         HILOG_ERROR("failed to get extractor from ability");
         return NOT_FOUND;
     }
-    std::string filePath = GetFilePath(extractor, qd, ResType::PROF);
+    std::string filePath = GetFilePathFromHap(extractor, qd, ResType::PROF);
     if (filePath.empty()) {
         HILOG_ERROR("get file path failed in GetProfileData");
         return NOT_FOUND;
@@ -531,15 +531,28 @@ RState HapManager::GetProfileData(const HapResource::ValueUnderQualifierDir *qd,
 RState HapManager::GetMediaData(const HapResource::ValueUnderQualifierDir *qd, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue)
 {
+    std::string filePath = qd->GetHapResource()->GetIndexPath();
+    RState state;
+    if (Utils::ContainsTail(filePath, Utils::tailSet)) {
+        state = HapManager::GetMediaDataFromHap(qd, len, outValue);
+    } else {
+        state = HapManager::GetMediaDataFromIndex(qd, len, outValue);
+    }
+    return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_ID;
+}
+
+RState HapManager::GetMediaDataFromHap(const HapResource::ValueUnderQualifierDir *qd, size_t &len,
+    std::unique_ptr<uint8_t[]> &outValue)
+{
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     auto extractor = GetAbilityExtractor(qd);
     if (extractor == nullptr) {
         HILOG_ERROR("failed to get extractor from ability");
         return NOT_FOUND;
     }
-    std::string filePath = GetFilePath(extractor, qd, ResType::MEDIA);
+    std::string filePath = GetFilePathFromHap(extractor, qd, ResType::MEDIA);
     if (filePath.empty()) {
-        HILOG_ERROR("get file path failed in GetMediaData");
+        HILOG_ERROR("get file path failed in GetMediaDataFromHap");
         return NOT_FOUND;
     }
     bool ret = extractor->ExtractToBufByName(filePath, outValue, len);
@@ -551,7 +564,31 @@ RState HapManager::GetMediaData(const HapResource::ValueUnderQualifierDir *qd, s
     return SUCCESS;
 }
 
+RState HapManager::GetMediaDataFromIndex(const HapResource::ValueUnderQualifierDir *qd, size_t &len,
+    std::unique_ptr<uint8_t[]> &outValue)
+{
+    std::string filePath;
+    RState state = HapManager::GetFilePath(qd, ResType::MEDIA, filePath);
+    if (state != SUCCESS) {
+        return NOT_FOUND;
+    }
+    outValue = Utils::LoadResourceFile(filePath, len);
+    return SUCCESS;
+}
+
 RState HapManager::GetMediaBase64Data(const HapResource::ValueUnderQualifierDir *qd, std::string &outValue)
+{
+    std::string filePath = qd->GetHapResource()->GetIndexPath();
+    RState state;
+    if (Utils::ContainsTail(filePath, Utils::tailSet)) {
+        state = HapManager::GetMediaBase64DataFromHap(qd, outValue);
+    } else {
+        state = HapManager::GetMediaBase64DataFromIndex(qd, outValue);
+    }
+    return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_ID;
+}
+
+RState HapManager::GetMediaBase64DataFromHap(const HapResource::ValueUnderQualifierDir *qd, std::string &outValue)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     auto extractor = GetAbilityExtractor(qd);
@@ -559,7 +596,7 @@ RState HapManager::GetMediaBase64Data(const HapResource::ValueUnderQualifierDir 
         HILOG_ERROR("failed to get extractor from ability");
         return NOT_FOUND;
     }
-    std::string filePath = GetFilePath(extractor, qd, ResType::MEDIA);
+    std::string filePath = GetFilePathFromHap(extractor, qd, ResType::MEDIA);
     std::unique_ptr<uint8_t[]> buffer;
     size_t tmpLen;
     bool ret = extractor->ExtractToBufByName(filePath, buffer, tmpLen);
@@ -571,6 +608,16 @@ RState HapManager::GetMediaBase64Data(const HapResource::ValueUnderQualifierDir 
     Utils::EncodeBase64(buffer, tmpLen, imgType, outValue);
 #endif
     return SUCCESS;
+}
+
+RState HapManager::GetMediaBase64DataFromIndex(const HapResource::ValueUnderQualifierDir *qd, std::string &outValue)
+{
+    std::string filePath;
+    RState state = HapManager::GetFilePath(qd, ResType::MEDIA, filePath);
+    if (state != SUCCESS) {
+        return NOT_FOUND;
+    }
+    return Utils::GetMediaBase64Data(filePath, outValue);
 }
 
 int32_t HapManager::GetValidHapPath(std::string &hapPath)
@@ -632,6 +679,44 @@ bool HapManager::IsLoadHap()
         }
     }
     return false;
+}
+
+RState HapManager::GetFilePath(const HapResource::ValueUnderQualifierDir *vuqd, const ResType resType,
+    std::string &outValue)
+{
+    // not found or type invalid
+    if (vuqd == nullptr) {
+        return NOT_FOUND;
+    }
+    const IdItem *idItem = vuqd->GetIdItem();
+    if (idItem == nullptr || idItem->resType_ != resType) {
+        return NOT_FOUND;
+    }
+    outValue = vuqd->GetHapResource()->GetResourcePath();
+#if defined(__ARKUI_CROSS__)
+    auto index = idItem->value_.find('/');
+    if (index == std::string::npos) {
+        HILOG_ERROR("resource path format error, %s", idItem->value_.c_str());
+        return NOT_FOUND;
+    }
+    auto nameWithoutModule = idItem->value_.substr(index + 1);
+    outValue.append(nameWithoutModule);
+#elif defined(__IDE_PREVIEW__)
+    if (Utils::IsFileExist(idItem->value_)) {
+        outValue = idItem->value_;
+        return SUCCESS;
+    }
+    auto index = idItem->value_.find('/');
+    if (index == std::string::npos) {
+        HILOG_ERROR("resource path format error, %s", idItem->value_.c_str());
+        return NOT_FOUND;
+    }
+    auto nameWithoutModule = idItem->value_.substr(index + 1);
+    outValue.append(nameWithoutModule);
+#else
+    outValue.append(idItem->value_);
+#endif
+    return SUCCESS;
 }
 } // namespace Resource
 } // namespace Global

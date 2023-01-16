@@ -176,7 +176,7 @@ struct ResMgrAsyncContext {
     std::vector<std::string> arrayValue_;
 
     std::unique_ptr<uint8_t[]> mediaData;
-    int len_;
+    size_t len_;
 
     napi_deferred deferred_;
     napi_ref callbackRef_;

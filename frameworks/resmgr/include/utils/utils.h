@@ -53,7 +53,7 @@ public:
 
     static RState ConvertColorToUInt32(const char *s, uint32_t &outValue);
 
-    static std::unique_ptr<uint8_t[]> LoadResourceFile(const std::string &path, int &len);
+    static std::unique_ptr<uint8_t[]> LoadResourceFile(const std::string &path, size_t &len);
 
     static RState EncodeBase64(std::unique_ptr<uint8_t[]> &data, int srcLen,
                               const std::string &imgType, std::string &outValue);
@@ -62,11 +62,13 @@ public:
 
     static bool endWithTail(const std::string& path, const std::string& tail);
 
-    static bool isFileExist(const std::string& filePath);
+    static bool IsFileExist(const std::string& filePath);
 
     static bool ContainsTail(std::string hapPath, std::set<std::string> tailSet);
 
     static const std::set<std::string> tailSet;
+
+    static RState GetMediaBase64Data(const std::string& iconPath, std::string &base64Data);
 private:
 
     static uint16_t EncodeLanguageOrRegion(const char *str, char base);

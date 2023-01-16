@@ -194,6 +194,52 @@ public:
      */
     bool IsLoadHap();
 
+    /**
+     * Get the raw file list
+     * @param qd the QualifierDir
+     * @param resType the resource type
+     * @param outValue the resource path write to
+     * @return SUCCESS if resource exist, else not found
+     */
+    RState GetFilePath(const HapResource::ValueUnderQualifierDir *qd, const ResType resType,
+        std::string &outValue);
+
+    /**
+     * Get the raw file list
+     * @param qd the QualifierDir
+     * @param len the resource type
+     * @param outValue the media data write to
+     * @return SUCCESS if resource exist, else not found
+     */
+    RState GetMediaDataFromHap(const HapResource::ValueUnderQualifierDir *qd, size_t &len,
+        std::unique_ptr<uint8_t[]> &outValue);
+
+    /**
+     * Get the raw file list
+     * @param qd the QualifierDir
+     * @param len the resource type
+     * @param outValue the media data write to
+     * @return SUCCESS if resource exist, else not found
+     */
+    RState GetMediaDataFromIndex(const HapResource::ValueUnderQualifierDir *qd, size_t &len,
+        std::unique_ptr<uint8_t[]> &outValue);
+
+    /**
+     * Get the raw file list
+     * @param qd the QualifierDir
+     * @param outValue the mediabase64 data write to
+     * @return SUCCESS if resource exist, else not found
+     */
+    RState GetMediaBase64DataFromHap(const HapResource::ValueUnderQualifierDir *qd, std::string &outValue);
+
+    /**
+     * Get the raw file list
+     * @param qd the QualifierDir
+     * @param outValue the mediabase64 data write to
+     * @return SUCCESS if resource exist, else not found
+     */
+    RState GetMediaBase64DataFromIndex(const HapResource::ValueUnderQualifierDir *qd, std::string &outValue);
+
 private:
     void UpdateResConfigImpl(ResConfigImpl &resConfig);
 

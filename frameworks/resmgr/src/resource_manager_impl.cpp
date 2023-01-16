@@ -80,22 +80,22 @@ bool ResourceManagerImpl::Init()
         HILOG_ERROR("new HapManager failed when ResourceManagerImpl::Init");
         return false;
     }
-    if (Utils::isFileExist(SYSTEM_RESOURCE_OVERLAY_PATH) && Utils::isFileExist(SYSTEM_RESOURCE_PATH)) {
+    if (Utils::IsFileExist(SYSTEM_RESOURCE_OVERLAY_PATH) && Utils::IsFileExist(SYSTEM_RESOURCE_PATH)) {
         vector<string> overlayPaths;
         overlayPaths.push_back(SYSTEM_RESOURCE_OVERLAY_PATH);
         AddResource(SYSTEM_RESOURCE_PATH.c_str(), overlayPaths);
         return true;
     }
     
-    if (Utils::isFileExist(SYSTEM_RESOURCE_OVERLAY_PATH_COMPRESSED) &&
-        Utils::isFileExist(SYSTEM_RESOURCE_PATH_COMPRESSED)) {
+    if (Utils::IsFileExist(SYSTEM_RESOURCE_OVERLAY_PATH_COMPRESSED) &&
+        Utils::IsFileExist(SYSTEM_RESOURCE_PATH_COMPRESSED)) {
         vector<string> overlayPaths;
         overlayPaths.push_back(SYSTEM_RESOURCE_OVERLAY_PATH_COMPRESSED);
         AddResource(SYSTEM_RESOURCE_PATH_COMPRESSED.c_str(), overlayPaths);
         return true;
     }
 
-    if (Utils::isFileExist(SYSTEM_RESOURCE_PATH)) {
+    if (Utils::IsFileExist(SYSTEM_RESOURCE_PATH)) {
         AddResource(SYSTEM_RESOURCE_PATH.c_str());
     } else {
         AddResource(SYSTEM_RESOURCE_PATH_COMPRESSED.c_str());
@@ -733,7 +733,7 @@ RState ResourceManagerImpl::GetProfileById(uint32_t id, std::string &outValue)
     if (qd == nullptr) {
         return NOT_FOUND;
     }
-    return GetRawFile(qd, ResType::PROF, outValue);
+    return hapManager_->GetFilePath(qd, ResType::PROF, outValue);
 }
 
 RState ResourceManagerImpl::GetProfileByName(const char *name, std::string &outValue)
@@ -742,7 +742,7 @@ RState ResourceManagerImpl::GetProfileByName(const char *name, std::string &outV
     if (qd == nullptr) {
         return NOT_FOUND;
     }
-    return GetRawFile(qd, ResType::PROF, outValue);
+    return hapManager_->GetFilePath(qd, ResType::PROF, outValue);
 }
 
 RState ResourceManagerImpl::GetMediaById(uint32_t id, std::string &outValue)
@@ -752,7 +752,7 @@ RState ResourceManagerImpl::GetMediaById(uint32_t id, std::string &outValue)
         HILOG_ERROR("find qualifier value by Media id error");
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
-    RState state = GetRawFile(qd, ResType::MEDIA, outValue);
+    RState state = hapManager_->GetFilePath(qd, ResType::MEDIA, outValue);
     if (state != SUCCESS) {
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
@@ -770,7 +770,7 @@ RState ResourceManagerImpl::GetMediaById(uint32_t id, uint32_t density, std::str
         HILOG_ERROR("find qualifier value by media id error");
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
-    RState state = GetRawFile(qualifierDir, ResType::MEDIA, outValue);
+    RState state = hapManager_->GetFilePath(qualifierDir, ResType::MEDIA, outValue);
     if (state != SUCCESS) {
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
@@ -784,7 +784,7 @@ RState ResourceManagerImpl::GetMediaByName(const char *name, std::string &outVal
         HILOG_ERROR("find qualifier value by Media name error");
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
-    RState state = GetRawFile(qd, ResType::MEDIA, outValue);
+    RState state = hapManager_->GetFilePath(qd, ResType::MEDIA, outValue);
     if (state != SUCCESS) {
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
     }
@@ -802,24 +802,7 @@ RState ResourceManagerImpl::GetMediaByName(const char *name, uint32_t density, s
         HILOG_ERROR("find qualifier value by media name error");
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
     }
-    return GetRawFile(qualifierDir, ResType::MEDIA, outValue);
-}
-
-RState GetMediaBase64Data(const std::string& iconPath, std::string &base64Data)
-{
-    int len = 0;
-    auto tempData = Utils::LoadResourceFile(iconPath, len);
-    if (tempData == nullptr) {
-        HILOG_ERROR("get the tempData error");
-        return NOT_FOUND;
-    }
-    auto pos = iconPath.find_last_of('.');
-    std::string imgType;
-    if (pos != std::string::npos) {
-        imgType = iconPath.substr(pos + 1);
-    }
-    Utils::EncodeBase64(tempData, len, imgType, base64Data);
-    return SUCCESS;
+    return hapManager_->GetFilePath(qualifierDir, ResType::MEDIA, outValue);
 }
 
 RState ResourceManagerImpl::GetMediaBase64ByNameData(const char *name, uint32_t density, std::string &base64Data)
@@ -830,7 +813,7 @@ RState ResourceManagerImpl::GetMediaBase64ByNameData(const char *name, uint32_t 
         HILOG_ERROR("the resource path is not exist");
         return NOT_FOUND;
     }
-    return GetMediaBase64Data(path, base64Data);
+    return Utils::GetMediaBase64Data(path, base64Data);
 }
 
 RState ResourceManagerImpl::GetMediaBase64ByIdData(uint32_t id, uint32_t density, std::string &base64Data)
@@ -841,45 +824,7 @@ RState ResourceManagerImpl::GetMediaBase64ByIdData(uint32_t id, uint32_t density
         HILOG_ERROR("the resource path is not exist");
         return NOT_FOUND;
     }
-    return GetMediaBase64Data(path, base64Data);
-}
-
-RState ResourceManagerImpl::GetRawFile(const HapResource::ValueUnderQualifierDir *vuqd, const ResType resType,
-    std::string &outValue)
-{
-    // not found or type invalid
-    if (vuqd == nullptr) {
-        return NOT_FOUND;
-    }
-    const IdItem *idItem = vuqd->GetIdItem();
-    if (idItem == nullptr || idItem->resType_ != resType) {
-        return NOT_FOUND;
-    }
-    outValue = vuqd->GetHapResource()->GetResourcePath();
-#if defined(__ARKUI_CROSS__)
-    auto index = idItem->value_.find('/');
-    if (index == std::string::npos) {
-        HILOG_ERROR("resource path format error, %s", idItem->value_.c_str());
-        return NOT_FOUND;
-    }
-    auto nameWithoutModule = idItem->value_.substr(index + 1);
-    outValue.append(nameWithoutModule);
-#elif defined(__IDE_PREVIEW__)
-    if (IsFileExist(idItem->value_)) {
-        outValue = idItem->value_;
-        return SUCCESS;
-    }
-    auto index = idItem->value_.find('/');
-    if (index == std::string::npos) {
-        HILOG_ERROR("resource path format error, %s", idItem->value_.c_str());
-        return NOT_FOUND;
-    }
-    auto nameWithoutModule = idItem->value_.substr(index + 1);
-    outValue.append(nameWithoutModule);
-#else
-    outValue.append(idItem->value_);
-#endif
-    return SUCCESS;
+    return Utils::GetMediaBase64Data(path, base64Data);
 }
 
 RState ResourceManagerImpl::GetRawFilePathByName(const std::string &name, std::string &outValue)
@@ -1037,11 +982,7 @@ RState ResourceManagerImpl::GetMediaDataById(uint32_t id, size_t &len, std::uniq
         HILOG_ERROR("find qualifier value by media id error");
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
-    RState state = hapManager_->GetMediaData(qd, len, outValue);
-    if (state != SUCCESS) {
-        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
-    }
-    return state;
+    return hapManager_->GetMediaData(qd, len, outValue);
 }
 
 RState ResourceManagerImpl::GetMediaDataByName(const char *name, size_t &len, std::unique_ptr<uint8_t[]> &outValue)
@@ -1051,11 +992,7 @@ RState ResourceManagerImpl::GetMediaDataByName(const char *name, size_t &len, st
         HILOG_ERROR("find qualifier value by media name error");
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
-    RState state = hapManager_->GetMediaData(qd, len, outValue);
-    if (state != SUCCESS) {
-        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
-    }
-    return state;
+    return hapManager_->GetMediaData(qd, len, outValue);
 }
 
 RState ResourceManagerImpl::GetMediaDataById(uint32_t id, uint32_t density, size_t &len,
@@ -1095,11 +1032,7 @@ RState ResourceManagerImpl::GetMediaBase64DataById(uint32_t id, std::string &out
         HILOG_ERROR("find qualifier value by media id error");
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
-    RState state = hapManager_->GetMediaBase64Data(qd, outValue);
-    if (state != SUCCESS) {
-        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
-    }
-    return state;
+    return hapManager_->GetMediaBase64Data(qd, outValue);
 }
 
 RState ResourceManagerImpl::GetMediaBase64DataByName(const char *name,  std::string &outValue)
@@ -1109,11 +1042,7 @@ RState ResourceManagerImpl::GetMediaBase64DataByName(const char *name,  std::str
         HILOG_ERROR("find qualifier value by media name error");
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
-    RState state = hapManager_->GetMediaBase64Data(qd, outValue);
-    if (state != SUCCESS) {
-        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
-    }
-    return state;
+    return hapManager_->GetMediaBase64Data(qd, outValue);
 }
 
 RState ResourceManagerImpl::GetMediaBase64DataById(uint32_t id, uint32_t density, std::string &outValue)
