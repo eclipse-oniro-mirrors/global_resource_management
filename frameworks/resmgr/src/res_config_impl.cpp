@@ -42,6 +42,7 @@ static const std::vector<std::pair<float, ScreenDensity>> resolutions = {
 ResConfigImpl::ResConfigImpl()
     : resLocale_(nullptr),
     direction_(DIRECTION_NOT_SET),
+    density_(SCREEN_DENSITY_NOT_SET),
     screenDensityDpi_(SCREEN_DENSITY_NOT_SET),
     colorMode_(LIGHT),
     mcc_(MCC_UNDEFINED),

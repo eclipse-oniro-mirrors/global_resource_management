@@ -105,7 +105,7 @@ HWTEST_F(HapParserTest, HapParserFuncTest001, TestSize.Level1)
         EXPECT_EQ(std::string("Hans"), config->GetLocaleInfo()->getScript());
         EXPECT_EQ(DEVICE_CAR, config->GetDeviceType());
         EXPECT_EQ(DIRECTION_VERTICAL, config->GetDirection());
-        EXPECT_EQ(SCREEN_DENSITY_SDPI, config->GetScreenDensity());
+        EXPECT_EQ(SCREEN_DENSITY_SDPI / BASE_DPI, config->GetScreenDensity());
         EXPECT_EQ(DARK, config->GetColorMode());
     } else {
         EXPECT_TRUE(false);
