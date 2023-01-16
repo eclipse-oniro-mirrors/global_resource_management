@@ -136,7 +136,7 @@ void CanonicalizePath(const char *path, char *outPath, size_t len)
 
 const HapResource* HapResource::Load(const char *path, const ResConfigImpl* defaultConfig, bool system)
 {
-    if (Utils::endWithTail(path, "hap")) {
+    if (Utils::ContainsTail(path, Utils::tailSet)) {
         return LoadFromHap(path, defaultConfig, system);
     } else {
         return LoadFromIndex(path, defaultConfig, system);

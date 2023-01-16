@@ -466,7 +466,7 @@ bool HapManager::IsLoadHap()
             return false;
         }
         const std::string hapPath = (*iter)->GetIndexPath();
-        if (Utils::endWithTail(hapPath, "hap")) {
+        if (Utils::ContainsTail(hapPath, Utils::tailSet)) {
             return true;
         }
     }
@@ -604,7 +604,7 @@ RState HapManager::FindRawFileFromHap(const std::string &rawFileName,
         if (hapPath.find(sysResHap) != std::string::npos) {
             continue;
         }
-        if (Utils::endWithTail(hapPath, "hap")) {
+        if (Utils::ContainsTail(hapPath, Utils::tailSet)) {
             size_t tmpLen;
             int32_t ret = HapParser::ReadRawFileFromHap(hapPath.c_str(), rawFile->buffer, tmpLen, rawFileName, rawFile);
             if (ret != OK) {
