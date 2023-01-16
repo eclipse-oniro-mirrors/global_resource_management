@@ -39,7 +39,7 @@ public:
 
     virtual void SetDirection(Direction direction) = 0;
 
-    virtual void SetScreenDensity(ScreenDensity screenDensity) = 0;
+    virtual void SetScreenDensity(float screenDensity) = 0;
 
     virtual void SetColorMode(ColorMode colorMode) = 0;
 
@@ -53,7 +53,7 @@ public:
 
     virtual Direction GetDirection() const = 0;
 
-    virtual ScreenDensity GetScreenDensity() const = 0;
+    virtual float GetScreenDensity() const = 0;
 
     virtual DeviceType GetDeviceType() const = 0;
 

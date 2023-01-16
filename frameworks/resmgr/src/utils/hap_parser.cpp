@@ -30,6 +30,7 @@
 #endif
 #include "utils/errors.h"
 #include "utils/string_utils.h"
+#include "utils/utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -544,7 +545,7 @@ ResConfigImpl *HapParser::BuildResConfig(ResConfigKey *configKey)
     resConfig->SetMcc(configKey->mcc);
     resConfig->SetMnc(configKey->mnc);
     resConfig->SetInputDevice(configKey->inputDevice);
-    resConfig->SetScreenDensity(configKey->screenDensity);
+    resConfig->SetScreenDensity((configKey->screenDensity) / Utils::DPI_BASE);
     RState r = resConfig->SetLocaleInfo(configKey->language, configKey->script, configKey->region);
     if (r != SUCCESS) {
         HILOG_ERROR("error set locale,lang %s,script %s,region %s", configKey->language, configKey->script,
