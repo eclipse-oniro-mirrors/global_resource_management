@@ -14,6 +14,16 @@
 import("//base/global/resource_management/resmgr.gni")
 import("//build/ohos.gni")
 
+# source code for win.
+is_win = "${current_os}_${current_cpu}" == "mingw_x86_64"
+
+# source code for linux.
+is_linux = "${current_os}_${current_cpu}" == "linux_x64"
+
+# source code for mac.
+is_mac = "${current_os}_${current_cpu}" == "mac_x64" ||
+         "${current_os}_${host_cpu}" == "mac_arm64"
+
 config("resmgr_config") {
   include_dirs = [
     "include",
@@ -121,9 +131,9 @@ ohos_shared_library("global_resmgr_win") {
     public_configs = [ ":resmgr_public_config" ]
 
     deps = [
-      "//third_party/icu/icu4c:static_icui18n(//build/toolchain/mingw:mingw_x86_64)",
-      "//third_party/icu/icu4c:static_icuuc(//build/toolchain/mingw:mingw_x86_64)",
-      "//third_party/zlib:libz(//build/toolchain/mingw:mingw_x86_64)",
+      "//third_party/icu/icu4c:static_icui18n",
+      "//third_party/icu/icu4c:static_icuuc",
+      "//third_party/zlib:libz",
     ]
 
     libs = [ "shlwapi" ]
@@ -133,10 +143,8 @@ ohos_shared_library("global_resmgr_win") {
 }
 
 group("win_resmgr") {
-  if (resource_management_support_icu) {
-    if (host_os != "mac") {
-      deps = [ ":global_resmgr_win(//build/toolchain/mingw:mingw_x86_64)" ]
-    }
+  if (resource_management_support_icu && is_win) {
+    deps = [ ":global_resmgr_win" ]
   }
 }
 
@@ -168,10 +176,8 @@ ohos_shared_library("global_resmgr_mac") {
 }
 
 group("mac_resmgr") {
-  if (resource_management_support_icu) {
-    if (host_os == "mac") {
-      deps = [ ":global_resmgr_mac" ]
-    }
+  if (resource_management_support_icu && is_mac) {
+    deps = [ ":global_resmgr_mac" ]
   }
 }
 
@@ -204,10 +210,8 @@ ohos_shared_library("global_resmgr_linux") {
 }
 
 group("linux_resmgr") {
-  if (resource_management_support_icu) {
-    if (host_os != "mac") {
-      deps = [ ":global_resmgr_linux" ]
-    }
+  if (resource_management_support_icu && is_linux) {
+    deps = [ ":global_resmgr_linux" ]
   }
 }
 
