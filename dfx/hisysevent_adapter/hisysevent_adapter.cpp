@@ -20,11 +20,10 @@ namespace OHOS {
 namespace Global {
 namespace Resource {
 using HiSysEventNameSpace = OHOS::HiviewDFX::HiSysEvent;
-const std::string DOMAIN_STR = std::string(HiSysEventNameSpace::Domain::GLOBAL_RESMGR);
 
 void ReportInitResourceManagerFail(const std::string& bundleName, const std::string& errMsg)
 {
-    int ret = HiSysEventNameSpace::Write(DOMAIN_STR, "INIT_RESMGR_FAILED",
+    int ret = HiSysEventWrite(HiSysEventNameSpace::Domain::GLOBAL_RESMGR, "INIT_RESMGR_FAILED",
         HiSysEventNameSpace::EventType::FAULT,
         "BUNDLENAME", bundleName,
         "ERROR_MSG", errMsg);
@@ -36,7 +35,7 @@ void ReportInitResourceManagerFail(const std::string& bundleName, const std::str
 
 void ReportGetResourceByIdFail(int32_t resId, const std::string& result, const std::string& errMsg)
 {
-    int ret = HiSysEventNameSpace::Write(DOMAIN_STR, "GET_RES_BY_ID_FAILED",
+    int ret = HiSysEventWrite(HiSysEventNameSpace::Domain::GLOBAL_RESMGR, "GET_RES_BY_ID_FAILED",
         HiSysEventNameSpace::EventType::BEHAVIOR,
         "ID", resId,
         "RESULT", result,
@@ -49,7 +48,7 @@ void ReportGetResourceByIdFail(int32_t resId, const std::string& result, const s
 
 void ReportGetResourceByNameFail(const std::string& resName, const std::string& result, const std::string& errMsg)
 {
-    int ret = HiSysEventNameSpace::Write(DOMAIN_STR, "GET_RES_BY_NAME_FAILED",
+    int ret = HiSysEventWrite(HiSysEventNameSpace::Domain::GLOBAL_RESMGR, "GET_RES_BY_NAME_FAILED",
         HiSysEventNameSpace::EventType::BEHAVIOR,
         "NAME", resName,
         "RESULT", result,
@@ -62,7 +61,7 @@ void ReportGetResourceByNameFail(const std::string& resName, const std::string& 
 
 void ReportAddResourcePathFail(const char* resourcePath, const std::string& errMsg)
 {
-    int ret = HiSysEventNameSpace::Write(DOMAIN_STR, "ADD_RES_PATH_FAILED",
+    int ret = HiSysEventWrite(HiSysEventNameSpace::Domain::GLOBAL_RESMGR, "ADD_RES_PATH_FAILED",
         HiSysEventNameSpace::EventType::BEHAVIOR,
         "PATH", resourcePath,
         "ERROR_MSG", errMsg);

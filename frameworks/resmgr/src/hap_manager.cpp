@@ -390,9 +390,6 @@ bool HapManager::AddResourcePath(const char *path)
     }
     const HapResource *pResource = HapResource::Load(path, resConfig_);
     if (pResource == nullptr) {
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-        ReportAddResourcePathFail(path, "AddResourcePath failed");
-#endif
         return false;
     }
     this->hapResources_.push_back(const_cast<HapResource *>(pResource));
