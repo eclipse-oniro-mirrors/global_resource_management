@@ -44,7 +44,24 @@ std::vector<char> g_codes = {
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
 };
 
-std::unique_ptr<uint8_t[]> Utils::LoadResourceFile(const std::string &path, int &len)
+RState Utils::GetMediaBase64Data(const std::string& iconPath, std::string &base64Data)
+{
+    size_t len = 0;
+    auto tempData = Utils::LoadResourceFile(iconPath, len);
+    if (tempData == nullptr) {
+        HILOG_ERROR("get the tempData error");
+        return NOT_FOUND;
+    }
+    auto pos = iconPath.find_last_of('.');
+    std::string imgType;
+    if (pos != std::string::npos) {
+        imgType = iconPath.substr(pos + 1);
+    }
+    Utils::EncodeBase64(tempData, len, imgType, base64Data);
+    return SUCCESS;
+}
+
+std::unique_ptr<uint8_t[]> Utils::LoadResourceFile(const std::string &path, size_t &len)
 {
     std::ifstream mediaStream(path, std::ios::binary);
     if (!mediaStream.is_open()) {
@@ -412,7 +429,7 @@ bool Utils::endWithTail(const std::string& path, const std::string& tail)
     return path.compare(path.size() - tail.size(), tail.size(), tail) == 0;
 }
 
-bool Utils::isFileExist(const std::string& filePath)
+bool Utils::IsFileExist(const std::string& filePath)
 {
     struct stat buffer;
     return (stat(filePath.c_str(), &buffer) == 0);
