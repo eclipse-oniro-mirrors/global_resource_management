@@ -331,7 +331,7 @@ bool HapResource::Init(bool system)
         HILOG_ERROR("index path format error, %s", indexPath_.c_str());
         return false;
     }
-#if defined(__ARKUI_CROSS__)
+#if defined(__IDE_PREVIEW__) || defined(__ARKUI_CROSS__)
     resourcePath_ = indexPath_.substr(0, index + 1);
 #else
     index = indexPath_.rfind(separator, index - 1);
