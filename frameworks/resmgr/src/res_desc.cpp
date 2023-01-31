@@ -137,7 +137,8 @@ std::string KeyParam::GetMncStr() const
 const std::string KeyParam::ConvertToStr() const
 {
     if ((type_ == KeyType::LANGUAGES) || (type_ == KeyType::REGION) || (type_ == KeyType::SCRIPT)) {
-        char tmp[4], tmp2[5];
+        char tmp[4];
+        char tmp2[5];
         errno_t eret = memcpy_s(tmp, sizeof(tmp), &value_, 4);
         if (eret != OK) {
             HILOG_ERROR("memcpy_s error : %d", eret);
@@ -225,7 +226,8 @@ bool IdItem::IsRef(const std::string &value, ResType &resType, int &id)
     if (index == std::string::npos || index < 2) {
         return false;
     }
-    std::string typeStr, idStr;
+    std::string typeStr;
+    std::string idStr;
     typeStr.assign(it + 1, index - 1);
     idStr.assign(it + index + 1, value.size() - index);
 
