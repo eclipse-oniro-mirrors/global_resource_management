@@ -28,6 +28,8 @@ ohos_shared_library("resmgr_napi_core") {
     "src/resource_manager_addon.cpp",
   ]
 
+  version_script = "libresmgr_napi_core.versionscript"
+
   configs = [ ":resmgr_napi_core_public_config" ]
 
   public_configs = [ ":resmgr_napi_core_public_config" ]

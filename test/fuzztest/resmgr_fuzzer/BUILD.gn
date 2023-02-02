@@ -35,7 +35,7 @@ ohos_fuzztest("ResmgrFuzzTest") {
   sources = [ "resmgr_fuzzer.cpp" ]
 
   deps = [
-    "${resmgr_base_path}/frameworks/resmgr:global_resmgr_static",
+    "${resmgr_base_path}/frameworks/resmgr:global_resmgr",
     "//third_party/bounds_checking_function:libsec_shared",
   ]
 }
