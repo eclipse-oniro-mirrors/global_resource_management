@@ -1,0 +1,32 @@
+# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+1.0 {
+  global:
+    extern "C++" {
+      "OHOS::Global::Resource::CreateResConfig()";
+      "OHOS::Global::Resource::CreateResourceManager()";
+      "OHOS::Global::Resource::ResourceManager::~ResourceManager()";
+      "OHOS::Global::Resource::ResourceManagerImpl::~ResourceManagerImpl()";
+      "OHOS::Global::Resource::ResourceManagerImpl::GetResourcePaths()";
+      "OHOS::Global::Resource::Utils::LoadResourceFile(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char> > const&, unsigned int&)";
+      "OHOS::Global::Resource::GetSysDefault()";
+      "OHOS::Global::Resource::UpdateSysDefault(icu_69::Locale const&, bool)";
+      "OHOS::Global::Resource::BuildFromString(char const*, char, OHOS::Global::Resource::RState&)";
+      "OHOS::Global::Resource::BuildFromParts(char const*, char const*, char const*, OHOS::Global::Resource::RState&)";
+      "OHOS::Global::Resource::HapResource::LoadFromIndex(char const*, OHOS::Global::Resource::ResConfigImpl const*, bool)";
+      "OHOS::Global::Resource::HapResource::GetQualifiers() const";
+    };
+  local:
+    *;
+};

@@ -83,6 +83,8 @@ ohos_shared_library("global_resmgr") {
 
   configs = [ ":resmgr_config" ]
 
+  version_script = "libresmgr.versionscript"
+
   include_dirs = [ "//base/global/resource_management/dfx/hisysevent_adapter" ]
 
   public_configs = [ ":resmgr_public_config" ]
@@ -253,6 +255,46 @@ ohos_shared_library("librawfile") {
                        "target_gen_dir") + "/" + get_label_info(
                        "//base/global/resource_management/interfaces/native/resource:librawfile_ndk",
                        "name") + version_script_suffix
+
+  subsystem_name = "global"
+  part_name = "resource_management"
+}
+
+ohos_static_library("global_resmgr_static") {
+  sources = manager_sources
+
+  sources +=
+      [ "${resmgr_base_path}/dfx/hisysevent_adapter/hisysevent_adapter.cpp" ]
+
+  defines = [ "CONFIG_HILOG" ]
+
+  configs = [ ":resmgr_config" ]
+
+  include_dirs = [ "${resmgr_base_path}/dfx/hisysevent_adapter" ]
+
+  public_configs = [ ":resmgr_public_config" ]
+
+  all_dependent_configs = [ ":global_resmgr_all_deps_config" ]
+
+  deps = [
+    "//third_party/bounds_checking_function:libsec_shared",
+    "//third_party/zlib:shared_libz",
+  ]
+
+  if (resource_management_support_icu) {
+    deps += [
+      "//third_party/icu/icu4c:shared_icui18n",
+      "//third_party/icu/icu4c:shared_icuuc",
+    ]
+    defines += [ "SUPPORT_GRAPHICS" ]
+  }
+
+  external_deps = [
+    "ability_base:extractortool",
+    "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
 
   subsystem_name = "global"
   part_name = "resource_management"
