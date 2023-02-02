@@ -50,7 +50,7 @@ ohos_unittest("resmgr_test") {
   }
 
   deps = [
-    "${resmgr_base_path}/frameworks/resmgr:global_resmgr_static",
+    "${resmgr_base_path}/frameworks/resmgr:global_resmgr",
     "//third_party/googletest:gtest_main",
     "//third_party/zlib:libz",
   ]
