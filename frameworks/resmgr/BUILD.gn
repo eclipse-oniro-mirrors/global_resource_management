@@ -83,6 +83,8 @@ ohos_shared_library("global_resmgr") {
 
   configs = [ ":resmgr_config" ]
 
+  version_script = "libresmgr.versionscript"
+
   include_dirs = [ "//base/global/resource_management/dfx/hisysevent_adapter" ]
 
   public_configs = [ ":resmgr_public_config" ]
