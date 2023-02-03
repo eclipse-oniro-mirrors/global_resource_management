@@ -834,55 +834,12 @@ RState ResourceManagerImpl::GetRawFilePathByName(const std::string &name, std::s
 
 RState ResourceManagerImpl::GetRawFileDescriptor(const std::string &name, RawFileDescriptor &descriptor)
 {
-    auto it = rawFileDescriptor_.find(name);
-    if (it != rawFileDescriptor_.end()) {
-        descriptor.fd = rawFileDescriptor_[name].fd;
-        descriptor.length = rawFileDescriptor_[name].length;
-        descriptor.offset = rawFileDescriptor_[name].offset;
-        return SUCCESS;
-    }
-    std::string paths = "";
-    RState rState = GetRawFilePathByName(name, paths);
-    if (rState != SUCCESS) {
-        return rState;
-    }
-    int fd = open(paths.c_str(), O_RDONLY);
-    if (fd > 0) {
-        long length = lseek(fd, 0, SEEK_END);
-        if (length == -1) {
-            close(fd);
-            return ERROR_CODE_RES_PATH_INVALID;
-        }
-        long begin = lseek(fd, 0, SEEK_SET);
-        if (begin == -1) {
-            close(fd);
-            return ERROR_CODE_RES_PATH_INVALID;
-        }
-        descriptor.fd = fd;
-        descriptor.length = length;
-        descriptor.offset = 0;
-        rawFileDescriptor_[name] = descriptor;
-        return SUCCESS;
-    }
-    return ERROR_CODE_RES_PATH_INVALID;
+    return hapManager_->FindRawFileDescriptorFromHap(name, descriptor);
 }
 
 RState ResourceManagerImpl::CloseRawFileDescriptor(const std::string &name)
 {
-    auto it = rawFileDescriptor_.find(name);
-    if (it == rawFileDescriptor_.end()) {
-        return ERROR_CODE_RES_PATH_INVALID;
-    }
-    int fd = rawFileDescriptor_[name].fd;
-    if (fd > 0) {
-        int result = close(fd);
-        if (result == -1) {
-            return ERROR_CODE_RES_PATH_INVALID;
-        }
-        rawFileDescriptor_.erase(name);
-        return SUCCESS;
-    }
-    return ERROR_CODE_RES_PATH_INVALID;
+    return hapManager_->CloseRawFileDescriptor(name);
 }
 
 void ResourceManagerImpl::ProcessPsuedoTranslate(std::string &outValue)
@@ -1101,20 +1058,7 @@ RState ResourceManagerImpl::GetRawFileFromHap(const std::string &rawFileName, si
 
 RState ResourceManagerImpl::GetRawFileDescriptorFromHap(const std::string &rawFileName, RawFileDescriptor &descriptor)
 {
-    auto it = rawFileDescriptor_.find(rawFileName);
-    if (it != rawFileDescriptor_.end()) {
-        descriptor.fd = rawFileDescriptor_[rawFileName].fd;
-        descriptor.length = rawFileDescriptor_[rawFileName].length;
-        descriptor.offset = rawFileDescriptor_[rawFileName].offset;
-        return SUCCESS;
-    }
-
-    int32_t ret = hapManager_->FindRawFileDescriptorFromHap(rawFileName, descriptor);
-    if (ret != 0) {
-        return ERROR_CODE_RES_PATH_INVALID;
-    }
-    rawFileDescriptor_[rawFileName] = descriptor;
-    return SUCCESS;
+    return hapManager_->FindRawFileDescriptorFromHap(rawFileName, descriptor);
 }
 
 RState ResourceManagerImpl::IsLoadHap(std::string &hapPath)
@@ -1138,11 +1082,6 @@ bool ResourceManagerImpl::IsFileExist(const std::string& path)
 RState ResourceManagerImpl::GetRawFileList(const std::string rawDirPath, std::vector<std::string>& rawfileList)
 {
     return hapManager_->GetRawFileList(rawDirPath, rawfileList);
-}
-
-RState ResourceManagerImpl::IsLoadHap()
-{
-    return hapManager_->IsLoadHap() ? SUCCESS : NOT_FOUND;
 }
 } // namespace Resource
 } // namespace Global

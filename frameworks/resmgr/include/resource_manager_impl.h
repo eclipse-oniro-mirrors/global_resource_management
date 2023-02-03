@@ -494,11 +494,6 @@ public:
      */
     virtual RState GetRawFileList(const std::string rawDirPath, std::vector<std::string>& rawfileList);
 
-    /**
-     * Is load hap
-     */
-    virtual RState IsLoadHap();
-
 private:
     RState GetString(const IdItem *idItem, std::string &outValue);
 
@@ -557,8 +552,6 @@ private:
 
     const std::string SYSTEM_RESOURCE_OVERLAY_PATH_COMPRESSED = "/data/storage/el1/bundle/" \
             "ohos.global.systemres.overlay/ohos.global.systemres.overlay/SystemResourcesOverlay.hap";
-
-    std::unordered_map<std::string, RawFileDescriptor> rawFileDescriptor_;
 };
 } // namespace Resource
 } // namespace Global

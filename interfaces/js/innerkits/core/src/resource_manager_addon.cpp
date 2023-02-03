@@ -281,11 +281,6 @@ napi_value ResourceManagerAddon::New(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
-bool IsLoadHap(ResMgrAsyncContext *asyncContext)
-{
-    return asyncContext->addon_->GetResMgr()->IsLoadHap() == RState::SUCCESS ? true : false;
-}
-
 std::shared_ptr<ResourceManagerAddon> getResourceManagerAddon(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, 2);
@@ -306,7 +301,7 @@ bool isNapiNumber(napi_env env, napi_callback_info info)
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_number) {
-        HiLog::Error(LABEL, "Parameter type is not napi_number");
+        HiLog::Warn(LABEL, "Parameter type is not napi_number");
         return false;
     }
     return true;
@@ -319,7 +314,7 @@ bool isNapiObject(napi_env env, napi_callback_info info)
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_object) {
-        HiLog::Error(LABEL, "Parameter type is not napi_object");
+        HiLog::Warn(LABEL, "Parameter type is not napi_object");
         return false;
     }
     return true;
@@ -332,7 +327,7 @@ bool isNapiString(napi_env env, napi_callback_info info)
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_string) {
-        HiLog::Error(LABEL, "Parameter type is not napi_string");
+        HiLog::Warn(LABEL, "Parameter type is not napi_string");
         return false;
     }
     return true;
@@ -660,15 +655,6 @@ void CreateValue(ResMgrAsyncContext *asyncContext)
         context.mediaData.release();
         return result;
     };
-}
-
-void GetResourcesBufferData(std::string path, ResMgrAsyncContext &asyncContext)
-{
-    asyncContext.mediaData = Utils::LoadResourceFile(path, asyncContext.len_);
-    if (asyncContext.mediaData == nullptr) {
-        return;
-    }
-    CreateValue(&asyncContext);
 }
 
 auto getMediaByNameFunc = [](napi_env env, void *data) {
@@ -1023,22 +1009,9 @@ napi_value ResourceManagerAddon::GetPluralString(napi_env env, napi_callback_inf
 
 auto g_getRawFileFunc = [](napi_env env, void* data) {
     ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
-    if (IsLoadHap(asyncContext)) {
-        std::unique_ptr<uint8_t[]> buffer;
-        size_t len;
-        asyncContext->addon_->GetResMgr()->GetRawFileFromHap(asyncContext->path_,
-            len, asyncContext->mediaData);
-        asyncContext->len_ = static_cast<int>(len);
-        CreateValue(asyncContext);
-        return;
-    }
-    std::string path;
-    RState state = asyncContext->addon_->GetResMgr()->GetRawFilePathByName(asyncContext->path_, path);
-    if (path.empty()) {
-        asyncContext->SetErrorMsg("GetRawFile path failed", true, state);
-        return;
-    }
-    GetResourcesBufferData(path, *asyncContext);
+    asyncContext->addon_->GetResMgr()->GetRawFileFromHap(asyncContext->path_,
+        asyncContext->len_, asyncContext->mediaData);
+    CreateValue(asyncContext);
 };
 
 napi_value ResourceManagerAddon::GetRawFile(napi_env env, napi_callback_info info)
@@ -1050,12 +1023,7 @@ auto g_getRawFileDescriptorFunc = [](napi_env env, void* data) {
     ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
     asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext& context) -> napi_value {
         ResourceManager::RawFileDescriptor descriptor;
-        RState state;
-        if (IsLoadHap(&context)) {
-            state = context.addon_->GetResMgr()->GetRawFileDescriptorFromHap(context.path_, descriptor);
-        } else {
-            state = context.addon_->GetResMgr()->GetRawFileDescriptor(context.path_, descriptor);
-        }
+        RState state = context.addon_->GetResMgr()->GetRawFileDescriptorFromHap(context.path_, descriptor);
         if (state != RState::SUCCESS) {
             context.SetErrorMsg("GetRawFileDescriptor failed state", true, state);
             return nullptr;
