@@ -250,6 +250,8 @@ int ResourceManagerGetMediaBase64DataByIdFromHapTest0043(void);
 int ResourceManagerGetMediaBase64DataByNameFromHapTest0044(void);
 int RawFileTestFromHap0045(void);
 int RawFileTestFromHap0046(void);
+int RawFileTestFromHap0047(void);
+int RawFileTestFromHap0048(void);
 int ResourceManagerOverlayTest001(void);
 int ResourceManagerUtilsTest001(void);
 } // namespace Resource

@@ -636,10 +636,22 @@ int32_t HapManager::GetValidHapPath(std::string &hapPath)
 RState HapManager::FindRawFileFromHap(const std::string rawFileName, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue)
 {
-    std::string hapPath;
-    int32_t ret = HapManager::GetValidHapPath(hapPath);
-    if (ret == OK) {
-       return HapParser::ReadRawFileFromHap(hapPath, rawFileName, len, outValue);
+    for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
+        const std::string tempPath = (*iter)->GetIndexPath();
+        if (Utils::ContainsTail(tempPath, Utils::tailSet)) { // if file path is compressed
+            RState state = HapParser::ReadRawFileFromHap(tempPath, rawFileName, len, outValue);
+            if (state != SUCCESS) {
+                continue;
+            }
+        } else { // if file path is uncompressed
+            std::string filePath;
+            HapManager::FindRawFile(rawFileName, filePath);
+            outValue = Utils::LoadResourceFile(filePath, len);
+            if (outValue == nullptr) {
+                continue;
+            }
+        }
+        return SUCCESS;
     }
     return ERROR_CODE_RES_PATH_INVALID;
 }
@@ -647,10 +659,26 @@ RState HapManager::FindRawFileFromHap(const std::string rawFileName, size_t &len
 RState HapManager::FindRawFileDescriptorFromHap(const std::string rawFileName,
     ResourceManager::RawFileDescriptor &descriptor)
 {
-    std::string hapPath;
-    int32_t ret = HapManager::GetValidHapPath(hapPath);
-    if (ret == OK) {
-        return HapParser::ReadRawFileDescriptor(hapPath.c_str(), rawFileName, descriptor);
+    auto it = rawFileDescriptor_.find(rawFileName);
+    if (it != rawFileDescriptor_.end()) {
+        descriptor.fd = rawFileDescriptor_[rawFileName].fd;
+        descriptor.length = rawFileDescriptor_[rawFileName].length;
+        descriptor.offset = rawFileDescriptor_[rawFileName].offset;
+        return SUCCESS;
+    }
+    RState state;
+    for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
+        const std::string tempPath = (*iter)->GetIndexPath();
+        if (Utils::ContainsTail(tempPath, Utils::tailSet)) { // if file path is compressed
+            state = HapParser::ReadRawFileDescriptor(tempPath.c_str(), rawFileName, descriptor);
+        } else { // if file path is uncompressed
+            state = HapManager::FindRawFileDescriptor(rawFileName, descriptor);
+        }
+        if (state != SUCCESS) {
+            continue;
+        }
+        rawFileDescriptor_[rawFileName] = descriptor;
+        return SUCCESS;
     }
     return ERROR_CODE_RES_PATH_INVALID;
 }
@@ -665,17 +693,6 @@ RState HapManager::GetRawFileList(const std::string rawDirPath, std::vector<std:
 bool HapManager::IsLoadHap(std::string &hapPath)
 {
     return HapManager::GetValidHapPath(hapPath) == OK ? true : false;
-}
-
-bool HapManager::IsLoadHap()
-{
-    for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
-        const std::string tempPath = (*iter)->GetIndexPath();
-        if (Utils::ContainsTail(tempPath, Utils::tailSet)) {
-            return true;
-        }
-    }
-    return false;
 }
 
 RState HapManager::GetFilePath(const HapResource::ValueUnderQualifierDir *vuqd, const ResType resType,
@@ -714,6 +731,51 @@ RState HapManager::GetFilePath(const HapResource::ValueUnderQualifierDir *vuqd, 
     outValue.append(idItem->value_);
 #endif
     return SUCCESS;
+}
+
+RState HapManager::FindRawFileDescriptor(const std::string &name, ResourceManager::RawFileDescriptor &descriptor)
+{
+    std::string paths = "";
+    RState rState = HapManager::FindRawFile(name, paths);
+    if (rState != SUCCESS) {
+        return rState;
+    }
+    int fd = open(paths.c_str(), O_RDONLY);
+    if (fd > 0) {
+        long length = lseek(fd, 0, SEEK_END);
+        if (length == -1) {
+            close(fd);
+            return ERROR_CODE_RES_PATH_INVALID;
+        }
+        long begin = lseek(fd, 0, SEEK_SET);
+        if (begin == -1) {
+            close(fd);
+            return ERROR_CODE_RES_PATH_INVALID;
+        }
+        descriptor.fd = fd;
+        descriptor.length = length;
+        descriptor.offset = 0;
+        return SUCCESS;
+    }
+    return ERROR_CODE_RES_PATH_INVALID;
+}
+
+RState HapManager::CloseRawFileDescriptor(const std::string &name)
+{
+    auto it = rawFileDescriptor_.find(name);
+    if (it == rawFileDescriptor_.end()) {
+        return ERROR_CODE_RES_PATH_INVALID;
+    }
+    int fd = rawFileDescriptor_[name].fd;
+    if (fd > 0) {
+        int result = close(fd);
+        if (result == -1) {
+            return ERROR_CODE_RES_PATH_INVALID;
+        }
+        rawFileDescriptor_.erase(name);
+        return SUCCESS;
+    }
+    return ERROR_CODE_RES_PATH_INVALID;
 }
 } // namespace Resource
 } // namespace Global

@@ -38,18 +38,6 @@ public:
         long length;
     } RawFileDescriptor;
 
-    struct RawFile {
-        /** the offset from where the raw file starts in the HAP */
-        long offset;
-
-        /** the length of the raw file in the HAP. */
-        long length;
-
-        FILE *pf;
-
-        std::unique_ptr<uint8_t[]> buffer;
-    };
-
     struct Resource {
         /** the hap bundle name */
         std::string bundleName;
@@ -173,8 +161,6 @@ public:
     virtual RState IsLoadHap(std::string &hapPath) = 0;
 
     virtual RState GetRawFileList(const std::string rawDirPath, std::vector<std::string>& rawfileList) = 0;
-
-    virtual RState IsLoadHap() = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();

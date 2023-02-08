@@ -190,11 +190,6 @@ public:
     RState GetRawFileList(const std::string rawDirPath, std::vector<std::string>& rawfileList);
 
     /**
-     * Is load hap
-     */
-    bool IsLoadHap();
-
-    /**
      * Get the raw file list
      * @param qd the QualifierDir
      * @param resType the resource type
@@ -240,6 +235,21 @@ public:
      */
     RState GetMediaBase64DataFromIndex(const HapResource::ValueUnderQualifierDir *qd, std::string &outValue);
 
+    /**
+     * Get the raw file list
+     * @param name the rawfile name
+     * @param descriptor the file descriptor write to
+     * @return SUCCESS if resource exist, else not found
+     */
+    RState FindRawFileDescriptor(const std::string &name, ResourceManager::RawFileDescriptor &descriptor);
+
+    /**
+     * Close rawFile descriptor by resource name
+     * @param name the resource name
+     * @return SUCCESS if close the rawFile descriptor, else ERROR
+     */
+    RState CloseRawFileDescriptor(const std::string &name);
+
 private:
     void UpdateResConfigImpl(ResConfigImpl &resConfig);
 
@@ -269,6 +279,8 @@ private:
 
     // set of loaded hap path
     std::unordered_map<std::string, std::vector<std::string>> loadedHapPaths_;
+
+    std::unordered_map<std::string, ResourceManager::RawFileDescriptor> rawFileDescriptor_;
 
 #ifdef SUPPORT_GRAPHICS
     // key is language

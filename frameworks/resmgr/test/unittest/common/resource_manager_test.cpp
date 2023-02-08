@@ -5778,6 +5778,41 @@ HWTEST_F(ResourceManagerTest, RawFileTestFromHap0046, TestSize.Level1)
 }
 
 /*
+ * test get raw file path interface
+ * @tc.name: RawFileTestFromHap0047
+ * @tc.desc: Test GetRawFileFromHap & AddResource function, file case.
+ * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
+ */
+HWTEST_F(ResourceManagerTest, RawFileTestFromHap0047, TestSize.Level1)
+{
+    rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    size_t len;
+    std::unique_ptr<uint8_t[]> outValue;
+    RState state = rm->GetRawFileFromHap("test_rawfile.txt", len, outValue);
+    ASSERT_EQ(len, 17); // 17 means the length of "for raw file test" in "test_rawfile.txt"
+    EXPECT_TRUE(state == SUCCESS);
+}
+
+/*
+ * test get raw file path interface
+ * @tc.name: RawFileTestFromHap0048
+ * @tc.desc: Test GetRawFileDescriptorFromHap & AddResource function, file case.
+ * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
+ */
+HWTEST_F(ResourceManagerTest, RawFileTestFromHap0048, TestSize.Level1)
+{
+    rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    std::unique_ptr<uint8_t[]> outValue;
+    ResourceManager::RawFileDescriptor descriptor;
+    RState state;
+    state = rm->GetRawFileDescriptorFromHap("test_rawfile.txt", descriptor);
+    ASSERT_EQ(descriptor.length, 17);
+    EXPECT_TRUE(state == SUCCESS);
+}
+
+/*
  * @tc.name: ResourceManagerOverlayTest001
  * @tc.desc: Test overlay AddResource & UpdateResConfig function, file case.
  * @tc.type: FUNC
