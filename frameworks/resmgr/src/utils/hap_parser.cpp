@@ -98,12 +98,12 @@ int32_t HapParser::ReadFileFromZip(unzFile &uf, const char *fileName, std::uniqu
     return OK;
 }
 
-std::string GetModuleName(const char *configStr)
+std::string GetModuleName(const char *configStr, size_t len)
 {
     if (configStr == nullptr) {
         return std::string();
     }
-    std::string config(configStr);
+    std::string config(configStr, len);
     static const char *key = "\"moduleName\"";
     auto idx = config.find(key);
     if (idx == std::string::npos) {
@@ -142,7 +142,7 @@ std::string ParseModuleName(unzFile &uf)
         return std::string();
     }
     // parse config.json
-    std::string mName = GetModuleName(reinterpret_cast<char *>(tmpBuf.get()));
+    std::string mName = GetModuleName(reinterpret_cast<char *>(tmpBuf.get()), tmpLen);
     if (mName.size() == 0) {
         HILOG_ERROR("parse moduleName from config.json error");
         return std::string();
