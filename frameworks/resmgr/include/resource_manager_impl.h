@@ -535,6 +535,8 @@ private:
 
     bool isFakeLocale = false;
 
+    bool isBidirectionFakeLocale = false;
+
     PsueManager *psueManager_;
 
     const std::string VIRTUAL_PIXEL = "vp";
