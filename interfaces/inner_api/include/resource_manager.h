@@ -113,13 +113,9 @@ public:
 
     virtual RState GetProfileByName(const char *name, std::string &outValue) = 0;
 
-    virtual RState GetMediaById(uint32_t id, std::string &outValue) = 0;
+    virtual RState GetMediaById(uint32_t id, std::string &outValue, uint32_t density = 0) = 0;
 
-    virtual RState GetMediaById(uint32_t id, uint32_t density, std::string &outValue) = 0;
-
-    virtual RState GetMediaByName(const char *name, std::string &outValue) = 0;
-
-    virtual RState GetMediaByName(const char *name, uint32_t density, std::string &outValue) = 0;
+    virtual RState GetMediaByName(const char *name, std::string &outValue, uint32_t density = 0) = 0;
 
     virtual RState GetRawFilePathByName(const std::string &name, std::string &outValue) = 0;
 
@@ -127,27 +123,15 @@ public:
 
     virtual RState CloseRawFileDescriptor(const std::string &name) = 0;
 
-    virtual RState GetMediaBase64ByNameData(const char *name, uint32_t density, std::string &base64Data) = 0;
+    virtual RState GetMediaDataById(uint32_t id, size_t& len, std::unique_ptr<uint8_t[]> &outValue,
+        uint32_t density = 0) = 0;
 
-    virtual RState GetMediaBase64ByIdData(uint32_t id, uint32_t density, std::string &base64Data) = 0;
+    virtual RState GetMediaDataByName(const char *name, size_t& len, std::unique_ptr<uint8_t[]> &outValue,
+        uint32_t density = 0) = 0;
 
-    virtual RState GetMediaDataById(uint32_t id, size_t& len, std::unique_ptr<uint8_t[]> &outValue) = 0;
+    virtual RState GetMediaBase64DataById(uint32_t id,  std::string &outValue, uint32_t density = 0) = 0;
 
-    virtual RState GetMediaDataByName(const char *name, size_t& len, std::unique_ptr<uint8_t[]> &outValue) = 0;
-
-    virtual RState GetMediaDataById(uint32_t id, uint32_t density, size_t& len,
-        std::unique_ptr<uint8_t[]> &outValue) = 0;
-
-    virtual RState GetMediaDataByName(const char *name, uint32_t density, size_t& len,
-        std::unique_ptr<uint8_t[]> &outValue) = 0;
-
-    virtual RState GetMediaBase64DataById(uint32_t id,  std::string &outValue) = 0;
-
-    virtual RState GetMediaBase64DataByName(const char *name,  std::string &outValue) = 0;
-
-    virtual RState GetMediaBase64DataById(uint32_t id, uint32_t density, std::string &outValue) = 0;
-
-    virtual RState GetMediaBase64DataByName(const char *name, uint32_t density, std::string &outValue) = 0;
+    virtual RState GetMediaBase64DataByName(const char *name,  std::string &outValue, uint32_t density = 0) = 0;
 
     virtual RState GetProfileDataById(uint32_t id, size_t &len, std::unique_ptr<uint8_t[]> &outValue) = 0;
 

@@ -335,7 +335,7 @@ void ResourceManagerTest::TestGetMediaWithDensityById(HapResource *tmp) const
     RState state;
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, density, outValue);
+    state = rm->GetMediaById(id, outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
 }
@@ -373,7 +373,7 @@ void ResourceManagerTest::TestGetMediaWithDensityByName(HapResource *tmp) const
     uint32_t density = 120;
     std::string outValue;
     RState state;
-    state = rm->GetMediaByName("icon", density, outValue);
+    state = rm->GetMediaByName("icon", outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
 }
@@ -2863,7 +2863,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest004, TestSize.Level
     RState state;
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, density, outValue);
+    state = rm->GetMediaById(id, outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -2899,7 +2899,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest005, TestSize.Level
     RState state;
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, density, outValue);
+    state = rm->GetMediaById(id, outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -2935,7 +2935,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest006, TestSize.Level
     RState state;
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, density, outValue);
+    state = rm->GetMediaById(id, outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -2971,7 +2971,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest007, TestSize.Level
     RState state;
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, density, outValue);
+    state = rm->GetMediaById(id, outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3007,7 +3007,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest008, TestSize.Level
     RState state;
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, density, outValue);
+    state = rm->GetMediaById(id, outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3031,9 +3031,9 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest009, TestSize.Level
     RState state3;
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state1 = rm->GetMediaById(id, density1, outValue);
-    state2 = rm->GetMediaById(id, density2, outValue);
-    state3 = rm->GetMediaById(id, density3, outValue);
+    state1 = rm->GetMediaById(id, outValue, density1);
+    state2 = rm->GetMediaById(id, outValue, density2);
+    state3 = rm->GetMediaById(id, outValue, density3);
     EXPECT_TRUE(state1 == ERROR_CODE_INVALID_INPUT_PARAMETER);
     EXPECT_TRUE(state2 == ERROR_CODE_INVALID_INPUT_PARAMETER);
     EXPECT_TRUE(state3 == ERROR_CODE_INVALID_INPUT_PARAMETER);
@@ -3054,7 +3054,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest010, TestSize.Level
     RState state1;
     RState state2;
     int id = GetResId("icon", ResType::MEDIA);
-    state1 = rm->GetMediaById(id, density, outValue1);
+    state1 = rm->GetMediaById(id, outValue1, density);
     state2 = rm->GetMediaById(id, outValue2);
     EXPECT_TRUE(state1 == SUCCESS);
     EXPECT_TRUE(state2 == SUCCESS);
@@ -3091,7 +3091,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest011, TestSize.Level
     RState state;
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, density, outValue);
+    state = rm->GetMediaById(id, outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3127,7 +3127,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest012, TestSize.Level
     RState state;
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, density, outValue);
+    state = rm->GetMediaById(id, outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3163,7 +3163,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest013, TestSize.Level
     RState state;
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, density, outValue);
+    state = rm->GetMediaById(id, outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3199,7 +3199,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest014, TestSize.Level
     RState state;
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, density, outValue);
+    state = rm->GetMediaById(id, outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3235,7 +3235,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest015, TestSize.Level
     RState state;
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, density, outValue);
+    state = rm->GetMediaById(id, outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3271,7 +3271,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest016, TestSize.Level
     RState state;
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, density, outValue);
+    state = rm->GetMediaById(id, outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3310,7 +3310,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest017, TestSize.Level
     RState state;
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, density, outValue);
+    state = rm->GetMediaById(id, outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3349,7 +3349,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest018, TestSize.Level
     RState state;
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, density, outValue);
+    state = rm->GetMediaById(id, outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3388,7 +3388,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest019, TestSize.Level
     RState state;
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, density, outValue);
+    state = rm->GetMediaById(id, outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3427,7 +3427,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest020, TestSize.Level
     RState state;
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, density, outValue);
+    state = rm->GetMediaById(id, outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3466,7 +3466,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest021, TestSize.Level
     RState state;
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, density, outValue);
+    state = rm->GetMediaById(id, outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3505,7 +3505,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByIdTest022, TestSize.Level
     RState state;
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, density, outValue);
+    state = rm->GetMediaById(id, outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3598,7 +3598,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest004, TestSize.Lev
     uint32_t density = 160;
     std::string outValue;
     RState state;
-    state = rm->GetMediaByName("icon", density, outValue);
+    state = rm->GetMediaByName("icon", outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3632,7 +3632,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest005, TestSize.Lev
     uint32_t density = 240;
     std::string outValue;
     RState state;
-    state = rm->GetMediaByName("icon", density, outValue);
+    state = rm->GetMediaByName("icon", outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3666,7 +3666,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest006, TestSize.Lev
     uint32_t density = 320;
     std::string outValue;
     RState state;
-    state = rm->GetMediaByName("icon", density, outValue);
+    state = rm->GetMediaByName("icon", outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3700,7 +3700,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest007, TestSize.Lev
     uint32_t density = 480;
     std::string outValue;
     RState state;
-    state = rm->GetMediaByName("icon", density, outValue);
+    state = rm->GetMediaByName("icon", outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3734,7 +3734,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest008, TestSize.Lev
     uint32_t density = 640;
     std::string outValue;
     RState state;
-    state = rm->GetMediaByName("icon", density, outValue);
+    state = rm->GetMediaByName("icon", outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3756,9 +3756,9 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest009, TestSize.Lev
     RState state1;
     RState state2;
     RState state3;
-    state1 = rm->GetMediaByName("icon", density1, outValue);
-    state2 = rm->GetMediaByName("icon", density2, outValue);
-    state3 = rm->GetMediaByName("icon", density3, outValue);
+    state1 = rm->GetMediaByName("icon", outValue, density1);
+    state2 = rm->GetMediaByName("icon", outValue, density2);
+    state3 = rm->GetMediaByName("icon", outValue, density3);
     EXPECT_TRUE(state1 == ERROR_CODE_INVALID_INPUT_PARAMETER);
     EXPECT_TRUE(state2 == ERROR_CODE_INVALID_INPUT_PARAMETER);
     EXPECT_TRUE(state3 == ERROR_CODE_INVALID_INPUT_PARAMETER);
@@ -3778,7 +3778,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest010, TestSize.Lev
     std::string outValue2;
     RState state1;
     RState state2;
-    state1 = rm->GetMediaByName("icon", density, outValue1);
+    state1 = rm->GetMediaByName("icon", outValue1, density);
     state2 = rm->GetMediaByName("icon", outValue2);
     EXPECT_TRUE(state1 == SUCCESS);
     EXPECT_TRUE(state2 == SUCCESS);
@@ -3813,7 +3813,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest011, TestSize.Lev
     int density = 120;
     std::string outValue;
     RState state;
-    state = rm->GetMediaByName("icon", density, outValue);
+    state = rm->GetMediaByName("icon", outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3847,7 +3847,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest012, TestSize.Lev
     int density = 160;
     std::string outValue;
     RState state;
-    state = rm->GetMediaByName("icon", density, outValue);
+    state = rm->GetMediaByName("icon", outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3881,7 +3881,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest013, TestSize.Lev
     int density = 240;
     std::string outValue;
     RState state;
-    state = rm->GetMediaByName("icon", density, outValue);
+    state = rm->GetMediaByName("icon", outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3915,7 +3915,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest014, TestSize.Lev
     int density = 320;
     std::string outValue;
     RState state;
-    state = rm->GetMediaByName("icon", density, outValue);
+    state = rm->GetMediaByName("icon", outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3949,7 +3949,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest015, TestSize.Lev
     int density = 480;
     std::string outValue;
     RState state;
-    state = rm->GetMediaByName("icon", density, outValue);
+    state = rm->GetMediaByName("icon", outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -3983,7 +3983,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest016, TestSize.Lev
     int density = 640;
     std::string outValue;
     RState state;
-    state = rm->GetMediaByName("icon", density, outValue);
+    state = rm->GetMediaByName("icon", outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -4020,7 +4020,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest017, TestSize.Lev
     int density = 120;
     std::string outValue;
     RState state;
-    state = rm->GetMediaByName("icon", density, outValue);
+    state = rm->GetMediaByName("icon", outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -4057,7 +4057,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest018, TestSize.Lev
     int density = 160;
     std::string outValue;
     RState state;
-    state = rm->GetMediaByName("icon", density, outValue);
+    state = rm->GetMediaByName("icon", outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -4094,7 +4094,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest019, TestSize.Lev
     int density = 240;
     std::string outValue;
     RState state;
-    state = rm->GetMediaByName("icon", density, outValue);
+    state = rm->GetMediaByName("icon", outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -4131,7 +4131,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest020, TestSize.Lev
     int density = 320;
     std::string outValue;
     RState state;
-    state = rm->GetMediaByName("icon", density, outValue);
+    state = rm->GetMediaByName("icon", outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -4168,7 +4168,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest021, TestSize.Lev
     int density = 480;
     std::string outValue;
     RState state;
-    state = rm->GetMediaByName("icon", density, outValue);
+    state = rm->GetMediaByName("icon", outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -4205,7 +4205,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameTest022, TestSize.Lev
     int density = 640;
     std::string outValue;
     RState state;
-    state = rm->GetMediaByName("icon", density, outValue);
+    state = rm->GetMediaByName("icon", outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
@@ -5630,7 +5630,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByIdFromHapTest0041, Te
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
     size_t len;
-    state = rm->GetMediaDataById(id, density, len, outValue);
+    state = rm->GetMediaDataById(id, len, outValue, density);
     EXPECT_EQ(len, 6790); // the length of icon
     EXPECT_TRUE(state == SUCCESS);
 }
@@ -5660,7 +5660,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaDataByNameFromHapTest0042, 
     std::unique_ptr<uint8_t[]> outValue;
     RState state;
     size_t len;
-    state = rm->GetMediaDataByName("icon", density, len, outValue);
+    state = rm->GetMediaDataByName("icon", len, outValue, density);
     EXPECT_EQ(len, 6790); // the length of icon
     EXPECT_TRUE(state == SUCCESS);
 }
@@ -5691,7 +5691,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaBase64DataByIdFromHapTest00
     RState state;
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state = rm->GetMediaBase64DataById(id, density, outValue);
+    state = rm->GetMediaBase64DataById(id, outValue, density);
     EXPECT_TRUE(state == SUCCESS);
 }
 
@@ -5719,7 +5719,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaBase64DataByNameFromHapTest
     int density = 120;
     std::string outValue;
     RState state;
-    state = rm->GetMediaBase64DataByName("icon", density, outValue);
+    state = rm->GetMediaBase64DataByName("icon", outValue, density);
     EXPECT_TRUE(state == SUCCESS);
 }
 
