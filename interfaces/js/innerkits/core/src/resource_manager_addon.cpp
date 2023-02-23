@@ -29,6 +29,8 @@
 #include "hisysevent_adapter.h"
 #include "hitrace_meter.h"
 #include "utils/utils.h"
+#include "drawable_descriptor.h"
+#include "js_drawable_descriptor.h"
 
 namespace OHOS {
 namespace Global {
@@ -43,6 +45,9 @@ namespace Resource {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "ResourceManagerJs" };
 using namespace OHOS::HiviewDFX;
 static thread_local napi_ref* g_constructor = nullptr;
+constexpr int ARRAY_SUBCRIPTOR_ZERO = 0;
+constexpr int ARRAY_SUBCRIPTOR_ONE = 1;
+constexpr int PARAMS_NUM_TWO = 2;
 
 std::map<std::string, std::shared_ptr<ResourceManager>> g_resourceMgr;
 std::mutex g_resMapLock;
@@ -155,7 +160,9 @@ bool ResourceManagerAddon::Init(napi_env env)
         DECLARE_NAPI_FUNCTION("getMediaContentBase64", GetMediaContentBase64),
         DECLARE_NAPI_FUNCTION("getRawFileContent", GetRawFileContent),
         DECLARE_NAPI_FUNCTION("getRawFd", GetRawFd),
-        DECLARE_NAPI_FUNCTION("closeRawFd", CloseRawFd)
+        DECLARE_NAPI_FUNCTION("closeRawFd", CloseRawFd),
+        DECLARE_NAPI_FUNCTION("getDrawableDescriptor", GetDrawableDescriptor),
+        DECLARE_NAPI_FUNCTION("getDrawableDescriptorByName", GetDrawableDescriptorByName)
         
     };
 
@@ -1561,6 +1568,91 @@ napi_value ResourceManagerAddon::CloseRawFd(napi_env env, napi_callback_info inf
     return ProcessOnlyIdParam(env, info, "closeRawFd", closeRawFileDescriptorFunc);
 }
 
+RState GetDensity(napi_env env, size_t argc, napi_value *argv, uint32_t& density)
+{
+    napi_valuetype valuetype;
+    napi_typeof(env, argv[ARRAY_SUBCRIPTOR_ONE], &valuetype);
+    if (valuetype != napi_number) {
+        HiLog::Error(LABEL, "Invalid param, not number");
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+
+    if (napi_get_value_uint32(env, argv[ARRAY_SUBCRIPTOR_ONE], &density) != napi_ok) {
+        HiLog::Error(LABEL, "Failed to get density");
+        return NOT_FOUND;
+    }
+    return SUCCESS;
+}
+
+int32_t ResMgrAsyncContext::ProcessIdResourceParam(napi_env env, napi_callback_info info,
+    std::unique_ptr<ResMgrAsyncContext> &asyncContext)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+    if (isNapiNumber(env, info)) {
+        asyncContext->resId_ = ResourceManagerAddon::GetResId(env, argc, argv);
+    } else if (isNapiObject(env, info)) {
+        auto resourcePtr = std::make_shared<ResourceManager::Resource>();
+        int32_t retCode = ResourceManagerAddon::GetResourceObject(env, resourcePtr, argv[ARRAY_SUBCRIPTOR_ZERO]);
+        asyncContext->resource_ = resourcePtr;
+        return retCode;
+    } else {
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+    return SUCCESS;
+}
+
+napi_value ResourceManagerAddon::GetDrawableDescriptor(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+    auto asyncContext = std::make_unique<ResMgrAsyncContext>();
+    asyncContext->addon_ = getResourceManagerAddon(env, info);
+    int32_t ret = ResMgrAsyncContext::ProcessIdResourceParam(env, info, asyncContext);
+    if (ret != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to process para in ProcessIdResourceDensityParam");
+        ResMgrAsyncContext::NapiThrow(env, ret);
+        return nullptr;
+    }
+    // density optional parameters
+    if (argv[ARRAY_SUBCRIPTOR_ONE] != nullptr && GetDensity(env, argc, argv, asyncContext->density_) != SUCCESS) {
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+
+    std::shared_ptr<ResourceManager> resMgr = nullptr;
+    int32_t resId = 0;
+    if (!ResMgrAsyncContext::GetHapResourceManager(asyncContext.get(), resMgr, resId)) {
+        HiLog::Error(LABEL, "Failed to get GetHapResourceManager in GetDrawableDescriptor");
+        return nullptr;
+    }
+    auto drawableDescriptor = Ace::Napi::DrawableDescriptorFactory::Create(resId, resMgr, asyncContext->density_);
+    return Ace::Napi::JsDrawableDescriptor::ToNapi(env, drawableDescriptor.release());
+}
+
+napi_value ResourceManagerAddon::GetDrawableDescriptorByName(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+    if (!isNapiString(env, info)) {
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+
+    auto asyncContext = std::make_unique<ResMgrAsyncContext>();
+    // density optional parameters
+    if (argv[ARRAY_SUBCRIPTOR_ONE] != nullptr && GetDensity(env, argc, argv, asyncContext->density_) != SUCCESS) {
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+    asyncContext->addon_ = getResourceManagerAddon(env, info);
+    if (asyncContext->addon_ == nullptr) {
+        HiLog::Error(LABEL, "Failed to get addon_ in GetDrawableDescriptorByName");
+        return nullptr;
+    }
+    asyncContext->resName_ = GetResNameOrPath(env, argc, argv);
+    auto resMgr = asyncContext->addon_->GetResMgr();
+    auto drawableDescriptor = Ace::Napi::DrawableDescriptorFactory::Create(asyncContext->resName_.c_str(),
+        resMgr, asyncContext->density_);
+    return Ace::Napi::JsDrawableDescriptor::ToNapi(env, drawableDescriptor.release());
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
