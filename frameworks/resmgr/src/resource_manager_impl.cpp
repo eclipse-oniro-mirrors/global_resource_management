@@ -745,86 +745,34 @@ RState ResourceManagerImpl::GetProfileByName(const char *name, std::string &outV
     return hapManager_->GetFilePath(qd, ResType::PROF, outValue);
 }
 
-RState ResourceManagerImpl::GetMediaById(uint32_t id, std::string &outValue)
+RState ResourceManagerImpl::GetMediaById(uint32_t id, std::string &outValue, uint32_t density)
 {
-    auto qd = hapManager_->FindQualifierValueById(id);
+    if (!IsDensityValid(density)) {
+        HILOG_ERROR("density invalid");
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+    auto qd = hapManager_->FindQualifierValueById(id, density);
     if (qd == nullptr) {
         HILOG_ERROR("find qualifier value by Media id error");
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     RState state = hapManager_->GetFilePath(qd, ResType::MEDIA, outValue);
-    if (state != SUCCESS) {
-        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
-    }
-    return state;
+    return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_ID;
 }
 
-RState ResourceManagerImpl::GetMediaById(uint32_t id, uint32_t density, std::string &outValue)
+RState ResourceManagerImpl::GetMediaByName(const char *name, std::string &outValue, uint32_t density)
 {
     if (!IsDensityValid(density)) {
         HILOG_ERROR("density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    auto qualifierDir = hapManager_->FindQualifierValueById(id, density);
-    if (qualifierDir == nullptr) {
-        HILOG_ERROR("find qualifier value by media id error");
-        return ERROR_CODE_RES_ID_NOT_FOUND;
-    }
-    RState state = hapManager_->GetFilePath(qualifierDir, ResType::MEDIA, outValue);
-    if (state != SUCCESS) {
-        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
-    }
-    return state;
-}
-
-RState ResourceManagerImpl::GetMediaByName(const char *name, std::string &outValue)
-{
-    auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA);
+    auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, density);
     if (qd == nullptr) {
         HILOG_ERROR("find qualifier value by Media name error");
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     RState state = hapManager_->GetFilePath(qd, ResType::MEDIA, outValue);
-    if (state != SUCCESS) {
-        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
-    }
-    return state;
-}
-
-RState ResourceManagerImpl::GetMediaByName(const char *name, uint32_t density, std::string &outValue)
-{
-    if (!IsDensityValid(density)) {
-        HILOG_ERROR("density invalid");
-        return ERROR_CODE_INVALID_INPUT_PARAMETER;
-    }
-    auto qualifierDir = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, density);
-    if (qualifierDir == nullptr) {
-        HILOG_ERROR("find qualifier value by media name error");
-        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
-    }
-    return hapManager_->GetFilePath(qualifierDir, ResType::MEDIA, outValue);
-}
-
-RState ResourceManagerImpl::GetMediaBase64ByNameData(const char *name, uint32_t density, std::string &base64Data)
-{
-    std::string path;
-    RState state = ResourceManagerImpl::GetMediaByName(name, density, path);
-    if (state != SUCCESS) {
-        HILOG_ERROR("the resource path is not exist");
-        return NOT_FOUND;
-    }
-    return Utils::GetMediaBase64Data(path, base64Data);
-}
-
-RState ResourceManagerImpl::GetMediaBase64ByIdData(uint32_t id, uint32_t density, std::string &base64Data)
-{
-    std::string path;
-    RState state = ResourceManagerImpl::GetMediaById(id, density, path);
-    if (state != SUCCESS) {
-        HILOG_ERROR("the resource path is not exist");
-        return NOT_FOUND;
-    }
-    return Utils::GetMediaBase64Data(path, base64Data);
+    return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_NAME;
 }
 
 RState ResourceManagerImpl::GetRawFilePathByName(const std::string &name, std::string &outValue)
@@ -932,28 +880,8 @@ bool ResourceManagerImpl::IsDensityValid(uint32_t density)
     }
 }
 
-RState ResourceManagerImpl::GetMediaDataById(uint32_t id, size_t &len, std::unique_ptr<uint8_t[]> &outValue)
-{
-    auto qd = hapManager_->FindQualifierValueById(id);
-    if (qd == nullptr) {
-        HILOG_ERROR("find qualifier value by media id error");
-        return ERROR_CODE_RES_ID_NOT_FOUND;
-    }
-    return hapManager_->GetMediaData(qd, len, outValue);
-}
-
-RState ResourceManagerImpl::GetMediaDataByName(const char *name, size_t &len, std::unique_ptr<uint8_t[]> &outValue)
-{
-    auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA);
-    if (qd == nullptr) {
-        HILOG_ERROR("find qualifier value by media name error");
-        return ERROR_CODE_RES_NAME_NOT_FOUND;
-    }
-    return hapManager_->GetMediaData(qd, len, outValue);
-}
-
-RState ResourceManagerImpl::GetMediaDataById(uint32_t id, uint32_t density, size_t &len,
-    std::unique_ptr<uint8_t[]> &outValue)
+RState ResourceManagerImpl::GetMediaDataById(uint32_t id, size_t &len, std::unique_ptr<uint8_t[]> &outValue,
+    uint32_t density)
 {
     if (!IsDensityValid(density)) {
         HILOG_ERROR("density invalid");
@@ -962,13 +890,13 @@ RState ResourceManagerImpl::GetMediaDataById(uint32_t id, uint32_t density, size
     auto qd = hapManager_->FindQualifierValueById(id, density);
     if (qd == nullptr) {
         HILOG_ERROR("find qualifier value by media id error");
-        return NOT_FOUND;
+        return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     return hapManager_->GetMediaData(qd, len, outValue);
 }
 
-RState ResourceManagerImpl::GetMediaDataByName(const char *name, uint32_t density, size_t &len,
-    std::unique_ptr<uint8_t[]> &outValue)
+RState ResourceManagerImpl::GetMediaDataByName(const char *name, size_t &len, std::unique_ptr<uint8_t[]> &outValue,
+    uint32_t density)
 {
     if (!IsDensityValid(density)) {
         HILOG_ERROR("density invalid");
@@ -977,32 +905,12 @@ RState ResourceManagerImpl::GetMediaDataByName(const char *name, uint32_t densit
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, density);
     if (qd == nullptr) {
         HILOG_ERROR("find qualifier value by media name error");
-        return NOT_FOUND;
+        return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     return hapManager_->GetMediaData(qd, len, outValue);
 }
 
-RState ResourceManagerImpl::GetMediaBase64DataById(uint32_t id, std::string &outValue)
-{
-    auto qd = hapManager_->FindQualifierValueById(id);
-    if (qd == nullptr) {
-        HILOG_ERROR("find qualifier value by media id error");
-        return ERROR_CODE_RES_ID_NOT_FOUND;
-    }
-    return hapManager_->GetMediaBase64Data(qd, outValue);
-}
-
-RState ResourceManagerImpl::GetMediaBase64DataByName(const char *name,  std::string &outValue)
-{
-    auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA);
-    if (qd == nullptr) {
-        HILOG_ERROR("find qualifier value by media name error");
-        return ERROR_CODE_RES_NAME_NOT_FOUND;
-    }
-    return hapManager_->GetMediaBase64Data(qd, outValue);
-}
-
-RState ResourceManagerImpl::GetMediaBase64DataById(uint32_t id, uint32_t density, std::string &outValue)
+RState ResourceManagerImpl::GetMediaBase64DataById(uint32_t id, std::string &outValue, uint32_t density)
 {
     if (!IsDensityValid(density)) {
         HILOG_ERROR("density invalid");
@@ -1011,12 +919,12 @@ RState ResourceManagerImpl::GetMediaBase64DataById(uint32_t id, uint32_t density
     auto qd = hapManager_->FindQualifierValueById(id, density);
     if (qd == nullptr) {
         HILOG_ERROR("find qualifier value by media id error");
-        return NOT_FOUND;
+        return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     return hapManager_->GetMediaBase64Data(qd, outValue);
 }
 
-RState ResourceManagerImpl::GetMediaBase64DataByName(const char *name, uint32_t density, std::string &outValue)
+RState ResourceManagerImpl::GetMediaBase64DataByName(const char *name, std::string &outValue, uint32_t density)
 {
     if (!IsDensityValid(density)) {
         HILOG_ERROR("density invalid");
@@ -1025,7 +933,7 @@ RState ResourceManagerImpl::GetMediaBase64DataByName(const char *name, uint32_t 
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, density);
     if (qd == nullptr) {
         HILOG_ERROR("find qualifier value by media name error");
-        return NOT_FOUND;
+        return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     return hapManager_->GetMediaBase64Data(qd, outValue);
 }

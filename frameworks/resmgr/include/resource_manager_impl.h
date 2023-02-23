@@ -295,35 +295,19 @@ public:
      * Get the MEDIA resource by resource id
      * @param id the resource id
      * @param outValue the obtain resource path write to
-     * @return SUCCESS if resource exist, else NOT_FOUND
-     */
-    virtual RState GetMediaById(uint32_t id, std::string &outValue);
-
-    /**
-     * Get the MEDIA resource by resource id with density
-     * @param id the resource id
      * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
-     * @param outValue the obtain resource path write to
      * @return SUCCESS if resource exist, else NOT_FOUND
      */
-    virtual RState GetMediaById(uint32_t id, uint32_t density, std::string &outValue);
+    virtual RState GetMediaById(uint32_t id, std::string &outValue, uint32_t density = 0);
 
     /**
      * Get the MEDIA resource by resource name
      * @param name the resource name
      * @param outValue the obtain resource path write to
+     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
      * @return SUCCESS if resource exist, else NOT_FOUND
      */
-    virtual RState GetMediaByName(const char *name, std::string &outValue);
-
-    /**
-     * Get the MEDIA resource by resource name with density
-     * @param name the resource name
-     * @param density the screen density,  within the area of OHOS::Global::Resource::ScreenDensity
-     * @param outValue the obtain resource path write to
-     * @return SUCCESS if resource exist, else NOT_FOUND
-     */
-    virtual RState GetMediaByName(const char *name, uint32_t density, std::string &outValue);
+    virtual RState GetMediaByName(const char *name, std::string &outValue, uint32_t density = 0);
 
     /**
      * Get the raw file path by resource name
@@ -355,94 +339,44 @@ public:
     std::vector<std::string> GetResourcePaths();
 
     /**
-     * Get the MEDIA base64 data resource by resource id with density
-     * @param id the resource id
-     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
-     * @param base64Data the media base64 data
-     * @return SUCCESS if resource exist, else NOT_FOUND
-     */
-    virtual RState GetMediaBase64ByIdData(uint32_t id, uint32_t density, std::string &base64Data);
-
-    /**
-     * Get the MEDIA base64 data resource by resource id with density
-     * @param name the resource name
-     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
-     * @param base64Data the media base64 data
-     * @return SUCCESS if resource exist, else NOT_FOUND
-     */
-    virtual RState GetMediaBase64ByNameData(const char *name, uint32_t density, std::string &base64Data);
-
-    /**
      * Get the MEDIA data by resource id
      * @param id the resource id
      * @param len the data len write to
      * @param outValue the obtain resource path write to
+     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
      * @return SUCCESS if resource exist, else NOT_FOUND
      */
-    virtual RState GetMediaDataById(uint32_t id, size_t &len, std::unique_ptr<uint8_t[]> &outValue);
+    virtual RState GetMediaDataById(uint32_t id, size_t &len, std::unique_ptr<uint8_t[]> &outValue,
+        uint32_t density = 0);
 
     /**
      * Get the MEDIA data by resource name
      * @param name the resource name
      * @param len the data len write to
      * @param outValue the obtain resource path write to
-     * @return SUCCESS if resource exist, else NOT_FOUND
-     */
-    virtual RState GetMediaDataByName(const char *name, size_t &len, std::unique_ptr<uint8_t[]> &outValue);
-
-        /**
-     * Get the MEDIA data by resource id with density
-     * @param id the resource id
      * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
-     * @param len the data len write to
-     * @param outValue the obtain resource path write to
      * @return SUCCESS if resource exist, else NOT_FOUND
      */
-    virtual RState GetMediaDataById(uint32_t id, uint32_t density, size_t &len, std::unique_ptr<uint8_t[]> &outValue);
-
-    /**
-     * Get the MEDIA data by resource name with density
-     * @param name the resource name
-     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
-     * @param len the data len write to
-     * @param outValue the obtain resource path write to
-     * @return SUCCESS if resource exist, else NOT_FOUND
-     */
-    virtual RState GetMediaDataByName(const char *name, uint32_t density, size_t &len,
-        std::unique_ptr<uint8_t[]> &outValue);
+    virtual RState GetMediaDataByName(const char *name, size_t &len, std::unique_ptr<uint8_t[]> &outValue,
+        uint32_t density = 0);
 
     /**
      * Get the MEDIA base64 data resource by resource id
      * @param id the resource id
      * @param outValue the media base64 data
+     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
      * @return SUCCESS if resource exist, else NOT_FOUND
      */
-    virtual RState GetMediaBase64DataById(uint32_t id, std::string &outValue);
+    virtual RState GetMediaBase64DataById(uint32_t id, std::string &outValue, uint32_t density = 0);
 
     /**
      * Get the MEDIA base64 data resource by resource id
      * @param name the resource name
      * @param outValue the media base64 data
-     * @return SUCCESS if resource exist, else NOT_FOUND
-     */
-    virtual RState GetMediaBase64DataByName(const char *name, std::string &outValue);
-
-    /**
-     * Get the MEDIA base64 data resource by resource id with density
-     * @param id the resource id
      * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
-     * @param outValue the media base64 data
      * @return SUCCESS if resource exist, else NOT_FOUND
      */
-    virtual RState GetMediaBase64DataById(uint32_t id, uint32_t density, std::string &outValue);
-
-    /**
-     * Get the MEDIA base64 data resource by resource id with density
-     * @param name the resource name
-     * @param outValue the media base64 data
-     * @return SUCCESS if resource exist, else NOT_FOUND
-     */
-    virtual RState GetMediaBase64DataByName(const char *name, uint32_t density, std::string &outValue);
+    virtual RState GetMediaBase64DataByName(const char *name, std::string &outValue, uint32_t density = 0);
 
     /**
      * Get the PROF resource by resource id
