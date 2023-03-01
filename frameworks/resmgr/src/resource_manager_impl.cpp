@@ -171,6 +171,9 @@ RState ResourceManagerImpl::GetString(const IdItem *idItem, std::string &outValu
     if (isFakeLocale) {
         ProcessPsuedoTranslate(outValue);
     }
+    if (isBidirectionFakeLocale) {
+        outValue = psueManager_->BidirectionConvert(outValue);
+    }
     if (ret != SUCCESS) {
         return ret;
     }
@@ -225,6 +228,11 @@ RState ResourceManagerImpl::GetStringArray(const IdItem *idItem, std::vector<std
     if (isFakeLocale) {
         for (auto &iter : outValue) {
             ProcessPsuedoTranslate(iter);
+        }
+    }
+    if (isBidirectionFakeLocale) {
+        for (auto &iter : outValue) {
+            iter = psueManager_->BidirectionConvert(iter);
         }
     }
     return SUCCESS;
@@ -355,6 +363,9 @@ RState ResourceManagerImpl::GetPluralString(const HapResource::ValueUnderQualifi
     outValue = mapIter->second;
     if (isFakeLocale) {
         ProcessPsuedoTranslate(outValue);
+    }
+    if (isBidirectionFakeLocale) {
+        outValue = psueManager_->BidirectionConvert(outValue);
     }
     return SUCCESS;
 }
@@ -848,6 +859,11 @@ RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig)
             isFakeLocale = true;
         } else {
             isFakeLocale = false;
+        }
+        if (languageStr == "ar" && regionStr == "XB") {
+            isBidirectionFakeLocale = true;
+        } else {
+            isBidirectionFakeLocale = false;
         }
     }
 #endif

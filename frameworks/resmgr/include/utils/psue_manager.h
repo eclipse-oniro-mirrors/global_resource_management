@@ -29,12 +29,16 @@ public:
     ~PsueManager();
     std::string Convert(const std::string &src, std::string &dest);
     void SetFakeLocaleLevel(const int level);
+    bool IsAsciiString(const std::string &src);
+    std::string BidirectionConvert(std::string &src);
 private:
     float GetExtendRatio(int32_t len) const;
     void ToAccent(wstring &ws) const;
     std::string ToWstring(wstring &dest, const string &src);
     std::string ToString(string &dest, const wstring &src);
     bool isDigit(const string src);
+    std::string directionHead = "\u200F\u202E";
+    std::string directionTail = "\u202C\u200F";
 };
 } // namespace Resource
 } // namespace Global

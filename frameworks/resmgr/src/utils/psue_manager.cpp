@@ -15,6 +15,7 @@
 
 #include "utils/psue_manager.h"
 
+#include <algorithm>
 #include <cctype>
 #include <cstdlib>
 #include <iostream>
@@ -201,6 +202,47 @@ void PsueManager::SetFakeLocaleLevel(const int level)
     if (level <= g_levelForAppend && level >= g_levelForAddBracket) {
         g_fakeLocaleLevel = level;
     }
+}
+
+bool PsueManager::IsAsciiString(const std::string &src)
+{
+    bool isAscii = true;
+    for (size_t i = 0; i < src.length(); i++) {
+        if (src[i] < 0 || src[i] > 127) {  // 127 is the max value of ascii
+            isAscii = false;
+            break;
+        }
+    }
+    return isAscii;
+}
+
+std::string PsueManager::BidirectionConvert(std::string &src)
+{
+    if (!IsAsciiString(src)) {
+        return src;
+    }
+    std::string result;
+    size_t start = 0;
+    size_t end = 0;
+    while (start < src.length()) {
+        while (start < src.length() && isspace(src[start])) {
+            start++;
+        }
+        if (start > end) {
+            result += src.substr(end, start - end);
+        }
+        end = start;
+        while (end < src.length() && !isspace(src[end])) {
+            end++;
+        }
+        if (start < src.length()) {
+            result += directionHead;
+            result += src.substr(start, end - start);
+            result += directionTail;
+        }
+        start = end;
+    }
+    return result;
 }
 } // namespace Resource
 } // namespace Global
