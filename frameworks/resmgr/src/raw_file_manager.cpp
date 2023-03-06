@@ -140,7 +140,7 @@ RawDir *OH_ResourceManager_OpenRawDir(const NativeResourceManager *mgr, const ch
     }
     ResourceManagerImpl* impl = static_cast<ResourceManagerImpl *>(mgr->resManager.get());
     std::string tempName = dirName;
-    const std::string rawFileDirName = "rawfile/";
+    const std::string rawFileDirName = tempName.empty() ? "rawfile" : "rawfile/";
     if (tempName.length() < rawFileDirName.length()
         || (tempName.compare(0, rawFileDirName.length(), rawFileDirName) != 0)) {
         tempName = rawFileDirName + tempName;
@@ -160,7 +160,7 @@ RawDir *OH_ResourceManager_OpenRawDir(const NativeResourceManager *mgr, const ch
                 dirp = readdir(dir);
                 continue;
             }
-            if (dirp->d_type == DT_REG) {
+            if (dirp->d_type == DT_REG || dirp->d_type == DT_DIR) {
                 result->fileNameCache.names.push_back(tempName + "/" + dirp->d_name);
             }
 
