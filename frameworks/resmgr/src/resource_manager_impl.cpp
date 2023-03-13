@@ -1031,7 +1031,7 @@ RState ResourceManagerImpl::GetDrawableInfoById(uint32_t id, std::string &type, 
     }
     auto qd = hapManager_->FindQualifierValueById(id, density);
     if (qd == nullptr) {
-        HILOG_ERROR("find qualifier value by %{public}zu error", id);
+        HILOG_ERROR("find qualifier value error by drawable id");
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     type = GetSuffix(qd);
@@ -1051,7 +1051,7 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name, std::string 
     }
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, density);
     if (qd == nullptr) {
-        HILOG_ERROR("failed to find qualifier value by %{public}s", name);
+        HILOG_ERROR("find qualifier value error by drawable name");
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     type = GetSuffix(qd);
