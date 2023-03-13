@@ -1007,6 +1007,60 @@ RState ResourceManagerImpl::GetRawFileList(const std::string rawDirPath, std::ve
 {
     return hapManager_->GetRawFileList(rawDirPath, rawfileList);
 }
+
+std::string GetSuffix(const HapResource::ValueUnderQualifierDir *qd)
+{
+    const IdItem *idItem = qd->GetIdItem();
+    if (idItem == nullptr || idItem->resType_ != ResType::MEDIA) {
+        return std::string();
+    }
+    std::string mediaPath = idItem->value_;
+    auto pos = mediaPath.find_last_of('.');
+    if (pos == std::string::npos) {
+        return std::string();
+    }
+    return mediaPath.substr(pos + 1);
+}
+
+RState ResourceManagerImpl::GetDrawableInfoById(uint32_t id, std::string &type, size_t &len,
+    std::unique_ptr<uint8_t[]> &outValue, uint32_t density)
+{
+    if (!IsDensityValid(density)) {
+        HILOG_ERROR("density invalid");
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+    auto qd = hapManager_->FindQualifierValueById(id, density);
+    if (qd == nullptr) {
+        HILOG_ERROR("find qualifier value by %{public}zu error", id);
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
+    type = GetSuffix(qd);
+    if (type.empty()) {
+        HILOG_ERROR("failed to get resourceType");
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+    return hapManager_->GetMediaData(qd, len, outValue);
+}
+
+RState ResourceManagerImpl::GetDrawableInfoByName(const char *name, std::string &type, size_t &len,
+    std::unique_ptr<uint8_t[]> &outValue, uint32_t density)
+{
+    if (!IsDensityValid(density)) {
+        HILOG_ERROR("density invalid");
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+    auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, density);
+    if (qd == nullptr) {
+        HILOG_ERROR("failed to find qualifier value by %{public}s", name);
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
+    type = GetSuffix(qd);
+    if (type.empty()) {
+        HILOG_ERROR("failed to get resourceType");
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+    return hapManager_->GetMediaData(qd, len, outValue);
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

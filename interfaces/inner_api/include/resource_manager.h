@@ -145,6 +145,12 @@ public:
     virtual RState IsLoadHap(std::string &hapPath) = 0;
 
     virtual RState GetRawFileList(const std::string rawDirPath, std::vector<std::string>& rawfileList) = 0;
+
+    virtual RState GetDrawableInfoById(uint32_t id, std::string &type, size_t &len,
+        std::unique_ptr<uint8_t[]> &outValue, uint32_t density = 0) = 0;
+
+    virtual RState GetDrawableInfoByName(const char *name, std::string &type, size_t &len,
+        std::unique_ptr<uint8_t[]> &outValue, uint32_t density = 0) = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();

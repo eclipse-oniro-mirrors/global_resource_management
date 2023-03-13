@@ -428,6 +428,30 @@ public:
      */
     virtual RState GetRawFileList(const std::string rawDirPath, std::vector<std::string>& rawfileList);
 
+    /**
+     * Get the drawable information for given resId, mainly about type, len, buffer
+     * @param id the resource id
+     * @param type the drawable type
+     * @param len the drawable buffer length
+     * @param outValue the drawable buffer write to
+     * @param density the drawable density
+     * @return SUCCESS if resource exist, else not found
+     */
+    virtual RState GetDrawableInfoById(uint32_t id, std::string &type, size_t &len,
+        std::unique_ptr<uint8_t[]> &outValue, uint32_t density = 0);
+
+    /**
+     * Get the drawable information for given resName, mainly about type, len, buffer
+     * @param name the resource Name
+     * @param type the drawable type
+     * @param len the drawable buffer length
+     * @param outValue the drawable buffer write to
+     * @param density the drawable density
+     * @return SUCCESS if resource exist, else not found
+     */
+    virtual RState GetDrawableInfoByName(const char *name, std::string &type, size_t &len,
+        std::unique_ptr<uint8_t[]> &outValue, uint32_t density = 0);
+
 private:
     RState GetString(const IdItem *idItem, std::string &outValue);
 

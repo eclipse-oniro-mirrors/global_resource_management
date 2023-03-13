@@ -54,8 +54,11 @@ public:
 
     std::string GetLocale(std::unique_ptr<ResConfig> &cfg);
 
-private:
     static int GetResId(napi_env env, size_t argc, napi_value *argv);
+
+    static int32_t GetResourceObject(napi_env env, std::shared_ptr<ResourceManager::Resource> &resourcePtr,
+        napi_value &value);
+private:
 
     static napi_value ProcessOnlyIdParam(napi_env env, napi_callback_info info, const std::string &name,
         napi_async_execute_callback execute);
@@ -116,9 +119,6 @@ private:
 
     static napi_value GetStringByNameSync(napi_env env, napi_callback_info info);
 
-    static int32_t GetResourceObject(napi_env env, std::shared_ptr<ResourceManager::Resource> &resourcePtr,
-        napi_value &value);
-
     static napi_valuetype GetType(napi_env env, napi_value value);
 
     static bool GetResourceObjectName(napi_env env, std::shared_ptr<ResourceManager::Resource> &resourcePtr,
@@ -152,6 +152,10 @@ private:
 
     static napi_value CloseRawFd(napi_env env, napi_callback_info info);
 
+    static napi_value GetDrawableDescriptor(napi_env env, napi_callback_info info);
+
+    static napi_value GetDrawableDescriptorByName(napi_env env, napi_callback_info info);
+
     std::string bundleName_;
     std::shared_ptr<ResourceManager> resMgr_;
     std::shared_ptr<AbilityRuntime::Context> context_;
@@ -184,13 +188,15 @@ struct ResMgrAsyncContext {
     std::string errMsg_;
     int success_;
     int errCode_;
+    uint32_t density_;
 
     std::shared_ptr<ResourceManagerAddon> addon_;
     std::shared_ptr<ResourceManager> resMgr_;
     std::shared_ptr<ResourceManager::Resource> resource_;
 
     ResMgrAsyncContext() : work_(nullptr), resId_(0), param_(0), iValue_(0), fValue_(0.0f), bValue_(false),
-        createValueFunc_(nullptr), len_(0), deferred_(nullptr), callbackRef_(nullptr), success_(true), errCode_(0) {}
+        createValueFunc_(nullptr), len_(0), deferred_(nullptr), callbackRef_(nullptr), success_(true), errCode_(0),
+        density_(0) {}
 
     void SetErrorMsg(const std::string &msg, bool withResId = false, int32_t errCode = 0);
 
@@ -203,6 +209,9 @@ struct ResMgrAsyncContext {
         const std::string &name, napi_async_execute_callback &execute);
     
     static void NapiThrow(napi_env env, int32_t errCode);
+
+    static int32_t ProcessIdResourceParam(napi_env env, napi_callback_info info,
+        std::unique_ptr<ResMgrAsyncContext> &asyncContext);
 };
 } // namespace Resource
 } // namespace Global
