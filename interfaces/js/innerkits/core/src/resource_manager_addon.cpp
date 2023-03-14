@@ -1613,11 +1613,12 @@ napi_value ResourceManagerAddon::GetDrawableDescriptor(napi_env env, napi_callba
         return nullptr;
     }
     // density optional parameters
-    if (argv[ARRAY_SUBCRIPTOR_ONE] != nullptr && GetDensity(env, argc, argv, asyncContext->density_) != SUCCESS) {
+    napi_valuetype valuetype = GetType(env, argv[ARRAY_SUBCRIPTOR_ONE]);
+    if (valuetype != napi_valuetype::napi_undefined
+        && GetDensity(env, argc, argv, asyncContext->density_) != SUCCESS) {
         ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
-
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     int32_t resId = 0;
     if (!ResMgrAsyncContext::GetHapResourceManager(asyncContext.get(), resMgr, resId)) {
@@ -1638,7 +1639,9 @@ napi_value ResourceManagerAddon::GetDrawableDescriptorByName(napi_env env, napi_
 
     auto asyncContext = std::make_unique<ResMgrAsyncContext>();
     // density optional parameters
-    if (argv[ARRAY_SUBCRIPTOR_ONE] != nullptr && GetDensity(env, argc, argv, asyncContext->density_) != SUCCESS) {
+    napi_valuetype valuetype = GetType(env, argv[ARRAY_SUBCRIPTOR_ONE]);
+    if (valuetype != napi_valuetype::napi_undefined
+        && GetDensity(env, argc, argv, asyncContext->density_) != SUCCESS) {
         ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
