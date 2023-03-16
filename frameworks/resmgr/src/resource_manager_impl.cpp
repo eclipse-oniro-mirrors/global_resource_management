@@ -1052,12 +1052,12 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name, std::string 
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, density);
     if (qd == nullptr) {
         HILOG_ERROR("find qualifier value error by drawable name");
-        return ERROR_CODE_RES_ID_NOT_FOUND;
+        return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     type = GetSuffix(qd);
     if (type.empty()) {
         HILOG_ERROR("failed to get resourceType");
-        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
     }
     return hapManager_->GetMediaData(qd, len, outValue);
 }
