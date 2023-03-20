@@ -1614,8 +1614,8 @@ napi_value ResourceManagerAddon::GetDrawableDescriptor(napi_env env, napi_callba
     }
     // density optional parameters
     napi_valuetype valuetype = GetType(env, argv[ARRAY_SUBCRIPTOR_ONE]);
-    if (valuetype != napi_valuetype::napi_undefined
-        && GetDensity(env, argc, argv, asyncContext->density_) != SUCCESS) {
+    if (valuetype != napi_valuetype::napi_undefined &&
+        GetDensity(env, argc, argv, asyncContext->density_) != SUCCESS) {
         ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
@@ -1625,7 +1625,14 @@ napi_value ResourceManagerAddon::GetDrawableDescriptor(napi_env env, napi_callba
         HiLog::Error(LABEL, "Failed to get GetHapResourceManager in GetDrawableDescriptor");
         return nullptr;
     }
-    auto drawableDescriptor = Ace::Napi::DrawableDescriptorFactory::Create(resId, resMgr, asyncContext->density_);
+    RState state = SUCCESS;
+    auto drawableDescriptor = Ace::Napi::DrawableDescriptorFactory::Create(resId, resMgr,
+        state, asyncContext->density_);
+    if (state != SUCCESS) {
+        HiLog::Error(LABEL, "Failed to Create drawableDescriptor by %{public}d", resId);
+        ResMgrAsyncContext::NapiThrow(env, state);
+        return nullptr;
+    }
     return Ace::Napi::JsDrawableDescriptor::ToNapi(env, drawableDescriptor.release());
 }
 
@@ -1640,8 +1647,8 @@ napi_value ResourceManagerAddon::GetDrawableDescriptorByName(napi_env env, napi_
     auto asyncContext = std::make_unique<ResMgrAsyncContext>();
     // density optional parameters
     napi_valuetype valuetype = GetType(env, argv[ARRAY_SUBCRIPTOR_ONE]);
-    if (valuetype != napi_valuetype::napi_undefined
-        && GetDensity(env, argc, argv, asyncContext->density_) != SUCCESS) {
+    if (valuetype != napi_valuetype::napi_undefined &&
+        GetDensity(env, argc, argv, asyncContext->density_) != SUCCESS) {
         ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
@@ -1652,8 +1659,14 @@ napi_value ResourceManagerAddon::GetDrawableDescriptorByName(napi_env env, napi_
     }
     asyncContext->resName_ = GetResNameOrPath(env, argc, argv);
     auto resMgr = asyncContext->addon_->GetResMgr();
+    RState state = SUCCESS;
     auto drawableDescriptor = Ace::Napi::DrawableDescriptorFactory::Create(asyncContext->resName_.c_str(),
-        resMgr, asyncContext->density_);
+        resMgr, state, asyncContext->density_);
+    if (state != SUCCESS) {
+        HiLog::Error(LABEL, "Failed to Create drawableDescriptor by %{public}s", asyncContext->resName_.c_str());
+        ResMgrAsyncContext::NapiThrow(env, state);
+        return nullptr;
+    }
     return Ace::Napi::JsDrawableDescriptor::ToNapi(env, drawableDescriptor.release());
 }
 } // namespace Resource
