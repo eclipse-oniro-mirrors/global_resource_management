@@ -77,11 +77,13 @@ napi_value ResourceManagerAddon::Create(
     napi_value constructor;
     napi_status status = napi_get_reference_value(env, *g_constructor, &constructor);
     if (status != napi_ok) {
+        HiLog::Error(LABEL, "Failed to get reference value in Create");
         return nullptr;
     }
     napi_value result;
     status = napi_new_instance(env, constructor, 0, nullptr, &result);
     if (status != napi_ok) {
+        HiLog::Error(LABEL, "Failed to new instance in Create");
         return nullptr;
     }
 
@@ -89,6 +91,7 @@ napi_value ResourceManagerAddon::Create(
     status = napi_wrap(env, result, reinterpret_cast<void *>(addonPtr.get()), ResourceManagerAddon::Destructor,
         nullptr, nullptr);
     if (status != napi_ok) {
+        HiLog::Error(LABEL, "Failed to wrape in Create");
         return nullptr;
     }
     addonPtr.release();
