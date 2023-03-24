@@ -70,6 +70,14 @@ public:
     bool AddResource(const std::string &path, const std::vector<std::string> &overlayPaths);
 
     /**
+     * Remove resource path to overlay paths
+     * @param path the resource path
+     * @param overlayPaths the exist overlay resource path
+     * @return true if add resource path success, else false
+     */
+    bool RemoveResource(const std::string &path, const std::vector<std::string> &overlayPaths);
+
+    /**
      * Find resource by resource id
      * @param id the resource id
      * @return the resources related to resource id

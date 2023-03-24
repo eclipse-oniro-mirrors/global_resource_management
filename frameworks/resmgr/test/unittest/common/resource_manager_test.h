@@ -253,6 +253,9 @@ int RawFileTestFromHap0046(void);
 int RawFileTestFromHap0047(void);
 int RawFileTestFromHap0048(void);
 int ResourceManagerOverlayTest001(void);
+int ResourceManagerOverlayTest002(void);
+int ResourceManagerOverlayTest003(void);
+int ResourceManagerOverlayTest004(void);
 int ResourceManagerUtilsTest001(void);
 } // namespace Resource
 } // namespace Global

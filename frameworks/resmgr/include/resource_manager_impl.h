@@ -49,6 +49,14 @@ public:
     virtual bool AddResource(const std::string &path, const std::vector<std::string> &overlayPaths);
 
     /**
+     * Remove resource path to overlay paths
+     * @param path the resource path
+     * @param overlayPaths the exist overlay resource path
+     * @return true if add resource path success, else false
+     */
+    virtual bool RemoveResource(const std::string &path, const std::vector<std::string> &overlayPaths);
+
+    /**
      * Update the resConfig
      * @param resConfig the resource config
      * @return SUCCESS if the resConfig updated success, else HAP_INIT_FAILED

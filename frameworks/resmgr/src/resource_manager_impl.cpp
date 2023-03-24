@@ -838,6 +838,11 @@ bool ResourceManagerImpl::AddResource(const std::string &path, const std::vector
     return this->hapManager_->AddResource(path, overlayPaths);
 }
 
+bool ResourceManagerImpl::RemoveResource(const std::string &path, const std::vector<std::string> &overlayPaths)
+{
+    return this->hapManager_->RemoveResource(path, overlayPaths);
+}
+
 RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
