@@ -276,15 +276,17 @@ RState HapParser::ReadRawFileDescriptor(const char *hapPath, const std::string r
     ResourceManager::RawFileDescriptor &descriptor)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    int zipFd = open(hapPath, O_RDONLY);
+    char outPath[PATH_MAX + 1] = {0};
+    Utils::CanonicalizePath(hapPath, outPath, PATH_MAX);
+    int zipFd = open(outPath, O_RDONLY);
     if (zipFd < 0) {
-        HILOG_ERROR("failed open file %{public}s", hapPath);
+        HILOG_ERROR("failed open file %{public}s", outPath);
         return NOT_FOUND;
     }
     bool isNewExtractor = false;
-    auto extractor = AbilityBase::ExtractorUtil::GetExtractor(hapPath, isNewExtractor);
+    auto extractor = AbilityBase::ExtractorUtil::GetExtractor(outPath, isNewExtractor);
     if (extractor == nullptr) {
-        HILOG_ERROR("failed to get extractor in ReadRawFileDescriptor hapPath, %{public}s", hapPath);
+        HILOG_ERROR("failed to get extractor in ReadRawFileDescriptor hapPath, %{public}s", outPath);
         return NOT_FOUND;
     }
     std::string rawfilePath = HapParser::GetRawFilePath(extractor, rawFileName);

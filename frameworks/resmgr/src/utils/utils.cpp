@@ -23,6 +23,16 @@
 #include <cstring>
 #endif
 
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+#include "hitrace_meter.h"
+#endif
+
+#ifdef __WINNT__
+#include <shlwapi.h>
+#include <windows.h>
+#undef ERROR
+#endif
+
 namespace OHOS {
 namespace Global {
 namespace Resource {
@@ -30,6 +40,7 @@ constexpr int BIT_SIX = 6;
 constexpr int BIT_FOUR = 4;
 constexpr int BIT_TWO = 2;
 constexpr int LEN_THREE = 3;
+constexpr int ERROR_RESULT = -1;
 
 const std::set<std::string> Utils::tailSet {
     ".hap",
@@ -68,7 +79,13 @@ std::unique_ptr<uint8_t[]> Utils::LoadResourceFile(const std::string &path, size
         return nullptr;
     }
     mediaStream.seekg(0, std::ios::end);
-    len = mediaStream.tellg();
+    int length = mediaStream.tellg();
+    if (length == ERROR_RESULT) {
+        HILOG_ERROR("failed to get the file length");
+        return nullptr;
+    } else {
+        len = static_cast<size_t>(length);
+    }
     std::unique_ptr<uint8_t[]> tempData = std::make_unique<uint8_t[]>(len);
     if (tempData == nullptr) {
         return nullptr;
@@ -444,6 +461,32 @@ bool Utils::ContainsTail(std::string hapPath, std::set<std::string> tailSet)
         }
     }
     return false;
+}
+
+void Utils::CanonicalizePath(const char *path, char *outPath, size_t len)
+{
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
+#endif
+    if (path == nullptr) {
+        HILOG_ERROR("path is null");
+        return;
+    }
+    if (strlen(path) >= len) {
+        HILOG_ERROR("the length of path longer than len");
+        return;
+    }
+#ifdef __WINNT__
+    if (!PathCanonicalizeA(outPath, path)) {
+        HILOG_ERROR("failed to canonicalize the path");
+        return;
+    }
+#else
+    if (realpath(path, outPath) == nullptr) {
+        HILOG_ERROR("failed to realpath the path, %{public}s, errno:%{public}d", path, errno);
+        return;
+    }
+#endif
 }
 } // namespace Resource
 } // namespace Global

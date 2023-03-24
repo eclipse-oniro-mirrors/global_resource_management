@@ -740,7 +740,9 @@ RState HapManager::FindRawFileDescriptor(const std::string &name, ResourceManage
     if (rState != SUCCESS) {
         return rState;
     }
-    int fd = open(paths.c_str(), O_RDONLY);
+    char outPath[PATH_MAX + 1] = {0};
+    Utils::CanonicalizePath(paths.c_str(), outPath, PATH_MAX);
+    int fd = open(outPath, O_RDONLY);
     if (fd > 0) {
         long length = lseek(fd, 0, SEEK_END);
         if (length == -1) {

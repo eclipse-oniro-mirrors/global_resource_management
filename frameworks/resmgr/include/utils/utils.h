@@ -69,6 +69,8 @@ public:
     static const std::set<std::string> tailSet;
 
     static RState GetMediaBase64Data(const std::string& iconPath, std::string &base64Data);
+
+    static void CanonicalizePath(const char *path, char *outPath, size_t len);
 private:
 
     static uint16_t EncodeLanguageOrRegion(const char *str, char base);
