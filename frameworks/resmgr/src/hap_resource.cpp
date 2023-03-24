@@ -110,32 +110,6 @@ HapResource::~HapResource()
     defaultConfig_ = nullptr;
 }
 
-void CanonicalizePath(const char *path, char *outPath, size_t len)
-{
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
-#endif
-    if (path == nullptr) {
-        HILOG_ERROR("path is null");
-        return;
-    }
-    if (strlen(path) >= len) {
-        HILOG_ERROR("the length of path longer than len");
-        return;
-    }
-#ifdef __WINNT__
-    if (!PathCanonicalizeA(outPath, path)) {
-        HILOG_ERROR("failed to canonicalize the path");
-        return;
-    }
-#else
-    if (realpath(path, outPath) == nullptr) {
-        HILOG_ERROR("failed to realpath the path errno:%{public}d", errno);
-        return;
-    }
-#endif
-}
-
 const HapResource* HapResource::Load(const char *path, const ResConfigImpl* defaultConfig, bool system)
 {
     if (Utils::ContainsTail(path, Utils::tailSet)) {
@@ -148,7 +122,7 @@ const HapResource* HapResource::Load(const char *path, const ResConfigImpl* defa
 const HapResource* HapResource::LoadFromIndex(const char *path, const ResConfigImpl *defaultConfig, bool system)
 {
     char outPath[PATH_MAX + 1] = {0};
-    CanonicalizePath(path, outPath, PATH_MAX);
+    Utils::CanonicalizePath(path, outPath, PATH_MAX);
     std::ifstream inFile(outPath, std::ios::binary | std::ios::in);
     if (!inFile.good()) {
         return nullptr;

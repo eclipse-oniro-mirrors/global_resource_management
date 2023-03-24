@@ -198,7 +198,7 @@ RawFile *LoadRawFileFromHap(const NativeResourceManager *mgr, const char *fileNa
         return nullptr;
     }
     result->pf = fdopen(zipFd, "r");
-    result->length = len;
+    result->length = static_cast<long>(len);
     result->resMgr = mgr;
     return result.release();
 }
