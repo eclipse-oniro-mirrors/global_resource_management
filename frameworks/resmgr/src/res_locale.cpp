@@ -377,7 +377,7 @@ Locale *BuildFromString(const char *str, char sep, RState &rState)
     if (rState == SUCCESS && resLocale != nullptr) {
         UErrorCode errCode = U_ZERO_ERROR;
         Locale temp = icu::LocaleBuilder().setLanguage(resLocale->GetLanguage())
-                                 .setRegion(resLocale->GetRegion()).setScript(resLocale->GetScript()).build(errCode);
+            .setRegion(resLocale->GetRegion()).setScript(resLocale->GetScript()).build(errCode);
 
         if (!U_SUCCESS(errCode)) {
             delete resLocale;
@@ -418,7 +418,7 @@ Locale *BuildFromParts(const char *language, const char *script, const char *reg
     }
     UErrorCode errCode = U_ZERO_ERROR;
     Locale localeInfo = icu::LocaleBuilder().setLanguage(language)
-                                 .setRegion(region).setScript(script).build(errCode);
+        .setRegion(region).setScript(script).build(errCode);
     if (!U_SUCCESS(errCode)) {
         rState = ERROR;
         return nullptr;
