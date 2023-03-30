@@ -307,18 +307,17 @@ bool HapManager::AddResource(const char *path)
 
 bool HapManager::AddResource(const std::string &path, const std::vector<std::string> &overlayPaths)
 {
+    AutoMutex mutex(this->lock_);
+    std::vector<std::string> targetOverlay = loadedHapPaths_[path];
+    if (!targetOverlay.empty() && targetOverlay == overlayPaths) {
+        HILOG_INFO("the overlay for %{public}s already been loaded", path.c_str());
+        return false;
+    }
     loadedHapPaths_[path] = overlayPaths;
     std::unordered_map<std::string, HapResource *> result = HapResource::LoadOverlays(path, overlayPaths, resConfig_);
     if (result.size() > 0) {
-        std::vector<std::string> &validOverlayPaths = loadedHapPaths_[path];
-        int i = 0;
         for (auto iter = result.begin(); iter != result.end(); iter++) {
             this->hapResources_.push_back(iter->second);
-            if (i > 0) {
-                // the first is the target, not the overlay
-                validOverlayPaths.push_back(iter->first);
-                i++;
-            }
         }
         return true;
     }
@@ -778,6 +777,46 @@ RState HapManager::CloseRawFileDescriptor(const std::string &name)
         return SUCCESS;
     }
     return ERROR_CODE_RES_PATH_INVALID;
+}
+
+bool HapManager::RemoveResource(const std::string &path, const std::vector<std::string> &overlayPaths)
+{
+    AutoMutex mutex(this->lock_);
+    HILOG_INFO("remove overlay for path, %{public}s", path.c_str());
+    if (loadedHapPaths_.find(path) == loadedHapPaths_.end()) {
+        return false;
+    }
+    std::vector<std::string> targetOverlay = loadedHapPaths_[path];
+    if (targetOverlay.empty()) {
+        HILOG_ERROR("the %{public}s have not overlay", path.c_str());
+        return false;
+    }
+    char outPath[PATH_MAX] = {0};
+    for (auto iter = overlayPaths.begin(); iter != overlayPaths.end(); iter++) {
+        Utils::CanonicalizePath((*iter).c_str(), outPath, PATH_MAX);
+        if (outPath[0] == '\0') {
+            HILOG_ERROR("invalid overlayPath, %{public}s", (*iter).c_str());
+            continue;
+        }
+        if (std::find(targetOverlay.begin(), targetOverlay.end(), outPath) != targetOverlay.end()) {
+            targetOverlay.erase(std::remove(targetOverlay.begin(), targetOverlay.end(), outPath),
+                targetOverlay.end());
+        }
+        for (auto resIter = hapResources_.begin(); resIter != hapResources_.end(); ) {
+            if ((*resIter) == nullptr) {
+                HILOG_ERROR("hapResource is nullptr");
+                return false;
+            }
+            std::string hapPath = (*resIter)->GetIndexPath();
+            if (hapPath == outPath) {
+                resIter = hapResources_.erase(resIter);
+            } else {
+                resIter++;
+            }
+        }
+    }
+    loadedHapPaths_[path] = targetOverlay;
+    return true;
 }
 } // namespace Resource
 } // namespace Global

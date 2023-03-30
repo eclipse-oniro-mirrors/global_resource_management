@@ -5836,6 +5836,86 @@ HWTEST_F(ResourceManagerTest, ResourceManagerOverlayTest001, TestSize.Level1)
 }
 
 /*
+ * @tc.name: ResourceManagerOverlayTest002
+ * @tc.desc: Test overlay function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerOverlayTest002, TestSize.Level1)
+{
+    AddResource("en", nullptr, nullptr);
+
+    std::vector<std::string> overlayPaths;
+    overlayPaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
+    bool ret = ((ResourceManagerImpl*)rm)->AddResource(FormatFullPath(g_systemResFilePath).c_str(), overlayPaths);
+    ASSERT_TRUE(ret);
+    ret = ((ResourceManagerImpl*)rm)->AddResource(FormatFullPath(g_systemResFilePath).c_str(), overlayPaths);
+    // repeat add the same overlayPaths
+    ASSERT_FALSE(ret);
+    TestStringById("ohos_app_name", "SystemOverlay");
+
+    std::vector<std::string> removePaths;
+    removePaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
+    ret = ((ResourceManagerImpl*)rm)->RemoveResource(FormatFullPath(g_systemResFilePath).c_str(), removePaths);
+    ASSERT_TRUE(ret);
+    TestStringById("ohos_app_name", "System");
+
+    ret = ((ResourceManagerImpl*)rm)->AddResource(FormatFullPath(g_systemResFilePath).c_str(), overlayPaths);
+    ASSERT_TRUE(ret);
+    TestStringById("ohos_app_name", "SystemOverlay");
+}
+
+/*
+ * @tc.name: ResourceManagerOverlayTest003
+ * @tc.desc: Test overlay function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerOverlayTest003, TestSize.Level1)
+{
+    AddResource("en", nullptr, nullptr);
+
+    std::vector<std::string> overlayPaths;
+    overlayPaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
+    bool ret = ((ResourceManagerImpl*)rm)->AddResource(FormatFullPath(g_systemResFilePath).c_str(), overlayPaths);
+    ASSERT_TRUE(ret);
+    TestStringById("ohos_app_name", "SystemOverlay");
+
+    std::vector<std::string> removePaths;
+    removePaths.push_back("notexist.index");
+    removePaths.push_back("notexist2.index");
+    removePaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
+    ret = ((ResourceManagerImpl*)rm)->RemoveResource(FormatFullPath(g_systemResFilePath).c_str(), removePaths);
+    ASSERT_TRUE(ret);
+    TestStringById("ohos_app_name", "System");
+}
+
+/*
+ * @tc.name: ResourceManagerOverlayTest004
+ * @tc.desc: Test overlay function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerOverlayTest004, TestSize.Level1)
+{
+    AddResource("zh", nullptr, nullptr);
+
+    std::vector<std::string> overlayPaths;
+    overlayPaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
+    bool ret = ((ResourceManagerImpl*)rm)->AddResource(FormatFullPath(g_systemResFilePath).c_str(), overlayPaths);
+    ASSERT_TRUE(ret);
+    TestStringById("ohos_lab_answer_call", "overlay接听电话");
+
+    std::vector<std::string> removePaths;
+    removePaths.push_back("notexist.index");
+    removePaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
+    ret = ((ResourceManagerImpl*)rm)->RemoveResource(FormatFullPath(g_systemResFilePath).c_str(), removePaths);
+    ASSERT_TRUE(ret);
+    TestStringById("ohos_lab_answer_call", "接听电话");
+
+    ret = ((ResourceManagerImpl*)rm)->AddResource(FormatFullPath(g_systemResFilePath).c_str(), overlayPaths);
+    ASSERT_TRUE(ret);
+    TestStringById("ohos_lab_answer_call", "overlay接听电话");
+}
+
+/*
  * @tc.name: ResourceManagerUtilsTest001
  * @tc.desc: Test endWithTail;
  * @tc.type: FUNC

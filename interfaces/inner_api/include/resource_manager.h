@@ -151,6 +151,10 @@ public:
 
     virtual RState GetDrawableInfoByName(const char *name, std::string &type, size_t &len,
         std::unique_ptr<uint8_t[]> &outValue, uint32_t density = 0) = 0;
+
+    virtual bool AddResource(const std::string &path, const std::vector<std::string> &overlayPaths) = 0;
+
+    virtual bool RemoveResource(const std::string &path, const std::vector<std::string> &overlayPaths) = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();
