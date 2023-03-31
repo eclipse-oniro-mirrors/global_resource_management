@@ -25,6 +25,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <fstream>
+#include <functional>
 
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 #include "hitrace_meter.h"
@@ -43,6 +44,8 @@ namespace Resource {
 #ifdef CONFIG_HILOG
 LogLevel g_logLevel = LOG_INFO;
 #endif
+
+constexpr char ESCAPE_CHARACTER = '%';
 
 ResourceManager *CreateResourceManager()
 {
@@ -1065,6 +1068,122 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name, std::string 
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
     }
     return hapManager_->GetMediaData(qd, len, outValue);
+}
+
+bool IsInt(std::tuple<ResourceManager::NapiValueType, std::string> &param,
+    std::string &strResult, size_t &countPlaceholder)
+{
+    if (std::get<0>(param) == ResourceManager::NapiValueType::NAPI_NUMBER) {
+        size_t quantity = std::get<1>(param).find(".");
+        // transform double to int
+        strResult += std::get<1>(param).substr(0, quantity);
+        ++countPlaceholder;
+        return true;
+    }
+    return false;
+}
+
+bool IsDouble(std::tuple<ResourceManager::NapiValueType, std::string> &param,
+    std::string &strResult, size_t &countPlaceholder)
+{
+    if (std::get<0>(param) == ResourceManager::NapiValueType::NAPI_NUMBER) {
+        strResult += std::get<1>(param);
+        ++countPlaceholder;
+        return true;
+    }
+    return false;
+}
+
+bool IsString(std::tuple<ResourceManager::NapiValueType, std::string> &param,
+    std::string &strResult, size_t &countPlaceholder)
+{
+    if (std::get<0>(param) == ResourceManager::NapiValueType::NAPI_STRING) {
+        strResult += std::get<1>(param);
+        ++countPlaceholder;
+        return true;
+    }
+    return false;
+}
+
+std::map<int32_t, std::function<bool(std::tuple<ResourceManager::NapiValueType, std::string>&,
+    std::string&, size_t&)>> symbolMatching {
+    {'d', std::bind(IsInt, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)},
+    {'f', std::bind(IsDouble, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)},
+    {'s', std::bind(IsString, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)}};
+
+bool IsFormattedString(std::string &outValue,
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
+{
+    size_t size = jsParams.size();
+    size_t len = outValue.length();
+    if (size == 0 || len == 0) {
+        return true;
+    }
+
+    size_t countPlaceholder = 0;
+    std::string strResult;
+    size_t nonplaceholderStart = 0;
+    size_t signIndex = outValue.find(ESCAPE_CHARACTER);
+    // ignore ESCAPE_CHARACTER at the end of line
+    while (signIndex < len - 1) {
+        size_t nonplaceholderSize = signIndex - nonplaceholderStart;
+        ++signIndex;
+        int32_t fmt = outValue[signIndex];
+        // if input is "%%", output is "%"
+        if (fmt == '%') {
+            ++nonplaceholderSize;
+            strResult += outValue.substr(nonplaceholderStart, nonplaceholderSize);
+            nonplaceholderStart = ++signIndex;
+            signIndex = outValue.find(ESCAPE_CHARACTER, signIndex);
+            continue;
+        }
+        auto isSign = symbolMatching.find(fmt);
+        // ignore invalid ESCAPE_CHARACTER
+        if (isSign == symbolMatching.end()) {
+            ++signIndex;
+            signIndex = outValue.find(ESCAPE_CHARACTER, signIndex);
+            continue;
+        }
+        // valid input list: %d %f %s, format it
+        strResult += outValue.substr(nonplaceholderStart, nonplaceholderSize);
+        if (countPlaceholder >= size || !isSign->second(jsParams[countPlaceholder], strResult, countPlaceholder)) {
+            return false;
+        }
+        nonplaceholderStart = ++signIndex;
+        signIndex = outValue.find(ESCAPE_CHARACTER, signIndex);
+    }
+    if (countPlaceholder != size) {
+        return false;
+    }
+    strResult += outValue.substr(nonplaceholderStart);
+    outValue = strResult;
+    return true;
+}
+
+RState ResourceManagerImpl::GetStringFormatById(uint32_t id, std::string &outValue,
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
+{
+    RState state = GetStringById(id, outValue);
+    if (state != SUCCESS) {
+        return state;
+    }
+    if (!IsFormattedString(outValue, jsParams)) {
+        return ERROR_CODE_RES_ID_FORMAT_ERROR;
+    }
+    return SUCCESS;
+}
+
+RState ResourceManagerImpl::GetStringFormatByName(const char *name, std::string &outValue,
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
+{
+    RState state = GetStringByName(name, outValue);
+    if (state != SUCCESS) {
+        return state;
+    }
+    if (!IsFormattedString(outValue, jsParams)) {
+        return ERROR_CODE_RES_NAME_FORMAT_ERROR;
+    }
+    return SUCCESS;
 }
 } // namespace Resource
 } // namespace Global
