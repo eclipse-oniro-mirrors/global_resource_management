@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <tuple>
 #include "res_config.h"
 
 namespace OHOS {
@@ -47,6 +48,11 @@ public:
 
         /** the resource id in hap */
         int32_t id;
+    };
+
+    enum class NapiValueType {
+        NAPI_NUMBER = 0,
+        NAPI_STRING = 1
     };
 
     virtual ~ResourceManager() = 0;
@@ -155,6 +161,12 @@ public:
     virtual bool AddResource(const std::string &path, const std::vector<std::string> &overlayPaths) = 0;
 
     virtual bool RemoveResource(const std::string &path, const std::vector<std::string> &overlayPaths) = 0;
+
+    virtual RState GetStringFormatById(uint32_t id, std::string &outValue,
+        std::vector<std::tuple<NapiValueType, std::string>> &jsParams) = 0;
+
+    virtual RState GetStringFormatByName(const char *name, std::string &outValue,
+        std::vector<std::tuple<NapiValueType, std::string>> &jsParams) = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();

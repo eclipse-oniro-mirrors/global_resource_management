@@ -60,6 +60,8 @@ static const std::unordered_map<int32_t, std::string> ErrorCodeToMsg {
     {ERROR_CODE_RES_NOT_FOUND_BY_NAME, "Resource not found by name"},
     {ERROR_CODE_RES_PATH_INVALID, "Rawfile path is invalid"},
     {ERROR_CODE_RES_REF_TOO_MUCH, "Resource re-ref too much"},
+    {ERROR_CODE_RES_ID_FORMAT_ERROR, "Resource obtained by resId formatting error"},
+    {ERROR_CODE_RES_NAME_FORMAT_ERROR, "Resource obtained by resName formatting error"},
     {ERROR, "Unknow error"}
 };
 
@@ -1140,7 +1142,14 @@ napi_value ResourceManagerAddon::GetStringSync(napi_env env, napi_callback_info 
         HiLog::Error(LABEL, "Failed to GetHapResourceManager in GetStringSync");
         return nullptr;
     }
-    RState state = resMgr->GetStringById(resId, asyncContext->value_);
+
+    if (!InitNapiParameters(env, info, asyncContext->jsParams_)) {
+        HiLog::Error(LABEL, "GetStringSync formatting error");
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_RES_ID_FORMAT_ERROR);
+        return nullptr;
+    }
+
+    RState state = resMgr->GetStringFormatById(resId, asyncContext->value_, asyncContext->jsParams_);
     if (state != RState::SUCCESS) {
         asyncContext->SetErrorMsg("GetStringSync failed state", true);
         ResMgrAsyncContext::NapiThrow(env, state);
@@ -1167,8 +1176,14 @@ napi_value ResourceManagerAddon::GetStringByNameSync(napi_env env, napi_callback
     asyncContext->addon_ = getResourceManagerAddon(env, info);
     asyncContext->resName_ = GetResNameOrPath(env, argc, argv);
 
-    RState state = asyncContext->addon_->GetResMgr()->GetStringByName(asyncContext->resName_.c_str(),
-        asyncContext->value_);
+    if (!InitNapiParameters(env, info, asyncContext->jsParams_)) {
+        HiLog::Error(LABEL, "GetStringByNameSync formatting error");
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_RES_NAME_FORMAT_ERROR);
+        return nullptr;
+    }
+
+    RState state = asyncContext->addon_->GetResMgr()->GetStringFormatByName(asyncContext->resName_.c_str(),
+        asyncContext->value_, asyncContext->jsParams_);
     if (state != RState::SUCCESS) {
         asyncContext->SetErrorMsg("GetStringByNameSync failed state", true);
         ResMgrAsyncContext::NapiThrow(env, state);
@@ -1671,6 +1686,56 @@ napi_value ResourceManagerAddon::GetDrawableDescriptorByName(napi_env env, napi_
         return nullptr;
     }
     return Ace::Napi::JsDrawableDescriptor::ToNapi(env, drawableDescriptor.release());
+}
+
+bool ResourceManagerAddon::InitParamsFromParamArray(napi_env env, napi_value value,
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
+{
+    napi_valuetype valuetype = GetType(env, value);
+    if (valuetype == napi_number) {
+        double param;
+        if (napi_get_value_double(env, value, &param) != napi_ok) {
+            HiLog::Error(LABEL, "Failed to get parameter value in InitParamsFromParamArray");
+            return false;
+        }
+        jsParams.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_NUMBER, std::to_string(param)));
+        return true;
+    }
+    if (valuetype == napi_string) {
+        size_t len = 0;
+        if (napi_get_value_string_utf8(env, value, nullptr, 0, &len) != napi_ok) {
+            HiLog::Error(LABEL, "Failed to get parameter length in InitParamsFromParamArray");
+            return false;
+        }
+        std::vector<char> buf(len + 1);
+        if (napi_get_value_string_utf8(env, value, buf.data(), len + 1, &len) != napi_ok) {
+            HiLog::Error(LABEL, "Failed to get parameter value in InitParamsFromParamArray");
+            return false;
+        }
+        jsParams.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_STRING, buf.data()));
+        return true;
+    }
+    return false;
+}
+
+bool ResourceManagerAddon::InitNapiParameters(napi_env env, napi_callback_info info,
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
+{
+    size_t size = 1;
+    napi_get_cb_info(env, info, &size, nullptr, nullptr, nullptr);
+    // one parameter: resId or resource or Name
+    if (size == 1) {
+        return true;
+    }
+    napi_value paramArray[size];
+    napi_get_cb_info(env, info, &size, paramArray, nullptr, nullptr);
+
+    for (size_t i = 1; i < size; ++i) {
+        if (!InitParamsFromParamArray(env, paramArray[i], jsParams)) {
+            return false;
+        }
+    }
+    return true;
 }
 } // namespace Resource
 } // namespace Global

@@ -156,6 +156,12 @@ private:
 
     static napi_value GetDrawableDescriptorByName(napi_env env, napi_callback_info info);
 
+    static bool InitParamsFromParamArray(napi_env env, napi_value value,
+        std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams);
+
+    static bool InitNapiParameters(napi_env env, napi_callback_info value,
+        std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams);
+
     std::string bundleName_;
     std::shared_ptr<ResourceManager> resMgr_;
     std::shared_ptr<AbilityRuntime::Context> context_;
@@ -178,6 +184,7 @@ struct ResMgrAsyncContext {
     CreateNapiValue createValueFunc_;
     std::string value_;
     std::vector<std::string> arrayValue_;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams_;
 
     std::unique_ptr<uint8_t[]> mediaData;
     size_t len_;

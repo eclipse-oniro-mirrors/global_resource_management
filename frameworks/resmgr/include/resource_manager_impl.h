@@ -86,7 +86,7 @@ public:
     virtual RState GetStringByName(const char *name, std::string &outValue);
 
     /**
-     * Get formatstring by resource id
+     * Get string format by resource id
      * @param id the resource id
      * @param outValue the resource write to
      * @return SUCCESS if resource exist, else NOT_FOUND
@@ -94,7 +94,7 @@ public:
     virtual RState GetStringFormatById(std::string &outValue, uint32_t id, ...);
 
     /**
-     * Get formatstring by resource name
+     * Get string format by resource name
      * @param name the resource name
      * @param outValue the resource write to
      * @return SUCCESS if resource exist, else NOT_FOUND
@@ -459,6 +459,30 @@ public:
      */
     virtual RState GetDrawableInfoByName(const char *name, std::string &type, size_t &len,
         std::unique_ptr<uint8_t[]> &outValue, uint32_t density = 0);
+
+    /**
+     * Get string format by resource id
+     * @param id the resource id
+     * @param outValue the resource write to
+     * @param jsParams the formatting string resource js parameters, the tuple first parameter represents the type,
+     *     napi_number is denoted by NAPI_NUMBER, napi_string is denoted by NAPI_STRING,
+     *     the tuple second parameter represents the value
+     * @return SUCCESS if resource exists and was formatted successfully, else ERROR
+     */
+    virtual RState GetStringFormatById(uint32_t id, std::string &outValue,
+        std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams);
+
+    /**
+     * Get string format by resource name
+     * @param name the resource name
+     * @param outValue the resource write to
+     * @param jsParams the formatting string resource js parameters, the tuple first parameter represents the type,
+     *     napi_number is denoted by NAPI_NUMBER, napi_string is denoted by NAPI_STRING,
+     *     the tuple second parameter represents the value
+     * @return SUCCESS if resource exists and was formatted successfully, else ERROR
+     */
+    virtual RState GetStringFormatByName(const char *name, std::string &outValue,
+        std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams);
 
 private:
     RState GetString(const IdItem *idItem, std::string &outValue);
