@@ -473,6 +473,9 @@ std::string GetFilePathFromHap(std::shared_ptr<AbilityBase::Extractor> &extracto
     std::string filePath;
     const IdItem *idItem = qd->GetIdItem();
     if (idItem == nullptr || idItem->resType_ != resType) {
+        std::string hapPath = qd->GetHapResource()->GetIndexPath();
+        HILOG_ERROR("actual resType = %{public}d, expect resType = %{public}d, hapPath = %{public}s",
+            idItem == nullptr ? -1 : idItem->resType_, resType, hapPath.c_str());
         return filePath;
     }
     if (extractor->IsStageModel()) {
