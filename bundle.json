@@ -1,6 +1,6 @@
 {
-    "name": "@ohos/global_resource_management",
-    "version": "",
+    "name": "@ohos/resource_management",
+    "version": "4.0",
     "description": "根据当前configuration（语言，区域，横竖屏，mccmnc）和device capability（设备类型，分辨率）获取应用资源信息读取接口",
     "homePage": "https://gitee.com/openharmony",
     "license": "Apache V2",
@@ -46,8 +46,8 @@
         "hisysevent_config": [
           "//base/global/resource_management/hisysevent.yaml"
         ],
-        "rom": "",
-        "ram": "",
+        "rom": "600KB",
+        "ram": "2500KB",
         "deps": {
             "components": [
               "ability_base",
