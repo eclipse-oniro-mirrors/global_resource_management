@@ -11,33 +11,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/global/resource_management/resmgr.gni")
 import("//build/ohos.gni")
+import("../../../resmgr.gni")
 
 ohos_shared_library("resourcemanager") {
   include_dirs = [
-    "//base/global/resource_management/dfx/hisysevent_adapter",
-    "//base/global/resource_management/frameworks/resmgr/include",
-    "//base/global/resource_management/interfaces/inner_api/include",
-    "//base/hiviewdfx/interfaces/native/innerkits/include",
+    "../../../dfx/hisysevent_adapter",
+    "../../../frameworks/resmgr/include",
+    "../../inner_api/include",
     "//third_party/node/src",
   ]
 
   sources = [
-    "//base/global/resource_management/dfx/hisysevent_adapter/hisysevent_adapter.cpp",
+    "../../../dfx/hisysevent_adapter/hisysevent_adapter.cpp",
     "src/resource_manager_napi.cpp",
   ]
 
-  public_deps = [ "//foundation/arkui/napi:ace_napi" ]
+  deps = [ "../innerkits/core:resmgr_napi_core" ]
 
   external_deps = [
-    "ability_base:want",
     "ability_runtime:abilitykit_native",
     "ability_runtime:runtime",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
-    "resource_management:resmgr_napi_core",
+    "napi:ace_napi",
   ]
 
   relative_install_dir = "module"
