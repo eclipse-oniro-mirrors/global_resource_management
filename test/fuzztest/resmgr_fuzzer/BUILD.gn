@@ -20,11 +20,9 @@ module_output_path = "global/resource_management"
 ohos_fuzztest("ResmgrFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file =
-      "//base/global/resource_management/test/fuzztest/resmgr_fuzzer"
+  fuzz_config_file = "./"
 
-  include_dirs =
-      [ "//base/global/resource_management/interfaces/inner_api/include" ]
+  include_dirs = [ "../../../interfaces/inner_api/include" ]
 
   cflags = [
     "-g",
@@ -35,7 +33,7 @@ ohos_fuzztest("ResmgrFuzzTest") {
   sources = [ "resmgr_fuzzer.cpp" ]
 
   deps = [
-    "${resmgr_base_path}/frameworks/resmgr:global_resmgr",
+    "../../../frameworks/resmgr:global_resmgr",
     "//third_party/bounds_checking_function:libsec_shared",
   ]
 }

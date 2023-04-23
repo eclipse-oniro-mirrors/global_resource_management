@@ -11,33 +11,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/global/resource_management/resmgr.gni")
 import("//build/ohos.gni")
+import("../../../../resmgr.gni")
 
 config("resmgr_napi_core_public_config") {
   include_dirs = [
     "include",
-    "//base/global/resource_management/dfx/hisysevent_adapter",
-    "//base/global/resource_management/frameworks/resmgr/include",
+    "../../../../dfx/hisysevent_adapter",
+    "../../../../frameworks/resmgr/include",
   ]
 }
 
 ohos_shared_library("resmgr_napi_core") {
   sources = [
-    "//base/global/resource_management/dfx/hisysevent_adapter/hisysevent_adapter.cpp",
+    "../../../../dfx/hisysevent_adapter/hisysevent_adapter.cpp",
     "src/resource_manager_addon.cpp",
   ]
 
   version_script = "libresmgr_napi_core.versionscript"
 
-  configs = [ ":resmgr_napi_core_public_config" ]
-
   public_configs = [ ":resmgr_napi_core_public_config" ]
 
-  public_deps = [
-    "//base/global/resource_management/frameworks/resmgr:global_resmgr",
-    "//foundation/arkui/napi:ace_napi",
-  ]
+  deps = [ "../../../../frameworks/resmgr:global_resmgr" ]
 
   external_deps = [
     "ability_base:configuration",
@@ -46,7 +41,7 @@ ohos_shared_library("resmgr_napi_core") {
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
+    "napi:ace_napi",
   ]
 
   if (resource_management_support_icu) {
