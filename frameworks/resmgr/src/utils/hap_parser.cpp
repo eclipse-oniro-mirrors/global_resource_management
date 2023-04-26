@@ -310,15 +310,15 @@ RState HapParser::GetRawFileList(const std::string hapPath, const std::string ra
     bool isNewExtractor = false;
     auto extractor = AbilityBase::ExtractorUtil::GetExtractor(hapPath, isNewExtractor);
     if (extractor == nullptr) {
-        HILOG_ERROR("failed to get extractor from ability in GetFileList");
+        HILOG_ERROR("failed to get extractor from ability in GetRawFileList hapPath, %{public}s", hapPath.c_str());
         return NOT_FOUND;
     }
     std::set<std::string> fileSet;
     std::string rawfilePath = HapParser::GetRawFilePath(extractor, rawDirPath);
     bool ret = extractor->GetFileList(rawfilePath, fileSet);
-    if (!ret) {
+    if (!ret || fileSet.empty()) {
         HILOG_ERROR("failed to get fileSet from ability rawfilePath, %{public}s", rawfilePath.c_str());
-        return NOT_FOUND;
+        return ERROR_CODE_RES_PATH_INVALID;
     }
     for (auto it = fileSet.begin(); it != fileSet.end(); it++) {
         fileList.emplace_back(*it);
