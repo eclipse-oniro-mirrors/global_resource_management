@@ -384,7 +384,6 @@ bool HapManager::AddResourcePath(const char *path)
     std::string sPath(path);
     auto it = loadedHapPaths_.find(sPath);
     if (it != loadedHapPaths_.end()) {
-        HILOG_ERROR(" %s has already been loaded!", path);
         return false;
     }
     const HapResource *pResource = HapResource::Load(path, resConfig_);
