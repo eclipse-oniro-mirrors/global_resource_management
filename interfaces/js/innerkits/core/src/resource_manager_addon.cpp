@@ -167,8 +167,9 @@ bool ResourceManagerAddon::Init(napi_env env)
         DECLARE_NAPI_FUNCTION("getRawFd", GetRawFd),
         DECLARE_NAPI_FUNCTION("closeRawFd", CloseRawFd),
         DECLARE_NAPI_FUNCTION("getDrawableDescriptor", GetDrawableDescriptor),
-        DECLARE_NAPI_FUNCTION("getDrawableDescriptorByName", GetDrawableDescriptorByName)
-        
+        DECLARE_NAPI_FUNCTION("getDrawableDescriptorByName", GetDrawableDescriptorByName),
+        DECLARE_NAPI_FUNCTION("getRawFileList", GetRawFileList)
+
     };
 
     napi_value constructor;
@@ -581,6 +582,30 @@ napi_value ResourceManagerAddon::GetString(napi_env env, napi_callback_info info
     return ProcessOnlyIdParam(env, info, "getString", getStringFunc);
 }
 
+napi_value ResMgrAsyncContext::CreateJsArray(napi_env env, ResMgrAsyncContext &asyncContext)
+{
+    napi_value result;
+    napi_status status = napi_create_array_with_length(env, asyncContext.arrayValue_.size(), &result);
+    if (status != napi_ok) {
+        asyncContext.SetErrorMsg("Failed to create array");
+        return nullptr;
+    }
+    for (size_t i = 0; i < asyncContext.arrayValue_.size(); i++) {
+        napi_value value;
+        status = napi_create_string_utf8(env, asyncContext.arrayValue_[i].c_str(), NAPI_AUTO_LENGTH, &value);
+        if (status != napi_ok) {
+            asyncContext.SetErrorMsg("Failed to create string item");
+            return nullptr;
+        }
+        status = napi_set_element(env, result, i, value);
+        if (status != napi_ok) {
+            asyncContext.SetErrorMsg("Failed to set array item");
+            return nullptr;
+        }
+    }
+    return result;
+}
+
 auto getStringArrayFunc = [](napi_env env, void* data) {
     ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
     RState state;
@@ -605,29 +630,7 @@ auto getStringArrayFunc = [](napi_env env, void* data) {
             return;
         }
     }
-    asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext &context) -> napi_value {
-        napi_value result;
-        napi_status status = napi_create_array_with_length(env, context.arrayValue_.size(), &result);
-        if (status != napi_ok) {
-            context.SetErrorMsg("Failed to create array");
-            return nullptr;
-        }
-        for (size_t i = 0; i < context.arrayValue_.size(); i++) {
-            napi_value value;
-            status = napi_create_string_utf8(env, context.arrayValue_[i].c_str(), NAPI_AUTO_LENGTH, &value);
-            if (status != napi_ok) {
-                context.SetErrorMsg("Failed to create string item");
-                return nullptr;
-            }
-            status = napi_set_element(env, result, i, value);
-            if (status != napi_ok) {
-                context.SetErrorMsg("Failed to set array item");
-                return nullptr;
-            }
-        }
-
-        return result;
-    };
+    asyncContext->createValueFunc_ = ResMgrAsyncContext::CreateJsArray;
 };
 
 napi_value ResourceManagerAddon::GetStringArrayByName(napi_env env, napi_callback_info info)
@@ -1736,6 +1739,25 @@ bool ResourceManagerAddon::InitNapiParameters(napi_env env, napi_callback_info i
         }
     }
     return true;
+}
+
+auto getRawFileListFunc = [](napi_env env, void* data) {
+    ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
+    RState state = asyncContext->addon_->GetResMgr()->GetRawFileList(asyncContext->path_, asyncContext->arrayValue_);
+    if (state != SUCCESS) {
+        asyncContext->SetErrorMsg("GetRawFileList failed state", false, state);
+        return;
+    }
+    asyncContext->createValueFunc_ = ResMgrAsyncContext::CreateJsArray;
+};
+
+napi_value ResourceManagerAddon::GetRawFileList(napi_env env, napi_callback_info info)
+{
+    if (!isNapiString(env, info)) {
+        ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+    return ProcessOnlyIdParam(env, info, "getRawFileList", getRawFileListFunc);
 }
 } // namespace Resource
 } // namespace Global

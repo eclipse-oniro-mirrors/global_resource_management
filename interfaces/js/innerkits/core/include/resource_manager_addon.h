@@ -156,6 +156,8 @@ private:
 
     static napi_value GetDrawableDescriptorByName(napi_env env, napi_callback_info info);
 
+    static napi_value GetRawFileList(napi_env env, napi_callback_info info);
+
     static bool InitParamsFromParamArray(napi_env env, napi_value value,
         std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams);
 
@@ -219,6 +221,8 @@ struct ResMgrAsyncContext {
 
     static int32_t ProcessIdResourceParam(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrAsyncContext> &asyncContext);
+
+    static napi_value CreateJsArray(napi_env env, ResMgrAsyncContext &asyncContext);
 };
 } // namespace Resource
 } // namespace Global
