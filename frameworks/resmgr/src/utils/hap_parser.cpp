@@ -508,10 +508,6 @@ int32_t ParseKey(const char *buffer, uint32_t &offset,  ResKey *key,
         kp->InitStr();
         key->keyParams_.push_back(kp);
     }
-    match = IsLocaleMatch(defaultConfig, key->keyParams_);
-    if (!match) {
-        return OK;
-    }
     uint32_t idOffset = key->offset_;
     ResId *id = new (std::nothrow) ResId();
     if (id == nullptr) {

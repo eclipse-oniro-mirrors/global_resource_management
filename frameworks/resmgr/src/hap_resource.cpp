@@ -42,30 +42,19 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
-HapResource::ValueUnderQualifierDir::ValueUnderQualifierDir(const std::vector<KeyParam *> &keyParams, IdItem *idItem,
+HapResource::ValueUnderQualifierDir::ValueUnderQualifierDir(const ResKey *resKey, IdItem *idItem,
     HapResource *hapResource, bool isOverlay, bool systemResource) : hapResource_(hapResource)
 {
-    keyParams_ = keyParams;
+    keyParams_ = resKey->keyParams_;
     folder_ = HapParser::ToFolderPath(keyParams_);
     idItem_ = idItem;
     isOverlay_ = isOverlay;
     isSystemResource_ = systemResource;
-    InitResConfig();
+    resConfig_ = resKey->resConfig_;
 }
 
 HapResource::ValueUnderQualifierDir::~ValueUnderQualifierDir()
-{
-    // keyParams_ idItem_ was passed into this, we don't delete them because someone will do
-    if (resConfig_ != nullptr) {
-        delete (resConfig_);
-        resConfig_ = nullptr;
-    }
-}
-
-void HapResource::ValueUnderQualifierDir::InitResConfig()
-{
-    resConfig_ = HapParser::CreateResConfigFromKeyParams(keyParams_);
-}
+{}
 
 // IdValues
 HapResource::IdValues::~IdValues()
@@ -79,10 +68,9 @@ HapResource::IdValues::~IdValues()
 }
 
 // HapResource
-HapResource::HapResource(const std::string path, time_t lastModTime, const ResConfig *defaultConfig, ResDesc *resDes)
-    : indexPath_(path), lastModTime_(lastModTime), resDesc_(resDes), defaultConfig_(defaultConfig)
-{
-}
+HapResource::HapResource(const std::string path, time_t lastModTime, ResDesc *resDes, bool isSystem, bool isOverlay)
+    : indexPath_(path), lastModTime_(lastModTime), resDesc_(resDes), isSystem_(isSystem), isOverlay_(isOverlay)
+{}
 
 HapResource::~HapResource()
 {
@@ -106,20 +94,20 @@ HapResource::~HapResource()
         }
     }
     lastModTime_ = 0;
-    // defaultConfig_ was passed by constructor, we do not delete it here
-    defaultConfig_ = nullptr;
 }
 
-const HapResource* HapResource::Load(const char *path, const ResConfigImpl* defaultConfig, bool system)
+const HapResource* HapResource::Load(const char *path, const ResConfigImpl* defaultConfig,
+    bool isSystem, bool isOverlay)
 {
     if (Utils::ContainsTail(path, Utils::tailSet)) {
-        return LoadFromHap(path, defaultConfig, system);
+        return LoadFromHap(path, defaultConfig, isSystem, isOverlay);
     } else {
-        return LoadFromIndex(path, defaultConfig, system);
+        return LoadFromIndex(path, defaultConfig, isSystem, isOverlay);
     }
 }
 
-const HapResource* HapResource::LoadFromIndex(const char *path, const ResConfigImpl *defaultConfig, bool system)
+const HapResource* HapResource::LoadFromIndex(const char *path, const ResConfigImpl *defaultConfig,
+    bool isSystem, bool isOverlay)
 {
     char outPath[PATH_MAX + 1] = {0};
     Utils::CanonicalizePath(path, outPath, PATH_MAX);
@@ -161,13 +149,13 @@ const HapResource* HapResource::LoadFromIndex(const char *path, const ResConfigI
     }
     free(buf);
 
-    HapResource *pResource = new (std::nothrow) HapResource(std::string(path), 0, defaultConfig, resDesc);
+    HapResource *pResource = new (std::nothrow) HapResource(std::string(path), 0, resDesc, isSystem, isOverlay);
     if (pResource == nullptr) {
         HILOG_ERROR("new HapResource failed when LoadFromIndex");
         delete (resDesc);
         return nullptr;
     }
-    if (!pResource->Init(system)) {
+    if (!pResource->Init()) {
         delete (pResource);
         return nullptr;
     }
@@ -208,7 +196,8 @@ bool GetIndexData(const char *path, std::unique_ptr<uint8_t[]> &tmpBuf, size_t &
     return true;
 }
 
-const HapResource* HapResource::LoadFromHap(const char *path, const ResConfigImpl *defaultConfig, bool system)
+const HapResource* HapResource::LoadFromHap(const char *path, const ResConfigImpl *defaultConfig,
+    bool isSystem, bool isOverlay)
 {
     std::unique_ptr<uint8_t[]> tmpBuf;
     size_t tmpLen = 0;
@@ -229,13 +218,13 @@ const HapResource* HapResource::LoadFromHap(const char *path, const ResConfigImp
         return nullptr;
     }
 
-    HapResource *pResource = new (std::nothrow) HapResource(path, 0, defaultConfig, resDesc);
+    HapResource *pResource = new (std::nothrow) HapResource(path, 0, resDesc, isSystem, isOverlay);
     if (pResource == nullptr) {
         delete (resDesc);
         return nullptr;
     }
 
-    if (!pResource->Init(system)) {
+    if (!pResource->Init()) {
         delete (pResource);
         return nullptr;
     }
@@ -243,11 +232,11 @@ const HapResource* HapResource::LoadFromHap(const char *path, const ResConfigImp
 }
 
 const std::unordered_map<std::string, HapResource *> HapResource::LoadOverlays(const std::string &path,
-    const std::vector<std::string> &overlayPaths, const ResConfigImpl *defaultConfig)
+    const std::vector<std::string> &overlayPaths, const ResConfigImpl *defaultConfig, bool isSystem)
 {
     std::unordered_map<std::string, HapResource *> result;
     do {
-        const HapResource *targetResource = Load(path.c_str(), defaultConfig, true);
+        const HapResource *targetResource = Load(path.c_str(), defaultConfig, isSystem);
         if (targetResource == nullptr) {
             HILOG_ERROR("load target failed");
             break;
@@ -257,7 +246,8 @@ const std::unordered_map<std::string, HapResource *> HapResource::LoadOverlays(c
         std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> mapping =
             targetResource->BuildNameTypeIdMapping();
         for (auto iter = overlayPaths.begin(); iter != overlayPaths.end(); iter++) {
-            const HapResource *overlayResource = Load(iter->c_str(), defaultConfig);
+            // load overlay hap, the isOverlay flag set true.
+            const HapResource *overlayResource = Load(iter->c_str(), defaultConfig, isSystem, true);
             if (overlayResource == nullptr) {
                 HILOG_ERROR("load overlay failed");
                 success = false;
@@ -318,7 +308,6 @@ void HapResource::UpdateOverlayInfo(std::unordered_map<std::string, std::unorder
             uint32_t newId = typeId[type];
             for_each(limitPaths.begin(), limitPaths.end(), [&](auto &item) {
                 item->idItem_->id_ = newId;
-                item->isOverlay_ = true;
             });
             newIdValuesMap[newId] = iter->second;
         }
@@ -326,7 +315,7 @@ void HapResource::UpdateOverlayInfo(std::unordered_map<std::string, std::unorder
     idValuesMap_.swap(newIdValuesMap);
 }
 
-bool HapResource::Init(bool system)
+bool HapResource::Init()
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
@@ -359,10 +348,10 @@ bool HapResource::Init(bool system)
         }
         idValuesNameMap_.push_back(mptr);
     }
-    return InitIdList(system);
+    return InitIdList();
 }
 
-bool HapResource::InitIdList(bool system)
+bool HapResource::InitIdList()
 {
     if (resDesc_ == nullptr) {
         HILOG_ERROR("resDesc_ is null ! InitIdList failed");
@@ -370,6 +359,8 @@ bool HapResource::InitIdList(bool system)
     }
     for (size_t i = 0; i < resDesc_->keys_.size(); i++) {
         ResKey *resKey = resDesc_->keys_[i];
+        // init resConfig of each resKey.
+        resKey->resConfig_ = HapParser::CreateResConfigFromKeyParams(resKey->keyParams_);
 
         for (size_t j = 0; j < resKey->resId_->idParams_.size(); ++j) {
             IdParam *idParam = resKey->resId_->idParams_[j];
@@ -381,8 +372,8 @@ bool HapResource::InitIdList(bool system)
                     HILOG_ERROR("new IdValues failed in HapResource::InitIdList");
                     return false;
                 }
-                auto limitPath = new (std::nothrow) HapResource::ValueUnderQualifierDir(resKey->keyParams_,
-                    idParam->idItem_, this, false, system);
+                auto limitPath = new (std::nothrow) HapResource::ValueUnderQualifierDir(resKey,
+                    idParam->idItem_, this, isOverlay_, isSystem_);
                 if (limitPath == nullptr) {
                     HILOG_ERROR("new ValueUnderQualifierDir failed in HapResource::InitIdList");
                     delete (idValues);
@@ -394,8 +385,8 @@ bool HapResource::InitIdList(bool system)
                 idValuesNameMap_[idParam->idItem_->resType_]->insert(std::make_pair(name, idValues));
             } else {
                 HapResource::IdValues *idValues = iter->second;
-                auto limitPath = new (std::nothrow) HapResource::ValueUnderQualifierDir(resKey->keyParams_,
-                    idParam->idItem_, this, false, system);
+                auto limitPath = new (std::nothrow) HapResource::ValueUnderQualifierDir(resKey,
+                    idParam->idItem_, this, isOverlay_, isSystem_);
                 if (limitPath == nullptr) {
                     HILOG_ERROR("new ValueUnderQualifierDir failed in HapResource::InitIdList");
                     return false;

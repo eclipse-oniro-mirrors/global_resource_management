@@ -33,6 +33,7 @@
 #include "hilog_wrapper.h"
 #include "res_config.h"
 #include "securec.h"
+#include "system_resource_manager.h"
 #include "utils/common.h"
 #include "utils/string_utils.h"
 #include "utils/utils.h"
@@ -47,61 +48,30 @@ LogLevel g_logLevel = LOG_INFO;
 
 constexpr char ESCAPE_CHARACTER = '%';
 
-ResourceManager *CreateResourceManager()
+void ResourceManagerImpl::AddSystemResource(ResourceManagerImpl *systemResourceManager)
 {
-    ResourceManagerImpl *impl = new (std::nothrow) ResourceManagerImpl;
-    if (impl == nullptr) {
-        HILOG_ERROR("new ResourceManagerImpl failed when CreateResourceManager");
-        return nullptr;
-    }
-    if (impl->Init()) {
-        return impl;
-    } else {
-        delete (impl);
-        return nullptr;
+    if (systemResourceManager != nullptr) {
+        this->hapManager_->AddSystemResource(systemResourceManager->hapManager_);
     }
 }
-
-ResourceManager::~ResourceManager()
-{}
 
 ResourceManagerImpl::ResourceManagerImpl() : hapManager_(nullptr)
 {
     psueManager_ = new (std::nothrow) PsueManager();
 }
 
-bool ResourceManagerImpl::Init()
+bool ResourceManagerImpl::Init(bool isSystem)
 {
     ResConfigImpl *resConfig = new (std::nothrow) ResConfigImpl;
     if (resConfig == nullptr) {
         HILOG_ERROR("new ResConfigImpl failed when ResourceManagerImpl::Init");
         return false;
     }
-    hapManager_ = new (std::nothrow) HapManager(resConfig);
+    hapManager_ = new (std::nothrow) HapManager(resConfig, isSystem);
     if (hapManager_ == nullptr) {
         delete (resConfig);
         HILOG_ERROR("new HapManager failed when ResourceManagerImpl::Init");
         return false;
-    }
-    if (Utils::IsFileExist(SYSTEM_RESOURCE_OVERLAY_PATH) && Utils::IsFileExist(SYSTEM_RESOURCE_PATH)) {
-        vector<string> overlayPaths;
-        overlayPaths.push_back(SYSTEM_RESOURCE_OVERLAY_PATH);
-        AddResource(SYSTEM_RESOURCE_PATH.c_str(), overlayPaths);
-        return true;
-    }
-    
-    if (Utils::IsFileExist(SYSTEM_RESOURCE_OVERLAY_PATH_COMPRESSED) &&
-        Utils::IsFileExist(SYSTEM_RESOURCE_PATH_COMPRESSED)) {
-        vector<string> overlayPaths;
-        overlayPaths.push_back(SYSTEM_RESOURCE_OVERLAY_PATH_COMPRESSED);
-        AddResource(SYSTEM_RESOURCE_PATH_COMPRESSED.c_str(), overlayPaths);
-        return true;
-    }
-
-    if (Utils::IsFileExist(SYSTEM_RESOURCE_PATH)) {
-        AddResource(SYSTEM_RESOURCE_PATH.c_str());
-    } else {
-        AddResource(SYSTEM_RESOURCE_PATH_COMPRESSED.c_str());
     }
     return true;
 }

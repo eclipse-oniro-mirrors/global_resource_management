@@ -602,6 +602,15 @@ int8_t LocaleMatcher::IsMoreSuitable(const ResLocale *current,
     const ResLocale *request)
 {
     if (request == nullptr) {
+        // if request ResLocale is nullptr, the candidate is also nullptr will be more suitable
+        if (current != nullptr && other == nullptr) {
+        // -1 means other is more suitable
+            return -1;
+        }
+        if (current == nullptr && other != nullptr) {
+            // 1 means current is more suitable
+            return 1;
+        }
         return 0;
     }
     if (current == nullptr && other == nullptr) {

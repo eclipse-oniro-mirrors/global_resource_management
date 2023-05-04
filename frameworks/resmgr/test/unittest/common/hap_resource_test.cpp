@@ -164,14 +164,13 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest002, TestSize.Level1)
         EXPECT_TRUE(false);
         return;
     }
-
-    EXPECT_EQ(static_cast<size_t>(78), pResource->IdSize());
+    EXPECT_EQ(static_cast<size_t>(79), pResource->IdSize());
 
     int id = pResource->GetIdByName("app_name", ResType::STRING);
     start = CurrentTimeUsec();
     auto idValues = pResource->GetIdValues(id);
     cost = CurrentTimeUsec() - start;
-    EXPECT_EQ(static_cast<size_t>(2), idValues->GetLimitPathsConst().size());
+    EXPECT_EQ(static_cast<size_t>(3), idValues->GetLimitPathsConst().size());
     HILOG_DEBUG("GetIdValues by id cost: %ld us.", cost);
     PrintIdValues(idValues);
 
@@ -192,7 +191,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest002, TestSize.Level1)
     start = CurrentTimeUsec();
     auto idValues2 = pResource->GetIdValuesByName(name, ResType::STRING);
     cost = CurrentTimeUsec() - start;
-    EXPECT_EQ(static_cast<size_t>(2), idValues2->GetLimitPathsConst().size());
+    EXPECT_EQ(static_cast<size_t>(3), idValues2->GetLimitPathsConst().size());
     HILOG_DEBUG("GetIdValues by name cost: %ld us.", cost);
     PrintIdValues(idValues);
 

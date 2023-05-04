@@ -52,8 +52,8 @@ namespace Resource {
 #ifdef SUPPORT_GRAPHICS
 constexpr uint32_t PLURAL_CACHE_MAX_COUNT = 3;
 #endif
-HapManager::HapManager(ResConfigImpl *resConfig)
-    : resConfig_(resConfig)
+HapManager::HapManager(ResConfigImpl *resConfig, bool isSystem)
+    : resConfig_(resConfig), isSystem_(isSystem)
 {
 }
 
@@ -227,7 +227,7 @@ const HapResource::ValueUnderQualifierDir *HapManager::GetBestMatchResource(std:
             }
         }
     }
-    if (bestOverlayResConfig != nullptr && result != nullptr && result->IsSystemResource()) {
+    if (bestOverlayResConfig != nullptr && result != nullptr) {
         if (bestOverlayResConfig->IsMoreSuitable(bestResConfig, currentResConfig, density)) {
             return overlayResult;
         }
@@ -285,11 +285,7 @@ RState HapManager::UpdateResConfig(ResConfig &resConfig)
 {
     AutoMutex mutex(this->lock_);
     this->resConfig_->Copy(resConfig);
-    RState rState = this->ReloadAll();
-    if (rState != SUCCESS) {
-        HILOG_ERROR("ReloadAll() failed when UpdateResConfig!");
-    }
-    return rState;
+    return SUCCESS;
 }
 
 
@@ -314,7 +310,8 @@ bool HapManager::AddResource(const std::string &path, const std::vector<std::str
         return false;
     }
     loadedHapPaths_[path] = overlayPaths;
-    std::unordered_map<std::string, HapResource *> result = HapResource::LoadOverlays(path, overlayPaths, resConfig_);
+    std::unordered_map<std::string, HapResource *> result = HapResource::LoadOverlays(path, overlayPaths,
+        resConfig_, isSystem_);
     if (result.size() > 0) {
         for (auto iter = result.begin(); iter != result.end(); iter++) {
             this->hapResources_.push_back(iter->second);
@@ -327,10 +324,15 @@ bool HapManager::AddResource(const std::string &path, const std::vector<std::str
 HapManager::~HapManager()
 {
     for (size_t i = 0; i < hapResources_.size(); ++i) {
-        if (hapResources_[i] != nullptr) {
-            delete hapResources_[i];
-            hapResources_[i] = nullptr;
+        if (hapResources_[i] == nullptr) {
+            continue;
         }
+        // system resource is static, no need to release in each hap manager
+        if (hapResources_[i]->IsSystemResource()) {
+            continue;
+        }
+        delete hapResources_[i];
+        hapResources_[i] = nullptr;
     }
     if (resConfig_ != nullptr) {
         delete resConfig_;
@@ -386,7 +388,7 @@ bool HapManager::AddResourcePath(const char *path)
     if (it != loadedHapPaths_.end()) {
         return false;
     }
-    const HapResource *pResource = HapResource::Load(path, resConfig_);
+    const HapResource *pResource = HapResource::Load(path, resConfig_, isSystem_);
     if (pResource == nullptr) {
         return false;
     }
@@ -819,6 +821,38 @@ bool HapManager::RemoveResource(const std::string &path, const std::vector<std::
     }
     loadedHapPaths_[path] = targetOverlay;
     return true;
+}
+
+std::vector<HapResource *> HapManager::GetHapResource()
+{
+    return hapResources_;
+}
+
+void HapManager::AddSystemResource(const HapManager *systemHapManager)
+{
+    if (systemHapManager == nullptr) {
+        HILOG_ERROR("add system resource failed, systemHapManager is nullptr");
+        return;
+    }
+    if (!systemHapManager->isSystem_) {
+        HILOG_ERROR("add system resource failed, the added hapManager is not system");
+        return;
+    }
+    // add system resource to app resource vector
+    const std::vector<HapResource *> &systemResources = systemHapManager->hapResources_;
+    for (size_t i = 0; i < systemResources.size(); i++) {
+        this->hapResources_.push_back(systemResources[i]);
+    }
+
+    // add system loaded path to app loaded path map.
+    const std::unordered_map<std::string, std::vector<std::string>> &loadedSystemPaths =
+        systemHapManager->loadedHapPaths_;
+    for (auto iter = loadedSystemPaths.begin(); iter != loadedSystemPaths.end(); iter++) {
+        const std::vector<std::string> &overlayPaths = iter->second;
+        if (this->loadedHapPaths_.find(iter->first) == this->loadedHapPaths_.end()) {
+            this->loadedHapPaths_[iter->first] = overlayPaths;
+        }
+    }
 }
 } // namespace Resource
 } // namespace Global
