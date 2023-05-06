@@ -316,7 +316,7 @@ RState HapParser::GetRawFileList(const std::string hapPath, const std::string ra
     std::set<std::string> fileSet;
     std::string rawfilePath = HapParser::GetRawFilePath(extractor, rawDirPath);
     bool ret = extractor->GetFileList(rawfilePath, fileSet);
-    if (!ret || fileSet.empty()) {
+    if (!ret) {
         HILOG_ERROR("failed to get fileSet from ability rawfilePath, %{public}s", rawfilePath.c_str());
         return ERROR_CODE_RES_PATH_INVALID;
     }
