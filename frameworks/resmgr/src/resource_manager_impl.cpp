@@ -909,7 +909,7 @@ RState ResourceManagerImpl::GetMediaDataById(uint32_t id, size_t &len, std::uniq
 {
     if (!IsDensityValid(density)) {
         HILOG_ERROR("density invalid");
-        return NOT_SUPPORT_SEP;
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     auto qd = hapManager_->FindQualifierValueById(id, density);
     if (qd == nullptr) {
@@ -924,7 +924,7 @@ RState ResourceManagerImpl::GetMediaDataByName(const char *name, size_t &len, st
 {
     if (!IsDensityValid(density)) {
         HILOG_ERROR("density invalid");
-        return NOT_SUPPORT_SEP;
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, density);
     if (qd == nullptr) {
@@ -938,7 +938,7 @@ RState ResourceManagerImpl::GetMediaBase64DataById(uint32_t id, std::string &out
 {
     if (!IsDensityValid(density)) {
         HILOG_ERROR("density invalid");
-        return NOT_SUPPORT_SEP;
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     auto qd = hapManager_->FindQualifierValueById(id, density);
     if (qd == nullptr) {
@@ -952,7 +952,7 @@ RState ResourceManagerImpl::GetMediaBase64DataByName(const char *name, std::stri
 {
     if (!IsDensityValid(density)) {
         HILOG_ERROR("density invalid");
-        return NOT_SUPPORT_SEP;
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, density);
     if (qd == nullptr) {
