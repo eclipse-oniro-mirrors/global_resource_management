@@ -31,7 +31,20 @@ public:
 
     ~ResourceManagerImpl();
 
-    bool Init();
+    /**
+     * Init resource manager.
+     *
+     * @param isSystem indicate the resource manager is system or not.
+     * @return true if init success, else false
+     */
+    bool Init(bool isSystem = false);
+
+    /**
+     * Add system resource to hap resource vector.
+     *
+     * @param systemResourceManager the system resource manager.
+     */
+    void AddSystemResource(ResourceManagerImpl *systemResourceManager);
 
     /**
      * Add resource path to hap paths
@@ -532,18 +545,6 @@ private:
     const std::string VIRTUAL_PIXEL = "vp";
 
     const std::string FONT_SIZE_PIXEL = "fp";
-
-    const std::string SYSTEM_RESOURCE_PATH = "/data/storage/el1/bundle/ohos.global.systemres" \
-                                        "/ohos.global.systemres/assets/entry/resources.index";
-
-    const std::string SYSTEM_RESOURCE_PATH_COMPRESSED = "/data/storage/el1/bundle/" \
-                                                "systemResources/SystemResources.hap";
-
-    const std::string SYSTEM_RESOURCE_OVERLAY_PATH = "/data/storage/el1/bundle/" \
-            "ohos.global.systemres.overlay/ohos.global.systemres.overlay/assets/entry/resources.index";
-
-    const std::string SYSTEM_RESOURCE_OVERLAY_PATH_COMPRESSED = "/data/storage/el1/bundle/" \
-            "ohos.global.systemres.overlay/ohos.global.systemres.overlay/SystemResourcesOverlay.hap";
 };
 } // namespace Resource
 } // namespace Global

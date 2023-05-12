@@ -33,8 +33,11 @@ class HapManager {
 public:
     /**
      * The constructor of HapManager
+     *
+     * @param resConfig resource config
+     * @param isSystem system flag, default value is false
      */
-    explicit HapManager(ResConfigImpl *resConfig);
+    HapManager(ResConfigImpl *resConfig, bool isSystem = false);
 
     /**
      * The destructor of HapManager
@@ -258,6 +261,20 @@ public:
      */
     RState CloseRawFileDescriptor(const std::string &name);
 
+    /**
+     * Get hap resource of manager
+     *
+     * @return HapResource vector of manager
+     */
+    std::vector<HapResource *> GetHapResource();
+
+    /**
+     * Add system resourc to app resource vector
+     *
+     * @param systemHapManager system manager
+     */
+    void AddSystemResource(const HapManager *systemHapManager);
+
 private:
     void UpdateResConfigImpl(ResConfigImpl &resConfig);
 
@@ -296,6 +313,9 @@ private:
 #endif
 
     Lock lock_;
+
+    // indicate manager is system hap manager
+    bool isSystem_;
 };
 } // namespace Resource
 } // namespace Global

@@ -37,45 +37,55 @@ public:
      * @param path resources.index file path
      * @param defaultConfig  match defaultConfig to keys of index file, only parse the matched keys.
      *                       'null' means parse all keys.
-     * @param system If `system` is true, the package is marked as a system package, and allows some functions to
-     *               filter out this package when computing what configurations/resources are available.
+     * @param isSystem If `isSystem` is true, the package is marked as a system package and allows some functions to
+     *     filter out this package when computing what configurations/resources are available.
+     * @param isOverlay If 'isOverlay' is true, the package is marked as an overlay package and overlay resource can
+     *     replace non-overlay resource.
      * @return pResource if create pResource success, else nullptr
      */
-    static const HapResource *LoadFromIndex(const char *path, const ResConfigImpl *defaultConfig, bool system = false);
+    static const HapResource *LoadFromIndex(const char *path, const ResConfigImpl *defaultConfig,
+        bool isSystem = false, bool isOverlay = false);
 
     /**
      * Creates an HapResource.
      *
      * @param path hap file path
      * @param defaultConfig  match defaultConfig to keys of index file, only parse the matched keys.
-     *                       'null' means parse all keys.
-     * @param system If `system` is true, the package is marked as a system package, and allows some functions to
-     *               filter out this package when computing what configurations/resources are available.
+     *     'null' means parse all keys.
+     * @param isSystem If `isSystem` is true, the package is marked as a system package and allows some functions to
+     *     filter out this package when computing what configurations/resources are available.
+     * @param isOverlay If 'isOverlay' is true, the package is marked as an overlay package and overlay resource can
+     *     replace non-overlay resource.
      * @return pResource if create pResource success, else nullptr
      */
-    static const HapResource *LoadFromHap(const char *path, const ResConfigImpl *defaultConfig, bool system = false);
+    static const HapResource *LoadFromHap(const char *path, const ResConfigImpl *defaultConfig,
+        bool isSystem = false, bool isOverlay = false);
 
     /**
      * Creates an HapResource.
      *
      * @param path hap file path
      * @param defaultConfig  match defaultConfig to keys of index file, only parse the matched keys.
-     *                       'null' means parse all keys.
-     * @param system If `system` is true, the package is marked as a system package, and allows some functions to
-     *               filter out this package when computing what configurations/resources are available.
+     *     'null' means parse all keys.
+     * @param isSystem If `isSystem` is true, the package is marked as a system package and allows some functions to
+     *     filter out this package when computing what configurations/resources are available.
+     * @param isOverlay If 'isOverlay' is true, the package is marked as an overlay package and overlay resource can
+     *     replace non-overlay resource.
      * @return pResource if create pResource success, else nullptr
      */
-    static const HapResource *Load(const char* path, const ResConfigImpl* defaultConfig, bool system = false);
+    static const HapResource *Load(const char* path, const ResConfigImpl* defaultConfig,
+        bool isSystem = false, bool isOverlay = false);
 
     /**
      * Load overlay resources
      * @param path the resources.index file path
      * @param overlayPath  the resource overlay path
      * @param defaultConfig the resource config
+     * @param isSystem judge the overlay is system or not
      * @return the map of overlay resource path and resource info if success, else null
      */
     static const std::unordered_map<std::string, HapResource *> LoadOverlays(const std::string &path,
-        const std::vector<std::string> &overlayPath, const ResConfigImpl *defaultConfig);
+        const std::vector<std::string> &overlayPath, const ResConfigImpl *defaultConfig, bool isSystem = false);
 
     /**
      * The destructor of HapResource
@@ -96,6 +106,26 @@ public:
     inline const std::string GetResourcePath() const
     {
         return resourcePath_;
+    }
+
+    /**
+     * Get the system flag of HapResource.
+     *
+     * @return true if isSystem_ is true, false otherwise
+     */
+    inline bool IsSystemResource() const
+    {
+        return isSystem_;
+    }
+
+    /**
+     * Get the overlay flag of HapResource.
+     *
+     * @return true if isOverlay_ is true, false otherwise
+     */
+    inline bool IsOverlayResource() const
+    {
+        return isOverlay_;
     }
 
     /**
@@ -143,15 +173,21 @@ public:
             return isSystemResource_;
         }
 
-        ValueUnderQualifierDir(const std::vector<KeyParam *> &keyParams, IdItem *idItem,
+        /**
+         * The constructor of ValueUnderQualifierDir.
+         *
+         * @param resKey resKey, indicate every limit path item.
+         * @param idItem idItem value, include type and value of id.
+         * @param hapResource hapResource.
+         * @param isOverlay the overlay flag, default value is false.
+         * @param isSystemResource the system flag, default value is false.
+         */
+        ValueUnderQualifierDir(const ResKey *resKey, IdItem *idItem,
             HapResource *hapResource, bool isOverlay = false, bool isSystemResource = false);
 
         ~ValueUnderQualifierDir();
 
     private:
-
-        // using keyParams_ to init resconfig_
-        void InitResConfig();
 
         /*
          * keyParams_, folder_, resConfig_ are 3 different ways to describe Qualifiers Sub-directory
@@ -159,8 +195,8 @@ public:
         std::vector<KeyParam *> keyParams_;
         // the qualifier path name
         std::string folder_;
-        // ResConfig
-        ResConfigImpl *resConfig_;
+        // this resConfig_ point to the ResKey resConfig_ and resConfig_ will be unified free in ResKey destruct.
+        const ResConfigImpl *resConfig_;
 
         // the value
         IdItem *idItem_;
@@ -226,17 +262,18 @@ public:
     }
 
 private:
-    HapResource(const std::string path, time_t lastModTime, const ResConfig *defaultConfig, ResDesc *resDes);
+    HapResource(const std::string path, time_t lastModTime, ResDesc *resDes,
+        bool isSystem = false, bool isOverlay = false);
 
     std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> BuildNameTypeIdMapping() const;
 
     void UpdateOverlayInfo(std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> &nameTypeId);
 
     // must call Init() after constructor
-    bool Init(bool system = false);
+    bool Init();
 
     // step of Init(), called in Init()
-    bool InitIdList(bool system = false);
+    bool InitIdList();
 
     // resources.index file path
     const std::string indexPath_;
@@ -256,8 +293,11 @@ private:
     // name may conflict in same restype !
     std::vector<std::map<std::string, IdValues *> *> idValuesNameMap_;
 
-    // default resconfig
-    const ResConfig *defaultConfig_;
+    // judge the hap resource is system or not.
+    bool isSystem_;
+
+    // judge the hap resource is overlay or not.
+    bool isOverlay_;
 };
 } // namespace Resource
 } // namespace Global

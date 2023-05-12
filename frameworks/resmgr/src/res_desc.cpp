@@ -303,6 +303,11 @@ std::string ResId::ToString() const
 ResKey::~ResKey()
 {
     HILOG_DEBUG("~ResKey()");
+    if (resConfig_ != nullptr) {
+        delete (resConfig_);
+        resConfig_ = nullptr;
+    }
+
     for (size_t i = 0; i < keyParams_.size(); ++i) {
         if (keyParams_[i] != nullptr) {
             delete keyParams_[i];

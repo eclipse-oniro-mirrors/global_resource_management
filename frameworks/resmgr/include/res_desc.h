@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 #include "res_common.h"
+#include "res_config_impl.h"
 
 namespace OHOS {
 namespace Global {
@@ -187,6 +188,9 @@ public:
 
     // the resource ID data
     ResId *resId_;
+
+    // the resConfig of each ResKey and all resConfig_ in ValueUnderQualifierDir will point to this resConfig_
+    ResConfigImpl *resConfig_;
 };
 /**
  * a ResDesc means a index file in hap zip

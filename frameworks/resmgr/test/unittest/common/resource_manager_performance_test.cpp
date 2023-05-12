@@ -164,7 +164,7 @@ int TestLoadFromIndex(const char *filePath)
             HILOG_DEBUG("ParseResHex success:\n%s", resDesc->ToString().c_str());
         }
 
-        HapResource *pResource = new(std::nothrow) HapResource(pstr, 0, nullptr, resDesc);
+        HapResource *pResource = new(std::nothrow) HapResource(pstr, 0, resDesc);
         if (pResource == nullptr) {
             HILOG_ERROR("new HapResource failed when LoadFromIndex");
             delete (resDesc);
