@@ -77,7 +77,7 @@ bool SystemResourceManager::LoadSystemResource(ResourceManagerImpl *impl)
         }
         return impl->AddResource(SYSTEM_RESOURCE_PATH.c_str());
     }
-    
+
     if (Utils::IsFileExist(SYSTEM_RESOURCE_PATH_COMPRESSED)) {
         if (Utils::IsFileExist(SYSTEM_RESOURCE_OVERLAY_PATH_COMPRESSED)) {
             vector<string> overlayPaths;

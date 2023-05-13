@@ -838,6 +838,7 @@ void HapManager::AddSystemResource(const HapManager *systemHapManager)
         HILOG_ERROR("add system resource failed, the added hapManager is not system");
         return;
     }
+    AutoMutex mutex(this->lock_);
     // add system resource to app resource vector
     const std::vector<HapResource *> &systemResources = systemHapManager->hapResources_;
     for (size_t i = 0; i < systemResources.size(); i++) {
