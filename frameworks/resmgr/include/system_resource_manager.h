@@ -25,7 +25,7 @@ public:
     SystemResourceManager();
 
     ~SystemResourceManager();
-    
+
     static ResourceManagerImpl *GetSystemResourceManager();
 
 private:
