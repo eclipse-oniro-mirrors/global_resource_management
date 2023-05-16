@@ -110,6 +110,7 @@ ohos_shared_library("global_resmgr") {
   ]
 
   subsystem_name = "global"
+  innerapi_tags = [ "platformsdk_indirect" ]
   part_name = "resource_management"
 }
 
