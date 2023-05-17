@@ -346,16 +346,16 @@ bool isNapiString(napi_env env, napi_callback_info info)
     return true;
 }
 
-RState GetDensity(napi_env env, napi_value *argv, uint32_t& density)
+RState GetDensity(napi_env env, napi_value value, uint32_t& density)
 {
     napi_valuetype valuetype;
-    napi_typeof(env, argv[ARRAY_SUBCRIPTOR_ONE], &valuetype);
+    napi_typeof(env, value, &valuetype);
     if (valuetype != napi_number) {
         HiLog::Error(LABEL, "Invalid param, not number");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
 
-    if (napi_get_value_uint32(env, argv[ARRAY_SUBCRIPTOR_ONE], &density) != napi_ok) {
+    if (napi_get_value_uint32(env, value, &density) != napi_ok) {
         HiLog::Error(LABEL, "Failed to get density");
         return NOT_FOUND;
     }
@@ -433,7 +433,7 @@ napi_value ResourceManagerAddon::ProcessNameParamV9(napi_env env, napi_callback_
             napi_create_reference(env, argv[i], 1, &asyncContext->callbackRef_);
             break;
         } else if (i == 1 && valueType != napi_valuetype::napi_undefined && valueType != napi_valuetype::napi_null &&
-            GetDensity(env, argv, asyncContext->density_) != SUCCESS) {
+            GetDensity(env, argv[i], asyncContext->density_) != SUCCESS) {
             ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
             return nullptr;
         } else if (i == 2 && valueType == napi_function) { // the third callback param
@@ -467,7 +467,7 @@ napi_value ResourceManagerAddon::ProcessIdParamV9(napi_env env, napi_callback_in
             napi_create_reference(env, argv[i], 1, &asyncContext->callbackRef_);
             break;
         } else if (i == 1 && valueType != napi_valuetype::napi_undefined && valueType != napi_valuetype::napi_null &&
-            GetDensity(env, argv, asyncContext->density_) != SUCCESS) {
+            GetDensity(env, argv[i], asyncContext->density_) != SUCCESS) {
             ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
             return nullptr;
         } else if (i == 2 && valueType == napi_function) { // the third callback param
@@ -508,7 +508,7 @@ napi_value ResourceManagerAddon::ProcessResourceParamV9(napi_env env, napi_callb
             napi_create_reference(env, argv[i], 1, &asyncContext->callbackRef_);
             break;
         } else if (i == 1 && valueType != napi_valuetype::napi_undefined && valueType != napi_valuetype::napi_null &&
-            GetDensity(env, argv, asyncContext->density_) != SUCCESS) {
+            GetDensity(env, argv[i], asyncContext->density_) != SUCCESS) {
             ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
             return nullptr;
         } else if (i == 2 && valueType == napi_function) { // the third callback param
@@ -794,7 +794,7 @@ auto getMediaBase64Func = [](napi_env env, void *data) {
         CreateStringValue(asyncContext);
     } else {
         state = asyncContext->addon_->GetResMgr()->GetMediaBase64DataByName(asyncContext->resName_.c_str(),
-                asyncContext->value_, asyncContext->density_);
+            asyncContext->value_, asyncContext->density_);
         if (state != RState::SUCCESS) {
             asyncContext->SetErrorMsg("Failed to get media data in getMediaBase64Func", false, state);
             return;
@@ -1658,7 +1658,7 @@ napi_value ResourceManagerAddon::GetDrawableDescriptor(napi_env env, napi_callba
     // density optional parameters
     napi_valuetype valuetype = GetType(env, argv[ARRAY_SUBCRIPTOR_ONE]);
     if (valuetype != napi_valuetype::napi_undefined && valuetype != napi_valuetype::napi_null &&
-        GetDensity(env, argv, asyncContext->density_) != SUCCESS) {
+        GetDensity(env, argv[ARRAY_SUBCRIPTOR_ONE], asyncContext->density_) != SUCCESS) {
         ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
@@ -1692,7 +1692,7 @@ napi_value ResourceManagerAddon::GetDrawableDescriptorByName(napi_env env, napi_
     // density optional parameters
     napi_valuetype valuetype = GetType(env, argv[ARRAY_SUBCRIPTOR_ONE]);
     if (valuetype != napi_valuetype::napi_undefined && valuetype != napi_valuetype::napi_null &&
-        GetDensity(env, argv, asyncContext->density_) != SUCCESS) {
+        GetDensity(env, argv[ARRAY_SUBCRIPTOR_ONE], asyncContext->density_) != SUCCESS) {
         ResMgrAsyncContext::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
