@@ -497,6 +497,28 @@ public:
     virtual RState GetStringFormatByName(const char *name, std::string &outValue,
         std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams);
 
+    /**
+     * Get the resource limit keys value which every binary bit corresponds to existing limit key {@link KeyType},
+     *     enum KeyType {
+     *         LANGUAGES       = 0,
+     *         REGION          = 1,
+     *         SCREEN_DENSITY  = 2,
+     *         DIRECTION       = 3,
+     *         DEVICETYPE      = 4,
+     *         SCRIPT          = 5,
+     *         COLORMODE       = 6
+     *         MCC             = 7,
+     *         MNC             = 8,
+     *         // RESERVER 9
+     *         INPUTDEVICE     = 10,
+     *         KEY_TYPE_MAX,
+     *     }
+     *
+     * @return the resource limit keys, like if resource has LANGUAGES/REGION/DEVICETYPE, then the return value to
+     *     binary bits is 0000010011
+     */
+    virtual uint32_t GetResourceLimitKeys();
+
 private:
     RState GetString(const IdItem *idItem, std::string &outValue);
 

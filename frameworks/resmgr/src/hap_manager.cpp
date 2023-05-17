@@ -855,6 +855,17 @@ void HapManager::AddSystemResource(const HapManager *systemHapManager)
         }
     }
 }
+
+uint32_t HapManager::GetResourceLimitKeys()
+{
+    AutoMutex mutex(this->lock_);
+    uint32_t limitKeysValue = 0;
+    for (size_t i = 0; i < hapResources_.size(); i++) {
+        limitKeysValue |= hapResources_[i]->GetResourceLimitKeys();
+    }
+    HILOG_INFO("hap manager limit key is %{public}u", limitKeysValue);
+    return limitKeysValue;
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

@@ -457,6 +457,41 @@ const std::vector<std::string> HapResource::GetQualifiers() const
     }
     return result;
 }
+
+uint32_t HapResource::GetResourceLimitKeys() const
+{
+    uint32_t limitKeyValue = 0;
+    std::vector<bool> keyTypes(KeyType::KEY_TYPE_MAX - 1, false);
+    for (auto iter = idValuesMap_.begin(); iter != idValuesMap_.end(); iter++) {
+        if (iter->second == nullptr) {
+            continue;
+        }
+        const std::vector<ValueUnderQualifierDir *> &limitPaths = iter->second->GetLimitPathsConst();
+        if (limitPaths.size() <= 0) {
+            continue;
+        }
+        limitKeyValue |= GetLimitPathsKeys(limitPaths, keyTypes);
+    }
+    return limitKeyValue;
+}
+
+uint32_t HapResource::GetLimitPathsKeys(const std::vector<ValueUnderQualifierDir *> &limitPaths,
+    std::vector<bool> &keyTypes) const
+{
+    uint32_t limitKeyValue = 0;
+    const uint32_t limitKeysBase = 0x00000001;
+    for_each(limitPaths.begin(), limitPaths.end(), [&](auto &item) {
+        const std::vector<KeyParam *> &keyParams = item->keyParams_;
+        for_each(keyParams.begin(), keyParams.end(), [&](auto &keyParam) {
+            uint32_t typeValue = static_cast<uint32_t>(keyParam->type_);
+            if (keyParam->type_ < KeyType::KEY_TYPE_MAX && !keyTypes[typeValue]) {
+                keyTypes[typeValue] = true;
+                limitKeyValue |= limitKeysBase << typeValue;
+            }
+        });
+    });
+    return limitKeyValue;
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
