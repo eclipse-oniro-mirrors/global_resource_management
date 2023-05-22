@@ -275,6 +275,13 @@ public:
      */
     void AddSystemResource(const HapManager *systemHapManager);
 
+    /**
+     * Get the resource limit keys value which every binary bit corresponds to existing limit key {@link KeyType}
+     *
+     * @return the resource limit keys
+     */
+    uint32_t GetResourceLimitKeys();
+
 private:
     void UpdateResConfigImpl(ResConfigImpl &resConfig);
 

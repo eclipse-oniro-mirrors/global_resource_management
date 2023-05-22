@@ -261,6 +261,13 @@ public:
         return idValuesMap_.size();
     }
 
+    /**
+     * Get the resource limit keys value which every binary bit corresponds to existing limit key {@link KeyType}
+     *
+     * @return the resource limit keys
+     */
+    uint32_t GetResourceLimitKeys() const;
+
 private:
     HapResource(const std::string path, time_t lastModTime, ResDesc *resDes,
         bool isSystem = false, bool isOverlay = false);
@@ -268,6 +275,9 @@ private:
     std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> BuildNameTypeIdMapping() const;
 
     void UpdateOverlayInfo(std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> &nameTypeId);
+
+    uint32_t GetLimitPathsKeys(const std::vector<ValueUnderQualifierDir *> &limitPaths,
+        std::vector<bool> &keyTypes) const;
 
     // must call Init() after constructor
     bool Init();

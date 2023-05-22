@@ -167,6 +167,8 @@ public:
 
     virtual RState GetStringFormatByName(const char *name, std::string &outValue,
         std::vector<std::tuple<NapiValueType, std::string>> &jsParams) = 0;
+
+    virtual uint32_t GetResourceLimitKeys() = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();

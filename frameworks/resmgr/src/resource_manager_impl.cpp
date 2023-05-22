@@ -1155,6 +1155,15 @@ RState ResourceManagerImpl::GetStringFormatByName(const char *name, std::string 
     }
     return SUCCESS;
 }
+
+uint32_t ResourceManagerImpl::GetResourceLimitKeys()
+{
+    if (hapManager_ == nullptr) {
+        HILOG_ERROR("resource manager get limit keys failed, hapManager_ is nullptr");
+        return 0;
+    }
+    return hapManager_->GetResourceLimitKeys();
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

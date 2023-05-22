@@ -43,6 +43,16 @@ static const char *g_systemResFilePath = "system/assets/entry/resources.index";
 
 static const char *g_overlayResFilePath = "overlay/assets/entry/resources.index";
 
+static constexpr uint32_t DATA_ALL_HAP_LIMIT_KEYS = 1495;
+
+static constexpr uint32_t COLOR_MODE_RES_LIMIT_KEYS = 84;
+
+static constexpr uint32_t MCC_MNC_RES_LIMIT_KEYS = 471;
+
+static constexpr uint32_t SYSTEM_RES_LIMIT_KEYS = 75;
+
+static constexpr uint32_t ALL_TEST_RES_LIMIT_KEYS = 1503;
+
 class ResourceManagerTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -123,6 +133,8 @@ public:
     void TestGetMediaWithDensityByName(HapResource *tmp) const;
 
     void TestGetMediaByName(HapResource *tmp) const;
+
+    void TestGetResourceLimitKeys(uint32_t expectedLimitKeys) const;
 };
 
 void ResourceManagerTest::SetUpTestCase(void)
@@ -587,6 +599,12 @@ void ResourceManagerTest::TestGetIntArrayByName(const char* intarray1) const
     EXPECT_EQ(100, outValue[0]);
     EXPECT_EQ(200, outValue[1]);
     EXPECT_EQ(101, outValue[2]);
+}
+
+void ResourceManagerTest::TestGetResourceLimitKeys(uint32_t expectedLimitKeys) const
+{
+    uint32_t limitKeys = rm->GetResourceLimitKeys();
+    EXPECT_EQ(limitKeys, expectedLimitKeys);
 }
 
 /*
@@ -5927,5 +5945,125 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUtilsTest001, TestSize.Level1)
     std::string tail = ".hap";
     bool ret = Utils::endWithTail(path, tail);
     ASSERT_FALSE(ret);
+}
+
+/*
+ * @tc.name: ResourceManagerGetResourceLimitKeysTest001
+ * @tc.desc: Test GetResourceLimitKeys function
+ * @tc.type: FUNC
+ * @tc.require: issueI73ZQ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResourceLimitKeysTest001, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    // all/assets/entry/resources.index contains limit keys for LANGUAGE/REGION/
+    // SCREEN_DENSITY/DEVICETYPE/COLORMODE/MCC/MNC/INPUTDEVICE
+    TestGetResourceLimitKeys(DATA_ALL_HAP_LIMIT_KEYS);
+}
+
+/*
+ * @tc.name: ResourceManagerGetResourceLimitKeysTest002
+ * @tc.desc: Test GetResourceLimitKeys function
+ * @tc.type: FUNC
+ * @tc.require: issueI73ZQ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResourceLimitKeysTest002, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    // all.hap contains limit keys for LANGUAGE/REGION/
+    // SCREEN_DENSITY/DEVICETYPE/COLORMODE/MCC/MNC/INPUTDEVICE
+    TestGetResourceLimitKeys(DATA_ALL_HAP_LIMIT_KEYS);
+}
+
+/*
+ * @tc.name: ResourceManagerGetResourceLimitKeysTest003
+ * @tc.desc: Test GetResourceLimitKeys function
+ * @tc.type: FUNC
+ * @tc.require: issueI73ZQ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResourceLimitKeysTest003, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_colorModeResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    // colormode/assets/entry/resources.index contains limit keys for SCREEN_DENSITY/
+    // DEVICETYPE/COLORMODE
+    TestGetResourceLimitKeys(COLOR_MODE_RES_LIMIT_KEYS);
+}
+
+/*
+ * @tc.name: ResourceManagerGetResourceLimitKeysTest004
+ * @tc.desc: Test GetResourceLimitKeys function
+ * @tc.type: FUNC
+ * @tc.require: issueI73ZQ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResourceLimitKeysTest004, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_mccMncResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    // mccmnc/assets/entry/resources.index contains limit keys for LANGUAGE/REGION/
+    // SCREEN_DENSITY/DEVICETYPE/COLORMODE/MCC/MNC
+    TestGetResourceLimitKeys(MCC_MNC_RES_LIMIT_KEYS);
+}
+
+/*
+ * @tc.name: ResourceManagerGetResourceLimitKeysTest005
+ * @tc.desc: Test GetResourceLimitKeys function
+ * @tc.type: FUNC
+ * @tc.require: issueI73ZQ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResourceLimitKeysTest005, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_systemResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    // system/assets/entry/resources.index contains limit keys for LANGUAGE/REGION/
+    // DIRECTION/COLORMODE
+    TestGetResourceLimitKeys(SYSTEM_RES_LIMIT_KEYS);
+}
+
+/*
+ * @tc.name: ResourceManagerGetResourceLimitKeysTest006
+ * @tc.desc: Test GetResourceLimitKeys function
+ * @tc.type: FUNC
+ * @tc.require: issueI73ZQ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResourceLimitKeysTest006, TestSize.Level1)
+{
+    std::vector<std::string> overlayPaths;
+    overlayPaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
+    bool ret = ((ResourceManagerImpl *)rm)->AddResource(FormatFullPath(g_systemResFilePath).c_str(), overlayPaths);
+    ASSERT_TRUE(ret);
+    // system/assets/entry/resources.index and overlay/assets/entry/resources.index contains
+    // LANGUAGE/REGION/DIRECTION/COLORMODE
+    TestGetResourceLimitKeys(SYSTEM_RES_LIMIT_KEYS);
+}
+
+/*
+ * @tc.name: ResourceManagerGetResourceLimitKeysTest007
+ * @tc.desc: Test GetResourceLimitKeys function
+ * @tc.type: FUNC
+ * @tc.require: issueI73ZQ8
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResourceLimitKeysTest007, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+
+    ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+
+    ret = rm->AddResource(FormatFullPath(g_colorModeResFilePath).c_str());
+    ASSERT_TRUE(ret);
+
+    ret = rm->AddResource(FormatFullPath(g_mccMncResFilePath).c_str());
+    ASSERT_TRUE(ret);
+
+    std::vector<std::string> overlayPaths;
+    overlayPaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
+    ret = ((ResourceManagerImpl *)rm)->AddResource(FormatFullPath(g_systemResFilePath).c_str(), overlayPaths);
+    ASSERT_TRUE(ret);
+    // all test resource limit keys
+    TestGetResourceLimitKeys(ALL_TEST_RES_LIMIT_KEYS);
 }
 }
