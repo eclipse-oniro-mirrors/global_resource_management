@@ -25,6 +25,10 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
+enum FunctionType {
+    SYNC = 0,
+    ASYNC = 1
+};
 class ResourceManager {
 public:
 

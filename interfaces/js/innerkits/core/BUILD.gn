@@ -26,6 +26,10 @@ ohos_shared_library("resmgr_napi_core") {
   sources = [
     "../../../../dfx/hisysevent_adapter/hisysevent_adapter.cpp",
     "src/resource_manager_addon.cpp",
+    "src/resource_manager_napi_async_impl.cpp",
+    "src/resource_manager_napi_context.cpp",
+    "src/resource_manager_napi_sync_impl.cpp",
+    "src/resource_manager_napi_utils.cpp",
   ]
 
   version_script = "libresmgr_napi_core.versionscript"
