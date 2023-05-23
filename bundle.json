@@ -51,9 +51,21 @@
         "deps": {
             "components": [
               "ability_base",
-              "ability_runtime"
+              "ability_runtime",
+              "hisysevent_native",
+              "hitrace_native",
+              "hiviewdfx_hilog_native",
+              "napi",
+              "ace_engine",
+              "bundle_framework",
+              "c_utils",
+              "ace_engine"
             ],
-            "third_party": []
+            "third_party": [
+              "zlib",
+              "bounds_checking_function",
+              "icu"
+            ]
         },
         "build": {
             "sub_component": [
