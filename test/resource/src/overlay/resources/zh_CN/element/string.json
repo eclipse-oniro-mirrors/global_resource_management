@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "ohos_desc_camera",
+      "value": "overlay camera"
+    },
+    {
+      "name": "ohos_lab_answer_call",
+      "value": "overlay接听电话"
+    },
+    {
+      "name": "ohos_lab_internet_notexist",
+      "value": "overlay访问网络"
+    }
+  ]
+}

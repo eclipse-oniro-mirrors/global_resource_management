@@ -25,12 +25,24 @@
       "value": "技术支持: XXXXXXX"
     },
     {
-      "name":"app_sys_ref",
-      "value":"$ohos:string:request_location_reminder_title"
-    },
-    {
       "name": "string_ref",
       "value": "$aaaaa"
+    },
+    {
+      "name": "ohos_app_name",
+      "value": "系统"
+    },
+    {
+      "name": "ohos_lab_answer_call",
+      "value": "接听电话"
+    },
+    {
+      "name": "ohos_desc_camera",
+      "value": "允许应用拍摄照片和视频。"
+    },
+    {
+      "name": "mccmnc_str",
+      "value": "str_zh_cn"
     }
   ]
 }

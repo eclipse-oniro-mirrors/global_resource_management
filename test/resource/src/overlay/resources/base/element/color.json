@@ -1,0 +1,28 @@
+{
+  "color": [
+    {
+      "name": "ohos_id_color_background",
+      "value": "#f5dc6200"
+    },
+    {
+      "name": "ohos_id_color_emphasize",
+      "value": "#f5dc6200"
+    },
+    {
+      "name": "ohos_id_color_foreground_dark",
+      "value": "#f5dc6200"
+    },
+    {
+      "name": "ohos_id_color_foreground_transparent",
+      "value": "#f5dc6200"
+    },
+    {
+      "name": "ohos_id_color_progress",
+      "value": "#f5dc6200"
+    },
+    {
+      "name": "white",
+      "value": "#FFFFFF"
+    }
+  ]
+}

@@ -1,0 +1,475 @@
+{
+    "record" : 
+    [
+        {
+            "id" : "0x01000000",
+            "name" : "integer_1",
+            "type" : "integer"
+        },
+        {
+            "id" : "0x01000001",
+            "name" : "integer_input_device",
+            "type" : "integer"
+        },
+        {
+            "id" : "0x01000002",
+            "name" : "integer_ref",
+            "type" : "integer"
+        },
+        {
+            "id" : "0x01000005",
+            "name" : "same_name",
+            "type" : "integer"
+        },
+        {
+            "id" : "0x01000004",
+            "name" : "MainAbility_desc",
+            "type" : "string"
+        },
+        {
+            "id" : "0x01000003",
+            "name" : "aboutPage_title_primary",
+            "type" : "string"
+        },
+        {
+            "id" : "0x01000006",
+            "name" : "aboutPage_title_secondary",
+            "type" : "string"
+        },
+        {
+            "id" : "0x01000007",
+            "name" : "app_name",
+            "type" : "string"
+        },
+        {
+            "id" : "0x01000008",
+            "name" : "copyright_text",
+            "type" : "string"
+        },
+        {
+            "id" : "0x01000009",
+            "name" : "entry_MainAbility",
+            "type" : "string"
+        },
+        {
+            "id" : "0x0100000A",
+            "name" : "hello",
+            "type" : "string"
+        },
+        {
+            "id" : "0x0100000B",
+            "name" : "mainability_description",
+            "type" : "string"
+        },
+        {
+            "id" : "0x0100000C",
+            "name" : "mccmnc_str",
+            "type" : "string"
+        },
+        {
+            "id" : "0x0100000D",
+            "name" : "ohos_app_name",
+            "type" : "string"
+        },
+        {
+            "id" : "0x0100000E",
+            "name" : "ohos_desc_camera",
+            "type" : "string"
+        },
+        {
+            "id" : "0x0100000F",
+            "name" : "ohos_lab_answer_call",
+            "type" : "string"
+        },
+        {
+            "id" : "0x01000010",
+            "name" : "point_test",
+            "type" : "string"
+        },
+        {
+            "id" : "0x01000011",
+            "name" : "res_one",
+            "type" : "string"
+        },
+        {
+            "id" : "0x01000015",
+            "name" : "res_two",
+            "type" : "string"
+        },
+        {
+            "id" : "0x01000013",
+            "name" : "same_name",
+            "type" : "string"
+        },
+        {
+            "id" : "0x01000014",
+            "name" : "str_enus",
+            "type" : "string"
+        },
+        {
+            "id" : "0x01000012",
+            "name" : "string_ref",
+            "type" : "string"
+        },
+        {
+            "id" : "0x01000016",
+            "name" : "string_ref2",
+            "type" : "string"
+        },
+        {
+            "id" : "0x01000017",
+            "name" : "technicalSupport_text",
+            "type" : "string"
+        },
+        {
+            "id" : "0x01000018",
+            "name" : "test_string0",
+            "type" : "string"
+        },
+        {
+            "id" : "0x01000019",
+            "name" : "test_string1",
+            "type" : "string"
+        },
+        {
+            "id" : "0x0100001A",
+            "name" : "test_string2",
+            "type" : "string"
+        },
+        {
+            "id" : "0x0100001B",
+            "name" : "test_string3",
+            "type" : "string"
+        },
+        {
+            "id" : "0x0100001C",
+            "name" : "test_string4",
+            "type" : "string"
+        },
+        {
+            "id" : "0x0100001D",
+            "name" : "title",
+            "type" : "string"
+        },
+        {
+            "id" : "0x0100001E",
+            "name" : "size",
+            "type" : "strarray"
+        },
+        {
+            "id" : "0x0100001F",
+            "name" : "intarray_1",
+            "type" : "intarray"
+        },
+        {
+            "id" : "0x01000020",
+            "name" : "boolean_1",
+            "type" : "boolean"
+        },
+        {
+            "id" : "0x01000021",
+            "name" : "boolean_input_device",
+            "type" : "boolean"
+        },
+        {
+            "id" : "0x01000022",
+            "name" : "boolean_ref",
+            "type" : "boolean"
+        },
+        {
+            "id" : "0x01000023",
+            "name" : "same_name",
+            "type" : "boolean"
+        },
+        {
+            "id" : "0x01000024",
+            "name" : "base_dark",
+            "type" : "color"
+        },
+        {
+            "id" : "0x01000025",
+            "name" : "base_light",
+            "type" : "color"
+        },
+        {
+            "id" : "0x01000026",
+            "name" : "base_light_dark",
+            "type" : "color"
+        },
+        {
+            "id" : "0x01000027",
+            "name" : "base_light_ldpi",
+            "type" : "color"
+        },
+        {
+            "id" : "0x01000028",
+            "name" : "base_light_phone",
+            "type" : "color"
+        },
+        {
+            "id" : "0x01000029",
+            "name" : "base_only",
+            "type" : "color"
+        },
+        {
+            "id" : "0x0100002A",
+            "name" : "color_aboutPage_title_primary",
+            "type" : "color"
+        },
+        {
+            "id" : "0x0100002B",
+            "name" : "color_aboutPage_title_secondary",
+            "type" : "color"
+        },
+        {
+            "id" : "0x0100002C",
+            "name" : "color_ref",
+            "type" : "color"
+        },
+        {
+            "id" : "0x0100002D",
+            "name" : "divider_color",
+            "type" : "color"
+        },
+        {
+            "id" : "0x0100002E",
+            "name" : "grey_background",
+            "type" : "color"
+        },
+        {
+            "id" : "0x0100002F",
+            "name" : "normal_background_color",
+            "type" : "color"
+        },
+        {
+            "id" : "0x01000030",
+            "name" : "textColor_primary",
+            "type" : "color"
+        },
+        {
+            "id" : "0x01000031",
+            "name" : "textColor_secondary",
+            "type" : "color"
+        },
+        {
+            "id" : "0x01000032",
+            "name" : "touched_background_color",
+            "type" : "color"
+        },
+        {
+            "id" : "0x01000033",
+            "name" : "app_theme",
+            "type" : "theme"
+        },
+        {
+            "id" : "0x01000034",
+            "name" : "test_theme",
+            "type" : "theme"
+        },
+        {
+            "id" : "0x01000035",
+            "name" : "eat_apple",
+            "type" : "plural"
+        },
+        {
+            "id" : "0x01000036",
+            "name" : "eat_apple1",
+            "type" : "plural"
+        },
+        {
+            "id" : "0x01000037",
+            "name" : "aboutPage_minHeight",
+            "type" : "float"
+        },
+        {
+            "id" : "0x01000038",
+            "name" : "bottomMargin_doubleLineList",
+            "type" : "float"
+        },
+        {
+            "id" : "0x01000039",
+            "name" : "bottomMargin_primaryText",
+            "type" : "float"
+        },
+        {
+            "id" : "0x0100003A",
+            "name" : "card_margin_end",
+            "type" : "float"
+        },
+        {
+            "id" : "0x0100003B",
+            "name" : "card_margin_start",
+            "type" : "float"
+        },
+        {
+            "id" : "0x0100003C",
+            "name" : "default_padding_bottom_fixed",
+            "type" : "float"
+        },
+        {
+            "id" : "0x0100003D",
+            "name" : "default_padding_top_fixed",
+            "type" : "float"
+        },
+        {
+            "id" : "0x0100003E",
+            "name" : "float_ref",
+            "type" : "float"
+        },
+        {
+            "id" : "0x0100003F",
+            "name" : "height_aboutPage_upperPart",
+            "type" : "float"
+        },
+        {
+            "id" : "0x01000040",
+            "name" : "height_appBar",
+            "type" : "float"
+        },
+        {
+            "id" : "0x01000041",
+            "name" : "height_appBar_backButton_touchTarget",
+            "type" : "float"
+        },
+        {
+            "id" : "0x01000042",
+            "name" : "height_divider",
+            "type" : "float"
+        },
+        {
+            "id" : "0x01000043",
+            "name" : "height_doubleLineList",
+            "type" : "float"
+        },
+        {
+            "id" : "0x01000044",
+            "name" : "height_doubleLineList_icon",
+            "type" : "float"
+        },
+        {
+            "id" : "0x01000045",
+            "name" : "icon_radius",
+            "type" : "float"
+        },
+        {
+            "id" : "0x01000046",
+            "name" : "leftMargin_appBar_backButton_touchTarget",
+            "type" : "float"
+        },
+        {
+            "id" : "0x01000047",
+            "name" : "leftMargin_appBar_title",
+            "type" : "float"
+        },
+        {
+            "id" : "0x01000048",
+            "name" : "maxPadding_end",
+            "type" : "float"
+        },
+        {
+            "id" : "0x01000049",
+            "name" : "maxPadding_start",
+            "type" : "float"
+        },
+        {
+            "id" : "0x0100004A",
+            "name" : "size_aboutPage_iconBackground",
+            "type" : "float"
+        },
+        {
+            "id" : "0x0100004B",
+            "name" : "size_aboutPage_title_primary",
+            "type" : "float"
+        },
+        {
+            "id" : "0x0100004C",
+            "name" : "size_aboutPage_title_secondary",
+            "type" : "float"
+        },
+        {
+            "id" : "0x0100004D",
+            "name" : "size_appBar_backButton",
+            "type" : "float"
+        },
+        {
+            "id" : "0x0100004E",
+            "name" : "textSize_body1",
+            "type" : "float"
+        },
+        {
+            "id" : "0x0100004F",
+            "name" : "textSize_body2",
+            "type" : "float"
+        },
+        {
+            "id" : "0x01000050",
+            "name" : "textSize_body3",
+            "type" : "float"
+        },
+        {
+            "id" : "0x01000051",
+            "name" : "textSize_title",
+            "type" : "float"
+        },
+        {
+            "id" : "0x01000052",
+            "name" : "topMargin_aboutPage_iconBackground",
+            "type" : "float"
+        },
+        {
+            "id" : "0x01000053",
+            "name" : "topMargin_aboutPage_title_primary",
+            "type" : "float"
+        },
+        {
+            "id" : "0x01000054",
+            "name" : "topMargin_doubleLineList",
+            "type" : "float"
+        },
+        {
+            "id" : "0x01000055",
+            "name" : "width_appBar_backButton_touchTarget",
+            "type" : "float"
+        },
+        {
+            "id" : "0x01000056",
+            "name" : "width_doubleLineList_icon",
+            "type" : "float"
+        },
+        {
+            "id" : "0x01000057",
+            "name" : "base",
+            "type" : "pattern"
+        },
+        {
+            "id" : "0x01000058",
+            "name" : "ccchild",
+            "type" : "pattern"
+        },
+        {
+            "id" : "0x01000059",
+            "name" : "child",
+            "type" : "pattern"
+        },
+        {
+            "id" : "0x0100005A",
+            "name" : "icon",
+            "type" : "media"
+        },
+        {
+            "id" : "0x0100005B",
+            "name" : "icon1",
+            "type" : "media"
+        },
+        {
+            "id" : "0x0100005C",
+            "name" : "input_device",
+            "type" : "media"
+        },
+        {
+            "id" : "0x0100005D",
+            "name" : "test_profile",
+            "type" : "profile"
+        }
+    ]
+}

@@ -1,7 +1,7 @@
 {
   "app": {
     "bundleName": "ohos.global.test.all",
-    "vendor": "global",
+    "vendor": "example",
     "version": {
       "code": 1000000,
       "name": "1.0.0"
@@ -10,13 +10,10 @@
   "deviceConfig": {},
   "module": {
     "package": "ohos.global.test.all",
-    "name": ".MyApplication",
-    "mainAbility": "ohos.global.test.all.MainAbility",
+    "name": ".entry",
+    "mainAbility": ".MainAbility",
     "deviceType": [
-      "phone",
-      "tablet",
-      "tv",
-      "wearable"
+      "default"
     ],
     "distro": {
       "deliveryWithInstall": true,
@@ -36,12 +33,16 @@
             ]
           }
         ],
-        "visible": true,
-        "name": "ohos.global.test.all.MainAbility",
+        "orientation": "unspecified",
+        "formsEnabled": false,
+        "name": ".MainAbility",
+        "srcLanguage": "js",
+        "srcPath": "MainAbility",
         "icon": "$media:icon",
-        "description": "$string:mainability_description",
+        "description": "$string:MainAbility_desc",
         "label": "$string:entry_MainAbility",
         "type": "page",
+        "visible": true,
         "launchType": "standard"
       }
     ],
@@ -50,10 +51,10 @@
         "pages": [
           "pages/index/index"
         ],
-        "name": "default",
+        "name": ".MainAbility",
         "window": {
           "designWidth": 720,
-          "autoDesignWidth": true
+          "autoDesignWidth": false
         }
       }
     ]

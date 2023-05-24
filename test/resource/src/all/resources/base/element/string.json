@@ -5,6 +5,10 @@
       "value": "entry_MainAbility"
     },
     {
+      "name": "MainAbility_desc",
+      "value": "UT TEST"
+    },
+    {
       "name": "app_name",
       "value": "About"
     },
@@ -47,6 +51,50 @@
     {
       "name":"same_name",
       "value":"StringSameName"
+    },
+    {
+      "name": "ohos_app_name",
+      "value": "System"
+    },
+    {
+      "name": "ohos_lab_answer_call",
+      "value": "Answer phone calls"
+    },
+    {
+      "name": "ohos_desc_camera",
+      "value": "Allows an application to take photos and shoot videos."
+    },
+    {
+      "name": "test_string0",
+      "value": "向前兼容"
+    },
+    {
+      "name": "test_string1",
+      "value": "%%%d%%d%%%%d%%%%"
+    },
+    {
+      "name": "test_string2",
+      "value": "%f%s"
+    },
+    {
+      "name": "test_string3",
+      "value": "abc%fabc%%%%%sabc"
+    },
+    {
+      "name": "test_string4",
+      "value": "%a%da%%%"
+    },
+    {
+      "name": "mccmnc_str",
+      "value": "str_base"
+    },
+    {
+      "name": "res_one",
+      "value": "$string:res_two"
+    },
+    {
+      "name": "res_two",
+      "value": "$string:res_one"
     }
   ]
 }
