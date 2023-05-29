@@ -640,6 +640,9 @@ RState HapManager::FindRawFileFromHap(const std::string rawFileName, size_t &len
     std::unique_ptr<uint8_t[]> &outValue)
 {
     for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
+        if ((*iter)->IsSystemResource() || (*iter)->IsOverlayResource()) {
+            continue;
+        }
         const std::string tempPath = (*iter)->GetIndexPath();
         if (Utils::ContainsTail(tempPath, Utils::tailSet)) { // if file path is compressed
             RState state = HapParser::ReadRawFileFromHap(tempPath, rawFileName, len, outValue);
