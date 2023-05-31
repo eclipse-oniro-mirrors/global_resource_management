@@ -636,13 +636,29 @@ RState ResourceManagerImpl::GetInteger(const IdItem *idItem, int &outValue)
 RState ResourceManagerImpl::GetColorById(uint32_t id, uint32_t &outValue)
 {
     const IdItem *idItem = hapManager_->FindResourceById(id);
-    return GetColor(idItem, outValue);
+    if (idItem == nullptr) {
+        HILOG_ERROR("find resource by string id error");
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
+    RState state = GetColor(idItem, outValue);
+    if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+    return state;
 }
 
 RState ResourceManagerImpl::GetColorByName(const char *name, uint32_t &outValue)
 {
     const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::COLOR);
-    return GetColor(idItem, outValue);
+    if (idItem == nullptr) {
+        HILOG_ERROR("find resource by string id error");
+        return ERROR_CODE_RES_NAME_NOT_FOUND;
+    }
+    RState state = GetColor(idItem, outValue);
+    if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
+        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
+    }
+    return state;
 }
 
 RState ResourceManagerImpl::GetColor(const IdItem *idItem, uint32_t &outValue)

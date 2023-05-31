@@ -15,21 +15,17 @@
 
 #include "resource_manager_addon.h"
 
-#include <fstream>
-#include <memory>
-#include <vector>
-
 #include "ability.h"
 #include "foundation/ability/ability_runtime/interfaces/kits/native/appkit/ability_runtime/context/context.h"
 #include "hilog/log.h"
-#include "js_runtime_utils.h"
-#include "node_api.h"
 #include "hisysevent_adapter.h"
 #include "hitrace_meter.h"
+#include "js_runtime_utils.h"
 
 #include "napi/native_api.h"
 #include "napi/native_common.h"
 #include "res_common.h"
+#include "resource_manager_napi_async_impl.h"
 
 namespace OHOS {
 namespace Global {
@@ -41,8 +37,6 @@ namespace Resource {
     void *data = nullptr;             \
     napi_get_cb_info(env, info, &argc, argv, &thisVar, &data)
 
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "ResourceManagerJs" };
-using namespace OHOS::HiviewDFX;
 using namespace OHOS::AppExecFwk;
 
 static void ExecuteGetResMgr(napi_env env, void* data)
@@ -50,9 +44,9 @@ static void ExecuteGetResMgr(napi_env env, void* data)
     if (data == nullptr) {
         return;
     }
-    ResMgrAsyncContext *asyncContext = static_cast<ResMgrAsyncContext*>(data);
+    ResMgrDataContext *asyncContext = static_cast<ResMgrDataContext*>(data);
 
-    asyncContext->createValueFunc_ = [](napi_env env, ResMgrAsyncContext &context) -> napi_value {
+    asyncContext->createValueFunc_ = [](napi_env env, ResMgrDataContext &context) -> napi_value {
         std::string traceVal = "Create ResourceManager";
         StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
         napi_value result = ResourceManagerAddon::Create(env, context.bundleName_, context.resMgr_, nullptr);
@@ -92,7 +86,7 @@ Ability* GetGlobalAbility(napi_env env)
 }
 
 static bool InitAsyncContext(napi_env env, const std::string &bundleName, Ability* ability,
-    const std::shared_ptr<AbilityRuntime::Context>& context, ResMgrAsyncContext &asyncContext)
+    const std::shared_ptr<AbilityRuntime::Context>& context, ResMgrDataContext &asyncContext)
 {
     std::shared_ptr<ResourceManager> resMgr;
     if (ability != nullptr) {
@@ -119,7 +113,7 @@ static bool InitAsyncContext(napi_env env, const std::string &bundleName, Abilit
     return resMgr != nullptr;
 }
 
-static napi_value getResult(napi_env env, std::unique_ptr<ResMgrAsyncContext> &asyncContext,
+static napi_value getResult(napi_env env, std::unique_ptr<ResMgrDataContext> &asyncContext,
     std::string &bundleName, const std::shared_ptr<AbilityRuntime::Context> &abilityRuntimeContext)
 {
     napi_value result = nullptr;
@@ -138,7 +132,7 @@ static napi_value getResult(napi_env env, std::unique_ptr<ResMgrAsyncContext> &a
     napi_value resource = nullptr;
     napi_create_string_utf8(env, "getResourceManager", NAPI_AUTO_LENGTH, &resource);
     napi_status status = napi_create_async_work(env, nullptr, resource, ExecuteGetResMgr,
-        ResMgrAsyncContext::Complete, static_cast<void*>(asyncContext.get()), &asyncContext->work_);
+        ResourceManagerNapiAsyncImpl::Complete, static_cast<void*>(asyncContext.get()), &asyncContext->work_);
     if (status != napi_ok) {
         HiLog::Error(LABEL, "Failed to create async work for getResourceManager %{public}d", status);
         return result;
@@ -156,7 +150,7 @@ static napi_value GetResourceManager(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, 3);
 
-    std::unique_ptr<ResMgrAsyncContext> asyncContext = std::make_unique<ResMgrAsyncContext>();
+    std::unique_ptr<ResMgrDataContext> asyncContext = std::make_unique<ResMgrDataContext>();
     std::shared_ptr<AbilityRuntime::Context> abilityRuntimeContext;
     std::string bundleName;
     for (size_t i = 0; i < argc; i++) {
