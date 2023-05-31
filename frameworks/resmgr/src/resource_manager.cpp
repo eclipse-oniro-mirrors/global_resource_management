@@ -22,6 +22,9 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
+static std::map<std::string, std::shared_ptr<ResourceManager>> resMgrMap;
+static std::mutex resMgrLock;
+
 ResourceManager *CreateResourceManager()
 {
     ResourceManagerImpl *impl = new (std::nothrow) ResourceManagerImpl;
@@ -40,9 +43,50 @@ ResourceManager *CreateResourceManager()
     return impl;
 }
 
+std::shared_ptr<ResourceManager> CreateResourceManager(std::string &bundleName, std::string &moduleName,
+    std::string &hapPath, std::vector<std::string> overlayPath, ResConfig &resConfig)
+{
+    if (bundleName.size() == 0 || hapPath.size() == 0) {
+        HILOG_ERROR("bundleName or hapPath is empty when CreateResourceManager");
+        return nullptr;
+    }
+    std::string resMgrKey(bundleName);
+    if (moduleName.size() != 0) {
+        resMgrKey.append("/").append(moduleName);
+    }
+    std::lock_guard<std::mutex> lock(resMgrLock);
+    auto iter = resMgrMap.find(resMgrKey);
+    if (iter != resMgrMap.end()) {
+        return resMgrMap[resMgrKey];
+    }
+    std::shared_ptr<ResourceManager> resourceManagerImpl(CreateResourceManager());
+    if (resourceManagerImpl == nullptr) {
+        HILOG_ERROR("CreateResourceManager failed");
+        return nullptr;
+    }
+    bool result = false;
+    if (overlayPath.size() != 0) {
+        result = resourceManagerImpl->AddResource(hapPath, overlayPath);
+    } else {
+        result = resourceManagerImpl->AddResource(hapPath.c_str());
+    }
+    if (!result) {
+        HILOG_ERROR("AddResource failed when CreateResourceManager");
+        return nullptr;
+    }
+    resourceManagerImpl->UpdateResConfig(resConfig);
+    resMgrMap[resMgrKey] = resourceManagerImpl;
+    return resourceManagerImpl;
+}
+
 ResourceManager *GetSystemResourceManager()
 {
     return SystemResourceManager::GetSystemResourceManager();
+}
+
+ResourceManager *GetSystemResourceManagerNoSandBox()
+{
+    return SystemResourceManager::GetSystemResourceManagerNoSandBox();
 }
 
 ResourceManager::~ResourceManager()

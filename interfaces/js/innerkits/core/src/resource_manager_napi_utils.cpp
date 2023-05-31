@@ -392,9 +392,17 @@ bool ResourceManagerNapiUtils::GetHapResourceManager(const ResMgrDataContext* da
     std::shared_ptr<ResourceManager> &resMgr, int32_t &resId)
 {
     std::shared_ptr<ResourceManager::Resource> resource = dataContext->resource_;
+    // In fa module, resource is null.
     if (resource == nullptr) {
         resMgr = dataContext->addon_->GetResMgr();
         resId = dataContext->resId_;
+        return true;
+    }
+
+    // In stage module and isSystem is true, resId is the resource object id.
+    if (dataContext->addon_->IsSystem()) {
+        resMgr = dataContext->addon_->GetResMgr();
+        resId = resource->id;
         return true;
     }
 

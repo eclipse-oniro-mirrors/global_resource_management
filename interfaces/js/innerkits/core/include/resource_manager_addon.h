@@ -41,7 +41,11 @@ public:
     static void Destructor(napi_env env, void *nativeObject, void *finalize_hint);
 
     ResourceManagerAddon(const std::string& bundleName, const std::shared_ptr<ResourceManager>& resMgr,
-        const std::shared_ptr<AbilityRuntime::Context>& context);
+        const std::shared_ptr<AbilityRuntime::Context>& context, bool isSystem = false);
+
+    ResourceManagerAddon(const std::shared_ptr<ResourceManager>& resMgr, bool isSystem = false);
+
+    static napi_value GetSystemResMgr(napi_env env);
 
     ~ResourceManagerAddon();
 
@@ -55,6 +59,10 @@ public:
         return context_;
     }
 
+    inline bool IsSystem()
+    {
+        return isSystem_;
+    }
 private:
 
     static napi_value GetString(napi_env env, napi_callback_info info);
@@ -139,9 +147,13 @@ private:
     static napi_value GetColor(napi_env env, napi_callback_info info);
 
     static napi_value GetColorByName(napi_env env, napi_callback_info info);
+
+    static napi_value WrapResourceManager(napi_env env, std::shared_ptr<ResourceManagerAddon> &addon);
+
     std::string bundleName_;
     std::shared_ptr<ResourceManager> resMgr_;
     std::shared_ptr<AbilityRuntime::Context> context_;
+    bool isSystem_;
     std::shared_ptr<ResourceManagerNapiContext> napiContext_;
 };
 } // namespace Resource

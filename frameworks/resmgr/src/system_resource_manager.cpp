@@ -30,6 +30,12 @@ const std::string SystemResourceManager::SYSTEM_RESOURCE_PATH_COMPRESSED = "/dat
 const std::string SystemResourceManager::SYSTEM_RESOURCE_OVERLAY_PATH_COMPRESSED = "/sys_prod/app/" \
     "SystemResourcesOverlay/SystemResourcesOverlay.hap";
 
+const std::string SystemResourceManager::SYSTEM_RESOURCE_NO_SAND_BOX_PKG_PATH = "/system/app/ohos.global.systemres" \
+    "/SystemResources.hap";
+
+const std::string SystemResourceManager::SYSTEM_RESOURCE_NO_SAND_BOX_HAP_PATH = "/system/app/SystemResources" \
+    "/SystemResources.hap";
+
 ResourceManagerImpl *SystemResourceManager::resourceManager_ = nullptr;
 
 std::mutex SystemResourceManager::mutex_;
@@ -42,49 +48,81 @@ SystemResourceManager::~SystemResourceManager()
 
 ResourceManagerImpl *SystemResourceManager::GetSystemResourceManager()
 {
-    if (resourceManager_ == nullptr) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        if (resourceManager_ == nullptr) {
-            HILOG_INFO("create system resource manager when GetSystemResourceManager");
-            ResourceManagerImpl *impl = new (std::nothrow) ResourceManagerImpl;
-            if (impl == nullptr) {
-                HILOG_ERROR("new ResourceManagerImpl failed when GetSystemResourceManager");
-                return nullptr;
-            }
-            if (!impl->Init(true)) {
-                delete impl;
-                return nullptr;
-            }
-            if (!LoadSystemResource(impl)) {
-                HILOG_WARN("load system resource failed when GetSystemResourceManager");
-                delete impl;
-                return nullptr;
-            }
-            resourceManager_ = impl;
-        }
+    HILOG_INFO("GetSystemResourceManager");
+    // SystemAbility is not forked from appspawn, so SystemAbility should load sandbox system resource.
+    bool isCreated = CreateSystemResourceManager(true);
+    if (!isCreated) {
+        HILOG_WARN("CreateSystemResourceManager failed when GetSystemResourceManager");
+        return nullptr;
     }
     return resourceManager_;
 }
 
-bool SystemResourceManager::LoadSystemResource(ResourceManagerImpl *impl)
+ResourceManagerImpl *SystemResourceManager::GetSystemResourceManagerNoSandBox()
+{
+    HILOG_INFO("GetSystemResourceManagerNoSandBox");
+    // appspawn can only add no sandbox system resource path, so all app that forked from appspawn have
+    // one global resourceManager.
+    bool isCreated = CreateSystemResourceManager(false);
+    if (!isCreated) {
+        HILOG_WARN("CreateSystemResourceManager failed when GetSystemResourceManagerNoSandBox");
+        return nullptr;
+    }
+    return resourceManager_;
+}
+
+bool SystemResourceManager::CreateSystemResourceManager(bool isSandbox)
+{
+    if (resourceManager_ != nullptr) {
+        return true;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (resourceManager_ == nullptr) {
+        HILOG_INFO("create system resource manager when CreateSystemResourceManager");
+        ResourceManagerImpl *impl = new (std::nothrow) ResourceManagerImpl;
+        if (impl == nullptr) {
+            HILOG_ERROR("new ResourceManagerImpl failed when CreateSystemResourceManager");
+            return false;
+        }
+        if (!impl->Init(true)) {
+            delete impl;
+            return false;
+        }
+        if (!LoadSystemResource(impl, isSandbox)) {
+            HILOG_WARN("load system resource failed when CreateSystemResourceManager");
+            delete impl;
+            return false;
+        }
+        resourceManager_ = impl;
+    }
+    return true;
+}
+
+bool SystemResourceManager::LoadSystemResource(ResourceManagerImpl *impl, bool isSandbox)
 {
     HILOG_INFO("load system resource when GetSystemResourceManager");
-    if (Utils::IsFileExist(SYSTEM_RESOURCE_PATH)) {
+    std::string sysPkgNamePath = SystemResourceManager::SYSTEM_RESOURCE_PATH;
+    std::string sysHapNamePath = SystemResourceManager::SYSTEM_RESOURCE_PATH_COMPRESSED;
+    if (!isSandbox) {
+        sysPkgNamePath = SystemResourceManager::SYSTEM_RESOURCE_NO_SAND_BOX_PKG_PATH;
+        sysHapNamePath = SystemResourceManager::SYSTEM_RESOURCE_NO_SAND_BOX_HAP_PATH;
+    }
+    if (Utils::IsFileExist(sysPkgNamePath)) {
         if (Utils::IsFileExist(SYSTEM_RESOURCE_OVERLAY_PATH_COMPRESSED)) {
             vector<string> overlayPaths;
             overlayPaths.push_back(SYSTEM_RESOURCE_OVERLAY_PATH_COMPRESSED);
-            return impl->AddResource(SYSTEM_RESOURCE_PATH.c_str(), overlayPaths);
+            return impl->AddResource(sysPkgNamePath.c_str(), overlayPaths);
         }
-        return impl->AddResource(SYSTEM_RESOURCE_PATH.c_str());
+        return impl->AddResource(sysPkgNamePath.c_str());
     }
 
-    if (Utils::IsFileExist(SYSTEM_RESOURCE_PATH_COMPRESSED)) {
+    if (Utils::IsFileExist(sysHapNamePath)) {
         if (Utils::IsFileExist(SYSTEM_RESOURCE_OVERLAY_PATH_COMPRESSED)) {
             vector<string> overlayPaths;
             overlayPaths.push_back(SYSTEM_RESOURCE_OVERLAY_PATH_COMPRESSED);
-            return impl->AddResource(SYSTEM_RESOURCE_PATH_COMPRESSED.c_str(), overlayPaths);
+            return impl->AddResource(sysHapNamePath.c_str(), overlayPaths);
         }
-        return impl->AddResource(SYSTEM_RESOURCE_PATH_COMPRESSED.c_str());
+        return impl->AddResource(sysHapNamePath.c_str());
     }
     return false;
 }
