@@ -1844,7 +1844,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByIdTest002, TestSize.Level
     uint32_t outValue;
     RState state;
     state = rm->GetColorById(NON_EXIST_ID, outValue);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_ID_NOT_FOUND, state);
 }
 
 /*
@@ -1879,7 +1879,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByNameTest002, TestSize.Lev
     uint32_t outValue;
     RState state;
     state = rm->GetColorByName(g_nonExistName, outValue);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_NOT_FOUND, state);
 }
 
 /*
