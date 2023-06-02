@@ -12,6 +12,19 @@
           "value":"%d apples"
         }
       ]
+    },
+    {
+      "name":"eat_apple1",
+      "value":[
+        {
+          "quantity":"one",
+          "value":"$string:res_one"
+        },
+        {
+          "quantity":"other",
+          "value":"$string:res_two"
+        }
+      ]
     }
   ]
 }

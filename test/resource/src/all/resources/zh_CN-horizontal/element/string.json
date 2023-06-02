@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "ohos_app_name",
+      "value": "系统"
+    },
+    {
+      "name": "ohos_lab_answer_call",
+      "value": "接听电话"
+    },
+    {
+      "name": "ohos_desc_camera",
+      "value": "允许应用拍摄照片和视频。"
+    }
+  ]
+}

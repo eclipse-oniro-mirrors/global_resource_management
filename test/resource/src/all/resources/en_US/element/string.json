@@ -27,6 +27,14 @@
     {
       "name": "str_enus",
       "value": "OnlyIn en_US"
+    },
+    {
+      "name": "point_test",
+      "value": "default device test"
+    },
+    {
+      "name": "mccmnc_str",
+      "value": "str_en_us"
     }
   ]
 }

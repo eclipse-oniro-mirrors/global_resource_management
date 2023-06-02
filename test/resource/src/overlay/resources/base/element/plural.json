@@ -1,0 +1,17 @@
+{
+  "plural": [
+    {
+      "name": "eat_apple",
+      "value": [
+        {
+          "quantity": "one",
+          "value": "$pattern:base"
+        },
+        {
+          "quantity": "other",
+          "value": "$pattern:base"
+        }
+      ]
+    }
+  ]
+}

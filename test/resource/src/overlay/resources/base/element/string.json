@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "label"
+    },
+    {
+      "name": "ohos_app_name",
+      "value": "SystemOverlay"
+    },
+    {
+      "name": "hello",
+      "value": "Helloooo"
+    },
+    {
+      "name": "ohos_lab_answer_call",
+      "value": "overlay接听电话base"
+    }
+  ]
+}

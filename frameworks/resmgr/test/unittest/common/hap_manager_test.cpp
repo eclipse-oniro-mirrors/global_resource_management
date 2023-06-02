@@ -114,7 +114,7 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest002, TestSize.Level1)
 
     EXPECT_TRUE(ret);
 
-    uint32_t id = 16777234; // 16777234 means string_ref
+    uint32_t id = 16777237; // 16777237 means string_ref
     std::vector<const HapResource::IdValues *> idValues = hapManager->GetResourceList(id);
     if (idValues.size() == 0) {
         delete (hapManager);
@@ -178,7 +178,7 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest003, TestSize.Level1)
 
     EXPECT_TRUE(ret);
 
-    int id = 16777219; // 16777219 means 'aboutPage_title_primary'
+    int id = 16777221; // 16777221 means 'aboutPage_title_primary'
     std::vector<const HapResource::IdValues *> idValues = hapManager->GetResourceList(id);
     if (idValues.size() == 0) {
         delete hapManager;
@@ -218,7 +218,7 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest004, TestSize.Level1)
     }
     bool ret = hapManager->AddResourcePath(FormatFullPath(g_hapPath).c_str());
     EXPECT_TRUE(ret);
-    int id = 16777219; // 16777219 means 'AboutPageFA' 'aboutPage_title_primary'
+    int id = 16777221; // 16777221 means 'AboutPageFA' 'aboutPage_title_primary'
     std::vector<const HapResource::IdValues *> idValues = hapManager->GetResourceList(id);
     if (idValues.size() == 0) {
         delete hapManager;
