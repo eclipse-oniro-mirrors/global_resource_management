@@ -176,6 +176,35 @@ public:
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();
+
+/**
+ * Get system resource manager, the added system resource is sandbox path. This method should call
+ * after the sandbox mount.
+ *
+ * @return pointer of system resource manager
+ */
+EXPORT_FUNC ResourceManager *GetSystemResourceManager();
+
+/**
+ * Get system resource manager, the added system resource is no sandbox path. This method should call
+ * before the sandbox mount, for example appspawn.
+ *
+ * @return pointer of system resource manager
+ */
+EXPORT_FUNC ResourceManager *GetSystemResourceManagerNoSandBox();
+
+/**
+ * Create app resource manager.
+ *
+ * @param bundleName the hap bundleName
+ * @param moduleName the hap moduleName
+ * @param hapPath the hap resource path
+ * @param overlayPath the hap overlay resource path
+ * @param resConfig the device resConfig
+ * @return pointer of app resource manager
+ */
+EXPORT_FUNC std::shared_ptr<ResourceManager> CreateResourceManager(std::string &bundleName, std::string &moduleName,
+    std::string &hapPath, std::vector<std::string> overlayPath, ResConfig &resConfig);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

@@ -196,6 +196,11 @@ static napi_value GetResourceManager(napi_env env, napi_callback_info info)
     return result;
 }
 
+static napi_value GetSystemResourceManager(napi_env env, napi_callback_info info)
+{
+    return ResourceManagerAddon::GetSystemResMgr(env);
+}
+
 static napi_status SetEnumItem(napi_env env, napi_value object, const char* name, int32_t value)
 {
     napi_status status;
@@ -255,8 +260,10 @@ static napi_value ResMgrInit(napi_env env, napi_value exports)
     StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
     napi_property_descriptor creatorProp[] = {
         DECLARE_NAPI_FUNCTION("getResourceManager", GetResourceManager),
+        DECLARE_NAPI_FUNCTION("getSystemResourceManager", GetSystemResourceManager),
     };
-    napi_status status = napi_define_properties(env, exports, 1, creatorProp);
+    napi_status status = napi_define_properties(env, exports, sizeof(creatorProp) / sizeof(creatorProp[0]),
+        creatorProp);
     FinishTrace(HITRACE_TAG_GLOBAL_RESMGR);
     if (status != napi_ok) {
         HiLog::Error(LABEL, "Failed to set getResourceManager at init");

@@ -14,20 +14,26 @@
  */
 
 #include "resource_manager_addon.h"
-#include "resource_manager_data_context.h"
+#include "resource_manager_napi_utils.h"
 #include "hilog/log_cpp.h"
 
 namespace OHOS {
 namespace Global {
 namespace Resource {
 static thread_local napi_ref* g_constructor = nullptr;
+static std::shared_ptr<ResourceManager> sysResMgr = nullptr;
+static std::mutex sysMgrMutex;
 
 napi_value ResourceManagerAddon::Create(
     napi_env env, const std::string& bundleName, const std::shared_ptr<ResourceManager>& resMgr,
     std::shared_ptr<AbilityRuntime::Context> context)
 {
     std::shared_ptr<ResourceManagerAddon> addon = std::make_shared<ResourceManagerAddon>(bundleName, resMgr, context);
+    return WrapResourceManager(env, addon);
+}
 
+napi_value ResourceManagerAddon::WrapResourceManager(napi_env env, std::shared_ptr<ResourceManagerAddon> &addon)
+{
     if (!Init(env)) {
         HiLog::Error(LABEL, "Failed to init resource manager addon");
         return nullptr;
@@ -57,10 +63,34 @@ napi_value ResourceManagerAddon::Create(
     return result;
 }
 
+napi_value ResourceManagerAddon::GetSystemResMgr(napi_env env)
+{
+    if (sysResMgr == nullptr) {
+        std::lock_guard<std::mutex> lock(sysMgrMutex);
+        if (sysResMgr == nullptr) {
+            std::shared_ptr<Global::Resource::ResourceManager>
+                systemResManager(Global::Resource::GetSystemResourceManager());
+            if (systemResManager == nullptr) {
+                ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_SYSTEM_RES_MANAGER_GET_FAILED);
+                return nullptr;
+            }
+            sysResMgr = systemResManager;
+        }
+    }
+    std::shared_ptr<ResourceManagerAddon> addon = std::make_shared<ResourceManagerAddon>(sysResMgr, true);
+    return WrapResourceManager(env, addon);
+}
+
 ResourceManagerAddon::ResourceManagerAddon(
     const std::string& bundleName, const std::shared_ptr<ResourceManager>& resMgr,
-    const std::shared_ptr<AbilityRuntime::Context>& context)
-    : bundleName_(bundleName), resMgr_(resMgr), context_(context)
+    const std::shared_ptr<AbilityRuntime::Context>& context, bool isSystem)
+    : bundleName_(bundleName), resMgr_(resMgr), context_(context), isSystem_(isSystem)
+{
+    napiContext_ = std::make_shared<ResourceManagerNapiContext>();
+}
+
+ResourceManagerAddon::ResourceManagerAddon(const std::shared_ptr<ResourceManager>& resMgr, bool isSystem)
+    : resMgr_(resMgr), isSystem_(isSystem)
 {
     napiContext_ = std::make_shared<ResourceManagerNapiContext>();
 }

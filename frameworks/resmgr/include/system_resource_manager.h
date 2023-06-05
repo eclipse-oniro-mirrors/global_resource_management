@@ -26,14 +26,26 @@ public:
 
     ~SystemResourceManager();
 
+    /**
+     * Get system resource manager, the added system resource is sandbox path. This method should call
+     * after the sandbox mount.
+     *
+     * @return pointer of system resource manager
+     */
     static ResourceManagerImpl *GetSystemResourceManager();
+
+    /**
+     * Get system resource manager, the added system resource is no sandbox path. This method should call
+     * before the sandbox mount, for example appspawn.
+     *
+     * @return pointer of system resource manager
+     */
+    static ResourceManagerImpl *GetSystemResourceManagerNoSandBox();
 
 private:
     static std::mutex mutex_;
 
     static ResourceManagerImpl *resourceManager_;
-
-    static bool LoadSystemResource(ResourceManagerImpl *impl);
 
     static const std::string SYSTEM_RESOURCE_PATH;
 
@@ -42,6 +54,14 @@ private:
     static const std::string SYSTEM_RESOURCE_OVERLAY_PATH;
 
     static const std::string SYSTEM_RESOURCE_OVERLAY_PATH_COMPRESSED;
+
+    static const std::string SYSTEM_RESOURCE_NO_SAND_BOX_PKG_PATH;
+
+    static const std::string SYSTEM_RESOURCE_NO_SAND_BOX_HAP_PATH;
+
+    static bool LoadSystemResource(ResourceManagerImpl *impl, bool isSandbox = true);
+
+    static bool CreateSystemResourceManager(bool isSandbox = true);
 };
 } // namespace Resource
 } // namespace Global
