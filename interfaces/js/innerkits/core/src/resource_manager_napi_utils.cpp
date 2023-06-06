@@ -34,6 +34,7 @@ const std::unordered_map<int32_t, std::string> ResourceManagerNapiUtils::ErrorCo
     {ERROR_CODE_RES_REF_TOO_MUCH, "Resource re-ref too much"},
     {ERROR_CODE_RES_ID_FORMAT_ERROR, "Resource obtained by resId formatting error"},
     {ERROR_CODE_RES_NAME_FORMAT_ERROR, "Resource obtained by resName formatting error"},
+    {ERROR_CODE_SYSTEM_RES_MANAGER_GET_FAILED, "Get system resource manager failed"},
     {ERROR, "Unknow error"}
 };
 
