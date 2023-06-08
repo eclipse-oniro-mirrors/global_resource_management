@@ -53,5 +53,6 @@ ohos_shared_library("resmgr_napi_core") {
   }
 
   subsystem_name = "global"
+  innerapi_tags = [ "platformsdk" ]
   part_name = "resource_management"
 }
