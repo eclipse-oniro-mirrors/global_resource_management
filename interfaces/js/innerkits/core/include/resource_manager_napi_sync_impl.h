@@ -62,6 +62,10 @@ private:
 
     static napi_value GetColorByNameSync(napi_env env, napi_callback_info info);
 
+    static napi_value AddResource(napi_env env, napi_callback_info info);
+
+    static napi_value RemoveResource(napi_env env, napi_callback_info info);
+
     static int32_t InitIdResourceAddon(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
     

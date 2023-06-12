@@ -44,7 +44,9 @@ std::unordered_map<std::string, std::function<napi_value(napi_env&, napi_callbac
     {"GetDrawableDescriptor", std::bind(&ResourceManagerNapiSyncImpl::GetDrawableDescriptor, _1, _2)},
     {"GetDrawableDescriptorByName", std::bind(&ResourceManagerNapiSyncImpl::GetDrawableDescriptorByName, _1, _2)},
     {"GetColorSync", std::bind(&ResourceManagerNapiSyncImpl::GetColorSync, _1, _2)},
-    {"GetColorByNameSync", std::bind(&ResourceManagerNapiSyncImpl::GetColorByNameSync, _1, _2)}
+    {"GetColorByNameSync", std::bind(&ResourceManagerNapiSyncImpl::GetColorByNameSync, _1, _2)},
+    {"AddResource", std::bind(&ResourceManagerNapiSyncImpl::AddResource, _1, _2)},
+    {"RemoveResource", std::bind(&ResourceManagerNapiSyncImpl::RemoveResource, _1, _2)}
 };
 
 napi_value ResourceManagerNapiSyncImpl::GetResource(napi_env env, napi_callback_info info,
@@ -62,7 +64,7 @@ napi_value ResourceManagerNapiSyncImpl::GetRawFileList(napi_env env, napi_callba
 {
     GET_PARAMS(env, info, PARAMS_NUM_TWO);
 
-    if (!ResourceManagerNapiUtils::ResourceManagerNapiUtils::IsNapiString(env, info)) {
+    if (!ResourceManagerNapiUtils::IsNapiString(env, info)) {
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
@@ -543,6 +545,52 @@ napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptorByName(napi_env env
         return nullptr;
     }
     return Ace::Napi::JsDrawableDescriptor::ToNapi(env, drawableDescriptor.release(), drawableType);
+}
+
+std::shared_ptr<ResourceManager> GetNativeResoruceManager(napi_env env, napi_callback_info info)
+{
+    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
+    if (addon == nullptr) {
+        HiLog::Error(LABEL, "Failed to get addon_ in GetNativeResoruceManager");
+        return nullptr;
+    }
+    return addon->GetResMgr();
+}
+
+napi_value ResourceManagerNapiSyncImpl::AddResource(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+    if (!ResourceManagerNapiUtils::IsNapiString(env, info)) {
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    dataContext->path_ = ResourceManagerNapiUtils::GetResNameOrPath(env, argc, argv);
+    auto resMgr = GetNativeResoruceManager(env, info);
+    if (!resMgr->AddAppOverlay(dataContext->path_)) {
+        HiLog::Error(LABEL, "Failed to add overlay path = %{public}s", dataContext->path_.c_str());
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_OVERLAY_RES_PATH_INVALID);
+        return nullptr;
+    }
+    return nullptr;
+}
+
+napi_value ResourceManagerNapiSyncImpl::RemoveResource(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+    if (!ResourceManagerNapiUtils::IsNapiString(env, info)) {
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    dataContext->path_ = ResourceManagerNapiUtils::GetResNameOrPath(env, argc, argv);
+    auto resMgr = GetNativeResoruceManager(env, info);
+    if (!resMgr->RemoveAppOverlay(dataContext->path_)) {
+        HiLog::Error(LABEL, "Failed to add overlay path = %{public}s", dataContext->path_.c_str());
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_OVERLAY_RES_PATH_INVALID);
+        return nullptr;
+    }
+    return nullptr;
 }
 } // namespace Resource
 } // namespace Global

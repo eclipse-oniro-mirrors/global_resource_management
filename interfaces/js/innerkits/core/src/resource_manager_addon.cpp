@@ -149,7 +149,9 @@ bool ResourceManagerAddon::Init(napi_env env)
         DECLARE_NAPI_FUNCTION("getColor", GetColor),
         DECLARE_NAPI_FUNCTION("getColorByName", GetColorByName),
         DECLARE_NAPI_FUNCTION("getColorSync", GetColorSync),
-        DECLARE_NAPI_FUNCTION("getColorByNameSync", GetColorByNameSync)
+        DECLARE_NAPI_FUNCTION("getColorByNameSync", GetColorByNameSync),
+        DECLARE_NAPI_FUNCTION("addResource", AddResource),
+        DECLARE_NAPI_FUNCTION("removeResource", RemoveResource)
     };
 
     napi_value constructor;
@@ -410,6 +412,18 @@ napi_value ResourceManagerAddon::GetColorByNameSync(napi_env env, napi_callback_
 {
     auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
     return addon->napiContext_->ContextGetResource(env, info, "GetColorByNameSync", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::AddResource(napi_env env, napi_callback_info info)
+{
+    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
+    return addon->napiContext_->ContextGetResource(env, info, "AddResource", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::RemoveResource(napi_env env, napi_callback_info info)
+{
+    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
+    return addon->napiContext_->ContextGetResource(env, info, "RemoveResource", FunctionType::SYNC);
 }
 } // namespace Resource
 } // namespace Global

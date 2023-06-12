@@ -35,6 +35,7 @@ const std::unordered_map<int32_t, std::string> ResourceManagerNapiUtils::ErrorCo
     {ERROR_CODE_RES_ID_FORMAT_ERROR, "Resource obtained by resId formatting error"},
     {ERROR_CODE_RES_NAME_FORMAT_ERROR, "Resource obtained by resName formatting error"},
     {ERROR_CODE_SYSTEM_RES_MANAGER_GET_FAILED, "Get system resource manager failed"},
+    {ERROR_CODE_OVERLAY_RES_PATH_INVALID, "Overlay resource path is invalid"},
     {ERROR, "Unknow error"}
 };
 
@@ -211,6 +212,7 @@ napi_value ResourceManagerNapiUtils::CreateJsRawFd(napi_env env, ResMgrDataConte
     ResourceManager::RawFileDescriptor descriptor;
     RState state = context.addon_->GetResMgr()->GetRawFileDescriptorFromHap(context.path_, descriptor);
     if (state != RState::SUCCESS) {
+        context.SetErrorMsg("Failed to get descriptor", false, state);
         return nullptr;
     }
     napi_value result;
