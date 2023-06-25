@@ -81,6 +81,29 @@ public:
     bool RemoveResource(const std::string &path, const std::vector<std::string> &overlayPaths);
 
     /**
+     * Add the overlay resource for current application
+     *
+     * @param path the overlay resource path
+     * @return true if add resource path success, else false
+     */
+    bool AddAppOverlay(const std::string &path);
+
+    /**
+     * Remove the overlay resource for current application
+     *
+     * @param path the overlay resource path
+     * @return true if add resource path success, else false
+     */
+    bool RemoveAppOverlay(const std::string &path);
+
+    /**
+     * Obtain the hap path of the current application
+     *
+     * @return the current application hap path
+     */
+    std::string GetValidAppPath();
+
+    /**
      * Find resource by resource id
      * @param id the resource id
      * @return the resources related to resource id

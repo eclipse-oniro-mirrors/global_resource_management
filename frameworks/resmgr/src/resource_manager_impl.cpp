@@ -829,6 +829,16 @@ bool ResourceManagerImpl::RemoveResource(const std::string &path, const std::vec
     return this->hapManager_->RemoveResource(path, overlayPaths);
 }
 
+bool ResourceManagerImpl::AddAppOverlay(const std::string &path)
+{
+    return this->hapManager_->AddAppOverlay(path);
+}
+
+bool ResourceManagerImpl::RemoveAppOverlay(const std::string &path)
+{
+    return this->hapManager_->RemoveAppOverlay(path);
+}
+
 RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)

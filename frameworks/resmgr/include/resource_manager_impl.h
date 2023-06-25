@@ -70,6 +70,22 @@ public:
     virtual bool RemoveResource(const std::string &path, const std::vector<std::string> &overlayPaths);
 
     /**
+     * Add the overlay resource for current application
+     *
+     * @param path the overlay resource path
+     * @return true if add resource path success, else false
+     */
+    virtual bool AddAppOverlay(const std::string &path);
+
+    /**
+     * Remove the overlay resource for current application
+     *
+     * @param path the overlay resource path
+     * @return true if add resource path success, else false
+     */
+    virtual bool RemoveAppOverlay(const std::string &path);
+
+    /**
      * Update the resConfig
      * @param resConfig the resource config
      * @return SUCCESS if the resConfig updated success, else HAP_INIT_FAILED

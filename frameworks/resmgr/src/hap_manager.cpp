@@ -193,7 +193,8 @@ const HapResource::ValueUnderQualifierDir *HapManager::GetBestMatchResource(std:
     const HapResource::ValueUnderQualifierDir *result = nullptr;
     const HapResource::ValueUnderQualifierDir *overlayResult = nullptr;
     const ResConfigImpl *currentResConfig = this->resConfig_;
-    for (auto iter = candidates.begin(); iter != candidates.end(); iter++) {
+    // When there are multiple overlays, reverse the search to find the first match resource.
+    for (auto iter = candidates.rbegin(); iter != candidates.rend(); iter++) {
         const std::vector<HapResource::ValueUnderQualifierDir *> paths = (*iter)->GetLimitPathsConst();
         size_t len = paths.size();
         size_t i = 0;
@@ -307,7 +308,7 @@ bool HapManager::AddResource(const std::string &path, const std::vector<std::str
     std::vector<std::string> targetOverlay = loadedHapPaths_[path];
     if (!targetOverlay.empty() && targetOverlay == overlayPaths) {
         HILOG_INFO("the overlay for %{public}s already been loaded", path.c_str());
-        return false;
+        return true;
     }
     loadedHapPaths_[path] = overlayPaths;
     std::unordered_map<std::string, HapResource *> result = HapResource::LoadOverlays(path, overlayPaths,
@@ -319,6 +320,49 @@ bool HapManager::AddResource(const std::string &path, const std::vector<std::str
         return true;
     }
     return false;
+}
+
+std::string HapManager::GetValidAppPath()
+{
+    std::string appPath;
+    for (auto iter = hapResources_.rbegin(); iter != hapResources_.rend(); iter++) {
+        const std::string tempPath = (*iter)->GetIndexPath();
+        if ((*iter)->IsSystemResource() || (*iter)->IsOverlayResource()) {
+            continue;
+        }
+        appPath = tempPath;
+    }
+    return appPath;
+}
+
+bool HapManager::AddAppOverlay(const std::string &overlayPath)
+{
+    HILOG_INFO("AddAppOverlay overlayPath = %{public}s", overlayPath.c_str());
+    char outPath[PATH_MAX + 1] = {0};
+    Utils::CanonicalizePath(overlayPath.c_str(), outPath, PATH_MAX);
+    if (outPath[0] == '\0') {
+        HILOG_ERROR("invalid overlayPath, %{public}s", overlayPath.c_str());
+        return false;
+    }
+    std::vector<std::string> overlayPaths;
+    overlayPaths.emplace_back(outPath);
+    std::string appPath = GetValidAppPath();
+    return AddResource(appPath, overlayPaths);
+}
+
+bool HapManager::RemoveAppOverlay(const std::string &overlayPath)
+{
+    HILOG_INFO("RemoveAppOverlay overlayPath = %{public}s", overlayPath.c_str());
+    char outPath[PATH_MAX + 1] = {0};
+    Utils::CanonicalizePath(overlayPath.c_str(), outPath, PATH_MAX);
+    if (outPath[0] == '\0') {
+        HILOG_ERROR("invalid overlayPath, %{public}s", overlayPath.c_str());
+        return false;
+    }
+    std::vector<std::string> overlayPaths;
+    overlayPaths.emplace_back(outPath);
+    std::string appPath = GetValidAppPath();
+    return RemoveResource(appPath, overlayPaths);
 }
 
 HapManager::~HapManager()
