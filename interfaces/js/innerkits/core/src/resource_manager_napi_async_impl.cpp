@@ -634,8 +634,12 @@ napi_value ResourceManagerNapiAsyncImpl::GetPluralString(napi_env env, napi_call
 
 auto g_getRawFileFunc = [](napi_env env, void* data) {
     ResMgrDataContext *dataContext = static_cast<ResMgrDataContext*>(data);
-    dataContext->addon_->GetResMgr()->GetRawFileFromHap(dataContext->path_,
+    RState state = dataContext->addon_->GetResMgr()->GetRawFileFromHap(dataContext->path_,
         dataContext->len_, dataContext->mediaData);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("GetRawFileContent failed", false, state);
+        return;
+    }
     dataContext->createValueFunc_ = ResourceManagerNapiUtils::CreateJsUint8Array;
 };
 
