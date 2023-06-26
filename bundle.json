@@ -97,6 +97,42 @@
                   ]
                 },
                 "name": "//base/global/resource_management/interfaces/js/innerkits/core:resmgr_napi_core"
+              },
+              {
+                "header": {
+                  "header_base": "//base/global/resource_management/interfaces/inner_api/include/",
+                  "header_files": [
+                    "res_common.h",
+                    "res_config.h",
+                    "resource_manager.h",
+                    "rstate.h"
+                  ]
+                },
+                "name": "//base/global/resource_management/frameworks/resmgr:win_resmgr"
+              },
+              {
+                "header": {
+                  "header_base": "//base/global/resource_management/interfaces/inner_api/include/",
+                  "header_files": [
+                    "res_common.h",
+                    "res_config.h",
+                    "resource_manager.h",
+                    "rstate.h"
+                  ]
+                },
+                "name": "//base/global/resource_management/frameworks/resmgr:mac_resmgr"
+              },
+              {
+                "header": {
+                  "header_base": "//base/global/resource_management/interfaces/inner_api/include/",
+                  "header_files": [
+                    "res_common.h",
+                    "res_config.h",
+                    "resource_manager.h",
+                    "rstate.h"
+                  ]
+                },
+                "name": "//base/global/resource_management/frameworks/resmgr:linux_resmgr"
               }
             ],
             "test": [
