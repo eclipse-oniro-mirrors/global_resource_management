@@ -59,7 +59,8 @@
               "ace_engine",
               "bundle_framework",
               "c_utils",
-              "ace_engine"
+              "ace_engine",
+              "graphic_standard"
             ],
             "third_party": [
               "zlib",
