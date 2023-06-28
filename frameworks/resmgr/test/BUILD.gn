@@ -55,7 +55,7 @@ ohos_unittest("resmgr_test") {
 
   external_deps = [
     "ability_base:extractortool",
-    "hilog:libhilog",
+    "hiviewdfx_hilog_native:libhilog",
   ]
 
   resource_config_file = "../../../test/resource/ohos_test.xml"
