@@ -32,9 +32,9 @@ ohos_shared_library("resourcemanager") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "ability_runtime:runtime",
-    "hilog:libhilog",
-    "hisysevent:libhisysevent",
-    "hitrace:hitrace_meter",
+    "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
+    "hiviewdfx_hilog_native:libhilog",
     "napi:ace_napi",
   ]
 
