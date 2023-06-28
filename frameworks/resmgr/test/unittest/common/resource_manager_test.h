@@ -264,6 +264,8 @@ int ResourceManagerOverlayTest001(void);
 int ResourceManagerOverlayTest002(void);
 int ResourceManagerOverlayTest003(void);
 int ResourceManagerOverlayTest004(void);
+int ResourceManagerOverlayTest005(void);
+int ResourceManagerOverlayTest006(void);
 int ResourceManagerUtilsTest001(void);
 int ResourceManagerGetResourceLimitKeysTest001(void);
 int ResourceManagerGetResourceLimitKeysTest002(void);

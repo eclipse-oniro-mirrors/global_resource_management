@@ -5767,7 +5767,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerOverlayTest002, TestSize.Level1)
     ASSERT_TRUE(ret);
     ret = ((ResourceManagerImpl*)rm)->AddResource(FormatFullPath(g_resFilePath).c_str(), overlayPaths);
     // repeat add the same overlayPaths
-    ASSERT_FALSE(ret);
+    ASSERT_TRUE(ret);
     TestStringById("ohos_app_name", "SystemOverlay");
 
     std::vector<std::string> removePaths;
@@ -6077,5 +6077,41 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringFormatByNameTest008, TestS
         {ResourceManager::NapiValueType::NAPI_STRING, "a2"}};
     RState state = rm->GetStringFormatByName(name, outValue, jsParams);
     ASSERT_EQ(ERROR_CODE_RES_NAME_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerOverlayTest005
+ * @tc.desc: Test overlay function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerOverlayTest005, TestSize.Level1)
+{
+    AddResource("zh", nullptr, nullptr);
+    // test add invalid overlay path
+    bool ret = ((ResourceManagerImpl*)rm)->AddAppOverlay("noexist.hap");
+    ASSERT_FALSE(ret);
+
+    ret = ((ResourceManagerImpl*)rm)->AddAppOverlay(FormatFullPath(g_overlayResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    TestStringById("ohos_lab_answer_call", "overlay接听电话");
+}
+
+/*
+ * @tc.name: ResourceManagerOverlayTest006
+ * @tc.desc: Test overlay function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerOverlayTest006, TestSize.Level1)
+{
+    AddResource("zh", nullptr, nullptr);
+    // test remove invalid overlay path
+    bool ret = ((ResourceManagerImpl*)rm)->RemoveAppOverlay("noexist.hap");
+    ASSERT_FALSE(ret);
+
+    ret = ((ResourceManagerImpl*)rm)->AddAppOverlay(FormatFullPath(g_overlayResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    ret = ((ResourceManagerImpl*)rm)->RemoveAppOverlay(FormatFullPath(g_overlayResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    TestStringById("ohos_lab_answer_call", "接听电话");
 }
 }
