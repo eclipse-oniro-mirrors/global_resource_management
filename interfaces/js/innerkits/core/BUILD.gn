@@ -44,9 +44,9 @@ ohos_shared_library("resmgr_napi_core") {
     "bundle_framework:appexecfwk_base",
     "graphic_standard:2d_graphics",
     "graphic_standard:librender_service_client",
-    "hisysevent_native:libhisysevent",
-    "hitrace_native:hitrace_meter",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
     "napi:ace_napi",
   ]
 

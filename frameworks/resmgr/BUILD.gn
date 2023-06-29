@@ -104,9 +104,9 @@ ohos_shared_library("global_resmgr") {
 
   external_deps = [
     "ability_base:extractortool",
-    "hisysevent_native:libhisysevent",
-    "hitrace_native:hitrace_meter",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
   ]
 
   subsystem_name = "global"
@@ -243,7 +243,7 @@ ohos_shared_library("librawfile") {
     "ability_base:configuration",
     "bundle_framework:appexecfwk_base",
     "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "napi:ace_napi",
   ]
 

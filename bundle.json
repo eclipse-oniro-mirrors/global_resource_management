@@ -52,9 +52,9 @@
             "components": [
               "ability_base",
               "ability_runtime",
-              "hisysevent_native",
-              "hitrace_native",
-              "hiviewdfx_hilog_native",
+              "hilog",
+              "hisysevent",
+              "hitrace",
               "napi",
               "ace_engine",
               "bundle_framework",
