@@ -327,7 +327,7 @@ bool ResourceManagerNapiUtils::GetResourceObjectName(napi_env env,
     }
     size_t len = 0;
     status = napi_get_value_string_utf8(env, name, nullptr, 0, &len);
-    if (status != napi_ok || len <= 0) {
+    if (status != napi_ok) {
         HiLog::Error(LABEL, "Failed to get resource len");
         return false;
     }
