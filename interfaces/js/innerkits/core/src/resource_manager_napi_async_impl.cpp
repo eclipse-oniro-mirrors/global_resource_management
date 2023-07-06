@@ -75,7 +75,7 @@ napi_value ResourceManagerNapiAsyncImpl::GetResource(napi_env env, napi_callback
     return functionIndex->second(env, info);
 }
 
-napi_value GetCallbackErrorCode(napi_env env, const int32_t errCode, const std::string errMsg)
+napi_value GetCallbackErrorCode(napi_env env, const int32_t errCode, const std::string &errMsg)
 {
     napi_value error = nullptr;
     napi_value eCode = nullptr;
