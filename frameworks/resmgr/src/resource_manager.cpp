@@ -18,12 +18,19 @@
 #include "hilog_wrapper.h"
 #include "resource_manager_impl.h"
 #include "system_resource_manager.h"
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+#include "resource_manager_ext_mgr.h"
+#endif
 
 namespace OHOS {
 namespace Global {
 namespace Resource {
 static std::map<std::string, std::shared_ptr<ResourceManager>> resMgrMap;
 static std::mutex resMgrLock;
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+static std::mutex resMgrExtLock;
+static std::shared_ptr<ResourceManagerExtMgr> resMgrExtMgr = std::make_shared<ResourceManagerExtMgr>();
+#endif
 
 ResourceManager *CreateResourceManager()
 {
@@ -43,11 +50,12 @@ ResourceManager *CreateResourceManager()
     return impl;
 }
 
-std::shared_ptr<ResourceManager> CreateResourceManager(std::string &bundleName, std::string &moduleName,
-    std::string &hapPath, std::vector<std::string> overlayPath, ResConfig &resConfig)
+std::shared_ptr<ResourceManager> CreateResourceManagerDef(const std::string &bundleName,
+    const std::string &moduleName, const std::string &hapPath, const std::vector<std::string> &overlayPath,
+    ResConfig &resConfig)
 {
     if (bundleName.size() == 0 || hapPath.size() == 0) {
-        HILOG_ERROR("bundleName or hapPath is empty when CreateResourceManager");
+        HILOG_ERROR("bundleName or hapPath is empty when CreateResourceManagerDef");
         return nullptr;
     }
     std::string resMgrKey(bundleName);
@@ -61,7 +69,7 @@ std::shared_ptr<ResourceManager> CreateResourceManager(std::string &bundleName, 
     }
     std::shared_ptr<ResourceManager> resourceManagerImpl(CreateResourceManager());
     if (resourceManagerImpl == nullptr) {
-        HILOG_ERROR("CreateResourceManager failed");
+        HILOG_ERROR("CreateResourceManagerDef failed");
         return nullptr;
     }
     bool result = false;
@@ -71,12 +79,44 @@ std::shared_ptr<ResourceManager> CreateResourceManager(std::string &bundleName, 
         result = resourceManagerImpl->AddResource(hapPath.c_str());
     }
     if (!result) {
-        HILOG_ERROR("AddResource failed when CreateResourceManager");
+        HILOG_ERROR("AddResource failed when CreateResourceManagerDef");
         return nullptr;
     }
     resourceManagerImpl->UpdateResConfig(resConfig);
     resMgrMap[resMgrKey] = resourceManagerImpl;
     return resourceManagerImpl;
+}
+
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+std::shared_ptr<ResourceManager> CreateResourceManagerExt(const std::string &bundleName)
+{
+    if (bundleName.size() == 0) {
+        HILOG_ERROR("bundleName is empty when CreateResourceManagerExt");
+        return nullptr;
+    }
+    std::lock_guard<std::mutex> lock(resMgrExtLock);
+    std::shared_ptr<ResourceManager> resMgrExt;
+    resMgrExtMgr->Init(resMgrExt, bundleName);
+    if (resMgrExt == nullptr) {
+        HILOG_ERROR("ResourceManagerExt init fail");
+        return nullptr;
+    }
+    return resMgrExt;
+}
+#endif
+
+std::shared_ptr<ResourceManager> CreateResourceManager(const std::string &bundleName, const std::string &moduleName,
+    const std::string &hapPath, const std::vector<std::string> &overlayPath, ResConfig &resConfig, int32_t appType)
+{
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    if (appType == 0) {
+        return CreateResourceManagerDef(bundleName, moduleName, hapPath, overlayPath, resConfig);
+    } else {
+        return CreateResourceManagerExt(bundleName);
+    }
+#else
+    return CreateResourceManagerDef(bundleName, moduleName, hapPath, overlayPath, resConfig);
+#endif
 }
 
 ResourceManager *GetSystemResourceManager()
