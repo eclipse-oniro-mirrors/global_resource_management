@@ -205,10 +205,12 @@ EXPORT_FUNC ResourceManager *GetSystemResourceManagerNoSandBox();
  * @param hapPath the hap resource path
  * @param overlayPath the hap overlay resource path
  * @param resConfig the device resConfig
+ * @param appType the app type
  * @return pointer of app resource manager
  */
-EXPORT_FUNC std::shared_ptr<ResourceManager> CreateResourceManager(std::string &bundleName, std::string &moduleName,
-    std::string &hapPath, std::vector<std::string> overlayPath, ResConfig &resConfig);
+EXPORT_FUNC std::shared_ptr<ResourceManager> CreateResourceManager(const std::string &bundleName,
+    const std::string &moduleName, const std::string &hapPath, const std::vector<std::string> &overlayPath,
+    ResConfig &resConfig, int32_t appType = 0);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

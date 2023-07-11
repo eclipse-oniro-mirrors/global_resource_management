@@ -50,6 +50,7 @@ manager_sources = [
   "src/res_desc.cpp",
   "src/res_locale.cpp",
   "src/resource_manager.cpp",
+  "src/resource_manager_ext_mgr.cpp",
   "src/resource_manager_impl.cpp",
   "src/system_resource_manager.cpp",
   "src/utils/hap_parser.cpp",
