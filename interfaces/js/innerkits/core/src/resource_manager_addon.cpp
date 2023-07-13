@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
-static thread_local napi_ref* g_constructor = nullptr;
+static thread_local napi_ref g_constructor = nullptr;
 static std::shared_ptr<ResourceManager> sysResMgr = nullptr;
 static std::mutex sysMgrMutex;
 
@@ -39,16 +39,16 @@ napi_value ResourceManagerAddon::WrapResourceManager(napi_env env, std::shared_p
         return nullptr;
     }
 
-    napi_value constructor;
-    napi_status status = napi_get_reference_value(env, *g_constructor, &constructor);
-    if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to get reference value in Create");
+    napi_value constructor = nullptr;
+    napi_status status = napi_get_reference_value(env, g_constructor, &constructor);
+    if (status != napi_ok || constructor == nullptr) {
+        HiLog::Error(LABEL, "Failed to get reference value in Create, status = %{public}d", status);
         return nullptr;
     }
-    napi_value result;
+    napi_value result = nullptr;
     status = napi_new_instance(env, constructor, 0, nullptr, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to new instance in Create");
+        HiLog::Error(LABEL, "Failed to new instance in Create, status = %{public}d", status);
         return nullptr;
     }
 
@@ -162,12 +162,7 @@ bool ResourceManagerAddon::Init(napi_env env)
         return false;
     }
 
-    g_constructor = new (std::nothrow) napi_ref;
-    if (g_constructor == nullptr) {
-        HiLog::Error(LABEL, "Failed to create ref at init");
-        return false;
-    }
-    status = napi_create_reference(env, constructor, 1, g_constructor);
+    status = napi_create_reference(env, constructor, 1, &g_constructor);
     if (status != napi_ok) {
         HiLog::Error(LABEL, "Failed to create reference at init");
         return false;
