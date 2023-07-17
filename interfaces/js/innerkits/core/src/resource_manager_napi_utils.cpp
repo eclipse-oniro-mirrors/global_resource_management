@@ -457,7 +457,7 @@ napi_value ResourceManagerNapiUtils::CreateJsDeviceCap(napi_env env, ResMgrDataC
     }
 
     napi_value screenDensity;
-    status = napi_create_int32(env, static_cast<int>(cfg->GetScreenDensity()), &screenDensity);
+    status = napi_create_int32(env, static_cast<int>(cfg->ConvertDensity(cfg->GetScreenDensity())), &screenDensity);
     if (status != napi_ok) {
         context.SetErrorMsg("Failed to create screenDensity");
         return nullptr;
