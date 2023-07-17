@@ -69,6 +69,8 @@ public:
 	
     virtual InputDevice GetInputDevice() const = 0;
 
+    virtual ScreenDensity ConvertDensity(float density) = 0;
+
     virtual ~ResConfig() {}
 };
 
