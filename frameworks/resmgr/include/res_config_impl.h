@@ -142,6 +142,12 @@ public:
      */
     InputDevice GetInputDevice() const;
 
+    /**
+     * Matching screen density by screen density ratio
+     * @return ScreenDensity
+     */
+    ScreenDensity ConvertDensity(float density);
+
     virtual ~ResConfigImpl();
 
 private:
@@ -167,7 +173,7 @@ private:
 
     int IsDensityMoreSpecificThan(ScreenDensity otherDensity, uint32_t density = 0) const;
 
-    ScreenDensity ConvertDensity(float density);
+
 private:
     ResLocale *resLocale_;
     Direction direction_;
