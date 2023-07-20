@@ -42,8 +42,8 @@ ResourceManagerExtMgr::~ResourceManagerExtMgr()
 
 void ResourceManagerExtMgr::Init(std::shared_ptr<ResourceManager> &resMgrExt, const std::string &bundleName)
 {
-    std::string pluginPath = "system/lib64/libglobal_resmgr_broker.z.so";
     if (handle_ == nullptr) {
+        std::string pluginPath = "system/lib64/libglobal_resmgr_broker.z.so";
         handle_ = dlopen(pluginPath.c_str(), RTLD_LAZY);
         if (handle_ == nullptr) {
             HILOG_ERROR("open so fail");
