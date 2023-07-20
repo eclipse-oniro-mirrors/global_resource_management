@@ -12,9 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 #ifndef OHOS_RESOURCE_MANAGER_RESOURCEMANAGEREXTMGR_H
 #define OHOS_RESOURCE_MANAGER_RESOURCEMANAGEREXTMGR_H
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 
 #include "resource_manager.h"
 

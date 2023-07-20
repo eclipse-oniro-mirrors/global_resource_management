@@ -172,8 +172,6 @@ private:
     bool IsDensityMoreSuitable(int thisDistance, int otherDistance) const;
 
     int IsDensityMoreSpecificThan(ScreenDensity otherDensity, uint32_t density = 0) const;
-
-
 private:
     ResLocale *resLocale_;
     Direction direction_;
