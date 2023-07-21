@@ -22,12 +22,13 @@ namespace OHOS {
 namespace Global {
 namespace Resource {
 
-typedef int (*IResMgrExt) (std::shared_ptr<ResourceManager> &resMgrExt, const std::string &bundleName);
+typedef int (*IResMgrExt) (std::shared_ptr<ResourceManager> &resMgrExt, const std::string &bundleName,
+    const int32_t appType);
 class ResourceManagerExtMgr {
 public:
     ResourceManagerExtMgr();
     virtual ~ResourceManagerExtMgr();
-    void Init(std::shared_ptr<ResourceManager> &resMgrExt, const std::string &bundleName);
+    bool Init(std::shared_ptr<ResourceManager> &resMgrExt, const std::string &bundleName, const int32_t appType);
 
 private:
     void *handle_ = nullptr;
