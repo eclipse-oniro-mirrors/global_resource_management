@@ -59,7 +59,6 @@
               "ace_engine",
               "bundle_framework",
               "c_utils",
-              "ace_engine",
               "graphic_2d"
             ],
             "third_party": [

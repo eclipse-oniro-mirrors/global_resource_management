@@ -158,6 +158,7 @@ private:
     std::shared_ptr<AbilityRuntime::Context> context_;
     bool isSystem_;
     std::shared_ptr<ResourceManagerNapiContext> napiContext_;
+    static napi_property_descriptor properties[];
 };
 } // namespace Resource
 } // namespace Global

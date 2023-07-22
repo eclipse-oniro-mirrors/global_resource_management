@@ -388,9 +388,6 @@ RState ResourceManagerImpl::ResolveParentReference(const IdItem *idItem, std::ma
     // only pattern and theme
     // ref always at idx 0
     // child will cover parent
-    if (idItem == nullptr) {
-        return ERROR;
-    }
     if (!(idItem->resType_ == THEME || idItem->resType_ == PATTERN)) {
         HILOG_ERROR("only pattern and theme have parent: %d", idItem->resType_);
         return ERROR;

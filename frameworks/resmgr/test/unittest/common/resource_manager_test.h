@@ -209,6 +209,7 @@ int ResourceManagerGetMediaByNameForInputDeviceTest002(void);
 int ResourceManagerGetMediaByNameForInputDeviceTest003(void);
 int ResourceManagerGetMediaByNameForInputDeviceTest004(void);
 int ResourceManagerResolveReferenceTest001(void);
+int ResourceManagerResolveReferenceTest002(void);
 int ResourceManagerResolveParentReferenceTest001(void);
 int ResourceManagerSameNameTest001(void);
 int RawFileTest001(void);

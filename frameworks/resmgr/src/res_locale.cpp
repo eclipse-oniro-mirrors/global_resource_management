@@ -273,10 +273,7 @@ ResLocale *ResLocale::BuildFromString(const char *str, char sep, RState &rState)
     return DoParse(str, sep, rState);
 } // end of ParseBCP47Tag
 
-ResLocale *ResLocale::BuildFromParts(const char *language,
-    const char *script,
-    const char *region,
-    RState &rState)
+ResLocale *ResLocale::BuildFromParts(const char *language, const char *script, const char *region, RState &rState)
 {
     size_t len = Utils::StrLen(language);
     if (len == 0) {

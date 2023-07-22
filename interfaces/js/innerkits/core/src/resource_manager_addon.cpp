@@ -106,53 +106,53 @@ void ResourceManagerAddon::Destructor(napi_env env, void *nativeObject, void *hi
     addonPtr.reset(static_cast<std::shared_ptr<ResourceManagerAddon>*>(nativeObject));
 }
 
+napi_property_descriptor ResourceManagerAddon::properties[] = {
+    DECLARE_NAPI_FUNCTION("getString", GetString),
+    DECLARE_NAPI_FUNCTION("getStringByName", GetStringByName),
+    DECLARE_NAPI_FUNCTION("getStringArray", GetStringArray),
+    DECLARE_NAPI_FUNCTION("getStringArrayByName", GetStringArrayByName),
+    DECLARE_NAPI_FUNCTION("getMedia", GetMedia),
+    DECLARE_NAPI_FUNCTION("getMediaByName", GetMediaByName),
+    DECLARE_NAPI_FUNCTION("getMediaBase64", GetMediaBase64),
+    DECLARE_NAPI_FUNCTION("getMediaBase64ByName", GetMediaBase64ByName),
+    DECLARE_NAPI_FUNCTION("getConfiguration", GetConfiguration),
+    DECLARE_NAPI_FUNCTION("getDeviceCapability", GetDeviceCapability),
+    DECLARE_NAPI_FUNCTION("getPluralString", GetPluralString),
+    DECLARE_NAPI_FUNCTION("getPluralStringByName", GetPluralStringByName),
+    DECLARE_NAPI_FUNCTION("getRawFile", GetRawFile),
+    DECLARE_NAPI_FUNCTION("getRawFileDescriptor", GetRawFileDescriptor),
+    DECLARE_NAPI_FUNCTION("closeRawFileDescriptor", CloseRawFileDescriptor),
+    DECLARE_NAPI_FUNCTION("getStringSync", GetStringSync),
+    DECLARE_NAPI_FUNCTION("getStringByNameSync", GetStringByNameSync),
+    DECLARE_NAPI_FUNCTION("getBoolean", GetBoolean),
+    DECLARE_NAPI_FUNCTION("getNumber", GetNumber),
+    DECLARE_NAPI_FUNCTION("getBooleanByName", GetBooleanByName),
+    DECLARE_NAPI_FUNCTION("getNumberByName", GetNumberByName),
+    DECLARE_NAPI_FUNCTION("release", Release),
+    DECLARE_NAPI_FUNCTION("getStringValue", GetStringValue),
+    DECLARE_NAPI_FUNCTION("getStringArrayValue", GetStringArrayValue),
+    DECLARE_NAPI_FUNCTION("getPluralStringValue", GetPluralStringValue),
+    DECLARE_NAPI_FUNCTION("getMediaContent", GetMediaContent),
+    DECLARE_NAPI_FUNCTION("getMediaContentBase64", GetMediaContentBase64),
+    DECLARE_NAPI_FUNCTION("getRawFileContent", GetRawFileContent),
+    DECLARE_NAPI_FUNCTION("getRawFd", GetRawFd),
+    DECLARE_NAPI_FUNCTION("closeRawFd", CloseRawFd),
+    DECLARE_NAPI_FUNCTION("getDrawableDescriptor", GetDrawableDescriptor),
+    DECLARE_NAPI_FUNCTION("getDrawableDescriptorByName", GetDrawableDescriptorByName),
+    DECLARE_NAPI_FUNCTION("getRawFileList", GetRawFileList),
+    DECLARE_NAPI_FUNCTION("getColor", GetColor),
+    DECLARE_NAPI_FUNCTION("getColorByName", GetColorByName),
+    DECLARE_NAPI_FUNCTION("getColorSync", GetColorSync),
+    DECLARE_NAPI_FUNCTION("getColorByNameSync", GetColorByNameSync),
+    DECLARE_NAPI_FUNCTION("addResource", AddResource),
+    DECLARE_NAPI_FUNCTION("removeResource", RemoveResource)
+};
+
 bool ResourceManagerAddon::Init(napi_env env)
 {
     if (g_constructor != nullptr) {
         return true;
     }
-
-    napi_property_descriptor properties[] = {
-        DECLARE_NAPI_FUNCTION("getString", GetString),
-        DECLARE_NAPI_FUNCTION("getStringByName", GetStringByName),
-        DECLARE_NAPI_FUNCTION("getStringArray", GetStringArray),
-        DECLARE_NAPI_FUNCTION("getStringArrayByName", GetStringArrayByName),
-        DECLARE_NAPI_FUNCTION("getMedia", GetMedia),
-        DECLARE_NAPI_FUNCTION("getMediaByName", GetMediaByName),
-        DECLARE_NAPI_FUNCTION("getMediaBase64", GetMediaBase64),
-        DECLARE_NAPI_FUNCTION("getMediaBase64ByName", GetMediaBase64ByName),
-        DECLARE_NAPI_FUNCTION("getConfiguration", GetConfiguration),
-        DECLARE_NAPI_FUNCTION("getDeviceCapability", GetDeviceCapability),
-        DECLARE_NAPI_FUNCTION("getPluralString", GetPluralString),
-        DECLARE_NAPI_FUNCTION("getPluralStringByName", GetPluralStringByName),
-        DECLARE_NAPI_FUNCTION("getRawFile", GetRawFile),
-        DECLARE_NAPI_FUNCTION("getRawFileDescriptor", GetRawFileDescriptor),
-        DECLARE_NAPI_FUNCTION("closeRawFileDescriptor", CloseRawFileDescriptor),
-        DECLARE_NAPI_FUNCTION("getStringSync", GetStringSync),
-        DECLARE_NAPI_FUNCTION("getStringByNameSync", GetStringByNameSync),
-        DECLARE_NAPI_FUNCTION("getBoolean", GetBoolean),
-        DECLARE_NAPI_FUNCTION("getNumber", GetNumber),
-        DECLARE_NAPI_FUNCTION("getBooleanByName", GetBooleanByName),
-        DECLARE_NAPI_FUNCTION("getNumberByName", GetNumberByName),
-        DECLARE_NAPI_FUNCTION("release", Release),
-        DECLARE_NAPI_FUNCTION("getStringValue", GetStringValue),
-        DECLARE_NAPI_FUNCTION("getStringArrayValue", GetStringArrayValue),
-        DECLARE_NAPI_FUNCTION("getPluralStringValue", GetPluralStringValue),
-        DECLARE_NAPI_FUNCTION("getMediaContent", GetMediaContent),
-        DECLARE_NAPI_FUNCTION("getMediaContentBase64", GetMediaContentBase64),
-        DECLARE_NAPI_FUNCTION("getRawFileContent", GetRawFileContent),
-        DECLARE_NAPI_FUNCTION("getRawFd", GetRawFd),
-        DECLARE_NAPI_FUNCTION("closeRawFd", CloseRawFd),
-        DECLARE_NAPI_FUNCTION("getDrawableDescriptor", GetDrawableDescriptor),
-        DECLARE_NAPI_FUNCTION("getDrawableDescriptorByName", GetDrawableDescriptorByName),
-        DECLARE_NAPI_FUNCTION("getRawFileList", GetRawFileList),
-        DECLARE_NAPI_FUNCTION("getColor", GetColor),
-        DECLARE_NAPI_FUNCTION("getColorByName", GetColorByName),
-        DECLARE_NAPI_FUNCTION("getColorSync", GetColorSync),
-        DECLARE_NAPI_FUNCTION("getColorByNameSync", GetColorByNameSync),
-        DECLARE_NAPI_FUNCTION("addResource", AddResource),
-        DECLARE_NAPI_FUNCTION("removeResource", RemoveResource)
-    };
 
     napi_value constructor;
     napi_status status = napi_define_class(env, "ResourceManager", NAPI_AUTO_LENGTH, New, nullptr,
