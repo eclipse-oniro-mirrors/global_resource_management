@@ -40,29 +40,31 @@ ResourceManagerExtMgr::~ResourceManagerExtMgr()
     handle_ = nullptr;
 }
 
-void ResourceManagerExtMgr::Init(std::shared_ptr<ResourceManager> &resMgrExt, const std::string &bundleName)
+bool ResourceManagerExtMgr::Init(std::shared_ptr<ResourceManager> &resMgrExt, const std::string &bundleName,
+    const int32_t appType)
 {
     if (handle_ == nullptr) {
         std::string pluginPath = "system/lib64/libglobal_resmgr_broker.z.so";
         handle_ = dlopen(pluginPath.c_str(), RTLD_LAZY);
         if (handle_ == nullptr) {
             HILOG_ERROR("open so fail");
-            return;
+            return false;
         }
     }
     std::string resMgrExtKey(bundleName);
     auto iter = resMgrExtMap_.find(resMgrExtKey);
     if (iter != resMgrExtMap_.end()) {
         resMgrExt = resMgrExtMap_[resMgrExtKey];
-        return;
+        return true;
     }
     IResMgrExt iResMgrExt = (IResMgrExt)dlsym(handle_, "CreateResMgrExt");
-    int ret = (*iResMgrExt)(resMgrExt, bundleName);
+    int ret = (*iResMgrExt)(resMgrExt, bundleName, appType);
     if (ret) {
         HILOG_ERROR("CreateResMgrExt fail.");
-        return;
+        return false;
     }
     resMgrExtMap_[bundleName] = resMgrExt;
+    return true;
 }
 } // namespace Resource
 } // namespace Global

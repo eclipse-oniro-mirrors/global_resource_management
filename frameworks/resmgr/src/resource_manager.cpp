@@ -54,12 +54,12 @@ std::shared_ptr<ResourceManager> CreateResourceManagerDef(const std::string &bun
     const std::string &moduleName, const std::string &hapPath, const std::vector<std::string> &overlayPath,
     ResConfig &resConfig)
 {
-    if (bundleName.size() == 0 || hapPath.size() == 0) {
+    if (bundleName.empty() || hapPath.empty()) {
         HILOG_ERROR("bundleName or hapPath is empty when CreateResourceManagerDef");
         return nullptr;
     }
     std::string resMgrKey(bundleName);
-    if (moduleName.size() != 0) {
+    if (!moduleName.empty()) {
         resMgrKey.append("/").append(moduleName);
     }
     std::lock_guard<std::mutex> lock(resMgrLock);
@@ -73,7 +73,7 @@ std::shared_ptr<ResourceManager> CreateResourceManagerDef(const std::string &bun
         return nullptr;
     }
     bool result = false;
-    if (overlayPath.size() != 0) {
+    if (!overlayPath.empty()) {
         result = resourceManagerImpl->AddResource(hapPath, overlayPath);
     } else {
         result = resourceManagerImpl->AddResource(hapPath.c_str());
@@ -88,16 +88,15 @@ std::shared_ptr<ResourceManager> CreateResourceManagerDef(const std::string &bun
 }
 
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-std::shared_ptr<ResourceManager> CreateResourceManagerExt(const std::string &bundleName)
+std::shared_ptr<ResourceManager> CreateResourceManagerExt(const std::string &bundleName, const int32_t appType)
 {
-    if (bundleName.size() == 0) {
+    if (bundleName.empty()) {
         HILOG_ERROR("bundleName is empty when CreateResourceManagerExt");
         return nullptr;
     }
     std::lock_guard<std::mutex> lock(resMgrExtLock);
     std::shared_ptr<ResourceManager> resMgrExt;
-    resMgrExtMgr->Init(resMgrExt, bundleName);
-    if (resMgrExt == nullptr) {
+    if (!resMgrExtMgr->Init(resMgrExt, bundleName, appType) || resMgrExt == nullptr) {
         HILOG_ERROR("ResourceManagerExt init fail");
         return nullptr;
     }
@@ -108,15 +107,15 @@ std::shared_ptr<ResourceManager> CreateResourceManagerExt(const std::string &bun
 std::shared_ptr<ResourceManager> CreateResourceManager(const std::string &bundleName, const std::string &moduleName,
     const std::string &hapPath, const std::vector<std::string> &overlayPath, ResConfig &resConfig, int32_t appType)
 {
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     if (appType == 0) {
         return CreateResourceManagerDef(bundleName, moduleName, hapPath, overlayPath, resConfig);
     } else {
-        return CreateResourceManagerExt(bundleName);
+    #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+        return CreateResourceManagerExt(bundleName, appType);
+    #else
+        return nullptr;
+    #endif
     }
-#else
-    return CreateResourceManagerDef(bundleName, moduleName, hapPath, overlayPath, resConfig);
-#endif
 }
 
 ResourceManager *GetSystemResourceManager()
