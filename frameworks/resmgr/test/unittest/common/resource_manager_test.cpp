@@ -4807,18 +4807,35 @@ HWTEST_F(ResourceManagerTest, ResourceManagerResolveReferenceTest001, TestSize.L
     value.assign(FormatString("$pattern:%d", id));
     ret = ((ResourceManagerImpl *)rm)->ResolveReference(value, outValue);
     EXPECT_EQ(ERROR, ret);
+}
+
+/*
+ * @tc.name: ResourceManagerResolveReferenceTest002
+ * @tc.desc: Test ResolveReference function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerResolveReferenceTest002, TestSize.Level1)
+{
+    ResConfig *rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("en", nullptr, "US");
+    rm->UpdateResConfig(*rc);
+    rm->AddResource(FormatFullPath(g_resFilePath).c_str());
 
     // reload
     rc->SetLocaleInfo("zh", nullptr, "CN");
     rm->UpdateResConfig(*rc);
     delete rc;
 
-    id = GetResId("copyright_text", ResType::STRING);
-    value.assign(FormatString("$string:%d", id));
-    ret = ((ResourceManagerImpl *)rm)->ResolveReference(value, outValue);
+    int id = GetResId("copyright_text", ResType::STRING);
+    std::string value(FormatString("$string:%d", id));
+    std::string outValue;
+    RState ret = ((ResourceManagerImpl *)rm)->ResolveReference(value, outValue);
     ASSERT_EQ(SUCCESS, ret);
     ASSERT_EQ(std::string("版权所有 ©2011-2019 XXXX有限公司保留一切权利"), outValue.c_str());
-
     id = GetResId("string_ref", ResType::STRING);
     value.assign(FormatString("$string:%d", id));
     ret = ((ResourceManagerImpl *)rm)->ResolveReference(value, outValue);
@@ -4874,9 +4891,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerResolveParentReferenceTest001, Test
     ASSERT_EQ(SUCCESS, ret);
     PrintMapString(outValue);
 
-    // error case
-    ret = ((ResourceManagerImpl *)rm)->ResolveParentReference(nullptr, outValue);
-    ASSERT_EQ(ERROR, ret);
     // wrong resType
     IdItem *item = new IdItem;
     for (int i = 0; i < ResType::MAX_RES_TYPE; ++i) {

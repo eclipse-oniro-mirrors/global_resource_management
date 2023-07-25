@@ -140,6 +140,31 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest001, TestSize.Level0)
     delete (pResource);
 }
 
+void GetIdValuesByNameFuncTest002(const HapResource *pResource)
+{
+    int id = pResource->GetIdByName("app_name", ResType::STRING);
+    std::string name = std::string("app_name");
+    auto start = CurrentTimeUsec();
+    auto idValues = pResource->GetIdValuesByName(name, ResType::STRING);
+    auto cost = CurrentTimeUsec() - start;
+    EXPECT_EQ(static_cast<size_t>(3), idValues->GetLimitPathsConst().size()); // 3 means the number of candidates
+    HILOG_DEBUG("GetIdValues by name cost: %ld us.", cost);
+    PrintIdValues(idValues);
+
+    {
+        auto limitPath = idValues->GetLimitPathsConst()[0];
+        EXPECT_TRUE(limitPath->GetFolder() == "default");
+        EXPECT_TRUE(limitPath->GetIdItem()->id_ == static_cast<uint32_t>(id));
+        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "About");
+    }
+    {
+        auto limitPath = idValues->GetLimitPathsConst()[1];
+        EXPECT_TRUE(limitPath->GetFolder() == "en_US");
+        EXPECT_TRUE(limitPath->GetIdItem()->id_ == static_cast<uint32_t>(id));
+        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "App Name");
+    }
+}
+
 /*
  * load a hap, set config en_US
  * @tc.name: HapResourceFuncTest002
@@ -185,27 +210,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest002, TestSize.Level1)
         EXPECT_TRUE(limitPath->GetIdItem()->value_ == "App Name");
     }
 
-    std::string name = std::string("app_name");
-    start = CurrentTimeUsec();
-    auto idValues2 = pResource->GetIdValuesByName(name, ResType::STRING);
-    cost = CurrentTimeUsec() - start;
-    EXPECT_EQ(static_cast<size_t>(3), idValues2->GetLimitPathsConst().size());
-    HILOG_DEBUG("GetIdValues by name cost: %ld us.", cost);
-    PrintIdValues(idValues);
-
-    {
-        auto limitPath = idValues->GetLimitPathsConst()[0];
-        EXPECT_TRUE(limitPath->GetFolder() == "default");
-        EXPECT_TRUE(limitPath->GetIdItem()->id_ == static_cast<uint32_t>(id));
-        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "About");
-    }
-    {
-        auto limitPath = idValues2->GetLimitPathsConst()[1];
-        EXPECT_TRUE(limitPath->GetFolder() == "en_US");
-        EXPECT_TRUE(limitPath->GetIdItem()->id_ == static_cast<uint32_t>(id));
-        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "App Name");
-    }
-
+    GetIdValuesByNameFuncTest002(pResource);
     delete pResource;
     delete rc;
 }
