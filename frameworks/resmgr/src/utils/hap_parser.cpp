@@ -339,7 +339,7 @@ int32_t ParseString(const char *buffer, uint32_t &offset, std::string &id, bool 
 {
     uint16_t strLen;
     errno_t eret = memcpy_s(&strLen, sizeof(strLen), buffer + offset, 2);
-    if (eret != OK) {
+    if (eret != OK || (includeTemi && strLen == 0)) {
         return SYS_ERROR;
     }
     offset += 2;
