@@ -140,9 +140,8 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest001, TestSize.Level0)
     delete (pResource);
 }
 
-void GetIdValuesByNameFuncTest002(const HapResource *pResource)
+void GetIdValuesByNameFuncTest002(const HapResource *pResource, int id)
 {
-    int id = pResource->GetIdByName("app_name", ResType::STRING);
     std::string name = std::string("app_name");
     auto start = CurrentTimeUsec();
     auto idValues = pResource->GetIdValuesByName(name, ResType::STRING);
@@ -210,7 +209,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest002, TestSize.Level1)
         EXPECT_TRUE(limitPath->GetIdItem()->value_ == "App Name");
     }
 
-    GetIdValuesByNameFuncTest002(pResource);
+    GetIdValuesByNameFuncTest002(pResource, id);
     delete pResource;
     delete rc;
 }
