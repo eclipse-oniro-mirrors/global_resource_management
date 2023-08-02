@@ -287,33 +287,30 @@ ResLocale *ResLocale::BuildFromParts(const char *language, const char *script, c
     size_t languageTagLen = 0;
     size_t scriptTagLen = 0;
     size_t regionTagLen = 0;
-    if (LocaleMatcher::IsLanguageTag(language, len)) {
-        tempLanguage = language;
-        languageTagLen = len;
-    } else {
+    if (!LocaleMatcher::IsLanguageTag(language, len)) {
         rState = INVALID_BCP47_LANGUAGE_SUBTAG;
         return nullptr;
     }
+    tempLanguage = language;
+    languageTagLen = len;
 
     len = Utils::StrLen(script);
     if (len > 0) {
-        if (LocaleMatcher::IsScriptTag(script, len)) {
-            tempScript = script;
-            scriptTagLen = len;
-        } else {
+        if (!LocaleMatcher::IsScriptTag(script, len)) {
             rState = INVALID_BCP47_SCRIPT_SUBTAG;
             return nullptr;
         }
+        tempScript = script;
+        scriptTagLen = len;
     }
     len = Utils::StrLen(region);
     if (len > 0) {
-        if (LocaleMatcher::IsRegionTag(region, len)) {
-            tempRegion = region;
-            regionTagLen = len;
-        } else {
+        if (!LocaleMatcher::IsRegionTag(region, len)) {
             rState = INVALID_BCP47_REGION_SUBTAG;
             return nullptr;
         }
+        tempRegion = region;
+        regionTagLen = len;
     }
     ResLocale *resLocale = new(std::nothrow) ResLocale;
     if (resLocale == nullptr) {
