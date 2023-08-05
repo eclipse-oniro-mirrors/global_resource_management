@@ -46,7 +46,11 @@ std::unordered_map<std::string, std::function<napi_value(napi_env&, napi_callbac
     {"GetColorSync", std::bind(&ResourceManagerNapiSyncImpl::GetColorSync, _1, _2)},
     {"GetColorByNameSync", std::bind(&ResourceManagerNapiSyncImpl::GetColorByNameSync, _1, _2)},
     {"AddResource", std::bind(&ResourceManagerNapiSyncImpl::AddResource, _1, _2)},
-    {"RemoveResource", std::bind(&ResourceManagerNapiSyncImpl::RemoveResource, _1, _2)}
+    {"RemoveResource", std::bind(&ResourceManagerNapiSyncImpl::RemoveResource, _1, _2)},
+    {"GetMediaContentBase64Sync", std::bind(&ResourceManagerNapiSyncImpl::GetMediaContentBase64Sync, _1, _2)},
+    {"GetMediaContentSync", std::bind(&ResourceManagerNapiSyncImpl::GetMediaContentSync, _1, _2)},
+    {"GetPluralStringValueSync", std::bind(&ResourceManagerNapiSyncImpl::GetPluralStringValueSync, _1, _2)},
+    {"GetStringArrayValueSync", std::bind(&ResourceManagerNapiSyncImpl::GetStringArrayValueSync, _1, _2)}
 };
 
 napi_value ResourceManagerNapiSyncImpl::GetResource(napi_env env, napi_callback_info info,
@@ -155,7 +159,7 @@ int32_t ResourceManagerNapiSyncImpl::InitIdResourceAddon(napi_env env, napi_call
     return SUCCESS;
 }
 
-int32_t ResourceManagerNapiSyncImpl::ProcessStrResourceById(napi_env env, napi_callback_info info,
+int32_t ResourceManagerNapiSyncImpl::ProcessStrResource(napi_env env, napi_callback_info info,
     std::unique_ptr<ResMgrDataContext> &dataContext)
 {
     std::shared_ptr<ResourceManager> resMgr = nullptr;
@@ -163,7 +167,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessStrResourceById(napi_env env, napi_c
     bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         HiLog::Error(LABEL, "Failed to get resMgr in GetStringSync");
-        return ERROR_CODE_RES_ID_FORMAT_ERROR;
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
 
     if (!InitNapiParameters(env, info, dataContext->jsParams_)) {
@@ -193,7 +197,7 @@ napi_value ResourceManagerNapiSyncImpl::GetStringSync(napi_env env, napi_callbac
         return nullptr;
     }
 
-    state = ProcessStrResourceById(env, info, dataContext);
+    state = ProcessStrResource(env, info, dataContext);
     if (state != RState::SUCCESS) {
         HiLog::Error(LABEL, "Failed to process string in GetStringSync");
         ResourceManagerNapiUtils::NapiThrow(env, state);
@@ -211,7 +215,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessColorResource(napi_env env, napi_cal
     bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         HiLog::Error(LABEL, "Failed to get resMgr in ProcessColorResource");
-        return ERROR_CODE_RES_ID_FORMAT_ERROR;
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
 
     RState state = resMgr->GetColorById(resId, dataContext->colorValue_);
@@ -254,7 +258,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessNumResource(napi_env env, napi_callb
     bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         HiLog::Error(LABEL, "Failed to ResourceManagerNapiUtils::GetHapResourceManager in GetNumber");
-        return ERROR_CODE_RES_ID_FORMAT_ERROR;
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
 
     RState state = resMgr->GetIntegerById(resId, dataContext->iValue_);
@@ -296,7 +300,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessBoolResource(napi_env env, napi_call
     bool ret2 = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret2) {
         HiLog::Error(LABEL, "Failed to get resMgr in GetBoolean");
-        return ERROR_CODE_RES_ID_FORMAT_ERROR;
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
     RState state = resMgr->GetBooleanById(resId, dataContext->bValue_);
     if (state != RState::SUCCESS) {
@@ -329,6 +333,187 @@ napi_value ResourceManagerNapiSyncImpl::GetBoolean(napi_env env, napi_callback_i
     return ResourceManagerNapiUtils::CreateJsBool(env, *dataContext);
 }
 
+int32_t ResourceManagerNapiSyncImpl::ProcesstMediaContentBase64Resource(napi_env env, napi_callback_info info,
+    std::unique_ptr<ResMgrDataContext> &dataContext)
+{
+    std::shared_ptr<ResourceManager> resMgr = nullptr;
+    int32_t resId = 0;
+    bool ret2 = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
+    if (!ret2) {
+        HiLog::Error(LABEL, "Failed to get resMgr in GetMediaContentBase64Sync");
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+    RState state = resMgr->GetMediaBase64DataById(resId, dataContext->value_, dataContext->density_);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to GetMediaContentBase64Sync state", true);
+        return state;
+    }
+    return SUCCESS;
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetMediaContentBase64Sync(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+
+    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
+
+    int32_t state = ResourceManagerNapiSyncImpl::InitIdResourceAddon(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to process para in GetMediaContentBase64Sync");
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+    // density optional parameters
+    if (ResourceManagerNapiUtils::GetDensity(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+    state = ProcesstMediaContentBase64Resource(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to process media base64 resource in GetMediaContentBase64Sync");
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    return ResourceManagerNapiUtils::CreateJsString(env, *dataContext);
+}
+
+int32_t ResourceManagerNapiSyncImpl::ProcessMediaContentResource(napi_env env, napi_callback_info info,
+    std::unique_ptr<ResMgrDataContext> &dataContext)
+{
+    std::shared_ptr<ResourceManager> resMgr = nullptr;
+    int32_t resId = 0;
+    bool ret2 = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
+    if (!ret2) {
+        HiLog::Error(LABEL, "Failed to get resMgr in GetMediaContentSync");
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+    RState state = resMgr->GetMediaDataById(resId, dataContext->len_, dataContext->mediaData,
+        dataContext->density_);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to GetMediaContentSync state", true);
+        return state;
+    }
+    return SUCCESS;
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetMediaContentSync(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+
+    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
+
+    int32_t state = ResourceManagerNapiSyncImpl::InitIdResourceAddon(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to process para in GetMediaContentSync");
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+    // density optional parameters
+    if (ResourceManagerNapiUtils::GetDensity(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+    state = ProcessMediaContentResource(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to process media resource in GetMediaContentSync");
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    return ResourceManagerNapiUtils::CreateJsUint8Array(env, *dataContext);
+}
+
+int32_t ResourceManagerNapiSyncImpl::ProcessPluralStringValueResource(napi_env env, napi_callback_info info,
+    std::unique_ptr<ResMgrDataContext> &dataContext)
+{
+    std::shared_ptr<ResourceManager> resMgr = nullptr;
+    int32_t resId = 0;
+    bool ret2 = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
+    if (!ret2) {
+        HiLog::Error(LABEL, "Failed to get resMgr in GetPluralStringValueSync");
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+    RState state = resMgr->GetPluralStringByIdFormat(dataContext->value_,
+        resId, dataContext->param_, dataContext->param_);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to GetPluralStringValueSync state", true);
+        return state;
+    }
+    return SUCCESS;
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetPluralStringValueSync(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+
+    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
+
+    int32_t state = ResourceManagerNapiSyncImpl::InitIdResourceAddon(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to process para in GetPluralStringValueSync");
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    if (ResourceManagerNapiUtils::GetType(env, argv[ARRAY_SUBCRIPTOR_ONE]) != napi_number) {
+        HiLog::Error(LABEL, "Parameter type is not napi_number in GetPluralStringValueSync");
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+    napi_get_value_int32(env, argv[ARRAY_SUBCRIPTOR_ONE], &dataContext->param_);
+
+    state = ProcessPluralStringValueResource(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to process plural string resource in GetPluralStringValueSync");
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    return ResourceManagerNapiUtils::CreateJsString(env, *dataContext);
+}
+
+int32_t ResourceManagerNapiSyncImpl::ProcessStringArrayValueResource(napi_env env, napi_callback_info info,
+    std::unique_ptr<ResMgrDataContext> &dataContext)
+{
+    std::shared_ptr<ResourceManager> resMgr = nullptr;
+    int32_t resId = 0;
+    bool ret2 = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
+    if (!ret2) {
+        HiLog::Error(LABEL, "Failed to get resMgr in GetStringArrayValueSync");
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+    RState state = resMgr->GetStringArrayById(resId, dataContext->arrayValue_);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to GetStringArrayValueSync state", true);
+        return state;
+    }
+    return SUCCESS;
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetStringArrayValueSync(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+
+    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
+
+    int32_t state = ResourceManagerNapiSyncImpl::InitIdResourceAddon(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to process para in GetStringArrayValueSync");
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    state = ProcessStringArrayValueResource(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to process string array resource in GetStringArrayValueSync");
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    return ResourceManagerNapiUtils::CreateJsArray(env, *dataContext);
+}
+
 napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptor(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, PARAMS_NUM_TWO);
@@ -340,9 +525,7 @@ napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptor(napi_env env, napi
         return nullptr;
     }
     // density optional parameters
-    napi_valuetype valuetype = ResourceManagerNapiUtils::GetType(env, argv[ARRAY_SUBCRIPTOR_ONE]);
-    if (valuetype != napi_valuetype::napi_undefined && valuetype != napi_valuetype::napi_null &&
-        ResourceManagerNapiUtils::GetDensity(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
+    if (ResourceManagerNapiUtils::GetDensity(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
@@ -522,9 +705,7 @@ napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptorByName(napi_env env
 
     auto dataContext = std::make_unique<ResMgrDataContext>();
     // density optional parameters
-    napi_valuetype valuetype = ResourceManagerNapiUtils::GetType(env, argv[ARRAY_SUBCRIPTOR_ONE]);
-    if (valuetype != napi_valuetype::napi_undefined && valuetype != napi_valuetype::napi_null &&
-        ResourceManagerNapiUtils::GetDensity(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
+    if (ResourceManagerNapiUtils::GetDensity(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }

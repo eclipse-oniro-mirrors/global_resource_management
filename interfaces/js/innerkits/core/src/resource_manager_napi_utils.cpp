@@ -552,6 +552,9 @@ RState ResourceManagerNapiUtils::GetDensity(napi_env env, napi_value value, uint
 {
     napi_valuetype valuetype;
     napi_typeof(env, value, &valuetype);
+    if (valuetype == napi_undefined || valuetype == napi_null) {
+        return SUCCESS;
+    }
     if (valuetype != napi_number) {
         HiLog::Error(LABEL, "Invalid param, not number");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;

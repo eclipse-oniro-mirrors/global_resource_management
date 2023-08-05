@@ -182,8 +182,7 @@ napi_value ResourceManagerNapiAsyncImpl::ProcessNameParamV9(napi_env env, napi_c
         } else if (i == 1 && valueType == napi_function) {
             napi_create_reference(env, argv[i], 1, &dataContext->callbackRef_);
             break;
-        } else if (i == 1 && valueType != napi_valuetype::napi_undefined && valueType != napi_valuetype::napi_null &&
-            ResourceManagerNapiUtils::GetDensity(env, argv[i], dataContext->density_) != SUCCESS) {
+        } else if (i == 1 && ResourceManagerNapiUtils::GetDensity(env, argv[i], dataContext->density_) != SUCCESS) {
             ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
             return nullptr;
         } else if (i == 2 && valueType == napi_function) { // the third callback param
@@ -216,8 +215,7 @@ napi_value ResourceManagerNapiAsyncImpl::ProcessIdParamV9(napi_env env, napi_cal
         } else if (i == 1 && valueType == napi_function) {
             napi_create_reference(env, argv[i], 1, &dataContext->callbackRef_);
             break;
-        } else if (i == 1 && valueType != napi_valuetype::napi_undefined && valueType != napi_valuetype::napi_null &&
-            ResourceManagerNapiUtils::GetDensity(env, argv[i], dataContext->density_) != SUCCESS) {
+        } else if (i == 1 && ResourceManagerNapiUtils::GetDensity(env, argv[i], dataContext->density_) != SUCCESS) {
             ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
             return nullptr;
         } else if (i == 2 && valueType == napi_function) { // the third callback param
@@ -257,8 +255,7 @@ napi_value ResourceManagerNapiAsyncImpl::ProcessResourceParamV9(napi_env env, na
         } else if (i == 1 && valueType == napi_function) {
             napi_create_reference(env, argv[i], 1, &dataContext->callbackRef_);
             break;
-        } else if (i == 1 && valueType != napi_valuetype::napi_undefined && valueType != napi_valuetype::napi_null &&
-            ResourceManagerNapiUtils::GetDensity(env, argv[i], dataContext->density_) != SUCCESS) {
+        } else if (i == 1 && ResourceManagerNapiUtils::GetDensity(env, argv[i], dataContext->density_) != SUCCESS) {
             ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
             return nullptr;
         } else if (i == 2 && valueType == napi_function) { // the third callback param
@@ -331,6 +328,10 @@ napi_value ResourceManagerNapiAsyncImpl::ProcessIdNameParam(napi_env env, napi_c
                 return nullptr;
             }
             dataContext->resource_ = resourcePtr;
+        } else if (i == 1 && valueType != napi_number) { // the second quantity param
+            HiLog::Error(LABEL, "Parameter type is not napi_number");
+            ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+            return nullptr;
         } else if (i == 1 && valueType == napi_number) {
             napi_get_value_int32(env, argv[i], &dataContext->param_);
         } else if (i == 2 && valueType == napi_function) { // the third callback param
