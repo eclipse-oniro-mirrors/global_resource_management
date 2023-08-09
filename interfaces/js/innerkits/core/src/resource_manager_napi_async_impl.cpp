@@ -157,7 +157,7 @@ napi_value ResourceManagerNapiAsyncImpl::GetResult(napi_env env, std::unique_ptr
         HiLog::Error(LABEL, "Failed to create async work for %{public}s", name.c_str());
         return result;
     }
-    if (napi_queue_async_work(env, dataContext->work_) != napi_ok) {
+    if (napi_queue_async_work_with_qos(env, dataContext->work_, napi_qos_user_initiated) != napi_ok) {
         HiLog::Error(LABEL, "Failed to queue async work for %{public}s", name.c_str());
         return result;
     }
