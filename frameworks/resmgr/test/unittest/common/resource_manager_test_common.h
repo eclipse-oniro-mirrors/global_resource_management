@@ -42,7 +42,7 @@ public:
 
     void TearDown();
 
-    ResourceManagerTestCommon(ResourceManager *rm);
+    explicit ResourceManagerTestCommon(ResourceManager *rm);
 
     ~ResourceManagerTestCommon();
 public:
