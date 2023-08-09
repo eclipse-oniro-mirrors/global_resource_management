@@ -23,6 +23,9 @@
 #include <string>
 #include <vector>
 
+namespace OHOS {
+namespace Global {
+namespace Resource {
 // this is relative path
 static const char *g_resFilePath = "all/assets/entry/resources.index";
 static const char *g_hapPath = "all.hap";
@@ -30,10 +33,6 @@ static const char *g_nonExistName = "non_existent_name";
 static const char *g_overlayResFilePath = "overlay/assets/entry/resources.index";
 static const float BASE_DPI = 160.0f;
 static const int NON_EXIST_ID = 1111;
-
-namespace OHOS {
-namespace Global {
-namespace Resource {
 std::string FormatFullPath(const char *fileRelativePath);
 
 void PrintIdValues(const HapResource::IdValues *idValues);

@@ -61,9 +61,8 @@ int ResourceManagerTestCommon::GetResId(std::string name, ResType resType)
 
 void ResourceManagerTestCommon::TestStringByName(const char *name, const char *cmp)
 {
-    RState rState;
     std::string outValue;
-    rState = rm->GetStringByName(name, outValue);
+    RState rState = rm->GetStringByName(name, outValue);
     ASSERT_EQ(SUCCESS, rState);
     HILOG_DEBUG("%s : %s", name, outValue.c_str());
     ASSERT_EQ(std::string(cmp), outValue);
@@ -71,11 +70,10 @@ void ResourceManagerTestCommon::TestStringByName(const char *name, const char *c
 
 void ResourceManagerTestCommon::TestStringById(const char *name, const char *cmp)
 {
-    RState rState;
     std::string outValue;
     int id = GetResId(name, ResType::STRING);
     ASSERT_TRUE(id > 0);
-    rState = rm->GetStringById(id, outValue);
+    RState rState = rm->GetStringById(id, outValue);
     ASSERT_EQ(SUCCESS, rState);
     ASSERT_EQ(std::string(cmp), outValue);
 }
@@ -113,7 +111,7 @@ void ResourceManagerTestCommon::AddHapResource(const char *language, const char 
 }
 
 void ResourceManagerTestCommon::AddColorModeResource(DeviceType deviceType, ColorMode colorMode,
-                                               float screenDensity)
+    float screenDensity)
 {
     auto rc = CreateResConfig();
     if (rc == nullptr) {
@@ -191,8 +189,7 @@ void ResourceManagerTestCommon::TestGetProfileByName(HapResource *tmp)
     res.append("entry/resources/base/profile/test_profile.json");
 
     std::string outValue;
-    RState state;
-    state = rm->GetProfileByName("test_profile", outValue);
+    RState state = rm->GetProfileByName("test_profile", outValue);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
 }
@@ -204,10 +201,9 @@ void ResourceManagerTestCommon::TestGetMediaById(HapResource *tmp)
     res.append("entry/resources/base/media/icon1.png");
 
     std::string outValue;
-    RState state;
     int id = GetResId("icon1", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, outValue);
+    RState state = rm->GetMediaById(id, outValue);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
 }
@@ -231,10 +227,9 @@ void ResourceManagerTestCommon::TestGetMediaWithDensityById(HapResource *tmp)
 
     int density = 120;
     std::string outValue;
-    RState state;
     int id = GetResId("icon", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
-    state = rm->GetMediaById(id, outValue, density);
+    RState state = rm->GetMediaById(id, outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
 }
@@ -246,8 +241,7 @@ void ResourceManagerTestCommon::TestGetMediaByName(HapResource *tmp)
     res.append("entry/resources/base/media/icon1.png");
 
     std::string outValue;
-    RState state;
-    state = rm->GetMediaByName("icon1", outValue);
+    RState state = rm->GetMediaByName("icon1", outValue);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
 }
@@ -271,8 +265,7 @@ void ResourceManagerTestCommon::TestGetMediaWithDensityByName(HapResource *tmp)
 
     uint32_t density = 120;
     std::string outValue;
-    RState state;
-    state = rm->GetMediaByName("icon", outValue, density);
+    RState state = rm->GetMediaByName("icon", outValue, density);
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
 }
@@ -282,7 +275,7 @@ void ResourceManagerTestCommon::TestGetStringFormatById(const char *name, const 
     int id = GetResId(name, ResType::STRING);
     ASSERT_TRUE(id > 0);
     std::string outValue;
-    RState state = rm->GetStringFormatById(outValue, id, 101);
+    RState state = rm->GetStringFormatById(outValue, id, 101); // 101 means the format number
     ASSERT_EQ(SUCCESS, state);
     ASSERT_EQ(cmp, outValue);
 }
@@ -290,8 +283,7 @@ void ResourceManagerTestCommon::TestGetStringFormatById(const char *name, const 
 void ResourceManagerTestCommon::TestGetStringFormatByName(const char *name, const char *cmp)
 {
     std::string outValue;
-    RState state;
-    state = rm->GetStringFormatByName(outValue, name, 101);
+    RState state = rm->GetStringFormatByName(outValue, name, 101); // 101 means the format number
     ASSERT_EQ(SUCCESS, state);
     ASSERT_EQ(cmp, outValue);
 }
@@ -300,10 +292,9 @@ void ResourceManagerTestCommon::TestGetStringArrayById(const char *name)
 {
     std::vector<std::string> outValue;
     int id = GetResId(name, ResType::STRINGARRAY);
-    RState state;
-    state = rm->GetStringArrayById(id, outValue);
+    RState state = rm->GetStringArrayById(id, outValue);
     ASSERT_EQ(SUCCESS, state);
-    ASSERT_EQ(static_cast<size_t>(4), outValue.size());
+    ASSERT_EQ(static_cast<size_t>(4), outValue.size()); // 4 means the size of string array resource
     PrintVectorString(outValue);
 }
 
@@ -334,10 +325,9 @@ void ResourceManagerTestCommon::TestGetStringFormatByName(const char *name,
 void ResourceManagerTestCommon::TestGetStringArrayByName(const char *name)
 {
     std::vector<std::string> outValue;
-    RState state;
-    state = rm->GetStringArrayByName(name, outValue);
+    RState state = rm->GetStringArrayByName(name, outValue);
     ASSERT_EQ(SUCCESS, state);
-    ASSERT_EQ(static_cast<size_t>(4), outValue.size());
+    ASSERT_EQ(static_cast<size_t>(4), outValue.size()); // 4 means the size of string array resource
     PrintVectorString(outValue);
 }
 
@@ -345,38 +335,34 @@ void ResourceManagerTestCommon::TestGetPatternById(const char *name)
 {
     std::map<std::string, std::string> outValue;
     int id = GetResId(name, ResType::PATTERN);
-    RState state;
-    state = rm->GetPatternById(id, outValue);
+    RState state = rm->GetPatternById(id, outValue);
     ASSERT_EQ(SUCCESS, state);
-    ASSERT_EQ(static_cast<size_t>(3), outValue.size());
+    ASSERT_EQ(static_cast<size_t>(3), outValue.size()); // 3 means the size of pattern resource
     PrintMapString(outValue);
 }
 
 void ResourceManagerTestCommon::TestGetPatternByName(const char *name)
 {
     std::map<std::string, std::string> outValue;
-    RState state;
-    state = rm->GetPatternByName(name, outValue);
+    RState state = rm->GetPatternByName(name, outValue);
     ASSERT_EQ(SUCCESS, state);
-    ASSERT_EQ(static_cast<size_t>(3), outValue.size());
+    ASSERT_EQ(static_cast<size_t>(3), outValue.size()); // 3 means the size of pattern resource
     PrintMapString(outValue);
 }
 
 void ResourceManagerTestCommon::TestGetThemeById(const char *name)
 {
     std::map<std::string, std::string> outValue;
-    RState state;
     int id = GetResId(name, ResType::THEME);
     ASSERT_TRUE(id > 0);
-    state = rm->GetThemeById(id, outValue);
+    RState state = rm->GetThemeById(id, outValue);
     ASSERT_EQ(SUCCESS, state);
 }
 
 void ResourceManagerTestCommon::TestGetThemeByName(const char *appTheme, const char *testTheme)
 {
     std::map<std::string, std::string> outValue;
-    RState state;
-    state = rm->GetThemeByName(appTheme, outValue);
+    RState state = rm->GetThemeByName(appTheme, outValue);
     ASSERT_EQ(SUCCESS, state);
     PrintMapString(outValue);
 
@@ -387,10 +373,9 @@ void ResourceManagerTestCommon::TestGetThemeByName(const char *appTheme, const c
 void ResourceManagerTestCommon::TestGetBooleanById(const char* boolean1, const char* booleanRef)
 {
     bool outValue = true;
-    RState state;
     int id = GetResId(boolean1, ResType::BOOLEAN);
     ASSERT_TRUE(id > 0);
-    state = rm->GetBooleanById(id, outValue);
+    RState state = rm->GetBooleanById(id, outValue);
     ASSERT_EQ(SUCCESS, state);
     EXPECT_TRUE(outValue);
 
@@ -404,8 +389,7 @@ void ResourceManagerTestCommon::TestGetBooleanById(const char* boolean1, const c
 void ResourceManagerTestCommon::TestGetBooleanByName(const char* boolean1, const char* booleanRef)
 {
     bool outValue = true;
-    RState state;
-    state = rm->GetBooleanByName(boolean1, outValue);
+    RState state = rm->GetBooleanByName(boolean1, outValue);
     ASSERT_EQ(SUCCESS, state);
     EXPECT_TRUE(outValue);
 
@@ -417,40 +401,38 @@ void ResourceManagerTestCommon::TestGetBooleanByName(const char* boolean1, const
 void ResourceManagerTestCommon::TestGetIntegerById(const char* integer1, const char* integerRef)
 {
     int outValue;
-    RState state;
     int id = GetResId(integer1, ResType::INTEGER);
     ASSERT_TRUE(id > 0);
-    state = rm->GetIntegerById(id, outValue);
+    RState state = rm->GetIntegerById(id, outValue);
     ASSERT_EQ(SUCCESS, state);
-    EXPECT_EQ(101, outValue);
+    EXPECT_EQ(101, outValue); // 101 means the result of int resource
 
     id = GetResId(integerRef, ResType::INTEGER);
     ASSERT_TRUE(id > 0);
     state = rm->GetIntegerById(id, outValue);
     ASSERT_EQ(SUCCESS, state);
-    EXPECT_EQ(101, outValue);
+    EXPECT_EQ(101, outValue); // 101 means the result of int resource
 }
 
 void ResourceManagerTestCommon::TestGetIntegerByName(const char* integer1, const char* integerRef)
 {
     int outValue;
-    RState state;
-    state = rm->GetIntegerByName(integer1, outValue);
+    RState state = rm->GetIntegerByName(integer1, outValue);
     ASSERT_EQ(SUCCESS, state);
-    EXPECT_EQ(101, outValue);
+    EXPECT_EQ(101, outValue); // 101 means the result of int resource
+
 
     state = rm->GetIntegerByName(integerRef, outValue);
     ASSERT_EQ(SUCCESS, state);
-    EXPECT_EQ(101, outValue);
+    EXPECT_EQ(101, outValue); // 101 means the result of int resource
 }
 
 void ResourceManagerTestCommon::TestGetFloatById(const char* touchTarget, const char* floatRef)
 {
     float outValue;
-    RState state;
     int id = GetResId(touchTarget, ResType::FLOAT);
     ASSERT_TRUE(id > 0);
-    state = rm->GetFloatById(id, outValue);
+    RState state = rm->GetFloatById(id, outValue);
     ASSERT_EQ(SUCCESS, state);
     EXPECT_EQ(48, outValue); // 48vp
 
@@ -470,8 +452,7 @@ void ResourceManagerTestCommon::TestGetFloatById(const char* touchTarget, const 
 void ResourceManagerTestCommon::TestGetFloatByName(const char* touchTarget, const char* floatRef)
 {
     float outValue;
-    RState state;
-    state = rm->GetFloatByName(touchTarget, outValue);
+    RState state = rm->GetFloatByName(touchTarget, outValue);
     ASSERT_EQ(SUCCESS, state);
     EXPECT_EQ(48, outValue); // 48vp
 
@@ -489,27 +470,25 @@ void ResourceManagerTestCommon::TestGetFloatByName(const char* touchTarget, cons
 void ResourceManagerTestCommon::TestGetIntArrayById(const char* intarray1)
 {
     std::vector<int> outValue;
-    RState state;
     int id = GetResId(intarray1, ResType::INTARRAY);
     EXPECT_TRUE(id > 0);
-    state = rm->GetIntArrayById(id, outValue);
+    RState state = rm->GetIntArrayById(id, outValue);
     EXPECT_TRUE(state == SUCCESS);
-    EXPECT_EQ(static_cast<uint32_t>(3), outValue.size());
-    EXPECT_EQ(100, outValue[0]);
-    EXPECT_EQ(200, outValue[1]);
-    EXPECT_EQ(101, outValue[2]);
+    EXPECT_EQ(static_cast<uint32_t>(3), outValue.size()); // 3 means the size of int array resource
+    EXPECT_EQ(100, outValue[0]); // 100 means the first value of int array
+    EXPECT_EQ(200, outValue[1]); // 200 means the second value of int array
+    EXPECT_EQ(101, outValue[2]); // 101 means the third value of int array
 }
 
 void ResourceManagerTestCommon::TestGetIntArrayByName(const char* intarray1)
 {
     std::vector<int> outValue;
-    RState state;
-    state = rm->GetIntArrayByName(intarray1, outValue);
+    RState state = rm->GetIntArrayByName(intarray1, outValue);
     EXPECT_TRUE(state == SUCCESS);
-    EXPECT_EQ(static_cast<uint32_t>(3), outValue.size());
-    EXPECT_EQ(100, outValue[0]);
-    EXPECT_EQ(200, outValue[1]);
-    EXPECT_EQ(101, outValue[2]);
+    EXPECT_EQ(static_cast<uint32_t>(3), outValue.size()); // 3 means the size of int array resource
+    EXPECT_EQ(100, outValue[0]); // 100 means the first value of int array
+    EXPECT_EQ(200, outValue[1]); // 200 means the second value of int array
+    EXPECT_EQ(101, outValue[2]); // 101 means the third value of int array
 }
 
 void ResourceManagerTestCommon::TestGetResourceLimitKeys(uint32_t expectedLimitKeys)
