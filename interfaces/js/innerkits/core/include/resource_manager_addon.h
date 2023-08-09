@@ -153,6 +153,14 @@ private:
     static napi_value AddResource(napi_env env, napi_callback_info info);
 
     static napi_value RemoveResource(napi_env env, napi_callback_info info);
+
+    static napi_value GetMediaContentBase64Sync(napi_env env, napi_callback_info info);
+
+    static napi_value GetMediaContentSync(napi_env env, napi_callback_info info);
+
+    static napi_value GetPluralStringValueSync(napi_env env, napi_callback_info info);
+
+    static napi_value GetStringArrayValueSync(napi_env env, napi_callback_info info);
     std::string bundleName_;
     std::shared_ptr<ResourceManager> resMgr_;
     std::shared_ptr<AbilityRuntime::Context> context_;

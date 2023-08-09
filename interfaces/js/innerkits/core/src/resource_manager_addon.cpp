@@ -145,7 +145,11 @@ napi_property_descriptor ResourceManagerAddon::properties[] = {
     DECLARE_NAPI_FUNCTION("getColorSync", GetColorSync),
     DECLARE_NAPI_FUNCTION("getColorByNameSync", GetColorByNameSync),
     DECLARE_NAPI_FUNCTION("addResource", AddResource),
-    DECLARE_NAPI_FUNCTION("removeResource", RemoveResource)
+    DECLARE_NAPI_FUNCTION("removeResource", RemoveResource),
+    DECLARE_NAPI_FUNCTION("getMediaContentBase64Sync", GetMediaContentBase64Sync),
+    DECLARE_NAPI_FUNCTION("getMediaContentSync", GetMediaContentSync),
+    DECLARE_NAPI_FUNCTION("getPluralStringValueSync", GetPluralStringValueSync),
+    DECLARE_NAPI_FUNCTION("getStringArrayValueSync", GetStringArrayValueSync)
 };
 
 bool ResourceManagerAddon::Init(napi_env env)
@@ -419,6 +423,30 @@ napi_value ResourceManagerAddon::RemoveResource(napi_env env, napi_callback_info
 {
     auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
     return addon->napiContext_->ContextGetResource(env, info, "RemoveResource", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::GetMediaContentBase64Sync(napi_env env, napi_callback_info info)
+{
+    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
+    return addon->napiContext_->ContextGetResource(env, info, "GetMediaContentBase64Sync", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::GetMediaContentSync(napi_env env, napi_callback_info info)
+{
+    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
+    return addon->napiContext_->ContextGetResource(env, info, "GetMediaContentSync", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::GetPluralStringValueSync(napi_env env, napi_callback_info info)
+{
+    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
+    return addon->napiContext_->ContextGetResource(env, info, "GetPluralStringValueSync", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::GetStringArrayValueSync(napi_env env, napi_callback_info info)
+{
+    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
+    return addon->napiContext_->ContextGetResource(env, info, "GetStringArrayValueSync", FunctionType::SYNC);
 }
 } // namespace Resource
 } // namespace Global

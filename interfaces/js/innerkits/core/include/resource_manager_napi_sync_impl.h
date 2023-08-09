@@ -66,6 +66,14 @@ private:
 
     static napi_value RemoveResource(napi_env env, napi_callback_info info);
 
+    static napi_value GetMediaContentBase64Sync(napi_env env, napi_callback_info info);
+
+    static napi_value GetMediaContentSync(napi_env env, napi_callback_info info);
+
+    static napi_value GetPluralStringValueSync(napi_env env, napi_callback_info info);
+
+    static napi_value GetStringArrayValueSync(napi_env env, napi_callback_info info);
+
     static int32_t InitIdResourceAddon(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
     
@@ -78,7 +86,7 @@ private:
     static bool InitParamsFromParamArray(napi_env env, napi_value value,
         std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams);
 
-    static int32_t ProcessStrResourceById(napi_env env, napi_callback_info info,
+    static int32_t ProcessStrResource(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
 
     static int32_t ProcessStrResourceByName(napi_env env, napi_callback_info info,
@@ -97,6 +105,18 @@ private:
         std::unique_ptr<ResMgrDataContext> &dataContext);
 
     static int32_t ProcessColorResourceByName(napi_env env, napi_callback_info info,
+        std::unique_ptr<ResMgrDataContext> &dataContext);
+
+    static int32_t ProcesstMediaContentBase64Resource(napi_env env, napi_callback_info info,
+        std::unique_ptr<ResMgrDataContext> &dataContext);
+
+    static int32_t ProcessMediaContentResource(napi_env env, napi_callback_info info,
+        std::unique_ptr<ResMgrDataContext> &dataContext);
+
+    static int32_t ProcessPluralStringValueResource(napi_env env, napi_callback_info info,
+        std::unique_ptr<ResMgrDataContext> &dataContext);
+
+    static int32_t ProcessStringArrayValueResource(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
 };
 } // namespace Resource
