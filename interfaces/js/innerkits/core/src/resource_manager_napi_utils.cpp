@@ -209,12 +209,6 @@ napi_value ResourceManagerNapiUtils::CreateJsUint8Array(napi_env env, ResMgrData
 
 napi_value ResourceManagerNapiUtils::CreateJsRawFd(napi_env env, ResMgrDataContext &context)
 {
-    ResourceManager::RawFileDescriptor descriptor;
-    RState state = context.addon_->GetResMgr()->GetRawFileDescriptorFromHap(context.path_, descriptor);
-    if (state != RState::SUCCESS) {
-        context.SetErrorMsg("Failed to get descriptor", false, state);
-        return nullptr;
-    }
     napi_value result;
     napi_status status = napi_create_object(env, &result);
     if (status != napi_ok) {
@@ -223,7 +217,7 @@ napi_value ResourceManagerNapiUtils::CreateJsRawFd(napi_env env, ResMgrDataConte
     }
 
     napi_value fd;
-    status = napi_create_int32(env, descriptor.fd, &fd);
+    status = napi_create_int32(env, context.descriptor_.fd, &fd);
     if (status != napi_ok) {
         context.SetErrorMsg("Failed to create fd");
         return result;
@@ -235,7 +229,7 @@ napi_value ResourceManagerNapiUtils::CreateJsRawFd(napi_env env, ResMgrDataConte
     }
 
     napi_value offset;
-    status = napi_create_int64(env, descriptor.offset, &offset);
+    status = napi_create_int64(env, context.descriptor_.offset, &offset);
     if (status != napi_ok) {
         context.SetErrorMsg("Failed to create offset");
         return result;
@@ -247,7 +241,7 @@ napi_value ResourceManagerNapiUtils::CreateJsRawFd(napi_env env, ResMgrDataConte
     }
 
     napi_value length;
-    status = napi_create_int64(env, descriptor.length, &length);
+    status = napi_create_int64(env, context.descriptor_.length, &length);
     if (status != napi_ok) {
         context.SetErrorMsg("Failed to create length");
         return result;

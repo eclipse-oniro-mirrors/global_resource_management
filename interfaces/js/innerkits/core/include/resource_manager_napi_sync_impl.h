@@ -42,8 +42,6 @@ private:
 
     static napi_value GetStringSync(napi_env env, napi_callback_info info);
 
-    static napi_value GetRawFileList(napi_env env, napi_callback_info info);
-
     static napi_value GetStringByNameSync(napi_env env, napi_callback_info info);
 
     static napi_value GetBoolean(napi_env env, napi_callback_info info);
@@ -74,12 +72,23 @@ private:
 
     static napi_value GetStringArrayValueSync(napi_env env, napi_callback_info info);
 
+    static napi_value GetRawFileListSync(napi_env env, napi_callback_info info);
+
+    static napi_value GetRawFileContentSync(napi_env env, napi_callback_info info);
+
+    static napi_value GetRawFdSync(napi_env env, napi_callback_info info);
+
+    static napi_value CloseRawFdSync(napi_env env, napi_callback_info info);
+
     static int32_t InitIdResourceAddon(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
-    
+
     static int32_t InitNameAddon(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
     
+    static int32_t InitPathAddon(napi_env env, napi_callback_info info,
+        std::unique_ptr<ResMgrDataContext> &dataContext);
+
     static bool InitNapiParameters(napi_env env, napi_callback_info info,
         std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams);
 
@@ -91,13 +100,13 @@ private:
 
     static int32_t ProcessStrResourceByName(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
-    
+
     static int32_t ProcessNumResource(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
 
     static int32_t ProcessNumResourceByName(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
-    
+
     static int32_t ProcessBoolResource(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
 

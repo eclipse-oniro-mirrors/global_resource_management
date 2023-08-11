@@ -55,6 +55,7 @@ struct ResMgrDataContext {
     int errCode_;
     uint32_t density_;
 
+    ResourceManager::RawFileDescriptor descriptor_;
     std::shared_ptr<ResourceManagerAddon> addon_;
     std::shared_ptr<ResourceManager> resMgr_;
     std::shared_ptr<ResourceManager::Resource> resource_;

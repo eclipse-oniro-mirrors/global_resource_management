@@ -64,6 +64,8 @@ public:
         return isSystem_;
     }
 private:
+    static napi_value AddonGetResource(napi_env env, napi_callback_info info, const std::string& name,
+        FunctionType type);
 
     static napi_value GetString(napi_env env, napi_callback_info info);
 
@@ -161,6 +163,14 @@ private:
     static napi_value GetPluralStringValueSync(napi_env env, napi_callback_info info);
 
     static napi_value GetStringArrayValueSync(napi_env env, napi_callback_info info);
+
+    static napi_value GetRawFileContentSync(napi_env env, napi_callback_info info);
+
+    static napi_value GetRawFdSync(napi_env env, napi_callback_info info);
+
+    static napi_value CloseRawFdSync(napi_env env, napi_callback_info info);
+
+    static napi_value GetRawFileListSync(napi_env env, napi_callback_info info);
     std::string bundleName_;
     std::shared_ptr<ResourceManager> resMgr_;
     std::shared_ptr<AbilityRuntime::Context> context_;

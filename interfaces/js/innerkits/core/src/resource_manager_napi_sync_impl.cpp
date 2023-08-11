@@ -34,7 +34,6 @@ ResourceManagerNapiSyncImpl::~ResourceManagerNapiSyncImpl()
 
 std::unordered_map<std::string, std::function<napi_value(napi_env&, napi_callback_info&)>>
     ResourceManagerNapiSyncImpl::syncFuncMatch {
-    {"GetRawFileList", std::bind(&ResourceManagerNapiSyncImpl::GetRawFileList, _1, _2)},
     {"GetStringSync", std::bind(&ResourceManagerNapiSyncImpl::GetStringSync, _1, _2)},
     {"GetStringByNameSync", std::bind(&ResourceManagerNapiSyncImpl::GetStringByNameSync, _1, _2)},
     {"GetBoolean", std::bind(&ResourceManagerNapiSyncImpl::GetBoolean, _1, _2)},
@@ -50,7 +49,11 @@ std::unordered_map<std::string, std::function<napi_value(napi_env&, napi_callbac
     {"GetMediaContentBase64Sync", std::bind(&ResourceManagerNapiSyncImpl::GetMediaContentBase64Sync, _1, _2)},
     {"GetMediaContentSync", std::bind(&ResourceManagerNapiSyncImpl::GetMediaContentSync, _1, _2)},
     {"GetPluralStringValueSync", std::bind(&ResourceManagerNapiSyncImpl::GetPluralStringValueSync, _1, _2)},
-    {"GetStringArrayValueSync", std::bind(&ResourceManagerNapiSyncImpl::GetStringArrayValueSync, _1, _2)}
+    {"GetStringArrayValueSync", std::bind(&ResourceManagerNapiSyncImpl::GetStringArrayValueSync, _1, _2)},
+    {"GetRawFileContentSync", std::bind(&ResourceManagerNapiSyncImpl::GetRawFileContentSync, _1, _2)},
+    {"GetRawFdSync", std::bind(&ResourceManagerNapiSyncImpl::GetRawFdSync, _1, _2)},
+    {"CloseRawFdSync", std::bind(&ResourceManagerNapiSyncImpl::CloseRawFdSync, _1, _2)},
+    {"GetRawFileListSync", std::bind(&ResourceManagerNapiSyncImpl::GetRawFileListSync, _1, _2)}
 };
 
 napi_value ResourceManagerNapiSyncImpl::GetResource(napi_env env, napi_callback_info info,
@@ -64,31 +67,119 @@ napi_value ResourceManagerNapiSyncImpl::GetResource(napi_env env, napi_callback_
     return functionIndex->second(env, info);
 }
 
-napi_value ResourceManagerNapiSyncImpl::GetRawFileList(napi_env env, napi_callback_info info)
+int32_t ResourceManagerNapiSyncImpl::InitPathAddon(napi_env env, napi_callback_info info,
+    std::unique_ptr<ResMgrDataContext> &dataContext)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+    dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
+    if (dataContext->addon_ == nullptr) {
+        HiLog::Error(LABEL, "Failed to get addon in InitPathAddon");
+        return NOT_FOUND;
+    }
+    if (ResourceManagerNapiUtils::IsNapiString(env, info)) {
+        dataContext->path_ = ResourceManagerNapiUtils::GetResNameOrPath(env, argc, argv);
+    } else {
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+    return SUCCESS;
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetRawFileListSync(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, PARAMS_NUM_TWO);
 
-    if (!ResourceManagerNapiUtils::IsNapiString(env, info)) {
-        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
-        return nullptr;
-    }
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
-    dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    if (dataContext->addon_ == nullptr) {
-        HiLog::Error(LABEL, "Failed to get addon in GetRawfileList");
+
+    int32_t ret = InitPathAddon(env, info, dataContext);
+    if (ret != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to process para in GetRawFileListSync");
+        ResourceManagerNapiUtils::NapiThrow(env, ret);
         return nullptr;
     }
-
-    dataContext->path_ = ResourceManagerNapiUtils::GetResNameOrPath(env, argc, argv);
 
     RState state = dataContext->addon_->GetResMgr()->GetRawFileList(dataContext->path_.c_str(),
         dataContext->arrayValue_);
-    if (state != RState::SUCCESS) {
+    if (state != RState::SUCCESS || dataContext->arrayValue_.empty()) {
         HiLog::Error(LABEL, "Failed to get rawfile list by %{public}s", dataContext->path_.c_str());
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_RES_PATH_INVALID);
+        return nullptr;
+    }
+
+    return ResourceManagerNapiUtils::CreateJsArray(env, *dataContext);
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetRawFileContentSync(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+
+    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
+
+    int32_t ret = InitPathAddon(env, info, dataContext);
+    if (ret != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to process para in GetRawFileContentSync");
+        ResourceManagerNapiUtils::NapiThrow(env, ret);
+        return nullptr;
+    }
+
+    RState state = dataContext->addon_->GetResMgr()->GetRawFileFromHap(dataContext->path_,
+        dataContext->len_, dataContext->mediaData);
+    if (state != SUCCESS) {
+        HiLog::Error(LABEL, "Failed to get rawfile by %{public}s", dataContext->path_.c_str());
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
-    return ResourceManagerNapiUtils::CreateJsArray(env, *dataContext);
+
+    return ResourceManagerNapiUtils::CreateJsUint8Array(env, *dataContext);
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetRawFdSync(napi_env env, napi_callback_info info)
+{
+     GET_PARAMS(env, info, PARAMS_NUM_TWO);
+
+    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
+
+    int32_t ret = InitPathAddon(env, info, dataContext);
+    if (ret != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to process para in GetRawFileContentSync");
+        ResourceManagerNapiUtils::NapiThrow(env, ret);
+        return nullptr;
+    }
+
+    RState state = dataContext->addon_->GetResMgr()->GetRawFileDescriptorFromHap(dataContext->path_,
+        dataContext->descriptor_);
+    if (state != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to get rawfd by %{public}s", dataContext->path_.c_str());
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+    return ResourceManagerNapiUtils::CreateJsRawFd(env, *dataContext);
+}
+
+napi_value ResourceManagerNapiSyncImpl::CloseRawFdSync(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+
+    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
+
+    int32_t ret = InitPathAddon(env, info, dataContext);
+    if (ret != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to process para in GetRawFileContentSync");
+        ResourceManagerNapiUtils::NapiThrow(env, ret);
+        return nullptr;
+    }
+
+    RState state = dataContext->addon_->GetResMgr()->CloseRawFileDescriptor(dataContext->path_);
+    if (state != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to close rawfd by %{public}s", dataContext->path_.c_str());
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    napi_value undefined;
+    if (napi_get_undefined(env, &undefined) != napi_ok) {
+        return nullptr;
+    }
+    return undefined;
 }
 
 bool ResourceManagerNapiSyncImpl::InitParamsFromParamArray(napi_env env, napi_value value,
