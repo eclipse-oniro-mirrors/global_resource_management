@@ -67,7 +67,7 @@ public:
      * @param rawFilePath the rawFile path
      * @return the rawFile path
      */
-    static std::string GetPath(const std::string filePath, std::string &rawFilePath);
+    static std::string GetPath(const std::string &filePath, std::string &rawFilePath);
 
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     /**
@@ -84,7 +84,7 @@ public:
      * @return the rawFile path
      */
     static std::string GetRawFilePath(std::shared_ptr<AbilityBase::Extractor> &extractor,
-        const std::string rawFileName);
+        const std::string &rawFileName);
 #endif
 
     /**
@@ -95,7 +95,7 @@ public:
      * @param outValue the rawFile path
      * @return the rawFile path
      */
-    static RState ReadRawFileFromHap(const std::string hapPath, const std::string rawFileName,
+    static RState ReadRawFileFromHap(const std::string &hapPath, const std::string &rawFileName,
         size_t &len, std::unique_ptr<uint8_t[]> &outValue);
 
     /**
@@ -105,7 +105,7 @@ public:
      * @param descriptor the rawFile path
      * @return the rawFile path
      */
-    static RState ReadRawFileDescriptor(const char *hapPath, const std::string rawFileName,
+    static RState ReadRawFileDescriptor(const char *hapPath, const std::string &rawFileName,
         ResourceManager::RawFileDescriptor &descriptor);
     
     /**
@@ -115,7 +115,7 @@ public:
      * @param fileList the rawfile list write to
      * @return SUCCESS if resource exist, else not found
      */
-    static RState GetRawFileList(const std::string hapPath, const std::string rawDirPath,
+    static RState GetRawFileList(const std::string &hapPath, const std::string &rawDirPath,
         std::vector<std::string>& fileList);
 
     /**
