@@ -149,7 +149,11 @@ napi_property_descriptor ResourceManagerAddon::properties[] = {
     DECLARE_NAPI_FUNCTION("getMediaContentBase64Sync", GetMediaContentBase64Sync),
     DECLARE_NAPI_FUNCTION("getMediaContentSync", GetMediaContentSync),
     DECLARE_NAPI_FUNCTION("getPluralStringValueSync", GetPluralStringValueSync),
-    DECLARE_NAPI_FUNCTION("getStringArrayValueSync", GetStringArrayValueSync)
+    DECLARE_NAPI_FUNCTION("getStringArrayValueSync", GetStringArrayValueSync),
+    DECLARE_NAPI_FUNCTION("getRawFileContentSync", GetRawFileContentSync),
+    DECLARE_NAPI_FUNCTION("getRawFdSync", GetRawFdSync),
+    DECLARE_NAPI_FUNCTION("closeRawFdSync", CloseRawFdSync),
+    DECLARE_NAPI_FUNCTION("getRawFileListSync", GetRawFileListSync)
 };
 
 bool ResourceManagerAddon::Init(napi_env env)
@@ -195,258 +199,247 @@ napi_value ResourceManagerAddon::Release(napi_env env, napi_callback_info info)
     }
     return undefined;
 }
+
+napi_value ResourceManagerAddon::AddonGetResource(napi_env env, napi_callback_info info, const std::string& name,
+    FunctionType type)
+{
+    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
+    if (addon == nullptr) {
+        return nullptr;
+    }
+    return addon->napiContext_->ContextGetResource(env, info, name, type);
+}
+
 /*====================================Here is the asynchronization function==================================*/
 napi_value ResourceManagerAddon::GetString(napi_env env, napi_callback_info info)
 {   
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetString", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetString", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetStringArray(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetStringArray", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetStringArray", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetMedia(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetMedia", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetMedia", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetMediaBase64(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetMediaBase64", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetMediaBase64", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetConfiguration(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetConfiguration", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetConfiguration", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetDeviceCapability(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetDeviceCapability", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetDeviceCapability", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetPluralString(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetPluralString", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetPluralString", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetRawFile(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetRawFile", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetRawFile", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetRawFileDescriptor(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetRawFileDescriptor", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetRawFileDescriptor", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::CloseRawFileDescriptor(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "CloseRawFileDescriptor", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "CloseRawFileDescriptor", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetPluralStringByName(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetPluralStringByName", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetPluralStringByName", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetMediaBase64ByName(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetMediaBase64ByName", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetMediaBase64ByName", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetMediaByName(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetMediaByName", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetMediaByName", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetStringArrayByName(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetStringArrayByName", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetStringArrayByName", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetStringByName(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetStringByName", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetStringByName", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetStringValue(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetStringValue", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetStringValue", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetStringArrayValue(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetStringArrayValue", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetStringArrayValue", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetMediaContent(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetMediaContent", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetMediaContent", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetMediaContentBase64(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetMediaContentBase64", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetMediaContentBase64", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetPluralStringValue(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetPluralStringValue", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetPluralStringValue", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetRawFileContent(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetRawFileContent", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetRawFileContent", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetRawFd(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetRawFd", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetRawFd", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::CloseRawFd(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "CloseRawFd", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "CloseRawFd", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetRawFileList(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetRawFileList", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetRawFileList", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetColor(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetColor", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetColor", FunctionType::ASYNC);
 }
 
 napi_value ResourceManagerAddon::GetColorByName(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetColorByName", FunctionType::ASYNC);
+    return AddonGetResource(env, info, "GetColorByName", FunctionType::ASYNC);
 }
 
 /*====================================Here is the synchronization function===================================*/
 napi_value ResourceManagerAddon::GetStringSync(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetStringSync", FunctionType::SYNC);
+    return AddonGetResource(env, info, "GetStringSync", FunctionType::SYNC);
 }
 
 napi_value ResourceManagerAddon::GetStringByNameSync(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetStringByNameSync", FunctionType::SYNC);
+    return AddonGetResource(env, info, "GetStringByNameSync", FunctionType::SYNC);
 }
 
 napi_value ResourceManagerAddon::GetBoolean(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetBoolean", FunctionType::SYNC);
+    return AddonGetResource(env, info, "GetBoolean", FunctionType::SYNC);
 }
 
 napi_value ResourceManagerAddon::GetNumber(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetNumber", FunctionType::SYNC);
+    return AddonGetResource(env, info, "GetNumber", FunctionType::SYNC);
 }
 
 napi_value ResourceManagerAddon::GetNumberByName(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetNumberByName", FunctionType::SYNC);
+    return AddonGetResource(env, info, "GetNumberByName", FunctionType::SYNC);
 }
 
 napi_value ResourceManagerAddon::GetBooleanByName(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetBooleanByName", FunctionType::SYNC);
+    return AddonGetResource(env, info, "GetBooleanByName", FunctionType::SYNC);
 }
 
 napi_value ResourceManagerAddon::GetDrawableDescriptor(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetDrawableDescriptor", FunctionType::SYNC);
+    return AddonGetResource(env, info, "GetDrawableDescriptor", FunctionType::SYNC);
 }
 
 napi_value ResourceManagerAddon::GetDrawableDescriptorByName(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetDrawableDescriptorByName", FunctionType::SYNC);
+    return AddonGetResource(env, info, "GetDrawableDescriptorByName", FunctionType::SYNC);
 }
 
 napi_value ResourceManagerAddon::GetColorSync(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetColorSync", FunctionType::SYNC);
+    return AddonGetResource(env, info, "GetColorSync", FunctionType::SYNC);
 }
 
 napi_value ResourceManagerAddon::GetColorByNameSync(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetColorByNameSync", FunctionType::SYNC);
+    return AddonGetResource(env, info, "GetColorByNameSync", FunctionType::SYNC);
 }
 
 napi_value ResourceManagerAddon::AddResource(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "AddResource", FunctionType::SYNC);
+    return AddonGetResource(env, info, "AddResource", FunctionType::SYNC);
 }
 
 napi_value ResourceManagerAddon::RemoveResource(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "RemoveResource", FunctionType::SYNC);
+    return AddonGetResource(env, info, "RemoveResource", FunctionType::SYNC);
 }
 
 napi_value ResourceManagerAddon::GetMediaContentBase64Sync(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetMediaContentBase64Sync", FunctionType::SYNC);
+    return AddonGetResource(env, info, "GetMediaContentBase64Sync", FunctionType::SYNC);
 }
 
 napi_value ResourceManagerAddon::GetMediaContentSync(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetMediaContentSync", FunctionType::SYNC);
+    return AddonGetResource(env, info, "GetMediaContentSync", FunctionType::SYNC);
 }
 
 napi_value ResourceManagerAddon::GetPluralStringValueSync(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetPluralStringValueSync", FunctionType::SYNC);
+    return AddonGetResource(env, info, "GetPluralStringValueSync", FunctionType::SYNC);
 }
 
 napi_value ResourceManagerAddon::GetStringArrayValueSync(napi_env env, napi_callback_info info)
 {
-    auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
-    return addon->napiContext_->ContextGetResource(env, info, "GetStringArrayValueSync", FunctionType::SYNC);
+    return AddonGetResource(env, info, "GetStringArrayValueSync", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::GetRawFileContentSync(napi_env env, napi_callback_info info)
+{
+    return AddonGetResource(env, info, "GetRawFileContentSync", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::GetRawFdSync(napi_env env, napi_callback_info info)
+{
+    return AddonGetResource(env, info, "GetRawFdSync", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::CloseRawFdSync(napi_env env, napi_callback_info info)
+{
+    return AddonGetResource(env, info, "CloseRawFdSync", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::GetRawFileListSync(napi_env env, napi_callback_info info)
+{
+    return AddonGetResource(env, info, "GetRawFileListSync", FunctionType::SYNC);
 }
 } // namespace Resource
 } // namespace Global

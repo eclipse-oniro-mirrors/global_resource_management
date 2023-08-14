@@ -659,8 +659,13 @@ napi_value ResourceManagerNapiAsyncImpl::GetRawFile(napi_env env, napi_callback_
 }
 
 auto g_getRawFileDescriptorFunc = [](napi_env env, void* data) {
-    ResMgrDataContext *dataContext = static_cast<ResMgrDataContext*>(data);
-    dataContext->createValueFunc_ = ResourceManagerNapiUtils::CreateJsRawFd;
+    ResMgrDataContext *context = static_cast<ResMgrDataContext*>(data);
+    RState state = context->addon_->GetResMgr()->GetRawFileDescriptorFromHap(context->path_, context->descriptor_);
+    if (state != RState::SUCCESS) {
+        context->SetErrorMsg("Failed to get descriptor", false, state);
+        return;
+    }
+    context->createValueFunc_ = ResourceManagerNapiUtils::CreateJsRawFd;
 };
 
 napi_value ResourceManagerNapiAsyncImpl::GetRawFd(napi_env env, napi_callback_info info)
