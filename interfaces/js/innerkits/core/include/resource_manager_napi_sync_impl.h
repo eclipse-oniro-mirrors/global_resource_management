@@ -85,7 +85,7 @@ private:
 
     static int32_t InitNameAddon(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
-    
+
     static int32_t InitPathAddon(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
 

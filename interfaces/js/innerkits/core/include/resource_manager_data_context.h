@@ -78,7 +78,7 @@ struct ResMgrDataContext {
 
     static std::shared_ptr<ResourceManagerAddon> GetResourceManagerAddon(napi_env env, napi_callback_info info)
     {
-        GET_PARAMS(env, info, 2); // 2 means get two params 
+        GET_PARAMS(env, info, 2); // 2 means get two params
 
         std::shared_ptr<ResourceManagerAddon> *addonPtr = nullptr;
         napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&addonPtr));
