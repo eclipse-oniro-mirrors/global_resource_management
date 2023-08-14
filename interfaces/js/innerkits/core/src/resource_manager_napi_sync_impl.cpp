@@ -26,7 +26,7 @@ using namespace std::placeholders;
 constexpr int ARRAY_SUBCRIPTOR_ZERO = 0;
 constexpr int ARRAY_SUBCRIPTOR_ONE = 1;
 constexpr int PARAMS_NUM_TWO = 2;
-ResourceManagerNapiSyncImpl::ResourceManagerNapiSyncImpl() 
+ResourceManagerNapiSyncImpl::ResourceManagerNapiSyncImpl()
 {}
 
 ResourceManagerNapiSyncImpl::~ResourceManagerNapiSyncImpl()
@@ -134,7 +134,7 @@ napi_value ResourceManagerNapiSyncImpl::GetRawFileContentSync(napi_env env, napi
 
 napi_value ResourceManagerNapiSyncImpl::GetRawFdSync(napi_env env, napi_callback_info info)
 {
-     GET_PARAMS(env, info, PARAMS_NUM_TWO);
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
 
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
 

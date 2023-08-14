@@ -212,7 +212,7 @@ napi_value ResourceManagerAddon::AddonGetResource(napi_env env, napi_callback_in
 
 /*====================================Here is the asynchronization function==================================*/
 napi_value ResourceManagerAddon::GetString(napi_env env, napi_callback_info info)
-{   
+{
     return AddonGetResource(env, info, "GetString", FunctionType::ASYNC);
 }
 
