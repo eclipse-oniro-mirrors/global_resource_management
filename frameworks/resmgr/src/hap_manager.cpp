@@ -666,12 +666,11 @@ RState HapManager::GetMediaBase64DataFromIndex(const HapResource::ValueUnderQual
 
 int32_t HapManager::GetValidHapPath(std::string &hapPath)
 {
-    const std::string sysResHap = "SystemResources.hap";
     for (auto iter = hapResources_.rbegin(); iter != hapResources_.rend(); iter++) {
-        const std::string tempPath = (*iter)->GetIndexPath();
-        if (tempPath.find(sysResHap) != std::string::npos) {
+        if ((*iter)->IsSystemResource() || (*iter)->IsOverlayResource()) {
             continue;
         }
+        const std::string tempPath = (*iter)->GetIndexPath();
         if (Utils::ContainsTail(tempPath, Utils::tailSet)) {
             hapPath = tempPath;
             return OK;
@@ -680,7 +679,7 @@ int32_t HapManager::GetValidHapPath(std::string &hapPath)
     return NOT_FOUND;
 }
 
-RState HapManager::FindRawFileFromHap(const std::string rawFileName, size_t &len,
+RState HapManager::FindRawFileFromHap(const std::string &rawFileName, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue)
 {
     for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
@@ -706,7 +705,7 @@ RState HapManager::FindRawFileFromHap(const std::string rawFileName, size_t &len
     return ERROR_CODE_RES_PATH_INVALID;
 }
 
-RState HapManager::FindRawFileDescriptorFromHap(const std::string rawFileName,
+RState HapManager::FindRawFileDescriptorFromHap(const std::string &rawFileName,
     ResourceManager::RawFileDescriptor &descriptor)
 {
     auto it = rawFileDescriptor_.find(rawFileName);
@@ -718,6 +717,9 @@ RState HapManager::FindRawFileDescriptorFromHap(const std::string rawFileName,
     }
     RState state;
     for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
+        if ((*iter)->IsSystemResource() || (*iter)->IsOverlayResource()) {
+            continue;
+        }
         const std::string tempPath = (*iter)->GetIndexPath();
         if (Utils::ContainsTail(tempPath, Utils::tailSet)) { // if file path is compressed
             state = HapParser::ReadRawFileDescriptor(tempPath.c_str(), rawFileName, descriptor);
@@ -733,7 +735,7 @@ RState HapManager::FindRawFileDescriptorFromHap(const std::string rawFileName,
     return ERROR_CODE_RES_PATH_INVALID;
 }
 
-RState HapManager::GetRawFileList(const std::string rawDirPath, std::vector<std::string>& fileList)
+RState HapManager::GetRawFileList(const std::string &rawDirPath, std::vector<std::string> &fileList)
 {
     std::string hapPath;
     return HapManager::GetValidHapPath(hapPath) == OK ? HapParser::GetRawFileList(hapPath, rawDirPath, fileList)

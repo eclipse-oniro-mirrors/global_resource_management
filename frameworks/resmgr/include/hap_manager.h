@@ -191,7 +191,7 @@ public:
      * @param outValue the rawfile data
      * @return SUCCESS if resource exist, else NOT_FOUND
      */
-    RState FindRawFileFromHap(const std::string rawFileName, size_t &len,
+    RState FindRawFileFromHap(const std::string &rawFileName, size_t &len,
         std::unique_ptr<uint8_t[]> &outValue);
 
     /**
@@ -200,7 +200,8 @@ public:
      * @param descriptor the rawfile descriptor
      * @return SUCCESS if resource exist, else NOT_FOUND
      */
-    RState FindRawFileDescriptorFromHap(const std::string rawFileName, ResourceManager::RawFileDescriptor &descriptor);
+    RState FindRawFileDescriptorFromHap(const std::string &rawFileName,
+        ResourceManager::RawFileDescriptor &descriptor);
 
     /**
      * Is load hap
@@ -221,7 +222,7 @@ public:
      * @param rawfileList the rawfile list write to
      * @return SUCCESS if resource exist, else not found
      */
-    RState GetRawFileList(const std::string rawDirPath, std::vector<std::string>& rawfileList);
+    RState GetRawFileList(const std::string &rawDirPath, std::vector<std::string>& rawfileList);
 
     /**
      * Get the raw file list
