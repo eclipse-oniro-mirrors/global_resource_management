@@ -582,7 +582,7 @@ RState HapManager::GetMediaData(const HapResource::ValueUnderQualifierDir *qd, s
     } else {
         state = HapManager::GetMediaDataFromIndex(qd, len, outValue);
     }
-    return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    return state;
 }
 
 RState HapManager::GetMediaDataFromHap(const HapResource::ValueUnderQualifierDir *qd, size_t &len,
@@ -629,7 +629,7 @@ RState HapManager::GetMediaBase64Data(const HapResource::ValueUnderQualifierDir 
     } else {
         state = HapManager::GetMediaBase64DataFromIndex(qd, outValue);
     }
-    return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    return state;
 }
 
 RState HapManager::GetMediaBase64DataFromHap(const HapResource::ValueUnderQualifierDir *qd, std::string &outValue)
