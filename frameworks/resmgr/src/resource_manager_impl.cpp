@@ -906,7 +906,8 @@ RState ResourceManagerImpl::GetMediaDataById(uint32_t id, size_t &len, std::uniq
         HILOG_ERROR("find qualifier value by media id error");
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
-    return hapManager_->GetMediaData(qd, len, outValue);
+    RState state = hapManager_->GetMediaData(qd, len, outValue);
+    return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_ID;
 }
 
 RState ResourceManagerImpl::GetMediaDataByName(const char *name, size_t &len, std::unique_ptr<uint8_t[]> &outValue,
@@ -921,7 +922,8 @@ RState ResourceManagerImpl::GetMediaDataByName(const char *name, size_t &len, st
         HILOG_ERROR("find qualifier value by media name error");
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
-    return hapManager_->GetMediaData(qd, len, outValue);
+    RState state = hapManager_->GetMediaData(qd, len, outValue);
+    return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_NAME;
 }
 
 RState ResourceManagerImpl::GetMediaBase64DataById(uint32_t id, std::string &outValue, uint32_t density)
@@ -935,7 +937,8 @@ RState ResourceManagerImpl::GetMediaBase64DataById(uint32_t id, std::string &out
         HILOG_ERROR("find qualifier value by media id error");
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
-    return hapManager_->GetMediaBase64Data(qd, outValue);
+    RState state = hapManager_->GetMediaBase64Data(qd, outValue);
+    return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_ID;
 }
 
 RState ResourceManagerImpl::GetMediaBase64DataByName(const char *name, std::string &outValue, uint32_t density)
@@ -949,7 +952,8 @@ RState ResourceManagerImpl::GetMediaBase64DataByName(const char *name, std::stri
         HILOG_ERROR("find qualifier value by media name error");
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
-    return hapManager_->GetMediaBase64Data(qd, outValue);
+    RState state = hapManager_->GetMediaBase64Data(qd, outValue);
+    return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_NAME;
 }
 
 RState ResourceManagerImpl::GetProfileDataById(uint32_t id, size_t &len, std::unique_ptr<uint8_t[]> &outValue)

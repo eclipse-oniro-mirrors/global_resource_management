@@ -80,6 +80,18 @@ private:
 
     static napi_value CloseRawFdSync(napi_env env, napi_callback_info info);
 
+    static napi_value GetPluralStringByNameSync(napi_env env, napi_callback_info info);
+
+    static napi_value GetMediaBase64ByNameSync(napi_env env, napi_callback_info info);
+
+    static napi_value GetMediaByNameSync(napi_env env, napi_callback_info info);
+
+    static napi_value GetStringArrayByNameSync(napi_env env, napi_callback_info info);
+
+    static napi_value GetConfigurationSync(napi_env env, napi_callback_info info);
+
+    static napi_value GetDeviceCapabilitySync(napi_env env, napi_callback_info info);
+
     static int32_t InitIdResourceAddon(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
 
@@ -126,6 +138,18 @@ private:
         std::unique_ptr<ResMgrDataContext> &dataContext);
 
     static int32_t ProcessStringArrayValueResource(napi_env env, napi_callback_info info,
+        std::unique_ptr<ResMgrDataContext> &dataContext);
+
+    static int32_t ProcessPluralStrResourceByName(napi_env env, napi_callback_info info,
+        std::unique_ptr<ResMgrDataContext> &dataContext);
+
+    static int32_t ProcessMediaBase64ResourceByName(napi_env env, napi_callback_info info,
+        std::unique_ptr<ResMgrDataContext> &dataContext);
+
+    static int32_t ProcessMediaResourceByName(napi_env env, napi_callback_info info,
+        std::unique_ptr<ResMgrDataContext> &dataContext);
+
+    static int32_t ProcessStringArrayResourceByName(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
 };
 } // namespace Resource

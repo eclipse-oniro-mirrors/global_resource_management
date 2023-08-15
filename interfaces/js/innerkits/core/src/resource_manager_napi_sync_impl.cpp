@@ -53,7 +53,13 @@ std::unordered_map<std::string, std::function<napi_value(napi_env&, napi_callbac
     {"GetRawFileContentSync", std::bind(&ResourceManagerNapiSyncImpl::GetRawFileContentSync, _1, _2)},
     {"GetRawFdSync", std::bind(&ResourceManagerNapiSyncImpl::GetRawFdSync, _1, _2)},
     {"CloseRawFdSync", std::bind(&ResourceManagerNapiSyncImpl::CloseRawFdSync, _1, _2)},
-    {"GetRawFileListSync", std::bind(&ResourceManagerNapiSyncImpl::GetRawFileListSync, _1, _2)}
+    {"GetRawFileListSync", std::bind(&ResourceManagerNapiSyncImpl::GetRawFileListSync, _1, _2)},
+    {"GetPluralStringByNameSync", std::bind(&ResourceManagerNapiSyncImpl::GetPluralStringByNameSync, _1, _2)},
+    {"GetMediaBase64ByNameSync", std::bind(&ResourceManagerNapiSyncImpl::GetMediaBase64ByNameSync, _1, _2)},
+    {"GetMediaByNameSync", std::bind(&ResourceManagerNapiSyncImpl::GetMediaByNameSync, _1, _2)},
+    {"GetStringArrayByNameSync", std::bind(&ResourceManagerNapiSyncImpl::GetStringArrayByNameSync, _1, _2)},
+    {"GetConfigurationSync", std::bind(&ResourceManagerNapiSyncImpl::GetConfigurationSync, _1, _2)},
+    {"GetDeviceCapabilitySync", std::bind(&ResourceManagerNapiSyncImpl::GetDeviceCapabilitySync, _1, _2)}
 };
 
 napi_value ResourceManagerNapiSyncImpl::GetResource(napi_env env, napi_callback_info info,
@@ -237,6 +243,10 @@ int32_t ResourceManagerNapiSyncImpl::InitIdResourceAddon(napi_env env, napi_call
 {
     GET_PARAMS(env, info, PARAMS_NUM_TWO);
     dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
+    if (dataContext->addon_ == nullptr) {
+        HiLog::Error(LABEL, "Failed to get addon in InitIdResourceAddon");
+        return NOT_FOUND;
+    }
     if (ResourceManagerNapiUtils::IsNapiNumber(env, info)) {
         dataContext->resId_ = ResourceManagerNapiUtils::GetResId(env, argc, argv);
     } else if (ResourceManagerNapiUtils::IsNapiObject(env, info)) {
@@ -643,6 +653,10 @@ int32_t ResourceManagerNapiSyncImpl::InitNameAddon(napi_env env, napi_callback_i
 {
     GET_PARAMS(env, info, PARAMS_NUM_TWO);
     dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
+    if (dataContext->addon_ == nullptr) {
+        HiLog::Error(LABEL, "Failed to get addon in InitNameAddon");
+        return NOT_FOUND;
+    }
     if (ResourceManagerNapiUtils::IsNapiString(env, info)) {
         dataContext->resName_ = ResourceManagerNapiUtils::GetResNameOrPath(env, argc, argv);
     } else {
@@ -683,7 +697,7 @@ napi_value ResourceManagerNapiSyncImpl::GetStringByNameSync(napi_env env, napi_c
 
     state = ProcessStrResourceByName(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetStringByNameSync");
+        HiLog::Error(LABEL, "Failed to process string in GetStringByNameSync");
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -718,7 +732,7 @@ napi_value ResourceManagerNapiSyncImpl::GetColorByNameSync(napi_env env, napi_ca
 
     state = ProcessColorResourceByName(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetStringByNameSync");
+        HiLog::Error(LABEL, "Failed to process color in GetStringByNameSync");
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -864,6 +878,187 @@ napi_value ResourceManagerNapiSyncImpl::RemoveResource(napi_env env, napi_callba
     }
     return nullptr;
 }
+
+int32_t ResourceManagerNapiSyncImpl::ProcessPluralStrResourceByName(napi_env env, napi_callback_info info,
+    std::unique_ptr<ResMgrDataContext> &dataContext)
+{
+    RState state = dataContext->addon_->GetResMgr()->GetPluralStringByNameFormat(dataContext->value_,
+        dataContext->resName_.c_str(), dataContext->param_, dataContext->param_);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("GetPluralStringByNameSync failed state", true);
+        return state;
+    }
+    return SUCCESS;
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetPluralStringByNameSync(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+    if (!ResourceManagerNapiUtils::IsNapiString(env, info)) {
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to process para in GetPluralStringByNameSync");
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    if (ResourceManagerNapiUtils::GetType(env, argv[ARRAY_SUBCRIPTOR_ONE]) != napi_number) {
+        HiLog::Error(LABEL, "Parameter type is not napi_number in GetPluralStringByNameSync");
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+    napi_get_value_int32(env, argv[ARRAY_SUBCRIPTOR_ONE], &dataContext->param_);
+
+    state = ProcessPluralStrResourceByName(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to process plural in GetPluralStringByNameSync");
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    return ResourceManagerNapiUtils::CreateJsString(env, *dataContext);
+}
+
+int32_t ResourceManagerNapiSyncImpl::ProcessMediaBase64ResourceByName(napi_env env, napi_callback_info info,
+    std::unique_ptr<ResMgrDataContext> &dataContext)
+{
+    RState state = dataContext->addon_->GetResMgr()->GetMediaBase64DataByName(dataContext->resName_.c_str(),
+        dataContext->value_, dataContext->density_);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to get media data in GetMediaBase64ByNameSync", true);
+        return state;
+    }
+    return SUCCESS;
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetMediaBase64ByNameSync(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+    if (!ResourceManagerNapiUtils::IsNapiString(env, info)) {
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to process para in GetMediaBase64ByNameSync");
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    // density optional parameters
+    if (ResourceManagerNapiUtils::GetDensity(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+
+    state = ProcessMediaBase64ResourceByName(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to process media base64 resource in GetMediaBase64ByNameSync");
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    return ResourceManagerNapiUtils::CreateJsString(env, *dataContext);
+}
+
+int32_t ResourceManagerNapiSyncImpl::ProcessMediaResourceByName(napi_env env, napi_callback_info info,
+    std::unique_ptr<ResMgrDataContext> &dataContext)
+{
+    RState state = dataContext->addon_->GetResMgr()->GetMediaDataByName(dataContext->resName_.c_str(),
+        dataContext->len_, dataContext->mediaData, dataContext->density_);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("GetMediaByNameSync failed state", true);
+        return state;
+    }
+    return SUCCESS;
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetMediaByNameSync(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+    if (!ResourceManagerNapiUtils::IsNapiString(env, info)) {
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to process para in GetMediaByNameSync");
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    // density optional parameters
+    if (ResourceManagerNapiUtils::GetDensity(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+
+    state = ProcessMediaResourceByName(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to process media resource in GetMediaByNameSync");
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    return ResourceManagerNapiUtils::CreateJsUint8Array(env, *dataContext);
+}
+
+int32_t ResourceManagerNapiSyncImpl::ProcessStringArrayResourceByName(napi_env env, napi_callback_info info,
+    std::unique_ptr<ResMgrDataContext> &dataContext)
+{
+    RState state = dataContext->addon_->GetResMgr()->GetStringArrayByName(dataContext->resName_.c_str(),
+        dataContext->arrayValue_);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("GetStringArrayByNameSync failed state", true);
+        return state;
+    }
+    return SUCCESS;
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetStringArrayByNameSync(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+    if (!ResourceManagerNapiUtils::IsNapiString(env, info)) {
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to process para in GetStringArrayByNameSync");
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    state = ProcessStringArrayResourceByName(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to process plural string resource in GetStringArrayByNameSync");
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+    return ResourceManagerNapiUtils::CreateJsArray(env, *dataContext);
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetConfigurationSync(napi_env env, napi_callback_info info)
+{
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
+    return ResourceManagerNapiUtils::CreateJsConfig(env, *dataContext);
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetDeviceCapabilitySync(napi_env env, napi_callback_info info)
+{
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
+    return ResourceManagerNapiUtils::CreateJsDeviceCap(env, *dataContext);
+}
+
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
