@@ -171,6 +171,19 @@ private:
     static napi_value CloseRawFdSync(napi_env env, napi_callback_info info);
 
     static napi_value GetRawFileListSync(napi_env env, napi_callback_info info);
+
+    static napi_value GetPluralStringByNameSync(napi_env env, napi_callback_info info);
+
+    static napi_value GetMediaBase64ByNameSync(napi_env env, napi_callback_info info);
+
+    static napi_value GetMediaByNameSync(napi_env env, napi_callback_info info);
+
+    static napi_value GetStringArrayByNameSync(napi_env env, napi_callback_info info);
+
+    static napi_value GetConfigurationSync(napi_env env, napi_callback_info info);
+
+    static napi_value GetDeviceCapabilitySync(napi_env env, napi_callback_info info);
+
     std::string bundleName_;
     std::shared_ptr<ResourceManager> resMgr_;
     std::shared_ptr<AbilityRuntime::Context> context_;
