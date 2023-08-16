@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,8 +19,8 @@
 #include "likely_subtags_key_data.cpp"
 #include "likely_subtags_value_data.cpp"
 
+#include "utils/locale_data.cpp"
 #include "utils/common.h"
-#include "utils/locale_data.h"
 #include "utils/utils.h"
 
 namespace OHOS {
@@ -270,26 +270,26 @@ bool CompareLanguage(const ResLocale *current, const ResLocale *other)
     uint16_t otherEncodedLanguage = Utils::EncodeLanguageByResLocale(
         other);
     return ((currentEncodedLanguage == otherEncodedLanguage) ||
-        ((currentEncodedLanguage == NEW_LANGUAGES_CODES[0])
-            && (otherEncodedLanguage == OLD_LANGUAGES_CODES[0])) ||
-        ((otherEncodedLanguage == NEW_LANGUAGES_CODES[0])
-            && (currentEncodedLanguage == OLD_LANGUAGES_CODES[0])) ||
-        ((currentEncodedLanguage == NEW_LANGUAGES_CODES[1])
-            && (otherEncodedLanguage == OLD_LANGUAGES_CODES[1])) ||
-        ((otherEncodedLanguage == NEW_LANGUAGES_CODES[1])
-            && (currentEncodedLanguage == OLD_LANGUAGES_CODES[1])) ||
-        ((currentEncodedLanguage == NEW_LANGUAGES_CODES[2])
-            && (otherEncodedLanguage == OLD_LANGUAGES_CODES[2])) ||
-        ((otherEncodedLanguage == NEW_LANGUAGES_CODES[2])
-            && (currentEncodedLanguage == OLD_LANGUAGES_CODES[2])) ||
-        ((currentEncodedLanguage == NEW_LANGUAGES_CODES[3])
-            && (otherEncodedLanguage == OLD_LANGUAGES_CODES[3])) ||
-        ((otherEncodedLanguage == NEW_LANGUAGES_CODES[3])
-            && (currentEncodedLanguage == OLD_LANGUAGES_CODES[3])) ||
-        ((currentEncodedLanguage == NEW_LANGUAGES_CODES[4])
-            && (otherEncodedLanguage == OLD_LANGUAGES_CODES[4])) ||
-        ((otherEncodedLanguage == NEW_LANGUAGES_CODES[4])
-            && (currentEncodedLanguage == OLD_LANGUAGES_CODES[4])));
+        ((currentEncodedLanguage == NEW_LANGUAGES_CODES[0]) &&
+        (otherEncodedLanguage == OLD_LANGUAGES_CODES[0])) ||
+        ((otherEncodedLanguage == NEW_LANGUAGES_CODES[0]) &&
+        (currentEncodedLanguage == OLD_LANGUAGES_CODES[0])) ||
+        ((currentEncodedLanguage == NEW_LANGUAGES_CODES[1]) &&
+        (otherEncodedLanguage == OLD_LANGUAGES_CODES[1])) ||
+        ((otherEncodedLanguage == NEW_LANGUAGES_CODES[1]) &&
+        (currentEncodedLanguage == OLD_LANGUAGES_CODES[1])) ||
+        ((currentEncodedLanguage == NEW_LANGUAGES_CODES[2]) &&
+        (otherEncodedLanguage == OLD_LANGUAGES_CODES[2])) ||
+        ((otherEncodedLanguage == NEW_LANGUAGES_CODES[2]) &&
+        (currentEncodedLanguage == OLD_LANGUAGES_CODES[2])) ||
+        ((currentEncodedLanguage == NEW_LANGUAGES_CODES[3]) &&
+        (otherEncodedLanguage == OLD_LANGUAGES_CODES[3])) ||
+        ((otherEncodedLanguage == NEW_LANGUAGES_CODES[3]) &&
+        (currentEncodedLanguage == OLD_LANGUAGES_CODES[3])) ||
+        ((currentEncodedLanguage == NEW_LANGUAGES_CODES[4]) &&
+        (otherEncodedLanguage == OLD_LANGUAGES_CODES[4])) ||
+        ((otherEncodedLanguage == NEW_LANGUAGES_CODES[4]) &&
+        (currentEncodedLanguage == OLD_LANGUAGES_CODES[4])));
 }
 
 bool CompareScript(const ResLocale *current, const ResLocale *other)
