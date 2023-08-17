@@ -45,7 +45,7 @@ void ResourceManagerTestCommon::TearDown(void)
     delete this->rm;
 }
 
-int ResourceManagerTestCommon::GetResId(std::string name, ResType resType)
+int ResourceManagerTestCommon::GetResId(const std::string &name, ResType resType)
 {
     auto idv = ((ResourceManagerImpl *)rm)->hapManager_->GetResourceListByName(name.c_str(), resType);
     if (idv.size() == 0) {

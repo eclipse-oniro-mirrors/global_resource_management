@@ -34,9 +34,9 @@ namespace Global {
 namespace Resource {
 class ResourceManagerTestCommon {
 public:
-    void SetUpTestCase(void);
+    static void SetUpTestCase(void);
 
-    void TearDownTestCase(void);
+    static void TearDownTestCase(void);
 
     void SetUp();
 
@@ -48,7 +48,7 @@ public:
 public:
     ResourceManager *rm;
 
-    int GetResId(std::string name, ResType resType);
+    int GetResId(const std::string &name, ResType resType);
 
     void TestStringByName(const char *name, const char *cmp);
 
