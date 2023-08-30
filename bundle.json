@@ -58,8 +58,7 @@
               "napi",
               "ace_engine",
               "bundle_framework",
-              "c_utils",
-              "graphic_2d"
+              "c_utils"
             ],
             "third_party": [
               "zlib",
