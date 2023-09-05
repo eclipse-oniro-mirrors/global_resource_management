@@ -23,12 +23,10 @@ namespace Global {
 namespace Resource {
 ResourceManagerExtMgr::ResourceManagerExtMgr()
 {
-    HILOG_INFO("ResourceManagerExtMgr::ResourceManagerExtMgr");
 }
 
 ResourceManagerExtMgr::~ResourceManagerExtMgr()
 {
-    HILOG_INFO("ResourceManagerExtMgr::~ResourceManagerExtMgr()");
     for (auto entry : resMgrExtMap_) {
         entry.second.reset();
         entry.second = nullptr;
