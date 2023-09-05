@@ -48,7 +48,6 @@ SystemResourceManager::~SystemResourceManager()
 
 ResourceManagerImpl *SystemResourceManager::GetSystemResourceManager()
 {
-    HILOG_INFO("GetSystemResourceManager");
     // SystemAbility is not forked from appspawn, so SystemAbility should load sandbox system resource.
     bool isCreated = CreateSystemResourceManager(true);
     if (!isCreated) {
@@ -77,7 +76,6 @@ bool SystemResourceManager::CreateSystemResourceManager(bool isSandbox)
     }
     std::lock_guard<std::mutex> lock(mutex_);
     if (resourceManager_ == nullptr) {
-        HILOG_INFO("create system resource manager when CreateSystemResourceManager");
         ResourceManagerImpl *impl = new (std::nothrow) ResourceManagerImpl;
         if (impl == nullptr) {
             HILOG_ERROR("new ResourceManagerImpl failed when CreateSystemResourceManager");
@@ -88,7 +86,6 @@ bool SystemResourceManager::CreateSystemResourceManager(bool isSandbox)
             return false;
         }
         if (!LoadSystemResource(impl, isSandbox)) {
-            HILOG_WARN("load system resource failed when CreateSystemResourceManager");
             delete impl;
             return false;
         }
@@ -99,7 +96,6 @@ bool SystemResourceManager::CreateSystemResourceManager(bool isSandbox)
 
 bool SystemResourceManager::LoadSystemResource(ResourceManagerImpl *impl, bool isSandbox)
 {
-    HILOG_INFO("load system resource when GetSystemResourceManager");
     std::string sysPkgNamePath = SystemResourceManager::SYSTEM_RESOURCE_PATH;
     std::string sysHapNamePath = SystemResourceManager::SYSTEM_RESOURCE_PATH_COMPRESSED;
     if (!isSandbox) {
