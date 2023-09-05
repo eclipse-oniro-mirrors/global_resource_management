@@ -59,7 +59,6 @@ bool ResourceManagerNapiUtils::IsNapiNumber(napi_env env, napi_callback_info inf
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[ARRAY_SUBCRIPTOR_ZERO], &valueType);
     if (valueType != napi_number) {
-        HiLog::Warn(LABEL, "Parameter type is not napi_number");
         return false;
     }
     return true;
