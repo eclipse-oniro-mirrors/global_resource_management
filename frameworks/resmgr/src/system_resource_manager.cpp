@@ -52,7 +52,6 @@ ResourceManagerImpl *SystemResourceManager::GetSystemResourceManager()
     // SystemAbility is not forked from appspawn, so SystemAbility should load sandbox system resource.
     bool isCreated = CreateSystemResourceManager(true);
     if (!isCreated) {
-        HILOG_WARN("CreateSystemResourceManager failed when GetSystemResourceManager");
         return nullptr;
     }
     return resourceManager_;
