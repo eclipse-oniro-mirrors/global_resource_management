@@ -1188,6 +1188,11 @@ uint32_t ResourceManagerImpl::GetResourceLimitKeys()
     }
     return hapManager_->GetResourceLimitKeys();
 }
+
+RState ResourceManagerImpl::GetRawFdNdkFromHap(const std::string &name, RawFileDescriptor &descriptor)
+{
+    return hapManager_->GetRawFd(name, descriptor);
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

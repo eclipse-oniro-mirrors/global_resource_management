@@ -715,6 +715,11 @@ RState HapManager::FindRawFileDescriptorFromHap(const std::string &rawFileName,
         descriptor.offset = rawFileDescriptor_[rawFileName].offset;
         return SUCCESS;
     }
+    return GetRawFd(rawFileName, descriptor);
+}
+
+RState HapManager::GetRawFd(const std::string &rawFileName, ResourceManager::RawFileDescriptor &descriptor)
+{
     RState state;
     for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
         if ((*iter)->IsSystemResource() || (*iter)->IsOverlayResource()) {

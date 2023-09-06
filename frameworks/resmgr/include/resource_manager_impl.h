@@ -363,6 +363,14 @@ public:
     virtual RState GetRawFileDescriptor(const std::string &name, RawFileDescriptor &descriptor);
 
     /**
+     * Get the rawFile descriptor by resource name
+     * @param name the resource name
+     * @param descriptor the obtain raw file member fd, length, offet write to
+     * @return SUCCESS if resource exist, else ERROR
+     */
+    virtual RState GetRawFdNdkFromHap(const std::string &name, RawFileDescriptor &descriptor);
+
+    /**
      * Close rawFile descriptor by resource name
      * @param name the resource name
      * @return SUCCESS if close the rawFile descriptor, else ERROR

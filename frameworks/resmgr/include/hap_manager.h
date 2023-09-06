@@ -306,6 +306,15 @@ public:
      */
     uint32_t GetResourceLimitKeys();
 
+    /**
+     * Get the rawFile descriptor by resource name
+     *
+     * @param rawFile the rawfile name or relative path
+     * @param descriptor the obtain raw file member fd, length, offet write to
+     * @return SUCCESS if resource exist, else ERROR
+     */
+    RState GetRawFd(const std::string &rawFile, ResourceManager::RawFileDescriptor &descriptor);
+
 private:
     void UpdateResConfigImpl(ResConfigImpl &resConfig);
 
