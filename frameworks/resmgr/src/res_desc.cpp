@@ -80,6 +80,9 @@ std::string KeyParam::GetDeviceTypeStr() const
             case DeviceType::DEVICE_WEARABLE:
                 ret = std::string(WEARABLE_STR);
                 break;
+            case DeviceType::DEVICE_TWOINONE:
+                ret = std::string(TWOINONE_STR);
+                break;
             default:
                 break;
         }

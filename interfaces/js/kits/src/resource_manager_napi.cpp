@@ -237,6 +237,7 @@ static napi_value InitDeviceTypeObject(napi_env env)
     NAPI_CALL(env, SetEnumItem(env, object, "DEVICE_TYPE_PC", DEVICE_PAD));
     NAPI_CALL(env, SetEnumItem(env, object, "DEVICE_TYPE_TV", DEVICE_TV));
     NAPI_CALL(env, SetEnumItem(env, object, "DEVICE_TYPE_WEARABLE", DEVICE_WEARABLE));
+    NAPI_CALL(env, SetEnumItem(env, object, "DEVICE_TYPE_2IN1", DEVICE_TWOINONE));
     return object;
 }
 

@@ -38,6 +38,7 @@ static const char *CAR_STR = "car";
 static const char *PAD_STR = "pad";
 static const char *TV_STR = "tv";
 static const char *WEARABLE_STR = "wearable";
+static const char *TWOINONE_STR = "2in1";
 
 // ColorMode
 static const char *DARK_STR = "dark";
@@ -110,6 +111,7 @@ enum DeviceType {
     DEVICE_PAD      = 3,
     DEVICE_TV       = 4,
     DEVICE_WEARABLE = 6,
+    DEVICE_TWOINONE = 7,
 };
 
 enum ColorMode {
