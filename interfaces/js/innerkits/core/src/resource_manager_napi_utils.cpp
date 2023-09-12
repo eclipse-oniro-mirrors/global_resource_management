@@ -19,8 +19,6 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
-std::map<std::string, std::shared_ptr<ResourceManager>> g_resourceMgr;
-std::mutex g_resMapLock;
 constexpr int ARRAY_SUBCRIPTOR_ZERO = 0;
 constexpr int PARAMS_NUM_TWO = 2;
 
@@ -403,13 +401,6 @@ bool ResourceManagerNapiUtils::GetHapResourceManager(const ResMgrDataContext* da
     }
 
     resId = resource->id;
-    std::string key(resource->bundleName + "/" + resource->moduleName);
-    std::lock_guard<std::mutex> lock(g_resMapLock);
-    auto iter = g_resourceMgr.find(key);
-    if (iter != g_resourceMgr.end()) {
-        resMgr = g_resourceMgr[key];
-        return true;
-    }
     auto context = dataContext->addon_->GetContext();
     if (context == nullptr) {
         HiLog::Error(LABEL, "GetHapResourceManager context == nullptr");
@@ -421,7 +412,6 @@ bool ResourceManagerNapiUtils::GetHapResourceManager(const ResMgrDataContext* da
         return false;
     }
     resMgr = moduleContext->GetResourceManager();
-    g_resourceMgr[key] = resMgr;
     return true;
 }
 
