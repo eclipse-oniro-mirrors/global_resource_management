@@ -668,6 +668,8 @@ DeviceType HapParser::GetDeviceType(uint32_t value)
         deviceType = DEVICE_TV;
     } else if (value == DEVICE_WEARABLE) {
         deviceType = DEVICE_WEARABLE;
+    } else if (value == DEVICE_TWOINONE) {
+        deviceType = DEVICE_TWOINONE;
     }
     return deviceType;
 }
