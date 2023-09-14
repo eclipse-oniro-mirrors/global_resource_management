@@ -153,7 +153,13 @@ napi_property_descriptor ResourceManagerAddon::properties[] = {
     DECLARE_NAPI_FUNCTION("getRawFileContentSync", GetRawFileContentSync),
     DECLARE_NAPI_FUNCTION("getRawFdSync", GetRawFdSync),
     DECLARE_NAPI_FUNCTION("closeRawFdSync", CloseRawFdSync),
-    DECLARE_NAPI_FUNCTION("getRawFileListSync", GetRawFileListSync)
+    DECLARE_NAPI_FUNCTION("getRawFileListSync", GetRawFileListSync),
+    DECLARE_NAPI_FUNCTION("getPluralStringByNameSync", GetPluralStringByNameSync),
+    DECLARE_NAPI_FUNCTION("getMediaBase64ByNameSync", GetMediaBase64ByNameSync),
+    DECLARE_NAPI_FUNCTION("getMediaByNameSync", GetMediaByNameSync),
+    DECLARE_NAPI_FUNCTION("getStringArrayByNameSync", GetStringArrayByNameSync),
+    DECLARE_NAPI_FUNCTION("getConfigurationSync", GetConfigurationSync),
+    DECLARE_NAPI_FUNCTION("getDeviceCapabilitySync", GetDeviceCapabilitySync)
 };
 
 bool ResourceManagerAddon::Init(napi_env env)
@@ -440,6 +446,36 @@ napi_value ResourceManagerAddon::CloseRawFdSync(napi_env env, napi_callback_info
 napi_value ResourceManagerAddon::GetRawFileListSync(napi_env env, napi_callback_info info)
 {
     return AddonGetResource(env, info, "GetRawFileListSync", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::GetPluralStringByNameSync(napi_env env, napi_callback_info info)
+{
+    return AddonGetResource(env, info, "GetPluralStringByNameSync", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::GetMediaBase64ByNameSync(napi_env env, napi_callback_info info)
+{
+    return AddonGetResource(env, info, "GetMediaBase64ByNameSync", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::GetMediaByNameSync(napi_env env, napi_callback_info info)
+{
+    return AddonGetResource(env, info, "GetMediaByNameSync", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::GetStringArrayByNameSync(napi_env env, napi_callback_info info)
+{
+    return AddonGetResource(env, info, "GetStringArrayByNameSync", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::GetConfigurationSync(napi_env env, napi_callback_info info)
+{
+    return AddonGetResource(env, info, "GetConfigurationSync", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::GetDeviceCapabilitySync(napi_env env, napi_callback_info info)
+{
+    return AddonGetResource(env, info, "GetDeviceCapabilitySync", FunctionType::SYNC);
 }
 } // namespace Resource
 } // namespace Global
