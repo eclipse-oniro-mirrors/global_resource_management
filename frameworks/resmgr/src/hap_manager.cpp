@@ -52,6 +52,7 @@ namespace Resource {
 #ifdef SUPPORT_GRAPHICS
 constexpr uint32_t PLURAL_CACHE_MAX_COUNT = 3;
 #endif
+Lock g_rawFileLock;
 HapManager::HapManager(ResConfigImpl *resConfig, bool isSystem)
     : resConfig_(resConfig), isSystem_(isSystem)
 {
@@ -708,6 +709,7 @@ RState HapManager::FindRawFileFromHap(const std::string &rawFileName, size_t &le
 RState HapManager::FindRawFileDescriptorFromHap(const std::string &rawFileName,
     ResourceManager::RawFileDescriptor &descriptor)
 {
+    AutoMutex mutex(g_rawFileLock);
     auto it = rawFileDescriptor_.find(rawFileName);
     if (it != rawFileDescriptor_.end()) {
         descriptor.fd = rawFileDescriptor_[rawFileName].fd;
@@ -821,6 +823,7 @@ RState HapManager::FindRawFileDescriptor(const std::string &name, ResourceManage
 
 RState HapManager::CloseRawFileDescriptor(const std::string &name)
 {
+    AutoMutex mutex(g_rawFileLock);
     auto it = rawFileDescriptor_.find(name);
     if (it == rawFileDescriptor_.end()) {
         return ERROR_CODE_RES_PATH_INVALID;
