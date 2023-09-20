@@ -186,7 +186,7 @@ int32_t HapParser::ReadIndexFromFile(const char *zipFile, std::unique_ptr<uint8_
     return ReadFileInfoFromZip(uf, indexFilePath.c_str(), buffer, bufLen);
 }
 
-std::string HapParser::GetPath(const std::string filePath, std::string &rawFilePath)
+std::string HapParser::GetPath(const std::string &filePath, std::string &rawFilePath)
 {
     std::string tempName = filePath;
     const std::string rawFileDirName = "rawfile/";
@@ -231,7 +231,7 @@ std::string GetRawFilePathFromFA(std::shared_ptr<AbilityBase::Extractor> &extrac
     return rawFilePath;
 }
 
-std::string GetRawFilePathFromStage(const std::string filePath)
+std::string GetRawFilePathFromStage(const std::string &filePath)
 {
     std::string rawFilePath("resources/");
     HapParser::GetPath(filePath, rawFilePath);
@@ -239,7 +239,7 @@ std::string GetRawFilePathFromStage(const std::string filePath)
 }
 
 std::string HapParser::GetRawFilePath(std::shared_ptr<AbilityBase::Extractor> &extractor,
-    const std::string rawFileName)
+    const std::string &rawFileName)
 {
     std::string rawfilePath;
     if (extractor->IsStageModel()) {
@@ -251,7 +251,7 @@ std::string HapParser::GetRawFilePath(std::shared_ptr<AbilityBase::Extractor> &e
 }
 #endif
 
-RState HapParser::ReadRawFileFromHap(const std::string hapPath, const std::string rawFileName, size_t &len,
+RState HapParser::ReadRawFileFromHap(const std::string &hapPath, const std::string &rawFileName, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
@@ -262,6 +262,10 @@ RState HapParser::ReadRawFileFromHap(const std::string hapPath, const std::strin
         return NOT_FOUND;
     }
     std::string rawfilePath = HapParser::GetRawFilePath(extractor, rawFileName);
+    if (!extractor->HasEntry(rawfilePath)) {
+        HILOG_ERROR("the rawfile file %{public}s is not exist in %{public}s", rawfilePath.c_str(), hapPath.c_str());
+        return ERROR_CODE_RES_PATH_INVALID;
+    }
     bool ret = extractor->ExtractToBufByName(rawfilePath, outValue, len);
     if (!ret) {
         HILOG_ERROR("failed to get rawfile data rawfilePath, %{public}s, hapPath, %{public}s",
@@ -272,7 +276,7 @@ RState HapParser::ReadRawFileFromHap(const std::string hapPath, const std::strin
     return SUCCESS;
 }
 
-RState HapParser::ReadRawFileDescriptor(const char *hapPath, const std::string rawFileName,
+RState HapParser::ReadRawFileDescriptor(const char *hapPath, const std::string &rawFileName,
     ResourceManager::RawFileDescriptor &descriptor)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
@@ -290,6 +294,10 @@ RState HapParser::ReadRawFileDescriptor(const char *hapPath, const std::string r
         return NOT_FOUND;
     }
     std::string rawfilePath = HapParser::GetRawFilePath(extractor, rawFileName);
+    if (!extractor->HasEntry(rawfilePath)) {
+        HILOG_ERROR("the rawfile file %{public}s is not exist in %{public}s", rawfilePath.c_str(), hapPath);
+        return ERROR_CODE_RES_PATH_INVALID;
+    }
     AbilityBase::FileInfo fileInfo;
     bool ret = extractor->GetFileInfo(rawfilePath, fileInfo);
     if (!ret) {
@@ -303,7 +311,7 @@ RState HapParser::ReadRawFileDescriptor(const char *hapPath, const std::string r
     return SUCCESS;
 }
 
-RState HapParser::GetRawFileList(const std::string hapPath, const std::string rawDirPath,
+RState HapParser::GetRawFileList(const std::string &hapPath, const std::string &rawDirPath,
     std::vector<std::string>& fileList)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
@@ -315,6 +323,10 @@ RState HapParser::GetRawFileList(const std::string hapPath, const std::string ra
     }
     std::set<std::string> fileSet;
     std::string rawfilePath = HapParser::GetRawFilePath(extractor, rawDirPath);
+    if (!extractor->IsDirExist(rawfilePath)) {
+        HILOG_ERROR("the rawfile dir %{public}s is not exist in %{public}s", rawfilePath.c_str(), hapPath.c_str());
+        return ERROR_CODE_RES_PATH_INVALID;
+    }
     bool ret = extractor->GetFileList(rawfilePath, fileSet);
     if (!ret) {
         HILOG_ERROR("failed to get fileSet from ability rawfilePath, %{public}s", rawfilePath.c_str());
