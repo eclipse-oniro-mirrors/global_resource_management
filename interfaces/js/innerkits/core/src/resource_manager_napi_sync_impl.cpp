@@ -676,7 +676,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessStrResourceByName(napi_env env, napi
     RState state = dataContext->addon_->GetResMgr()->GetStringFormatByName(dataContext->resName_.c_str(),
         dataContext->value_, dataContext->jsParams_);
     if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("GetStringByNameSync failed state", true);
+        dataContext->SetErrorMsg("GetStringByNameSync failed state", false);
         return state;
     }
     return SUCCESS;
@@ -711,7 +711,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessColorResourceByName(napi_env env, na
     RState state = dataContext->addon_->GetResMgr()->GetColorByName(dataContext->resName_.c_str(),
         dataContext->colorValue_);
     if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("GetStringByNameSync failed state", true);
+        dataContext->SetErrorMsg("GetColorByNameSync failed state", false);
         return state;
     }
     return SUCCESS;
@@ -725,14 +725,14 @@ napi_value ResourceManagerNapiSyncImpl::GetColorByNameSync(napi_env env, napi_ca
 
     int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetStringByNameSync");
+        HiLog::Error(LABEL, "Failed to process para in GetColorByNameSync");
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
 
     state = ProcessColorResourceByName(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process color in GetStringByNameSync");
+        HiLog::Error(LABEL, "Failed to process color in GetColorByNameSync");
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -761,14 +761,14 @@ napi_value ResourceManagerNapiSyncImpl::GetNumberByName(napi_env env, napi_callb
 
     int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetStringByNameSync");
+        HiLog::Error(LABEL, "Failed to process para in GetNumberByName");
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
 
     state = ProcessNumResourceByName(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process string in GetStringSync");
+        HiLog::Error(LABEL, "Failed to process number in GetNumberByName");
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -784,7 +784,7 @@ napi_value ResourceManagerNapiSyncImpl::GetBooleanByName(napi_env env, napi_call
 
     int32_t ret = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (ret != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetStringByNameSync");
+        HiLog::Error(LABEL, "Failed to process para in GetBooleanByName");
         ResourceManagerNapiUtils::NapiThrow(env, ret);
         return nullptr;
     }
@@ -792,7 +792,7 @@ napi_value ResourceManagerNapiSyncImpl::GetBooleanByName(napi_env env, napi_call
     RState state = dataContext->addon_->GetResMgr()->GetBooleanByName(dataContext->resName_.c_str(),
         dataContext->bValue_);
     if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("GetBooleanByName failed state", true);
+        dataContext->SetErrorMsg("GetBooleanByName failed state", false);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -885,7 +885,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessPluralStrResourceByName(napi_env env
     RState state = dataContext->addon_->GetResMgr()->GetPluralStringByNameFormat(dataContext->value_,
         dataContext->resName_.c_str(), dataContext->param_, dataContext->param_);
     if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("GetPluralStringByNameSync failed state", true);
+        dataContext->SetErrorMsg("GetPluralStringByNameSync failed state", false);
         return state;
     }
     return SUCCESS;
@@ -915,7 +915,7 @@ napi_value ResourceManagerNapiSyncImpl::GetPluralStringByNameSync(napi_env env, 
 
     state = ProcessPluralStrResourceByName(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process plural in GetPluralStringByNameSync");
+        HiLog::Error(LABEL, "Failed to process plural string in GetPluralStringByNameSync");
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -929,7 +929,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessMediaBase64ResourceByName(napi_env e
     RState state = dataContext->addon_->GetResMgr()->GetMediaBase64DataByName(dataContext->resName_.c_str(),
         dataContext->value_, dataContext->density_);
     if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to get media data in GetMediaBase64ByNameSync", true);
+        dataContext->SetErrorMsg("Failed to get media data in GetMediaBase64ByNameSync", false);
         return state;
     }
     return SUCCESS;
@@ -972,7 +972,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessMediaResourceByName(napi_env env, na
     RState state = dataContext->addon_->GetResMgr()->GetMediaDataByName(dataContext->resName_.c_str(),
         dataContext->len_, dataContext->mediaData, dataContext->density_);
     if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("GetMediaByNameSync failed state", true);
+        dataContext->SetErrorMsg("GetMediaByNameSync failed state", false);
         return state;
     }
     return SUCCESS;
@@ -1015,7 +1015,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessStringArrayResourceByName(napi_env e
     RState state = dataContext->addon_->GetResMgr()->GetStringArrayByName(dataContext->resName_.c_str(),
         dataContext->arrayValue_);
     if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("GetStringArrayByNameSync failed state", true);
+        dataContext->SetErrorMsg("GetStringArrayByNameSync failed state", false);
         return state;
     }
     return SUCCESS;
@@ -1038,7 +1038,7 @@ napi_value ResourceManagerNapiSyncImpl::GetStringArrayByNameSync(napi_env env, n
 
     state = ProcessStringArrayResourceByName(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process plural string resource in GetStringArrayByNameSync");
+        HiLog::Error(LABEL, "Failed to process string array resource in GetStringArrayByNameSync");
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
