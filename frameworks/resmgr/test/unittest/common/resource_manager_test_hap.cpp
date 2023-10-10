@@ -1062,4 +1062,100 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerOverlayTest006, TestSize.Level1)
     ASSERT_TRUE(ret);
     rmc->TestStringById("ohos_lab_answer_call", "接听电话");
 }
+
+/*
+ * @tc.name: ResourceManagerGetResIdTest001
+ * @tc.desc: Test GetResId function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetResIdTest001, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    const std::string resTypeName = "app.string.entry_MainAbility";
+    uint32_t id = 0;
+    RState state = rm->GetResId(resTypeName, id);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(id, 16777225);
+}
+
+/*
+ * @tc.name: ResourceManagerGetResIdTest002
+ * @tc.desc: Test GetResId function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetResIdTest002, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    const std::string resTypeName = "app.media.icon";
+    uint32_t id = 0;
+    RState state = rm->GetResId(resTypeName, id);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(id, 16777306);
+}
+
+/*
+ * @tc.name: ResourceManagerGetResIdTest003
+ * @tc.desc: Test GetResId function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetResIdTest003, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    const std::string resTypeName = "app.color.color_aboutPage_title_primary";
+    uint32_t id = 0;
+    RState state = rm->GetResId(resTypeName, id);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(id, 16777258);
+}
+
+/*
+ * @tc.name: ResourceManagerGetResIdTest004
+ * @tc.desc: Test GetResId function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetResIdTest004, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    const std::string resTypeName = "app.string.xxx";
+    uint32_t id = 0;
+    RState state = rm->GetResId(resTypeName, id);
+    EXPECT_TRUE(state == NOT_FOUND);
+    EXPECT_EQ(id, 0);
+}
+
+/*
+ * @tc.name: ResourceManagerGetResIdTest005
+ * @tc.desc: Test GetResId function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetResIdTest005, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    const std::string resTypeName = "xxx.string.entry_MainAbility";
+    uint32_t id = 0;
+    RState state = rm->GetResId(resTypeName, id);
+    EXPECT_TRUE(state == NOT_FOUND);
+    EXPECT_EQ(id, 0);
+}
+
+/*
+ * @tc.name: ResourceManagerGetResIdTest006
+ * @tc.desc: Test GetResId function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetResIdTest006, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    const std::string resTypeName = "app.xxx.entry_MainAbility";
+    uint32_t id = 0;
+    RState state = rm->GetResId(resTypeName, id);
+    EXPECT_TRUE(state == NOT_FOUND);
+    EXPECT_EQ(id, 0);
+}
 }

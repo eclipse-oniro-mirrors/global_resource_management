@@ -77,6 +77,12 @@ int ResourceManagerUtilsTest001(void);
 int ResourceManagerGetResourceLimitKeysTest001(void);
 int ResourceManagerGetResourceLimitKeysTest002(void);
 int ResourceManagerGetResourceLimitKeysTest003(void);
+int ResourceManagerGetResIdTest001(void);
+int ResourceManagerGetResIdTest002(void);
+int ResourceManagerGetResIdTest003(void);
+int ResourceManagerGetResIdTest004(void);
+int ResourceManagerGetResIdTest005(void);
+int ResourceManagerGetResIdTest006(void);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

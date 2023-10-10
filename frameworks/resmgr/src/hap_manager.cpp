@@ -20,6 +20,7 @@
 #include <cstdlib>
 #include <fcntl.h>
 #include <unistd.h>
+#include <tuple>
 #include "utils/errors.h"
 #ifdef SUPPORT_GRAPHICS
 #include <ohos/init_data.h>
@@ -922,6 +923,105 @@ uint32_t HapManager::GetResourceLimitKeys()
     }
     HILOG_INFO("hap manager limit key is %{public}u", limitKeysValue);
     return limitKeysValue;
+}
+
+std::unordered_map<std::string, ResType> ResTypeMap {
+    {"integer", INTEGER},
+    {"string", STRING},
+    {"strarray", STRINGARRAY},
+    {"intarray", INTARRAY},
+    {"boolean", BOOLEAN},
+    {"color", COLOR},
+    {"theme", THEME},
+    {"plural", PLURALS},
+    {"float", FLOAT},
+    {"media", MEDIA},
+    {"profile", PROF},
+    {"pattern", PATTERN},
+};
+
+bool IsPrefix(std::string_view prefix, std::string_view full)
+{
+    return prefix == full.substr(0, prefix.size());
+}
+
+uint32_t GetRealResId(const std::string &resType,
+    const std::vector<std::unordered_map<ResType, uint32_t>> &candidates)
+{
+    for (auto candidate : candidates) {
+        for (auto data : candidate) {
+            if (ResTypeMap.find(resType) != ResTypeMap.end() && ResTypeMap[resType] == data.first) {
+                return data.second;
+            }
+        }
+    }
+    return 0;
+}
+
+std::tuple<std::string, std::string> GetResTypeAndResName(const std::string &resTypeName)
+{
+    std::tuple<std::string, std::string> typeNameTuple;
+    auto pos1 = resTypeName.find('.');
+    auto pos2 = resTypeName.rfind('.');
+    if (pos1 == std::string::npos || pos2 == std::string::npos) {
+        return std::make_tuple("", "");
+    }
+    const std::string resType = resTypeName.substr(pos1 + 1, pos2 - pos1 - 1);
+    if (ResTypeMap.find(resType) == ResTypeMap.end()) {
+        return std::make_tuple("", "");
+    }
+    const std::string resName = resTypeName.substr(pos2 + 1);
+    if (resName.empty()) {
+        return std::make_tuple("", "");
+    }
+    typeNameTuple = std::make_tuple(resType, resName);
+    return typeNameTuple;
+}
+
+RState HapManager::GetResId(const std::string &resTypeName, uint32_t &resId)
+{
+    auto typeNameTuple = GetResTypeAndResName(resTypeName);
+    const std::string resType =  std::get<0>(typeNameTuple);
+    const std::string resName =  std::get<1>(typeNameTuple);
+    if (resType.empty() || resName.empty()) {
+        HILOG_ERROR("invalid resTypeName = %{public}s", resTypeName.c_str());
+        return NOT_FOUND;
+    }
+    bool isSystem = IsPrefix("sys", resTypeName);
+    bool isApp = IsPrefix("app", resTypeName);
+    if (!isSystem && !isApp) {
+        HILOG_ERROR("invalid resTypeName = %{public}s", resTypeName.c_str());
+        return NOT_FOUND;
+    }
+    for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
+        bool isSystemResource = (*iter)->IsSystemResource();
+        bool isOverlayResource = (*iter)->IsOverlayResource();
+        std::string indexPath = (*iter)->GetIndexPath();
+        if (isOverlayResource) {
+            continue;
+        }
+        if (isSystem && !isSystemResource) {
+            continue;
+        }
+        if (isApp && isSystemResource) {
+            continue;
+        }
+        std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> nameTypeIdMap =
+                (*iter)->BuildNameTypeIdMapping();
+        std::vector<std::unordered_map<ResType, uint32_t>> candidates;
+        for (auto data : nameTypeIdMap) {
+            if (data.first != resName) {
+                continue;
+            }
+            candidates.emplace_back(data.second);
+        }
+        resId = GetRealResId(resType, candidates);
+        if (resId == 0) {
+            HILOG_ERROR("GetResId name = %{public}s, resType = %{public}s", resName.c_str(), resType.c_str());
+            return NOT_FOUND;
+        }
+    }
+    return SUCCESS;
 }
 } // namespace Resource
 } // namespace Global
