@@ -268,11 +268,11 @@ public:
      */
     uint32_t GetResourceLimitKeys() const;
 
+    std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> BuildNameTypeIdMapping() const;
+
 private:
     HapResource(const std::string path, time_t lastModTime, ResDesc *resDes,
         bool isSystem = false, bool isOverlay = false);
-
-    std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> BuildNameTypeIdMapping() const;
 
     void UpdateOverlayInfo(std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> &nameTypeId);
 

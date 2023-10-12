@@ -315,6 +315,15 @@ public:
      */
     RState GetRawFd(const std::string &rawFile, ResourceManager::RawFileDescriptor &descriptor);
 
+    /**
+     * Get the resource id by resType and resName
+     *
+     * @param resTypeName the resType and resName
+     * @param resId the resId write to
+     * @return SUCCESS if resource exist, else ERROR
+     */
+    RState GetResId(const std::string &resTypeName, uint32_t &resId);
+
 private:
     void UpdateResConfigImpl(ResConfigImpl &resConfig);
 

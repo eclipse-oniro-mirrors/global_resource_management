@@ -543,6 +543,15 @@ public:
      */
     virtual uint32_t GetResourceLimitKeys();
 
+    /**
+     * Get the resource id by resType and resName
+     *
+     * @param resTypeName the resType and resName
+     * @param resId the resId write to
+     * @return SUCCESS if resource exist, else ERROR
+     */
+    virtual RState GetResId(const std::string &resTypeName, uint32_t &resId);
+
 private:
     RState GetString(const IdItem *idItem, std::string &outValue);
 

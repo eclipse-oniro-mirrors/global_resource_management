@@ -179,6 +179,8 @@ public:
     virtual bool RemoveAppOverlay(const std::string &path) = 0;
 
     virtual RState GetRawFdNdkFromHap(const std::string &rawFileName, RawFileDescriptor &descriptor) = 0;
+
+    virtual RState GetResId(const std::string &resTypeName, uint32_t &resId) = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();

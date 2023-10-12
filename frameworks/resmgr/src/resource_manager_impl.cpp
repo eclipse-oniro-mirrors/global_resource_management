@@ -1193,6 +1193,11 @@ RState ResourceManagerImpl::GetRawFdNdkFromHap(const std::string &name, RawFileD
 {
     return hapManager_->GetRawFd(name, descriptor);
 }
+
+RState ResourceManagerImpl::GetResId(const std::string &resTypeName, uint32_t &resId)
+{
+    return hapManager_->GetResId(resTypeName, resId);
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
