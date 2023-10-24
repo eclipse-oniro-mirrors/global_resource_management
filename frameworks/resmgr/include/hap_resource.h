@@ -19,6 +19,7 @@
 #include <string>
 #include <time.h>
 #include <unordered_map>
+#include <set>
 #include "res_desc.h"
 #include "res_config_impl.h"
 
@@ -270,6 +271,16 @@ public:
 
     std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> BuildNameTypeIdMapping() const;
 
+    /**
+     * Get locale list
+     *
+     * @param outValue the locales write to, the locale string is divided into three parts: language,
+     *     script (optional), and region (optional), concatenated by the connector (-).
+     * @param includeSystem the parameter controls whether to include system resources,
+     *     it has no effect when only system resources query the locales list.
+     */
+    void GetLocales(std::set<std::string> &outValue, bool includeSystem);
+
 private:
     HapResource(const std::string path, time_t lastModTime, ResDesc *resDes,
         bool isSystem = false, bool isOverlay = false);
@@ -278,6 +289,8 @@ private:
 
     uint32_t GetLimitPathsKeys(const std::vector<ValueUnderQualifierDir *> &limitPaths,
         std::vector<bool> &keyTypes) const;
+
+    void GetKeyParamsLocales(const std::vector<KeyParam *> keyParams, std::set<std::string> &outValue);
 
     // must call Init() after constructor
     bool Init();

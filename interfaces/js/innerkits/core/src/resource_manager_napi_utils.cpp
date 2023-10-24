@@ -549,6 +549,25 @@ RState ResourceManagerNapiUtils::GetDensity(napi_env env, napi_value value, uint
     }
     return SUCCESS;
 }
+
+RState ResourceManagerNapiUtils::GetIncludeSystem(napi_env env, napi_value value, bool &includeSystem)
+{
+    napi_valuetype valuetype;
+    napi_typeof(env, value, &valuetype);
+    if (valuetype == napi_undefined || valuetype == napi_null) {
+        return SUCCESS;
+    }
+    if (valuetype != napi_boolean) {
+        HiLog::Error(LABEL, "Invalid param, not boolean");
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+
+    if (napi_get_value_bool(env, value, &includeSystem) != napi_ok) {
+        HiLog::Error(LABEL, "Failed to get includeSystem");
+        return NOT_FOUND;
+    }
+    return SUCCESS;
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

@@ -1158,4 +1158,46 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetResIdTest006, TestSize.Level1
     EXPECT_TRUE(state == NOT_FOUND);
     EXPECT_EQ(id, 0);
 }
+
+/*
+ * @tc.name: ResourceManagerGetLocalesTest001
+ * @tc.desc: Test GetLocales function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetLocalesTest001, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    std::vector<std::string> outValue;
+    rm->GetLocales(outValue);
+    EXPECT_EQ(static_cast<size_t>(4), outValue.size());
+}
+
+/*
+ * @tc.name: ResourceManagerGetLocalesTest002
+ * @tc.desc: Test GetLocales function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetLocalesTest002, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    std::vector<std::string> outValue;
+    rm->GetLocales(outValue, false);
+    EXPECT_EQ(static_cast<size_t>(4), outValue.size());
+}
+
+/*
+ * @tc.name: ResourceManagerGetLocalesTest003
+ * @tc.desc: Test GetLocales function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetLocalesTest003, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    std::vector<std::string> outValue;
+    rm->GetLocales(outValue, true);
+    EXPECT_EQ(static_cast<size_t>(4), outValue.size());
+}
 }

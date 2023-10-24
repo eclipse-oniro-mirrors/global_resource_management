@@ -64,6 +64,8 @@ public:
     static bool GetHapResourceManager(const ResMgrDataContext* dataContext,
         std::shared_ptr<ResourceManager> &resMgr, int32_t &resId);
 
+    static RState GetIncludeSystem(napi_env env, napi_value value, bool &includeSystem);
+
 private:
 
     static const std::unordered_map<int32_t, std::string> ErrorCodeToMsg;

@@ -181,6 +181,8 @@ public:
     virtual RState GetRawFdNdkFromHap(const std::string &rawFileName, RawFileDescriptor &descriptor) = 0;
 
     virtual RState GetResId(const std::string &resTypeName, uint32_t &resId) = 0;
+
+    virtual void GetLocales(std::vector<std::string> &outValue, bool includeSystem = false) = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();
