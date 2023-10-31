@@ -84,6 +84,11 @@ HWTEST_F(ResConfigImplTest, ResConfigImplMatchTest002, TestSize.Level1)
     ResConfigImpl *other = CreateResConfigImpl("en", nullptr, "CA");
     ResConfigImpl *current = CreateResConfigImpl("fr", nullptr, "CA");
     EXPECT_FALSE(current->Match(other));
+
+    Locale locale;
+    locale = GetLocale("en", nullptr, "CA");
+    current->SetPreferredLocaleInfo(locale);
+    EXPECT_TRUE(current->Match(other));
     delete current;
     delete other;
 };
@@ -97,6 +102,11 @@ HWTEST_F(ResConfigImplTest, ResConfigImplMatchTest003, TestSize.Level1)
 {
     ResConfigImpl *other = CreateResConfigImpl("tl", nullptr, "PH");
     ResConfigImpl *current = CreateResConfigImpl("fil", nullptr, "PH");
+    EXPECT_TRUE(current->Match(other));
+
+    Locale locale;
+    locale = GetLocale("en", nullptr, "CA");
+    current->SetPreferredLocaleInfo(locale);
     EXPECT_TRUE(current->Match(other));
     delete current;
     delete other;
@@ -182,6 +192,11 @@ HWTEST_F(ResConfigImplTest, ResConfigImplMatchTest009, TestSize.Level1)
     ResConfigImpl *other = CreateResConfigImpl("qaa", "Latn", "FR");
     ResConfigImpl *current = CreateResConfigImpl("qaa", nullptr, "CA");
     EXPECT_FALSE(current->Match(other));
+
+    Locale locale;
+    locale = GetLocale("qaa", "Latn", "FR");
+    current->SetPreferredLocaleInfo(locale);
+    EXPECT_TRUE(current->Match(other));
     delete current;
     delete other;
 };
@@ -196,6 +211,11 @@ HWTEST_F(ResConfigImplTest, ResConfigImplMatchTest010, TestSize.Level1)
     ResConfigImpl *other = CreateResConfigImpl("qaa", nullptr, "FR");
     ResConfigImpl *current = CreateResConfigImpl("qaa", "Latn", "CA");
     EXPECT_FALSE(current->Match(other));
+
+    Locale locale;
+    locale = GetLocale("qaa", nullptr, "FR");
+    current->SetPreferredLocaleInfo(locale);
+    EXPECT_TRUE(current->Match(other));
     delete current;
     delete other;
 };
@@ -209,6 +229,15 @@ HWTEST_F(ResConfigImplTest, ResConfigImplMatchTest011, TestSize.Level1)
 {
     ResConfigImpl *other = CreateResConfigImpl("az", nullptr, nullptr);
     ResConfigImpl *current = CreateResConfigImpl("az", "Cyrl", nullptr);
+    EXPECT_FALSE(current->Match(other));
+
+    Locale locale;
+    locale = GetLocale("az", nullptr, nullptr);
+    current->SetPreferredLocaleInfo(locale);
+    EXPECT_TRUE(current->Match(other));
+
+    locale = GetLocale("qaa", "Latn", "CA");
+    current->SetPreferredLocaleInfo(locale);
     EXPECT_FALSE(current->Match(other));
     delete current;
     delete other;
@@ -593,6 +622,34 @@ HWTEST_F(ResConfigImplTest, ResConfigImplMatchTest035, TestSize.Level1)
 };
 
 /*
+ * @tc.name: ResConfigImplMatchTest036
+ * @tc.desc: Test set preferred locale ResConfig Match
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResConfigImplTest, ResConfigImplMatchTest036, TestSize.Level1)
+{
+    ResConfigImpl *other = CreateResConfigImpl("en", nullptr, "CA");
+    ResConfigImpl *current = CreateResConfigImpl("fr", nullptr, "CA");
+    EXPECT_FALSE(current->Match(other));
+
+    Locale locale;
+    locale = GetLocale(nullptr, nullptr, nullptr);
+    current->SetPreferredLocaleInfo(locale);
+    EXPECT_FALSE(current->Match(other));
+
+    locale = GetLocale("fr", nullptr, "CA");
+    current->SetPreferredLocaleInfo(locale);
+    EXPECT_FALSE(current->Match(other));
+
+    locale = GetLocale("en", nullptr, "CA");
+    current->SetPreferredLocaleInfo(locale);
+    EXPECT_TRUE(current->Match(other));
+
+    delete current;
+    delete other;
+};
+
+/*
  * @tc.name: ResConfigImplIsMoreSuitableTest001
  * @tc.desc: Test ResConfig IsMoreSuitable
  * @tc.type: FUNC
@@ -619,6 +676,12 @@ HWTEST_F(ResConfigImplTest, ResConfigImplIsMoreSuitableTest002, TestSize.Level1)
     ResConfigImpl *request = CreateResConfigImpl("fr", nullptr, "CA");
     ResConfigImpl *current = CreateResConfigImpl(nullptr, nullptr, nullptr);
     ResConfigImpl *other = CreateResConfigImpl(nullptr, nullptr, nullptr);
+    EXPECT_TRUE(current->IsMoreSuitable(other, request));
+    EXPECT_TRUE(other->IsMoreSuitable(current, request));
+
+    Locale locale;
+    locale = GetLocale(nullptr, nullptr, nullptr);
+    request->SetPreferredLocaleInfo(locale);
     EXPECT_TRUE(current->IsMoreSuitable(other, request));
     EXPECT_TRUE(other->IsMoreSuitable(current, request));
     delete request;
@@ -655,6 +718,13 @@ HWTEST_F(ResConfigImplTest, ResConfigImplIsMoreSuitableTest004, TestSize.Level1)
     ResConfigImpl *other = CreateResConfigImpl("fil", nullptr, "US");
     EXPECT_TRUE(current->IsMoreSuitable(other, request));
     EXPECT_FALSE(other->IsMoreSuitable(current, request));
+
+    Locale locale;
+    locale = GetLocale("fil", nullptr, "US");
+    request->SetPreferredLocaleInfo(locale);
+    EXPECT_FALSE(current->IsMoreSuitable(other, request));
+    EXPECT_TRUE(other->IsMoreSuitable(current, request));
+
     delete request;
     delete current;
     delete other;
@@ -774,6 +844,12 @@ HWTEST_F(ResConfigImplTest, ResConfigImplIsMoreSuitableTest011, TestSize.Level1)
     ResConfigImpl *other = CreateResConfigImpl("es", nullptr, "ES");
     EXPECT_TRUE(current->IsMoreSuitable(other, request));
     EXPECT_FALSE(other->IsMoreSuitable(current, request));
+
+    Locale locale;
+    locale = GetLocale("es", nullptr, "ES");
+    request->SetPreferredLocaleInfo(locale);
+    EXPECT_FALSE(current->IsMoreSuitable(other, request));
+    EXPECT_TRUE(other->IsMoreSuitable(current, request));
     delete request;
     delete current;
     delete other;
@@ -1012,6 +1088,13 @@ HWTEST_F(ResConfigImplTest, ResConfigImplIsMoreSuitableTest025, TestSize.Level1)
     ResConfigImpl *other = CreateResConfigImpl("zh", "Hant", "TW");
     EXPECT_TRUE(current->IsMoreSuitable(other, request));
     EXPECT_FALSE(other->IsMoreSuitable(current, request));
+
+    Locale locale;
+    locale = GetLocale("zh", "Hant", "US");
+    request->SetPreferredLocaleInfo(locale);
+    EXPECT_FALSE(current->IsMoreSuitable(other, request));
+    EXPECT_TRUE(other->IsMoreSuitable(current, request));
+
     delete request;
     delete current;
     delete other;
@@ -1233,6 +1316,12 @@ HWTEST_F(ResConfigImplTest, ResConfigImplIsMoreSuitableTest038, TestSize.Level1)
     ResConfigImpl *other = CreateResConfigImpl("en", nullptr, "CA");
     EXPECT_TRUE(current->IsMoreSuitable(other, request));
     EXPECT_FALSE(other->IsMoreSuitable(current, request));
+
+    Locale locale;
+    locale = GetLocale("en", nullptr, "CA");
+    request->SetPreferredLocaleInfo(locale);
+    EXPECT_FALSE(current->IsMoreSuitable(other, request));
+    EXPECT_TRUE(other->IsMoreSuitable(current, request));
     delete request;
     delete current;
     delete other;
@@ -1696,6 +1785,31 @@ HWTEST_F(ResConfigImplTest, ResConfigImplIsMoreSuitableTest060, TestSize.Level1)
     other->SetScreenDensity(ScreenDensity::SCREEN_DENSITY_NOT_SET);
     EXPECT_FALSE(current->IsMoreSuitable(other, request));
     EXPECT_TRUE(other->IsMoreSuitable(current, request));
+    delete request;
+    delete current;
+    delete other;
+}
+
+/*
+ * @tc.name: ResConfigImplIsMoreSuitableTest061
+ * @tc.desc: Test ResConfig IsMoreSuitable, match preferredLocale
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResConfigImplTest, ResConfigImplIsMoreSuitableTest061, TestSize.Level1)
+{
+    ResConfigImpl *request = CreateResConfigImpl("en", nullptr, "IN");
+    ResConfigImpl *current = CreateResConfigImpl("en", nullptr, "AU");
+    ResConfigImpl *other = CreateResConfigImpl("en", nullptr, "CA");
+    EXPECT_TRUE(current->IsMoreSuitable(other, request));
+    EXPECT_FALSE(other->IsMoreSuitable(current, request));
+
+    Locale currentLocale;
+    currentLocale = GetLocale("en", nullptr, "CA");
+    request->SetPreferredLocaleInfo(currentLocale);
+    EXPECT_FALSE(current->IsMoreSuitable(other, request));
+    EXPECT_TRUE(other->IsMoreSuitable(current, request));
+
+
     delete request;
     delete current;
     delete other;

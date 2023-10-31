@@ -235,13 +235,25 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest004, TestSize.Le
     // update to another language, will trigger reload
     // before reload:
     rmc->TestStringByName("app_name", "App Name");
-
     rc->SetLocaleInfo("zh", nullptr, nullptr);
     state = rm->UpdateResConfig(*rc);
-    delete rc;
     EXPECT_EQ(SUCCESS, state);
     // after reload:
     rmc->TestStringByName("app_name", "应用名称");
+#ifdef SUPPORT_GRAPHICS
+    // update to App Preferred language,weill trigger reload
+    Locale locale = GetLocale("en", nullptr, nullptr);
+    rc->SetPreferredLocaleInfo(locale);
+    state = rm->UpdateResConfig(*rc);
+    
+    EXPECT_EQ(SUCCESS, state);
+    rmc->TestStringByName("app_name", "App Name");
+    locale = GetLocale(nullptr, nullptr, nullptr);
+    rc->SetPreferredLocaleInfo(locale);
+    state = rm->UpdateResConfig(*rc);
+    EXPECT_EQ(SUCCESS, state);
+    delete rc;
+#endif
 }
 
 /*
@@ -282,6 +294,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigTest001, TestSize.Level
     rm->GetResConfig(rc);
 #ifdef SUPPORT_GRAPHICS
     EXPECT_EQ(nullptr, rc.GetLocaleInfo());
+    EXPECT_EQ(nullptr, rc.GetPreferredLocaleInfo());
 #endif
     EXPECT_EQ(DIRECTION_NOT_SET, rc.GetDirection());
     EXPECT_EQ(SCREEN_DENSITY_NOT_SET, rc.GetScreenDensity());
@@ -304,6 +317,10 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigTest002, TestSize.Level
             return;
         }
         rc->SetLocaleInfo("en", nullptr, "US");
+#ifdef SUPPORT_GRAPHICS
+        Locale locale = GetLocale("zh", "Hans", "CN");
+        rc->SetPreferredLocaleInfo(locale);
+#endif
         rc->SetDeviceType(DeviceType::DEVICE_CAR);
         state = rm->UpdateResConfig(*rc);
         delete rc;
@@ -314,6 +331,9 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigTest002, TestSize.Level
     rm->GetResConfig(rc);
 #ifdef SUPPORT_GRAPHICS
     EXPECT_EQ("en", std::string(rc.GetLocaleInfo()->getLanguage()));
+    EXPECT_EQ("zh", std::string(rc.GetPreferredLocaleInfo()->getLanguage()));
+    EXPECT_EQ("CN", std::string(rc.GetPreferredLocaleInfo()->getCountry()));
+    EXPECT_EQ("Hans", std::string(rc.GetPreferredLocaleInfo()->getScript()));
 #endif
     EXPECT_EQ(DEVICE_CAR, rc.GetDeviceType());
 }
