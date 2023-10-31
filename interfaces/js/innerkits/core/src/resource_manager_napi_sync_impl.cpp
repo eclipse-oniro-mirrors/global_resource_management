@@ -59,7 +59,8 @@ std::unordered_map<std::string, std::function<napi_value(napi_env&, napi_callbac
     {"GetMediaByNameSync", std::bind(&ResourceManagerNapiSyncImpl::GetMediaByNameSync, _1, _2)},
     {"GetStringArrayByNameSync", std::bind(&ResourceManagerNapiSyncImpl::GetStringArrayByNameSync, _1, _2)},
     {"GetConfigurationSync", std::bind(&ResourceManagerNapiSyncImpl::GetConfigurationSync, _1, _2)},
-    {"GetDeviceCapabilitySync", std::bind(&ResourceManagerNapiSyncImpl::GetDeviceCapabilitySync, _1, _2)}
+    {"GetDeviceCapabilitySync", std::bind(&ResourceManagerNapiSyncImpl::GetDeviceCapabilitySync, _1, _2)},
+    {"GetLocales", std::bind(&ResourceManagerNapiSyncImpl::GetLocales, _1, _2)}
 };
 
 napi_value ResourceManagerNapiSyncImpl::GetResource(napi_env env, napi_callback_info info,
@@ -1059,6 +1060,21 @@ napi_value ResourceManagerNapiSyncImpl::GetDeviceCapabilitySync(napi_env env, na
     return ResourceManagerNapiUtils::CreateJsDeviceCap(env, *dataContext);
 }
 
+napi_value ResourceManagerNapiSyncImpl::GetLocales(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
+
+    // includeSystem optional parameters
+    if (ResourceManagerNapiUtils::GetIncludeSystem(env, argv[ARRAY_SUBCRIPTOR_ZERO],
+        dataContext->bValue_) != SUCCESS) {
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+    dataContext->addon_->GetResMgr()->GetLocales(dataContext->arrayValue_, dataContext->bValue_);
+    return ResourceManagerNapiUtils::CreateJsArray(env, *dataContext);
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

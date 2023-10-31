@@ -83,6 +83,9 @@ int ResourceManagerGetResIdTest003(void);
 int ResourceManagerGetResIdTest004(void);
 int ResourceManagerGetResIdTest005(void);
 int ResourceManagerGetResIdTest006(void);
+int ResourceManagerGetLocalesTest001(void);
+int ResourceManagerGetLocalesTest002(void);
+int ResourceManagerGetLocalesTest003(void);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

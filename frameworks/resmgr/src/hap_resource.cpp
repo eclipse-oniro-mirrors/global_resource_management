@@ -489,6 +489,47 @@ uint32_t HapResource::GetLimitPathsKeys(const std::vector<ValueUnderQualifierDir
     });
     return limitKeyValue;
 }
+
+void HapResource::GetLocales(std::set<std::string> &outValue, bool includeSystem)
+{
+    if ((!includeSystem && isSystem_) || (!isSystem_ && isOverlay_)) {
+        return;
+    }
+    for (size_t i = 0; i < resDesc_->keys_.size(); i++) {
+        GetKeyParamsLocales(resDesc_->keys_[i]->keyParams_, outValue);
+    }
+}
+
+void HapResource::GetKeyParamsLocales(const std::vector<KeyParam *> keyParams, std::set<std::string> &outValue)
+{
+    std::string locale;
+    bool isLocale = false;
+    for (size_t i = 0; i < keyParams.size(); i++) {
+        KeyType keyType = keyParams[i]->type_;
+        if (keyType == KeyType::MCC || keyType == KeyType::MNC) {
+            continue;
+        }
+        if (keyType == KeyType::LANGUAGES) {
+            locale = keyParams[i]->GetStr();
+            isLocale = true;
+            continue;
+        }
+        if (keyType == KeyType::SCRIPT) {
+            locale.append("-");
+            locale.append(keyParams[i]->GetStr());
+            continue;
+        }
+        if (keyType == KeyType::REGION) {
+            locale.append("-");
+            locale.append(keyParams[i]->GetStr());
+            break;
+        }
+        break;
+    }
+    if (isLocale) {
+        outValue.emplace(locale);
+    }
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

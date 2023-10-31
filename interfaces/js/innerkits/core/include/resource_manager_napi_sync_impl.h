@@ -92,6 +92,8 @@ private:
 
     static napi_value GetDeviceCapabilitySync(napi_env env, napi_callback_info info);
 
+    static napi_value GetLocales(napi_env env, napi_callback_info info);
+
     static int32_t InitIdResourceAddon(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
 

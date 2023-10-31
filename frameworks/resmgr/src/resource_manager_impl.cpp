@@ -1198,6 +1198,11 @@ RState ResourceManagerImpl::GetResId(const std::string &resTypeName, uint32_t &r
 {
     return hapManager_->GetResId(resTypeName, resId);
 }
+
+void ResourceManagerImpl::GetLocales(std::vector<std::string> &outValue, bool includeSystem)
+{
+    hapManager_->GetLocales(outValue, includeSystem);
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

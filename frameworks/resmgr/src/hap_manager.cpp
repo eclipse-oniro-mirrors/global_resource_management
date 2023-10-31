@@ -21,6 +21,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <tuple>
+#include <set>
 #include "utils/errors.h"
 #ifdef SUPPORT_GRAPHICS
 #include <ohos/init_data.h>
@@ -1022,6 +1023,18 @@ RState HapManager::GetResId(const std::string &resTypeName, uint32_t &resId)
         }
     }
     return SUCCESS;
+}
+
+void HapManager::GetLocales(std::vector<std::string> &outValue, bool includeSystem)
+{
+    if (isSystem_) {
+        includeSystem = true;
+    }
+    std::set<std::string> result;
+    for (size_t i = 0; i < hapResources_.size(); i++) {
+        hapResources_[i]->GetLocales(result, includeSystem);
+    }
+    outValue.assign(result.begin(), result.end());
 }
 } // namespace Resource
 } // namespace Global

@@ -159,7 +159,8 @@ napi_property_descriptor ResourceManagerAddon::properties[] = {
     DECLARE_NAPI_FUNCTION("getMediaByNameSync", GetMediaByNameSync),
     DECLARE_NAPI_FUNCTION("getStringArrayByNameSync", GetStringArrayByNameSync),
     DECLARE_NAPI_FUNCTION("getConfigurationSync", GetConfigurationSync),
-    DECLARE_NAPI_FUNCTION("getDeviceCapabilitySync", GetDeviceCapabilitySync)
+    DECLARE_NAPI_FUNCTION("getDeviceCapabilitySync", GetDeviceCapabilitySync),
+    DECLARE_NAPI_FUNCTION("getLocales", GetLocales)
 };
 
 bool ResourceManagerAddon::Init(napi_env env)
@@ -476,6 +477,11 @@ napi_value ResourceManagerAddon::GetConfigurationSync(napi_env env, napi_callbac
 napi_value ResourceManagerAddon::GetDeviceCapabilitySync(napi_env env, napi_callback_info info)
 {
     return AddonGetResource(env, info, "GetDeviceCapabilitySync", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::GetLocales(napi_env env, napi_callback_info info)
+{
+    return AddonGetResource(env, info, "GetLocales", FunctionType::SYNC);
 }
 } // namespace Resource
 } // namespace Global
