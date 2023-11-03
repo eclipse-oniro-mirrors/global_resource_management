@@ -99,7 +99,7 @@ napi_value ResourceManagerNapiSyncImpl::GetRawFileListSync(napi_env env, napi_ca
 
     int32_t ret = InitPathAddon(env, info, dataContext);
     if (ret != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetRawFileListSync");
+        HiLog::Error(LABEL, "Failed to init para in GetRawFileListSync by %{public}s", dataContext->path_.c_str());
         ResourceManagerNapiUtils::NapiThrow(env, ret);
         return nullptr;
     }
@@ -123,7 +123,7 @@ napi_value ResourceManagerNapiSyncImpl::GetRawFileContentSync(napi_env env, napi
 
     int32_t ret = InitPathAddon(env, info, dataContext);
     if (ret != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetRawFileContentSync");
+        HiLog::Error(LABEL, "Failed to init para in GetRawFileContentSync by %{public}s", dataContext->path_.c_str());
         ResourceManagerNapiUtils::NapiThrow(env, ret);
         return nullptr;
     }
@@ -147,7 +147,7 @@ napi_value ResourceManagerNapiSyncImpl::GetRawFdSync(napi_env env, napi_callback
 
     int32_t ret = InitPathAddon(env, info, dataContext);
     if (ret != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetRawFileContentSync");
+        HiLog::Error(LABEL, "Failed to init para in GetRawFdSync by %{public}s", dataContext->path_.c_str());
         ResourceManagerNapiUtils::NapiThrow(env, ret);
         return nullptr;
     }
@@ -170,7 +170,7 @@ napi_value ResourceManagerNapiSyncImpl::CloseRawFdSync(napi_env env, napi_callba
 
     int32_t ret = InitPathAddon(env, info, dataContext);
     if (ret != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetRawFileContentSync");
+        HiLog::Error(LABEL, "Failed to init para in CloseRawFdSync by %{public}s", dataContext->path_.c_str());
         ResourceManagerNapiUtils::NapiThrow(env, ret);
         return nullptr;
     }
@@ -294,14 +294,14 @@ napi_value ResourceManagerNapiSyncImpl::GetStringSync(napi_env env, napi_callbac
 
     int32_t state = InitIdResourceAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to init para in GetStringSync");
+        dataContext->SetErrorMsg("Failed to init para in GetStringSync", true);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
 
     state = ProcessStrResource(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process string in GetStringSync");
+        dataContext->SetErrorMsg("Failed to process string in GetStringSync", true);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -337,14 +337,14 @@ napi_value ResourceManagerNapiSyncImpl::GetColorSync(napi_env env, napi_callback
 
     int32_t state = InitIdResourceAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to init para in GetColor");
+        dataContext->SetErrorMsg("Failed to init para in GetColorSync", true);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
 
     state = ProcessColorResource(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process string in GetColor");
+        dataContext->SetErrorMsg("Failed to process string in GetColorSync", true);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -379,14 +379,14 @@ napi_value ResourceManagerNapiSyncImpl::GetNumber(napi_env env, napi_callback_in
 
     int32_t state = InitIdResourceAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in InitIdResourceAddon");
+        dataContext->SetErrorMsg("Failed to init para in GetNumber", true);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
 
     state = ProcessNumResource(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process string in GetStringSync");
+        dataContext->SetErrorMsg("Failed to process string in GetNumber", true);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -420,14 +420,14 @@ napi_value ResourceManagerNapiSyncImpl::GetBoolean(napi_env env, napi_callback_i
 
     int32_t state = ResourceManagerNapiSyncImpl::InitIdResourceAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetBoolean");
+        dataContext->SetErrorMsg("Failed to init para in GetBoolean", true);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
 
     state = ProcessBoolResource(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process bool resource in GetBoolean");
+        dataContext->SetErrorMsg("Failed to process bool resource in GetBoolean", true);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -461,7 +461,7 @@ napi_value ResourceManagerNapiSyncImpl::GetMediaContentBase64Sync(napi_env env, 
 
     int32_t state = ResourceManagerNapiSyncImpl::InitIdResourceAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetMediaContentBase64Sync");
+        dataContext->SetErrorMsg("Failed to init para in GetMediaContentBase64Sync", true);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -472,7 +472,7 @@ napi_value ResourceManagerNapiSyncImpl::GetMediaContentBase64Sync(napi_env env, 
     }
     state = ProcesstMediaContentBase64Resource(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process media base64 resource in GetMediaContentBase64Sync");
+        dataContext->SetErrorMsg("Failed to process media base64 resource in GetMediaContentBase64Sync", true);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -507,7 +507,7 @@ napi_value ResourceManagerNapiSyncImpl::GetMediaContentSync(napi_env env, napi_c
 
     int32_t state = ResourceManagerNapiSyncImpl::InitIdResourceAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetMediaContentSync");
+        dataContext->SetErrorMsg("Failed to init para in GetMediaContentSync", true);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -518,7 +518,7 @@ napi_value ResourceManagerNapiSyncImpl::GetMediaContentSync(napi_env env, napi_c
     }
     state = ProcessMediaContentResource(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process media resource in GetMediaContentSync");
+        dataContext->SetErrorMsg("Failed to process media resource in GetMediaContentSync", true);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -553,7 +553,7 @@ napi_value ResourceManagerNapiSyncImpl::GetPluralStringValueSync(napi_env env, n
 
     int32_t state = ResourceManagerNapiSyncImpl::InitIdResourceAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetPluralStringValueSync");
+        dataContext->SetErrorMsg("Failed to init para in GetPluralStringValueSync",true);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -567,7 +567,7 @@ napi_value ResourceManagerNapiSyncImpl::GetPluralStringValueSync(napi_env env, n
 
     state = ProcessPluralStringValueResource(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process plural string resource in GetPluralStringValueSync");
+        dataContext->SetErrorMsg("Failed to process plural string resource in GetPluralStringValueSync", true);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -601,14 +601,14 @@ napi_value ResourceManagerNapiSyncImpl::GetStringArrayValueSync(napi_env env, na
 
     int32_t state = ResourceManagerNapiSyncImpl::InitIdResourceAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetStringArrayValueSync");
+        dataContext->SetErrorMsg("Failed to init para in GetStringArrayValueSync", true);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
 
     state = ProcessStringArrayValueResource(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process string array resource in GetStringArrayValueSync");
+        dataContext->SetErrorMsg("Failed to process string array resource in GetStringArrayValueSync", true);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -622,7 +622,7 @@ napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptor(napi_env env, napi
     auto dataContext = std::make_unique<ResMgrDataContext>();
     int32_t ret = ResourceManagerNapiSyncImpl::InitIdResourceAddon(env, info, dataContext);
     if (ret != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in ProcessIdResourceDensityParam");
+        dataContext->SetErrorMsg("Failed to init para in GetDrawableDescriptor", true);
         ResourceManagerNapiUtils::NapiThrow(env, ret);
         return nullptr;
     }
@@ -634,7 +634,7 @@ napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptor(napi_env env, napi
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     int32_t resId = 0;
     if (!ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId)) {
-        HiLog::Error(LABEL, "Failed to get ResourceManagerNapiUtils::GetHapResourceManager in GetDrawableDescriptor");
+        dataContext->SetErrorMsg("Failed to get ResourceManagerNapiUtils::GetHapResourceManager in GetDrawableDescriptor", true);
         return nullptr;
     }
     RState state = SUCCESS;
@@ -642,7 +642,7 @@ napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptor(napi_env env, napi
     auto drawableDescriptor = Ace::Napi::DrawableDescriptorFactory::Create(resId, resMgr,
         state, drawableType, dataContext->density_);
     if (state != SUCCESS) {
-        HiLog::Error(LABEL, "Failed to Create drawableDescriptor by %{public}d", resId);
+        dataContext->SetErrorMsg("Failed to Create drawableDescriptor", true);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -691,14 +691,14 @@ napi_value ResourceManagerNapiSyncImpl::GetStringByNameSync(napi_env env, napi_c
 
     int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetStringByNameSync");
+        dataContext->SetErrorMsg("Failed to init para in GetStringByNameSync", false);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
 
     state = ProcessStrResourceByName(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process string in GetStringByNameSync");
+        dataContext->SetErrorMsg("Failed to process string in GetStringByNameSync", false);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -726,14 +726,14 @@ napi_value ResourceManagerNapiSyncImpl::GetColorByNameSync(napi_env env, napi_ca
 
     int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetColorByNameSync");
+        dataContext->SetErrorMsg("Failed to init para in GetColorByNameSync", false);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
 
     state = ProcessColorResourceByName(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process color in GetColorByNameSync");
+        dataContext->SetErrorMsg("Failed to process color in GetColorByNameSync", false);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -762,14 +762,14 @@ napi_value ResourceManagerNapiSyncImpl::GetNumberByName(napi_env env, napi_callb
 
     int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetNumberByName");
+        dataContext->SetErrorMsg("Failed to init para in GetNumberByName", false);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
 
     state = ProcessNumResourceByName(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process number in GetNumberByName");
+        dataContext->SetErrorMsg("Failed to process number in GetNumberByName", false);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -785,7 +785,7 @@ napi_value ResourceManagerNapiSyncImpl::GetBooleanByName(napi_env env, napi_call
 
     int32_t ret = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (ret != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetBooleanByName");
+        dataContext->SetErrorMsg("Failed to init para in GetBooleanByName", false);
         ResourceManagerNapiUtils::NapiThrow(env, ret);
         return nullptr;
     }
@@ -827,7 +827,7 @@ napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptorByName(napi_env env
     auto drawableDescriptor = Ace::Napi::DrawableDescriptorFactory::Create(dataContext->resName_.c_str(),
         resMgr, state, drawableType, dataContext->density_);
     if (state != SUCCESS) {
-        HiLog::Error(LABEL, "Failed to Create drawableDescriptor by %{public}s", dataContext->resName_.c_str());
+        dataContext->SetErrorMsg("Failed to Create drawableDescriptor ", false);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -902,7 +902,7 @@ napi_value ResourceManagerNapiSyncImpl::GetPluralStringByNameSync(napi_env env, 
     auto dataContext = std::make_unique<ResMgrDataContext>();
     int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetPluralStringByNameSync");
+        dataContext->SetErrorMsg("Failed to init para in GetPluralStringByNameSync", false);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -916,7 +916,7 @@ napi_value ResourceManagerNapiSyncImpl::GetPluralStringByNameSync(napi_env env, 
 
     state = ProcessPluralStrResourceByName(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process plural string in GetPluralStringByNameSync");
+        dataContext->SetErrorMsg("Failed to process plural string in GetPluralStringByNameSync", false);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -946,7 +946,7 @@ napi_value ResourceManagerNapiSyncImpl::GetMediaBase64ByNameSync(napi_env env, n
     auto dataContext = std::make_unique<ResMgrDataContext>();
     int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetMediaBase64ByNameSync");
+        dataContext->SetErrorMsg("Failed to init para in GetMediaBase64ByNameSync", false);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -959,7 +959,7 @@ napi_value ResourceManagerNapiSyncImpl::GetMediaBase64ByNameSync(napi_env env, n
 
     state = ProcessMediaBase64ResourceByName(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process media base64 resource in GetMediaBase64ByNameSync");
+        dataContext->SetErrorMsg("Failed to process media base64 resource in GetMediaBase64ByNameSync", false);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -989,7 +989,7 @@ napi_value ResourceManagerNapiSyncImpl::GetMediaByNameSync(napi_env env, napi_ca
     auto dataContext = std::make_unique<ResMgrDataContext>();
     int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetMediaByNameSync");
+        dataContext->SetErrorMsg("Failed to init para in GetMediaByNameSync", false);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -1002,7 +1002,7 @@ napi_value ResourceManagerNapiSyncImpl::GetMediaByNameSync(napi_env env, napi_ca
 
     state = ProcessMediaResourceByName(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process media resource in GetMediaByNameSync");
+        dataContext->SetErrorMsg("Failed to process media resource in GetMediaByNameSync", false);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -1032,14 +1032,14 @@ napi_value ResourceManagerNapiSyncImpl::GetStringArrayByNameSync(napi_env env, n
     auto dataContext = std::make_unique<ResMgrDataContext>();
     int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process para in GetStringArrayByNameSync");
+        dataContext->SetErrorMsg("Failed to init para in GetStringArrayByNameSync", false);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
 
     state = ProcessStringArrayResourceByName(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to process string array resource in GetStringArrayByNameSync");
+        dataContext->SetErrorMsg("Failed to process string array resource in GetStringArrayByNameSync", false);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
