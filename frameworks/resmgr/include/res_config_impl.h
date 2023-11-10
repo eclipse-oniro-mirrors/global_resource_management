@@ -49,6 +49,8 @@ public:
     RState SetLocaleInfo(const char *language, const char *script, const char *region);
 
 #ifdef SUPPORT_GRAPHICS
+    RState SetPreferredLocaleInfo(Locale &preferredLocaleInfo);
+
     RState SetLocaleInfo(Locale &localeInfo);
 #endif
     /**
@@ -88,6 +90,10 @@ public:
     void SetScreenDensity(float screenDensity);
 
 #ifdef SUPPORT_GRAPHICS
+    const ResLocale *GetResPreferredLocale() const;
+
+    const Locale *GetPreferredLocaleInfo() const;
+
     const Locale *GetLocaleInfo() const;
 #endif
 
@@ -155,6 +161,13 @@ private:
 
     bool CopyLocale(ResConfig &other);
 
+#ifdef SUPPORT_GRAPHICS
+    bool CopyPreferredLocale(ResConfig &other);
+
+    bool CopyLocale(Locale **currentLocaleInfo, ResLocale **currentResLocale,
+        const Locale *otherLocaleInfo);
+#endif
+
     bool IsMccMncMatch(uint32_t mcc,  uint32_t mnc) const;
 
     bool IsDirectionMatch(Direction direction) const;
@@ -172,6 +185,10 @@ private:
     bool IsDensityMoreSuitable(int thisDistance, int otherDistance) const;
 
     int IsDensityMoreSpecificThan(ScreenDensity otherDensity, uint32_t density = 0) const;
+
+    RState BuildResLocale(const char *language, const char *script, const char *region, ResLocale **resLocale);
+
+    RState BuildLocaleInfo(const ResLocale *resLocale, Locale **localeInfo);
 private:
     ResLocale *resLocale_;
     Direction direction_;
@@ -183,6 +200,8 @@ private:
     DeviceType deviceType_;
     InputDevice inputDevice_;
 #ifdef SUPPORT_GRAPHICS
+    ResLocale *resPreferredLocale_;
+    Locale *preferredLocaleInfo_;
     Locale *localeInfo_;
 #endif
     bool isCompletedScript_;

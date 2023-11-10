@@ -43,19 +43,20 @@ ohos_unittest("resmgr_test") {
     "../../../interfaces/inner_api/include",
   ]
 
+  deps = [
+    "../:global_resmgr",
+    "//third_party/googletest:gtest_main",
+    "//third_party/zlib:libz",
+  ]
+
   if (resource_management_support_icu) {
     include_dirs += [
       "//third_party/icu/icu4c/source",
       "//third_party/icu/icu4c/source/i18n",
     ]
     defines += [ "SUPPORT_GRAPHICS" ]
+    deps += [ "//third_party/icu/icu4c:shared_icuuc" ]
   }
-
-  deps = [
-    "../:global_resmgr",
-    "//third_party/googletest:gtest_main",
-    "//third_party/zlib:libz",
-  ]
 
   external_deps = [
     "ability_base:extractortool",

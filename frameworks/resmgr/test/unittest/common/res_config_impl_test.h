@@ -54,6 +54,7 @@ int ResConfigImplMatchTest032(void);
 int ResConfigImplMatchTest033(void);
 int ResConfigImplMatchTest034(void);
 int ResConfigImplMatchTest035(void);
+int ResConfigImplMatchTest036(void);
 int ResConfigImplIsMoreSuitableTest001(void);
 int ResConfigImplIsMoreSuitableTest002(void);
 int ResConfigImplIsMoreSuitableTest003(void);
@@ -114,6 +115,7 @@ int ResConfigImplIsMoreSuitableTest057(void);
 int ResConfigImplIsMoreSuitableTest058(void);
 int ResConfigImplIsMoreSuitableTest059(void);
 int ResConfigImplIsMoreSuitableTest060(void);
+int ResConfigImplIsMoreSuitableTest061(void);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

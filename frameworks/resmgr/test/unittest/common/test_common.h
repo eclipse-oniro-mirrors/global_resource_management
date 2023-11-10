@@ -19,10 +19,15 @@
 #include "hap_resource.h"
 #include "hilog_wrapper.h"
 
+#include <unicode/localebuilder.h>
+#include <unicode/locid.h>
+#include <unicode/utypes.h>
 #include <map>
 #include <string>
 #include <vector>
 
+using icu::Locale;
+using icu::LocaleBuilder;
 namespace OHOS {
 namespace Global {
 namespace Resource {
@@ -42,6 +47,8 @@ void PrintMapString(const std::map<std::string, std::string> &value);
 void PrintVectorString(const std::vector<std::string> &value);
 
 ResConfig *CreateResConfig(const char *language, const char *script, const char *region);
+
+Locale GetLocale(const char *language, const char *script, const char *region);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

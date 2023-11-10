@@ -78,6 +78,14 @@ ResConfig *CreateResConfig(const char *language, const char *script, const char 
     resConfig->SetLocaleInfo(language, script, region);
     return resConfig;
 }
+
+Locale GetLocale(const char *language, const char *script, const char *region)
+{
+    UErrorCode errCode = U_ZERO_ERROR;
+    Locale locale  = LocaleBuilder().setLanguage(language)
+        .setRegion(region).setScript(script).build(errCode);
+    return locale;
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

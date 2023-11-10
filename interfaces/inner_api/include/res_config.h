@@ -72,6 +72,12 @@ public:
     virtual ScreenDensity ConvertDensity(float density) = 0;
 
     virtual ~ResConfig() {}
+	
+#ifdef SUPPORT_GRAPHICS
+    virtual const Locale *GetPreferredLocaleInfo() const = 0;
+
+    virtual RState SetPreferredLocaleInfo(Locale &preferredLocaleInfo) = 0;
+#endif
 };
 
 EXPORT_FUNC ResConfig *CreateResConfig();

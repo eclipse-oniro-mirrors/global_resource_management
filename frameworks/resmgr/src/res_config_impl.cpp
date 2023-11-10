@@ -50,17 +50,71 @@ ResConfigImpl::ResConfigImpl()
     deviceType_(DEVICE_NOT_SET),
     inputDevice_(INPUTDEVICE_NOT_SET),
 #ifdef SUPPORT_GRAPHICS
+    resPreferredLocale_(nullptr),
+    preferredLocaleInfo_(nullptr),
     localeInfo_(nullptr),
 #endif
     isCompletedScript_(false)
 {}
 
 #ifdef SUPPORT_GRAPHICS
+RState ResConfigImpl::SetPreferredLocaleInfo(Locale &preferredLocaleInfo)
+{
+    const char *language = preferredLocaleInfo.getLanguage();
+    const char *script = preferredLocaleInfo.getScript();
+    const char *region = preferredLocaleInfo.getCountry();
+    if (Utils::IsStrEmpty(language)) {
+        delete this->resPreferredLocale_;
+        delete this->preferredLocaleInfo_;
+        this->resPreferredLocale_ = nullptr;
+        this->preferredLocaleInfo_ = nullptr;
+        return SUCCESS;
+    }
+    RState state = BuildResLocale(language, script, region, &this->resPreferredLocale_);
+    if (state != SUCCESS) {
+        return state;
+    }
+    return BuildLocaleInfo(this->resPreferredLocale_, &this->preferredLocaleInfo_);
+}
+
 RState ResConfigImpl::SetLocaleInfo(Locale &localeInfo)
 {
     return this->SetLocaleInfo(localeInfo.getLanguage(), localeInfo.getScript(), localeInfo.getCountry());
 }
 #endif
+
+RState ResConfigImpl::BuildResLocale(const char *language, const char *script,
+    const char *region, ResLocale **resLocale)
+{
+    RState state = SUCCESS;
+    ResLocale *temp = ResLocale::BuildFromParts(language, script, region, state);
+    if (state != SUCCESS) {
+        return state;
+    }
+    if (script == nullptr || script[0] == '\0') {
+        if (!LocaleMatcher::Normalize(temp)) {
+            delete temp;
+            temp = nullptr;
+            return NOT_ENOUGH_MEM;
+        }
+    }
+    delete *resLocale;
+    *resLocale = temp;
+    return state;
+}
+
+RState ResConfigImpl::BuildLocaleInfo(const ResLocale *resLocale, Locale **localeInfo)
+{
+    UErrorCode errCode = U_ZERO_ERROR;
+    Locale temp  = icu::LocaleBuilder().setLanguage(resLocale->GetLanguage())
+        .setRegion(resLocale->GetRegion()).setScript(resLocale->GetScript()).build(errCode);
+    if (!U_SUCCESS(errCode)) {
+        return NOT_ENOUGH_MEM;
+    }
+    delete *localeInfo;
+    *localeInfo = new Locale(temp);
+    return SUCCESS;
+}
 
 RState ResConfigImpl::SetLocaleInfo(const char *language,
     const char *script,
@@ -75,33 +129,16 @@ RState ResConfigImpl::SetLocaleInfo(const char *language,
         this->localeInfo_ = nullptr;
         return state;
     }
-    ResLocale *resLocale =
-        ResLocale::BuildFromParts(language, script, region, state);
-    if (state == SUCCESS) {
-        this->isCompletedScript_ = false;
-        if (script == nullptr || script[0] == '\0') {
-            if (LocaleMatcher::Normalize(resLocale)) {
-                this->isCompletedScript_ = true;
-            } else {
-                delete resLocale;
-                return NOT_ENOUGH_MEM;
-            }
-        }
-        UErrorCode errCode = U_ZERO_ERROR;
-        Locale temp = icu::LocaleBuilder().setLanguage(resLocale->GetLanguage())
-            .setRegion(resLocale->GetRegion()).setScript(resLocale->GetScript()).build(errCode);
-
-        if (!U_SUCCESS(errCode)) {
-            state = NOT_ENOUGH_MEM;
-            delete resLocale;
-            return state;
-        }
-        delete resLocale_;
-        delete localeInfo_;
-        resLocale_ = resLocale;
-        localeInfo_ = new Locale(temp);
+    this->isCompletedScript_ = false;
+    state = BuildResLocale(language, script, region, &this->resLocale_);
+    if (state != SUCCESS) {
+        return state;
     }
-
+    state = BuildLocaleInfo(this->resLocale_, &this->localeInfo_);
+    if (state != SUCCESS) {
+        return state;
+    }
+    this->isCompletedScript_ = true;
     return state;
 #else
     return NOT_SUPPORT_SEP;
@@ -158,6 +195,16 @@ void ResConfigImpl::SetScreenDensity(float screenDensity)
 }
 
 #ifdef SUPPORT_GRAPHICS
+const ResLocale *ResConfigImpl::GetResPreferredLocale() const
+{
+    return this->resPreferredLocale_;
+}
+
+const Locale *ResConfigImpl::GetPreferredLocaleInfo() const
+{
+    return this->preferredLocaleInfo_;
+}
+
 const Locale *ResConfigImpl::GetLocaleInfo() const
 {
     return localeInfo_;
@@ -203,27 +250,29 @@ DeviceType ResConfigImpl::GetDeviceType() const
 {
     return this->deviceType_;
 }
-bool ResConfigImpl::CopyLocale(ResConfig &other)
-{
+
 #ifdef SUPPORT_GRAPHICS
+bool ResConfigImpl::CopyLocale(Locale **currentLocaleInfo, ResLocale **currentResLocale,
+    const Locale *otherLocaleInfo)
+{
     bool needCopy = false;
-    if (this->GetLocaleInfo() == nullptr && other.GetLocaleInfo() != nullptr) {
+    if (*currentLocaleInfo == nullptr && otherLocaleInfo != nullptr) {
         needCopy = true;
     }
-    if (this->GetLocaleInfo() != nullptr && other.GetLocaleInfo() == nullptr) {
-        delete this->resLocale_;
-        delete this->localeInfo_;
-        this->resLocale_ = nullptr;
-        this->localeInfo_ = nullptr;
+    if (*currentLocaleInfo != nullptr && otherLocaleInfo == nullptr) {
+        delete *currentResLocale;
+        delete *currentLocaleInfo;
+        *currentResLocale = nullptr;
+        *currentLocaleInfo = nullptr;
         return true;
     }
-    if (this->GetResLocale() != nullptr && other.GetLocaleInfo() != nullptr) {
+    if (*currentResLocale != nullptr && otherLocaleInfo != nullptr) {
         uint64_t encodedLocale = Utils::EncodeLocale(
-            this->GetResLocale()->GetLanguage(),
-            this->GetResLocale()->GetScript(), this->GetResLocale()->GetRegion());
+            (*currentResLocale)->GetLanguage(),
+            (*currentResLocale)->GetScript(), (*currentResLocale)->GetRegion());
         uint64_t otherEncodedLocale = Utils::EncodeLocale(
-            other.GetLocaleInfo()->getLanguage(),
-            other.GetLocaleInfo()->getScript(), other.GetLocaleInfo()->getCountry());
+            otherLocaleInfo->getLanguage(),
+            otherLocaleInfo->getScript(), otherLocaleInfo->getCountry());
         if (encodedLocale != otherEncodedLocale) {
             needCopy = true;
         }
@@ -233,34 +282,52 @@ bool ResConfigImpl::CopyLocale(ResConfig &other)
         if (temp == nullptr) {
             return false;
         }
-        RState rs = temp->CopyFromLocaleInfo(other.GetLocaleInfo());
+        RState rs = temp->CopyFromLocaleInfo(otherLocaleInfo);
         if (rs != SUCCESS) {
             delete temp;
             return false;
         }
         UErrorCode errCode = U_ZERO_ERROR;
-        Locale tempLocale = icu::LocaleBuilder().setLocale(*other.GetLocaleInfo()).build(errCode);
+        Locale tempLocale = icu::LocaleBuilder().setLocale(*otherLocaleInfo).build(errCode);
 
         if (!U_SUCCESS(errCode)) {
             delete temp;
             return false;
         }
-        delete this->resLocale_;
-        delete this->localeInfo_;
-        this->resLocale_ = temp;
-        this->localeInfo_ = new Locale(tempLocale);
+        delete *currentResLocale;
+        delete *currentLocaleInfo;
+        *currentResLocale = temp;
+        *currentLocaleInfo = new Locale(tempLocale);
     }
     return true;
+}
+#endif
+
+#ifdef SUPPORT_GRAPHICS
+bool ResConfigImpl::CopyPreferredLocale(ResConfig &other)
+{
+    return CopyLocale(&this->preferredLocaleInfo_, &this->resPreferredLocale_, other.GetPreferredLocaleInfo());
+}
+#endif
+
+bool ResConfigImpl::CopyLocale(ResConfig &other)
+{
+#ifdef SUPPORT_GRAPHICS
+    return CopyLocale(&this->localeInfo_, &this->resLocale_, other.GetLocaleInfo());
 #else
     return false;
 #endif
 }
 bool ResConfigImpl::Copy(ResConfig &other)
 {
-    bool isSuccess = this->CopyLocale(other);
-    if (!isSuccess) {
+    if (!this->CopyLocale(other)) {
         return false;
     }
+#ifdef SUPPORT_GRAPHICS
+    if (!this->CopyPreferredLocale(other)) {
+        return false;
+    }
+#endif
     if (this->GetDeviceType() != other.GetDeviceType()) {
         this->SetDeviceType(other.GetDeviceType());
     }
@@ -293,7 +360,15 @@ bool ResConfigImpl::Match(const ResConfigImpl *other) const
     if (!IsMccMncMatch(other->mcc_, other->mnc_)) {
         return false;
     }
-    if (!(LocaleMatcher::Match(this->resLocale_, other->GetResLocale()))) {
+
+    bool isPreferredLocaleMatch = false;
+#ifdef SUPPORT_GRAPHICS
+    if (this->resPreferredLocale_ != nullptr) {
+        isPreferredLocaleMatch = LocaleMatcher::Match(this->resPreferredLocale_, other->GetResLocale());
+    }
+#endif
+
+    if (!isPreferredLocaleMatch && !(LocaleMatcher::Match(this->resLocale_, other->GetResLocale()))) {
         return false;
     }
     if (!IsDirectionMatch(other->direction_)) {
@@ -386,6 +461,15 @@ bool ResConfigImpl::IsMoreSuitable(const ResConfigImpl *other,
         if (ret != 0) {
             return ret > 0;
         }
+#ifdef SUPPORT_GRAPHICS
+        if (request->GetResPreferredLocale() != nullptr) {
+            int8_t preferredResult = LocaleMatcher::IsMoreSuitable(this->GetResLocale(), other->GetResLocale(),
+                request->GetResPreferredLocale());
+            if (preferredResult != 0) {
+                return preferredResult > 0;
+            }
+        }
+#endif
         int8_t result = LocaleMatcher::IsMoreSuitable(this->GetResLocale(), other->GetResLocale(),
             request->GetResLocale());
         if (result != 0) {
@@ -517,10 +601,18 @@ ResConfigImpl::~ResConfigImpl()
         delete resLocale_;
         resLocale_ = nullptr;
     }
+    if (resPreferredLocale_ != nullptr) {
+        delete resPreferredLocale_;
+        resPreferredLocale_ = nullptr;
+    }
 #ifdef SUPPORT_GRAPHICS
     if (localeInfo_ != nullptr) {
         delete localeInfo_;
         localeInfo_ = nullptr;
+    }
+    if (preferredLocaleInfo_ != nullptr) {
+        delete preferredLocaleInfo_;
+        preferredLocaleInfo_ = nullptr;
     }
 #endif
 }
