@@ -147,7 +147,7 @@ ohos_shared_library("global_resmgr_win") {
 
 group("win_resmgr") {
   if (resource_management_support_icu && is_win) {
-    deps = [ ":global_resmgr_win" ]
+    public_deps = [ ":global_resmgr_win" ]
   }
 }
 
@@ -180,7 +180,7 @@ ohos_shared_library("global_resmgr_mac") {
 
 group("mac_resmgr") {
   if (resource_management_support_icu && is_mac) {
-    deps = [ ":global_resmgr_mac" ]
+    public_deps = [ ":global_resmgr_mac" ]
   }
 }
 
