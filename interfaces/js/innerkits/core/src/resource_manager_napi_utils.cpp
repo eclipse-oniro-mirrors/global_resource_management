@@ -541,8 +541,7 @@ napi_value ResourceManagerNapiUtils::CreateJsColor(napi_env env, ResMgrDataConte
     return jsColorValue;
 }
 
-
-RState ResourceManagerNapiUtils::GetDensity(napi_env env, napi_value value, uint32_t& density)
+RState ResourceManagerNapiUtils::GetDataType(napi_env env, napi_value value, uint32_t& density)
 {
     napi_valuetype valuetype;
     napi_typeof(env, value, &valuetype);

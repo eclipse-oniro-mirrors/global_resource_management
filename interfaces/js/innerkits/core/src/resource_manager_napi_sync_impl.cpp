@@ -25,7 +25,9 @@ namespace Resource {
 using namespace std::placeholders;
 constexpr int ARRAY_SUBCRIPTOR_ZERO = 0;
 constexpr int ARRAY_SUBCRIPTOR_ONE = 1;
+constexpr int ARRAY_SUBCRIPTOR_TWO = 2;
 constexpr int PARAMS_NUM_TWO = 2;
+constexpr int PARAMS_NUM_THREE = 3;
 ResourceManagerNapiSyncImpl::ResourceManagerNapiSyncImpl()
 {}
 
@@ -466,7 +468,7 @@ napi_value ResourceManagerNapiSyncImpl::GetMediaContentBase64Sync(napi_env env, 
         return nullptr;
     }
     // density optional parameters
-    if (ResourceManagerNapiUtils::GetDensity(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
+    if (ResourceManagerNapiUtils::GetDataType(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
@@ -512,7 +514,7 @@ napi_value ResourceManagerNapiSyncImpl::GetMediaContentSync(napi_env env, napi_c
         return nullptr;
     }
     // density optional parameters
-    if (ResourceManagerNapiUtils::GetDensity(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
+    if (ResourceManagerNapiUtils::GetDataType(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
@@ -618,7 +620,7 @@ napi_value ResourceManagerNapiSyncImpl::GetStringArrayValueSync(napi_env env, na
 
 napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptor(napi_env env, napi_callback_info info)
 {
-    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+    GET_PARAMS(env, info, PARAMS_NUM_THREE);
     auto dataContext = std::make_unique<ResMgrDataContext>();
     int32_t ret = ResourceManagerNapiSyncImpl::InitIdResourceAddon(env, info, dataContext);
     if (ret != RState::SUCCESS) {
@@ -627,18 +629,36 @@ napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptor(napi_env env, napi
         return nullptr;
     }
     // density optional parameters
-    if (ResourceManagerNapiUtils::GetDensity(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
+    if (ResourceManagerNapiUtils::GetDataType(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
+
+    // data type optional parameters
+    if (ResourceManagerNapiUtils::GetDataType(env, argv[ARRAY_SUBCRIPTOR_TWO], dataContext->iconType_) != SUCCESS) {
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     int32_t resId = 0;
     if (!ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId)) {
-        dataContext->SetErrorMsg("Failed to get ResourceManagerNapiUtils::GetHapResourceManager in GetDrawableDescriptor", true);
+        dataContext->SetErrorMsg("Failed to get GetHapResourceManager in GetDrawableDescriptor", true);
         return nullptr;
     }
     RState state = SUCCESS;
     Ace::Napi::DrawableDescriptor::DrawableType drawableType;
+    if (dataContext->iconType_ == 1) {
+        std::tuple<int32_t, uint32_t, uint32_t> drawableInfo(resId, dataContext->iconType_, dataContext->density_);
+        auto drawableDescriptor = Ace::Napi::DrawableDescriptorFactory::Create(drawableInfo, resMgr,
+            state, drawableType);
+        if (state != SUCCESS) {
+            dataContext->SetErrorMsg("Failed to Create drawableDescriptor", true);
+            ResourceManagerNapiUtils::NapiThrow(env, state);
+            return nullptr;
+        }
+        return Ace::Napi::JsDrawableDescriptor::ToNapi(env, drawableDescriptor.release(), drawableType);
+    }
     auto drawableDescriptor = Ace::Napi::DrawableDescriptorFactory::Create(resId, resMgr,
         state, drawableType, dataContext->density_);
     if (state != SUCCESS) {
@@ -803,7 +823,7 @@ napi_value ResourceManagerNapiSyncImpl::GetBooleanByName(napi_env env, napi_call
 
 napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptorByName(napi_env env, napi_callback_info info)
 {
-    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+    GET_PARAMS(env, info, PARAMS_NUM_THREE);
     if (!ResourceManagerNapiUtils::IsNapiString(env, info)) {
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
@@ -811,7 +831,12 @@ napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptorByName(napi_env env
 
     auto dataContext = std::make_unique<ResMgrDataContext>();
     // density optional parameters
-    if (ResourceManagerNapiUtils::GetDensity(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
+    if (ResourceManagerNapiUtils::GetDataType(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+    // icon type optional parameters
+    if (ResourceManagerNapiUtils::GetDataType(env, argv[ARRAY_SUBCRIPTOR_TWO], dataContext->iconType_) != SUCCESS) {
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
@@ -824,6 +849,18 @@ napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptorByName(napi_env env
     auto resMgr = dataContext->addon_->GetResMgr();
     RState state = SUCCESS;
     Ace::Napi::DrawableDescriptor::DrawableType drawableType;
+    if (dataContext->iconType_ == 1) {
+        std::tuple<const char *, uint32_t, uint32_t> drawableInfo(dataContext->resName_.c_str(),
+        dataContext->iconType_, dataContext->density_);
+        auto drawableDescriptor = Ace::Napi::DrawableDescriptorFactory::Create(drawableInfo, resMgr,
+            state, drawableType);
+        if (state != SUCCESS) {
+            dataContext->SetErrorMsg("Failed to Create drawableDescriptor ", false);
+            ResourceManagerNapiUtils::NapiThrow(env, state);
+            return nullptr;
+        }
+        return Ace::Napi::JsDrawableDescriptor::ToNapi(env, drawableDescriptor.release(), drawableType);
+    }
     auto drawableDescriptor = Ace::Napi::DrawableDescriptorFactory::Create(dataContext->resName_.c_str(),
         resMgr, state, drawableType, dataContext->density_);
     if (state != SUCCESS) {
@@ -952,7 +989,7 @@ napi_value ResourceManagerNapiSyncImpl::GetMediaBase64ByNameSync(napi_env env, n
     }
 
     // density optional parameters
-    if (ResourceManagerNapiUtils::GetDensity(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
+    if (ResourceManagerNapiUtils::GetDataType(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
@@ -995,7 +1032,7 @@ napi_value ResourceManagerNapiSyncImpl::GetMediaByNameSync(napi_env env, napi_ca
     }
 
     // density optional parameters
-    if (ResourceManagerNapiUtils::GetDensity(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
+    if (ResourceManagerNapiUtils::GetDataType(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }

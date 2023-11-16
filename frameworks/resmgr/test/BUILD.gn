@@ -45,6 +45,7 @@ ohos_unittest("resmgr_test") {
 
   deps = [
     "../:global_resmgr",
+    "//third_party/cJSON:cjson",
     "//third_party/googletest:gtest_main",
     "//third_party/zlib:libz",
   ]

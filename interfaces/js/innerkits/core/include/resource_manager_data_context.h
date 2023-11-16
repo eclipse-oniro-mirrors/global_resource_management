@@ -54,6 +54,7 @@ struct ResMgrDataContext {
     int success_;
     int errCode_;
     uint32_t density_;
+    uint32_t iconType_;
 
     ResourceManager::RawFileDescriptor descriptor_;
     std::shared_ptr<ResourceManagerAddon> addon_;
@@ -62,7 +63,7 @@ struct ResMgrDataContext {
 
     ResMgrDataContext() : work_(nullptr), resId_(0), param_(0), iValue_(0), fValue_(0.0f), bValue_(false),
         colorValue_(0), createValueFunc_(nullptr), len_(0), deferred_(nullptr), callbackRef_(nullptr), success_(true),
-        errCode_(0), density_(0) {}
+        errCode_(0), density_(0), iconType_(0) {}
 
     void SetErrorMsg(const std::string &msg, bool withResId = false, int32_t errCode = 0)
     {

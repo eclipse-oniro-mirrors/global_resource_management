@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,6 +37,7 @@
 #include "utils/common.h"
 #include "utils/string_utils.h"
 #include "utils/utils.h"
+#include "tuple"
 
 namespace OHOS {
 namespace Global {
@@ -47,7 +48,6 @@ LogLevel g_logLevel = LOG_INFO;
 #endif
 
 constexpr char ESCAPE_CHARACTER = '%';
-
 void ResourceManagerImpl::AddSystemResource(ResourceManagerImpl *systemResourceManager)
 {
     if (systemResourceManager != nullptr) {
@@ -58,6 +58,7 @@ void ResourceManagerImpl::AddSystemResource(ResourceManagerImpl *systemResourceM
 ResourceManagerImpl::ResourceManagerImpl() : hapManager_(nullptr)
 {
     psueManager_ = new (std::nothrow) PsueManager();
+    ThemePackManager_ = ThemePackManager::GetThemePackManager();
 }
 
 bool ResourceManagerImpl::Init(bool isSystem)
@@ -492,6 +493,22 @@ RState ResourceManagerImpl::GetBoolean(const IdItem *idItem, bool &outValue)
     return state;
 }
 
+RState ResourceManagerImpl::GetThemeFloat(const IdItem *idItem, float &outValue)
+{
+    ResConfigImpl resConfig;
+    GetResConfig(resConfig);
+    std::vector<const IdItem *> idItems;
+    idItems.emplace_back(idItem);
+    ProcessReference(idItem->value_, idItems);
+    std::string result = ThemePackManager_->FindThemeResource(bundleInfo, idItems, resConfig);
+    if (result.empty()) {
+        return NOT_FOUND;
+    }
+    std::string unit;
+    RState state = ParseFloat(result.c_str(), outValue, unit);
+    return state == SUCCESS ? RecalculateFloat(unit, outValue) : state;
+}
+
 RState ResourceManagerImpl::GetFloatById(uint32_t id, float &outValue)
 {
     const IdItem *idItem = hapManager_->FindResourceById(id);
@@ -499,6 +516,12 @@ RState ResourceManagerImpl::GetFloatById(uint32_t id, float &outValue)
         HILOG_ERROR("find resource by Float id error");
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
+
+    // find in theme pack
+    if (GetThemeFloat(idItem, outValue) == SUCCESS) {
+        return SUCCESS;
+    }
+
     std::string unit;
     RState state = GetFloat(idItem, outValue, unit);
     if (state == SUCCESS) {
@@ -523,6 +546,12 @@ RState ResourceManagerImpl::GetFloatByName(const char *name, float &outValue)
         HILOG_ERROR("find resource by Float name error");
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
+
+    // find in theme pack
+    if (GetThemeFloat(idItem, outValue) == SUCCESS) {
+        return SUCCESS;
+    }
+
     std::string unit;
     RState state = GetFloat(idItem, outValue, unit);
     if (state == SUCCESS) {
@@ -630,6 +659,60 @@ RState ResourceManagerImpl::GetInteger(const IdItem *idItem, int &outValue)
     return state;
 }
 
+RState ResourceManagerImpl::ProcessReference(const std::string value, std::vector<const IdItem *> &idItems)
+{
+    int id;
+    ResType resType;
+    bool isRef = true;
+    int count = 0;
+    std::string refStr(value);
+    while (isRef) {
+        isRef = IdItem::IsRef(refStr, resType, id);
+        if (!isRef) {
+            return SUCCESS;
+        }
+
+        if (IdItem::IsArrayOfType(resType)) {
+            // can't be array
+            HILOG_ERROR("ref %s can't be array", refStr.c_str());
+            return ERROR;
+        }
+        const IdItem *idItem = hapManager_->FindResourceById(id);
+        idItems.emplace_back(idItem);
+        if (idItem == nullptr) {
+            HILOG_ERROR("ref %s id not found", refStr.c_str());
+            return ERROR;
+        }
+        // unless compile bug
+        if (resType != idItem->resType_) {
+            HILOG_ERROR("impossible. ref %s type mismatch, found type: %d", refStr.c_str(), idItem->resType_);
+            return ERROR;
+        }
+
+        refStr = idItem->value_;
+
+        if (++count > MAX_DEPTH_REF_SEARCH) {
+            HILOG_ERROR("ref %s has re-ref too much", value.c_str());
+            return ERROR_CODE_RES_REF_TOO_MUCH;
+        }
+    }
+    return SUCCESS;
+}
+
+RState ResourceManagerImpl::GetThemeColor(const IdItem *idItem, uint32_t &outValue)
+{
+    ResConfigImpl resConfig;
+    GetResConfig(resConfig);
+    std::vector<const IdItem *> idItems;
+    idItems.emplace_back(idItem);
+    RState state = ProcessReference(idItem->value_, idItems);
+    std::string result = ThemePackManager_->FindThemeResource(bundleInfo, idItems, resConfig);
+    if (result.empty()) {
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
+    return state == SUCCESS ? Utils::ConvertColorToUInt32(result.c_str(), outValue) : state;
+}
+
 RState ResourceManagerImpl::GetColorById(uint32_t id, uint32_t &outValue)
 {
     const IdItem *idItem = hapManager_->FindResourceById(id);
@@ -637,6 +720,12 @@ RState ResourceManagerImpl::GetColorById(uint32_t id, uint32_t &outValue)
         HILOG_ERROR("find resource by string id error");
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
+
+    // find in theme pack
+    if (GetThemeColor(idItem, outValue) == SUCCESS) {
+        return SUCCESS;
+    }
+
     RState state = GetColor(idItem, outValue);
     if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
@@ -651,6 +740,12 @@ RState ResourceManagerImpl::GetColorByName(const char *name, uint32_t &outValue)
         HILOG_ERROR("find resource by string id error");
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
+
+    // find in theme pack
+    if (GetThemeColor(idItem, outValue) == SUCCESS) {
+        return SUCCESS;
+    }
+
     RState state = GetColor(idItem, outValue);
     if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
@@ -894,6 +989,18 @@ bool ResourceManagerImpl::IsDensityValid(uint32_t density)
     }
 }
 
+RState ResourceManagerImpl::GetThemeMedia(const IdItem *idItem, size_t &len,
+    std::unique_ptr<uint8_t[]> &outValue, uint32_t density)
+{
+    ResConfigImpl resConfig;
+    GetResConfig(resConfig);
+    std::vector<const IdItem *> idItems;
+    idItems.emplace_back(idItem);
+    std::string result = ThemePackManager_->FindThemeResource(bundleInfo, idItems, resConfig);
+    outValue = Utils::LoadResourceFile(result, len);
+    return result.empty() ? ERROR_CODE_RES_ID_NOT_FOUND : SUCCESS;
+}
+
 RState ResourceManagerImpl::GetMediaDataById(uint32_t id, size_t &len, std::unique_ptr<uint8_t[]> &outValue,
     uint32_t density)
 {
@@ -906,6 +1013,13 @@ RState ResourceManagerImpl::GetMediaDataById(uint32_t id, size_t &len, std::uniq
         HILOG_ERROR("find qualifier value by media id error");
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
+
+    // find in theme
+    const IdItem *idItem = qd->GetIdItem();
+    if (GetThemeMedia(idItem, len, outValue, density) == SUCCESS) {
+        return SUCCESS;
+    }
+
     RState state = hapManager_->GetMediaData(qd, len, outValue);
     return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_ID;
 }
@@ -917,13 +1031,30 @@ RState ResourceManagerImpl::GetMediaDataByName(const char *name, size_t &len, st
         HILOG_ERROR("density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
+
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, density);
     if (qd == nullptr) {
         HILOG_ERROR("find qualifier value by media name error");
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
+
+    const IdItem *idItem = qd->GetIdItem();
+    if (GetThemeMedia(idItem, len, outValue, density) == SUCCESS) {
+        return SUCCESS;
+    }
+
     RState state = hapManager_->GetMediaData(qd, len, outValue);
     return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_NAME;
+}
+
+RState ResourceManagerImpl::GetThemeMediaBase64(const IdItem *idItem, std::string &outValue)
+{
+    ResConfigImpl resConfig;
+    GetResConfig(resConfig);
+    std::vector<const IdItem *> idItems;
+    idItems.emplace_back(idItem);
+    std::string result = ThemePackManager_->FindThemeResource(bundleInfo, idItems, resConfig);
+    return Utils::GetMediaBase64Data(result, outValue);
 }
 
 RState ResourceManagerImpl::GetMediaBase64DataById(uint32_t id, std::string &outValue, uint32_t density)
@@ -932,11 +1063,18 @@ RState ResourceManagerImpl::GetMediaBase64DataById(uint32_t id, std::string &out
         HILOG_ERROR("density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
+    
     auto qd = hapManager_->FindQualifierValueById(id, density);
     if (qd == nullptr) {
         HILOG_ERROR("find qualifier value by media id error");
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
+
+    const IdItem *idItem = qd->GetIdItem();
+    if (GetThemeMediaBase64(idItem, outValue) == SUCCESS) {
+        return SUCCESS;
+    }
+
     RState state = hapManager_->GetMediaBase64Data(qd, outValue);
     return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_ID;
 }
@@ -952,6 +1090,12 @@ RState ResourceManagerImpl::GetMediaBase64DataByName(const char *name, std::stri
         HILOG_ERROR("find qualifier value by media name error");
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
+
+    const IdItem *idItem = qd->GetIdItem();
+    if (GetThemeMediaBase64(idItem, outValue) == SUCCESS) {
+        return SUCCESS;
+    }
+
     RState state = hapManager_->GetMediaBase64Data(qd, outValue);
     return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_NAME;
 }
@@ -1024,6 +1168,28 @@ std::string GetSuffix(const HapResource::ValueUnderQualifierDir *qd)
     return mediaPath.substr(pos + 1);
 }
 
+RState ResourceManagerImpl::GetThemeIcon(const IdItem *idItem, size_t &len,
+    std::unique_ptr<uint8_t[]> &outValue, uint32_t density)
+{
+    std::string iconName = idItem->GetItemResName();
+    std::string result = ThemePackManager_->FindThemeIconResource(bundleInfo, iconName);
+    outValue = Utils::LoadResourceFile(result, len);
+    return result.empty() ? ERROR_CODE_RES_ID_NOT_FOUND : SUCCESS;
+}
+
+RState ResourceManagerImpl::GetThemeDrawable(const IdItem *idItem, size_t &len,
+    std::unique_ptr<uint8_t[]> &outValue, uint32_t iconType, uint32_t density)
+{
+    if (iconType == 0 && GetThemeMedia(idItem, len, outValue, density) == SUCCESS) {
+        return SUCCESS;
+    } else if (iconType == 1 && GetThemeIcon(idItem, len, outValue, density) == SUCCESS) {
+        return SUCCESS;
+    } else {
+        // other type
+    }
+    return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+}
+
 RState ResourceManagerImpl::GetDrawableInfoById(uint32_t id, std::string &type, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue, uint32_t density)
 {
@@ -1062,6 +1228,68 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name, std::string 
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
     }
     return hapManager_->GetMediaData(qd, len, outValue);
+}
+
+RState ResourceManagerImpl::GetDrawableInfoById(uint32_t id,
+    std::tuple<std::string, size_t, std::string> &drawableInfo,
+    std::unique_ptr<uint8_t[]> &outValue, uint32_t iconType, uint32_t density)
+{
+    if (!IsDensityValid(density)) {
+        HILOG_ERROR("density invalid");
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+    auto qd = hapManager_->FindQualifierValueById(id, density);
+    if (qd == nullptr) {
+        HILOG_ERROR("find qualifier value error by drawable id");
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
+    std::string type = GetSuffix(qd);
+    if (type.empty()) {
+        HILOG_ERROR("failed to get resourceType");
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+    size_t len = 0;
+    // find in theme
+    const IdItem *idItem = qd->GetIdItem();
+    if (GetThemeDrawable(idItem, len, outValue, iconType, density) == SUCCESS) {
+        drawableInfo = std::make_tuple(type, len, themeMask);
+        return SUCCESS;
+    }
+
+    RState state = hapManager_->GetMediaData(qd, len, outValue);
+    drawableInfo = std::make_tuple(type, len, themeMask);
+    return state;
+}
+
+RState ResourceManagerImpl::GetDrawableInfoByName(const char *name,
+    std::tuple<std::string, size_t, std::string> &drawableInfo,
+    std::unique_ptr<uint8_t[]> &outValue, uint32_t iconType, uint32_t density)
+{
+    if (!IsDensityValid(density)) {
+        HILOG_ERROR("density invalid");
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+    auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, density);
+    if (qd == nullptr) {
+        HILOG_ERROR("find qualifier value error by drawable name");
+        return ERROR_CODE_RES_NAME_NOT_FOUND;
+    }
+    std::string type = GetSuffix(qd);
+    if (type.empty()) {
+        HILOG_ERROR("failed to get resourceType");
+        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
+    }
+    size_t len = 0;
+    // find in theme
+    const IdItem *idItem = qd->GetIdItem();
+    if (GetThemeDrawable(idItem, len, outValue, iconType, density) == SUCCESS) {
+        drawableInfo = std::make_tuple(type, len, themeMask);
+        return SUCCESS;
+    }
+
+    RState state = hapManager_->GetMediaData(qd, len, outValue);
+    drawableInfo = std::make_tuple(type, len, themeMask);
+    return state;
 }
 
 bool IsInt(std::tuple<ResourceManager::NapiValueType, std::string> &param,

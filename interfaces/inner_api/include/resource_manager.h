@@ -31,7 +31,9 @@ enum FunctionType {
 };
 class ResourceManager {
 public:
+    std::pair<std::string, std::string> bundleInfo;
 
+    std::string themeMask;
     typedef struct {
         /** the raw file fd */
         int fd;
@@ -183,6 +185,14 @@ public:
     virtual RState GetResId(const std::string &resTypeName, uint32_t &resId) = 0;
 
     virtual void GetLocales(std::vector<std::string> &outValue, bool includeSystem = false) = 0;
+
+    virtual RState GetDrawableInfoById(uint32_t id,
+        std::tuple<std::string, size_t, std::string> &drawableInfo,
+        std::unique_ptr<uint8_t[]> &outValue, uint32_t iconType, uint32_t density = 0) = 0;
+
+    virtual RState GetDrawableInfoByName(const char *name,
+        std::tuple<std::string, size_t, std::string> &drawableInfo,
+        std::unique_ptr<uint8_t[]> &outValue, uint32_t iconType, uint32_t density = 0) = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();

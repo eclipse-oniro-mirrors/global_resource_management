@@ -53,6 +53,9 @@ manager_sources = [
   "src/resource_manager_ext_mgr.cpp",
   "src/resource_manager_impl.cpp",
   "src/system_resource_manager.cpp",
+  "src/theme_pack_config.cpp",
+  "src/theme_pack_manager.cpp",
+  "src/theme_pack_resource.cpp",
   "src/utils/hap_parser.cpp",
   "src/utils/psue_manager.cpp",
   "src/utils/string_utils.cpp",
@@ -93,6 +96,7 @@ ohos_shared_library("global_resmgr") {
 
   deps = [
     "//third_party/bounds_checking_function:libsec_shared",
+    "//third_party/cJSON:cjson",
     "//third_party/zlib:shared_libz",
   ]
 
@@ -137,6 +141,7 @@ ohos_shared_library("global_resmgr_win") {
     public_configs = [ ":resmgr_public_config" ]
 
     deps = [
+      "//third_party/cJSON:cjson_static",
       "//third_party/icu/icu4c:static_icui18n",
       "//third_party/icu/icu4c:static_icuuc",
       "//third_party/zlib:libz",
@@ -171,6 +176,7 @@ ohos_shared_library("global_resmgr_mac") {
     if (host_os == "mac") {
       deps = [
         "//third_party/bounds_checking_function:libsec_static",
+        "//third_party/cJSON:cjson_static",
         "//third_party/icu/icu4c:static_icui18n",
         "//third_party/icu/icu4c:static_icuuc",
         "//third_party/zlib:libz",
@@ -206,6 +212,7 @@ ohos_shared_library("global_resmgr_linux") {
 
     deps = [
       "//third_party/bounds_checking_function:libsec_shared",
+      "//third_party/cJSON:cjson_static",
       "//third_party/icu/icu4c:shared_icui18n",
       "//third_party/icu/icu4c:shared_icuuc",
       "//third_party/zlib:shared_libz",
@@ -241,6 +248,7 @@ ohos_shared_library("librawfile") {
   deps = [
     ":global_resmgr",
     "../../interfaces/native/resource:librawfile_ndk",
+    "//third_party/cJSON:cjson_static",
   ]
 
   external_deps = [
