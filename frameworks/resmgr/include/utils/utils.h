@@ -71,6 +71,8 @@ public:
     static RState GetMediaBase64Data(const std::string& iconPath, std::string &base64Data);
 
     static void CanonicalizePath(const char *path, char *outPath, size_t len);
+
+    static bool IsPrefix(std::string_view prefix, std::string_view full);
 private:
 
     static uint16_t EncodeLanguageOrRegion(const char *str, char base);

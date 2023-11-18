@@ -488,6 +488,11 @@ void Utils::CanonicalizePath(const char *path, char *outPath, size_t len)
     }
 #endif
 }
+
+bool Utils::IsPrefix(std::string_view prefix, std::string_view full)
+{
+    return prefix == full.substr(0, prefix.size());
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

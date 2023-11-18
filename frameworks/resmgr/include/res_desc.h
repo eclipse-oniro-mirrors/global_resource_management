@@ -88,6 +88,21 @@ public:
 
     std::string ToString() const;
 
+    std::string GetItemResName() const
+    {
+        return name_;
+    }
+
+    uint32_t GetItemResId() const
+    {
+        return id_;
+    }
+
+    ResType GetItemResType() const
+    {
+        return resType_;
+    }
+
     uint32_t size_;
     ResType resType_;
     uint32_t id_;

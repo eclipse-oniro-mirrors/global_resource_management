@@ -21,6 +21,7 @@
 #include "hap_manager.h"
 #include "resource_manager.h"
 #include "utils/psue_manager.h"
+#include "theme_pack_manager.h"
 
 namespace OHOS {
 namespace Global {
@@ -562,6 +563,32 @@ public:
      */
     virtual void GetLocales(std::vector<std::string> &outValue, bool includeSystem = false);
 
+    /**
+     * Get the drawable information for given resId, mainly about type, len, buffer
+     * @param id the resource id
+     * @param drawableInfo the drawable info
+     * @param outValue the drawable buffer write to
+     * @param iconType the drawable type
+     * @param density the drawable density
+     * @return SUCCESS if resource exist, else not found
+     */
+    virtual RState GetDrawableInfoById(uint32_t id,
+        std::tuple<std::string, size_t, std::string> &drawableInfo,
+        std::unique_ptr<uint8_t[]> &outValue, uint32_t iconType, uint32_t density = 0);
+    
+    /**
+     * Get the drawable information for given resName, mainly about type, len, buffer
+     * @param name the resource Name
+     * @param drawableInfo the drawable info
+     * @param outValue the drawable buffer write to
+     * @param iconType the drawable type
+     * @param density the drawable density
+     * @return SUCCESS if resource exist, else not found
+     */
+    virtual RState GetDrawableInfoByName(const char *name,
+        std::tuple<std::string, size_t, std::string> &drawableInfo,
+        std::unique_ptr<uint8_t[]> &outValue, uint32_t iconType, uint32_t density = 0);
+
 private:
     RState GetString(const IdItem *idItem, std::string &outValue);
 
@@ -597,6 +624,21 @@ private:
 
     bool IsFileExist(const std::string& path);
 
+    RState GetThemeColor(const IdItem *idItem, uint32_t &outValue);
+
+    RState GetThemeFloat(const IdItem *idItem, float &outValue);
+
+    RState GetThemeMedia(const IdItem *idItem, size_t &len, std::unique_ptr<uint8_t[]> &outValue, uint32_t density);
+
+    RState GetThemeMediaBase64(const IdItem *idItem, std::string &outValue);
+
+    RState GetThemeDrawable(const IdItem *idItem, size_t &len, std::unique_ptr<uint8_t[]> &outValue,
+        uint32_t iconType, uint32_t density);
+
+    RState GetThemeIcon(const IdItem *idItem, size_t &len, std::unique_ptr<uint8_t[]> &outValue, uint32_t density);
+
+    RState ProcessReference(const std::string value, std::vector<const IdItem *> &idItems);
+
     HapManager *hapManager_;
 
     float fontRatio_ = 0.0f;
@@ -606,6 +648,8 @@ private:
     bool isBidirectionFakeLocale = false;
 
     PsueManager *psueManager_;
+
+    std::shared_ptr<ThemePackManager> ThemePackManager_;
 
     const std::string VIRTUAL_PIXEL = "vp";
 

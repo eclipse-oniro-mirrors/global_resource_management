@@ -21,7 +21,7 @@
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 #include "resource_manager_ext_mgr.h"
 #endif
-
+#include "theme_pack_manager.h"
 namespace OHOS {
 namespace Global {
 namespace Resource {
@@ -50,11 +50,12 @@ ResourceManager *CreateResourceManager()
     return impl;
 }
 
-std::shared_ptr<ResourceManager> CreateResourceManagerDef(const std::string &bundleName,
-    const std::string &moduleName, const std::string &hapPath, const std::vector<std::string> &overlayPath,
+std::shared_ptr<ResourceManager> CreateResourceManagerDef(
+    const std::string &bundleName, const std::string &moduleName,
+    const std::string &hapPath, const std::vector<std::string> &overlayPath,
     ResConfig &resConfig)
 {
-    if (bundleName.empty() || hapPath.empty()) {
+    if (bundleName.empty()) {
         HILOG_ERROR("bundleName or hapPath is empty when CreateResourceManagerDef");
         return nullptr;
     }
@@ -69,20 +70,14 @@ std::shared_ptr<ResourceManager> CreateResourceManagerDef(const std::string &bun
     }
     std::shared_ptr<ResourceManager> resourceManagerImpl(CreateResourceManager());
     if (resourceManagerImpl == nullptr) {
-        HILOG_ERROR("CreateResourceManagerDef failed");
+        HILOG_ERROR("CreateResourceManagerDef failed bundleName = %{public}s moduleName = %{public}s",
+            bundleName.c_str(), moduleName.c_str());
         return nullptr;
     }
-    bool result = false;
-    if (!overlayPath.empty()) {
-        result = resourceManagerImpl->AddResource(hapPath, overlayPath);
-    } else {
-        result = resourceManagerImpl->AddResource(hapPath.c_str());
-    }
-    if (!result) {
-        HILOG_ERROR("AddResource failed when CreateResourceManagerDef");
-        return nullptr;
-    }
-    resourceManagerImpl->UpdateResConfig(resConfig);
+    resourceManagerImpl->bundleInfo.first = bundleName;
+    resourceManagerImpl->bundleInfo.second = moduleName;
+    ThemePackManager::GetThemePackManager()->LoadThemeRes(bundleName, moduleName,
+        resourceManagerImpl->themeMask);
     resMgrMap[resMgrKey] = resourceManagerImpl;
     return resourceManagerImpl;
 }
@@ -105,7 +100,8 @@ std::shared_ptr<ResourceManager> CreateResourceManagerExt(const std::string &bun
 #endif
 
 std::shared_ptr<ResourceManager> CreateResourceManager(const std::string &bundleName, const std::string &moduleName,
-    const std::string &hapPath, const std::vector<std::string> &overlayPath, ResConfig &resConfig, int32_t appType)
+    const std::string &hapPath, const std::vector<std::string> &overlayPath,
+    ResConfig &resConfig, int32_t appType)
 {
     if (appType == 0) {
         return CreateResourceManagerDef(bundleName, moduleName, hapPath, overlayPath, resConfig);
