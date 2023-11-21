@@ -406,15 +406,6 @@ bool ResourceManagerNapiUtils::GetHapResourceManager(const ResMgrDataContext* da
         HiLog::Error(LABEL, "GetHapResourceManager context == nullptr");
         return false;
     }
-    auto moduleInfo = context->GetHapModuleInfo();
-    if (moduleInfo != nullptr) {
-        std::string moduleName = moduleInfo->moduleName;
-        std::string bundleName = context->GetBundleName();
-        if (bundleName == resource->bundleName && moduleName == resource->moduleName) {
-            resMgr = context->GetResourceManager();
-            return true;
-        }
-    }
     auto moduleContext = context->CreateModuleContext(resource->bundleName, resource->moduleName);
     if (moduleContext == nullptr) {
         HiLog::Error(LABEL, "GetHapResourceManager moduleContext == nullptr");
