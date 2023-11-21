@@ -26,7 +26,6 @@ namespace OHOS {
 namespace Global {
 namespace Resource {
 static std::map<std::string, std::shared_ptr<ResourceManager>> resMgrMap;
-static std::mutex resMgrLock;
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 static std::mutex resMgrExtLock;
 static std::shared_ptr<ResourceManagerExtMgr> resMgrExtMgr = std::make_shared<ResourceManagerExtMgr>();
@@ -59,15 +58,6 @@ std::shared_ptr<ResourceManager> CreateResourceManagerDef(
         HILOG_ERROR("bundleName or hapPath is empty when CreateResourceManagerDef");
         return nullptr;
     }
-    std::string resMgrKey(bundleName);
-    if (!moduleName.empty()) {
-        resMgrKey.append("/").append(moduleName);
-    }
-    std::lock_guard<std::mutex> lock(resMgrLock);
-    auto iter = resMgrMap.find(resMgrKey);
-    if (iter != resMgrMap.end()) {
-        return resMgrMap[resMgrKey];
-    }
     std::shared_ptr<ResourceManager> resourceManagerImpl(CreateResourceManager());
     if (resourceManagerImpl == nullptr) {
         HILOG_ERROR("CreateResourceManagerDef failed bundleName = %{public}s moduleName = %{public}s",
@@ -78,7 +68,6 @@ std::shared_ptr<ResourceManager> CreateResourceManagerDef(
     resourceManagerImpl->bundleInfo.second = moduleName;
     ThemePackManager::GetThemePackManager()->LoadThemeRes(bundleName, moduleName,
         resourceManagerImpl->themeMask);
-    resMgrMap[resMgrKey] = resourceManagerImpl;
     return resourceManagerImpl;
 }
 
