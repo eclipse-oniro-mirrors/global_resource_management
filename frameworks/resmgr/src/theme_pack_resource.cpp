@@ -32,34 +32,21 @@ ThemeResource::ThemeResource(std::string path) : themePath_(path)
 
 ThemeResource::~ThemeResource()
 {
-    for (auto themeValue : themeValueVec_) {
-        if (std::get<THIRED_ELEMENT>(themeValue) != nullptr) {
-            delete std::get<THIRED_ELEMENT>(themeValue);
-            std::get<THIRED_ELEMENT>(themeValue) = nullptr;
-        }
-    }
+    themeValueVec_.clear();
+    iconValues_.clear();
 }
 
 ThemeResource::ThemeQualifierValue::~ThemeQualifierValue()
-{
-    if (themeConfig_ != nullptr) {
-        delete themeConfig_;
-        themeConfig_ = nullptr;
-    }
-}
+{}
 
 ThemeResource::ThemeValue::~ThemeValue()
 {
-    for (size_t i = 0; i < limitPaths_.size(); ++i) {
-        if (limitPaths_[i] != nullptr) {
-            delete limitPaths_[i];
-            limitPaths_[i] = nullptr;
-        }
-    }
+    limitPaths_.clear();
 }
 
-ThemeResource::ThemeQualifierValue::ThemeQualifierValue(const ThemeKey themeKey, ThemeConfig *themeConfig,
-    const std::string &value) : themeKey_(themeKey), themeConfig_(themeConfig), resValue_(value)
+ThemeResource::ThemeQualifierValue::ThemeQualifierValue(const ThemeKey themeKey,
+    std::shared_ptr<ThemeConfig> themeConfig, const std::string &value) : themeKey_(themeKey),
+    themeConfig_(themeConfig), resValue_(value)
 {}
 
 std::unordered_map<std::string, ResType> themeResTypeMap {
@@ -81,9 +68,9 @@ std::string GetResKey(const std::string &jsonPath)
     return res;
 }
 
-ThemeConfig *GetThemeConfig(const std::string &iconPath)
+std::shared_ptr<ThemeConfig> GetThemeConfig(const std::string &iconPath)
 {
-    ThemeConfig *themeConfig = new ThemeConfig();
+    auto themeConfig = std::make_shared<ThemeConfig>();
     std::string resKey = GetResKey(iconPath);
     if (resKey == "dark") {
         themeConfig->SetThemeColorMode(ColorMode::DARK);
@@ -109,7 +96,7 @@ ResType GetResType(const std::string &resTypeStr)
 }
 
 void ThemeResource::InitThemeRes(std::pair<std::string, std::string> bundleInfo, cJSON *root,
-    ThemeConfig *themeConfig, const std::string &resTypeStr)
+    std::shared_ptr<ThemeConfig> themeConfig, const std::string &resTypeStr)
 {
     if (root == nullptr) {
         HILOG_WARN("The json file has not resType = %{public}s", resTypeStr.c_str());
@@ -130,13 +117,13 @@ void ThemeResource::InitThemeRes(std::pair<std::string, std::string> bundleInfo,
                 HILOG_WARN("The resource value is not exist in childValue");
                 return;
             }
-            ThemeValue *themeValue = new (std::nothrow) ThemeResource::ThemeValue();
+            auto themeValue = std::shared_ptr<ThemeValue>();
             if (themeValue == nullptr) {
                 HILOG_ERROR("New themeValue fialed in InitThemeRes");
                 return;
             }
             ThemeKey themeKey = ThemeKey(bundleInfo.first, bundleInfo.second, resType, name->valuestring);
-            ThemeQualifierValue *themeQualifierValue = new ThemeQualifierValue(themeKey, themeConfig,
+            auto themeQualifierValue = std::make_shared<ThemeQualifierValue>(themeKey, themeConfig,
                 value->valuestring);
             if (themeQualifierValue == nullptr) {
                 HILOG_ERROR("New themeQualifierValue fialed in InitThemeRes");
@@ -165,7 +152,7 @@ void ThemeResource::ParseJson(const std::string &bundleName, const std::string &
     char *jsonData = (char *)malloc(len + 1);
     std::fread(jsonData, len, 1, pf);
     jsonData[len] = '\0';
-    ThemeConfig *themeConfig = GetThemeConfig(jsonPath);
+    auto themeConfig = GetThemeConfig(jsonPath);
     cJSON *jsonValue = cJSON_Parse(jsonData);
     std::pair<std::string, std::string> bundleInfo(bundleName, moduleName);
     cJSON *floatRoot = cJSON_GetObjectItem(jsonValue, "float");
@@ -186,7 +173,7 @@ void ThemeResource::ParseJson(const std::string &bundleName, const std::string &
 void ThemeResource::ParseIcon(const std::string &bundleName, const std::string &moduleName,
     const std::string &iconPath)
 {
-    ThemeConfig *themeConfig = GetThemeConfig(iconPath);
+    auto themeConfig = GetThemeConfig(iconPath);
     auto pos1 = iconPath.rfind('.');
     auto pos2 = iconPath.rfind('/');
     if (pos1 == std::string::npos || pos2 == std::string::npos) {
@@ -194,13 +181,13 @@ void ThemeResource::ParseIcon(const std::string &bundleName, const std::string &
         return;
     }
     std::string iconName = iconPath.substr(pos2 + 1, pos1 - pos2 - 1);
-    ThemeValue *themeValue = new (std::nothrow) ThemeResource::ThemeValue();
+    auto themeValue = std::make_shared<ThemeValue>();
     if (themeValue == nullptr) {
         HILOG_ERROR("new themeValue failed in ParseIcon");
         return;
     }
     ThemeKey themeKey = ThemeKey(bundleName, moduleName, ResType::MEDIA, iconName);
-    ThemeQualifierValue *themeQualifierValue = new ThemeQualifierValue(themeKey, themeConfig, iconPath);
+    auto themeQualifierValue = std::make_shared<ThemeQualifierValue>(themeKey, themeConfig, iconPath);
     if (themeQualifierValue == nullptr) {
         HILOG_ERROR("new themeQualifierValue failed in ParseIcon");
         return;
@@ -210,10 +197,10 @@ void ThemeResource::ParseIcon(const std::string &bundleName, const std::string &
     return;
 }
 
-std::vector<const ThemeResource::ThemeValue *> ThemeResource::GetThemeValues(
+std::vector<std::shared_ptr<ThemeResource::ThemeValue> > ThemeResource::GetThemeValues(
     const std::pair<std::string, std::string> &bundInfo, const ResType &resType, const std::string &name)
 {
-    std::vector<const ThemeResource::ThemeValue *> result;
+    std::vector<std::shared_ptr<ThemeResource::ThemeValue> > result;
     if (themeValueVec_.empty()) {
         return result;
     }
@@ -278,9 +265,13 @@ std::tuple<std::string, std::string> GetBundleInfo(const std::string& rootDir, c
     return bundleInfoTuple;
 }
 
-const ThemeResource* ThemeResource::LoadThemeResource(const std::string& rootDir)
+const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeResource(const std::string& rootDir)
 {
-    ThemeResource *themeResource = new (std::nothrow) ThemeResource(rootDir);
+    if (rootDir.empty()) {
+        HILOG_ERROR("Invalid rootDir in LoadThemeResource = %{public}s", rootDir.c_str());
+        return nullptr;
+    }
+    auto themeResource = std::make_shared<ThemeResource>(rootDir);
     if (themeResource == nullptr) {
         HILOG_ERROR("New themeResource failed in LoadThemeResource");
         return nullptr;
@@ -314,15 +305,28 @@ std::string ThemeResource::GetThemeResBundleName(const std::string &themePath)
     return bundleName;
 }
 
-const ThemeResource* ThemeResource::LoadThemeIconResource(const std::string& iconPath)
+std::string GetIconsBundleName(const std::string& iconPath)
+{
+    if (iconPath.empty()) {
+        return std::string("");
+    }
+    auto pos = iconPath.rfind('/');
+    if (pos == std::string::npos) {
+        HILOG_ERROR("invalid iconPath = %{public}s in GetIconsBundleName", iconPath.c_str());
+        return std::string("");
+    }
+    return iconPath.substr(pos + 1);
+}
+
+const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeIconResource(const std::string& iconPath)
 {
     if (iconPath.empty()) {
         return nullptr;
     }
-    ThemeResource *themeResource = new (std::nothrow) ThemeResource(iconPath);
+    auto themeResource = std::make_shared<ThemeResource>(iconPath);
+    std::string bundleName = GetIconsBundleName(iconPath);
     std::vector<std::string> resPaths = GetFiles(iconPath);
     for (auto path : resPaths) {
-        auto bundleInfo = GetBundleInfo(iconPath, path);
         auto pos1 = path.rfind('.');
         auto pos2 = path.rfind('/');
         if (pos1 == std::string::npos || pos2 == std::string::npos) {
@@ -330,8 +334,7 @@ const ThemeResource* ThemeResource::LoadThemeIconResource(const std::string& ico
             continue;
         }
         std::string iconName = path.substr(pos2 + 1, pos1 - pos2 - 1);
-        ThemeKey themeKey = ThemeKey(std::get<FIRST_ELEMENT>(bundleInfo),
-            std::get<SECOND_ELEMENT>(bundleInfo), ResType::MEDIA, iconName);
+        ThemeKey themeKey = ThemeKey(bundleName, "", ResType::MEDIA, iconName);
         themeRes->iconValues_.emplace_back(std::make_pair(themeKey, path));
     }
     return themeResource;
@@ -342,9 +345,6 @@ const std::string ThemeResource::GetThemeAppIcon(const std::pair<std::string, st
 {
     for (size_t i = 0; i < iconValues_.size(); i++) {
         if (iconValues_[i].first.bundleName != bundleInfo.first) {
-            continue;
-        }
-        if (!iconValues_[i].first.moduleName.empty() && iconValues_[i].first.moduleName != bundleInfo.second) {
             continue;
         }
         if (iconName == iconValues_[i].first.resName) {

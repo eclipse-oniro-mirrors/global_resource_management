@@ -933,6 +933,7 @@ bool ResourceManagerImpl::RemoveAppOverlay(const std::string &path)
 
 RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig)
 {
+    ThemePackManager::GetThemePackManager()->LoadThemeRes(bundleInfo.first, bundleInfo.second, themeMask);
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
 #endif

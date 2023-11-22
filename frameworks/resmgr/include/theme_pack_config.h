@@ -56,7 +56,7 @@ public:
      * @param resConfig the device resConfig
      * @return true if this themeConfig match the device resConfig, else false
      */
-    static bool Match(const ThemeConfig *themeConfig, const ResConfigImpl &resConfig);
+    static bool Match(const std::shared_ptr<ThemeConfig> &themeConfig, const ResConfigImpl &resConfig);
 
     /**
      * Whether this themeConfig best match the device resConfig
@@ -65,9 +65,9 @@ public:
      * @param resConfig the device resConfig
      * @return true if this themeConfig best match the device resConfig, else false
      */
-    bool BestMatch(const ThemeConfig *themeConfig, const ResConfigImpl &resConfig) const;
+    bool BestMatch(const std::shared_ptr<ThemeConfig> &themeConfig, const ResConfigImpl &resConfig) const;
 private:
-    bool IsMoreMatchThan(const ThemeConfig *themeConfig) const;
+    bool IsMoreMatchThan(const std::shared_ptr<ThemeConfig> &themeConfig) const;
 
     Direction themeDirection_;
     ColorMode themeColorMode_;
