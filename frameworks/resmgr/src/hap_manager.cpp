@@ -997,7 +997,6 @@ RState HapManager::GetResId(const std::string &resTypeName, uint32_t &resId)
     for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
         bool isSystemResource = (*iter)->IsSystemResource();
         bool isOverlayResource = (*iter)->IsOverlayResource();
-        std::string indexPath = (*iter)->GetIndexPath();
         if (isOverlayResource) {
             continue;
         }
