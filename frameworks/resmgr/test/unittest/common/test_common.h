@@ -26,8 +26,6 @@
 #include <string>
 #include <vector>
 
-using icu::Locale;
-using icu::LocaleBuilder;
 namespace OHOS {
 namespace Global {
 namespace Resource {
