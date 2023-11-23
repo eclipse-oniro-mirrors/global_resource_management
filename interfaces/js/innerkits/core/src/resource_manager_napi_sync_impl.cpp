@@ -62,7 +62,9 @@ std::unordered_map<std::string, std::function<napi_value(napi_env&, napi_callbac
     {"GetStringArrayByNameSync", std::bind(&ResourceManagerNapiSyncImpl::GetStringArrayByNameSync, _1, _2)},
     {"GetConfigurationSync", std::bind(&ResourceManagerNapiSyncImpl::GetConfigurationSync, _1, _2)},
     {"GetDeviceCapabilitySync", std::bind(&ResourceManagerNapiSyncImpl::GetDeviceCapabilitySync, _1, _2)},
-    {"GetLocales", std::bind(&ResourceManagerNapiSyncImpl::GetLocales, _1, _2)}
+    {"GetLocales", std::bind(&ResourceManagerNapiSyncImpl::GetLocales, _1, _2)},
+	{"GetSymbol", std::bind(&ResourceManagerNapiSyncImpl::GetSymbol, _1, _2)},
+    {"GetSymbolByName", std::bind(&ResourceManagerNapiSyncImpl::GetSymbolByName, _1, _2)}
 };
 
 napi_value ResourceManagerNapiSyncImpl::GetResource(napi_env env, napi_callback_info info,
@@ -309,6 +311,49 @@ napi_value ResourceManagerNapiSyncImpl::GetStringSync(napi_env env, napi_callbac
     }
 
     return ResourceManagerNapiUtils::CreateJsString(env, *dataContext);
+}
+
+int32_t ResourceManagerNapiSyncImpl::ProcessSymbolResource(napi_env env, napi_callback_info info,
+    std::unique_ptr<ResMgrDataContext> &dataContext)
+{
+    std::shared_ptr<ResourceManager> resMgr = nullptr;
+    int32_t resId = 0;
+    bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
+    if (!ret) {
+        HiLog::Error(LABEL, "Failed to get resMgr in GetSymbol");
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+
+    RState state = resMgr->GetSymbolById(resId, dataContext->symbolValue_);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("GetSymbol failed state", true);
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return state;
+    }
+    return SUCCESS;
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetSymbol(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+
+    int32_t state = InitIdResourceAddon(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to init para in GetSymbol", true);
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    state = ProcessSymbolResource(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to process symbol in GetSymbol", true);
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    return ResourceManagerNapiUtils::CreateJsSymbol(env, *dataContext);
 }
 
 int32_t ResourceManagerNapiSyncImpl::ProcessColorResource(napi_env env, napi_callback_info info,
@@ -725,6 +770,42 @@ napi_value ResourceManagerNapiSyncImpl::GetStringByNameSync(napi_env env, napi_c
     
     return ResourceManagerNapiUtils::CreateJsString(env, *dataContext);
 }
+
+int32_t ResourceManagerNapiSyncImpl::ProcessSymbolResourceByName(napi_env env, napi_callback_info info,
+    std::unique_ptr<ResMgrDataContext> &dataContext)
+{
+    RState state = dataContext->addon_->GetResMgr()->GetSymbolByName(dataContext->resName_.c_str(),
+        dataContext->symbolValue_);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("GetSymbolByName failed state", false);
+        return state;
+    }
+    return SUCCESS;
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetSymbolByName(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+
+    int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to init para in GetSymbolByName", false);
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    state = ProcessSymbolResourceByName(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to process symbol in GetSymbolByName", false);
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    return ResourceManagerNapiUtils::CreateJsSymbol(env, *dataContext);
+}
+
 
 int32_t ResourceManagerNapiSyncImpl::ProcessColorResourceByName(napi_env env, napi_callback_info info,
     std::unique_ptr<ResMgrDataContext> &dataContext)

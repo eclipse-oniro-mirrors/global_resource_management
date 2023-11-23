@@ -185,6 +185,10 @@ private:
     static napi_value GetDeviceCapabilitySync(napi_env env, napi_callback_info info);
 
     static napi_value GetLocales(napi_env env, napi_callback_info info);
+	
+    static napi_value GetSymbol(napi_env env, napi_callback_info info);
+
+    static napi_value GetSymbolByName(napi_env env, napi_callback_info info);
 
     std::string bundleName_;
     std::shared_ptr<ResourceManager> resMgr_;

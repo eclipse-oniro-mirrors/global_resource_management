@@ -314,6 +314,22 @@ public:
     virtual RState GetColorByName(const char *name, uint32_t &outValue);
 
     /**
+     * Get the SYMBOL resource by resource id
+     * @param id the resource id
+     * @param outValue the obtain resource value convert to uint32_t write to
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetSymbolById(uint32_t id, uint32_t &outValue);
+
+    /**
+     * Get the SYMBOL resource by resource name
+     * @param name the resource name
+     * @param outValue the obtain resource value convert to uint32_t write to
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetSymbolByName(const char *name, uint32_t &outValue);
+
+    /**
      * Get the PROF resource by resource id
      * @param id the resource id
      * @param outValue the obtain resource path write to
@@ -615,6 +631,8 @@ private:
     RState GetColor(const IdItem *idItem, uint32_t &outValue);
 
     RState GetIntArray(const IdItem *idItem, std::vector<int> &outValue);
+
+    RState GetSymbol(const IdItem *idItem, uint32_t &outValue);
 
     void ProcessPsuedoTranslate(std::string &outValue);
 

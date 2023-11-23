@@ -371,7 +371,6 @@ static uint32_t ParseHex(char c, RState &state)
         return (c - 'A' + 0xa);
     }
     state = INVALID_FORMAT;
-
     return -1;
 }
 

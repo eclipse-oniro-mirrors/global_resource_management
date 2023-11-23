@@ -160,7 +160,9 @@ napi_property_descriptor ResourceManagerAddon::properties[] = {
     DECLARE_NAPI_FUNCTION("getStringArrayByNameSync", GetStringArrayByNameSync),
     DECLARE_NAPI_FUNCTION("getConfigurationSync", GetConfigurationSync),
     DECLARE_NAPI_FUNCTION("getDeviceCapabilitySync", GetDeviceCapabilitySync),
-    DECLARE_NAPI_FUNCTION("getLocales", GetLocales)
+    DECLARE_NAPI_FUNCTION("getLocales", GetLocales),
+    DECLARE_NAPI_FUNCTION("getSymbol", GetSymbol),
+    DECLARE_NAPI_FUNCTION("getSymbolByName", GetSymbolByName)
 };
 
 bool ResourceManagerAddon::Init(napi_env env)
@@ -482,6 +484,15 @@ napi_value ResourceManagerAddon::GetDeviceCapabilitySync(napi_env env, napi_call
 napi_value ResourceManagerAddon::GetLocales(napi_env env, napi_callback_info info)
 {
     return AddonGetResource(env, info, "GetLocales", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::GetSymbol(napi_env env, napi_callback_info info)
+{
+    return AddonGetResource(env, info, "GetSymbol", FunctionType::SYNC);
+}
+napi_value ResourceManagerAddon::GetSymbolByName(napi_env env, napi_callback_info info)
+{
+    return AddonGetResource(env, info, "GetSymbolByName", FunctionType::SYNC);
 }
 } // namespace Resource
 } // namespace Global

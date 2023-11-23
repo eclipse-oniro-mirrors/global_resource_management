@@ -207,6 +207,7 @@ bool IdItem::Init()
     resTypeStrList.insert(make_pair(ResType::PATTERN, std::string("pattern")));
     resTypeStrList.insert(make_pair(ResType::THEME, std::string("theme")));
     resTypeStrList.insert(make_pair(ResType::MEDIA, std::string("media")));
+    resTypeStrList.insert(make_pair(ResType::SYMBOL, std::string("symbol")));
     return true;
 }
 

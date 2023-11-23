@@ -48,6 +48,8 @@ LogLevel g_logLevel = LOG_INFO;
 #endif
 
 constexpr char ESCAPE_CHARACTER = '%';
+constexpr int HEX_ADECIMAL = 16;
+
 void ResourceManagerImpl::AddSystemResource(ResourceManagerImpl *systemResourceManager)
 {
     if (systemResourceManager != nullptr) {
@@ -762,6 +764,47 @@ RState ResourceManagerImpl::GetColor(const IdItem *idItem, uint32_t &outValue)
     RState state = ResolveReference(idItem->value_, temp);
     if (state == SUCCESS) {
         return Utils::ConvertColorToUInt32(temp.c_str(), outValue);
+    }
+    return state;
+}
+
+RState ResourceManagerImpl::GetSymbolById(uint32_t id, uint32_t &outValue)
+{
+    const IdItem *idItem = hapManager_->FindResourceById(id);
+    if (idItem == nullptr) {
+        HILOG_ERROR("find resource by symbol id error");
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
+    RState state = GetSymbol(idItem, outValue);
+    if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+    return state;
+}
+
+RState ResourceManagerImpl::GetSymbolByName(const char *name, uint32_t &outValue)
+{
+    const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::SYMBOL);
+    if (idItem == nullptr) {
+        HILOG_ERROR("find resource by symbol name error");
+        return ERROR_CODE_RES_NAME_NOT_FOUND;
+    }
+    RState state = GetSymbol(idItem, outValue);
+    if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
+        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
+    }
+    return state;
+}
+
+RState ResourceManagerImpl::GetSymbol(const IdItem *idItem, uint32_t &outValue)
+{
+    if (idItem == nullptr || idItem->resType_ != ResType::SYMBOL) {
+        return NOT_FOUND;
+    }
+    std::string temp;
+    RState state = ResolveReference(idItem->value_, temp);
+    if (state == SUCCESS) {
+        outValue = strtol(temp.c_str(), nullptr, HEX_ADECIMAL);
     }
     return state;
 }

@@ -48,6 +48,8 @@ public:
 
     static napi_value CreateJsColor(napi_env env, ResMgrDataContext& context);
 
+    static napi_value CreateJsSymbol(napi_env env, ResMgrDataContext& context);
+
     static RState GetDataType(napi_env env, napi_value value, uint32_t& density);
 
     static napi_valuetype GetType(napi_env env, napi_value value);
