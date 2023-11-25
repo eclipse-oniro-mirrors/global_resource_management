@@ -93,7 +93,7 @@ private:
     static napi_value GetDeviceCapabilitySync(napi_env env, napi_callback_info info);
 
     static napi_value GetLocales(napi_env env, napi_callback_info info);
-	
+
     static napi_value GetSymbol(napi_env env, napi_callback_info info);
 
     static napi_value GetSymbolByName(napi_env env, napi_callback_info info);
