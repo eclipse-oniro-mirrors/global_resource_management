@@ -63,7 +63,7 @@ std::unordered_map<std::string, std::function<napi_value(napi_env&, napi_callbac
     {"GetConfigurationSync", std::bind(&ResourceManagerNapiSyncImpl::GetConfigurationSync, _1, _2)},
     {"GetDeviceCapabilitySync", std::bind(&ResourceManagerNapiSyncImpl::GetDeviceCapabilitySync, _1, _2)},
     {"GetLocales", std::bind(&ResourceManagerNapiSyncImpl::GetLocales, _1, _2)},
-	{"GetSymbol", std::bind(&ResourceManagerNapiSyncImpl::GetSymbol, _1, _2)},
+    {"GetSymbol", std::bind(&ResourceManagerNapiSyncImpl::GetSymbol, _1, _2)},
     {"GetSymbolByName", std::bind(&ResourceManagerNapiSyncImpl::GetSymbolByName, _1, _2)}
 };
 
