@@ -490,6 +490,7 @@ napi_value ResourceManagerAddon::GetSymbol(napi_env env, napi_callback_info info
 {
     return AddonGetResource(env, info, "GetSymbol", FunctionType::SYNC);
 }
+
 napi_value ResourceManagerAddon::GetSymbolByName(napi_env env, napi_callback_info info)
 {
     return AddonGetResource(env, info, "GetSymbolByName", FunctionType::SYNC);
