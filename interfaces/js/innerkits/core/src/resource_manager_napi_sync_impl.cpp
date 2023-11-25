@@ -328,9 +328,8 @@ int32_t ResourceManagerNapiSyncImpl::ProcessSymbolResource(napi_env env, napi_ca
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("GetSymbol failed state", true);
         ResourceManagerNapiUtils::NapiThrow(env, state);
-        return state;
     }
-    return SUCCESS;
+    return state;
 }
 
 napi_value ResourceManagerNapiSyncImpl::GetSymbol(napi_env env, napi_callback_info info)
@@ -778,9 +777,8 @@ int32_t ResourceManagerNapiSyncImpl::ProcessSymbolResourceByName(napi_env env, n
         dataContext->symbolValue_);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("GetSymbolByName failed state", false);
-        return state;
     }
-    return SUCCESS;
+    return state;
 }
 
 napi_value ResourceManagerNapiSyncImpl::GetSymbolByName(napi_env env, napi_callback_info info)
