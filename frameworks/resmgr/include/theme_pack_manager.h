@@ -51,7 +51,7 @@ public:
      * @param rootDirs the theme skins dirs
      */
     void LoadThemeSkinResource(const std::string &bundleName, const std::string &moduleName,
-        const std::vector<std::string> &rootDirs);
+        const std::vector<std::string> &rootDirs, const std::string &themeFlag);
 
     /**
      * Load the icons dir resource int theme pack.
@@ -61,7 +61,7 @@ public:
      * @param rootDirs the theme icons dirs
      */
     void LoadThemeIconsResource(const std::string &bundleName, const std::string &moduleName,
-        const std::vector<std::string> &rootDirs);
+        const std::vector<std::string> &rootDirs, const std::string &themeFlag);
     
     /**
      * Get the theme resource related to bundlename, modulename, resType, resName and resConfig.
@@ -97,17 +97,24 @@ public:
 
 private:
     ThemePackManager();
-    std::vector<ThemeResource *> skinResource_;
-    std::vector<ThemeResource *> iconResource_;
-    std::vector<const ThemeResource::ThemeValue *> GetThemeResourceList(
+    std::string themeFlag;
+    void ClearSkinResource(const std::string &themeFlag);
+    void ClearIconResource(const std::string &themeFlag);
+    std::vector<std::shared_ptr<ThemeResource> > skinResource_;
+    std::vector<std::shared_ptr<ThemeResource>> iconResource_;
+    std::vector<std::shared_ptr<ThemeResource::ThemeValue> > GetThemeResourceList(
         const std::pair<std::string, std::string> &bundInfo, const ResType &resType, const std::string &resName) const;
 
-    const ThemeResource::ThemeQualifierValue *GetThemeQualifierValue(
+    const std::shared_ptr<ThemeResource::ThemeQualifierValue> GetThemeQualifierValue(
         const std::pair<std::string, std::string> &bundInfo, const ResType &resType,
         const std::string &resName, const ResConfigImpl &resConfig);
 
-    const ThemeResource::ThemeQualifierValue *GetBestMatchThemeResource(
-        const std::vector<const ThemeResource::ThemeValue *> candidates, const ResConfigImpl &resConfig);
+    const std::shared_ptr<ThemeResource::ThemeQualifierValue> GetBestMatchThemeResource(
+        const std::vector<std::shared_ptr<ThemeResource::ThemeValue> > &candidates,
+        const ResConfigImpl &resConfig);
+
+    Lock lockSkin_;
+    Lock lockIcon_;
 };
 } // namespace Resource
 } // namespace Global

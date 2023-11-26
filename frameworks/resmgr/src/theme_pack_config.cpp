@@ -31,7 +31,7 @@ void ThemeConfig::SetThemeColorMode(ColorMode colorMode)
     this->themeColorMode_ = colorMode;
 }
 
-bool ThemeConfig::Match(const ThemeConfig *themeConfig, const ResConfigImpl &resConfig)
+bool ThemeConfig::Match(const std::shared_ptr<ThemeConfig> &themeConfig, const ResConfigImpl &resConfig)
 {
     ColorMode colorMode = resConfig.GetColorMode();
     Direction direction = resConfig.GetDirection();
@@ -51,7 +51,7 @@ bool ThemeConfig::Match(const ThemeConfig *themeConfig, const ResConfigImpl &res
     return true;
 }
 
-bool ThemeConfig::BestMatch(const ThemeConfig *themeConfig, const ResConfigImpl &resConfig) const
+bool ThemeConfig::BestMatch(const std::shared_ptr<ThemeConfig> &themeConfig, const ResConfigImpl &resConfig) const
 {
     ColorMode colorMode = resConfig.GetColorMode();
     Direction direction = resConfig.GetDirection();
@@ -67,7 +67,7 @@ bool ThemeConfig::BestMatch(const ThemeConfig *themeConfig, const ResConfigImpl 
     return this->IsMoreMatchThan(themeConfig);
 }
 
-bool ThemeConfig::IsMoreMatchThan(const ThemeConfig *themeConfig) const
+bool ThemeConfig::IsMoreMatchThan(const std::shared_ptr<ThemeConfig> &themeConfig) const
 {
     if (this->themeDirection_ != themeConfig->themeDirection_) {
         return this->themeDirection_ != DIRECTION_NOT_SET;

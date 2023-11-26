@@ -59,8 +59,8 @@ class ThemeResource {
 public:
     ThemeResource(std::string path);
     ~ThemeResource();
-    static const ThemeResource* LoadThemeResource(const std::string& rootDir);
-    static const ThemeResource* LoadThemeIconResource(const std::string& rootDir);
+    static const std::shared_ptr<ThemeResource> LoadThemeResource(const std::string& rootDir);
+    static const std::shared_ptr<ThemeResource> LoadThemeIconResource(const std::string& rootDir);
     class ThemeQualifierValue {
     public:
         inline const std::string GetResValue() const
@@ -68,7 +68,7 @@ public:
             return resValue_;
         }
 
-        inline const ThemeConfig *GetThemeConfig() const
+        inline const std::shared_ptr<ThemeConfig> GetThemeConfig() const
         {
             return themeConfig_;
         }
@@ -77,28 +77,29 @@ public:
         {
             return themeKey_;
         }
-        ThemeQualifierValue(const ThemeKey themeKey, ThemeConfig *themeConfig, const std::string &value);
+        ThemeQualifierValue(const ThemeKey themeKey, std::shared_ptr<ThemeConfig> themeConfig,
+            const std::string &value);
         ~ThemeQualifierValue();
     private:
         ThemeKey themeKey_;
-        ThemeConfig* themeConfig_;
+        std::shared_ptr<ThemeConfig> themeConfig_;
         std::string resValue_;
     };
 
     class ThemeValue {
     public:
-        inline void AddThemeLimitPath(ThemeQualifierValue *themeQualifer)
+        inline void AddThemeLimitPath(std::shared_ptr<ThemeQualifierValue> themeQualifer)
         {
             limitPaths_.push_back(themeQualifer);
         }
 
-        inline const std::vector<ThemeQualifierValue *> &GetThemeLimitPathsConst() const
+        inline const std::vector<std::shared_ptr<ThemeQualifierValue> > &GetThemeLimitPathsConst() const
         {
             return limitPaths_;
         }
         ~ThemeValue();
     private:
-        std::vector<ThemeQualifierValue *> limitPaths_;
+        std::vector<std::shared_ptr<ThemeQualifierValue> > limitPaths_;
     };
     /**
      * Get the theme value related bundlename, modulename, resType and resource name.
@@ -108,9 +109,10 @@ public:
      * @param name the resource name
      * @return the theme value vector
      */
-    std::vector<const ThemeResource::ThemeValue *>  GetThemeValues(const std::pair<std::string, std::string> &bundInfo,
+    std::vector<std::shared_ptr<ThemeResource::ThemeValue> >  GetThemeValues(
+        const std::pair<std::string, std::string> &bundInfo,
         const ResType &resType, const std::string &name);
-    
+
     /**
      * Get the theme icon related bundlename, modulename and resource name.
      *
@@ -119,7 +121,7 @@ public:
      * @return the icon path
      */
     const std::string GetThemeAppIcon(const std::pair<std::string, std::string> &bundleInfo, const std::string &name);
-    
+
     /**
      * Get the theme value related bundlename, modulename, resType and resource name.
      *
@@ -129,14 +131,20 @@ public:
      * @return the theme value vector
      */
     std::string GetThemeResBundleName(const std::string &themePath);
+
+    inline std::string GetThemePath()
+    {
+        return themePath_;
+    }
+
     std::string themePath_;
 private:
-    std::vector<std::tuple<ResType, std::string, ThemeValue *> > themeValueVec_;
+    std::vector<std::tuple<ResType, std::string, std::shared_ptr<ThemeValue>> > themeValueVec_;
     std::vector<std::pair<ThemeKey, std::string> > iconValues_;
     void ParseJson(const std::string &bundleName, const std::string &moduleName, const std::string &jsonPath);
     void ParseIcon(const std::string &bundleName, const std::string &moduleName, const std::string &iconPath);
     void InitThemeRes(std::pair<std::string, std::string> bundleInfo, cJSON *root,
-        ThemeConfig *themeConfig, const std::string &resTypeStr);
+        std::shared_ptr<ThemeConfig> themeConfig, const std::string &resTypeStr);
     static ThemeResource *themeRes;
 };
 } // namespace Resource
