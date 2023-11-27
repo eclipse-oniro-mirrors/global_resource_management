@@ -117,7 +117,7 @@ void ThemeResource::InitThemeRes(std::pair<std::string, std::string> bundleInfo,
                 HILOG_WARN("The resource value is not exist in childValue");
                 return;
             }
-            auto themeValue = std::shared_ptr<ThemeValue>();
+            auto themeValue = std::make_shared<ThemeValue>();
             if (themeValue == nullptr) {
                 HILOG_ERROR("New themeValue fialed in InitThemeRes");
                 return;

@@ -181,7 +181,7 @@ std::vector<std::shared_ptr<ThemeResource::ThemeValue> > ThemePackManager::GetTh
         auto pThemeResource = skinResource_[i];
         if (pThemeResource == nullptr) {
             HILOG_ERROR("pThemeResource == nullptr");
-            return result;
+            continue;
         }
         std::string bundleName = pThemeResource->GetThemeResBundleName(pThemeResource->themePath_);
         if (bundleName != bundInfo.first) {
