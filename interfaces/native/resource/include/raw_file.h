@@ -91,15 +91,15 @@ typedef struct {
 int OH_ResourceManager_ReadRawFile(const RawFile *rawFile, void *buf, size_t length);
 
 /**
- * @brief Uses the 32-bit data type to seek a data read/write position based on the specified offset within a raw file.
+ * @brief Uses the 32-bit data type to seek a data read position based on the specified offset within a raw file.
  *
  * @param rawFile Indicates the pointer to {@link RawFile}.
  * @param offset Indicates the specified offset.
- * @param whence Indicates the new read/write position, which can be one of the following values: \n
- * <b>0</b>: The new read/write position is set to <b>offset</b>. \n
- * <b>1</b>: The read/write position is set to the current position plus <b>offset</b>. \n
- * <b>2</b>: The read/write position is set to the end of file (EOF) plus <b>offset</b>.
- * @return Returns the new read/write position if the operation is successful; returns <b>(long) -1</b> if an error
+ * @param whence Indicates the new read position, which can be one of the following values: \n
+ * <b>0</b>: The new read position is set to <b>offset</b>. \n
+ * <b>1</b>: The read position is set to the current position plus <b>offset</b>. \n
+ * <b>2</b>: The read position is set to the end of file (EOF) plus <b>offset</b>.
+ * @return Returns <b>(int) 0</b> if the operation is successful; returns <b>(int) -1</b> if an error
  * occurs.
  * @since 8
  * @version 1.0
@@ -115,6 +115,16 @@ int OH_ResourceManager_SeekRawFile(const RawFile *rawFile, long offset, int when
  * @version 1.0
  */
 long OH_ResourceManager_GetRawFileSize(RawFile *rawFile);
+
+/**
+ * @brief Obtains the remaining raw file length represented by an int64_t.
+ *
+ * @param rawFile Indicates the pointer to {@link RawFile}.
+ * @return Returns the remaining length of the raw file.
+ * @since 11
+ * @version 1.0
+ */
+int64_t OH_ResourceManager_GetRawFileRemainingLength(const RawFile *rawFile);
 
 /**
  * @brief Closes an opened {@link RawFile} and releases all associated resources.

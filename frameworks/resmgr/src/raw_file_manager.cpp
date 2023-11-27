@@ -56,16 +56,22 @@ struct RawDir {
     struct FileNameCache fileNameCache;
 };
 
+struct ActualOffset {
+    int64_t offset;
+    explicit ActualOffset() : offset(0) {}
+};
+
 struct RawFile {
     const std::string filePath;
-    long offset;
-    long length;
+    int64_t offset;
+    int64_t length;
     FILE* pf;
     uint8_t* buffer;
     const NativeResourceManager *resMgr;
+    std::unique_ptr<ActualOffset> actualOffset;
 
-    explicit RawFile(const std::string &path) : filePath(path), offset(0L), length(0L),
-        pf(nullptr), buffer(nullptr), resMgr{nullptr} {}
+    explicit RawFile(const std::string &path) : filePath(path), offset(0), length(0),
+        pf(nullptr), buffer(nullptr), resMgr(nullptr), actualOffset(std::make_unique<ActualOffset>()) {}
 
     ~RawFile()
     {
@@ -181,17 +187,11 @@ RawFile *LoadRawFileFromHap(const NativeResourceManager *mgr, const char *fileNa
         return nullptr;
     }
     auto result = std::make_unique<RawFile>(fileName);
-    result->buffer = reinterpret_cast<uint8_t*>(malloc(len));
+    result->buffer = tmpBuf.release();
     if (result->buffer == nullptr) {
-        HiLog::Error(LABEL, "failed to malloc");
+        HiLog::Error(LABEL, "failed get file buffer");
         return nullptr;
     }
-    int ret = memcpy_s(result->buffer, len, tmpBuf.get(), len);
-    if (ret != 0) {
-        HiLog::Error(LABEL, "failed to memcpy_s");
-        return nullptr;
-    }
-
     int zipFd = open(hapPath.c_str(), O_RDONLY);
     if (zipFd < 0) {
         HiLog::Error(LABEL, "failed open file %{public}s", hapPath.c_str());
@@ -219,7 +219,7 @@ RawFile *OH_ResourceManager_OpenRawFile(const NativeResourceManager *mgr, const 
     if (state != SUCCESS) {
         return nullptr;
     }
-    std::unique_ptr<RawFile> result = std::make_unique<RawFile>(filePath);
+    auto result = std::make_unique<RawFile>(filePath);
     if (!result->open()) {
         return nullptr;
     }
@@ -259,16 +259,21 @@ void OH_ResourceManager_CloseRawDir(RawDir *rawDir)
 
 int OH_ResourceManager_ReadRawFile(const RawFile *rawFile, void *buf, size_t length)
 {
-    if (rawFile == nullptr || buf == nullptr || length == 0) {
+    if (rawFile == nullptr || rawFile->actualOffset == nullptr || buf == nullptr || length == 0) {
         return 0;
     }
     if (rawFile->buffer != nullptr) {
-        int ret = memcpy_s(buf, length, rawFile->buffer, rawFile->length);
+        uint64_t len = OH_ResourceManager_GetRawFileRemainingLength(rawFile);
+        if (length > len) {
+            length = len;
+        }
+        int ret = memcpy_s(buf, length, rawFile->buffer + rawFile->actualOffset->offset, length);
         if (ret != 0) {
             HiLog::Error(LABEL, "failed to copy to buf");
             return 0;
         }
-        return rawFile->length;
+        rawFile->actualOffset->offset += length;
+        return static_cast<int>(length);
     } else {
         return std::fread(buf, 1, length, rawFile->pf);
     }
@@ -276,39 +281,52 @@ int OH_ResourceManager_ReadRawFile(const RawFile *rawFile, void *buf, size_t len
 
 int OH_ResourceManager_SeekRawFile(const RawFile *rawFile, long offset, int whence)
 {
-    if (rawFile == nullptr) {
-        return 0;
+    if (rawFile == nullptr || rawFile->actualOffset == nullptr || abs(offset) > rawFile->length) {
+        return -1;
     }
 
     int origin = 0;
-    int start = 0;
     switch (whence) {
         case SEEK_SET:
             origin = SEEK_SET;
-            start = rawFile->offset + offset;
+            rawFile->actualOffset->offset = offset;
             break;
         case SEEK_CUR:
             origin = SEEK_CUR;
-            start = offset;
+            rawFile->actualOffset->offset = rawFile->actualOffset->offset + offset;
             break;
         case SEEK_END:
-            start = rawFile->offset + rawFile->length + offset;
-            origin = SEEK_SET;
+            origin = SEEK_END;
+            rawFile->actualOffset->offset = rawFile->length + offset;
             break;
         default:
             return -1;
     }
 
-    return std::fseek(rawFile->pf, start, origin);
+    if (rawFile->actualOffset->offset < 0 || rawFile->actualOffset->offset > rawFile->length) {
+        return -1;
+    }
+
+    return std::fseek(rawFile->pf, rawFile->actualOffset->offset, origin);
 }
 
 long OH_ResourceManager_GetRawFileSize(RawFile *rawFile)
 {
-    if (rawFile == nullptr) {
+    if (rawFile == nullptr || rawFile->actualOffset == nullptr) {
         return 0;
     }
 
-    return rawFile->length;
+    return static_cast<long>(rawFile->length);
+}
+
+int64_t OH_ResourceManager_GetRawFileRemainingLength(const RawFile *rawFile)
+{
+    if (rawFile == nullptr || rawFile->actualOffset == nullptr ||
+        rawFile->length < rawFile->actualOffset->offset) {
+        return 0;
+    }
+
+    return rawFile->length - rawFile->actualOffset->offset;
 }
 
 void OH_ResourceManager_CloseRawFile(RawFile *rawFile)
@@ -320,16 +338,17 @@ void OH_ResourceManager_CloseRawFile(RawFile *rawFile)
 
 long OH_ResourceManager_GetRawFileOffset(const RawFile *rawFile)
 {
-    if (rawFile == nullptr) {
+    if (rawFile == nullptr || rawFile->actualOffset == nullptr) {
         return 0;
     }
-    return ftell(rawFile->pf) - rawFile->offset;
+    return static_cast<long>(rawFile->actualOffset->offset);
 }
 
 static bool GetRawFileDescriptorFromHap(const RawFile *rawFile, RawFileDescriptor &descriptor)
 {
     ResourceManager::RawFileDescriptor resMgrDescriptor;
-    int32_t ret = rawFile->resMgr->resManager->GetRawFdNdkFromHap(rawFile->filePath, resMgrDescriptor);
+    int32_t ret = rawFile->resMgr->resManager->
+        GetRawFdNdkFromHap(rawFile->filePath, resMgrDescriptor);
     if (ret != 0) {
         HiLog::Error(LABEL, "failed to get rawFile descriptor");
         return false;
@@ -342,7 +361,7 @@ static bool GetRawFileDescriptorFromHap(const RawFile *rawFile, RawFileDescripto
 
 bool OH_ResourceManager_GetRawFileDescriptor(const RawFile *rawFile, RawFileDescriptor &descriptor)
 {
-    if (rawFile == nullptr) {
+    if (rawFile == nullptr || rawFile->actualOffset == nullptr) {
         return false;
     }
     if (rawFile->resMgr != nullptr) {
@@ -362,7 +381,7 @@ bool OH_ResourceManager_GetRawFileDescriptor(const RawFile *rawFile, RawFileDesc
     if (fd > 0) {
         descriptor.fd = fd;
         descriptor.length = rawFile->length;
-        descriptor.start = rawFile->offset;
+        descriptor.start = rawFile->actualOffset->offset;
     } else {
         return false;
     }
