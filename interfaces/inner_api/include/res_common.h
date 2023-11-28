@@ -100,7 +100,8 @@ typedef enum ResType {
     PROF             = 20,
     SVG              = 21,
     PATTERN          = 22,
-    MAX_RES_TYPE     = 23,
+    SYMBOL           = 23,
+    MAX_RES_TYPE     = 24,
 } ResType;
 
 enum DeviceType {

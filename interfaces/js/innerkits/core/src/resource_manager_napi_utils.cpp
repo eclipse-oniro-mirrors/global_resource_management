@@ -530,6 +530,16 @@ napi_value ResourceManagerNapiUtils::CreateJsColor(napi_env env, ResMgrDataConte
     return jsColorValue;
 }
 
+napi_value ResourceManagerNapiUtils::CreateJsSymbol(napi_env env, ResMgrDataContext& context)
+{
+    napi_value jsSymbolValue;
+    if (napi_create_uint32(env, context.symbolValue_, &jsSymbolValue) != napi_ok) {
+        HiLog::Error(LABEL, "Failed to get symbol");
+        return nullptr;
+    }
+    return jsSymbolValue;
+}
+
 RState ResourceManagerNapiUtils::GetDataType(napi_env env, napi_value value, uint32_t& density)
 {
     napi_valuetype valuetype;
