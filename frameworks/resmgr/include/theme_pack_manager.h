@@ -98,12 +98,13 @@ public:
 private:
     ThemePackManager();
     std::string themeFlag;
+    std::string sysResFlag;
     void ClearSkinResource(const std::string &themeFlag);
     void ClearIconResource(const std::string &themeFlag);
     std::vector<std::shared_ptr<ThemeResource> > skinResource_;
     std::vector<std::shared_ptr<ThemeResource>> iconResource_;
     std::vector<std::shared_ptr<ThemeResource::ThemeValue> > GetThemeResourceList(
-        const std::pair<std::string, std::string> &bundInfo, const ResType &resType, const std::string &resName) const;
+        const std::pair<std::string, std::string> &bundInfo, const ResType &resType, const std::string &resName);
 
     const std::shared_ptr<ThemeResource::ThemeQualifierValue> GetThemeQualifierValue(
         const std::pair<std::string, std::string> &bundInfo, const ResType &resType,
