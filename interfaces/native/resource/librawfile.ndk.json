@@ -30,6 +30,9 @@
         "name": "OH_ResourceManager_GetRawFileSize"
     },
     {
+        "name": "OH_ResourceManager_GetRawFileRemainingLength"
+    },
+    {
         "name": "OH_ResourceManager_CloseRawFile"
     },
     {
