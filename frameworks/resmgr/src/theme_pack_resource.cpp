@@ -118,17 +118,9 @@ void ThemeResource::InitThemeRes(std::pair<std::string, std::string> bundleInfo,
                 return;
             }
             auto themeValue = std::make_shared<ThemeValue>();
-            if (themeValue == nullptr) {
-                HILOG_ERROR("New themeValue fialed in InitThemeRes");
-                return;
-            }
             ThemeKey themeKey = ThemeKey(bundleInfo.first, bundleInfo.second, resType, name->valuestring);
             auto themeQualifierValue = std::make_shared<ThemeQualifierValue>(themeKey, themeConfig,
                 value->valuestring);
-            if (themeQualifierValue == nullptr) {
-                HILOG_ERROR("New themeQualifierValue fialed in InitThemeRes");
-                return;
-            }
             themeValue->AddThemeLimitPath(themeQualifierValue);
             themeValueVec_.emplace_back(std::make_tuple(resType, name->valuestring, themeValue));
             childValue = childValue->next;
@@ -182,16 +174,8 @@ void ThemeResource::ParseIcon(const std::string &bundleName, const std::string &
     }
     std::string iconName = iconPath.substr(pos2 + 1, pos1 - pos2 - 1);
     auto themeValue = std::make_shared<ThemeValue>();
-    if (themeValue == nullptr) {
-        HILOG_ERROR("new themeValue failed in ParseIcon");
-        return;
-    }
     ThemeKey themeKey = ThemeKey(bundleName, moduleName, ResType::MEDIA, iconName);
     auto themeQualifierValue = std::make_shared<ThemeQualifierValue>(themeKey, themeConfig, iconPath);
-    if (themeQualifierValue == nullptr) {
-        HILOG_ERROR("new themeQualifierValue failed in ParseIcon");
-        return;
-    }
     themeValue->AddThemeLimitPath(themeQualifierValue);
     themeValueVec_.emplace_back(std::make_tuple(ResType::MEDIA, iconName, themeValue));
     return;
@@ -205,7 +189,7 @@ std::vector<std::shared_ptr<ThemeResource::ThemeValue> > ThemeResource::GetTheme
         return result;
     }
 
-    for (auto themeValue : themeValueVec_) {
+    for (const auto &themeValue : themeValueVec_) {
         ResType type = std::get<FIRST_ELEMENT>(themeValue);
         std::string resName = std::get<SECOND_ELEMENT>(themeValue);
         if (type == resType && resName == name) {
@@ -272,12 +256,8 @@ const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeResource(const std:
         return nullptr;
     }
     auto themeResource = std::make_shared<ThemeResource>(rootDir);
-    if (themeResource == nullptr) {
-        HILOG_ERROR("New themeResource failed in LoadThemeResource");
-        return nullptr;
-    }
     std::vector<std::string> resPaths = GetFiles(rootDir);
-    for (auto path : resPaths) {
+    for (const auto &path : resPaths) {
         auto bundleInfo = GetBundleInfo(rootDir, path);
         auto pos = path.rfind('.');
         if (pos == std::string::npos) {
@@ -326,7 +306,7 @@ const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeIconResource(const 
     auto themeResource = std::make_shared<ThemeResource>(iconPath);
     std::string bundleName = GetIconsBundleName(iconPath);
     std::vector<std::string> resPaths = GetFiles(iconPath);
-    for (auto path : resPaths) {
+    for (const auto &path : resPaths) {
         auto pos1 = path.rfind('.');
         auto pos2 = path.rfind('/');
         if (pos1 == std::string::npos || pos2 == std::string::npos) {

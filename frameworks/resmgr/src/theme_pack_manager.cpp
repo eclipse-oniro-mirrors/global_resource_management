@@ -103,7 +103,7 @@ void ThemePackManager::LoadThemeSkinResource(const std::string &bundleName, cons
     if (rootDirs.empty()) {
         return;
     }
-    for (auto dir : rootDirs) {
+    for (const auto &dir : rootDirs) {
         auto pos = dir.rfind('/');
         if (pos == std::string::npos) {
             HILOG_ERROR("invalid dir = %{public}s in LoadThemeSkinResource", dir.c_str());
@@ -262,7 +262,7 @@ void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, con
     if (rootDirs.empty()) {
         return;
     }
-    for (auto dir : rootDirs) {
+    for (const auto &dir : rootDirs) {
         auto pos = dir.rfind('/');
         if (pos == std::string::npos) {
             HILOG_ERROR("invalid dir = %{public}s in LoadThemeIconsResource", dir.c_str());
