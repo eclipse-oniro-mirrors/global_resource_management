@@ -272,14 +272,11 @@ RState HapManager::FindRawFile(const std::string &name, std::string &outValue)
         }
 #endif
         const std::string realPath = tmpPath;
-        if (realPath.length() > resourcesIndexPath.length()
-            && (realPath.compare(0, resourcesIndexPath.length(), resourcesIndexPath) == 0)) {
-            std::fstream inputFile;
-            inputFile.open(realPath, std::ios::in);
-            if (inputFile) {
-                outValue = realPath;
-                return SUCCESS;
-            }
+        std::fstream inputFile;
+        inputFile.open(realPath, std::ios::in);
+        if (inputFile) {
+            outValue = realPath;
+            return SUCCESS;
         }
     }
     return ERROR_CODE_RES_PATH_INVALID;
