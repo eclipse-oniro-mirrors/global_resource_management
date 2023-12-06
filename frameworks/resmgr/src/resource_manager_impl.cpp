@@ -974,9 +974,12 @@ bool ResourceManagerImpl::RemoveAppOverlay(const std::string &path)
     return this->hapManager_->RemoveAppOverlay(path);
 }
 
-RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig)
+RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig, bool isUpdateTheme)
 {
-    ThemePackManager::GetThemePackManager()->LoadThemeRes(bundleInfo.first, bundleInfo.second, themeMask);
+    if (isUpdateTheme) {
+        HILOG_INFO("The theme enabled");
+        ThemePackManager::GetThemePackManager()->LoadThemeRes(bundleInfo.first, bundleInfo.second, themeMask);
+    }
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
 #endif

@@ -65,7 +65,7 @@ public:
 
     virtual bool AddResource(const char *path) = 0;
 
-    virtual RState UpdateResConfig(ResConfig &resConfig) = 0;
+    virtual RState UpdateResConfig(ResConfig &resConfig, bool isUpdateTheme = false) = 0;
 
     virtual void GetResConfig(ResConfig &resConfig) = 0;
 
