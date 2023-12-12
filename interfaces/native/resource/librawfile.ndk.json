@@ -43,5 +43,32 @@
     },
     {
         "name": "OH_ResourceManager_ReleaseRawFileDescriptor"
+    },
+    {
+        "name": "OH_ResourceManager_OpenRawFile64"
+    },
+    {
+        "name": "OH_ResourceManager_ReadRawFile64"
+    },
+    {
+        "name": "OH_ResourceManager_SeekRawFile64"
+    },
+    {
+        "name": "OH_ResourceManager_GetRawFileSize64"
+    },
+    {
+        "name": "OH_ResourceManager_GetRawFileRemainingLength64"
+    },
+    {
+        "name": "OH_ResourceManager_CloseRawFile64"
+    },
+    {
+        "name": "OH_ResourceManager_GetRawFileOffset64"
+    },
+    {
+        "name": "OH_ResourceManager_GetRawFileDescriptor64"
+    },
+    {
+        "name": "OH_ResourceManager_ReleaseRawFileDescriptor64"
     }
 ]

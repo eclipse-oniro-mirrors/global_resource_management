@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -117,6 +117,23 @@ RawDir *OH_ResourceManager_OpenRawDir(const NativeResourceManager *mgr, const ch
  * @version 1.0
  */
 RawFile *OH_ResourceManager_OpenRawFile(const NativeResourceManager *mgr, const char *fileName);
+
+/**
+ * @brief Opens a raw file.
+ *
+ * After it is opened, you can read its data.
+ *
+ * @param mgr Indicates the pointer to {@link NativeResourceManager} obtained by calling
+ * {@link OH_ResourceManager_InitNativeResourceManager}.
+ * @param fileName Indicates the file path relative to the top-level raw file directory.
+ * @return Returns the pointer to {@link RawFile64}. After you finish using the pointer, call
+ * {@link OH_ResourceManager_CloseRawFile64} to release it.
+ * @see OH_ResourceManager_InitNativeResourceManager
+ * @see OH_ResourceManager_CloseRawFile64
+ * @since 11
+ * @version 1.0
+ */
+RawFile64 *OH_ResourceManager_OpenRawFile64(const NativeResourceManager *mgr, const char *fileName);
 
 #ifdef __cplusplus
 };
