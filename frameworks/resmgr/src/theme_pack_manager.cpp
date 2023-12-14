@@ -175,7 +175,7 @@ const std::string ThemePackManager::GetThemeResource(const std::pair<std::string
 {
     auto themeQualifierValue = GetThemeQualifierValue(bundInfo, resType, resName, resConfig);
     if (themeQualifierValue == nullptr) {
-        HILOG_ERROR("themeQualifierValue == nullptr");
+        HILOG_DEBUG("themeQualifierValue == nullptr");
         return std::string("");
     }
     return themeQualifierValue->GetResValue();
@@ -189,7 +189,6 @@ std::vector<std::shared_ptr<ThemeResource::ThemeValue> > ThemePackManager::GetTh
     for (size_t i = 0; i < skinResource_.size(); ++i) {
         auto pThemeResource = skinResource_[i];
         if (pThemeResource == nullptr) {
-            HILOG_ERROR("pThemeResource == nullptr");
             continue;
         }
         std::string bundleName = pThemeResource->GetThemeResBundleName(pThemeResource->themePath_);

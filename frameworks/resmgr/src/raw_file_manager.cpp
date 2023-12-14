@@ -183,7 +183,7 @@ RawFile *LoadRawFileFromHap(const NativeResourceManager *mgr, const char *fileNa
     std::unique_ptr<uint8_t[]> tmpBuf;
     RState state = mgr->resManager->GetRawFileFromHap(fileName, len, tmpBuf);
     if (state != SUCCESS) {
-        HiLog::Error(LABEL, "failed to get %{public}s rawfile", fileName);
+        HiLog::Debug(LABEL, "failed to get %{public}s rawfile", fileName);
         return nullptr;
     }
     auto result = std::make_unique<RawFile>(fileName);
