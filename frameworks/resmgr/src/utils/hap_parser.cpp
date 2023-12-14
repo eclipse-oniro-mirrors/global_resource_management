@@ -263,7 +263,7 @@ RState HapParser::ReadRawFileFromHap(const std::string &hapPath, const std::stri
     }
     std::string rawfilePath = HapParser::GetRawFilePath(extractor, rawFileName);
     if (!extractor->HasEntry(rawfilePath)) {
-        HILOG_ERROR("the rawfile file %{public}s is not exist in %{public}s", rawfilePath.c_str(), hapPath.c_str());
+        HILOG_DEBUG("the rawfile file %{public}s is not exist in %{public}s", rawfilePath.c_str(), hapPath.c_str());
         return ERROR_CODE_RES_PATH_INVALID;
     }
     bool ret = extractor->ExtractToBufByName(rawfilePath, outValue, len);
@@ -295,7 +295,7 @@ RState HapParser::ReadRawFileDescriptor(const char *hapPath, const std::string &
     }
     std::string rawfilePath = HapParser::GetRawFilePath(extractor, rawFileName);
     if (!extractor->HasEntry(rawfilePath)) {
-        HILOG_ERROR("the rawfile file %{public}s is not exist in %{public}s", rawfilePath.c_str(), hapPath);
+        HILOG_DEBUG("the rawfile file %{public}s is not exist in %{public}s", rawfilePath.c_str(), hapPath);
         return ERROR_CODE_RES_PATH_INVALID;
     }
     AbilityBase::FileInfo fileInfo;
@@ -324,7 +324,7 @@ RState HapParser::GetRawFileList(const std::string &hapPath, const std::string &
     std::set<std::string> fileSet;
     std::string rawfilePath = HapParser::GetRawFilePath(extractor, rawDirPath);
     if (!extractor->IsDirExist(rawfilePath)) {
-        HILOG_ERROR("the rawfile dir %{public}s is not exist in %{public}s", rawfilePath.c_str(), hapPath.c_str());
+        HILOG_DEBUG("the rawfile dir %{public}s is not exist in %{public}s", rawfilePath.c_str(), hapPath.c_str());
         return ERROR_CODE_RES_PATH_INVALID;
     }
     bool ret = extractor->GetFileList(rawfilePath, fileSet);
