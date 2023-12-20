@@ -115,6 +115,12 @@ enum DeviceType {
     DEVICE_TWOINONE = 7,
 };
 
+enum TimeFormat {
+    TIME_FORMAT_NOT_SET = -1,
+    TIME_FORMAT_12      = 0,
+    TIME_FORMAT_24      = 1,
+};
+
 enum ColorMode {
     COLOR_MODE_NOT_SET = -1,
     DARK               = 0,
