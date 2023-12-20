@@ -60,7 +60,6 @@ void ResourceManagerImpl::AddSystemResource(ResourceManagerImpl *systemResourceM
 ResourceManagerImpl::ResourceManagerImpl() : hapManager_(nullptr)
 {
     psueManager_ = new (std::nothrow) PsueManager();
-    ThemePackManager_ = ThemePackManager::GetThemePackManager();
 }
 
 bool ResourceManagerImpl::Init(bool isSystem)
@@ -502,7 +501,7 @@ RState ResourceManagerImpl::GetThemeFloat(const IdItem *idItem, float &outValue)
     std::vector<const IdItem *> idItems;
     idItems.emplace_back(idItem);
     ProcessReference(idItem->value_, idItems);
-    std::string result = ThemePackManager_->FindThemeResource(bundleInfo, idItems, resConfig);
+    std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig);
     if (result.empty()) {
         return NOT_FOUND;
     }
@@ -708,7 +707,7 @@ RState ResourceManagerImpl::GetThemeColor(const IdItem *idItem, uint32_t &outVal
     std::vector<const IdItem *> idItems;
     idItems.emplace_back(idItem);
     RState state = ProcessReference(idItem->value_, idItems);
-    std::string result = ThemePackManager_->FindThemeResource(bundleInfo, idItems, resConfig);
+    std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig);
     if (result.empty()) {
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
@@ -1043,7 +1042,7 @@ RState ResourceManagerImpl::GetThemeMedia(const IdItem *idItem, size_t &len,
     GetResConfig(resConfig);
     std::vector<const IdItem *> idItems;
     idItems.emplace_back(idItem);
-    std::string result = ThemePackManager_->FindThemeResource(bundleInfo, idItems, resConfig);
+    std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig);
     outValue = Utils::LoadResourceFile(result, len);
     return result.empty() ? ERROR_CODE_RES_ID_NOT_FOUND : SUCCESS;
 }
@@ -1100,7 +1099,7 @@ RState ResourceManagerImpl::GetThemeMediaBase64(const IdItem *idItem, std::strin
     GetResConfig(resConfig);
     std::vector<const IdItem *> idItems;
     idItems.emplace_back(idItem);
-    std::string result = ThemePackManager_->FindThemeResource(bundleInfo, idItems, resConfig);
+    std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig);
     return Utils::GetMediaBase64Data(result, outValue);
 }
 
@@ -1219,9 +1218,15 @@ RState ResourceManagerImpl::GetThemeIcon(const IdItem *idItem, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue, uint32_t density)
 {
     std::string iconName = idItem->GetItemResName();
-    std::string result = ThemePackManager_->FindThemeIconResource(bundleInfo, iconName);
+    std::string result = ThemePackManager::GetThemePackManager()->FindThemeIconResource(bundleInfo, iconName);
+    if (result.empty()) {
+        HILOG_INFO("GetThemeIcon FAILED bundlename = %{public}s, modulename = %{public}s, iconName = %{public}s",
+            bundleInfo.first.c_str(), bundleInfo.second.c_str(), iconName.c_str());
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
+    HILOG_INFO("GetThemeIcon SUCCESS result = %{public}s", result.c_str());
     outValue = Utils::LoadResourceFile(result, len);
-    return result.empty() ? ERROR_CODE_RES_ID_NOT_FOUND : SUCCESS;
+    return SUCCESS;
 }
 
 RState ResourceManagerImpl::GetThemeDrawable(const IdItem *idItem, size_t &len,
