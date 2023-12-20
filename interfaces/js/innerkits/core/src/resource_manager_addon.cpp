@@ -86,18 +86,20 @@ ResourceManagerAddon::ResourceManagerAddon(
     const std::shared_ptr<AbilityRuntime::Context>& context, bool isSystem)
     : bundleName_(bundleName), resMgr_(resMgr), context_(context), isSystem_(isSystem)
 {
+    HiLog::Debug(LABEL, "create ResourceManagerAddon %{public}s", bundleName_.c_str());
     napiContext_ = std::make_shared<ResourceManagerNapiContext>();
 }
 
 ResourceManagerAddon::ResourceManagerAddon(const std::shared_ptr<ResourceManager>& resMgr, bool isSystem)
     : resMgr_(resMgr), isSystem_(isSystem)
 {
+    HiLog::Debug(LABEL, "create ResourceManagerAddon.");
     napiContext_ = std::make_shared<ResourceManagerNapiContext>();
 }
 
 ResourceManagerAddon::~ResourceManagerAddon()
 {
-    HiLog::Info(LABEL, "~ResourceManagerAddon %{public}s", bundleName_.c_str());
+    HiLog::Debug(LABEL, "~ResourceManagerAddon %{public}s", bundleName_.c_str());
 }
 
 void ResourceManagerAddon::Destructor(napi_env env, void *nativeObject, void *hint)

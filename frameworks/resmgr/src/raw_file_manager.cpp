@@ -129,7 +129,7 @@ RawDir *LoadRawDirFromHap(const NativeResourceManager *mgr, const std::string di
     std::unique_ptr<RawDir> result = std::make_unique<RawDir>();
     RState state = mgr->resManager->GetRawFileList(dirName, result->fileNameCache.names);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "failed to get RawDir dirName, %{public}s", dirName.c_str());
+        HiLog::Debug(LABEL, "failed to get RawDir dirName, %{public}s", dirName.c_str());
         return nullptr;
     }
     return result.release();
