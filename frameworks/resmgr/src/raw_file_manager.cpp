@@ -23,6 +23,7 @@
 #include <securec.h>
 #include <unistd.h>
 
+#include "auto_mutex.h"
 #include "raw_dir.h"
 #include "raw_file.h"
 #include "resource_manager.h"
@@ -43,6 +44,9 @@ namespace {
     constexpr HiLogLabel LABEL = {LOG_CORE, 0xD001E00, "RawFile"};
 }
 
+Lock g_rawDirLock;
+Lock g_rawFileLock;
+Lock g_rawFile64Lock;
 struct NativeResourceManager {
     std::shared_ptr<ResourceManager> resManager = nullptr;
 };
@@ -137,6 +141,7 @@ RawDir *LoadRawDirFromHap(const NativeResourceManager *mgr, const std::string di
 
 RawDir *OH_ResourceManager_OpenRawDir(const NativeResourceManager *mgr, const char *dirName)
 {
+    AutoMutex mutex(g_rawDirLock);
     if (mgr == nullptr || dirName == nullptr) {
         return nullptr;
     }
@@ -205,6 +210,7 @@ RawFile *LoadRawFileFromHap(const NativeResourceManager *mgr, const char *fileNa
 
 RawFile *OH_ResourceManager_OpenRawFile(const NativeResourceManager *mgr, const char *fileName)
 {
+    AutoMutex mutex(g_rawFileLock);
     if (mgr == nullptr || fileName == nullptr) {
         return nullptr;
     }
@@ -252,6 +258,7 @@ const char *OH_ResourceManager_GetRawFileName(RawDir *rawDir, int index)
 
 void OH_ResourceManager_CloseRawDir(RawDir *rawDir)
 {
+    AutoMutex mutex(g_rawDirLock);
     if (rawDir != nullptr) {
         delete rawDir;
         rawDir = nullptr;
@@ -332,6 +339,7 @@ long OH_ResourceManager_GetRawFileRemainingLength(const RawFile *rawFile)
 
 void OH_ResourceManager_CloseRawFile(RawFile *rawFile)
 {
+    AutoMutex mutex(g_rawFileLock);
     if (rawFile != nullptr) {
         delete rawFile;
         rawFile = nullptr;
@@ -454,6 +462,7 @@ RawFile64 *LoadRawFileFromHap64(const NativeResourceManager *mgr, const char *fi
 
 RawFile64 *OH_ResourceManager_OpenRawFile64(const NativeResourceManager *mgr, const char *fileName)
 {
+    AutoMutex mutex(g_rawFile64Lock);
     if (mgr == nullptr || fileName == nullptr) {
         return nullptr;
     }
@@ -552,6 +561,7 @@ int64_t OH_ResourceManager_GetRawFileRemainingLength64(const RawFile64 *rawFile)
 
 void OH_ResourceManager_CloseRawFile64(RawFile64 *rawFile)
 {
+    AutoMutex mutex(g_rawFile64Lock);
     if (rawFile != nullptr) {
         delete rawFile;
         rawFile = nullptr;
