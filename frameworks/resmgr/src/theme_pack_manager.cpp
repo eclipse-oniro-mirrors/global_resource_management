@@ -141,7 +141,6 @@ void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::st
         rootDirs = GetRootDir(themeSkinB, themeMask);
         iconDirs = GetRootDir(themeIconsB, themeMask);
     } else {
-        themeFlag = "";
         return;
     }
     LoadThemeSkinResource(bundleName, moduleName, rootDirs, themeFlag);
@@ -267,10 +266,6 @@ void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, con
             HILOG_ERROR("invalid dir = %{public}s in LoadThemeIconsResource", dir.c_str());
             continue;
         }
-        std::string tempBundleName = dir.substr(pos + 1);
-        if (tempBundleName != bundleName) {
-            continue;
-        }
         auto pThemeResource = ThemeResource::LoadThemeIconResource(dir);
         if (pThemeResource != nullptr) {
             this->iconResource_.emplace_back(pThemeResource);
@@ -290,6 +285,9 @@ const std::string ThemePackManager::FindThemeIconResource(const std::pair<std::s
             return std::string("");
         }
         result = pThemeResource->GetThemeAppIcon(bundleInfo, iconName);
+        if (!result.empty()) {
+            break;
+        }
     }
     return result;
 }

@@ -667,8 +667,6 @@ private:
 
     PsueManager *psueManager_;
 
-    std::shared_ptr<ThemePackManager> ThemePackManager_;
-
     const std::string VIRTUAL_PIXEL = "vp";
 
     const std::string FONT_SIZE_PIXEL = "fp";
