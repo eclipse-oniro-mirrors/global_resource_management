@@ -116,9 +116,9 @@ enum DeviceType {
 };
 
 enum TimeFormat {
-    TIME_FORMAT_NOT_SET = -1,
-    TIME_FORMAT_12      = 0,
-    TIME_FORMAT_24      = 1,
+    HOUR_NOT_SET = -1,
+    HOUR_12      = 0,
+    HOUR_24      = 1,
 };
 
 enum ColorMode {
