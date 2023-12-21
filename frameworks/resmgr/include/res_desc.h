@@ -166,10 +166,11 @@ public:
 
     std::string ToString() const;
 
+    std::string GetDeviceTypeStr() const;
+
 private:
     const std::string ConvertToStr() const;
     std::string GetScreenDensityStr() const;
-    std::string GetDeviceTypeStr() const;
     std::string GetColorModeStr() const;
     std::string GetMccStr() const;
     std::string GetMncStr() const;
@@ -221,6 +222,8 @@ public:
     ResHeader *resHeader_;
 
     std::vector<ResKey *> keys_;
+
+    std::string GetCurrentDeviceType();
 };
 } // namespace Resource
 } // namespace Global
