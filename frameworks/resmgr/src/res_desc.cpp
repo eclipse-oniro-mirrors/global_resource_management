@@ -24,10 +24,15 @@
 #endif
 #include "utils/errors.h"
 #include "utils/string_utils.h"
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+#include "parameters.h"
+#endif
 
 namespace OHOS {
 namespace Global {
 namespace Resource {
+const std::string PROPERTY_DEVICE_TYPE = "const.product.devicetype";
+const std::string PROPERTY_DEVICE_TYPE_DEFAULT = "default";
 std::string KeyParam::GetScreenDensityStr() const
 {
     std::string ret("not_screen_density");
@@ -366,6 +371,15 @@ std::string ResDesc::ToString() const
         ret.append("\n");
     }
     return ret;
+}
+
+std::string ResDesc::GetCurrentDeviceType()
+{
+    std::string deviceType;
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    deviceType = system::GetParameter(PROPERTY_DEVICE_TYPE, PROPERTY_DEVICE_TYPE_DEFAULT);
+#endif
+    return deviceType;
 }
 } // namespace Resource
 } // namespace Global

@@ -37,7 +37,8 @@ namespace OHOS {
 namespace Global {
 namespace Resource {
 const char *HapParser::RES_FILE_NAME = "/resources.index";
-
+const std::string NOT_DEVICE_TYPE = "not_device_type";
+const std::string DEVICE_DEFAULT = "default";
 int32_t LocateFile(unzFile &uf, const char *fileName)
 {
     if (unzLocateFile2(uf, fileName, 1)) { // try to locate file inside zip, 1 = case sensitive
@@ -494,7 +495,7 @@ bool IsLocaleMatch(const ResConfigImpl *defaultConfig, const std::vector<KeyPara
 }
 
 int32_t ParseKey(const char *buffer, uint32_t &offset,  ResKey *key,
-                 bool &match, const ResConfigImpl *defaultConfig)
+                 bool &match, const ResConfigImpl *defaultConfig, const std::string &deviceType)
 {
     errno_t eret = memcpy_s(key, sizeof(ResKey), buffer + offset, ResKey::RESKEY_HEADER_LEN);
     if (eret != OK) {
@@ -518,6 +519,12 @@ int32_t ParseKey(const char *buffer, uint32_t &offset,  ResKey *key,
         }
         offset += ResKey::KEYPARAM_HEADER_LEN;
         kp->InitStr();
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+        auto resDeviceType = kp->GetDeviceTypeStr();
+        if (deviceType != DEVICE_DEFAULT && resDeviceType != NOT_DEVICE_TYPE && resDeviceType != deviceType) {
+            match = false;
+        }
+#endif
         key->keyParams_.push_back(kp);
     }
     uint32_t idOffset = key->offset_;
@@ -557,6 +564,7 @@ int32_t HapParser::ParseResHex(const char *buffer, const size_t bufLen, ResDesc 
     }
 
     resDesc.resHeader_ = resHeader;
+    const std::string deviceType = resDesc.GetCurrentDeviceType();
     for (uint32_t i = 0; i < resHeader->keyCount_; i++) {
         ResKey *key = new (std::nothrow) ResKey();
         if (key == nullptr) {
@@ -564,7 +572,7 @@ int32_t HapParser::ParseResHex(const char *buffer, const size_t bufLen, ResDesc 
             return SYS_ERROR;
         }
         bool match = true;
-        int32_t ret = ParseKey(buffer, offset, key, match, defaultConfig);
+        int32_t ret = ParseKey(buffer, offset, key, match, defaultConfig, deviceType);
         if (ret != OK) {
             delete (key);
             return ret;
