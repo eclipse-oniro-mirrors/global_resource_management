@@ -604,6 +604,25 @@ public:
     virtual RState GetDrawableInfoByName(const char *name,
         std::tuple<std::string, size_t, std::string> &drawableInfo,
         std::unique_ptr<uint8_t[]> &outValue, uint32_t iconType, uint32_t density = 0);
+    
+    /**
+     * Get the theme icon from theme pack
+     *
+     * @param resId the resource id
+     * @param foregroundInfo the foreground info
+     * @param backgroundInfo the background info
+     * @param density the drawable density
+     * @return SUCCESS if resource exist, else not found
+     */
+    virtual RState GetThemeIcons(uint32_t resId, std::pair<std::unique_ptr<uint8_t[]>, size_t> &foregroundInfo,
+        std::pair<std::unique_ptr<uint8_t[]>, size_t> &backgroundInfo, uint32_t density = 0);
+
+    /**
+     * Get the theme mask
+     *
+     * @return the theme mask path, else empty
+     */
+    virtual std::string GetThemeMask();
 
 private:
     RState GetString(const IdItem *idItem, std::string &outValue);
@@ -656,6 +675,8 @@ private:
     RState GetThemeIcon(const IdItem *idItem, size_t &len, std::unique_ptr<uint8_t[]> &outValue, uint32_t density);
 
     RState ProcessReference(const std::string value, std::vector<const IdItem *> &idItems);
+
+    RState GetThemeIconInfo(const std::string &iconName, size_t &len, std::unique_ptr<uint8_t[]> &outValue);
 
     HapManager *hapManager_;
 
