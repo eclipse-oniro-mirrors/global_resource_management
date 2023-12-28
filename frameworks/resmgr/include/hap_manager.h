@@ -214,7 +214,14 @@ public:
      * @param hapPath the hap path
      * @return OK if the hapPath exist, else NOT_FOUND
      */
-    int32_t GetValidHapPath(std::string& hapPath);
+    int32_t GetValidHapPath(std::string &hapPath);
+
+    /**
+     * Get the valid resource.index path
+     * @param hapPath the hap path
+     * @return OK if the hapPath exist, else NOT_FOUND
+     */
+    int32_t GetValidIndexPath(std::string &indexPath);
 
     /**
      * Get the raw file list
@@ -222,7 +229,7 @@ public:
      * @param rawfileList the rawfile list write to
      * @return SUCCESS if resource exist, else not found
      */
-    RState GetRawFileList(const std::string &rawDirPath, std::vector<std::string>& rawfileList);
+    RState GetRawFileList(const std::string &rawDirPath, std::vector<std::string> &rawfileList);
 
     /**
      * Get the raw file list
