@@ -492,6 +492,35 @@ bool Utils::IsPrefix(std::string_view prefix, std::string_view full)
 {
     return prefix == full.substr(0, prefix.size());
 }
+
+RState Utils::GetFiles(const std::string &strCurrentDir, std::vector<std::string> &vFiles)
+{
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
+    char outPath[PATH_MAX + 1] = {0};
+    Utils::CanonicalizePath(strCurrentDir.c_str(), outPath, PATH_MAX);
+    if (outPath[0] == '\0') {
+        HILOG_ERROR("invalid path, %{public}s", strCurrentDir.c_str());
+        return ERROR_CODE_RES_PATH_INVALID;
+    }
+    DIR *dir;
+    struct dirent *pDir;
+    if ((dir = opendir(strCurrentDir.c_str())) == nullptr) {
+        HILOG_ERROR("opendir failed strCurrentDir = %{public}s", strCurrentDir.c_str());
+        return ERROR_CODE_RES_PATH_INVALID;
+    }
+    while ((pDir = readdir(dir)) != nullptr) {
+        if (strcmp(pDir->d_name, ".") == 0 || strcmp(pDir->d_name, "..") == 0) {
+            continue;
+        }
+        if (pDir->d_type != DT_REG && pDir->d_type != DT_DIR) {
+            continue;
+        }
+        vFiles.emplace_back(pDir->d_name);
+    }
+    closedir(dir);
+#endif
+    return SUCCESS;
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

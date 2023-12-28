@@ -339,6 +339,17 @@ RState HapParser::GetRawFileList(const std::string &hapPath, const std::string &
     return SUCCESS;
 }
 
+RState HapParser::GetRawFileListUnCompressed(const std::string &indexPath, const std::string &rawDirPath,
+    std::vector<std::string>& fileList)
+{
+    auto pos = indexPath.rfind('/');
+    if (pos == std::string::npos) {
+        return ERROR_CODE_RES_PATH_INVALID;
+    }
+    std::string rawFilePath = indexPath.substr(0, pos) + "/resources/";
+    HapParser::GetPath(rawDirPath, rawFilePath);
+    return Utils::GetFiles(rawFilePath, fileList);
+}
 /**
  *
  * @param buffer
