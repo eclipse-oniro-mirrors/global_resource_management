@@ -223,7 +223,7 @@ bool OH_ResourceManager_ReleaseRawFileDescriptor(const RawFileDescriptor &descri
  * @since 11
  * @version 1.0
  */
-int64_t OH_ResourceManager_ReadRawFile64(const RawFile64 *rawFile, void *buf, size_t length);
+int64_t OH_ResourceManager_ReadRawFile64(const RawFile64 *rawFile, void *buf, int64_t length);
 
 /**
  * @brief Uses the 64-bit data type to seek a data read position based on the specified offset within a raw file.
@@ -239,7 +239,7 @@ int64_t OH_ResourceManager_ReadRawFile64(const RawFile64 *rawFile, void *buf, si
  * @since 11
  * @version 1.0
  */
-int OH_ResourceManager_SeekRawFile64(const RawFile64 *rawFile, long offset, int whence);
+int OH_ResourceManager_SeekRawFile64(const RawFile64 *rawFile, int64_t offset, int whence);
 
 /**
  * @brief Obtains the raw file length represented by an int64_t.
