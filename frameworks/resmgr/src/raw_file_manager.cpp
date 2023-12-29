@@ -271,7 +271,7 @@ int OH_ResourceManager_ReadRawFile(const RawFile *rawFile, void *buf, size_t len
         return 0;
     }
     if (rawFile->buffer != nullptr) {
-        long len = OH_ResourceManager_GetRawFileRemainingLength(rawFile);
+        size_t len = static_cast<size_t>(OH_ResourceManager_GetRawFileRemainingLength(rawFile));
         if (length > len) {
             length = len;
         }
@@ -487,7 +487,7 @@ RawFile64 *OH_ResourceManager_OpenRawFile64(const NativeResourceManager *mgr, co
     return new RawFile64(std::move(result));
 }
 
-int64_t OH_ResourceManager_ReadRawFile64(const RawFile64 *rawFile, void *buf, size_t length)
+int64_t OH_ResourceManager_ReadRawFile64(const RawFile64 *rawFile, void *buf, int64_t length)
 {
     if (rawFile == nullptr || rawFile->raw == nullptr || buf == nullptr || length == 0) {
         return 0;
@@ -505,7 +505,7 @@ int64_t OH_ResourceManager_ReadRawFile64(const RawFile64 *rawFile, void *buf, si
     return static_cast<int64_t>(ret);
 }
 
-int OH_ResourceManager_SeekRawFile64(const RawFile64 *rawFile, long offset, int whence)
+int OH_ResourceManager_SeekRawFile64(const RawFile64 *rawFile, int64_t offset, int whence)
 {
     if (rawFile == nullptr || rawFile->raw == nullptr || abs(offset) > rawFile->raw->length) {
         return -1;
