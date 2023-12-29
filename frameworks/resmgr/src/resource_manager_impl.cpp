@@ -576,7 +576,7 @@ RState ResourceManagerImpl::RecalculateFloat(const std::string &unit, float &res
     GetResConfig(rc);
     float density = rc.GetScreenDensity();
     if (density == SCREEN_DENSITY_NOT_SET) {
-        HILOG_INFO("RecalculateFloat srcDensity SCREEN_DENSITY_NOT_SET ");
+        HILOG_DEBUG("RecalculateFloat srcDensity SCREEN_DENSITY_NOT_SET ");
         return SUCCESS;
     }
     if (unit == VIRTUAL_PIXEL) {
