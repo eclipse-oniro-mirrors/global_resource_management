@@ -49,6 +49,8 @@ LogLevel g_logLevel = LOG_INFO;
 
 constexpr char ESCAPE_CHARACTER = '%';
 constexpr int HEX_ADECIMAL = 16;
+const std::string FOREGROUND = "foreground";
+const std::string BACKGROUND = "background";
 
 void ResourceManagerImpl::AddSystemResource(ResourceManagerImpl *systemResourceManager)
 {
@@ -1482,6 +1484,35 @@ RState ResourceManagerImpl::GetResId(const std::string &resTypeName, uint32_t &r
 void ResourceManagerImpl::GetLocales(std::vector<std::string> &outValue, bool includeSystem)
 {
     hapManager_->GetLocales(outValue, includeSystem);
+}
+
+RState ResourceManagerImpl::GetThemeIconInfo(const std::string &iconName, size_t &len,
+    std::unique_ptr<uint8_t[]> &outValue)
+{
+    std::string result = ThemePackManager::GetThemePackManager()->FindThemeIconResource(bundleInfo, iconName);
+    if (result.empty()) {
+        HILOG_INFO("GetThemeIconInfo FAILED bundlename = %{public}s,", result.c_str());
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
+    HILOG_INFO("GetThemeIconInfo SUCCESS result = %{public}s", result.c_str());
+    outValue = Utils::LoadResourceFile(result, len);
+    return SUCCESS;
+}
+
+RState ResourceManagerImpl::GetThemeIcons(uint32_t resId, std::pair<std::unique_ptr<uint8_t[]>, size_t> &foregroundInfo,
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> &backgroundInfo, uint32_t density)
+{
+    RState foreState = GetThemeIconInfo(FOREGROUND, foregroundInfo.second, foregroundInfo.first);
+    RState backState = GetThemeIconInfo(BACKGROUND, backgroundInfo.second, backgroundInfo.first);
+    if (foreState == SUCCESS && backState == SUCCESS) {
+        return SUCCESS;
+    }
+    return ERROR_CODE_RES_ID_NOT_FOUND;
+}
+
+std::string ResourceManagerImpl::GetThemeMask()
+{
+    return themeMask;
 }
 } // namespace Resource
 } // namespace Global
