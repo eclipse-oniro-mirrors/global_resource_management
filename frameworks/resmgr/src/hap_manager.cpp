@@ -43,6 +43,7 @@
 #endif
 
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+#include "hitrace_meter.h"
 #include "hisysevent_adapter.h"
 #include "file_mapper.h"
 #include "extractor.h"
@@ -589,6 +590,7 @@ RState HapManager::GetMediaDataFromHap(const HapResource::ValueUnderQualifierDir
     std::unique_ptr<uint8_t[]> &outValue)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
     auto extractor = GetAbilityExtractor(qd);
     if (extractor == nullptr) {
         HILOG_ERROR("failed to get extractor from ability");
