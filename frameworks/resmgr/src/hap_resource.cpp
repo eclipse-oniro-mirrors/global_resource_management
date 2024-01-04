@@ -176,6 +176,7 @@ std::string GetIndexFilePath(std::shared_ptr<AbilityBase::Extractor> &extractor)
 bool GetIndexData(const char *path, std::unique_ptr<uint8_t[]> &tmpBuf, size_t &len)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
     bool isNewExtractor = false;
     std::shared_ptr<AbilityBase::Extractor> extractor = AbilityBase::ExtractorUtil::GetExtractor(path, isNewExtractor);
     if (extractor == nullptr) {

@@ -29,6 +29,9 @@
 #else
 #include "securec.h"
 #endif
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+#include "hitrace_meter.h"
+#endif
 #include "utils/errors.h"
 #include "utils/string_utils.h"
 #include "utils/utils.h"
@@ -256,6 +259,7 @@ RState HapParser::ReadRawFileFromHap(const std::string &hapPath, const std::stri
     std::unique_ptr<uint8_t[]> &outValue)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
     bool isNewExtractor = false;
     auto extractor = AbilityBase::ExtractorUtil::GetExtractor(hapPath, isNewExtractor);
     if (extractor == nullptr) {
@@ -281,6 +285,7 @@ RState HapParser::ReadRawFileDescriptor(const char *hapPath, const std::string &
     ResourceManager::RawFileDescriptor &descriptor)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
     char outPath[PATH_MAX + 1] = {0};
     Utils::CanonicalizePath(hapPath, outPath, PATH_MAX);
     int zipFd = open(outPath, O_RDONLY);
@@ -316,6 +321,7 @@ RState HapParser::GetRawFileList(const std::string &hapPath, const std::string &
     std::vector<std::string>& fileList)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
     bool isNewExtractor = false;
     auto extractor = AbilityBase::ExtractorUtil::GetExtractor(hapPath, isNewExtractor);
     if (extractor == nullptr) {
