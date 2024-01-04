@@ -681,6 +681,19 @@ int32_t HapManager::GetValidHapPath(std::string &hapPath)
     return NOT_FOUND;
 }
 
+int32_t HapManager::GetValidIndexPath(std::string &indexPath)
+{
+    for (auto iter = hapResources_.rbegin(); iter != hapResources_.rend(); iter++) {
+        const std::string tempPath = (*iter)->GetIndexPath();
+        if (Utils::endWithTail(tempPath, "/systemres/resources.index")) {
+            continue;
+        }
+        indexPath = tempPath;
+        return OK;
+    }
+    return NOT_FOUND;
+}
+
 RState HapManager::FindRawFileFromHap(const std::string &rawFileName, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue)
 {
@@ -745,9 +758,14 @@ RState HapManager::GetRawFd(const std::string &rawFileName, ResourceManager::Raw
 
 RState HapManager::GetRawFileList(const std::string &rawDirPath, std::vector<std::string> &fileList)
 {
-    std::string hapPath;
-    return HapManager::GetValidHapPath(hapPath) == OK ? HapParser::GetRawFileList(hapPath, rawDirPath, fileList)
-        : ERROR_CODE_RES_PATH_INVALID;
+    std::string hapOrIndexPath;
+    if (HapManager::GetValidHapPath(hapOrIndexPath) == OK) {
+        return HapParser::GetRawFileList(hapOrIndexPath, rawDirPath, fileList);
+    }
+    if (HapManager::GetValidIndexPath(hapOrIndexPath) == OK) {
+        return  HapParser::GetRawFileListUnCompressed(hapOrIndexPath, rawDirPath, fileList);
+    }
+    return ERROR_CODE_RES_PATH_INVALID;
 }
 
 bool HapManager::IsLoadHap(std::string &hapPath)
