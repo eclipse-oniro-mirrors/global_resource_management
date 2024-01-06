@@ -18,7 +18,9 @@
 #include <cstdint>
 #include "res_locale.h"
 #include "rstate.h"
+#include <dirent.h>
 #include <set>
+#include <vector>
 
 namespace OHOS {
 namespace Global {
@@ -73,6 +75,8 @@ public:
     static void CanonicalizePath(const char *path, char *outPath, size_t len);
 
     static bool IsPrefix(std::string_view prefix, std::string_view full);
+
+    static RState GetFiles(const std::string &strCurrentDir, std::vector<std::string> &vFiles);
 private:
 
     static uint16_t EncodeLanguageOrRegion(const char *str, char base);

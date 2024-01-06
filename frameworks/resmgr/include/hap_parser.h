@@ -119,6 +119,16 @@ public:
         std::vector<std::string>& fileList);
 
     /**
+     * Get the raw file list in UnCompressed
+     * @param indexPath the hap path
+     * @param rawDirPath the rawfile directory path
+     * @param fileList the rawfile list write to
+     * @return SUCCESS if resource exist, else not found
+     */
+    static RState GetRawFileListUnCompressed(const std::string &indexPath, const std::string &rawDirPath,
+        std::vector<std::string>& fileList);
+
+    /**
      * Parse resource hex to resDesc
      * @param buffer the resource bytes
      * @param bufLen length in bytes
