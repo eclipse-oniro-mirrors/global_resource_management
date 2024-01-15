@@ -197,7 +197,7 @@ RState ResourceManagerImpl::GetStringArray(const IdItem *idItem, std::vector<std
         std::string resolvedValue;
         RState rrRet = ResolveReference(idItem->values_[i], resolvedValue);
         if (rrRet != SUCCESS) {
-            HILOG_ERROR("ResolveReference failed, value:%s", idItem->values_[i].c_str());
+            HILOG_DEBUG("GetStringArray ResolveReference failed, value:%{public}s", idItem->values_[i].c_str());
             return rrRet;
         }
         outValue.push_back(resolvedValue);
@@ -322,7 +322,7 @@ RState ResourceManagerImpl::GetPluralString(const HapResource::ValueUnderQualifi
             std::string resolvedValue;
             RState rrRet = ResolveReference(value, resolvedValue);
             if (rrRet != SUCCESS) {
-                HILOG_ERROR("ResolveReference failed, value:%s", value.c_str());
+                HILOG_DEBUG("ResolveReference failed, value:%{public}s", value.c_str());
                 return rrRet;
             }
             map[key] = resolvedValue;
@@ -363,7 +363,7 @@ RState ResourceManagerImpl::ResolveReference(const std::string value, std::strin
 
         if (IdItem::IsArrayOfType(resType)) {
             // can't be array
-            HILOG_ERROR("ref %s can't be array", refStr.c_str());
+            HILOG_DEBUG("ref %{public}s can't be array", refStr.c_str());
             return ERROR;
         }
         const IdItem *idItem = hapManager_->FindResourceById(id);
@@ -430,7 +430,7 @@ RState ResourceManagerImpl::ResolveParentReference(const IdItem *idItem, std::ma
             }
             RState rrRet = ResolveReference(value, resolvedValue);
             if (rrRet != SUCCESS) {
-                HILOG_ERROR("ResolveReference failed, value:%s", value.c_str());
+                HILOG_DEBUG("ResolveReference failed, value:%{public}s", value.c_str());
                 return ERROR;
             }
             outValue[key] = resolvedValue;
@@ -441,7 +441,7 @@ RState ResourceManagerImpl::ResolveParentReference(const IdItem *idItem, std::ma
             ResType resType;
             bool isRef = IdItem::IsRef(currItem->values_[0], resType, id);
             if (!isRef) {
-                HILOG_ERROR("something wrong, pls check HaveParent(). idItem: %s", idItem->ToString().c_str());
+                HILOG_ERROR("something wrong, pls check HaveParent(). idItem: %{public}s", idItem->ToString().c_str());
                 return ERROR;
             }
             currItem = hapManager_->FindResourceById(id);
@@ -610,7 +610,7 @@ RState ResourceManagerImpl::ParseFloat(const std::string &strValue, float &resul
     std::regex reg("(\\+|-)?\\d+(\\.\\d+)? *(px|vp|fp)?");
     std::smatch floatMatch;
     if (!regex_search(strValue, floatMatch, reg)) {
-        HILOG_ERROR("not valid float value %{public}s", strValue.c_str());
+        HILOG_DEBUG("not valid float value %{public}s", strValue.c_str());
         return ERROR;
     }
     std::string matchString(floatMatch.str());
@@ -690,7 +690,7 @@ RState ResourceManagerImpl::ProcessReference(const std::string value, std::vecto
 
         if (IdItem::IsArrayOfType(resType)) {
             // can't be array
-            HILOG_ERROR("ref %s can't be array", refStr.c_str());
+            HILOG_DEBUG("ref %{public}s can't be array", refStr.c_str());
             return ERROR;
         }
         const IdItem *idItem = hapManager_->FindResourceById(id);
@@ -847,7 +847,7 @@ RState ResourceManagerImpl::GetIntArray(const IdItem *idItem, std::vector<int> &
         std::string resolvedValue;
         RState rrRet = ResolveReference(idItem->values_[i], resolvedValue);
         if (rrRet != SUCCESS) {
-            HILOG_ERROR("ResolveReference failed, value:%s", idItem->values_[i].c_str());
+            HILOG_DEBUG("ResolveReference failed, value:%{public}s", idItem->values_[i].c_str());
             return ERROR;
         }
         outValue.push_back(stoi(resolvedValue));
@@ -994,7 +994,7 @@ bool ResourceManagerImpl::RemoveAppOverlay(const std::string &path)
 RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig, bool isUpdateTheme)
 {
     if (isUpdateTheme) {
-        HILOG_INFO("The theme enabled");
+        HILOG_DEBUG("The theme enabled");
         ThemePackManager::GetThemePackManager()->LoadThemeRes(bundleInfo.first, bundleInfo.second, themeMask);
     }
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
@@ -1238,11 +1238,10 @@ RState ResourceManagerImpl::GetThemeIcon(const IdItem *idItem, size_t &len,
     std::string iconName = idItem->GetItemResName();
     std::string result = ThemePackManager::GetThemePackManager()->FindThemeIconResource(bundleInfo, iconName);
     if (result.empty()) {
-        HILOG_INFO("GetThemeIcon FAILED bundlename = %{public}s, modulename = %{public}s, iconName = %{public}s",
+        HILOG_DEBUG("GetThemeIcon FAILED bundlename = %{public}s, modulename = %{public}s, iconName = %{public}s",
             bundleInfo.first.c_str(), bundleInfo.second.c_str(), iconName.c_str());
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
-    HILOG_INFO("GetThemeIcon SUCCESS result = %{public}s", result.c_str());
     outValue = Utils::LoadResourceFile(result, len);
     return SUCCESS;
 }
@@ -1507,10 +1506,9 @@ RState ResourceManagerImpl::GetThemeIconInfo(const std::string &iconName, size_t
 {
     std::string result = ThemePackManager::GetThemePackManager()->FindThemeIconResource(bundleInfo, iconName);
     if (result.empty()) {
-        HILOG_INFO("GetThemeIconInfo FAILED bundlename = %{public}s,", result.c_str());
+        HILOG_DEBUG("GetThemeIconInfo FAILED bundlename = %{public}s,", result.c_str());
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
-    HILOG_INFO("GetThemeIconInfo SUCCESS result = %{public}s", result.c_str());
     outValue = Utils::LoadResourceFile(result, len);
     return SUCCESS;
 }
