@@ -387,15 +387,23 @@ RState ResourceManagerImpl::ResolveReference(const std::string value, std::strin
     return SUCCESS;
 }
 
+RState ResourceManagerImpl::GetThemeValues(const std::string &value, std::string &outValue)
+{
+    ResConfigImpl resConfig;
+    GetResConfig(resConfig);
+    std::vector<const IdItem *> idItems;
+    if (ProcessReference(value, idItems) != SUCCESS) {
+        return NOT_FOUND;
+    }
+    outValue = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig);
+    return outValue.empty() ? NOT_FOUND : SUCCESS;
+}
+
 RState ResourceManagerImpl::ResolveParentReference(const IdItem *idItem, std::map<std::string, std::string> &outValue)
 {
     // only pattern and theme
     // ref always at idx 0
     // child will cover parent
-    if (!(idItem->resType_ == THEME || idItem->resType_ == PATTERN)) {
-        HILOG_ERROR("only pattern and theme have parent: %d", idItem->resType_);
-        return ERROR;
-    }
     outValue.clear();
 
     bool haveParent = false;
@@ -412,15 +420,20 @@ RState ResourceManagerImpl::ResolveParentReference(const IdItem *idItem, std::ma
             std::string key(currItem->values_[startIdx + i * 2]);
             std::string value(currItem->values_[startIdx + i * 2 + 1]);
             auto iter = outValue.find(key);
-            if (iter == outValue.end()) {
-                std::string resolvedValue;
-                RState rrRet = ResolveReference(value, resolvedValue);
-                if (rrRet != SUCCESS) {
-                    HILOG_ERROR("ResolveReference failed, value:%s", value.c_str());
-                    return ERROR;
-                }
-                outValue[key] = resolvedValue;
+            if (iter != outValue.end()) {
+                continue;
             }
+            std::string resolvedValue;
+            if (GetThemeValues(value, resolvedValue) == SUCCESS) {
+                outValue[key] = resolvedValue;
+                continue;
+            }
+            RState rrRet = ResolveReference(value, resolvedValue);
+            if (rrRet != SUCCESS) {
+                HILOG_ERROR("ResolveReference failed, value:%s", value.c_str());
+                return ERROR;
+            }
+            outValue[key] = resolvedValue;
         }
         if (haveParent) {
             // get parent

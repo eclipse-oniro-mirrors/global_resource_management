@@ -678,6 +678,8 @@ private:
 
     RState GetThemeIconInfo(const std::string &iconName, size_t &len, std::unique_ptr<uint8_t[]> &outValue);
 
+    RState GetThemeValues(const std::string &value, std::string &outValue);
+
     HapManager *hapManager_;
 
     float fontRatio_ = 0.0f;
