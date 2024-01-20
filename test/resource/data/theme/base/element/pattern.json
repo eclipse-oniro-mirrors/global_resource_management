@@ -1,0 +1,22 @@
+{
+  "color": [
+    {
+        "name": "base_only",
+        "value": "#ffffff"
+    },
+    {
+        "name": "normal_background_color",
+        "value": "#00000000"
+    }
+  ],
+  "float": [
+    {
+        "name": "card_margin_end",
+        "value": "24vp"
+    },
+    {
+        "name": "card_margin_start",
+        "value": "48vp"
+    }
+  ]
+}

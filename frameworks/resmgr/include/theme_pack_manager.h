@@ -41,7 +41,7 @@ public:
      * @param moduleName the hap moduleName
      * @param themeMask the theme icon mask
      */
-    void LoadThemeRes(const std::string &bundleName, const std::string &moduleName, std::string& themeMask);
+    void LoadThemeRes(const std::string &bundleName, const std::string &moduleName);
 
     /**
      * Load the skin dir resource in theme pack.
@@ -95,10 +95,15 @@ public:
     const std::string FindThemeIconResource(const std::pair<std::string, std::string> &bundleInfo,
         const std::string &iconName);
 
+    inline const std::string GetMask() const
+    {
+        return themeMask;
+    }
 private:
     ThemePackManager();
     std::string themeFlag;
     std::string sysResFlag;
+    std::string themeMask;
     void ClearSkinResource(const std::string &themeFlag);
     void ClearIconResource(const std::string &themeFlag);
     std::vector<std::shared_ptr<ThemeResource> > skinResource_;
@@ -114,6 +119,7 @@ private:
         const std::vector<std::shared_ptr<ThemeResource::ThemeValue> > &candidates,
         const ResConfigImpl &resConfig);
 
+    std::vector<std::string> GetRootDir(const std::string &strCurrentDir);
     Lock lockSkin_;
     Lock lockIcon_;
 };

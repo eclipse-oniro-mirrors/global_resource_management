@@ -44,6 +44,8 @@ public:
 
     explicit ResourceManagerTestCommon(ResourceManager *rm);
 
+    explicit ResourceManagerTestCommon(std::shared_ptr<ResourceManager> rm);
+
     ~ResourceManagerTestCommon();
 public:
     ResourceManager *rm;

@@ -995,7 +995,7 @@ RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig, bool isUpdateT
 {
     if (isUpdateTheme) {
         HILOG_DEBUG("The theme enabled");
-        ThemePackManager::GetThemePackManager()->LoadThemeRes(bundleInfo.first, bundleInfo.second, themeMask);
+        ThemePackManager::GetThemePackManager()->LoadThemeRes(bundleInfo.first, bundleInfo.second);
     }
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
@@ -1320,6 +1320,7 @@ RState ResourceManagerImpl::GetDrawableInfoById(uint32_t id,
     size_t len = 0;
     // find in theme
     const IdItem *idItem = qd->GetIdItem();
+    std::string themeMask = ThemePackManager::GetThemePackManager()->GetMask();
     if (GetThemeDrawable(idItem, len, outValue, iconType, density) == SUCCESS) {
         drawableInfo = std::make_tuple(type, len, themeMask);
         return SUCCESS;
@@ -1350,6 +1351,7 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name,
     }
     size_t len = 0;
     // find in theme
+    std::string themeMask = ThemePackManager::GetThemePackManager()->GetMask();
     const IdItem *idItem = qd->GetIdItem();
     if (GetThemeDrawable(idItem, len, outValue, iconType, density) == SUCCESS) {
         drawableInfo = std::make_tuple(type, len, themeMask);
@@ -1526,7 +1528,7 @@ RState ResourceManagerImpl::GetThemeIcons(uint32_t resId, std::pair<std::unique_
 
 std::string ResourceManagerImpl::GetThemeMask()
 {
-    return themeMask;
+    return ThemePackManager::GetThemePackManager()->GetMask();
 }
 } // namespace Resource
 } // namespace Global

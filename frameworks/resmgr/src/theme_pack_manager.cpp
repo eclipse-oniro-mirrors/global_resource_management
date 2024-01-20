@@ -55,7 +55,7 @@ std::shared_ptr<ThemePackManager> ThemePackManager::GetThemePackManager()
     return themeMgr;
 }
 
-std::vector<std::string> GetRootDir(const std::string &strCurrentDir, std::string& themeMask)
+std::vector<std::string> ThemePackManager::GetRootDir(const std::string &strCurrentDir)
 {
     std::vector<std::string> vDir;
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
@@ -127,19 +127,18 @@ void ThemePackManager::LoadThemeSkinResource(const std::string &bundleName, cons
     ClearSkinResource(themeFlag);
 }
 
-void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::string &moduleName,
-    std::string& themeMask)
+void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::string &moduleName)
 {
     std::vector<std::string> rootDirs;
     std::vector<std::string> iconDirs;
     if (Utils::IsFileExist(themeFlagA) && themeFlag != flagA) {
         themeFlag = flagA;
-        rootDirs = GetRootDir(themeSkinA, themeMask);
-        iconDirs = GetRootDir(themeIconsA, themeMask);
+        rootDirs = GetRootDir(themeSkinA);
+        iconDirs = GetRootDir(themeIconsA);
     } else if (Utils::IsFileExist(themeFlagB) && themeFlag != flagB) {
         themeFlag = flagB;
-        rootDirs = GetRootDir(themeSkinB, themeMask);
-        iconDirs = GetRootDir(themeIconsB, themeMask);
+        rootDirs = GetRootDir(themeSkinB);
+        iconDirs = GetRootDir(themeIconsB);
     } else {
         return;
     }

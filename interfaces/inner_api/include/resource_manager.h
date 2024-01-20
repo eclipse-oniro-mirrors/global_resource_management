@@ -33,7 +33,6 @@ class ResourceManager {
 public:
     std::pair<std::string, std::string> bundleInfo;
 
-    std::string themeMask;
     typedef struct {
         /** the raw file fd */
         int fd;
