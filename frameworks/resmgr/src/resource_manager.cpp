@@ -66,8 +66,7 @@ std::shared_ptr<ResourceManager> CreateResourceManagerDef(
     }
     resourceManagerImpl->bundleInfo.first = bundleName;
     resourceManagerImpl->bundleInfo.second = moduleName;
-    ThemePackManager::GetThemePackManager()->LoadThemeRes(bundleName, moduleName,
-        resourceManagerImpl->themeMask);
+    ThemePackManager::GetThemePackManager()->LoadThemeRes(bundleName, moduleName);
     return resourceManagerImpl;
 }
 

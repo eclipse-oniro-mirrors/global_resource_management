@@ -21,6 +21,11 @@ using namespace testing::ext;
 ResourceManagerTestCommon::ResourceManagerTestCommon(ResourceManager *rm) : rm(rm)
 {}
 
+ResourceManagerTestCommon::ResourceManagerTestCommon(std::shared_ptr<ResourceManager> rm)
+{
+    this->rm = rm.get();
+}
+
 ResourceManagerTestCommon::~ResourceManagerTestCommon()
 {}
 
