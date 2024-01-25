@@ -186,9 +186,11 @@ private:
 
     int IsDensityMoreSpecificThan(ScreenDensity otherDensity, uint32_t density = 0) const;
 
+#ifdef SUPPORT_GRAPHICS
     RState BuildResLocale(const char *language, const char *script, const char *region, ResLocale **resLocale);
 
     RState BuildLocaleInfo(const ResLocale *resLocale, Locale **localeInfo);
+#endif
 private:
     ResLocale *resLocale_;
     Direction direction_;
