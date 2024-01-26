@@ -81,7 +81,6 @@ RState ResConfigImpl::SetLocaleInfo(Locale &localeInfo)
 {
     return this->SetLocaleInfo(localeInfo.getLanguage(), localeInfo.getScript(), localeInfo.getCountry());
 }
-#endif
 
 RState ResConfigImpl::BuildResLocale(const char *language, const char *script,
     const char *region, ResLocale **resLocale)
@@ -115,6 +114,7 @@ RState ResConfigImpl::BuildLocaleInfo(const ResLocale *resLocale, Locale **local
     *localeInfo = new Locale(temp);
     return SUCCESS;
 }
+#endif
 
 RState ResConfigImpl::SetLocaleInfo(const char *language,
     const char *script,
@@ -601,11 +601,11 @@ ResConfigImpl::~ResConfigImpl()
         delete resLocale_;
         resLocale_ = nullptr;
     }
+#ifdef SUPPORT_GRAPHICS
     if (resPreferredLocale_ != nullptr) {
         delete resPreferredLocale_;
         resPreferredLocale_ = nullptr;
     }
-#ifdef SUPPORT_GRAPHICS
     if (localeInfo_ != nullptr) {
         delete localeInfo_;
         localeInfo_ = nullptr;

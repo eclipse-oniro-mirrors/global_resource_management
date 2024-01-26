@@ -155,7 +155,7 @@ ohos_shared_library("global_resmgr_win") {
 }
 
 group("win_resmgr") {
-  if (resource_management_support_icu && is_win) {
+  if (is_win && resource_management_support_icu) {
     public_deps = [ ":global_resmgr_win" ]
   }
 }
@@ -189,7 +189,7 @@ ohos_shared_library("global_resmgr_mac") {
 }
 
 group("mac_resmgr") {
-  if (resource_management_support_icu && is_mac) {
+  if (is_mac && resource_management_support_icu) {
     public_deps = [ ":global_resmgr_mac" ]
   }
 }
@@ -224,7 +224,7 @@ ohos_shared_library("global_resmgr_linux") {
 }
 
 group("linux_resmgr") {
-  if (resource_management_support_icu && is_linux) {
+  if (is_linux && resource_management_support_icu) {
     deps = [ ":global_resmgr_linux" ]
   }
 }
