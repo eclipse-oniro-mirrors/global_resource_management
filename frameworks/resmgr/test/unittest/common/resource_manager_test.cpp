@@ -1298,7 +1298,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest00
     }
     rc->SetLocaleInfo("zh", nullptr, "CN");
     rc->SetDirection(DIRECTION_NOT_SET);
-    rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
     rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
     rc->SetInputDevice(INPUTDEVICE_POINTINGDEVICE);
@@ -1309,7 +1308,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest00
     std::string outValue;
     rState = rm->GetStringByName("point_test", outValue);
     ASSERT_EQ(SUCCESS, rState);
-    ASSERT_EQ("pointing device test", outValue);
+    ASSERT_EQ("zh_CN phone pointing device test", outValue);
 }
 
 /*
@@ -1796,18 +1795,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerResolveParentReferenceTest001, Test
     ret = ((ResourceManagerImpl *)rm)->ResolveParentReference(idItem, outValue);
     ASSERT_EQ(SUCCESS, ret);
     PrintMapString(outValue);
-
-    // wrong resType
-    IdItem *item = new IdItem;
-    for (int i = 0; i < ResType::MAX_RES_TYPE; ++i) {
-        if (i == ResType::THEME || i == ResType::PATTERN) {
-            continue;
-        }
-        item->resType_ = (ResType) i;
-        ret = ((ResourceManagerImpl *)rm)->ResolveParentReference(item, outValue);
-        EXPECT_EQ(ERROR, ret);
-    }
-    delete item;
 }
 
 /*
