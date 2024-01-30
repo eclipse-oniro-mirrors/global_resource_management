@@ -1056,7 +1056,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
     std::string outValue;
     rState = rm->GetStringByName("mccmnc_str", outValue);
     ASSERT_EQ(SUCCESS, rState);
-    ASSERT_EQ("str_en_us_car", outValue);
+    ASSERT_EQ("str_en_us_light", outValue);
 }
 
 /*
@@ -1116,7 +1116,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
     std::string outValue;
     rState = rm->GetStringByName("mccmnc_str", outValue);
     ASSERT_EQ(SUCCESS, rState);
-    ASSERT_EQ("str_mcc460_mnc101_en_car", outValue);
+    ASSERT_EQ("str_mcc460_mnc101_en_light", outValue);
 }
 
 /*
