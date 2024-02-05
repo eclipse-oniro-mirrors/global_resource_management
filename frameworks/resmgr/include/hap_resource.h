@@ -159,11 +159,6 @@ public:
             return resConfig_;
         }
 
-        inline const HapResource *GetHapResource() const
-        {
-            return hapResource_;
-        }
-
         inline bool IsOverlay() const
         {
             return isOverlay_;
@@ -172,6 +167,16 @@ public:
         inline bool IsSystemResource() const
         {
             return isSystemResource_;
+        }
+
+        inline const std::string GetIndexPath() const
+        {
+            return indexPath_;
+        }
+
+        inline const std::string GetResourcePath() const
+        {
+            return resourcePath_;
         }
 
         /**
@@ -184,7 +189,7 @@ public:
          * @param isSystemResource the system flag, default value is false.
          */
         ValueUnderQualifierDir(const ResKey *resKey, IdItem *idItem,
-            HapResource *hapResource, bool isOverlay = false, bool isSystemResource = false);
+            const std::pair<std::string, std::string> &resPath, bool isOverlay = false, bool isSystemResource = false);
 
         ~ValueUnderQualifierDir();
 
@@ -202,14 +207,15 @@ public:
         // the value
         IdItem *idItem_;
 
-        // indicate belong to which hapresource
-        const HapResource *hapResource_;
-
         friend class HapResource;
 
         bool isOverlay_;
 
         bool isSystemResource_;
+
+        std::string indexPath_;
+
+        std::string resourcePath_;
     };
 
     /**

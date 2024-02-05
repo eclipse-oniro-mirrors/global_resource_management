@@ -519,7 +519,7 @@ std::string GetFilePathFromHap(std::shared_ptr<AbilityBase::Extractor> &extracto
     std::string filePath;
     const IdItem *idItem = qd->GetIdItem();
     if (idItem == nullptr || idItem->resType_ != resType) {
-        std::string hapPath = qd->GetHapResource()->GetIndexPath();
+        std::string hapPath = qd->GetIndexPath();
         HILOG_ERROR("actual resType = %{public}d, expect resType = %{public}d, hapPath = %{public}s",
             idItem == nullptr ? -1 : idItem->resType_, resType, hapPath.c_str());
         return filePath;
@@ -543,7 +543,7 @@ std::string GetFilePathFromHap(std::shared_ptr<AbilityBase::Extractor> &extracto
 
 std::shared_ptr<AbilityBase::Extractor> GetAbilityExtractor(const HapResource::ValueUnderQualifierDir *qd)
 {
-    std::string hapPath = qd->GetHapResource()->GetIndexPath();
+    std::string hapPath = qd->GetIndexPath();
     bool isNewExtractor = false;
     auto extractor = AbilityBase::ExtractorUtil::GetExtractor(hapPath, isNewExtractor);
     return extractor;
@@ -576,7 +576,7 @@ RState HapManager::GetProfileData(const HapResource::ValueUnderQualifierDir *qd,
 RState HapManager::GetMediaData(const HapResource::ValueUnderQualifierDir *qd, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue)
 {
-    std::string filePath = qd->GetHapResource()->GetIndexPath();
+    std::string filePath = qd->GetIndexPath();
     RState state;
     if (Utils::ContainsTail(filePath, Utils::tailSet)) {
         state = HapManager::GetMediaDataFromHap(qd, len, outValue);
@@ -624,7 +624,7 @@ RState HapManager::GetMediaDataFromIndex(const HapResource::ValueUnderQualifierD
 
 RState HapManager::GetMediaBase64Data(const HapResource::ValueUnderQualifierDir *qd, std::string &outValue)
 {
-    std::string filePath = qd->GetHapResource()->GetIndexPath();
+    std::string filePath = qd->GetIndexPath();
     RState state;
     if (Utils::ContainsTail(filePath, Utils::tailSet)) {
         state = HapManager::GetMediaBase64DataFromHap(qd, outValue);
@@ -784,7 +784,7 @@ RState HapManager::GetFilePath(const HapResource::ValueUnderQualifierDir *vuqd, 
     if (idItem == nullptr || idItem->resType_ != resType) {
         return NOT_FOUND;
     }
-    outValue = vuqd->GetHapResource()->GetResourcePath();
+    outValue = vuqd->GetResourcePath();
 #if defined(__ARKUI_CROSS__)
     auto index = idItem->value_.find('/');
     if (index == std::string::npos) {
