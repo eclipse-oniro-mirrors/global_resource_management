@@ -43,7 +43,7 @@ namespace OHOS {
 namespace Global {
 namespace Resource {
 HapResource::ValueUnderQualifierDir::ValueUnderQualifierDir(const ResKey *resKey, IdItem *idItem,
-    HapResource *hapResource, bool isOverlay, bool systemResource) : hapResource_(hapResource)
+    const std::pair<std::string, std::string> &resPath, bool isOverlay, bool systemResource)
 {
     keyParams_ = resKey->keyParams_;
     folder_ = HapParser::ToFolderPath(keyParams_);
@@ -51,6 +51,8 @@ HapResource::ValueUnderQualifierDir::ValueUnderQualifierDir(const ResKey *resKey
     isOverlay_ = isOverlay;
     isSystemResource_ = systemResource;
     resConfig_ = resKey->resConfig_;
+    indexPath_ = resPath.first;
+    resourcePath_ = resPath.second;
 }
 
 HapResource::ValueUnderQualifierDir::~ValueUnderQualifierDir()
@@ -355,6 +357,7 @@ bool HapResource::InitIdList()
         HILOG_ERROR("resDesc_ is null ! InitIdList failed");
         return false;
     }
+    auto resPath = std::make_pair(indexPath_, resourcePath_);
     for (size_t i = 0; i < resDesc_->keys_.size(); i++) {
         ResKey *resKey = resDesc_->keys_[i];
         // init resConfig of each resKey.
@@ -371,7 +374,7 @@ bool HapResource::InitIdList()
                     return false;
                 }
                 auto limitPath = new (std::nothrow) HapResource::ValueUnderQualifierDir(resKey,
-                    idParam->idItem_, this, isOverlay_, isSystem_);
+                    idParam->idItem_, resPath, isOverlay_, isSystem_);
                 if (limitPath == nullptr) {
                     HILOG_ERROR("new ValueUnderQualifierDir failed in HapResource::InitIdList");
                     delete (idValues);
@@ -384,7 +387,7 @@ bool HapResource::InitIdList()
             } else {
                 HapResource::IdValues *idValues = iter->second;
                 auto limitPath = new (std::nothrow) HapResource::ValueUnderQualifierDir(resKey,
-                    idParam->idItem_, this, isOverlay_, isSystem_);
+                    idParam->idItem_, resPath, isOverlay_, isSystem_);
                 if (limitPath == nullptr) {
                     HILOG_ERROR("new ValueUnderQualifierDir failed in HapResource::InitIdList");
                     return false;
