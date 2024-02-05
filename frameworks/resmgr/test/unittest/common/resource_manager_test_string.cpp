@@ -1046,7 +1046,6 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
         return;
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
-    rc->SetDeviceType(DEVICE_CAR);
     rc->SetColorMode(LIGHT);
     rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
@@ -1106,7 +1105,6 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetMcc(460);
     rc->SetMnc(101);
-    rc->SetDeviceType(DEVICE_CAR);
     rc->SetColorMode(LIGHT);
     rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
     rm->UpdateResConfig(*rc);
