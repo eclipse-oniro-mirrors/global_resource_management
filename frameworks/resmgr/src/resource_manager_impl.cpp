@@ -543,6 +543,21 @@ RState ResourceManagerImpl::GetThemeFloat(const std::shared_ptr<IdItem> idItem, 
     return state == SUCCESS ? RecalculateFloat(unit, outValue) : state;
 }
 
+RState ResourceManagerImpl::GetThemeFloat(const std::shared_ptr<IdItem> idItem, float &outValue, std::string &unit)
+{
+    ResConfigImpl resConfig;
+    GetResConfig(resConfig);
+    std::vector<std::shared_ptr<IdItem>> idItems;
+    idItems.emplace_back(idItem);
+    ProcessReference(idItem->value_, idItems);
+    std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig);
+    if (result.empty()) {
+        return NOT_FOUND;
+    }
+    RState state = ParseFloat(result.c_str(), outValue, unit);
+    return state == SUCCESS ? RecalculateFloat(unit, outValue) : state;
+}
+
 RState ResourceManagerImpl::GetFloatById(uint32_t id, float &outValue)
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id);
@@ -570,7 +585,24 @@ RState ResourceManagerImpl::GetFloatById(uint32_t id, float &outValue)
 RState ResourceManagerImpl::GetFloatById(uint32_t id, float &outValue, std::string &unit)
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id);
-    return GetFloat(idItem, outValue, unit);
+    if (idItem == nullptr) {
+        HILOG_ERROR("find resource by Float id error with unit id = %{public}d", id);
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
+
+    // find in theme pack
+    if (GetThemeFloat(idItem, outValue, unit) == SUCCESS) {
+        return SUCCESS;
+    }
+
+    RState state = GetFloat(idItem, outValue, unit);
+    if (state == SUCCESS) {
+        return state;
+    }
+    if (state != ERROR_CODE_RES_REF_TOO_MUCH) {
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+    return state;
 }
 
 RState ResourceManagerImpl::GetFloatByName(const char *name, float &outValue)
