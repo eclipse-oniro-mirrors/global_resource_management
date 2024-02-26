@@ -223,7 +223,7 @@ RState ResourceManagerImpl::GetPatternById(uint32_t id, std::map<std::string, st
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     RState state = GetPattern(idItem, outValue);
-    if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH){
+    if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
     return state;
@@ -247,7 +247,7 @@ RState ResourceManagerImpl::GetPattern(const IdItem *idItem, std::map<std::strin
 {
     //type invalid
     if (idItem->resType_ != ResType::PATTERN) {
-        HILOG_ERROR("actual resType = %{public}d, expect resType = %{public}d",idItem->resType_, ResType::PATTERN);
+        HILOG_ERROR("actual resType = %{public}d, expect resType = %{public}d", idItem->resType_, ResType::PATTERN);
         return NOT_FOUND;
     }
     return ResolveParentReference(idItem, outValue);
@@ -904,7 +904,7 @@ RState ResourceManagerImpl::GetTheme(const IdItem *idItem, std::map<std::string,
 {
     //type invalid
     if (idItem->resType_ != ResType::THEME) {
-        HILOG_ERROR("actual resType = %{public}d, expect resType = %{public}d",idItem->resType_, ResType::THEME);
+        HILOG_ERROR("actual resType = %{public}d, expect resType = %{public}d", idItem->resType_, ResType::THEME);
         return NOT_FOUND;
     }
     return ResolveParentReference(idItem, outValue);
