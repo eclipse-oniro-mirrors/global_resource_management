@@ -404,7 +404,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPatternByIdTest004, TestSize.Lev
 
     // not found case
     state = rm->GetPatternById(NON_EXIST_ID, outValue);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_ID_NOT_FOUND, state);
 }
 
 /*
@@ -469,7 +469,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPatternByNameTest004, TestSize.L
 
     // not found case
     state = rm->GetPatternByName(g_nonExistName, outValue);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_NOT_FOUND, state);
 }
 
 /*
@@ -496,7 +496,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetThemeByIdTest002, TestSize.Level
     std::map<std::string, std::string> outValue;
     RState state;
     state = rm->GetThemeById(NON_EXIST_ID, outValue);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_ID_NOT_FOUND, state);
 }
 
 /*
@@ -523,7 +523,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetThemeByNameTest002, TestSize.Lev
     std::map<std::string, std::string> outValue;
     RState state;
     state = rm->GetThemeByName(g_nonExistName, outValue);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_NOT_FOUND, state);
 }
 
 /*
@@ -1002,7 +1002,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileByIdTest002, TestSize.Lev
     std::string outValue;
     RState state;
     state = rm->GetProfileById(NON_EXIST_ID, outValue);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_ID_NOT_FOUND, state);
 }
 
 /*
@@ -1031,7 +1031,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileByNameTest002, TestSize.L
     std::string outValue;
     RState state;
     state = rm->GetProfileByName(g_nonExistName, outValue);
-    ASSERT_EQ(NOT_FOUND, state);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_NOT_FOUND, state);
 }
 
 /*

@@ -84,7 +84,7 @@ RState ResourceManagerImpl::GetStringById(uint32_t id, std::string &outValue)
 {
     const IdItem *idItem = hapManager_->FindResourceById(id);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by string id error");
+        HILOG_ERROR("find resource by string id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     RState state = GetString(idItem, outValue);
@@ -98,7 +98,7 @@ RState ResourceManagerImpl::GetStringByName(const char *name, std::string &outVa
 {
     const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::STRING);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by string name error");
+        HILOG_ERROR("find resource by string name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     RState state = GetString(idItem, outValue);
@@ -161,7 +161,7 @@ RState ResourceManagerImpl::GetStringArrayById(uint32_t id, std::vector<std::str
 {
     const IdItem *idItem = hapManager_->FindResourceById(id);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by string array id error");
+        HILOG_ERROR("find resource by string array id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     RState state = GetStringArray(idItem, outValue);
@@ -175,7 +175,7 @@ RState ResourceManagerImpl::GetStringArrayByName(const char *name, std::vector<s
 {
     const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::STRINGARRAY);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by string array name error");
+        HILOG_ERROR("find resource by string array name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     RState state = GetStringArray(idItem, outValue);
@@ -218,19 +218,36 @@ RState ResourceManagerImpl::GetStringArray(const IdItem *idItem, std::vector<std
 RState ResourceManagerImpl::GetPatternById(uint32_t id, std::map<std::string, std::string> &outValue)
 {
     const IdItem *idItem = hapManager_->FindResourceById(id);
-    return GetPattern(idItem, outValue);
+    if (idItem == nullptr) {
+        HILOG_ERROR("find resource by pattern id error id = %{public}d", id);
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
+    RState state = GetPattern(idItem, outValue);
+    if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+    return state;
 }
 
 RState ResourceManagerImpl::GetPatternByName(const char *name, std::map<std::string, std::string> &outValue)
 {
     const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::PATTERN);
-    return GetPattern(idItem, outValue);
+    if (idItem == nullptr) {
+        HILOG_ERROR("find resource by Pattern name error name = %{public}s", name);
+        return ERROR_CODE_RES_NAME_NOT_FOUND;
+    }
+    RState state = GetPattern(idItem, outValue);
+    if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
+        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
+    }
+    return state;
 }
 
 RState ResourceManagerImpl::GetPattern(const IdItem *idItem, std::map<std::string, std::string> &outValue)
 {
-    // not found or type invalid
-    if (idItem == nullptr || idItem->resType_ != ResType::PATTERN) {
+    //type invalid
+    if (idItem->resType_ != ResType::PATTERN) {
+        HILOG_ERROR("actual resType = %{public}d, expect resType = %{public}d", idItem->resType_, ResType::PATTERN);
         return NOT_FOUND;
     }
     return ResolveParentReference(idItem, outValue);
@@ -253,7 +270,7 @@ RState ResourceManagerImpl::GetPluralStringByIdFormat(std::string &outValue, uin
 {
     const HapResource::ValueUnderQualifierDir *vuqd = hapManager_->FindQualifierValueById(id);
     if (vuqd == nullptr) {
-        HILOG_ERROR("find qualifier value by plural id error");
+        HILOG_ERROR("find qualifier value by plural id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     std::string temp;
@@ -278,7 +295,7 @@ RState ResourceManagerImpl::GetPluralStringByNameFormat(std::string &outValue, c
     const HapResource::ValueUnderQualifierDir *vuqd =
         hapManager_->FindQualifierValueByName(name, ResType::PLURALS);
     if (vuqd == nullptr) {
-        HILOG_ERROR("find qualifier value by plural name error");
+        HILOG_ERROR("find qualifier value by plural name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     std::string temp;
@@ -464,7 +481,7 @@ RState ResourceManagerImpl::GetBooleanById(uint32_t id, bool &outValue)
 {
     const IdItem *idItem = hapManager_->FindResourceById(id);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by Boolean id error");
+        HILOG_ERROR("find resource by Boolean id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     RState state = GetBoolean(idItem, outValue);
@@ -478,7 +495,7 @@ RState ResourceManagerImpl::GetBooleanByName(const char *name, bool &outValue)
 {
     const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::BOOLEAN);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by Boolean name error");
+        HILOG_ERROR("find resource by Boolean name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     RState state = GetBoolean(idItem, outValue);
@@ -529,7 +546,7 @@ RState ResourceManagerImpl::GetFloatById(uint32_t id, float &outValue)
 {
     const IdItem *idItem = hapManager_->FindResourceById(id);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by Float id error");
+        HILOG_ERROR("find resource by Float id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
 
@@ -559,7 +576,7 @@ RState ResourceManagerImpl::GetFloatByName(const char *name, float &outValue)
 {
     const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::FLOAT);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by Float name error");
+        HILOG_ERROR("find resource by Float name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
 
@@ -637,7 +654,7 @@ RState ResourceManagerImpl::GetIntegerById(uint32_t id, int &outValue)
 {
     const IdItem *idItem = hapManager_->FindResourceById(id);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by Integer id error");
+        HILOG_ERROR("find resource by Integer id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     RState state = GetInteger(idItem, outValue);
@@ -651,7 +668,7 @@ RState ResourceManagerImpl::GetIntegerByName(const char *name, int &outValue)
 {
     const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::INTEGER);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by Integer name error");
+        HILOG_ERROR("find resource by Integer name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     RState state = GetInteger(idItem, outValue);
@@ -733,7 +750,7 @@ RState ResourceManagerImpl::GetColorById(uint32_t id, uint32_t &outValue)
 {
     const IdItem *idItem = hapManager_->FindResourceById(id);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by string id error");
+        HILOG_ERROR("find resource by string id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
 
@@ -753,7 +770,7 @@ RState ResourceManagerImpl::GetColorByName(const char *name, uint32_t &outValue)
 {
     const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::COLOR);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by string id error");
+        HILOG_ERROR("find resource by string id error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
 
@@ -786,7 +803,7 @@ RState ResourceManagerImpl::GetSymbolById(uint32_t id, uint32_t &outValue)
 {
     const IdItem *idItem = hapManager_->FindResourceById(id);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by symbol id error");
+        HILOG_ERROR("find resource by symbol id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     RState state = GetSymbol(idItem, outValue);
@@ -800,7 +817,7 @@ RState ResourceManagerImpl::GetSymbolByName(const char *name, uint32_t &outValue
 {
     const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::SYMBOL);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by symbol name error");
+        HILOG_ERROR("find resource by symbol name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     RState state = GetSymbol(idItem, outValue);
@@ -858,19 +875,36 @@ RState ResourceManagerImpl::GetIntArray(const IdItem *idItem, std::vector<int> &
 RState ResourceManagerImpl::GetThemeById(uint32_t id, std::map<std::string, std::string> &outValue)
 {
     const IdItem *idItem = hapManager_->FindResourceById(id);
-    return GetTheme(idItem, outValue);
+    if (idItem == nullptr) {
+        HILOG_ERROR("find resource by Theme id error id = %{public}d", id);
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
+    RState state = GetTheme(idItem, outValue);
+    if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+    return state;
 }
 
 RState ResourceManagerImpl::GetThemeByName(const char *name, std::map<std::string, std::string> &outValue)
 {
     const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::THEME);
-    return GetTheme(idItem, outValue);
+    if (idItem == nullptr) {
+        HILOG_ERROR("find resource by Theme name error name = %{public}s", name);
+        return ERROR_CODE_RES_NAME_NOT_FOUND;
+    }
+    RState state = GetTheme(idItem, outValue);
+    if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
+        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
+    }
+    return state;
 }
 
 RState ResourceManagerImpl::GetTheme(const IdItem *idItem, std::map<std::string, std::string> &outValue)
 {
-// not found or type invalid
-    if (idItem == nullptr || idItem->resType_ != ResType::THEME) {
+    //type invalid
+    if (idItem->resType_ != ResType::THEME) {
+        HILOG_ERROR("actual resType = %{public}d, expect resType = %{public}d", idItem->resType_, ResType::THEME);
         return NOT_FOUND;
     }
     return ResolveParentReference(idItem, outValue);
@@ -880,18 +914,22 @@ RState ResourceManagerImpl::GetProfileById(uint32_t id, std::string &outValue)
 {
     auto qd = hapManager_->FindQualifierValueById(id);
     if (qd == nullptr) {
-        return NOT_FOUND;
+        HILOG_ERROR("GetProfileById find qualifier value by profile id error id = %{public}d", id);
+        return ERROR_CODE_RES_ID_NOT_FOUND;
     }
-    return hapManager_->GetFilePath(qd, ResType::PROF, outValue);
+    RState state = hapManager_->GetFilePath(qd, ResType::PROF, outValue);
+    return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_ID;
 }
 
 RState ResourceManagerImpl::GetProfileByName(const char *name, std::string &outValue)
 {
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::PROF);
     if (qd == nullptr) {
-        return NOT_FOUND;
+        HILOG_ERROR("GetProfileByName find qualifier value by profile name error name = %{public}s", name);
+        return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
-    return hapManager_->GetFilePath(qd, ResType::PROF, outValue);
+    RState state = hapManager_->GetFilePath(qd, ResType::PROF, outValue);
+    return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_NAME;
 }
 
 RState ResourceManagerImpl::GetMediaById(uint32_t id, std::string &outValue, uint32_t density)
@@ -902,7 +940,7 @@ RState ResourceManagerImpl::GetMediaById(uint32_t id, std::string &outValue, uin
     }
     auto qd = hapManager_->FindQualifierValueById(id, density);
     if (qd == nullptr) {
-        HILOG_ERROR("find qualifier value by Media id error");
+        HILOG_ERROR("GetMediaById find qualifier value by Media id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     RState state = hapManager_->GetFilePath(qd, ResType::MEDIA, outValue);
@@ -917,7 +955,7 @@ RState ResourceManagerImpl::GetMediaByName(const char *name, std::string &outVal
     }
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, density);
     if (qd == nullptr) {
-        HILOG_ERROR("find qualifier value by Media name error");
+        HILOG_ERROR("GetMediaByName find qualifier value by Media name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     RState state = hapManager_->GetFilePath(qd, ResType::MEDIA, outValue);
@@ -1074,7 +1112,7 @@ RState ResourceManagerImpl::GetMediaDataById(uint32_t id, size_t &len, std::uniq
     }
     auto qd = hapManager_->FindQualifierValueById(id, density);
     if (qd == nullptr) {
-        HILOG_ERROR("find qualifier value by media id error");
+        HILOG_ERROR("GetMediaDataById find qualifier value by media id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
 
@@ -1098,7 +1136,7 @@ RState ResourceManagerImpl::GetMediaDataByName(const char *name, size_t &len, st
 
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, density);
     if (qd == nullptr) {
-        HILOG_ERROR("find qualifier value by media name error");
+        HILOG_ERROR("GetMediaDataByName find qualifier value by media name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
 
@@ -1130,7 +1168,7 @@ RState ResourceManagerImpl::GetMediaBase64DataById(uint32_t id, std::string &out
     
     auto qd = hapManager_->FindQualifierValueById(id, density);
     if (qd == nullptr) {
-        HILOG_ERROR("find qualifier value by media id error");
+        HILOG_ERROR("GetMediaBase64DataById find qualifier value by media id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
 
@@ -1151,7 +1189,7 @@ RState ResourceManagerImpl::GetMediaBase64DataByName(const char *name, std::stri
     }
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, density);
     if (qd == nullptr) {
-        HILOG_ERROR("find qualifier value by media name error");
+        HILOG_ERROR("GetMediaBase64DataByName find qualifier value by media name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
 
@@ -1168,7 +1206,7 @@ RState ResourceManagerImpl::GetProfileDataById(uint32_t id, size_t &len, std::un
 {
     auto qd = hapManager_->FindQualifierValueById(id);
     if (qd == nullptr) {
-        HILOG_ERROR("find qualifier value by profile id error");
+        HILOG_ERROR("GetProfileDataById find qualifier value by profile id error id = %{public}d", id);
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
     return hapManager_->GetProfileData(qd, len, outValue);
@@ -1178,7 +1216,7 @@ RState ResourceManagerImpl::GetProfileDataByName(const char *name, size_t &len, 
 {
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::PROF);
     if (qd == nullptr) {
-        HILOG_ERROR("find qualifier value by profile name error");
+        HILOG_ERROR("GetProfileDataByName find qualifier value by profile name error name = %{public}s", name);
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
     }
     return hapManager_->GetProfileData(qd, len, outValue);
@@ -1268,7 +1306,7 @@ RState ResourceManagerImpl::GetDrawableInfoById(uint32_t id, std::string &type, 
     }
     auto qd = hapManager_->FindQualifierValueById(id, density);
     if (qd == nullptr) {
-        HILOG_ERROR("find qualifier value error by drawable id");
+        HILOG_ERROR("find qualifier value error by drawable id id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     type = GetSuffix(qd);
@@ -1288,7 +1326,7 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name, std::string 
     }
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, density);
     if (qd == nullptr) {
-        HILOG_ERROR("find qualifier value error by drawable name");
+        HILOG_ERROR("find qualifier value error by drawable name name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     type = GetSuffix(qd);
@@ -1309,7 +1347,7 @@ RState ResourceManagerImpl::GetDrawableInfoById(uint32_t id,
     }
     auto qd = hapManager_->FindQualifierValueById(id, density);
     if (qd == nullptr) {
-        HILOG_ERROR("find qualifier value error by drawable id");
+        HILOG_ERROR("find qualifier value error by drawable id id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     std::string type = GetSuffix(qd);
@@ -1341,7 +1379,7 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name,
     }
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, density);
     if (qd == nullptr) {
-        HILOG_ERROR("find qualifier value error by drawable name");
+        HILOG_ERROR("find qualifier value error by drawable name name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     std::string type = GetSuffix(qd);

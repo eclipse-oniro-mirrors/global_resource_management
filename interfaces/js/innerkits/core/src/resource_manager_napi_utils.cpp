@@ -408,7 +408,8 @@ bool ResourceManagerNapiUtils::GetHapResourceManager(const ResMgrDataContext* da
     }
     auto moduleContext = context->CreateModuleContext(resource->bundleName, resource->moduleName);
     if (moduleContext == nullptr) {
-        HiLog::Error(LABEL, "GetHapResourceManager moduleContext == nullptr");
+        HiLog::Error(LABEL, "GetHapResourceManager moduleContext == nullptr, bundleName = %{public}s," \
+            "moduleName = %{public}s", resource->bundleName.c_str(), resource->moduleName.c_str());
         return false;
     }
     resMgr = moduleContext->GetResourceManager();
