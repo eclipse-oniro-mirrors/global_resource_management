@@ -218,8 +218,8 @@ RState ResourceManagerImpl::GetStringArray(const IdItem *idItem, std::vector<std
 RState ResourceManagerImpl::GetPatternById(uint32_t id, std::map<std::string, std::string> &outValue)
 {
     const IdItem *idItem = hapManager_->FindResourceById(id);
-    if (IdItem == nullptr) {
-        HILOG_ERROR("find resource by pattern id error id = %{public}d", id)
+    if (idItem == nullptr) {
+        HILOG_ERROR("find resource by pattern id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     RState state = GetPattern(idItem, outValue);
@@ -875,8 +875,8 @@ RState ResourceManagerImpl::GetIntArray(const IdItem *idItem, std::vector<int> &
 RState ResourceManagerImpl::GetThemeById(uint32_t id, std::map<std::string, std::string> &outValue)
 {
     const IdItem *idItem = hapManager_->FindResourceById(id);
-    if (IdItem == nullptr) {
-        HILOG_ERROR("find resource by Theme id error id = %{public}d", id)
+    if (idItem == nullptr) {
+        HILOG_ERROR("find resource by Theme id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     RState state = GetTheme(idItem, outValue);
@@ -928,7 +928,7 @@ RState ResourceManagerImpl::GetProfileByName(const char *name, std::string &outV
         HILOG_ERROR("GetProfileByName find qualifier value by profile name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
-    RState state hapManager_->GetFilePath(qd, ResType::PROF, outValue);
+    RState state = hapManager_->GetFilePath(qd, ResType::PROF, outValue);
     return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_NAME;
 }
 
