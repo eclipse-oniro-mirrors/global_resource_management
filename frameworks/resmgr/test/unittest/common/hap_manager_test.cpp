@@ -70,13 +70,13 @@ void HapManagerTest::TearDown()
  */
 HWTEST_F(HapManagerTest, HapManagerFuncTest001, TestSize.Level1)
 {
-    HapManager *hapManager = new HapManager(new ResConfigImpl);
+    HapManager *hapManager = new HapManager(std::make_shared<ResConfigImpl>());
     bool ret = hapManager->AddResourcePath(FormatFullPath(g_resFilePath).c_str());
 
     EXPECT_TRUE(ret);
 
     int id = 16777217;
-    std::vector<const HapResource::IdValues *> idValues = hapManager->GetResourceList(id);
+    auto idValues = hapManager->GetResourceList(id);
     if (idValues.size() == 0) {
         delete hapManager;
         EXPECT_TRUE(false);
@@ -95,7 +95,7 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest001, TestSize.Level1)
  */
 HWTEST_F(HapManagerTest, HapManagerFuncTest002, TestSize.Level1)
 {
-    ResConfig *rc = CreateResConfig();
+    auto rc = CreateResConfig();
     if (rc == nullptr) {
         EXPECT_TRUE(false);
         return;
@@ -103,7 +103,7 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest002, TestSize.Level1)
     rc->SetLocaleInfo("en", nullptr, "US");
     std::string resPath = FormatFullPath(g_resFilePath);
     const char *path = resPath.c_str();
-    HapManager *hapManager = new HapManager(new ResConfigImpl);
+    HapManager *hapManager = new HapManager(std::make_shared<ResConfigImpl>());
     if (hapManager == nullptr) {
         delete (rc);
         EXPECT_TRUE(false);
@@ -115,7 +115,7 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest002, TestSize.Level1)
     EXPECT_TRUE(ret);
 
     uint32_t id = 16777237; // 16777237 means string_ref
-    std::vector<const HapResource::IdValues *> idValues = hapManager->GetResourceList(id);
+    auto idValues = hapManager->GetResourceList(id);
     if (idValues.size() == 0) {
         delete (hapManager);
         delete (rc);
@@ -128,7 +128,7 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest002, TestSize.Level1)
 
     // reload
 
-    ResConfig *rc2 = CreateResConfig();
+    auto rc2 = CreateResConfig();
     if (rc2 == nullptr) {
         delete (hapManager);
         delete (rc);
@@ -162,13 +162,13 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest002, TestSize.Level1)
  */
 HWTEST_F(HapManagerTest, HapManagerFuncTest003, TestSize.Level1)
 {
-    ResConfig *rc = CreateResConfig();
+    auto rc = CreateResConfig();
     if (rc == nullptr) {
         EXPECT_TRUE(false);
         return;
     }
     rc->SetLocaleInfo("zh", nullptr, "CN");
-    HapManager *hapManager = new HapManager(new ResConfigImpl);
+    HapManager *hapManager = new HapManager(std::make_shared<ResConfigImpl>());
     hapManager->UpdateResConfig(*rc);
     if (hapManager == nullptr) {
         EXPECT_TRUE(false);
@@ -179,7 +179,7 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest003, TestSize.Level1)
     EXPECT_TRUE(ret);
 
     int id = 16777221; // 16777221 means 'aboutPage_title_primary'
-    std::vector<const HapResource::IdValues *> idValues = hapManager->GetResourceList(id);
+    auto idValues = hapManager->GetResourceList(id);
     if (idValues.size() == 0) {
         delete hapManager;
         EXPECT_TRUE(false);
@@ -204,13 +204,13 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest003, TestSize.Level1)
  */
 HWTEST_F(HapManagerTest, HapManagerFuncTest004, TestSize.Level1)
 {
-    ResConfig *rc = CreateResConfig();
+    auto rc = CreateResConfig();
     if (rc == nullptr) {
         EXPECT_TRUE(false);
         return;
     }
     rc->SetLocaleInfo("en", nullptr, "US");
-    HapManager *hapManager = new HapManager(new ResConfigImpl);
+    HapManager *hapManager = new HapManager(std::make_shared<ResConfigImpl>());
     hapManager->UpdateResConfig(*rc);
     if (hapManager == nullptr) {
         EXPECT_TRUE(false);
@@ -219,7 +219,7 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest004, TestSize.Level1)
     bool ret = hapManager->AddResourcePath(FormatFullPath(g_hapPath).c_str());
     EXPECT_TRUE(ret);
     int id = 16777221; // 16777221 means 'AboutPageFA' 'aboutPage_title_primary'
-    std::vector<const HapResource::IdValues *> idValues = hapManager->GetResourceList(id);
+    auto idValues = hapManager->GetResourceList(id);
     if (idValues.size() == 0) {
         delete hapManager;
         EXPECT_TRUE(false);

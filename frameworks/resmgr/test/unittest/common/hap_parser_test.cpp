@@ -67,37 +67,37 @@ void HapParserTest::TearDown()
  */
 HWTEST_F(HapParserTest, HapParserFuncTest001, TestSize.Level1)
 {
-    std::vector<KeyParam *> keyParams;
-    auto kp = new KeyParam();
+    std::vector<std::shared_ptr<KeyParam>> keyParams;
+    auto kp = std::make_shared<KeyParam>();
     kp->type_ = LANGUAGES;
     kp->value_ = 31336;
     kp->InitStr();
     keyParams.push_back(kp);
-    kp = new KeyParam();
-    kp->type_ = REGION;
-    kp->value_ = 17230;
+    auto kp1 = std::make_shared<KeyParam>();
+    kp1->type_ = REGION;
+    kp1->value_ = 17230;
+    kp1->InitStr();
+    keyParams.push_back(kp1);
+    auto kp2 = std::make_shared<KeyParam>();
+    kp2->type_ = SCREEN_DENSITY;
+    kp2->value_ = SCREEN_DENSITY_SDPI;
     kp->InitStr();
-    keyParams.push_back(kp);
-    kp = new KeyParam();
-    kp->type_ = SCREEN_DENSITY;
-    kp->value_ = SCREEN_DENSITY_SDPI;
-    kp->InitStr();
-    keyParams.push_back(kp);
-    kp = new KeyParam();
-    kp->type_ = DEVICETYPE;
-    kp->value_ = DEVICE_CAR;
-    kp->InitStr();
-    keyParams.push_back(kp);
-    kp = new KeyParam();
-    kp->type_ = DIRECTION;
-    kp->value_ = DIRECTION_VERTICAL;
-    kp->InitStr();
-    keyParams.push_back(kp);
-    kp = new KeyParam();
-    kp->type_ = COLORMODE;
-    kp->value_ = DARK;
-    kp->InitStr();
-    keyParams.push_back(kp);
+    keyParams.push_back(kp2);
+    auto kp3 = std::make_shared<KeyParam>();
+    kp3->type_ = DEVICETYPE;
+    kp3->value_ = DEVICE_CAR;
+    kp3->InitStr();
+    keyParams.push_back(kp3);
+    auto kp4 = std::make_shared<KeyParam>();
+    kp4->type_ = DIRECTION;
+    kp4->value_ = DIRECTION_VERTICAL;
+    kp4->InitStr();
+    keyParams.push_back(kp4);
+    auto kp5 = std::make_shared<KeyParam>();
+    kp5->type_ = COLORMODE;
+    kp5->value_ = DARK;
+    kp5->InitStr();
+    keyParams.push_back(kp5);
     auto config = HapParser::CreateResConfigFromKeyParams(keyParams);
     if (config != nullptr) {
         EXPECT_EQ(std::string("zh"), config->GetLocaleInfo()->getLanguage());
@@ -110,11 +110,7 @@ HWTEST_F(HapParserTest, HapParserFuncTest001, TestSize.Level1)
     } else {
         EXPECT_TRUE(false);
     }
-
-    for (auto kp = keyParams.begin(); kp != keyParams.end(); kp++) {
-        delete *kp;
-    }
-    delete config;
+    keyParams.clear();
 }
 #endif
 
@@ -157,42 +153,40 @@ HWTEST_F(HapParserTest, HapParserFuncTest003, TestSize.Level1)
  */
 HWTEST_F(HapParserTest, HapParserFuncTest004, TestSize.Level1)
 {
-    std::vector<KeyParam *> keyParams;
-    auto kp = new KeyParam();
-    kp->type_ = LANGUAGES;
-    kp->value_ = 31336;
-    kp->InitStr();
-    keyParams.push_back(kp);
-    kp = new KeyParam();
-    kp->type_ = REGION;
-    kp->value_ = 17230;
-    kp->InitStr();
-    keyParams.push_back(kp);
-    kp = new KeyParam();
-    kp->type_ = SCREEN_DENSITY;
-    kp->value_ = SCREEN_DENSITY_SDPI;
-    kp->InitStr();
-    keyParams.push_back(kp);
-    kp = new KeyParam();
-    kp->type_ = DEVICETYPE;
-    kp->value_ = DEVICE_CAR;
-    kp->InitStr();
-    keyParams.push_back(kp);
-    kp = new KeyParam();
-    kp->type_ = DIRECTION;
-    kp->value_ = DIRECTION_VERTICAL;
-    kp->InitStr();
-    keyParams.push_back(kp);
-    kp = new KeyParam();
-    kp->type_ = COLORMODE;
-    kp->value_ = DARK;
-    kp->InitStr();
-    keyParams.push_back(kp);
+    std::vector<std::shared_ptr<KeyParam>> keyParams;
+    auto kp1 = std::make_shared<KeyParam>();
+    kp1->type_ = LANGUAGES;
+    kp1->value_ = 31336;
+    kp1->InitStr();
+    keyParams.push_back(kp1);
+    auto kp2 = std::make_shared<KeyParam>();
+    kp2->type_ = REGION;
+    kp2->value_ = 17230;
+    kp2->InitStr();
+    keyParams.push_back(kp2);
+    auto kp3 = std::make_shared<KeyParam>();
+    kp3->type_ = SCREEN_DENSITY;
+    kp3->value_ = SCREEN_DENSITY_SDPI;
+    kp3->InitStr();
+    keyParams.push_back(kp3);
+    auto kp4 = std::make_shared<KeyParam>();
+    kp4->type_ = DEVICETYPE;
+    kp4->value_ = DEVICE_CAR;
+    kp4->InitStr();
+    keyParams.push_back(kp4);
+    auto kp5 = std::make_shared<KeyParam>();
+    kp5->type_ = DIRECTION;
+    kp5->value_ = DIRECTION_VERTICAL;
+    kp5->InitStr();
+    keyParams.push_back(kp5);
+    auto kp6 = std::make_shared<KeyParam>();
+    kp6->type_ = COLORMODE;
+    kp6->value_ = DARK;
+    kp6->InitStr();
+    keyParams.push_back(kp6);
     std::string folder = HapParser::ToFolderPath(keyParams);
     ASSERT_EQ("zh_CN-vertical-car-dark-sdpi", folder);
-    for (auto kp = keyParams.begin(); kp != keyParams.end(); kp++) {
-        delete *kp;
-    }
+    keyParams.clear();
 }
 
 /*

@@ -37,7 +37,7 @@ public:
      * @param resConfig resource config
      * @param isSystem system flag, default value is false
      */
-    HapManager(ResConfigImpl *resConfig, bool isSystem = false);
+    HapManager(std::shared_ptr<ResConfigImpl> resConfig, bool isSystem = false);
 
     /**
      * The destructor of HapManager
@@ -108,7 +108,7 @@ public:
      * @param id the resource id
      * @return the resources related to resource id
      */
-    const IdItem *FindResourceById(uint32_t id);
+    const std::shared_ptr<IdItem> FindResourceById(uint32_t id);
 
     /**
      * Find resource by resource name
@@ -116,7 +116,7 @@ public:
      * @param resType the resource type
      * @return the resources related to resource name
      */
-    const IdItem *FindResourceByName(const char *name, const ResType resType);
+    const std::shared_ptr<IdItem> FindResourceByName(const char *name, const ResType resType);
 
     /**
      * Find best resource path by resource id
@@ -124,7 +124,8 @@ public:
      * @param density the input screen density
      * @return the best resource path
      */
-    const HapResource::ValueUnderQualifierDir *FindQualifierValueById(uint32_t id, uint32_t density = 0);
+    const std::shared_ptr<HapResource::ValueUnderQualifierDir> FindQualifierValueById(uint32_t id,
+        uint32_t density = 0);
     
     /**
      * Find best resource path by resource name
@@ -133,8 +134,8 @@ public:
      * @param density the input screen density
      * @return the best resource path
      */
-    const HapResource::ValueUnderQualifierDir *FindQualifierValueByName(const char *name, const ResType resType,
-        uint32_t density = 0);
+    const std::shared_ptr<HapResource::ValueUnderQualifierDir> FindQualifierValueByName(const char *name,
+        const ResType resType, uint32_t density = 0);
 
     /**
      * Find the raw file path
@@ -163,7 +164,7 @@ public:
      * @param outValue the media data
      * @return SUCCESS if get the media data success, else NOT_FOUND
      */
-    RState GetMediaData(const HapResource::ValueUnderQualifierDir *qd, size_t& len,
+    RState GetMediaData(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd, size_t& len,
         std::unique_ptr<uint8_t[]> &outValue);
 
     /**
@@ -172,7 +173,7 @@ public:
      * @param outValue the mediabase64 data
      * @return SUCCESS if get the mediabase64 data success, else NOT_FOUND
      */
-    RState GetMediaBase64Data(const HapResource::ValueUnderQualifierDir *qd, std::string &outValue);
+    RState GetMediaBase64Data(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd, std::string &outValue);
 
     /**
      * Get the Profile data
@@ -181,7 +182,7 @@ public:
      * @param outValue the profile data
      * @return SUCCESS if get the profile data success, else NOT_FOUND
      */
-    RState GetProfileData(const HapResource::ValueUnderQualifierDir *qd, size_t &len,
+    RState GetProfileData(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd, size_t &len,
         std::unique_ptr<uint8_t[]> &outValue);
 
     /**
@@ -238,7 +239,7 @@ public:
      * @param outValue the resource path write to
      * @return SUCCESS if resource exist, else not found
      */
-    RState GetFilePath(const HapResource::ValueUnderQualifierDir *qd, const ResType resType,
+    RState GetFilePath(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd, const ResType resType,
         std::string &outValue);
 
     /**
@@ -248,7 +249,7 @@ public:
      * @param outValue the media data write to
      * @return SUCCESS if resource exist, else not found
      */
-    RState GetMediaDataFromHap(const HapResource::ValueUnderQualifierDir *qd, size_t &len,
+    RState GetMediaDataFromHap(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd, size_t &len,
         std::unique_ptr<uint8_t[]> &outValue);
 
     /**
@@ -258,7 +259,7 @@ public:
      * @param outValue the media data write to
      * @return SUCCESS if resource exist, else not found
      */
-    RState GetMediaDataFromIndex(const HapResource::ValueUnderQualifierDir *qd, size_t &len,
+    RState GetMediaDataFromIndex(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd, size_t &len,
         std::unique_ptr<uint8_t[]> &outValue);
 
     /**
@@ -267,7 +268,8 @@ public:
      * @param outValue the mediabase64 data write to
      * @return SUCCESS if resource exist, else not found
      */
-    RState GetMediaBase64DataFromHap(const HapResource::ValueUnderQualifierDir *qd, std::string &outValue);
+    RState GetMediaBase64DataFromHap(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd,
+        std::string &outValue);
 
     /**
      * Get the raw file list
@@ -275,7 +277,8 @@ public:
      * @param outValue the mediabase64 data write to
      * @return SUCCESS if resource exist, else not found
      */
-    RState GetMediaBase64DataFromIndex(const HapResource::ValueUnderQualifierDir *qd, std::string &outValue);
+    RState GetMediaBase64DataFromIndex(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd,
+        std::string &outValue);
 
     /**
      * Get the raw file list
@@ -297,14 +300,14 @@ public:
      *
      * @return HapResource vector of manager
      */
-    std::vector<HapResource *> GetHapResource();
+    std::vector<std::shared_ptr<HapResource>> GetHapResource();
 
     /**
      * Add system resourc to app resource vector
      *
      * @param systemHapManager system manager
      */
-    void AddSystemResource(const HapManager *systemHapManager);
+    void AddSystemResource(const std::shared_ptr<HapManager> &systemHapManager);
 
     /**
      * Get the resource limit keys value which every binary bit corresponds to existing limit key {@link KeyType}
@@ -346,12 +349,13 @@ private:
 
     void GetResConfigImpl(ResConfigImpl &resConfig);
 
-    std::vector<const HapResource::IdValues *> GetResourceList(uint32_t ident) const;
+    std::vector<std::shared_ptr<HapResource::IdValues>> GetResourceList(uint32_t ident) const;
 
-    std::vector<const HapResource::IdValues *> GetResourceListByName(const char *name, const ResType resType) const;
+    std::vector<std::shared_ptr<HapResource::IdValues>> GetResourceListByName(const char *name,
+        const ResType resType) const;
 
-    const HapResource::ValueUnderQualifierDir *GetBestMatchResource(std::vector<const HapResource::IdValues *>
-        candidates, uint32_t density);
+    const std::shared_ptr<HapResource::ValueUnderQualifierDir> GetBestMatchResource(
+        std::vector<std::shared_ptr<HapResource::IdValues>> candidates, uint32_t density);
 
     bool AddResourcePath(const char *path);
 
@@ -363,10 +367,10 @@ private:
     static bool icuInitialized;
 
     // app res config
-    ResConfigImpl *resConfig_;
+    std::shared_ptr<ResConfigImpl> resConfig_;
 
     // set of hap Resources
-    std::vector<HapResource *> hapResources_;
+    std::vector<std::shared_ptr<HapResource>> hapResources_;
 
     // set of loaded hap path
     std::unordered_map<std::string, std::vector<std::string>> loadedHapPaths_;

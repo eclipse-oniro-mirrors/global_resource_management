@@ -352,7 +352,7 @@ bool ResConfigImpl::Copy(ResConfig &other)
     return true;
 }
 
-bool ResConfigImpl::Match(const ResConfigImpl *other) const
+bool ResConfigImpl::Match(const std::shared_ptr<ResConfigImpl> other) const
 {
     if (other == nullptr) {
         return false;
@@ -453,8 +453,8 @@ bool ResConfigImpl::IsInputDeviceMatch(InputDevice inputDevice) const
  * return false
  *
  */
-bool ResConfigImpl::IsMoreSuitable(const ResConfigImpl *other,
-    const ResConfigImpl *request, uint32_t density) const
+bool ResConfigImpl::IsMoreSuitable(const std::shared_ptr<ResConfigImpl> other,
+    const std::shared_ptr<ResConfigImpl> request, uint32_t density) const
 {
     if (request != nullptr && other != nullptr) {
         int ret = IsMccMncMoreSuitable(other->mcc_, other->mnc_, request->mcc_, request->mnc_);
@@ -632,7 +632,7 @@ bool ResConfigImpl::IsCompletedScript() const
     return isCompletedScript_;
 }
 
-bool ResConfigImpl::IsMoreSpecificThan(const ResConfigImpl *other, uint32_t density) const
+bool ResConfigImpl::IsMoreSpecificThan(const std::shared_ptr<ResConfigImpl> other, uint32_t density) const
 {
     if (other == nullptr) {
         return true;

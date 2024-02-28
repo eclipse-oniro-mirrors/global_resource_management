@@ -267,7 +267,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest005, TestSize.Le
     rmc->AddResource("zh", nullptr, nullptr);
 
     // make a fake hapResource, then reload will fail
-    HapResource *hapResource = new HapResource("/data/test/non_exist", 0, nullptr);
+    auto hapResource = std::make_shared<HapResource>("/data/test/non_exist", 0, nullptr);
     ((ResourceManagerImpl *)rm)->hapManager_->hapResources_.push_back(hapResource);
     ((ResourceManagerImpl *)rm)->hapManager_->loadedHapPaths_["/data/test/non_exist"] = std::vector<std::string>();
     RState state;
@@ -1769,12 +1769,11 @@ HWTEST_F(ResourceManagerTest, ResourceManagerResolveParentReferenceTest001, Test
     rm->AddResource(FormatFullPath(g_resFilePath).c_str());
     int id;
     std::map<std::string, std::string> outValue;
-    const IdItem *idItem;
     RState ret;
 
     id = rmc->GetResId("base", ResType::PATTERN);
     EXPECT_TRUE(id > 0);
-    idItem = ((ResourceManagerImpl *)rm)->hapManager_->FindResourceById(id);
+    auto idItem = ((ResourceManagerImpl *)rm)->hapManager_->FindResourceById(id);
     ASSERT_TRUE(idItem != nullptr);
     ret = ((ResourceManagerImpl *)rm)->ResolveParentReference(idItem, outValue);
     ASSERT_EQ(SUCCESS, ret);

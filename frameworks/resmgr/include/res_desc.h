@@ -124,7 +124,7 @@ public:
 
     uint32_t id_;
     uint32_t offset_;
-    IdItem *idItem_;
+    std::shared_ptr<IdItem> idItem_;
 };
 
 class ResId {
@@ -137,7 +137,7 @@ public:
 
     char tag_[4];
     uint32_t count_; // ID count
-    std::vector<IdParam *> idParams_;
+    std::vector<std::shared_ptr<IdParam>> idParams_;
 };
 
 /**
@@ -200,13 +200,13 @@ public:
     uint32_t keyParamsCount_;
 
     // the qualifiers
-    std::vector<KeyParam *> keyParams_;
+    std::vector<std::shared_ptr<KeyParam>> keyParams_;
 
     // the resource ID data
-    ResId *resId_;
+    std::shared_ptr<ResId> resId_;
 
     // the resConfig of each ResKey and all resConfig_ in ValueUnderQualifierDir will point to this resConfig_
-    ResConfigImpl *resConfig_;
+    std::shared_ptr<ResConfigImpl> resConfig_;
 };
 /**
  * a ResDesc means a index file in hap zip
@@ -221,7 +221,7 @@ public:
 
     ResHeader *resHeader_;
 
-    std::vector<ResKey *> keys_;
+    std::vector<std::shared_ptr<ResKey>> keys_;
 
     std::string GetCurrentDeviceType();
 };

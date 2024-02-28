@@ -137,21 +137,22 @@ public:
      * @return OK if the resource hex parse success, else SYS_ERROR
      */
     static int32_t ParseResHex(const char *buffer, const size_t bufLen, ResDesc &resDesc,
-                               const ResConfigImpl *defaultConfig = nullptr);
+                               const std::shared_ptr<ResConfigImpl> defaultConfig = nullptr);
 
     /**
      * Create resource config from KeyParams
      * @param keyParams the keyParams contain type and value
      * @return the resource config related to the keyParams
      */
-    static ResConfigImpl *CreateResConfigFromKeyParams(const std::vector<KeyParam *> &keyParams);
+    static std::shared_ptr<ResConfigImpl> CreateResConfigFromKeyParams(
+        const std::vector<std::shared_ptr<KeyParam>> &keyParams);
 
     /**
      * To resource folder path
      * @param keyParams the keyParams contain type and value
      * @return the resources folder path
      */
-    static std::string ToFolderPath(const std::vector<KeyParam *> &keyParams);
+    static std::string ToFolderPath(const std::vector<std::shared_ptr<KeyParam>> &keyParams);
 
     /**
      * Get screen density
@@ -224,7 +225,7 @@ private:
     };
 
     static std::string BuildFolderPath(Determiner *determiner);
-    static ResConfigImpl *BuildResConfig(ResConfigKey *configKey);
+    static std::shared_ptr<ResConfigImpl> BuildResConfig(ResConfigKey *configKey);
 };
 } // namespace Resource
 } // namespace Global

@@ -625,62 +625,65 @@ public:
     virtual std::string GetThemeMask();
 
 private:
-    RState GetString(const IdItem *idItem, std::string &outValue);
+    RState GetString(const std::shared_ptr<IdItem> idItem, std::string &outValue);
 
-    RState GetStringArray(const IdItem *idItem, std::vector<std::string> &outValue);
+    RState GetStringArray(const std::shared_ptr<IdItem> idItem, std::vector<std::string> &outValue);
 
-    RState GetPattern(const IdItem *idItem, std::map<std::string, std::string> &outValue);
+    RState GetPattern(const std::shared_ptr<IdItem> idItem, std::map<std::string, std::string> &outValue);
 
-    RState GetTheme(const IdItem *idItem, std::map<std::string, std::string> &outValue);
+    RState GetTheme(const std::shared_ptr<IdItem> idItem, std::map<std::string, std::string> &outValue);
 
-    RState GetPluralString(const HapResource::ValueUnderQualifierDir *vuqd, int quantity, std::string &outValue);
+    RState GetPluralString(const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd, int quantity,
+        std::string &outValue);
 
     RState ResolveReference(const std::string value, std::string &outValue);
 
-    RState GetBoolean(const IdItem *idItem, bool &outValue);
+    RState GetBoolean(const std::shared_ptr<IdItem> idItem, bool &outValue);
 
     RState ParseFloat(const std::string &strValue, float &result, std::string &unit);
 
     RState RecalculateFloat(const std::string &unit, float &result);
 
-    RState GetFloat(const IdItem *idItem, float &outValue, std::string &unit);
+    RState GetFloat(const std::shared_ptr<IdItem> idItem, float &outValue, std::string &unit);
 
-    RState GetInteger(const IdItem *idItem, int &outValue);
+    RState GetInteger(const std::shared_ptr<IdItem> idItem, int &outValue);
 
-    RState GetColor(const IdItem *idItem, uint32_t &outValue);
+    RState GetColor(const std::shared_ptr<IdItem> idItem, uint32_t &outValue);
 
-    RState GetIntArray(const IdItem *idItem, std::vector<int> &outValue);
+    RState GetIntArray(const std::shared_ptr<IdItem> idItem, std::vector<int> &outValue);
 
-    RState GetSymbol(const IdItem *idItem, uint32_t &outValue);
+    RState GetSymbol(const std::shared_ptr<IdItem> idItem, uint32_t &outValue);
 
     void ProcessPsuedoTranslate(std::string &outValue);
 
-    RState ResolveParentReference(const IdItem *idItem, std::map<std::string, std::string> &outValue);
+    RState ResolveParentReference(const std::shared_ptr<IdItem> idItem, std::map<std::string, std::string> &outValue);
 
     bool IsDensityValid(uint32_t density);
 
     bool IsFileExist(const std::string& path);
 
-    RState GetThemeColor(const IdItem *idItem, uint32_t &outValue);
+    RState GetThemeColor(const std::shared_ptr<IdItem> idItem, uint32_t &outValue);
 
-    RState GetThemeFloat(const IdItem *idItem, float &outValue);
+    RState GetThemeFloat(const std::shared_ptr<IdItem> idItem, float &outValue);
 
-    RState GetThemeMedia(const IdItem *idItem, size_t &len, std::unique_ptr<uint8_t[]> &outValue, uint32_t density);
+    RState GetThemeMedia(const std::shared_ptr<IdItem> idItem, size_t &len,
+        std::unique_ptr<uint8_t[]> &outValue, uint32_t density);
 
-    RState GetThemeMediaBase64(const IdItem *idItem, std::string &outValue);
+    RState GetThemeMediaBase64(const std::shared_ptr<IdItem> idItem, std::string &outValue);
 
-    RState GetThemeDrawable(const IdItem *idItem, size_t &len, std::unique_ptr<uint8_t[]> &outValue,
+    RState GetThemeDrawable(const std::shared_ptr<IdItem> idItem, size_t &len, std::unique_ptr<uint8_t[]> &outValue,
         uint32_t iconType, uint32_t density);
 
-    RState GetThemeIcon(const IdItem *idItem, size_t &len, std::unique_ptr<uint8_t[]> &outValue, uint32_t density);
+    RState GetThemeIcon(const std::shared_ptr<IdItem> idItem, size_t &len, std::unique_ptr<uint8_t[]> &outValue,
+        uint32_t density);
 
-    RState ProcessReference(const std::string value, std::vector<const IdItem *> &idItems);
+    RState ProcessReference(const std::string value, std::vector<std::shared_ptr<IdItem>> &idItems);
 
     RState GetThemeIconInfo(const std::string &iconName, size_t &len, std::unique_ptr<uint8_t[]> &outValue);
 
     RState GetThemeValues(const std::string &value, std::string &outValue);
 
-    HapManager *hapManager_;
+    std::shared_ptr<HapManager> hapManager_;
 
     float fontRatio_ = 0.0f;
 
