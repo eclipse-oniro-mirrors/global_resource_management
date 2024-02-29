@@ -39,7 +39,7 @@ std::string FormatFullPath(const char *fileRelativePath)
     return result;
 }
 
-void PrintIdValues(const HapResource::IdValues *idValues)
+void PrintIdValues(const std::shared_ptr<HapResource::IdValues> &idValues)
 {
     if (idValues == nullptr) {
         return;

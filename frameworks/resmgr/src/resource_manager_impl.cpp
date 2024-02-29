@@ -66,14 +66,13 @@ ResourceManagerImpl::ResourceManagerImpl() : hapManager_(nullptr)
 
 bool ResourceManagerImpl::Init(bool isSystem)
 {
-    ResConfigImpl *resConfig = new (std::nothrow) ResConfigImpl;
+    auto resConfig = std::make_shared<ResConfigImpl>();
     if (resConfig == nullptr) {
         HILOG_ERROR("new ResConfigImpl failed when ResourceManagerImpl::Init");
         return false;
     }
-    hapManager_ = new (std::nothrow) HapManager(resConfig, isSystem);
+    hapManager_ = std::make_shared<HapManager>(resConfig, isSystem);
     if (hapManager_ == nullptr) {
-        delete (resConfig);
         HILOG_ERROR("new HapManager failed when ResourceManagerImpl::Init");
         return false;
     }
@@ -82,7 +81,7 @@ bool ResourceManagerImpl::Init(bool isSystem)
 
 RState ResourceManagerImpl::GetStringById(uint32_t id, std::string &outValue)
 {
-    const IdItem *idItem = hapManager_->FindResourceById(id);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id);
     if (idItem == nullptr) {
         HILOG_ERROR("find resource by string id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
@@ -96,7 +95,7 @@ RState ResourceManagerImpl::GetStringById(uint32_t id, std::string &outValue)
 
 RState ResourceManagerImpl::GetStringByName(const char *name, std::string &outValue)
 {
-    const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::STRING);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::STRING);
     if (idItem == nullptr) {
         HILOG_ERROR("find resource by string name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
@@ -110,7 +109,7 @@ RState ResourceManagerImpl::GetStringByName(const char *name, std::string &outVa
 
 RState ResourceManagerImpl::GetStringFormatById(std::string &outValue, uint32_t id, ...)
 {
-    const IdItem *idItem = hapManager_->FindResourceById(id);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id);
     std::string temp;
     RState rState = GetString(idItem, temp);
     if (rState != SUCCESS) {
@@ -125,7 +124,7 @@ RState ResourceManagerImpl::GetStringFormatById(std::string &outValue, uint32_t 
 
 RState ResourceManagerImpl::GetStringFormatByName(std::string &outValue, const char *name, ...)
 {
-    const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::STRING);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::STRING);
     std::string temp;
     RState rState = GetString(idItem, temp);
     if (rState != SUCCESS) {
@@ -138,7 +137,7 @@ RState ResourceManagerImpl::GetStringFormatByName(std::string &outValue, const c
     return SUCCESS;
 }
 
-RState ResourceManagerImpl::GetString(const IdItem *idItem, std::string &outValue)
+RState ResourceManagerImpl::GetString(const std::shared_ptr<IdItem> idItem, std::string &outValue)
 {
     // not found or type invalid
     if (idItem == nullptr || idItem->resType_ != ResType::STRING) {
@@ -159,7 +158,7 @@ RState ResourceManagerImpl::GetString(const IdItem *idItem, std::string &outValu
 
 RState ResourceManagerImpl::GetStringArrayById(uint32_t id, std::vector<std::string> &outValue)
 {
-    const IdItem *idItem = hapManager_->FindResourceById(id);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id);
     if (idItem == nullptr) {
         HILOG_ERROR("find resource by string array id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
@@ -173,7 +172,7 @@ RState ResourceManagerImpl::GetStringArrayById(uint32_t id, std::vector<std::str
 
 RState ResourceManagerImpl::GetStringArrayByName(const char *name, std::vector<std::string> &outValue)
 {
-    const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::STRINGARRAY);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::STRINGARRAY);
     if (idItem == nullptr) {
         HILOG_ERROR("find resource by string array name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
@@ -185,7 +184,7 @@ RState ResourceManagerImpl::GetStringArrayByName(const char *name, std::vector<s
     return state;
 }
 
-RState ResourceManagerImpl::GetStringArray(const IdItem *idItem, std::vector<std::string> &outValue)
+RState ResourceManagerImpl::GetStringArray(const std::shared_ptr<IdItem> idItem, std::vector<std::string> &outValue)
 {
     // not found or type invalid
     if (idItem == nullptr || idItem->resType_ != ResType::STRINGARRAY) {
@@ -217,7 +216,7 @@ RState ResourceManagerImpl::GetStringArray(const IdItem *idItem, std::vector<std
 
 RState ResourceManagerImpl::GetPatternById(uint32_t id, std::map<std::string, std::string> &outValue)
 {
-    const IdItem *idItem = hapManager_->FindResourceById(id);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id);
     if (idItem == nullptr) {
         HILOG_ERROR("find resource by pattern id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
@@ -231,7 +230,7 @@ RState ResourceManagerImpl::GetPatternById(uint32_t id, std::map<std::string, st
 
 RState ResourceManagerImpl::GetPatternByName(const char *name, std::map<std::string, std::string> &outValue)
 {
-    const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::PATTERN);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::PATTERN);
     if (idItem == nullptr) {
         HILOG_ERROR("find resource by Pattern name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
@@ -243,7 +242,8 @@ RState ResourceManagerImpl::GetPatternByName(const char *name, std::map<std::str
     return state;
 }
 
-RState ResourceManagerImpl::GetPattern(const IdItem *idItem, std::map<std::string, std::string> &outValue)
+RState ResourceManagerImpl::GetPattern(const std::shared_ptr<IdItem> idItem, std::map<std::string,
+    std::string> &outValue)
 {
     //type invalid
     if (idItem->resType_ != ResType::PATTERN) {
@@ -255,20 +255,20 @@ RState ResourceManagerImpl::GetPattern(const IdItem *idItem, std::map<std::strin
 
 RState ResourceManagerImpl::GetPluralStringById(uint32_t id, int quantity, std::string &outValue)
 {
-    const HapResource::ValueUnderQualifierDir *vuqd = hapManager_->FindQualifierValueById(id);
+    const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd = hapManager_->FindQualifierValueById(id);
     return GetPluralString(vuqd, quantity, outValue);
 }
 
 RState ResourceManagerImpl::GetPluralStringByName(const char *name, int quantity, std::string &outValue)
 {
-    const HapResource::ValueUnderQualifierDir *vuqd =
+    const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd =
         hapManager_->FindQualifierValueByName(name, ResType::PLURALS);
     return GetPluralString(vuqd, quantity, outValue);
 }
 
 RState ResourceManagerImpl::GetPluralStringByIdFormat(std::string &outValue, uint32_t id, int quantity, ...)
 {
-    const HapResource::ValueUnderQualifierDir *vuqd = hapManager_->FindQualifierValueById(id);
+    const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd = hapManager_->FindQualifierValueById(id);
     if (vuqd == nullptr) {
         HILOG_ERROR("find qualifier value by plural id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
@@ -292,7 +292,7 @@ RState ResourceManagerImpl::GetPluralStringByIdFormat(std::string &outValue, uin
 
 RState ResourceManagerImpl::GetPluralStringByNameFormat(std::string &outValue, const char *name, int quantity, ...)
 {
-    const HapResource::ValueUnderQualifierDir *vuqd =
+    const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd =
         hapManager_->FindQualifierValueByName(name, ResType::PLURALS);
     if (vuqd == nullptr) {
         HILOG_ERROR("find qualifier value by plural name error name = %{public}s", name);
@@ -315,7 +315,7 @@ RState ResourceManagerImpl::GetPluralStringByNameFormat(std::string &outValue, c
     return SUCCESS;
 }
 
-RState ResourceManagerImpl::GetPluralString(const HapResource::ValueUnderQualifierDir *vuqd,
+RState ResourceManagerImpl::GetPluralString(const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd,
     int quantity, std::string &outValue)
 {
     // not found or type invalid
@@ -383,7 +383,7 @@ RState ResourceManagerImpl::ResolveReference(const std::string value, std::strin
             HILOG_DEBUG("ref %{public}s can't be array", refStr.c_str());
             return ERROR;
         }
-        const IdItem *idItem = hapManager_->FindResourceById(id);
+        const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id);
         if (idItem == nullptr) {
             HILOG_ERROR("ref %s id not found", refStr.c_str());
             return ERROR;
@@ -408,7 +408,7 @@ RState ResourceManagerImpl::GetThemeValues(const std::string &value, std::string
 {
     ResConfigImpl resConfig;
     GetResConfig(resConfig);
-    std::vector<const IdItem *> idItems;
+    std::vector<std::shared_ptr<IdItem>> idItems;
     if (ProcessReference(value, idItems) != SUCCESS) {
         return NOT_FOUND;
     }
@@ -416,7 +416,8 @@ RState ResourceManagerImpl::GetThemeValues(const std::string &value, std::string
     return outValue.empty() ? NOT_FOUND : SUCCESS;
 }
 
-RState ResourceManagerImpl::ResolveParentReference(const IdItem *idItem, std::map<std::string, std::string> &outValue)
+RState ResourceManagerImpl::ResolveParentReference(const std::shared_ptr<IdItem> idItem, std::map<std::string,
+    std::string> &outValue)
 {
     // only pattern and theme
     // ref always at idx 0
@@ -425,7 +426,7 @@ RState ResourceManagerImpl::ResolveParentReference(const IdItem *idItem, std::ma
 
     bool haveParent = false;
     int count = 0;
-    const IdItem *currItem = idItem;
+    std::shared_ptr<IdItem> currItem = idItem;
     do {
         haveParent = currItem->HaveParent();
         size_t startIdx = haveParent ? 1 : 0;
@@ -479,7 +480,7 @@ RState ResourceManagerImpl::ResolveParentReference(const IdItem *idItem, std::ma
 
 RState ResourceManagerImpl::GetBooleanById(uint32_t id, bool &outValue)
 {
-    const IdItem *idItem = hapManager_->FindResourceById(id);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id);
     if (idItem == nullptr) {
         HILOG_ERROR("find resource by Boolean id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
@@ -493,7 +494,7 @@ RState ResourceManagerImpl::GetBooleanById(uint32_t id, bool &outValue)
 
 RState ResourceManagerImpl::GetBooleanByName(const char *name, bool &outValue)
 {
-    const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::BOOLEAN);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::BOOLEAN);
     if (idItem == nullptr) {
         HILOG_ERROR("find resource by Boolean name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
@@ -505,7 +506,7 @@ RState ResourceManagerImpl::GetBooleanByName(const char *name, bool &outValue)
     return state;
 }
 
-RState ResourceManagerImpl::GetBoolean(const IdItem *idItem, bool &outValue)
+RState ResourceManagerImpl::GetBoolean(const std::shared_ptr<IdItem> idItem, bool &outValue)
 {
     if (idItem == nullptr || idItem->resType_ != ResType::BOOLEAN) {
         return NOT_FOUND;
@@ -526,11 +527,11 @@ RState ResourceManagerImpl::GetBoolean(const IdItem *idItem, bool &outValue)
     return state;
 }
 
-RState ResourceManagerImpl::GetThemeFloat(const IdItem *idItem, float &outValue)
+RState ResourceManagerImpl::GetThemeFloat(const std::shared_ptr<IdItem> idItem, float &outValue)
 {
     ResConfigImpl resConfig;
     GetResConfig(resConfig);
-    std::vector<const IdItem *> idItems;
+    std::vector<std::shared_ptr<IdItem>> idItems;
     idItems.emplace_back(idItem);
     ProcessReference(idItem->value_, idItems);
     std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig);
@@ -544,7 +545,7 @@ RState ResourceManagerImpl::GetThemeFloat(const IdItem *idItem, float &outValue)
 
 RState ResourceManagerImpl::GetFloatById(uint32_t id, float &outValue)
 {
-    const IdItem *idItem = hapManager_->FindResourceById(id);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id);
     if (idItem == nullptr) {
         HILOG_ERROR("find resource by Float id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
@@ -568,13 +569,13 @@ RState ResourceManagerImpl::GetFloatById(uint32_t id, float &outValue)
 
 RState ResourceManagerImpl::GetFloatById(uint32_t id, float &outValue, std::string &unit)
 {
-    const IdItem *idItem = hapManager_->FindResourceById(id);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id);
     return GetFloat(idItem, outValue, unit);
 }
 
 RState ResourceManagerImpl::GetFloatByName(const char *name, float &outValue)
 {
-    const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::FLOAT);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::FLOAT);
     if (idItem == nullptr) {
         HILOG_ERROR("find resource by Float name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
@@ -598,7 +599,7 @@ RState ResourceManagerImpl::GetFloatByName(const char *name, float &outValue)
 
 RState ResourceManagerImpl::GetFloatByName(const char *name, float &outValue, std::string &unit)
 {
-    const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::FLOAT);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::FLOAT);
     return GetFloat(idItem, outValue, unit);
 }
 
@@ -637,7 +638,7 @@ RState ResourceManagerImpl::ParseFloat(const std::string &strValue, float &resul
     return SUCCESS;
 }
 
-RState ResourceManagerImpl::GetFloat(const IdItem *idItem, float &outValue, std::string &unit)
+RState ResourceManagerImpl::GetFloat(const std::shared_ptr<IdItem> idItem, float &outValue, std::string &unit)
 {
     if (idItem == nullptr || idItem->resType_ != ResType::FLOAT) {
         return NOT_FOUND;
@@ -652,7 +653,7 @@ RState ResourceManagerImpl::GetFloat(const IdItem *idItem, float &outValue, std:
 
 RState ResourceManagerImpl::GetIntegerById(uint32_t id, int &outValue)
 {
-    const IdItem *idItem = hapManager_->FindResourceById(id);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id);
     if (idItem == nullptr) {
         HILOG_ERROR("find resource by Integer id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
@@ -666,7 +667,7 @@ RState ResourceManagerImpl::GetIntegerById(uint32_t id, int &outValue)
 
 RState ResourceManagerImpl::GetIntegerByName(const char *name, int &outValue)
 {
-    const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::INTEGER);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::INTEGER);
     if (idItem == nullptr) {
         HILOG_ERROR("find resource by Integer name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
@@ -678,7 +679,7 @@ RState ResourceManagerImpl::GetIntegerByName(const char *name, int &outValue)
     return state;
 }
 
-RState ResourceManagerImpl::GetInteger(const IdItem *idItem, int &outValue)
+RState ResourceManagerImpl::GetInteger(const std::shared_ptr<IdItem> idItem, int &outValue)
 {
     if (idItem == nullptr || idItem->resType_ != ResType::INTEGER) {
         return NOT_FOUND;
@@ -692,7 +693,8 @@ RState ResourceManagerImpl::GetInteger(const IdItem *idItem, int &outValue)
     return state;
 }
 
-RState ResourceManagerImpl::ProcessReference(const std::string value, std::vector<const IdItem *> &idItems)
+RState ResourceManagerImpl::ProcessReference(const std::string value,
+    std::vector<std::shared_ptr<IdItem>> &idItems)
 {
     int id;
     ResType resType;
@@ -710,7 +712,7 @@ RState ResourceManagerImpl::ProcessReference(const std::string value, std::vecto
             HILOG_DEBUG("ref %{public}s can't be array", refStr.c_str());
             return ERROR;
         }
-        const IdItem *idItem = hapManager_->FindResourceById(id);
+        const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id);
         idItems.emplace_back(idItem);
         if (idItem == nullptr) {
             HILOG_ERROR("ref %s id not found", refStr.c_str());
@@ -732,11 +734,11 @@ RState ResourceManagerImpl::ProcessReference(const std::string value, std::vecto
     return SUCCESS;
 }
 
-RState ResourceManagerImpl::GetThemeColor(const IdItem *idItem, uint32_t &outValue)
+RState ResourceManagerImpl::GetThemeColor(const std::shared_ptr<IdItem> idItem, uint32_t &outValue)
 {
     ResConfigImpl resConfig;
     GetResConfig(resConfig);
-    std::vector<const IdItem *> idItems;
+    std::vector<std::shared_ptr<IdItem> > idItems;
     idItems.emplace_back(idItem);
     RState state = ProcessReference(idItem->value_, idItems);
     std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig);
@@ -748,7 +750,7 @@ RState ResourceManagerImpl::GetThemeColor(const IdItem *idItem, uint32_t &outVal
 
 RState ResourceManagerImpl::GetColorById(uint32_t id, uint32_t &outValue)
 {
-    const IdItem *idItem = hapManager_->FindResourceById(id);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id);
     if (idItem == nullptr) {
         HILOG_ERROR("find resource by string id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
@@ -768,7 +770,7 @@ RState ResourceManagerImpl::GetColorById(uint32_t id, uint32_t &outValue)
 
 RState ResourceManagerImpl::GetColorByName(const char *name, uint32_t &outValue)
 {
-    const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::COLOR);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::COLOR);
     if (idItem == nullptr) {
         HILOG_ERROR("find resource by string id error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
@@ -786,7 +788,7 @@ RState ResourceManagerImpl::GetColorByName(const char *name, uint32_t &outValue)
     return state;
 }
 
-RState ResourceManagerImpl::GetColor(const IdItem *idItem, uint32_t &outValue)
+RState ResourceManagerImpl::GetColor(const std::shared_ptr<IdItem> idItem, uint32_t &outValue)
 {
     if (idItem == nullptr || idItem->resType_ != ResType::COLOR) {
         return NOT_FOUND;
@@ -801,7 +803,7 @@ RState ResourceManagerImpl::GetColor(const IdItem *idItem, uint32_t &outValue)
 
 RState ResourceManagerImpl::GetSymbolById(uint32_t id, uint32_t &outValue)
 {
-    const IdItem *idItem = hapManager_->FindResourceById(id);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id);
     if (idItem == nullptr) {
         HILOG_ERROR("find resource by symbol id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
@@ -815,7 +817,7 @@ RState ResourceManagerImpl::GetSymbolById(uint32_t id, uint32_t &outValue)
 
 RState ResourceManagerImpl::GetSymbolByName(const char *name, uint32_t &outValue)
 {
-    const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::SYMBOL);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::SYMBOL);
     if (idItem == nullptr) {
         HILOG_ERROR("find resource by symbol name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
@@ -827,7 +829,7 @@ RState ResourceManagerImpl::GetSymbolByName(const char *name, uint32_t &outValue
     return state;
 }
 
-RState ResourceManagerImpl::GetSymbol(const IdItem *idItem, uint32_t &outValue)
+RState ResourceManagerImpl::GetSymbol(const std::shared_ptr<IdItem> idItem, uint32_t &outValue)
 {
     if (idItem == nullptr || idItem->resType_ != ResType::SYMBOL) {
         return NOT_FOUND;
@@ -842,17 +844,17 @@ RState ResourceManagerImpl::GetSymbol(const IdItem *idItem, uint32_t &outValue)
 
 RState ResourceManagerImpl::GetIntArrayById(uint32_t id, std::vector<int> &outValue)
 {
-    const IdItem *idItem = hapManager_->FindResourceById(id);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id);
     return GetIntArray(idItem, outValue);
 }
 
 RState ResourceManagerImpl::GetIntArrayByName(const char *name, std::vector<int> &outValue)
 {
-    const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::INTARRAY);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::INTARRAY);
     return GetIntArray(idItem, outValue);
 }
 
-RState ResourceManagerImpl::GetIntArray(const IdItem *idItem, std::vector<int> &outValue)
+RState ResourceManagerImpl::GetIntArray(const std::shared_ptr<IdItem> idItem, std::vector<int> &outValue)
 {
     // not found or type invalid
     if (idItem == nullptr || idItem->resType_ != ResType::INTARRAY) {
@@ -874,7 +876,7 @@ RState ResourceManagerImpl::GetIntArray(const IdItem *idItem, std::vector<int> &
 
 RState ResourceManagerImpl::GetThemeById(uint32_t id, std::map<std::string, std::string> &outValue)
 {
-    const IdItem *idItem = hapManager_->FindResourceById(id);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id);
     if (idItem == nullptr) {
         HILOG_ERROR("find resource by Theme id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
@@ -888,7 +890,7 @@ RState ResourceManagerImpl::GetThemeById(uint32_t id, std::map<std::string, std:
 
 RState ResourceManagerImpl::GetThemeByName(const char *name, std::map<std::string, std::string> &outValue)
 {
-    const IdItem *idItem = hapManager_->FindResourceByName(name, ResType::THEME);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::THEME);
     if (idItem == nullptr) {
         HILOG_ERROR("find resource by Theme name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
@@ -900,7 +902,7 @@ RState ResourceManagerImpl::GetThemeByName(const char *name, std::map<std::strin
     return state;
 }
 
-RState ResourceManagerImpl::GetTheme(const IdItem *idItem, std::map<std::string, std::string> &outValue)
+RState ResourceManagerImpl::GetTheme(const std::shared_ptr<IdItem> idItem, std::map<std::string, std::string> &outValue)
 {
     //type invalid
     if (idItem->resType_ != ResType::THEME) {
@@ -991,10 +993,6 @@ void ResourceManagerImpl::ProcessPsuedoTranslate(std::string &outValue)
 
 ResourceManagerImpl::~ResourceManagerImpl()
 {
-    if (hapManager_ != nullptr) {
-        delete hapManager_;
-        hapManager_ = nullptr;
-    }
     if (psueManager_ != nullptr) {
         delete (psueManager_);
         psueManager_ = nullptr;
@@ -1091,12 +1089,12 @@ bool ResourceManagerImpl::IsDensityValid(uint32_t density)
     }
 }
 
-RState ResourceManagerImpl::GetThemeMedia(const IdItem *idItem, size_t &len,
+RState ResourceManagerImpl::GetThemeMedia(const std::shared_ptr<IdItem> idItem, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue, uint32_t density)
 {
     ResConfigImpl resConfig;
     GetResConfig(resConfig);
-    std::vector<const IdItem *> idItems;
+    std::vector<std::shared_ptr<IdItem>> idItems;
     idItems.emplace_back(idItem);
     std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig);
     outValue = Utils::LoadResourceFile(result, len);
@@ -1117,7 +1115,7 @@ RState ResourceManagerImpl::GetMediaDataById(uint32_t id, size_t &len, std::uniq
     }
 
     // find in theme
-    const IdItem *idItem = qd->GetIdItem();
+    const std::shared_ptr<IdItem> idItem = qd->GetIdItem();
     if (GetThemeMedia(idItem, len, outValue, density) == SUCCESS) {
         return SUCCESS;
     }
@@ -1140,7 +1138,7 @@ RState ResourceManagerImpl::GetMediaDataByName(const char *name, size_t &len, st
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
 
-    const IdItem *idItem = qd->GetIdItem();
+    const std::shared_ptr<IdItem> idItem = qd->GetIdItem();
     if (GetThemeMedia(idItem, len, outValue, density) == SUCCESS) {
         return SUCCESS;
     }
@@ -1149,13 +1147,16 @@ RState ResourceManagerImpl::GetMediaDataByName(const char *name, size_t &len, st
     return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_NAME;
 }
 
-RState ResourceManagerImpl::GetThemeMediaBase64(const IdItem *idItem, std::string &outValue)
+RState ResourceManagerImpl::GetThemeMediaBase64(const std::shared_ptr<IdItem> idItem, std::string &outValue)
 {
     ResConfigImpl resConfig;
     GetResConfig(resConfig);
-    std::vector<const IdItem *> idItems;
+    std::vector<std::shared_ptr<IdItem>> idItems;
     idItems.emplace_back(idItem);
     std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig);
+    if (result.empty()) {
+        return NOT_FOUND;
+    }
     return Utils::GetMediaBase64Data(result, outValue);
 }
 
@@ -1172,7 +1173,7 @@ RState ResourceManagerImpl::GetMediaBase64DataById(uint32_t id, std::string &out
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
 
-    const IdItem *idItem = qd->GetIdItem();
+    const std::shared_ptr<IdItem> idItem = qd->GetIdItem();
     if (GetThemeMediaBase64(idItem, outValue) == SUCCESS) {
         return SUCCESS;
     }
@@ -1193,7 +1194,7 @@ RState ResourceManagerImpl::GetMediaBase64DataByName(const char *name, std::stri
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
 
-    const IdItem *idItem = qd->GetIdItem();
+    const std::shared_ptr<IdItem> idItem = qd->GetIdItem();
     if (GetThemeMediaBase64(idItem, outValue) == SUCCESS) {
         return SUCCESS;
     }
@@ -1256,9 +1257,9 @@ RState ResourceManagerImpl::GetRawFileList(const std::string &rawDirPath, std::v
     return hapManager_->GetRawFileList(rawDirPath, rawfileList);
 }
 
-std::string GetSuffix(const HapResource::ValueUnderQualifierDir *qd)
+std::string GetSuffix(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd)
 {
-    const IdItem *idItem = qd->GetIdItem();
+    const std::shared_ptr<IdItem> idItem = qd->GetIdItem();
     if (idItem == nullptr || idItem->resType_ != ResType::MEDIA) {
         return std::string();
     }
@@ -1270,7 +1271,7 @@ std::string GetSuffix(const HapResource::ValueUnderQualifierDir *qd)
     return mediaPath.substr(pos + 1);
 }
 
-RState ResourceManagerImpl::GetThemeIcon(const IdItem *idItem, size_t &len,
+RState ResourceManagerImpl::GetThemeIcon(const std::shared_ptr<IdItem> idItem, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue, uint32_t density)
 {
     std::string iconName = idItem->GetItemResName();
@@ -1284,7 +1285,7 @@ RState ResourceManagerImpl::GetThemeIcon(const IdItem *idItem, size_t &len,
     return SUCCESS;
 }
 
-RState ResourceManagerImpl::GetThemeDrawable(const IdItem *idItem, size_t &len,
+RState ResourceManagerImpl::GetThemeDrawable(const std::shared_ptr<IdItem> idItem, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue, uint32_t iconType, uint32_t density)
 {
     if (iconType == 0 && GetThemeMedia(idItem, len, outValue, density) == SUCCESS) {
@@ -1357,7 +1358,7 @@ RState ResourceManagerImpl::GetDrawableInfoById(uint32_t id,
     }
     size_t len = 0;
     // find in theme
-    const IdItem *idItem = qd->GetIdItem();
+    const std::shared_ptr<IdItem> idItem = qd->GetIdItem();
     std::string themeMask = ThemePackManager::GetThemePackManager()->GetMask();
     if (GetThemeDrawable(idItem, len, outValue, iconType, density) == SUCCESS) {
         drawableInfo = std::make_tuple(type, len, themeMask);
@@ -1390,7 +1391,7 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name,
     size_t len = 0;
     // find in theme
     std::string themeMask = ThemePackManager::GetThemePackManager()->GetMask();
-    const IdItem *idItem = qd->GetIdItem();
+    const std::shared_ptr<IdItem> idItem = qd->GetIdItem();
     if (GetThemeDrawable(idItem, len, outValue, iconType, density) == SUCCESS) {
         drawableInfo = std::make_tuple(type, len, themeMask);
         return SUCCESS;

@@ -418,9 +418,9 @@ int32_t ParseStringArray(const char *buffer, uint32_t &offset, std::vector<std::
     return OK;
 }
 
-int32_t ParseIdItem(const char *buffer, uint32_t &offset, IdItem *idItem)
+int32_t ParseIdItem(const char *buffer, uint32_t &offset, std::shared_ptr<IdItem> idItem)
 {
-    errno_t eret = memcpy_s(idItem, sizeof(IdItem), buffer + offset, IdItem::HEADER_LEN);
+    errno_t eret = memcpy_s(idItem.get(), sizeof(IdItem), buffer + offset, IdItem::HEADER_LEN);
     if (eret != OK) {
         return SYS_ERROR;
     }
@@ -450,9 +450,9 @@ int32_t ParseIdItem(const char *buffer, uint32_t &offset, IdItem *idItem)
     return OK;
 }
 
-int32_t ParseId(const char *buffer, uint32_t &offset, ResId *id)
+int32_t ParseId(const char *buffer, uint32_t &offset, std::shared_ptr<ResId> id)
 {
-    errno_t eret = memcpy_s(id, sizeof(ResId), buffer + offset, ResId::RESID_HEADER_LEN);
+    errno_t eret = memcpy_s(id.get(), sizeof(ResId), buffer + offset, ResId::RESID_HEADER_LEN);
     if (eret != OK) {
         return SYS_ERROR;
     }
@@ -462,28 +462,24 @@ int32_t ParseId(const char *buffer, uint32_t &offset, ResId *id)
         return -1;
     }
     for (uint32_t i = 0; i < id->count_; ++i) {
-        IdParam *ip = new (std::nothrow) IdParam();
+        std::shared_ptr<IdParam> ip = std::make_shared<IdParam>();
         if (ip == nullptr) {
             HILOG_ERROR("new IdParam failed when ParseId");
             return SYS_ERROR;
         }
-        errno_t eret = memcpy_s(ip, sizeof(IdParam), buffer + offset, ResId::IDPARAM_HEADER_LEN);
+        errno_t eret = memcpy_s(ip.get(), sizeof(IdParam), buffer + offset, ResId::IDPARAM_HEADER_LEN);
         if (eret != OK) {
-            delete (ip);
             return SYS_ERROR;
         }
         offset += ResId::IDPARAM_HEADER_LEN;
-        IdItem *idItem = new (std::nothrow) IdItem();
+        std::shared_ptr<IdItem> idItem = std::make_shared<IdItem>();
         if (idItem == nullptr) {
             HILOG_ERROR("new IdItem failed when ParseId");
-            delete (ip);
             return SYS_ERROR;
         }
         uint32_t ipOffset = ip->offset_;
         int32_t ret = ParseIdItem(buffer, ipOffset, idItem);
         if (ret != OK) {
-            delete (ip);
-            delete (idItem);
             return ret;
         }
         ip->idItem_ = idItem;
@@ -493,28 +489,27 @@ int32_t ParseId(const char *buffer, uint32_t &offset, ResId *id)
     return OK;
 }
 
-bool IsLocaleMatch(const ResConfigImpl *defaultConfig, const std::vector<KeyParam *> &keyParams)
+bool IsLocaleMatch(const std::shared_ptr<ResConfigImpl> defaultConfig,
+    const std::vector<std::shared_ptr<KeyParam>> &keyParams)
 {
     if (defaultConfig == nullptr) {
         return true;
     }
-    ResConfigImpl *config = HapParser::CreateResConfigFromKeyParams(keyParams);
+    auto config = HapParser::CreateResConfigFromKeyParams(keyParams);
     if (config == nullptr) {
         return false;
     }
     if (LocaleMatcher::Match(defaultConfig->GetResLocale(), config->GetResLocale())) {
-        delete (config);
         return true;
     }
     HILOG_DEBUG("mismatch, do not parse %s", HapParser::ToFolderPath(keyParams).c_str());
-    delete (config);
     return false;
 }
 
-int32_t ParseKey(const char *buffer, uint32_t &offset,  ResKey *key,
-                 bool &match, const ResConfigImpl *defaultConfig, const std::string &deviceType)
+int32_t ParseKey(const char *buffer, uint32_t &offset,  std::shared_ptr<ResKey> key,
+                 bool &match, const std::shared_ptr<ResConfigImpl> defaultConfig, const std::string &deviceType)
 {
-    errno_t eret = memcpy_s(key, sizeof(ResKey), buffer + offset, ResKey::RESKEY_HEADER_LEN);
+    errno_t eret = memcpy_s(key.get(), sizeof(ResKey), buffer + offset, ResKey::RESKEY_HEADER_LEN);
     if (eret != OK) {
         return SYS_ERROR;
     }
@@ -524,14 +519,13 @@ int32_t ParseKey(const char *buffer, uint32_t &offset,  ResKey *key,
         return -1;
     }
     for (uint32_t i = 0; i < key->keyParamsCount_; ++i) {
-        KeyParam *kp = new (std::nothrow) KeyParam();
+        std::shared_ptr<KeyParam> kp = std::make_shared<KeyParam>();
         if (kp == nullptr) {
             HILOG_ERROR("new KeyParam failed when ParseKey");
             return SYS_ERROR;
         }
-        errno_t eret = memcpy_s(kp, sizeof(KeyParam), buffer + offset, ResKey::KEYPARAM_HEADER_LEN);
+        errno_t eret = memcpy_s(kp.get(), sizeof(KeyParam), buffer + offset, ResKey::KEYPARAM_HEADER_LEN);
         if (eret != OK) {
-            delete (kp);
             return SYS_ERROR;
         }
         offset += ResKey::KEYPARAM_HEADER_LEN;
@@ -545,14 +539,13 @@ int32_t ParseKey(const char *buffer, uint32_t &offset,  ResKey *key,
         key->keyParams_.push_back(kp);
     }
     uint32_t idOffset = key->offset_;
-    ResId *id = new (std::nothrow) ResId();
+    std::shared_ptr<ResId> id = std::make_shared<ResId>();
     if (id == nullptr) {
         HILOG_ERROR("new ResId failed when ParseKey");
         return SYS_ERROR;
     }
     int32_t ret = ParseId(buffer, idOffset, id);
     if (ret != OK) {
-        delete (id);
         return ret;
     }
     key->resId_ = id;
@@ -561,7 +554,7 @@ int32_t ParseKey(const char *buffer, uint32_t &offset,  ResKey *key,
 
 
 int32_t HapParser::ParseResHex(const char *buffer, const size_t bufLen, ResDesc &resDesc,
-                               const ResConfigImpl *defaultConfig)
+                               const std::shared_ptr<ResConfigImpl> defaultConfig)
 {
     ResHeader *resHeader = new (std::nothrow) ResHeader();
     if (resHeader == nullptr) {
@@ -583,7 +576,7 @@ int32_t HapParser::ParseResHex(const char *buffer, const size_t bufLen, ResDesc 
     resDesc.resHeader_ = resHeader;
     const std::string deviceType = resDesc.GetCurrentDeviceType();
     for (uint32_t i = 0; i < resHeader->keyCount_; i++) {
-        ResKey *key = new (std::nothrow) ResKey();
+        std::shared_ptr<ResKey> key = std::make_shared<ResKey>();
         if (key == nullptr) {
             HILOG_ERROR("new ResKey failed when ParseResHex");
             return SYS_ERROR;
@@ -591,21 +584,19 @@ int32_t HapParser::ParseResHex(const char *buffer, const size_t bufLen, ResDesc 
         bool match = true;
         int32_t ret = ParseKey(buffer, offset, key, match, defaultConfig, deviceType);
         if (ret != OK) {
-            delete (key);
             return ret;
         }
         if (match) {
             resDesc.keys_.push_back(key);
-        } else {
-            delete (key);
         }
     }
     return OK;
 }
 
-ResConfigImpl *HapParser::CreateResConfigFromKeyParams(const std::vector<KeyParam *> &keyParams)
+std::shared_ptr<ResConfigImpl> HapParser::CreateResConfigFromKeyParams(
+    const std::vector<std::shared_ptr<KeyParam>> &keyParams)
 {
-    ResConfigImpl *resConfig = new (std::nothrow) ResConfigImpl;
+    auto resConfig = std::make_shared<ResConfigImpl>();
     if (resConfig == nullptr) {
         HILOG_ERROR("new ResConfigImpl failed when CreateResConfigFromKeyParams");
         return nullptr;
@@ -616,11 +607,10 @@ ResConfigImpl *HapParser::CreateResConfigFromKeyParams(const std::vector<KeyPara
         resConfig->SetColorMode(COLOR_MODE_NOT_SET);
         return resConfig;
     }
-    delete resConfig;
     size_t i = 0;
     ResConfigKey configKey;
     for (i = 0; i < len; ++i) {
-        const KeyParam *kp = keyParams.at(i);
+        const std::shared_ptr<KeyParam> kp = keyParams.at(i);
         if (kp->type_ == LANGUAGES) {
             configKey.language = kp->GetStr().c_str();
         } else if (kp->type_ == REGION) {
@@ -651,13 +641,13 @@ ResConfigImpl *HapParser::CreateResConfigFromKeyParams(const std::vector<KeyPara
     return BuildResConfig(&configKey);
 }
 
-ResConfigImpl *HapParser::BuildResConfig(ResConfigKey *configKey)
+std::shared_ptr<ResConfigImpl> HapParser::BuildResConfig(ResConfigKey *configKey)
 {
     if (configKey == nullptr) {
         HILOG_ERROR("configKey is null");
         return nullptr;
     }
-    ResConfigImpl *resConfig = new (std::nothrow) ResConfigImpl;
+    auto resConfig = std::make_shared<ResConfigImpl>();
     if (resConfig == nullptr) {
         HILOG_ERROR("new ResConfigImpl failed when BuildResConfig");
         return nullptr;
@@ -758,7 +748,7 @@ void PathAppend(std::string &path, const std::string &append, const std::string 
     }
 }
 
-std::string HapParser::ToFolderPath(const std::vector<KeyParam *> &keyParams)
+std::string HapParser::ToFolderPath(const std::vector<std::shared_ptr<KeyParam>> &keyParams)
 {
     if (keyParams.size() == 0) {
         return std::string("default");
@@ -766,7 +756,7 @@ std::string HapParser::ToFolderPath(const std::vector<KeyParam *> &keyParams)
     // mcc-mnc-language_script_region-direction-deviceType-colorMode-inputDevice-screenDensity
     Determiner determiner;
     for (size_t i = 0; i < keyParams.size(); ++i) {
-        KeyParam *keyParam = keyParams[i];
+        std::shared_ptr<KeyParam> keyParam = keyParams[i];
         switch (keyParam->type_) {
             case KeyType::LANGUAGES:
                 determiner.language = keyParam->GetStr();

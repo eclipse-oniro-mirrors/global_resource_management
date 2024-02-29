@@ -148,7 +148,7 @@ void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::st
 }
 
 const std::string ThemePackManager::FindThemeResource(const std::pair<std::string, std::string> &bundleInfo,
-    std::vector<const IdItem *> idItems, const ResConfigImpl &resConfig)
+    std::vector<std::shared_ptr<IdItem>> idItems, const ResConfigImpl &resConfig)
 {
     std::string result;
     for (size_t i = 0; i < idItems.size(); i++) {

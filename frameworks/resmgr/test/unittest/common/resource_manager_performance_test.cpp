@@ -115,7 +115,7 @@ int ParseIndexCost(const std::string &pstr, char *buf, const size_t& bufLen)
     long long total = 0;
     for (int k = 0; k < 1000; ++k) {
         auto t1 = std::chrono::high_resolution_clock::now();
-        ResDesc *resDesc = new(std::nothrow) ResDesc();
+        auto resDesc = std::make_shared<ResDesc>();
         if (resDesc == nullptr) {
             HILOG_ERROR("new ResDesc failed when LoadFromIndex");
             free(buf);
@@ -123,7 +123,6 @@ int ParseIndexCost(const std::string &pstr, char *buf, const size_t& bufLen)
         }
         int32_t out = HapParser::ParseResHex((char *)buf, bufLen, *resDesc, nullptr);
         if (out != OK) {
-            delete (resDesc);
             free(buf);
             HILOG_ERROR("ParseResHex failed! retcode:%d", out);
             return -1;
@@ -131,21 +130,18 @@ int ParseIndexCost(const std::string &pstr, char *buf, const size_t& bufLen)
             HILOG_DEBUG("ParseResHex success:\n%s", resDesc->ToString().c_str());
         }
 
-        HapResource *pResource = new(std::nothrow) HapResource(pstr, 0, resDesc);
+        auto pResource = new(std::nothrow) HapResource(pstr, 0, resDesc);
         if (pResource == nullptr) {
             HILOG_ERROR("new HapResource failed when LoadFromIndex");
-            delete (resDesc);
             free(buf);
             return -1;
         }
         if (!pResource->Init()) {
-            delete (pResource);
             free(buf);
             return -1;
         }
         auto t2 = std::chrono::high_resolution_clock::now();
         total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-        delete pResource;
     }
     double average = total / 1000.0;
     g_logLevel = LOG_DEBUG;

@@ -277,12 +277,7 @@ std::string IdItem::ToString() const
 }
 
 IdParam::~IdParam()
-{
-    if (idItem_ != nullptr) {
-        delete (idItem_);
-        idItem_ = nullptr;
-    }
-}
+{}
 
 std::string IdParam::ToString() const
 {
@@ -292,12 +287,7 @@ std::string IdParam::ToString() const
 
 ResId::~ResId()
 {
-    for (size_t i = 0; i < idParams_.size(); ++i) {
-        if (idParams_[i] != nullptr) {
-            delete idParams_[i];
-            idParams_[i] = nullptr;
-        }
-    }
+    idParams_.clear();
 }
 
 std::string ResId::ToString() const
@@ -312,21 +302,7 @@ std::string ResId::ToString() const
 ResKey::~ResKey()
 {
     HILOG_DEBUG("~ResKey()");
-    if (resConfig_ != nullptr) {
-        delete (resConfig_);
-        resConfig_ = nullptr;
-    }
-
-    for (size_t i = 0; i < keyParams_.size(); ++i) {
-        if (keyParams_[i] != nullptr) {
-            delete keyParams_[i];
-            keyParams_[i] = nullptr;
-        }
-    }
-    if (resId_ != nullptr) {
-        delete (resId_);
-        resId_ = nullptr;
-    }
+    keyParams_.clear();
 }
 
 std::string ResKey::ToString() const
@@ -350,13 +326,7 @@ ResDesc::~ResDesc()
         delete (resHeader_);
         resHeader_ = nullptr;
     }
-
-    for (size_t i = 0; i < keys_.size(); ++i) {
-        if (keys_[i] != nullptr) {
-            delete keys_[i];
-            keys_[i] = nullptr;
-        }
-    }
+    keys_.clear();
 }
 
 std::string ResDesc::ToString() const

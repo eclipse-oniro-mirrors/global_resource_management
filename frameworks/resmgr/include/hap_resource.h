@@ -44,8 +44,8 @@ public:
      *     replace non-overlay resource.
      * @return pResource if create pResource success, else nullptr
      */
-    static const HapResource *LoadFromIndex(const char *path, const ResConfigImpl *defaultConfig,
-        bool isSystem = false, bool isOverlay = false);
+    static const std::shared_ptr<HapResource> LoadFromIndex(const char *path,
+        const std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem = false, bool isOverlay = false);
 
     /**
      * Creates an HapResource.
@@ -59,8 +59,8 @@ public:
      *     replace non-overlay resource.
      * @return pResource if create pResource success, else nullptr
      */
-    static const HapResource *LoadFromHap(const char *path, const ResConfigImpl *defaultConfig,
-        bool isSystem = false, bool isOverlay = false);
+    static const std::shared_ptr<HapResource> LoadFromHap(const char *path,
+        const std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem = false, bool isOverlay = false);
 
     /**
      * Creates an HapResource.
@@ -74,8 +74,8 @@ public:
      *     replace non-overlay resource.
      * @return pResource if create pResource success, else nullptr
      */
-    static const HapResource *Load(const char* path, const ResConfigImpl* defaultConfig,
-        bool isSystem = false, bool isOverlay = false);
+    static const std::shared_ptr<HapResource> Load(const char* path,
+        const std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem = false, bool isOverlay = false);
 
     /**
      * Load overlay resources
@@ -85,8 +85,9 @@ public:
      * @param isSystem judge the overlay is system or not
      * @return the map of overlay resource path and resource info if success, else null
      */
-    static const std::unordered_map<std::string, HapResource *> LoadOverlays(const std::string &path,
-        const std::vector<std::string> &overlayPath, const ResConfigImpl *defaultConfig, bool isSystem = false);
+    static const std::unordered_map<std::string, std::shared_ptr<HapResource>> LoadOverlays(
+        const std::string &path, const std::vector<std::string> &overlayPath,
+        const std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem = false);
 
     /**
      * The destructor of HapResource
@@ -139,7 +140,7 @@ public:
      */
     class ValueUnderQualifierDir {
     public:
-        inline const std::vector<KeyParam *> GetKeyParams() const
+        inline const std::vector<std::shared_ptr<KeyParam>> GetKeyParams() const
         {
             return keyParams_;
         }
@@ -149,12 +150,12 @@ public:
             return folder_;
         }
 
-        inline const IdItem *GetIdItem() const
+        inline const std::shared_ptr<IdItem> GetIdItem() const
         {
             return idItem_;
         }
 
-        inline const ResConfigImpl *GetResConfig() const
+        inline const std::shared_ptr<ResConfigImpl> GetResConfig() const
         {
             return resConfig_;
         }
@@ -188,7 +189,7 @@ public:
          * @param isOverlay the overlay flag, default value is false.
          * @param isSystemResource the system flag, default value is false.
          */
-        ValueUnderQualifierDir(const ResKey *resKey, IdItem *idItem,
+        ValueUnderQualifierDir(const std::shared_ptr<ResKey> resKey, std::shared_ptr<IdItem> idItem,
             const std::pair<std::string, std::string> &resPath, bool isOverlay = false, bool isSystemResource = false);
 
         ~ValueUnderQualifierDir();
@@ -198,14 +199,14 @@ public:
         /*
          * keyParams_, folder_, resConfig_ are 3 different ways to describe Qualifiers Sub-directory
          */
-        std::vector<KeyParam *> keyParams_;
+        std::vector<std::shared_ptr<KeyParam>> keyParams_;
         // the qualifier path name
         std::string folder_;
         // this resConfig_ point to the ResKey resConfig_ and resConfig_ will be unified free in ResKey destruct.
-        const ResConfigImpl *resConfig_;
+        std::shared_ptr<ResConfigImpl> resConfig_;
 
         // the value
-        IdItem *idItem_;
+        std::shared_ptr<IdItem> idItem_;
 
         friend class HapResource;
 
@@ -223,12 +224,12 @@ public:
      */
     class IdValues {
     public:
-        inline void AddLimitPath(ValueUnderQualifierDir *vuqd)
+        inline void AddLimitPath(std::shared_ptr<ValueUnderQualifierDir> vuqd)
         {
             limitPaths_.push_back(vuqd);
         }
 
-        inline const std::vector<ValueUnderQualifierDir *> &GetLimitPathsConst() const
+        inline const std::vector<std::shared_ptr<ValueUnderQualifierDir>> &GetLimitPathsConst() const
         {
             return limitPaths_;
         }
@@ -237,7 +238,7 @@ public:
 
     private:
         // the folder desc
-        std::vector<ValueUnderQualifierDir *> limitPaths_;
+        std::vector<std::shared_ptr<ValueUnderQualifierDir>> limitPaths_;
     };
 
     /**
@@ -245,7 +246,7 @@ public:
      * @param id the resource id
      * @return the resource value related to id
      */
-    const IdValues *GetIdValues(const uint32_t id) const;
+    const std::shared_ptr<IdValues> GetIdValues(const uint32_t id) const;
 
     /**
      * Get the resource value by resource name
@@ -253,7 +254,7 @@ public:
      * @param resType the resource type
      * @return the resource value related to resource name
      */
-    const IdValues *GetIdValuesByName(const std::string name, const ResType resType) const;
+    const std::shared_ptr<IdValues> GetIdValuesByName(const std::string name, const ResType resType) const;
 
     /**
      * Get the resource id by resource name
@@ -287,16 +288,16 @@ public:
      */
     void GetLocales(std::set<std::string> &outValue, bool includeSystem);
 
-private:
-    HapResource(const std::string path, time_t lastModTime, ResDesc *resDes,
+    HapResource(const std::string path, time_t lastModTime, std::shared_ptr<ResDesc> resDes,
         bool isSystem = false, bool isOverlay = false);
+private:
 
     void UpdateOverlayInfo(std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> &nameTypeId);
 
-    uint32_t GetLimitPathsKeys(const std::vector<ValueUnderQualifierDir *> &limitPaths,
+    uint32_t GetLimitPathsKeys(const std::vector<std::shared_ptr<ValueUnderQualifierDir>> &limitPaths,
         std::vector<bool> &keyTypes) const;
 
-    void GetKeyParamsLocales(const std::vector<KeyParam *> keyParams, std::set<std::string> &outValue);
+    void GetKeyParamsLocales(const std::vector<std::shared_ptr<KeyParam>> keyParams, std::set<std::string> &outValue);
 
     // must call Init() after constructor
     bool Init();
@@ -314,13 +315,13 @@ private:
     time_t lastModTime_;
 
     // resource information stored in resDesc_
-    ResDesc *resDesc_;
+    std::shared_ptr<ResDesc> resDesc_;
 
-    std::map<uint32_t, IdValues *> idValuesMap_;
+    std::map<uint32_t, std::shared_ptr<IdValues>> idValuesMap_;
 
     // the key is name, each restype holds one map
     // name may conflict in same restype !
-    std::vector<std::map<std::string, IdValues *> *> idValuesNameMap_;
+    std::vector<std::map<std::string, std::shared_ptr<IdValues>> *> idValuesNameMap_;
 
     // judge the hap resource is system or not.
     bool isSystem_;

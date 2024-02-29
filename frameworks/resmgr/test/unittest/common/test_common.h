@@ -38,7 +38,7 @@ static const float BASE_DPI = 160.0f;
 static const int NON_EXIST_ID = 1111;
 std::string FormatFullPath(const char *fileRelativePath);
 
-void PrintIdValues(const HapResource::IdValues *idValues);
+void PrintIdValues(const std::shared_ptr<HapResource::IdValues> &idValues);
 
 void PrintMapString(const std::map<std::string, std::string> &value);
 

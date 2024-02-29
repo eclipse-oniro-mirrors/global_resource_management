@@ -62,7 +62,8 @@ void HapResourceTest::TearDown()
     // step 4: input testcase teardown step
 }
 
-void TestGetIdValuesByName(const HapResource *pResource)
+//void TestGetIdValuesByName(const HapResource *pResource)
+void TestGetIdValuesByName(const std::shared_ptr<HapResource> pResource)
 {
     std::string name = std::string("app_name");
     auto start = CurrentTimeUsec();
@@ -101,7 +102,7 @@ void TestGetIdValuesByName(const HapResource *pResource)
 HWTEST_F(HapResourceTest, HapResourceFuncTest001, TestSize.Level0)
 {
     auto start = CurrentTimeUsec();
-    const HapResource *pResource = HapResource::LoadFromIndex(FormatFullPath(g_resFilePath).c_str(), nullptr);
+    auto pResource = HapResource::LoadFromIndex(FormatFullPath(g_resFilePath).c_str(), nullptr);
     auto cost = CurrentTimeUsec() - start;
     HILOG_DEBUG("load cost: %ld us.", cost);
 
@@ -136,11 +137,10 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest001, TestSize.Level0)
         EXPECT_TRUE(limitPath->GetIdItem()->value_ == "应用名称");
     }
     TestGetIdValuesByName(pResource);
-
-    delete (pResource);
 }
 
-void GetIdValuesByNameFuncTest002(const HapResource *pResource, int id)
+//void GetIdValuesByNameFuncTest002(const HapResource *pResource, int id)
+void GetIdValuesByNameFuncTest002(const std::shared_ptr<HapResource> pResource, int id)
 {
     std::string name = std::string("app_name");
     auto start = CurrentTimeUsec();
@@ -172,18 +172,17 @@ void GetIdValuesByNameFuncTest002(const HapResource *pResource, int id)
  */
 HWTEST_F(HapResourceTest, HapResourceFuncTest002, TestSize.Level1)
 {
-    ResConfigImpl *rc = new ResConfigImpl;
+    auto rc = std::make_shared<ResConfigImpl>();
     rc->SetLocaleInfo("en", nullptr, "US");
     std::string resPath = FormatFullPath(g_resFilePath);
     const char *path = resPath.c_str();
 
     auto start = CurrentTimeUsec();
-    const HapResource *pResource = HapResource::LoadFromIndex(path, rc);
+    auto pResource = HapResource::LoadFromIndex(path, rc);
     auto cost = CurrentTimeUsec() - start;
     HILOG_DEBUG("load cost: %ld us.", cost);
 
     if (pResource == nullptr) {
-        delete rc;
         EXPECT_TRUE(false);
         return;
     }
@@ -210,8 +209,6 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest002, TestSize.Level1)
     }
 
     GetIdValuesByNameFuncTest002(pResource, id);
-    delete pResource;
-    delete rc;
 }
 
 /*
@@ -223,7 +220,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest002, TestSize.Level1)
 HWTEST_F(HapResourceTest, HapResourceFuncTest003, TestSize.Level1)
 {
     auto start = CurrentTimeUsec();
-    const HapResource *pResource = HapResource::LoadFromIndex(FormatFullPath(g_resFilePath).c_str(), nullptr);
+    auto pResource = HapResource::LoadFromIndex(FormatFullPath(g_resFilePath).c_str(), nullptr);
     auto cost = CurrentTimeUsec() - start;
     HILOG_DEBUG("load cost: %ld us.", cost);
 
@@ -260,7 +257,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest003, TestSize.Level1)
     PrintIdValues(idv);
 }
 
-ResDesc *LoadFromHap(const char *hapPath, const ResConfigImpl *defaultConfig)
+ResDesc *LoadFromHap(const char *hapPath, const std::shared_ptr<ResConfigImpl> defaultConfig)
 {
     std::unique_ptr<uint8_t[]> buf;
     size_t bufLen;

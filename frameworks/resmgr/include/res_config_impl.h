@@ -37,7 +37,8 @@ public:
      * @param density the input screen density
      * @return true if this resConfig more match request resConfig than other resConfig, else false
      */
-    bool IsMoreSuitable(const ResConfigImpl *other, const ResConfigImpl *request, uint32_t density = 0) const;
+    bool IsMoreSuitable(const std::shared_ptr<ResConfigImpl> other, const std::shared_ptr<ResConfigImpl> request,
+        uint32_t density = 0) const;
 
     /**
      * Set locale information
@@ -116,7 +117,7 @@ public:
      * @param other the other resConfig
      * @return true if this resConfig match other resConfig, else false
      */
-    bool Match(const ResConfigImpl *other) const;
+    bool Match(const std::shared_ptr<ResConfigImpl> other) const;
 
     /**
      * Copy other resConfig to this resConfig
@@ -157,7 +158,7 @@ public:
     virtual ~ResConfigImpl();
 
 private:
-    bool IsMoreSpecificThan(const ResConfigImpl *other, uint32_t density = 0) const;
+    bool IsMoreSpecificThan(const std::shared_ptr<ResConfigImpl> other, uint32_t density = 0) const;
 
     bool CopyLocale(ResConfig &other);
 

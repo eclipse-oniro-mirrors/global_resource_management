@@ -42,8 +42,9 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
-HapResource::ValueUnderQualifierDir::ValueUnderQualifierDir(const ResKey *resKey, IdItem *idItem,
-    const std::pair<std::string, std::string> &resPath, bool isOverlay, bool systemResource)
+HapResource::ValueUnderQualifierDir::ValueUnderQualifierDir(const std::shared_ptr<ResKey> resKey,
+    std::shared_ptr<IdItem> idItem, const std::pair<std::string, std::string> &resPath, bool isOverlay,
+    bool systemResource)
 {
     keyParams_ = resKey->keyParams_;
     folder_ = HapParser::ToFolderPath(keyParams_);
@@ -61,34 +62,18 @@ HapResource::ValueUnderQualifierDir::~ValueUnderQualifierDir()
 // IdValues
 HapResource::IdValues::~IdValues()
 {
-    for (size_t i = 0; i < limitPaths_.size(); ++i) {
-        if (limitPaths_[i] != nullptr) {
-            delete limitPaths_[i];
-            limitPaths_[i] = nullptr;
-        }
-    }
+    limitPaths_.clear();
 }
 
 // HapResource
-HapResource::HapResource(const std::string path, time_t lastModTime, ResDesc *resDes, bool isSystem, bool isOverlay)
-    : indexPath_(path), lastModTime_(lastModTime), resDesc_(resDes), isSystem_(isSystem), isOverlay_(isOverlay)
+HapResource::HapResource(const std::string path, time_t lastModTime, std::shared_ptr<ResDesc> resDes,
+    bool isSystem, bool isOverlay) : indexPath_(path), lastModTime_(lastModTime), resDesc_(resDes),
+    isSystem_(isSystem), isOverlay_(isOverlay)
 {}
 
 HapResource::~HapResource()
 {
-    if (resDesc_ != nullptr) {
-        delete (resDesc_);
-        resDesc_ = nullptr;
-    }
-    std::map<uint32_t, IdValues *>::iterator iter;
-    for (iter = idValuesMap_.begin(); iter != idValuesMap_.end(); ++iter) {
-        if (iter->second != nullptr) {
-            IdValues *ptr = iter->second;
-            delete (ptr);
-            iter->second = nullptr;
-        }
-    }
-
+    idValuesMap_.clear();
     for (size_t i = 0; i < idValuesNameMap_.size(); ++i) {
         if (idValuesNameMap_[i] != nullptr) {
             delete (idValuesNameMap_[i]);
@@ -98,8 +83,8 @@ HapResource::~HapResource()
     lastModTime_ = 0;
 }
 
-const HapResource* HapResource::Load(const char *path, const ResConfigImpl* defaultConfig,
-    bool isSystem, bool isOverlay)
+const std::shared_ptr<HapResource> HapResource::Load(const char *path,
+    const std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem, bool isOverlay)
 {
     if (Utils::ContainsTail(path, Utils::tailSet)) {
         return LoadFromHap(path, defaultConfig, isSystem, isOverlay);
@@ -108,8 +93,8 @@ const HapResource* HapResource::Load(const char *path, const ResConfigImpl* defa
     }
 }
 
-const HapResource* HapResource::LoadFromIndex(const char *path, const ResConfigImpl *defaultConfig,
-    bool isSystem, bool isOverlay)
+const std::shared_ptr<HapResource> HapResource::LoadFromIndex(const char *path,
+    const std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem, bool isOverlay)
 {
     char outPath[PATH_MAX + 1] = {0};
     Utils::CanonicalizePath(path, outPath, PATH_MAX);
@@ -136,7 +121,7 @@ const HapResource* HapResource::LoadFromIndex(const char *path, const ResConfigI
 
     HILOG_DEBUG("extract success, bufLen:%d", bufLen);
 
-    ResDesc *resDesc = new (std::nothrow) ResDesc();
+    std::shared_ptr<ResDesc> resDesc = std::make_shared<ResDesc>();
     if (resDesc == nullptr) {
         HILOG_ERROR("new ResDesc failed when LoadFromIndex");
         free(buf);
@@ -144,21 +129,19 @@ const HapResource* HapResource::LoadFromIndex(const char *path, const ResConfigI
     }
     int32_t out = HapParser::ParseResHex(static_cast<char *>(buf), bufLen, *resDesc, defaultConfig);
     if (out != OK) {
-        delete (resDesc);
         free(buf);
         HILOG_ERROR("ParseResHex failed! retcode:%d", out);
         return nullptr;
     }
     free(buf);
 
-    HapResource *pResource = new (std::nothrow) HapResource(std::string(path), 0, resDesc, isSystem, isOverlay);
+    std::shared_ptr<HapResource> pResource = std::make_shared<HapResource>(std::string(path),
+        0, resDesc, isSystem, isOverlay);
     if (pResource == nullptr) {
         HILOG_ERROR("new HapResource failed when LoadFromIndex");
-        delete (resDesc);
         return nullptr;
     }
     if (!pResource->Init()) {
-        delete (pResource);
         return nullptr;
     }
     return pResource;
@@ -199,8 +182,8 @@ bool GetIndexData(const char *path, std::unique_ptr<uint8_t[]> &tmpBuf, size_t &
     return true;
 }
 
-const HapResource* HapResource::LoadFromHap(const char *path, const ResConfigImpl *defaultConfig,
-    bool isSystem, bool isOverlay)
+const std::shared_ptr<HapResource> HapResource::LoadFromHap(const char *path,
+    const std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem, bool isOverlay)
 {
     std::unique_ptr<uint8_t[]> tmpBuf;
     size_t tmpLen = 0;
@@ -209,7 +192,7 @@ const HapResource* HapResource::LoadFromHap(const char *path, const ResConfigImp
         HILOG_ERROR("read Index from file failed path, %{public}s", path);
         return nullptr;
     }
-    ResDesc *resDesc = new (std::nothrow) ResDesc();
+    std::shared_ptr<ResDesc> resDesc = std::make_shared<ResDesc>();
     if (resDesc == nullptr) {
         HILOG_ERROR("new ResDesc failed when LoadFromHap");
         return nullptr;
@@ -217,46 +200,43 @@ const HapResource* HapResource::LoadFromHap(const char *path, const ResConfigImp
     int32_t out = HapParser::ParseResHex(reinterpret_cast<char *>(tmpBuf.get()), tmpLen, *resDesc, defaultConfig);
     if (out != OK) {
         HILOG_ERROR("ParseResHex failed! retcode:%d", out);
-        delete (resDesc);
         return nullptr;
     }
 
-    HapResource *pResource = new (std::nothrow) HapResource(path, 0, resDesc, isSystem, isOverlay);
+    auto pResource = std::make_shared<HapResource>(path, 0, resDesc, isSystem, isOverlay);
     if (pResource == nullptr) {
-        delete (resDesc);
         return nullptr;
     }
 
     if (!pResource->Init()) {
-        delete (pResource);
         return nullptr;
     }
     return pResource;
 }
 
-const std::unordered_map<std::string, HapResource *> HapResource::LoadOverlays(const std::string &path,
-    const std::vector<std::string> &overlayPaths, const ResConfigImpl *defaultConfig, bool isSystem)
+const std::unordered_map<std::string, std::shared_ptr<HapResource>> HapResource::LoadOverlays(const std::string &path,
+    const std::vector<std::string> &overlayPaths, const std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem)
 {
-    std::unordered_map<std::string, HapResource *> result;
+    std::unordered_map<std::string, std::shared_ptr<HapResource>> result;
     do {
-        const HapResource *targetResource = Load(path.c_str(), defaultConfig, isSystem);
+        const std::shared_ptr<HapResource> targetResource = Load(path.c_str(), defaultConfig, isSystem);
         if (targetResource == nullptr) {
             HILOG_ERROR("load target failed");
             break;
         }
-        result[path] = const_cast<HapResource*>(targetResource);
+        result[path] = targetResource;
         bool success = true;
         std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> mapping =
             targetResource->BuildNameTypeIdMapping();
         for (auto iter = overlayPaths.begin(); iter != overlayPaths.end(); iter++) {
             // load overlay hap, the isOverlay flag set true.
-            const HapResource *overlayResource = Load(iter->c_str(), defaultConfig, isSystem, true);
+            const std::shared_ptr<HapResource> overlayResource = Load(iter->c_str(), defaultConfig, isSystem, true);
             if (overlayResource == nullptr) {
                 HILOG_ERROR("load overlay failed");
                 success = false;
                 break;
             }
-            result[*iter] = const_cast<HapResource*>(overlayResource);
+            result[*iter] = overlayResource;
         }
 
         if (!success) {
@@ -273,19 +253,17 @@ const std::unordered_map<std::string, HapResource *> HapResource::LoadOverlays(c
         return result;
     } while (false);
 
-    for_each (result.begin(), result.end(), [](auto &iter) {
-        delete iter.second;
-    });
-    return std::unordered_map<std::string, HapResource *>();
+    result.clear();
+    return std::unordered_map<std::string, std::shared_ptr<HapResource>>();
 }
 
 std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> HapResource::BuildNameTypeIdMapping() const
 {
     std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> result;
     for (auto iter = idValuesMap_.begin(); iter != idValuesMap_.end(); iter++) {
-        const std::vector<ValueUnderQualifierDir *> &limitPaths = iter->second->GetLimitPathsConst();
+        const std::vector<std::shared_ptr<ValueUnderQualifierDir>> &limitPaths = iter->second->GetLimitPathsConst();
         if (limitPaths.size() > 0) {
-            ValueUnderQualifierDir* value = limitPaths[0];
+            std::shared_ptr<ValueUnderQualifierDir> value = limitPaths[0];
             result[value->idItem_->name_][value->idItem_->resType_] = value->idItem_->id_;
         }
     }
@@ -294,11 +272,11 @@ std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> HapResour
 
 void HapResource::UpdateOverlayInfo(std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> &nameTypeId)
 {
-    std::map<uint32_t, IdValues *> newIdValuesMap;
+    std::map<uint32_t, std::shared_ptr<IdValues>> newIdValuesMap;
     for (auto iter = idValuesMap_.begin(); iter != idValuesMap_.end(); iter++) {
-        const std::vector<ValueUnderQualifierDir *> &limitPaths = iter->second->GetLimitPathsConst();
+        const std::vector<std::shared_ptr<ValueUnderQualifierDir>> &limitPaths = iter->second->GetLimitPathsConst();
         if (limitPaths.size() > 0) {
-            ValueUnderQualifierDir *value = limitPaths[0];
+            std::shared_ptr<ValueUnderQualifierDir> value = limitPaths[0];
             std::string name = value->idItem_->name_;
             ResType type = value->idItem_->resType_;
             if (nameTypeId.find(name) == nameTypeId.end()) {
@@ -341,7 +319,7 @@ bool HapResource::Init()
     resourcePath_ = indexPath_.substr(0, index + 1);
 #endif
     for (int i = 0; i < ResType::MAX_RES_TYPE; ++i) {
-        auto mptr = new (std::nothrow) std::map<std::string, IdValues *>();
+        auto mptr = new (std::nothrow) std::map<std::string, std::shared_ptr<IdValues>>();
         if (mptr == nullptr) {
             HILOG_ERROR("new std::map failed in HapResource::Init");
             return false;
@@ -359,25 +337,24 @@ bool HapResource::InitIdList()
     }
     auto resPath = std::make_pair(indexPath_, resourcePath_);
     for (size_t i = 0; i < resDesc_->keys_.size(); i++) {
-        ResKey *resKey = resDesc_->keys_[i];
+        std::shared_ptr<ResKey> resKey = resDesc_->keys_[i];
         // init resConfig of each resKey.
         resKey->resConfig_ = HapParser::CreateResConfigFromKeyParams(resKey->keyParams_);
 
         for (size_t j = 0; j < resKey->resId_->idParams_.size(); ++j) {
-            IdParam *idParam = resKey->resId_->idParams_[j];
+            std::shared_ptr<IdParam> idParam = resKey->resId_->idParams_[j];
             uint32_t id = idParam->id_;
-            std::map<uint32_t, IdValues *>::iterator iter = idValuesMap_.find(id);
+            std::map<uint32_t, std::shared_ptr<IdValues>>::iterator iter = idValuesMap_.find(id);
             if (iter == idValuesMap_.end()) {
-                auto idValues = new (std::nothrow) HapResource::IdValues();
+                auto idValues = std::make_shared<HapResource::IdValues>();
                 if (idValues == nullptr) {
                     HILOG_ERROR("new IdValues failed in HapResource::InitIdList");
                     return false;
                 }
-                auto limitPath = new (std::nothrow) HapResource::ValueUnderQualifierDir(resKey,
+                auto limitPath = std::make_shared<HapResource::ValueUnderQualifierDir>(resKey,
                     idParam->idItem_, resPath, isOverlay_, isSystem_);
                 if (limitPath == nullptr) {
                     HILOG_ERROR("new ValueUnderQualifierDir failed in HapResource::InitIdList");
-                    delete (idValues);
                     return false;
                 }
                 idValues->AddLimitPath(limitPath);
@@ -385,8 +362,8 @@ bool HapResource::InitIdList()
                 std::string name = std::string(idParam->idItem_->name_);
                 idValuesNameMap_[idParam->idItem_->resType_]->insert(std::make_pair(name, idValues));
             } else {
-                HapResource::IdValues *idValues = iter->second;
-                auto limitPath = new (std::nothrow) HapResource::ValueUnderQualifierDir(resKey,
+                std::shared_ptr<HapResource::IdValues> idValues = iter->second;
+                auto limitPath = std::make_shared<HapResource::ValueUnderQualifierDir>(resKey,
                     idParam->idItem_, resPath, isOverlay_, isSystem_);
                 if (limitPath == nullptr) {
                     HILOG_ERROR("new ValueUnderQualifierDir failed in HapResource::InitIdList");
@@ -399,14 +376,14 @@ bool HapResource::InitIdList()
     return true;
 };
 
-const HapResource::IdValues *HapResource::GetIdValues(const uint32_t id) const
+const std::shared_ptr<HapResource::IdValues> HapResource::GetIdValues(const uint32_t id) const
 {
     if (idValuesMap_.empty()) {
         HILOG_ERROR("idValuesMap_ is empty");
         return nullptr;
     }
     uint32_t uid = id;
-    std::map<uint32_t, IdValues *>::const_iterator iter = idValuesMap_.find(uid);
+    std::map<uint32_t, std::shared_ptr<IdValues>>::const_iterator iter = idValuesMap_.find(uid);
     if (iter == idValuesMap_.end()) {
         return nullptr;
     }
@@ -414,11 +391,11 @@ const HapResource::IdValues *HapResource::GetIdValues(const uint32_t id) const
     return iter->second;
 }
 
-const HapResource::IdValues *HapResource::GetIdValuesByName(
+const std::shared_ptr<HapResource::IdValues> HapResource::GetIdValuesByName(
     const std::string name, const ResType resType) const
 {
-    const std::map<std::string, IdValues *> *map = idValuesNameMap_[resType];
-    std::map<std::string, IdValues *>::const_iterator iter = map->find(name);
+    const std::map<std::string, std::shared_ptr<IdValues>> *map = idValuesNameMap_[resType];
+    std::map<std::string, std::shared_ptr<IdValues>>::const_iterator iter = map->find(name);
     if (iter == map->end()) {
         return nullptr;
     }
@@ -431,12 +408,12 @@ int HapResource::GetIdByName(const char *name, const ResType resType) const
     if (name == nullptr) {
         return -1;
     }
-    const std::map<std::string, IdValues *> *map = idValuesNameMap_[resType];
-    std::map<std::string, IdValues *>::const_iterator iter = map->find(name);
+    const std::map<std::string, std::shared_ptr<IdValues>> *map = idValuesNameMap_[resType];
+    std::map<std::string, std::shared_ptr<IdValues>>::const_iterator iter = map->find(name);
     if (iter == map->end()) {
         return OBJ_NOT_FOUND;
     }
-    const IdValues *ids = iter->second;
+    const std::shared_ptr<IdValues> ids = iter->second;
 
     if (ids->GetLimitPathsConst().size() == 0) {
         HILOG_ERROR("limitPaths empty");
@@ -467,7 +444,7 @@ uint32_t HapResource::GetResourceLimitKeys() const
         if (iter->second == nullptr) {
             continue;
         }
-        const std::vector<ValueUnderQualifierDir *> &limitPaths = iter->second->GetLimitPathsConst();
+        const std::vector<std::shared_ptr<ValueUnderQualifierDir>> &limitPaths = iter->second->GetLimitPathsConst();
         if (limitPaths.size() <= 0) {
             continue;
         }
@@ -476,13 +453,13 @@ uint32_t HapResource::GetResourceLimitKeys() const
     return limitKeyValue;
 }
 
-uint32_t HapResource::GetLimitPathsKeys(const std::vector<ValueUnderQualifierDir *> &limitPaths,
+uint32_t HapResource::GetLimitPathsKeys(const std::vector<std::shared_ptr<ValueUnderQualifierDir>> &limitPaths,
     std::vector<bool> &keyTypes) const
 {
     uint32_t limitKeyValue = 0;
     const uint32_t limitKeysBase = 0x00000001;
     for_each(limitPaths.begin(), limitPaths.end(), [&](auto &item) {
-        const std::vector<KeyParam *> &keyParams = item->keyParams_;
+        const std::vector<std::shared_ptr<KeyParam>> &keyParams = item->keyParams_;
         for_each(keyParams.begin(), keyParams.end(), [&](auto &keyParam) {
             uint32_t typeValue = static_cast<uint32_t>(keyParam->type_);
             if (keyParam->type_ < KeyType::KEY_TYPE_MAX && !keyTypes[typeValue]) {
@@ -504,7 +481,8 @@ void HapResource::GetLocales(std::set<std::string> &outValue, bool includeSystem
     }
 }
 
-void HapResource::GetKeyParamsLocales(const std::vector<KeyParam *> keyParams, std::set<std::string> &outValue)
+void HapResource::GetKeyParamsLocales(const std::vector<std::shared_ptr<KeyParam>> keyParams,
+    std::set<std::string> &outValue)
 {
     std::string locale;
     bool isLocale = false;

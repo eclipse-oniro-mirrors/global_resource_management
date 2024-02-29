@@ -63,16 +63,13 @@ void ResConfigTest::TearDown()
  */
 HWTEST_F(ResConfigTest, ResConfigFuncTest001, TestSize.Level1)
 {
-    ResConfigImpl *rc = new ResConfigImpl;
+    auto rc = std::make_shared<ResConfigImpl>();
     rc->SetLocaleInfo("en", nullptr, "AU");
-    ResConfigImpl *current = new ResConfigImpl;
+    auto current = std::make_shared<ResConfigImpl>();
     current->SetLocaleInfo("en", nullptr, "GB");
-    ResConfigImpl *target = new ResConfigImpl;
+    auto target = std::make_shared<ResConfigImpl>();
     target->SetLocaleInfo("zh", nullptr, "CN");
     EXPECT_TRUE(rc->Match(current));
     EXPECT_TRUE(!(rc->Match(target)));
-    delete target;
-    delete current;
-    delete rc;
 };
 }
