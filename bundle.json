@@ -137,7 +137,8 @@
               }
             ],
             "test": [
-              "//base/global/resource_management/frameworks/resmgr/test:unittest"
+              "//base/global/resource_management/frameworks/resmgr/test:unittest",
+              "//base/global/resource_management/test/fuzztest:fuzztest"
             ]
         }
     }

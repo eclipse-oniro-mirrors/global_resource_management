@@ -20,7 +20,7 @@ module_output_path = "global/resource_management"
 ohos_fuzztest("ResmgrFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file = "./"
+  fuzz_config_file = "../resmgr_fuzzer"
 
   include_dirs = [ "../../../interfaces/inner_api/include" ]
 
