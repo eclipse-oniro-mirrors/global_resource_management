@@ -266,6 +266,7 @@ ohos_shared_library("librawfile") {
       get_label_info("../../interfaces/native/resource:librawfile_ndk",
                      "name") + version_script_suffix
 
+  innerapi_tags = [ "platformsdk" ]
   subsystem_name = "global"
   part_name = "resource_management"
 }
