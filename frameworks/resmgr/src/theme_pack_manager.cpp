@@ -35,9 +35,16 @@ const std::string themeSkinA = "/data/themes/a/app/skin";
 const std::string themeSkinB = "/data/themes/b/app/skin";
 const std::string themeIconsA = "/data/themes/a/app/icons";
 const std::string themeIconsB = "/data/themes/b/app/icons";
+const std::string absoluteThemeFlagA = "data/service/el1/public/themes/<currentUserId>/a/app/flag";
+const std::string absoluteThemeFlagB = "data/service/el1/public/themes/<currentUserId>/b/app/flag";
+const std::string absoluteThemeSkinA = "data/service/el1/public/themes/<currentUserId>/a/app/skin";
+const std::string absoluteThemeSkinB = "data/service/el1/public/themes/<currentUserId>/b/app/skin";
+const std::string absoluteThemeIconsA = "data/service/el1/public/themes/<currentUserId>/a/app/icons";
+const std::string absoluteThemeIconsB = "data/service/el1/public/themes/<currentUserId>/b/app/icons";
 const std::string flagA = "a";
 const std::string flagB = "b";
 const int ENABLE_THEME_POS = 13;
+const int ABSOLUTE_THEME_POS = 33;
 ThemePackManager::ThemePackManager()
 {}
 
@@ -88,7 +95,24 @@ void ThemePackManager::ClearSkinResource(const std::string &themeFlag)
         if ((*it) == nullptr || (*it)->GetThemePath().empty()) {
             continue;
         }
-        if ((*it)->GetThemePath().substr(ENABLE_THEME_POS, 1) != themeFlag) { // 1 means get the enable theme
+        // 1 means get the enable theme
+        if ((*it)->GetThemePath().substr(ENABLE_THEME_POS, 1) != themeFlag) {
+            it = skinResource_.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
+void ThemePackManager::ClearSASkinResource(const std::string &themeFlag, int32_t userId)
+{
+    int idLength = std::to_string(userId).length();
+    for (auto it = skinResource_.begin(); it != skinResource_.end();) {
+        if ((*it) == nullptr || (*it)->GetThemePath().empty()) {
+            continue;
+        }
+        // 1 means get the enable theme
+        if ((*it)->GetThemePath().substr(ABSOLUTE_THEME_POS + idLength, 1) != themeFlag) {
             it = skinResource_.erase(it);
         } else {
             ++it;
@@ -97,7 +121,7 @@ void ThemePackManager::ClearSkinResource(const std::string &themeFlag)
 }
 
 void ThemePackManager::LoadThemeSkinResource(const std::string &bundleName, const std::string &moduleName,
-    const std::vector<std::string> &rootDirs, const std::string &themeFlag)
+    const std::vector<std::string> &rootDirs, const std::string &themeFlag, bool isAbslutePath, int32_t userId)
 {
     AutoMutex mutex(this->lockSkin_);
     if (rootDirs.empty()) {
@@ -124,13 +148,14 @@ void ThemePackManager::LoadThemeSkinResource(const std::string &bundleName, cons
             this->skinResource_.emplace_back(pThemeResource);
         }
     }
-    ClearSkinResource(themeFlag);
+    isAbslutePath ? ClearSASkinResource : ClearSkinResource;
 }
 
-void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::string &moduleName)
+void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::string &moduleName, int32_t userId)
 {
     std::vector<std::string> rootDirs;
     std::vector<std::string> iconDirs;
+    bool isAbslutePath = false;
     if (Utils::IsFileExist(themeFlagA) && themeFlag != flagA) {
         themeFlag = flagA;
         rootDirs = GetRootDir(themeSkinA);
@@ -140,11 +165,39 @@ void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::st
         rootDirs = GetRootDir(themeSkinB);
         iconDirs = GetRootDir(themeIconsB);
     } else {
+        LoadSAThemeRes(bundleName, moduleName, userId, rootDirs, iconDirs);
+    }
+    LoadThemeSkinResource(bundleName, moduleName, rootDirs, themeFlag, isAbslutePath, userId);
+    LoadThemeIconsResource(bundleName, moduleName, iconDirs, themeFlag, isAbslutePath, userId);
+    return;
+}
+
+void ThemePackManager::LoadSAThemeRes(const std::string &bundleName, const std::string &moduleName,
+    int32_t userId, std::vector<std::string> &rootDirs, std::vector<std::string> &iconDirs)
+{
+    bool isAbslutePath = true;
+    if (Utils::IsFileExist(ReplaceUserIdInPath(absoluteThemeFlagA, userId)) && themeFlag != flagA) {
+        themeFlag = flagA;
+        rootDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeSkinA, userId));
+        iconDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeIconsA, userId));
+    } else if (Utils::IsFileExist(ReplaceUserIdInPath(absoluteThemeFlagB, userId)) && themeFlag != flagB) {
+        themeFlag = flagB;
+        rootDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeSkinB, userId));
+        rootDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeIconsB, userId));
+    } else {
         return;
     }
-    LoadThemeSkinResource(bundleName, moduleName, rootDirs, themeFlag);
-    LoadThemeIconsResource(bundleName, moduleName, iconDirs, themeFlag);
     return;
+}
+
+const std::string ThemePackManager::ReplaceUserIdInPath(const std::string &originalPath, int32_t userId)
+{
+    std::string result = originalPath;
+    size_t found = result.find("<currentUserId>");
+    if (found != std::string::npos) {
+        result.replace(found, 15, std::to_string(userId)); // 15 is the length of "<currentUserId>"
+    }
+    return result;
 }
 
 const std::string ThemePackManager::FindThemeResource(const std::pair<std::string, std::string> &bundleInfo,
@@ -244,7 +297,24 @@ void ThemePackManager::ClearIconResource(const std::string &themeFlag)
         if ((*it) == nullptr || (*it)->GetThemePath().empty()) {
             continue;
         }
-        if ((*it)->GetThemePath().substr(ENABLE_THEME_POS, 1) != themeFlag) { // 1 means get the enable theme
+        // 1 means get the enable theme
+        if ((*it)->GetThemePath().substr(ENABLE_THEME_POS, 1) != themeFlag) {
+            it = iconResource_.erase(it);
+        } else {
+            ++it;
+        }
+    }
+}
+
+void ThemePackManager::ClearSAIconResource(const std::string &themeFlag, int32_t userId)
+{
+    int idLength = std::to_string(userId).length();
+    for (auto it = iconResource_.begin(); it != iconResource_.end();) {
+        if ((*it) == nullptr || (*it)->GetThemePath().empty()) {
+            continue;
+        }
+        // 1 means get the enable theme
+        if ((*it)->GetThemePath().substr(ABSOLUTE_THEME_POS + idLength, 1) != themeFlag) {
             it = iconResource_.erase(it);
         } else {
             ++it;
@@ -253,7 +323,7 @@ void ThemePackManager::ClearIconResource(const std::string &themeFlag)
 }
 
 void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, const std::string &moduleName,
-    const std::vector<std::string> &rootDirs, const std::string &themeFlag)
+    const std::vector<std::string> &rootDirs, const std::string &themeFlag, bool isAbslutePath, int32_t userId)
 {
     AutoMutex mutex(this->lockIcon_);
     if (rootDirs.empty()) {
@@ -270,7 +340,7 @@ void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, con
             this->iconResource_.emplace_back(pThemeResource);
         }
     }
-    ClearIconResource(themeFlag);
+    isAbslutePath ? ClearSASkinResource : ClearSkinResource;
 }
 
 const std::string ThemePackManager::FindThemeIconResource(const std::pair<std::string, std::string> &bundleInfo,
