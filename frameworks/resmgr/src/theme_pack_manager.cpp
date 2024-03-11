@@ -148,7 +148,7 @@ void ThemePackManager::LoadThemeSkinResource(const std::string &bundleName, cons
             this->skinResource_.emplace_back(pThemeResource);
         }
     }
-    isAbslutePath ? ClearSASkinResource : ClearSkinResource;
+    isAbslutePath ? ClearSASkinResource(themeFlag, userId) : ClearSkinResource(themeFlag);
 }
 
 void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::string &moduleName, int32_t userId)
@@ -166,6 +166,7 @@ void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::st
         iconDirs = GetRootDir(themeIconsB);
     } else {
         LoadSAThemeRes(bundleName, moduleName, userId, rootDirs, iconDirs);
+        isAbslutePath = true;
     }
     LoadThemeSkinResource(bundleName, moduleName, rootDirs, themeFlag, isAbslutePath, userId);
     LoadThemeIconsResource(bundleName, moduleName, iconDirs, themeFlag, isAbslutePath, userId);
@@ -175,7 +176,6 @@ void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::st
 void ThemePackManager::LoadSAThemeRes(const std::string &bundleName, const std::string &moduleName,
     int32_t userId, std::vector<std::string> &rootDirs, std::vector<std::string> &iconDirs)
 {
-    bool isAbslutePath = true;
     if (Utils::IsFileExist(ReplaceUserIdInPath(absoluteThemeFlagA, userId)) && themeFlag != flagA) {
         themeFlag = flagA;
         rootDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeSkinA, userId));
@@ -340,7 +340,7 @@ void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, con
             this->iconResource_.emplace_back(pThemeResource);
         }
     }
-    isAbslutePath ? ClearSASkinResource : ClearSkinResource;
+    isAbslutePath ? ClearSASkinResource(themeFlag, userId) : ClearSkinResource(themeFlag);
 }
 
 const std::string ThemePackManager::FindThemeIconResource(const std::pair<std::string, std::string> &bundleInfo,
