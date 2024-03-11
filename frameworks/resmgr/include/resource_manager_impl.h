@@ -666,6 +666,8 @@ private:
 
     RState GetThemeFloat(const std::shared_ptr<IdItem> idItem, float &outValue);
 
+    RState GetThemeFloat(const std::shared_ptr<IdItem> idItem, float &outValue, std::string &unit);
+
     RState GetThemeMedia(const std::shared_ptr<IdItem> idItem, size_t &len,
         std::unique_ptr<uint8_t[]> &outValue, uint32_t density);
 
