@@ -184,8 +184,6 @@ void ThemePackManager::LoadSAThemeRes(const std::string &bundleName, const std::
         themeFlag = flagB;
         rootDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeSkinB, userId));
         rootDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeIconsB, userId));
-    } else {
-        return;
     }
     return;
 }
@@ -193,7 +191,7 @@ void ThemePackManager::LoadSAThemeRes(const std::string &bundleName, const std::
 const std::string ThemePackManager::ReplaceUserIdInPath(const std::string &originalPath, int32_t userId)
 {
     std::string result = originalPath;
-    size_t found = result.find("<currentUserId>");
+    auto found = result.find("<currentUserId>");
     if (found != std::string::npos) {
         result.replace(found, 15, std::to_string(userId)); // 15 is the length of "<currentUserId>"
     }
