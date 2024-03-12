@@ -60,7 +60,7 @@ void ThemeManagerTest::SetUp(void)
     std::vector<std::string> overlayPath;
     ResConfigImpl *rc = new ResConfigImpl;
     int32_t appType = 0;
-    int32_t userId = 100;
+    int32_t userId = 100; // userId is 100
     this->rm = CreateResourceManager("ohos.global.test.all", "entry", hapPath, overlayPath, *rc, appType, userId);
     this->rmc = std::make_shared<ResourceManagerTestCommon>(rm);
 }
@@ -86,7 +86,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest001, TestSiz
     std::string rootDir = "/data/test/theme/skin/ohos.global.test.all";
     rootDirs.emplace_back(rootDir);
     const std::string themeFlag = "e";
-    int32_t userId = 100;
+    int32_t userId = 100; // userId is 100
     bool isAbsolutePath = false;
     // the bundlename is invalid
     tm->LoadThemeSkinResource("ohos.global.test", "entry", rootDirs, themeFlag, isAbsolutePath, userId);
@@ -113,7 +113,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest002, TestSiz
     std::string rootDir = "/data/test/theme/skin/ohos.global.test.all";
     rootDirs.emplace_back(rootDir);
     const std::string themeFlag = "e";
-    int32_t userId = 100;
+    int32_t userId = 100; // userId is 100
     bool isAbsolutePath = false;
     tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, themeFlag, isAbsolutePath, userId);
     rm->GetColorById(id, outValue);
@@ -139,7 +139,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeIconsResourceTest001, TestSi
 
     rootDirs.emplace_back(rootDir);
     const std::string themeFlag = "e";
-    int32_t userId = 100;
+    int32_t userId = 100; // userId is 100
     bool isAbsolutePath = false;
     tm->LoadThemeIconsResource("ohos.global.test.all", "entry", rootDirs, themeFlag, isAbsolutePath, userId);
     state = rm->GetThemeIcons(resId, foregroundInfo, backgroundInfo);
