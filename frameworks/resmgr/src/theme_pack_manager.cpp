@@ -340,7 +340,7 @@ void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, con
             this->iconResource_.emplace_back(pThemeResource);
         }
     }
-    isAbslutePath ? ClearSASkinResource(themeFlag, userId) : ClearSkinResource(themeFlag);
+    isAbslutePath ? ClearSAIconResource(themeFlag, userId) : ClearIconResource(themeFlag);
 }
 
 const std::string ThemePackManager::FindThemeIconResource(const std::pair<std::string, std::string> &bundleInfo,
