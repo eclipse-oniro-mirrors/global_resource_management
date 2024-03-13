@@ -288,11 +288,6 @@ RState HapParser::ReadRawFileDescriptor(const char *hapPath, const std::string &
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
     char outPath[PATH_MAX + 1] = {0};
     Utils::CanonicalizePath(hapPath, outPath, PATH_MAX);
-    int zipFd = open(outPath, O_RDONLY);
-    if (zipFd < 0) {
-        HILOG_ERROR("failed open file %{public}s", outPath);
-        return NOT_FOUND;
-    }
     bool isNewExtractor = false;
     auto extractor = AbilityBase::ExtractorUtil::GetExtractor(outPath, isNewExtractor);
     if (extractor == nullptr) {
@@ -308,6 +303,11 @@ RState HapParser::ReadRawFileDescriptor(const char *hapPath, const std::string &
     bool ret = extractor->GetFileInfo(rawfilePath, fileInfo);
     if (!ret) {
         HILOG_ERROR("failed to get rawFileDescriptor rawfilePath, %{public}s", rawfilePath.c_str());
+        return NOT_FOUND;
+    }
+    int zipFd = open(outPath, O_RDONLY);
+    if (zipFd < 0) {
+        HILOG_ERROR("failed open file %{public}s", outPath);
         return NOT_FOUND;
     }
     descriptor.offset = static_cast<long>(fileInfo.offset);
