@@ -183,7 +183,7 @@ void ThemePackManager::LoadSAThemeRes(const std::string &bundleName, const std::
     } else if (Utils::IsFileExist(ReplaceUserIdInPath(absoluteThemeFlagB, userId)) && themeFlag != flagB) {
         themeFlag = flagB;
         rootDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeSkinB, userId));
-        rootDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeIconsB, userId));
+        iconDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeIconsB, userId));
     }
     return;
 }
