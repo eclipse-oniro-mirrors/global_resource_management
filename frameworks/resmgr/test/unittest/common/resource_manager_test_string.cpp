@@ -364,6 +364,243 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest008, T
 }
 
 /*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest009
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest009, TestSize.Level1)
+{
+    const char *name = "test_string9";
+    const char *cmp = "%d-%d1$d";
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams;
+    rmc->TestGetStringFormatById(name, jsParams, cmp);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest010
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest010, TestSize.Level1)
+{
+    const char *name = "test_string10";
+    const char *cmp = "%d%%%";
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams;
+    rmc->TestGetStringFormatById(name, jsParams, cmp);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest011
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest011, TestSize.Level1)
+{
+    const char *name = "test_string11";
+    const char *cmp = "-7";
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "-7.5"}};
+    rmc->TestGetStringFormatById(name, jsParams, cmp);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest012
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest012, TestSize.Level1)
+{
+    const char *name = "test_string12";
+    const char *cmp = "2-1===6.100000-5.000000===你好,world===%hh%%%";
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1.000000"},
+        {ResourceManager::NapiValueType::NAPI_NUMBER, "2.100000"},
+        {ResourceManager::NapiValueType::NAPI_NUMBER, "5.000000"},
+        {ResourceManager::NapiValueType::NAPI_NUMBER, "6.100000"},
+        {ResourceManager::NapiValueType::NAPI_STRING, "world"},
+        {ResourceManager::NapiValueType::NAPI_STRING, "你好,"}};
+    rmc->TestGetStringFormatById(name, jsParams, cmp);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest013
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest013, TestSize.Level1)
+{
+    const char *name = "test_string13";
+    const char *cmp = "11";
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    rmc->TestGetStringFormatById(name, jsParams, cmp);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest014
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest014, TestSize.Level1)
+{
+    const char *name = "test_string14";
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId(name, ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    RState state = rm->GetStringFormatById(id, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_ID_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest015
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest015, TestSize.Level1)
+{
+    const char *name = "test_string15";
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId(name, ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_STRING, "hhh"}};
+    RState state = rm->GetStringFormatById(id, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_ID_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest016
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest016, TestSize.Level1)
+{
+    const char *name = "test_string16";
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId(name, ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_STRING, "hhh"}};
+    RState state = rm->GetStringFormatById(id, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_ID_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest017
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest017, TestSize.Level1)
+{
+    const char *name = "test_string17";
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId(name, ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    RState state = rm->GetStringFormatById(id, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_ID_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest018
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest018, TestSize.Level1)
+{
+    const char *name = "test_string18";
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId(name, ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    RState state = rm->GetStringFormatById(id, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_ID_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest019
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest019, TestSize.Level1)
+{
+    const char *name = "test_string19";
+    const char *cmp = "11";
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"},
+        {ResourceManager::NapiValueType::NAPI_NUMBER, "2"}};
+    rmc->TestGetStringFormatById(name, jsParams, cmp);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest020
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest020, TestSize.Level1)
+{
+    const char *name = "test_string20";
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId(name, ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    RState state = rm->GetStringFormatById(id, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_ID_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest021
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest021, TestSize.Level1)
+{
+    const char *name = "test_string21";
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId(name, ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    RState state = rm->GetStringFormatById(id, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_ID_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest022
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest022, TestSize.Level1)
+{
+    const char *name = "test_string22";
+    const char *cmp = "112";
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"},
+        {ResourceManager::NapiValueType::NAPI_NUMBER, "2"},
+        {ResourceManager::NapiValueType::NAPI_NUMBER, "3"}};
+    rmc->TestGetStringFormatById(name, jsParams, cmp);
+}
+
+/*
  * @tc.name: ResourceManagerGetStringFormatByNameTest001
  * @tc.desc: Test GetStringFormatByName function
  * @tc.type: FUNC
@@ -478,11 +715,232 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest008,
     ASSERT_TRUE(ret);
     std::string outValue;
     std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
-        {{ResourceManager::NapiValueType::NAPI_NUMBER, "-9.999"},
-        {ResourceManager::NapiValueType::NAPI_STRING, "a1"},
-        {ResourceManager::NapiValueType::NAPI_STRING, "a2"}};
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "-9.999"}};
     RState state = rm->GetStringFormatByName(name, outValue, jsParams);
     ASSERT_EQ(ERROR_CODE_RES_NAME_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest009
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest009, TestSize.Level1)
+{
+    const char *name = "test_string9";
+    const char *cmp = "%d-%d1$d";
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams;
+    rmc->TestGetStringFormatByName(name, jsParams, cmp);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest010
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest010, TestSize.Level1)
+{
+    const char *name = "test_string10";
+    const char *cmp = "%d%%%";
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams;
+    rmc->TestGetStringFormatByName(name, jsParams, cmp);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest011
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest011, TestSize.Level1)
+{
+    const char *name = "test_string11";
+    const char *cmp = "-7";
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "-7.5"}};
+    rmc->TestGetStringFormatByName(name, jsParams, cmp);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest012
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest012, TestSize.Level1)
+{
+    const char *name = "test_string12";
+    const char *cmp = "2-1===4.100000-3.000000===你好,world===%hh%%%";
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1.000000"},
+        {ResourceManager::NapiValueType::NAPI_NUMBER, "2.100000"},
+        {ResourceManager::NapiValueType::NAPI_NUMBER, "3.000000"},
+        {ResourceManager::NapiValueType::NAPI_NUMBER, "4.100000"},
+        {ResourceManager::NapiValueType::NAPI_STRING, "world"},
+        {ResourceManager::NapiValueType::NAPI_STRING, "你好,"}};
+    rmc->TestGetStringFormatByName(name, jsParams, cmp);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest013
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest013, TestSize.Level1)
+{
+    const char *name = "test_string13";
+    const char *cmp = "11";
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    rmc->TestGetStringFormatByName(name, jsParams, cmp);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest014
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest014, TestSize.Level1)
+{
+    const char *name = "test_string14";
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    RState state = rm->GetStringFormatByName(name, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest015
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest015, TestSize.Level1)
+{
+    const char *name = "test_string15";
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_STRING, "hhh"}};
+    RState state = rm->GetStringFormatByName(name, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest016
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest016, TestSize.Level1)
+{
+    const char *name = "test_string16";
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_STRING, "hhh"}};
+    RState state = rm->GetStringFormatByName(name, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest017
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest017, TestSize.Level1)
+{
+    const char *name = "test_string17";
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    RState state = rm->GetStringFormatByName(name, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest018
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest018, TestSize.Level1)
+{
+    const char *name = "test_string18";
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    RState state = rm->GetStringFormatByName(name, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest019
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest019, TestSize.Level1)
+{
+    const char *name = "test_string19";
+    const char *cmp = "11";
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"},
+        {ResourceManager::NapiValueType::NAPI_NUMBER, "2"}};
+    rmc->TestGetStringFormatByName(name, jsParams, cmp);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest020
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest020, TestSize.Level1)
+{
+    const char *name = "test_string20";
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    RState state = rm->GetStringFormatByName(name, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest021
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest021, TestSize.Level1)
+{
+    const char *name = "test_string21";
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    RState state = rm->GetStringFormatByName(name, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest022
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest022, TestSize.Level1)
+{
+    const char *name = "test_string22";
+    const char *cmp = "112";
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"},
+        {ResourceManager::NapiValueType::NAPI_NUMBER, "2"},
+        {ResourceManager::NapiValueType::NAPI_NUMBER, "3"}};
+    rmc->TestGetStringFormatByName(name, jsParams, cmp);
 }
 
 /*

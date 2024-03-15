@@ -17,6 +17,8 @@
 #define OHOS_RESOURCE_MANAGER_STRINGUTILS_H
 
 #include "utils/common.h"
+#include "resource_manager.h"
+#include "res_config_impl.h"
 
 #include <string>
 #include <vector>
@@ -27,6 +29,9 @@ namespace Resource {
 std::string FormatString(const char *fmt, ...);
 
 std::string FormatString(const char *fmt, va_list args);
+
+bool ReplacePlaceholderWithParams(std::string &inputOutputValue, const ResConfigImpl &resConfig,
+    const std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

@@ -1,475 +1,439 @@
 {
-    "record" : 
-    [
-        {
-            "id" : "0x01000000",
-            "name" : "integer_1",
-            "type" : "integer"
-        },
-        {
-            "id" : "0x01000001",
-            "name" : "integer_input_device",
-            "type" : "integer"
-        },
-        {
-            "id" : "0x01000002",
-            "name" : "integer_ref",
-            "type" : "integer"
-        },
-        {
-            "id" : "0x01000005",
-            "name" : "same_name",
-            "type" : "integer"
-        },
-        {
-            "id" : "0x01000004",
-            "name" : "MainAbility_desc",
-            "type" : "string"
-        },
-        {
-            "id" : "0x01000003",
-            "name" : "aboutPage_title_primary",
-            "type" : "string"
-        },
-        {
-            "id" : "0x01000006",
-            "name" : "aboutPage_title_secondary",
-            "type" : "string"
-        },
-        {
-            "id" : "0x01000007",
-            "name" : "app_name",
-            "type" : "string"
-        },
-        {
-            "id" : "0x01000008",
-            "name" : "copyright_text",
-            "type" : "string"
-        },
-        {
-            "id" : "0x01000009",
-            "name" : "entry_MainAbility",
-            "type" : "string"
-        },
-        {
-            "id" : "0x0100000A",
-            "name" : "hello",
-            "type" : "string"
-        },
-        {
-            "id" : "0x0100000B",
-            "name" : "mainability_description",
-            "type" : "string"
-        },
-        {
-            "id" : "0x0100000C",
-            "name" : "mccmnc_str",
-            "type" : "string"
-        },
-        {
-            "id" : "0x0100000D",
-            "name" : "ohos_app_name",
-            "type" : "string"
-        },
-        {
-            "id" : "0x0100000E",
-            "name" : "ohos_desc_camera",
-            "type" : "string"
-        },
-        {
-            "id" : "0x0100000F",
-            "name" : "ohos_lab_answer_call",
-            "type" : "string"
-        },
-        {
-            "id" : "0x01000010",
-            "name" : "point_test",
-            "type" : "string"
-        },
-        {
-            "id" : "0x01000011",
-            "name" : "res_one",
-            "type" : "string"
-        },
-        {
-            "id" : "0x01000015",
-            "name" : "res_two",
-            "type" : "string"
-        },
-        {
-            "id" : "0x01000013",
-            "name" : "same_name",
-            "type" : "string"
-        },
-        {
-            "id" : "0x01000014",
-            "name" : "str_enus",
-            "type" : "string"
-        },
-        {
-            "id" : "0x01000012",
-            "name" : "string_ref",
-            "type" : "string"
-        },
-        {
-            "id" : "0x01000016",
-            "name" : "string_ref2",
-            "type" : "string"
-        },
-        {
-            "id" : "0x01000017",
-            "name" : "technicalSupport_text",
-            "type" : "string"
-        },
-        {
-            "id" : "0x01000018",
-            "name" : "test_string0",
-            "type" : "string"
-        },
-        {
-            "id" : "0x01000019",
-            "name" : "test_string1",
-            "type" : "string"
-        },
-        {
-            "id" : "0x0100001A",
-            "name" : "test_string2",
-            "type" : "string"
-        },
-        {
-            "id" : "0x0100001B",
-            "name" : "test_string3",
-            "type" : "string"
-        },
-        {
-            "id" : "0x0100001C",
-            "name" : "test_string4",
-            "type" : "string"
-        },
-        {
-            "id" : "0x0100001D",
-            "name" : "title",
-            "type" : "string"
-        },
-        {
-            "id" : "0x0100001E",
-            "name" : "size",
-            "type" : "strarray"
-        },
-        {
-            "id" : "0x0100001F",
-            "name" : "intarray_1",
-            "type" : "intarray"
-        },
-        {
-            "id" : "0x01000020",
-            "name" : "boolean_1",
-            "type" : "boolean"
-        },
-        {
-            "id" : "0x01000021",
-            "name" : "boolean_input_device",
-            "type" : "boolean"
-        },
-        {
-            "id" : "0x01000022",
-            "name" : "boolean_ref",
-            "type" : "boolean"
-        },
-        {
-            "id" : "0x01000023",
-            "name" : "same_name",
-            "type" : "boolean"
-        },
-        {
-            "id" : "0x01000024",
-            "name" : "base_dark",
-            "type" : "color"
-        },
-        {
-            "id" : "0x01000025",
-            "name" : "base_light",
-            "type" : "color"
-        },
-        {
-            "id" : "0x01000026",
-            "name" : "base_light_dark",
-            "type" : "color"
-        },
-        {
-            "id" : "0x01000027",
-            "name" : "base_light_ldpi",
-            "type" : "color"
-        },
-        {
-            "id" : "0x01000028",
-            "name" : "base_light_phone",
-            "type" : "color"
-        },
-        {
-            "id" : "0x01000029",
-            "name" : "base_only",
-            "type" : "color"
-        },
-        {
-            "id" : "0x0100002A",
-            "name" : "color_aboutPage_title_primary",
-            "type" : "color"
-        },
-        {
-            "id" : "0x0100002B",
-            "name" : "color_aboutPage_title_secondary",
-            "type" : "color"
-        },
-        {
-            "id" : "0x0100002C",
-            "name" : "color_ref",
-            "type" : "color"
-        },
-        {
-            "id" : "0x0100002D",
-            "name" : "divider_color",
-            "type" : "color"
-        },
-        {
-            "id" : "0x0100002E",
-            "name" : "grey_background",
-            "type" : "color"
-        },
-        {
-            "id" : "0x0100002F",
-            "name" : "normal_background_color",
-            "type" : "color"
-        },
-        {
-            "id" : "0x01000030",
-            "name" : "textColor_primary",
-            "type" : "color"
-        },
-        {
-            "id" : "0x01000031",
-            "name" : "textColor_secondary",
-            "type" : "color"
-        },
-        {
-            "id" : "0x01000032",
-            "name" : "touched_background_color",
-            "type" : "color"
-        },
-        {
-            "id" : "0x01000033",
-            "name" : "app_theme",
-            "type" : "theme"
-        },
-        {
-            "id" : "0x01000034",
-            "name" : "test_theme",
-            "type" : "theme"
-        },
-        {
-            "id" : "0x01000035",
-            "name" : "eat_apple",
-            "type" : "plural"
-        },
-        {
-            "id" : "0x01000036",
-            "name" : "eat_apple1",
-            "type" : "plural"
-        },
-        {
-            "id" : "0x01000037",
-            "name" : "aboutPage_minHeight",
-            "type" : "float"
-        },
-        {
-            "id" : "0x01000038",
-            "name" : "bottomMargin_doubleLineList",
-            "type" : "float"
-        },
-        {
-            "id" : "0x01000039",
-            "name" : "bottomMargin_primaryText",
-            "type" : "float"
-        },
-        {
-            "id" : "0x0100003A",
-            "name" : "card_margin_end",
-            "type" : "float"
-        },
-        {
-            "id" : "0x0100003B",
-            "name" : "card_margin_start",
-            "type" : "float"
-        },
-        {
-            "id" : "0x0100003C",
-            "name" : "default_padding_bottom_fixed",
-            "type" : "float"
-        },
-        {
-            "id" : "0x0100003D",
-            "name" : "default_padding_top_fixed",
-            "type" : "float"
-        },
-        {
-            "id" : "0x0100003E",
-            "name" : "float_ref",
-            "type" : "float"
-        },
-        {
-            "id" : "0x0100003F",
-            "name" : "height_aboutPage_upperPart",
-            "type" : "float"
-        },
-        {
-            "id" : "0x01000040",
-            "name" : "height_appBar",
-            "type" : "float"
-        },
-        {
-            "id" : "0x01000041",
-            "name" : "height_appBar_backButton_touchTarget",
-            "type" : "float"
-        },
-        {
-            "id" : "0x01000042",
-            "name" : "height_divider",
-            "type" : "float"
-        },
-        {
-            "id" : "0x01000043",
-            "name" : "height_doubleLineList",
-            "type" : "float"
-        },
-        {
-            "id" : "0x01000044",
-            "name" : "height_doubleLineList_icon",
-            "type" : "float"
-        },
-        {
-            "id" : "0x01000045",
-            "name" : "icon_radius",
-            "type" : "float"
-        },
-        {
-            "id" : "0x01000046",
-            "name" : "leftMargin_appBar_backButton_touchTarget",
-            "type" : "float"
-        },
-        {
-            "id" : "0x01000047",
-            "name" : "leftMargin_appBar_title",
-            "type" : "float"
-        },
-        {
-            "id" : "0x01000048",
-            "name" : "maxPadding_end",
-            "type" : "float"
-        },
-        {
-            "id" : "0x01000049",
-            "name" : "maxPadding_start",
-            "type" : "float"
-        },
-        {
-            "id" : "0x0100004A",
-            "name" : "size_aboutPage_iconBackground",
-            "type" : "float"
-        },
-        {
-            "id" : "0x0100004B",
-            "name" : "size_aboutPage_title_primary",
-            "type" : "float"
-        },
-        {
-            "id" : "0x0100004C",
-            "name" : "size_aboutPage_title_secondary",
-            "type" : "float"
-        },
-        {
-            "id" : "0x0100004D",
-            "name" : "size_appBar_backButton",
-            "type" : "float"
-        },
-        {
-            "id" : "0x0100004E",
-            "name" : "textSize_body1",
-            "type" : "float"
-        },
-        {
-            "id" : "0x0100004F",
-            "name" : "textSize_body2",
-            "type" : "float"
-        },
-        {
-            "id" : "0x01000050",
-            "name" : "textSize_body3",
-            "type" : "float"
-        },
-        {
-            "id" : "0x01000051",
-            "name" : "textSize_title",
-            "type" : "float"
-        },
-        {
-            "id" : "0x01000052",
-            "name" : "topMargin_aboutPage_iconBackground",
-            "type" : "float"
-        },
-        {
-            "id" : "0x01000053",
-            "name" : "topMargin_aboutPage_title_primary",
-            "type" : "float"
-        },
-        {
-            "id" : "0x01000054",
-            "name" : "topMargin_doubleLineList",
-            "type" : "float"
-        },
-        {
-            "id" : "0x01000055",
-            "name" : "width_appBar_backButton_touchTarget",
-            "type" : "float"
-        },
-        {
-            "id" : "0x01000056",
-            "name" : "width_doubleLineList_icon",
-            "type" : "float"
-        },
-        {
-            "id" : "0x01000057",
-            "name" : "base",
-            "type" : "pattern"
-        },
-        {
-            "id" : "0x01000058",
-            "name" : "ccchild",
-            "type" : "pattern"
-        },
-        {
-            "id" : "0x01000059",
-            "name" : "child",
-            "type" : "pattern"
-        },
-        {
-            "id" : "0x0100005A",
-            "name" : "icon",
-            "type" : "media"
-        },
-        {
-            "id" : "0x0100005B",
-            "name" : "icon1",
-            "type" : "media"
-        },
-        {
-            "id" : "0x0100005C",
-            "name" : "input_device",
-            "type" : "media"
-        },
-        {
-            "id" : "0x0100005D",
-            "name" : "test_profile",
-            "type" : "profile"
-        }
-    ]
+	"record":	[{
+			"type":	"string",
+			"name":	"app_name",
+			"id":	"0x01000000"
+		}, {
+			"type":	"media",
+			"name":	"app_icon",
+			"id":	"0x01000001"
+		}, {
+			"type":	"integer",
+			"name":	"integer_1",
+			"id":	"0x01000002"
+		}, {
+			"type":	"integer",
+			"name":	"integer_input_device",
+			"id":	"0x01000003"
+		}, {
+			"type":	"integer",
+			"name":	"integer_ref",
+			"id":	"0x01000004"
+		}, {
+			"type":	"integer",
+			"name":	"same_name",
+			"id":	"0x01000005"
+		}, {
+			"type":	"string",
+			"name":	"MainAbility_desc",
+			"id":	"0x01000006"
+		}, {
+			"type":	"string",
+			"name":	"aboutPage_title_primary",
+			"id":	"0x01000007"
+		}, {
+			"type":	"string",
+			"name":	"aboutPage_title_secondary",
+			"id":	"0x01000008"
+		}, {
+			"type":	"string",
+			"name":	"copyright_text",
+			"id":	"0x01000009"
+		}, {
+			"type":	"string",
+			"name":	"entry_MainAbility",
+			"id":	"0x0100000A"
+		}, {
+			"type":	"string",
+			"name":	"hello",
+			"id":	"0x0100000B"
+		}, {
+			"type":	"string",
+			"name":	"mainability_description",
+			"id":	"0x0100000C"
+		}, {
+			"type":	"string",
+			"name":	"mccmnc_str",
+			"id":	"0x0100000D"
+		}, {
+			"type":	"string",
+			"name":	"ohos_app_name",
+			"id":	"0x0100000E"
+		}, {
+			"type":	"string",
+			"name":	"ohos_desc_camera",
+			"id":	"0x0100000F"
+		}, {
+			"type":	"string",
+			"name":	"ohos_lab_answer_call",
+			"id":	"0x01000010"
+		}, {
+			"type":	"string",
+			"name":	"point_test",
+			"id":	"0x01000011"
+		}, {
+			"type":	"string",
+			"name":	"res_one",
+			"id":	"0x01000012"
+		}, {
+			"type":	"string",
+			"name":	"res_two",
+			"id":	"0x01000013"
+		}, {
+			"type":	"string",
+			"name":	"same_name",
+			"id":	"0x01000014"
+		}, {
+			"type":	"string",
+			"name":	"str_enus",
+			"id":	"0x01000015"
+		}, {
+			"type":	"string",
+			"name":	"string_ref",
+			"id":	"0x01000016"
+		}, {
+			"type":	"string",
+			"name":	"string_ref2",
+			"id":	"0x01000017"
+		}, {
+			"type":	"string",
+			"name":	"technicalSupport_text",
+			"id":	"0x01000018"
+		}, {
+			"type":	"string",
+			"name":	"test_string0",
+			"id":	"0x01000019"
+		}, {
+			"type":	"string",
+			"name":	"test_string1",
+			"id":	"0x0100001A"
+		}, {
+			"type":	"string",
+			"name":	"test_string10",
+			"id":	"0x0100001B"
+		}, {
+			"type":	"string",
+			"name":	"test_string11",
+			"id":	"0x0100001C"
+		}, {
+			"type":	"string",
+			"name":	"test_string12",
+			"id":	"0x0100001D"
+		}, {
+			"type":	"string",
+			"name":	"test_string13",
+			"id":	"0x0100001E"
+		}, {
+			"type":	"string",
+			"name":	"test_string14",
+			"id":	"0x0100001F"
+		}, {
+			"type":	"string",
+			"name":	"test_string15",
+			"id":	"0x01000020"
+		}, {
+			"type":	"string",
+			"name":	"test_string16",
+			"id":	"0x01000021"
+		}, {
+			"type":	"string",
+			"name":	"test_string17",
+			"id":	"0x01000022"
+		}, {
+			"type":	"string",
+			"name":	"test_string18",
+			"id":	"0x01000023"
+		}, {
+			"type":	"string",
+			"name":	"test_string19",
+			"id":	"0x01000024"
+		}, {
+			"type":	"string",
+			"name":	"test_string2",
+			"id":	"0x01000025"
+		}, {
+			"type":	"string",
+			"name":	"test_string20",
+			"id":	"0x01000026"
+		}, {
+			"type":	"string",
+			"name":	"test_string21",
+			"id":	"0x01000027"
+		}, {
+			"type":	"string",
+			"name":	"test_string22",
+			"id":	"0x01000028"
+		}, {
+			"type":	"string",
+			"name":	"test_string3",
+			"id":	"0x01000029"
+		}, {
+			"type":	"string",
+			"name":	"test_string4",
+			"id":	"0x0100002A"
+		}, {
+			"type":	"string",
+			"name":	"test_string9",
+			"id":	"0x0100002B"
+		}, {
+			"type":	"string",
+			"name":	"title",
+			"id":	"0x0100002C"
+		}, {
+			"type":	"strarray",
+			"name":	"size",
+			"id":	"0x0100002D"
+		}, {
+			"type":	"intarray",
+			"name":	"intarray_1",
+			"id":	"0x0100002E"
+		}, {
+			"type":	"boolean",
+			"name":	"boolean_1",
+			"id":	"0x0100002F"
+		}, {
+			"type":	"boolean",
+			"name":	"boolean_input_device",
+			"id":	"0x01000030"
+		}, {
+			"type":	"boolean",
+			"name":	"boolean_ref",
+			"id":	"0x01000031"
+		}, {
+			"type":	"boolean",
+			"name":	"same_name",
+			"id":	"0x01000032"
+		}, {
+			"type":	"color",
+			"name":	"base_dark",
+			"id":	"0x01000033"
+		}, {
+			"type":	"color",
+			"name":	"base_light",
+			"id":	"0x01000034"
+		}, {
+			"type":	"color",
+			"name":	"base_light_dark",
+			"id":	"0x01000035"
+		}, {
+			"type":	"color",
+			"name":	"base_light_ldpi",
+			"id":	"0x01000036"
+		}, {
+			"type":	"color",
+			"name":	"base_light_phone",
+			"id":	"0x01000037"
+		}, {
+			"type":	"color",
+			"name":	"base_only",
+			"id":	"0x01000038"
+		}, {
+			"type":	"color",
+			"name":	"color_aboutPage_title_primary",
+			"id":	"0x01000039"
+		}, {
+			"type":	"color",
+			"name":	"color_aboutPage_title_secondary",
+			"id":	"0x0100003A"
+		}, {
+			"type":	"color",
+			"name":	"color_ref",
+			"id":	"0x0100003B"
+		}, {
+			"type":	"color",
+			"name":	"divider_color",
+			"id":	"0x0100003C"
+		}, {
+			"type":	"color",
+			"name":	"grey_background",
+			"id":	"0x0100003D"
+		}, {
+			"type":	"color",
+			"name":	"normal_background_color",
+			"id":	"0x0100003E"
+		}, {
+			"type":	"color",
+			"name":	"textColor_primary",
+			"id":	"0x0100003F"
+		}, {
+			"type":	"color",
+			"name":	"textColor_secondary",
+			"id":	"0x01000040"
+		}, {
+			"type":	"color",
+			"name":	"touched_background_color",
+			"id":	"0x01000041"
+		}, {
+			"type":	"theme",
+			"name":	"app_theme",
+			"id":	"0x01000042"
+		}, {
+			"type":	"theme",
+			"name":	"test_theme",
+			"id":	"0x01000043"
+		}, {
+			"type":	"plural",
+			"name":	"eat_apple",
+			"id":	"0x01000044"
+		}, {
+			"type":	"plural",
+			"name":	"eat_apple1",
+			"id":	"0x01000045"
+		}, {
+			"type":	"float",
+			"name":	"aboutPage_minHeight",
+			"id":	"0x01000046"
+		}, {
+			"type":	"float",
+			"name":	"bottomMargin_doubleLineList",
+			"id":	"0x01000047"
+		}, {
+			"type":	"float",
+			"name":	"bottomMargin_primaryText",
+			"id":	"0x01000048"
+		}, {
+			"type":	"float",
+			"name":	"card_margin_end",
+			"id":	"0x01000049"
+		}, {
+			"type":	"float",
+			"name":	"card_margin_start",
+			"id":	"0x0100004A"
+		}, {
+			"type":	"float",
+			"name":	"default_padding_bottom_fixed",
+			"id":	"0x0100004B"
+		}, {
+			"type":	"float",
+			"name":	"default_padding_top_fixed",
+			"id":	"0x0100004C"
+		}, {
+			"type":	"float",
+			"name":	"float_ref",
+			"id":	"0x0100004D"
+		}, {
+			"type":	"float",
+			"name":	"height_aboutPage_upperPart",
+			"id":	"0x0100004E"
+		}, {
+			"type":	"float",
+			"name":	"height_appBar",
+			"id":	"0x0100004F"
+		}, {
+			"type":	"float",
+			"name":	"height_appBar_backButton_touchTarget",
+			"id":	"0x01000050"
+		}, {
+			"type":	"float",
+			"name":	"height_divider",
+			"id":	"0x01000051"
+		}, {
+			"type":	"float",
+			"name":	"height_doubleLineList",
+			"id":	"0x01000052"
+		}, {
+			"type":	"float",
+			"name":	"height_doubleLineList_icon",
+			"id":	"0x01000053"
+		}, {
+			"type":	"float",
+			"name":	"icon_radius",
+			"id":	"0x01000054"
+		}, {
+			"type":	"float",
+			"name":	"leftMargin_appBar_backButton_touchTarget",
+			"id":	"0x01000055"
+		}, {
+			"type":	"float",
+			"name":	"leftMargin_appBar_title",
+			"id":	"0x01000056"
+		}, {
+			"type":	"float",
+			"name":	"maxPadding_end",
+			"id":	"0x01000057"
+		}, {
+			"type":	"float",
+			"name":	"maxPadding_start",
+			"id":	"0x01000058"
+		}, {
+			"type":	"float",
+			"name":	"size_aboutPage_iconBackground",
+			"id":	"0x01000059"
+		}, {
+			"type":	"float",
+			"name":	"size_aboutPage_title_primary",
+			"id":	"0x0100005A"
+		}, {
+			"type":	"float",
+			"name":	"size_aboutPage_title_secondary",
+			"id":	"0x0100005B"
+		}, {
+			"type":	"float",
+			"name":	"size_appBar_backButton",
+			"id":	"0x0100005C"
+		}, {
+			"type":	"float",
+			"name":	"textSize_body1",
+			"id":	"0x0100005D"
+		}, {
+			"type":	"float",
+			"name":	"textSize_body2",
+			"id":	"0x0100005E"
+		}, {
+			"type":	"float",
+			"name":	"textSize_body3",
+			"id":	"0x0100005F"
+		}, {
+			"type":	"float",
+			"name":	"textSize_title",
+			"id":	"0x01000060"
+		}, {
+			"type":	"float",
+			"name":	"topMargin_aboutPage_iconBackground",
+			"id":	"0x01000061"
+		}, {
+			"type":	"float",
+			"name":	"topMargin_aboutPage_title_primary",
+			"id":	"0x01000062"
+		}, {
+			"type":	"float",
+			"name":	"topMargin_doubleLineList",
+			"id":	"0x01000063"
+		}, {
+			"type":	"float",
+			"name":	"width_appBar_backButton_touchTarget",
+			"id":	"0x01000064"
+		}, {
+			"type":	"float",
+			"name":	"width_doubleLineList_icon",
+			"id":	"0x01000065"
+		}, {
+			"type":	"pattern",
+			"name":	"base",
+			"id":	"0x01000066"
+		}, {
+			"type":	"pattern",
+			"name":	"ccchild",
+			"id":	"0x01000067"
+		}, {
+			"type":	"pattern",
+			"name":	"child",
+			"id":	"0x01000068"
+		}, {
+			"type":	"media",
+			"name":	"icon",
+			"id":	"0x01000069"
+		}, {
+			"type":	"media",
+			"name":	"icon1",
+			"id":	"0x0100006A"
+		}, {
+			"type":	"media",
+			"name":	"input_device",
+			"id":	"0x0100006B"
+		}, {
+			"type":	"profile",
+			"name":	"test_profile",
+			"id":	"0x0100006C"
+		}]
 }

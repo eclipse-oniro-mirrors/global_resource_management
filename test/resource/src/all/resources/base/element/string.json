@@ -95,6 +95,62 @@
     {
       "name": "res_two",
       "value": "$string:res_one"
+    },
+    {
+      "name": "test_string9",
+      "value": "%d-%d1$d"
+    },
+    {
+      "name": "test_string10",
+      "value": "%d%%%%%%"
+    },
+    {
+      "name": "test_string11",
+      "value": "%1$d"
+    },
+    {
+      "name": "test_string12",
+      "value": "%2$d-%1$d===%4$f-%3$f===%6$s%5$s===%%hh%%%%%%"
+    },
+    {
+      "name": "test_string13",
+      "value": "%d%1$d"
+    },
+    {
+      "name": "test_string14",
+      "value": "%2$d"
+    },
+    {
+      "name": "test_string15",
+      "value": "%1$d"
+    },
+    {
+      "name": "test_string16",
+      "value": "%1$f"
+    },
+    {
+      "name": "test_string17",
+      "value": "%1$s"
+    },
+    {
+      "name": "test_string18",
+      "value": "%d%d"
+    },
+    {
+      "name": "test_string19",
+      "value": "%1$d%1$d"
+    },
+    {
+      "name": "test_string20",
+      "value": "%184467440737095516150$d"
+    },
+    {
+      "name": "test_string21",
+      "value": "%18446744073709551616$d"
+    },
+    {
+      "name": "test_string22",
+      "value": "%d%1$d%d"
     }
   ]
 }

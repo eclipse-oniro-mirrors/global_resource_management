@@ -1076,7 +1076,7 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetResIdTest001, TestSize.Level1
     uint32_t id = 0;
     RState state = rm->GetResId(resTypeName, id);
     EXPECT_TRUE(state == SUCCESS);
-    EXPECT_EQ(id, 16777225);
+    EXPECT_EQ(id, 16777226);
 }
 
 /*
@@ -1092,7 +1092,7 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetResIdTest002, TestSize.Level1
     uint32_t id = 0;
     RState state = rm->GetResId(resTypeName, id);
     EXPECT_TRUE(state == SUCCESS);
-    EXPECT_EQ(id, 16777306);
+    EXPECT_EQ(id, 16777321);
 }
 
 /*
@@ -1108,7 +1108,7 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetResIdTest003, TestSize.Level1
     uint32_t id = 0;
     RState state = rm->GetResId(resTypeName, id);
     EXPECT_TRUE(state == SUCCESS);
-    EXPECT_EQ(id, 16777258);
+    EXPECT_EQ(id, 16777273);
 }
 
 /*
