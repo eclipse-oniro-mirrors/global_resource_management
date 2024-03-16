@@ -34,7 +34,7 @@ namespace OHOS {
 namespace Global {
 namespace Resource {
 const std::regex PLACEHOLDER_MATCHING_RULES(R"((%%)|%((\d+)\$){0,1}([dsf]))");
-const std::string sizeMax = std::to_string(std::numeric_limits<size_t>::max());
+const std::string SIZE_T_MAX_STR = std::to_string(std::numeric_limits<size_t>::max());
 const int PRECISION_OF_NUMBER = 6;
 
 std::string FormatString(const char *fmt, ...)
@@ -186,8 +186,8 @@ bool ReplacePlaceholderWithParams(std::string &inputOutputValue, const ResConfig
         std::string placeholderType = matches[4];
         size_t paramIndex;
         if (placeholderIndex.length() != 0) {
-            if (placeholderIndex.size() > sizeMax.size() ||
-                (placeholderIndex.size() == sizeMax.size() && placeholderIndex > sizeMax)) {
+            if (placeholderIndex.size() > SIZE_T_MAX_STR.size() ||
+                (placeholderIndex.size() == SIZE_T_MAX_STR.size() && placeholderIndex > SIZE_T_MAX_STR)) {
                 HILOG_ERROR("index of placeholder is too large");
                 return false;
             }
