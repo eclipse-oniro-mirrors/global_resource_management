@@ -114,7 +114,7 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest002, TestSize.Level1)
 
     EXPECT_TRUE(ret);
 
-    uint32_t id = 16777237; // 16777237 means string_ref
+    uint32_t id = 16777238; // 16777238 means string_ref
     auto idValues = hapManager->GetResourceList(id);
     if (idValues.size() == 0) {
         delete (hapManager);
