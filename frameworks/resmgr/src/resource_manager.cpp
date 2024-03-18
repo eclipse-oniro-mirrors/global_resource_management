@@ -52,7 +52,7 @@ ResourceManager *CreateResourceManager()
 std::shared_ptr<ResourceManager> CreateResourceManagerDef(
     const std::string &bundleName, const std::string &moduleName,
     const std::string &hapPath, const std::vector<std::string> &overlayPath,
-    ResConfig &resConfig)
+    ResConfig &resConfig, int32_t userId)
 {
     if (bundleName.empty()) {
         HILOG_ERROR("bundleName or hapPath is empty when CreateResourceManagerDef");
@@ -66,7 +66,8 @@ std::shared_ptr<ResourceManager> CreateResourceManagerDef(
     }
     resourceManagerImpl->bundleInfo.first = bundleName;
     resourceManagerImpl->bundleInfo.second = moduleName;
-    ThemePackManager::GetThemePackManager()->LoadThemeRes(bundleName, moduleName);
+    resourceManagerImpl->userId = userId;
+    ThemePackManager::GetThemePackManager()->LoadThemeRes(bundleName, moduleName, userId);
     return resourceManagerImpl;
 }
 
@@ -89,10 +90,10 @@ std::shared_ptr<ResourceManager> CreateResourceManagerExt(const std::string &bun
 
 std::shared_ptr<ResourceManager> CreateResourceManager(const std::string &bundleName, const std::string &moduleName,
     const std::string &hapPath, const std::vector<std::string> &overlayPath,
-    ResConfig &resConfig, int32_t appType)
+    ResConfig &resConfig, int32_t appType, int32_t userId)
 {
     if (appType == 0) {
-        return CreateResourceManagerDef(bundleName, moduleName, hapPath, overlayPath, resConfig);
+        return CreateResourceManagerDef(bundleName, moduleName, hapPath, overlayPath, resConfig, userId);
     } else {
     #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
         return CreateResourceManagerExt(bundleName, appType);

@@ -1061,7 +1061,7 @@ RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig, bool isUpdateT
 {
     if (isUpdateTheme) {
         HILOG_DEBUG("The theme enabled");
-        ThemePackManager::GetThemePackManager()->LoadThemeRes(bundleInfo.first, bundleInfo.second);
+        ThemePackManager::GetThemePackManager()->LoadThemeRes(bundleInfo.first, bundleInfo.second, userId);
     }
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);

@@ -33,6 +33,8 @@ class ResourceManager {
 public:
     std::pair<std::string, std::string> bundleInfo;
 
+    int32_t userId = 0;
+
     typedef struct {
         /** the raw file fd */
         int fd;
@@ -234,7 +236,7 @@ EXPORT_FUNC ResourceManager *GetSystemResourceManagerNoSandBox();
  */
 EXPORT_FUNC std::shared_ptr<ResourceManager> CreateResourceManager(const std::string &bundleName,
     const std::string &moduleName, const std::string &hapPath, const std::vector<std::string> &overlayPath,
-    ResConfig &resConfig, int32_t appType = 0);
+    ResConfig &resConfig, int32_t appType = 0, int32_t userId = 0);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

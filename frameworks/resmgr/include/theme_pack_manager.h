@@ -39,9 +39,19 @@ public:
      *
      * @param bundleName the hap bundleName
      * @param moduleName the hap moduleName
-     * @param themeMask the theme icon mask
+     * @param userId the uesr id
      */
-    void LoadThemeRes(const std::string &bundleName, const std::string &moduleName);
+    void LoadThemeRes(const std::string &bundleName, const std::string &moduleName, int32_t userId);
+
+    /**
+     * Load the theme resource.
+     *
+     * @param bundleName the hap bundleName
+     * @param moduleName the hap moduleName
+     * @param userId the uesr id
+     */
+    void LoadSAThemeRes(const std::string &bundleName, const std::string &moduleName,
+        int32_t userId, std::vector<std::string> &rootDirs, std::vector<std::string> &iconDirs);
 
     /**
      * Load the skin dir resource in theme pack.
@@ -51,7 +61,7 @@ public:
      * @param rootDirs the theme skins dirs
      */
     void LoadThemeSkinResource(const std::string &bundleName, const std::string &moduleName,
-        const std::vector<std::string> &rootDirs, const std::string &themeFlag);
+        const std::vector<std::string> &rootDirs, const std::string &themeFlag, bool isAbslutePath, int32_t userId);
 
     /**
      * Load the icons dir resource int theme pack.
@@ -61,7 +71,7 @@ public:
      * @param rootDirs the theme icons dirs
      */
     void LoadThemeIconsResource(const std::string &bundleName, const std::string &moduleName,
-        const std::vector<std::string> &rootDirs, const std::string &themeFlag);
+        const std::vector<std::string> &rootDirs, const std::string &themeFlag, bool isAbslutePath, int32_t userId);
     
     /**
      * Get the theme resource related to bundlename, modulename, resType, resName and resConfig.
@@ -99,6 +109,8 @@ public:
     {
         return themeMask;
     }
+
+    const std::string ReplaceUserIdInPath(const std::string &originalPath, int32_t userId);
 private:
     ThemePackManager();
     std::string themeFlag;
@@ -106,7 +118,9 @@ private:
     std::string themeMask;
     void ClearSkinResource(const std::string &themeFlag);
     void ClearIconResource(const std::string &themeFlag);
-    std::vector<std::shared_ptr<ThemeResource> > skinResource_;
+    void ClearSASkinResource(const std::string &themeFlag, int32_t userId);
+    void ClearSAIconResource(const std::string &themeFlag, int32_t userId);
+    std::vector<std::shared_ptr<ThemeResource>> skinResource_;
     std::vector<std::shared_ptr<ThemeResource>> iconResource_;
     std::vector<std::shared_ptr<ThemeResource::ThemeValue> > GetThemeResourceList(
         const std::pair<std::string, std::string> &bundInfo, const ResType &resType, const std::string &resName);
