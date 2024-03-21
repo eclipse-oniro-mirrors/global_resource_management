@@ -24,7 +24,7 @@ namespace Resource {
 const std::string SystemResourceManager::SYSTEM_RESOURCE_PATH = "/data/storage/el1/bundle/ohos.global.systemres" \
     "/ohos.global.systemres/assets/entry/resources.index";
 
-const std::string SystemResourceManager::SYSTEM_RESOURCE_PATH_COMPRESSED = "/data/storage/el1/bundle/" \
+const std::string SystemResourceManager::SYSTEM_RESOURCE_PATH_COMPRESSED = "/data/global/" \
     "systemResources/SystemResources.hap";
 
 const std::string SystemResourceManager::SYSTEM_RESOURCE_OVERLAY_PATH_COMPRESSED = "/sys_prod/app/" \
