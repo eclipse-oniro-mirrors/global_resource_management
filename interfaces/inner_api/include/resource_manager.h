@@ -203,6 +203,8 @@ public:
         std::pair<std::unique_ptr<uint8_t[]>, size_t> &backgroundInfo, uint32_t density = 0) = 0;
 
     virtual std::string GetThemeMask() = 0;
+
+    virtual RState IsRawDirFromHap(const std::string &pathName, bool &outValue) = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();

@@ -64,7 +64,8 @@ std::unordered_map<std::string, std::function<napi_value(napi_env&, napi_callbac
     {"GetDeviceCapabilitySync", std::bind(&ResourceManagerNapiSyncImpl::GetDeviceCapabilitySync, _1, _2)},
     {"GetLocales", std::bind(&ResourceManagerNapiSyncImpl::GetLocales, _1, _2)},
     {"GetSymbol", std::bind(&ResourceManagerNapiSyncImpl::GetSymbol, _1, _2)},
-    {"GetSymbolByName", std::bind(&ResourceManagerNapiSyncImpl::GetSymbolByName, _1, _2)}
+    {"GetSymbolByName", std::bind(&ResourceManagerNapiSyncImpl::GetSymbolByName, _1, _2)},
+    {"IsRawDir", std::bind(&ResourceManagerNapiSyncImpl::IsRawDir, _1, _2)}
 };
 
 napi_value ResourceManagerNapiSyncImpl::GetResource(napi_env env, napi_callback_info info,
@@ -1190,6 +1191,28 @@ napi_value ResourceManagerNapiSyncImpl::GetLocales(napi_env env, napi_callback_i
     }
     dataContext->addon_->GetResMgr()->GetLocales(dataContext->arrayValue_, dataContext->bValue_);
     return ResourceManagerNapiUtils::CreateJsArray(env, *dataContext);
+}
+
+napi_value ResourceManagerNapiSyncImpl::IsRawDir(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+
+    int32_t ret = InitPathAddon(env, info, dataContext);
+    if (ret != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to init para in IsRawDir by %{public}s", dataContext->path_.c_str());
+        ResourceManagerNapiUtils::NapiThrow(env, ret);
+        return nullptr;
+    }
+
+    RState state = dataContext->addon_->GetResMgr()->IsRawDirFromHap(dataContext->path_,
+        dataContext->bValue_);
+    if (state != RState::SUCCESS) {
+        HiLog::Error(LABEL, "Failed to determine the raw file is directory by %{public}s", dataContext->path_.c_str());
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+    return ResourceManagerNapiUtils::CreateJsBool(env, *dataContext);
 }
 } // namespace Resource
 } // namespace Global

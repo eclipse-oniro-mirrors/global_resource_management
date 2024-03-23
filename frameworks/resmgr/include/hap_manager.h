@@ -344,6 +344,15 @@ public:
      */
     void GetLocales(std::vector<std::string> &outValue, bool includeSystem = false);
 
+    /**
+     * Whether this raw resource is a directory
+     *
+     * @param path the raw resource path
+     * @param outValue the obtain boolean value write to
+     * @return SUCCESS if raw resource is a directory, else ERROR
+     */
+    RState IsRawDirFromHap(const std::string &pathName, bool &outValue);
+
 private:
     void UpdateResConfigImpl(ResConfigImpl &resConfig);
 
