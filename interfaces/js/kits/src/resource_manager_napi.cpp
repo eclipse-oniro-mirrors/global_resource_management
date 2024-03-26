@@ -137,7 +137,7 @@ static napi_value getResult(napi_env env, std::unique_ptr<ResMgrDataContext> &as
         HiLog::Error(LABEL, "Failed to create async work for getResourceManager %{public}d", status);
         return result;
     }
-    status = napi_queue_async_work(env, asyncContext->work_);
+    status = napi_queue_async_work_with_qos(env, asyncContext->work_, napi_qos_user_initiated);
     if (status != napi_ok) {
         HiLog::Error(LABEL, "Failed to queue async work for getResourceManager %{public}d", status);
         return result;
