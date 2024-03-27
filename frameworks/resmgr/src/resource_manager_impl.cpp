@@ -1513,6 +1513,11 @@ std::string ResourceManagerImpl::GetThemeMask()
 {
     return ThemePackManager::GetThemePackManager()->GetMask();
 }
+
+RState ResourceManagerImpl::IsRawDirFromHap(const std::string &pathName, bool &outValue)
+{
+    return hapManager_->IsRawDirFromHap(pathName, outValue);
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

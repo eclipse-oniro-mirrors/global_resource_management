@@ -164,7 +164,8 @@ napi_property_descriptor ResourceManagerAddon::properties[] = {
     DECLARE_NAPI_FUNCTION("getDeviceCapabilitySync", GetDeviceCapabilitySync),
     DECLARE_NAPI_FUNCTION("getLocales", GetLocales),
     DECLARE_NAPI_FUNCTION("getSymbol", GetSymbol),
-    DECLARE_NAPI_FUNCTION("getSymbolByName", GetSymbolByName)
+    DECLARE_NAPI_FUNCTION("getSymbolByName", GetSymbolByName),
+    DECLARE_NAPI_FUNCTION("isRawDir", IsRawDir)
 };
 
 bool ResourceManagerAddon::Init(napi_env env)
@@ -496,6 +497,11 @@ napi_value ResourceManagerAddon::GetSymbol(napi_env env, napi_callback_info info
 napi_value ResourceManagerAddon::GetSymbolByName(napi_env env, napi_callback_info info)
 {
     return AddonGetResource(env, info, "GetSymbolByName", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::IsRawDir(napi_env env, napi_callback_info info)
+{
+    return AddonGetResource(env, info, "IsRawDir", FunctionType::SYNC);
 }
 } // namespace Resource
 } // namespace Global

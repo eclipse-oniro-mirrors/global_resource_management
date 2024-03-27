@@ -98,6 +98,8 @@ private:
 
     static napi_value GetSymbolByName(napi_env env, napi_callback_info info);
 
+    static napi_value IsRawDir(napi_env env, napi_callback_info info);
+
     static int32_t InitIdResourceAddon(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
 

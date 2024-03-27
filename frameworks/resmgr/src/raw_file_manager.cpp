@@ -627,3 +627,17 @@ bool OH_ResourceManager_ReleaseRawFileDescriptor64(const RawFileDescriptor64 *de
     }
     return true;
 }
+
+bool OH_ResourceManager_IsRawDir(const NativeResourceManager *mgr, const char *path)
+{
+    bool result = false;
+    if (mgr == nullptr || path == nullptr) {
+        return result;
+    }
+    RState state = mgr->resManager->IsRawDirFromHap(path, result);
+    if (state != SUCCESS) {
+        HiLog::Error(LABEL, "failed to determine whether the path is a directory");
+        return result;
+    }
+    return result;
+}

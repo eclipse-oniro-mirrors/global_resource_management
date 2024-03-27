@@ -624,6 +624,15 @@ public:
      */
     virtual std::string GetThemeMask();
 
+    /**
+     * Whether this raw resource is a directory
+     *
+     * @param pathName the raw resource path
+     * @param outValue the obtain boolean value write to
+     * @return SUCCESS if raw resource is a directory, else not found
+     */
+    virtual RState IsRawDirFromHap(const std::string &pathName, bool &outValue);
+
 private:
     RState GetString(const std::shared_ptr<IdItem> idItem, std::string &outValue);
 

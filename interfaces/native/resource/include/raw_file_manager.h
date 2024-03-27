@@ -135,6 +135,18 @@ RawFile *OH_ResourceManager_OpenRawFile(const NativeResourceManager *mgr, const 
  */
 RawFile64 *OH_ResourceManager_OpenRawFile64(const NativeResourceManager *mgr, const char *fileName);
 
+/**
+ * @brief Whether the rawfile resource is a directory or not.
+ *
+ * @param mgr Indicates the pointer to {@link NativeResourceManager} obtained by calling
+ * {@link OH_ResourceManager_InitNativeResourceManager}.
+ * @param path Indicates the rawfile resource relative path.
+ * @return Returns true means the file path is directory, else false.
+ * @since 12
+ * @version 1.0
+ */
+bool OH_ResourceManager_IsRawDir(const NativeResourceManager *mgr, const char *path);
+
 #ifdef __cplusplus
 };
 #endif

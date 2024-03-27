@@ -21,6 +21,7 @@
 #include <unzip.h>
 #include <unistd.h>
 #include <set>
+#include <sys/stat.h>
 
 #include "hilog_wrapper.h"
 #include "locale_matcher.h"
@@ -827,6 +828,52 @@ std::string HapParser::BuildFolderPath(Determiner *determiner)
     PathAppend(path, determiner->screenDensity, connecter2);
 
     return path;
+}
+
+RState HapParser::IsRawDirFromHap(const char *hapPath, const std::string &pathName, bool &outValue)
+{
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    if (pathName.empty()) {
+        HILOG_ERROR("the rawfile path is empty");
+        return ERROR_CODE_RES_PATH_INVALID;
+    }
+    bool isNewExtractor = false;
+    auto extractor = AbilityBase::ExtractorUtil::GetExtractor(hapPath, isNewExtractor);
+    if (extractor == nullptr) {
+        HILOG_ERROR("failed to get extractor hapPath, %{public}s", hapPath);
+        return NOT_FOUND;
+    }
+    std::string rawPath = HapParser::GetRawFilePath(extractor, pathName);
+    if (extractor->HasEntry(rawPath)) {
+        outValue = false;
+    } else if (extractor->IsDirExist(rawPath)) {
+        outValue = true;
+    } else {
+        HILOG_ERROR("the rawfile file %{public}s is not exist in %{public}s", rawPath.c_str(), hapPath);
+        return ERROR_CODE_RES_PATH_INVALID;
+    }
+#endif
+    return SUCCESS;
+}
+
+RState HapParser::IsRawDirUnCompressed(const std::string &pathName, bool &outValue)
+{
+    char outPath[PATH_MAX + 1] = {0};
+    Utils::CanonicalizePath(pathName.c_str(), outPath, PATH_MAX);
+    struct stat fileStat {};
+    if (stat(outPath, &fileStat) != 0) {
+        HILOG_ERROR("failed to get rawfile file info, %{public}s", outPath);
+        return ERROR_CODE_RES_PATH_INVALID;
+    }
+    if ((fileStat.st_mode & S_IFDIR)) {
+        outValue = true;
+    } else if ((fileStat.st_mode & S_IFREG)) {
+        outValue = false;
+    } else {
+        HILOG_ERROR("the rawfile file %{public}s is not exist", outPath);
+        return ERROR_CODE_RES_PATH_INVALID;
+    }
+    return SUCCESS;
 }
 } // namespace Resource
 } // namespace Global

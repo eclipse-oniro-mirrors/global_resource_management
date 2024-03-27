@@ -1031,6 +1031,29 @@ void HapManager::GetLocales(std::vector<std::string> &outValue, bool includeSyst
     }
     outValue.assign(result.begin(), result.end());
 }
+
+RState HapManager::IsRawDirFromHap(const std::string &pathName, bool &outValue)
+{
+    for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
+        if ((*iter)->IsSystemResource() || (*iter)->IsOverlayResource()) {
+            continue;
+        }
+        const std::string tempPath = (*iter)->GetIndexPath();
+        if (Utils::ContainsTail(tempPath, Utils::tailSet)) { // if file path is compressed
+            RState state = HapParser::IsRawDirFromHap(tempPath.c_str(), pathName, outValue);
+            if (state != SUCCESS) {
+                continue;
+            }
+        } else { // if file path is uncompressed
+            RState state = HapParser::IsRawDirUnCompressed(pathName, outValue);
+            if (state != SUCCESS) {
+                continue;
+            }
+        }
+        return SUCCESS;
+    }
+    return ERROR_CODE_RES_PATH_INVALID;
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
