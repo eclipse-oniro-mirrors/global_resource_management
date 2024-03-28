@@ -22,7 +22,10 @@
 #include <vector>
 #include <regex>
 #include "hilog_wrapper.h"
+
+#ifdef SUPPORT_GRAPHICS
 #include "unicode/numberformatter.h"
+#endif
 
 #if defined(__WINNT__)
 #include <cstring>
@@ -35,7 +38,9 @@ namespace Global {
 namespace Resource {
 const std::regex PLACEHOLDER_MATCHING_RULES(R"((%%)|%((\d+)\$){0,1}([dsf]))");
 const std::string SIZE_T_MAX_STR = std::to_string(std::numeric_limits<size_t>::max());
+#ifdef SUPPORT_GRAPHICS
 const int PRECISION_OF_NUMBER = 6;
+#endif
 
 std::string FormatString(const char *fmt, ...)
 {
@@ -68,6 +73,7 @@ std::string FormatString(const char *fmt, va_list args)
 
 bool LocalizeNumber(std::string &inputOutputNum, const ResConfigImpl &resConfig, bool isKeepPrecision = true)
 {
+#ifdef SUPPORT_GRAPHICS
     const ResLocale *resLocale = resConfig.GetResLocale();
     if (resLocale == nullptr) {
         HILOG_WARN("LocalizeNumber resLocale is null");
@@ -114,6 +120,9 @@ bool LocalizeNumber(std::string &inputOutputNum, const ResConfigImpl &resConfig,
         return false;
     }
     return true;
+#else
+    return true;
+#endif
 }
 
 bool GetReplaceStr(const std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams,
