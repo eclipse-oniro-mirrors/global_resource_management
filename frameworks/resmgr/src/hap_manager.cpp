@@ -710,7 +710,11 @@ RState HapManager::FindRawFileDescriptorFromHap(const std::string &rawFileName,
         descriptor.offset = rawFileDescriptor_[rawFileName].offset;
         return SUCCESS;
     }
-    return GetRawFd(rawFileName, descriptor);
+    RState state = GetRawFd(rawFileName, descriptor);
+    if (state == SUCCESS) {
+        rawFileDescriptor_[rawFileName] = descriptor;
+    }
+    return state;
 }
 
 RState HapManager::GetRawFd(const std::string &rawFileName, ResourceManager::RawFileDescriptor &descriptor)
@@ -729,7 +733,6 @@ RState HapManager::GetRawFd(const std::string &rawFileName, ResourceManager::Raw
         if (state != SUCCESS) {
             continue;
         }
-        rawFileDescriptor_[rawFileName] = descriptor;
         return SUCCESS;
     }
     return ERROR_CODE_RES_PATH_INVALID;
