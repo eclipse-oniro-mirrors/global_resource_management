@@ -771,7 +771,8 @@ RState ResourceManagerImpl::GetThemeColor(const std::shared_ptr<IdItem> idItem, 
     std::vector<std::shared_ptr<IdItem> > idItems;
     idItems.emplace_back(idItem);
     RState state = ProcessReference(idItem->value_, idItems);
-    std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig);
+    std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig,
+        hapManager_->IsThemeSystemResEnableHap());
     if (result.empty()) {
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }

@@ -290,6 +290,8 @@ public:
 
     HapResource(const std::string path, time_t lastModTime, std::shared_ptr<ResDesc> resDes,
         bool isSystem = false, bool isOverlay = false);
+
+    bool IsThemeSystemResEnable() const;
 private:
 
     void UpdateOverlayInfo(std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> &nameTypeId);
@@ -328,6 +330,9 @@ private:
 
     // judge the hap resource is overlay or not.
     bool isOverlay_;
+
+    //judge the theme SystemRes is enabled or not.
+    bool isThemeSystemResEnable_;
 };
 } // namespace Resource
 } // namespace Global
