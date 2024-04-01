@@ -1057,6 +1057,19 @@ RState HapManager::IsRawDirFromHap(const std::string &pathName, bool &outValue)
     }
     return ERROR_CODE_RES_PATH_INVALID;
 }
+
+bool HapManager::IsThemeSystemResEnableHap() const
+{
+    for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
+        if ((*iter)->IsSystemResource() || (*iter)->IsOverlayResource()) {
+            continue;
+        }
+        if ((*iter)->IsThemeSystemResEnable()) {
+            return true;
+        }
+    }
+    return false;
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

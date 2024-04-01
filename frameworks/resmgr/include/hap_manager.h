@@ -353,6 +353,13 @@ public:
      */
     RState IsRawDirFromHap(const std::string &pathName, bool &outValue);
 
+    /**
+     * Whether this theme system resource is enabled
+     *
+     * @return true is enabled, else not.
+     */
+    bool IsThemeSystemResEnableHap() const;
+
 private:
     void UpdateResConfigImpl(ResConfigImpl &resConfig);
 

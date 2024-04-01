@@ -199,7 +199,7 @@ const std::string ThemePackManager::ReplaceUserIdInPath(const std::string &origi
 }
 
 const std::string ThemePackManager::FindThemeResource(const std::pair<std::string, std::string> &bundleInfo,
-    std::vector<std::shared_ptr<IdItem>> idItems, const ResConfigImpl &resConfig)
+    std::vector<std::shared_ptr<IdItem>> idItems, const ResConfigImpl &resConfig, bool isThemeSystemResEnable)
 {
     std::string result;
     for (size_t i = 0; i < idItems.size(); i++) {
@@ -207,6 +207,9 @@ const std::string ThemePackManager::FindThemeResource(const std::pair<std::strin
         uint32_t id = idItems[i]->GetItemResId();
         ResType resType = idItems[i]->GetItemResType();
         if (Utils::IsPrefix(sysResIdPreFix, std::to_string(id))) {
+            if (resType == ResType::COLOR && !isThemeSystemResEnable) {
+                break;
+            }
             std::pair<std::string, std::string> tempInfo("systemRes", "entry");
             result = GetThemeResource(tempInfo, resType, resName, resConfig);
         } else {

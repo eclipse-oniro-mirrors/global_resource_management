@@ -68,7 +68,7 @@ HapResource::IdValues::~IdValues()
 // HapResource
 HapResource::HapResource(const std::string path, time_t lastModTime, std::shared_ptr<ResDesc> resDes,
     bool isSystem, bool isOverlay) : indexPath_(path), lastModTime_(lastModTime), resDesc_(resDes),
-    isSystem_(isSystem), isOverlay_(isOverlay)
+    isSystem_(isSystem), isOverlay_(isOverlay), isThemeSystemResEnable_(false)
 {}
 
 HapResource::~HapResource()
@@ -361,6 +361,9 @@ bool HapResource::InitIdList()
                 idValuesMap_.insert(std::make_pair(id, idValues));
                 std::string name = std::string(idParam->idItem_->name_);
                 idValuesNameMap_[idParam->idItem_->resType_]->insert(std::make_pair(name, idValues));
+                if (name == "system_color_change" && idParam->idItem_->value_ == "true") {
+                    isThemeSystemResEnable_ = true;
+                }
             } else {
                 std::shared_ptr<HapResource::IdValues> idValues = iter->second;
                 auto limitPath = std::make_shared<HapResource::ValueUnderQualifierDir>(resKey,
@@ -511,6 +514,10 @@ void HapResource::GetKeyParamsLocales(const std::vector<std::shared_ptr<KeyParam
     if (isLocale) {
         outValue.emplace(locale);
     }
+}
+bool HapResource::IsThemeSystemResEnable() const
+{
+    return this->isThemeSystemResEnable_;
 }
 } // namespace Resource
 } // namespace Global
