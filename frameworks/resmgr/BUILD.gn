@@ -248,7 +248,6 @@ ohos_shared_library("librawfile") {
 
   deps = [
     ":global_resmgr",
-    "../../interfaces/native/resource:librawfile_ndk",
     "//third_party/cJSON:cjson_static",
   ]
 
@@ -259,12 +258,6 @@ ohos_shared_library("librawfile") {
     "hilog:libhilog",
     "napi:ace_napi",
   ]
-
-  version_script =
-      get_label_info("../../interfaces/native/resource:librawfile_ndk",
-                     "target_gen_dir") + "/" +
-      get_label_info("../../interfaces/native/resource:librawfile_ndk",
-                     "name") + version_script_suffix
 
   innerapi_tags = [ "platformsdk" ]
   subsystem_name = "global"
