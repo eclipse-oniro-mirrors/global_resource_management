@@ -36,6 +36,9 @@ const std::string SystemResourceManager::SYSTEM_RESOURCE_NO_SAND_BOX_PKG_PATH = 
 const std::string SystemResourceManager::SYSTEM_RESOURCE_NO_SAND_BOX_HAP_PATH = "/system/app/SystemResources" \
     "/SystemResources.hap";
 
+const std::string SystemResourceManager::SYSTEM_RESOURCE_EXT_NO_SAND_BOX_HAP_PATH = "/system/app/SystemResources" \
+    "/SystemResourcesExt.hap";
+
 ResourceManagerImpl *SystemResourceManager::resourceManager_ = nullptr;
 
 std::mutex SystemResourceManager::mutex_;
@@ -98,6 +101,7 @@ bool SystemResourceManager::LoadSystemResource(ResourceManagerImpl *impl, bool i
 {
     std::string sysPkgNamePath = SystemResourceManager::SYSTEM_RESOURCE_PATH;
     std::string sysHapNamePath = SystemResourceManager::SYSTEM_RESOURCE_PATH_COMPRESSED;
+    std::string sysHapExtNamePath = SystemResourceManager::SYSTEM_RESOURCE_EXT_NO_SAND_BOX_HAP_PATH;
     if (!isSandbox) {
         sysPkgNamePath = SystemResourceManager::SYSTEM_RESOURCE_NO_SAND_BOX_PKG_PATH;
         sysHapNamePath = SystemResourceManager::SYSTEM_RESOURCE_NO_SAND_BOX_HAP_PATH;
@@ -112,12 +116,18 @@ bool SystemResourceManager::LoadSystemResource(ResourceManagerImpl *impl, bool i
     }
 
     if (Utils::IsFileExist(sysHapNamePath)) {
+        bool result = false;
         if (Utils::IsFileExist(SYSTEM_RESOURCE_OVERLAY_PATH_COMPRESSED)) {
             vector<string> overlayPaths;
             overlayPaths.push_back(SYSTEM_RESOURCE_OVERLAY_PATH_COMPRESSED);
-            return impl->AddResource(sysHapNamePath.c_str(), overlayPaths);
+            result = impl->AddResource(sysHapNamePath.c_str(), overlayPaths);
+        } else {
+            result = impl->AddResource(sysHapNamePath.c_str());
         }
-        return impl->AddResource(sysHapNamePath.c_str());
+        if (result && Utils::IsFileExist(sysHapExtNamePath)) {
+            result = impl->AddResource(sysHapExtNamePath.c_str());
+        }
+        return result;
     }
     return false;
 }

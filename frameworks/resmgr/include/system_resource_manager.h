@@ -59,6 +59,8 @@ private:
 
     static const std::string SYSTEM_RESOURCE_NO_SAND_BOX_HAP_PATH;
 
+    static const std::string SYSTEM_RESOURCE_EXT_NO_SAND_BOX_HAP_PATH;
+
     static bool LoadSystemResource(ResourceManagerImpl *impl, bool isSandbox = true);
 
     static bool CreateSystemResourceManager(bool isSandbox = true);
