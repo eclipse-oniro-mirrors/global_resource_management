@@ -14,7 +14,7 @@
 #####################hydra-fuzz###################
 import("//build/config/features.gni")
 import("//build/test.gni")
-module_output_path = "global/resource_management"
+module_output_path = "resource_management/resmgr"
 
 ##############################fuzztest##########################################
 ohos_fuzztest("ResmgrFuzzTest") {
