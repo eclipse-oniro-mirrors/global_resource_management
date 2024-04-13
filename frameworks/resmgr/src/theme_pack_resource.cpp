@@ -142,6 +142,10 @@ void ThemeResource::ParseJson(const std::string &bundleName, const std::string &
     len = ftell(pf);
     std::fseek(pf, 0, SEEK_SET);
     char *jsonData = (char *)malloc(len + 1);
+    if (jsonData == nullptr) {
+        HILOG_ERROR("failed malloc in ParseJson");
+        return;
+    }
     std::fread(jsonData, len, 1, pf);
     jsonData[len] = '\0';
     auto themeConfig = GetThemeConfig(jsonPath);
