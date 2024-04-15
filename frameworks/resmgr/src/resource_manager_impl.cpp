@@ -329,9 +329,8 @@ RState ResourceManagerImpl::GetPluralString(const std::shared_ptr<HapResource::V
     size_t startIdx = 0;
     size_t loop = idItem->values_.size() / 2;
     for (size_t i = 0; i < loop; ++i) {
-        // 2 means key and value appear in pairs
-        std::string key(idItem->values_[startIdx + i * 2]);
-        std::string value(idItem->values_[startIdx + i * 2 + 1]);
+        std::string key(idItem->values_[startIdx + i * 2]); // 2 means keyappear in pairs
+        std::string value(idItem->values_[startIdx + i * 2 + 1]); // 2 means value appear in pairs
         auto iter = map.find(key);
         if (iter == map.end()) {
             std::string resolvedValue;
@@ -432,9 +431,8 @@ RState ResourceManagerImpl::ResolveParentReference(const std::shared_ptr<IdItem>
         // this make sure child covers parent
         size_t loop = currItem->values_.size() / 2;
         for (size_t i = 0; i < loop; ++i) {
-            // 2 means key and value appear in pairs
-            std::string key(currItem->values_[startIdx + i * 2]);
-            std::string value(currItem->values_[startIdx + i * 2 + 1]);
+            std::string key(currItem->values_[startIdx + i * 2]); // 2 means key appear in pairs
+            std::string value(currItem->values_[startIdx + i * 2 + 1]); // 2 means value appear in pairs
             auto iter = outValue.find(key);
             if (iter != outValue.end()) {
                 continue;

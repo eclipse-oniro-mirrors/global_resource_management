@@ -25,6 +25,40 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
+enum BitOperatorNum {
+    BIT_TWO = 2,
+    BIT_THREE = 3,
+    BIT_FOUR = 4,
+    BIT_FIVE = 5,
+    BIT_SIX = 6,
+    BIT_EIGHT = 8,
+    BIT_TWELVE = 12,
+    BIT_SIXTEEN = 16,
+    BIT_TWENTY = 20,
+    BIT_TWENTY_FOUR = 24,
+    BIT_TWENTY_EIGHT = 28,
+    BIT_FORTY_EIGHT = 48
+};
+
+enum ArrayIndex {
+    INDEX_ZERO = 0,
+    INDEX_ONE = 1,
+    INDEX_TWO = 2,
+    INDEX_THREE = 3,
+    INDEX_FOUR = 4,
+    INDEX_FIVE = 5,
+    INDEX_SIX = 6,
+    INDEX_SEVEN = 7,
+    INDEX_EIGHT = 8
+};
+
+enum ArrayLen {
+    LEN_THREE = 3,
+    LEN_FOUR = 4,
+    LEN_FIVE = 5,
+    LEN_SEVEN = 7,
+    LEN_NINE = 9
+};
 class Utils {
 public:
     static bool IsAlphaString(const char *s, int32_t len);

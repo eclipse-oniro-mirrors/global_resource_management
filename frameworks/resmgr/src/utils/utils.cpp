@@ -18,7 +18,6 @@
 #include <vector>
 #include <sys/stat.h>
 #include "hilog_wrapper.h"
-
 #ifdef __LINUX__
 #include <cstring>
 #endif
@@ -36,10 +35,6 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
-constexpr int BIT_SIX = 6;
-constexpr int BIT_FOUR = 4;
-constexpr int BIT_TWO = 2;
-constexpr int LEN_THREE = 3;
 constexpr int ERROR_RESULT = -1;
 
 const std::set<std::string> Utils::tailSet {
@@ -110,24 +105,24 @@ RState Utils::EncodeBase64(std::unique_ptr<uint8_t[]> &data, int srcLen,
         unsigned char byte1 = static_cast<unsigned char>(srcData[i]);
         unsigned char byte2 = static_cast<unsigned char>(srcData[i + 1]);
         unsigned char byte3 = static_cast<unsigned char>(srcData[i + 2]);
-        base64data += g_codes[byte1 >> BIT_TWO];
-        base64data += g_codes[((byte1 & 0x3) << BIT_FOUR) | (byte2 >> BIT_FOUR)];
-        base64data += g_codes[((byte2 & 0xF) << BIT_TWO) | (byte3 >> BIT_SIX)];
+        base64data += g_codes[byte1 >> BitOperatorNum::BIT_TWO];
+        base64data += g_codes[((byte1 & 0x3) << BitOperatorNum::BIT_FOUR) | (byte2 >> BitOperatorNum::BIT_FOUR)];
+        base64data += g_codes[((byte2 & 0xF) << BitOperatorNum::BIT_TWO) | (byte3 >> BitOperatorNum::BIT_SIX)];
         base64data += g_codes[byte3 & 0x3F];
     }
     // Handle the case where there is one element left
-    if (srcLen % LEN_THREE == 1) {
+    if (srcLen % ArrayLen::LEN_THREE == 1) {
         unsigned char byte1 = static_cast<unsigned char>(srcData[i]);
-        base64data += g_codes[byte1 >> BIT_TWO];
-        base64data += g_codes[(byte1 & 0x3) << BIT_FOUR];
+        base64data += g_codes[byte1 >> BitOperatorNum::BIT_TWO];
+        base64data += g_codes[(byte1 & 0x3) << BitOperatorNum::BIT_FOUR];
         base64data += '=';
         base64data += '=';
     } else {
         unsigned char byte1 = static_cast<unsigned char>(srcData[i]);
         unsigned char byte2 = static_cast<unsigned char>(srcData[i + 1]);
-        base64data += g_codes[byte1 >> BIT_TWO];
-        base64data += g_codes[((byte1 & 0x3) << BIT_FOUR) | (byte2 >> BIT_FOUR)];
-        base64data += g_codes[(byte2 & 0xF) << BIT_TWO];
+        base64data += g_codes[byte1 >> BitOperatorNum::BIT_TWO];
+        base64data += g_codes[((byte1 & 0x3) << BitOperatorNum::BIT_FOUR) | (byte2 >> BitOperatorNum::BIT_FOUR)];
+        base64data += g_codes[(byte2 & 0xF) << BitOperatorNum::BIT_TWO];
         base64data += '=';
     }
     dstData = base64data;
@@ -180,10 +175,10 @@ void Utils::DecodeScript(uint32_t encodeScript, char *outValue)
     if (outValue == nullptr) {
         return;
     }
-    outValue[0] = (encodeScript & 0xFF000000) >> 24;
-    outValue[1] = (encodeScript & 0x00FF0000) >> 16;
-    outValue[2] = (encodeScript & 0x0000FF00) >> 8;
-    outValue[3] = (encodeScript & 0x000000FF);
+    outValue[ArrayIndex::INDEX_ZERO] = (encodeScript & 0xFF000000) >> BitOperatorNum::BIT_TWENTY_FOUR;
+    outValue[ArrayIndex::INDEX_ONE] = (encodeScript & 0x00FF0000) >> BitOperatorNum::BIT_SIXTEEN;
+    outValue[ArrayIndex::INDEX_TWO] = (encodeScript & 0x0000FF00) >> BitOperatorNum::BIT_EIGHT;
+    outValue[ArrayIndex::INDEX_THREE] = (encodeScript & 0x000000FF);
 }
 
 bool Utils::IsStrEmpty(const char *s)
@@ -226,8 +221,9 @@ uint64_t Utils::EncodeLocale(const char *language,
     uint32_t scriptData = Utils::EncodeScript(script);
     uint16_t regionData = Utils::EncodeRegion(region);
 
-    return (uint64_t)(0xffff000000000000 & (((uint64_t)languageData) << 48)) |
-           (0x0000ffffffff0000 & (((uint64_t)scriptData) << 16)) | (0x000000000000ffff & (uint64_t)(regionData));
+    return (uint64_t)(0xffff000000000000 & (((uint64_t)languageData) << BitOperatorNum::BIT_FORTY_EIGHT)) |
+           (0x0000ffffffff0000 & (((uint64_t)scriptData) << BitOperatorNum::BIT_SIXTEEN)) |
+           (0x000000000000ffff & (uint64_t)(regionData));
 }
 
 uint16_t Utils::EncodeRegionByResLocale(const ResLocale *locale)
@@ -280,7 +276,10 @@ uint32_t Utils::EncodeScript(const char *script)
     if (Utils::IsStrEmpty(script)) {
         return NULL_SCRIPT;
     }
-    return ((uint8_t)script[0] << 24) | ((uint8_t)script[1] << 16) | ((uint8_t)script[2] << 8) | (uint8_t)script[3];
+    return ((uint8_t)script[ArrayIndex::INDEX_ZERO] << BitOperatorNum::BIT_TWENTY_FOUR) |
+        ((uint8_t)script[ArrayIndex::INDEX_ONE] << BitOperatorNum::BIT_SIXTEEN) |
+        ((uint8_t)script[ArrayIndex::INDEX_TWO] << BitOperatorNum::BIT_EIGHT) |
+        (uint8_t)script[ArrayIndex::INDEX_THREE];
 }
 
 /**
@@ -306,13 +305,15 @@ uint32_t Utils::EncodeScript(const char *script)
  */
 uint16_t Utils::EncodeLanguageOrRegion(const char *str, char base)
 {
-    if (str[2] == 0 || str[2] == '-' || str[2] == '_') {
-        return ((uint8_t)str[0] << 8) | ((uint8_t)str[1]);
+    if (str[ArrayIndex::INDEX_TWO] == 0 || str[ArrayIndex::INDEX_TWO] == '-' || str[ArrayIndex::INDEX_TWO] == '_') {
+        return ((uint8_t)str[ArrayIndex::INDEX_ZERO] << BitOperatorNum::BIT_EIGHT) |
+            ((uint8_t)str[ArrayIndex::INDEX_ONE]);
     }
-    uint8_t first = ((uint8_t)(str[0] - base)) & 0x7f;
-    uint8_t second = ((uint8_t)(str[1] - base)) & 0x7f;
-    uint8_t third = ((uint8_t)(str[2] - base)) & 0x7f;
-    return ((0x80 | (first << 2) | (second >> 3)) << 8) | ((second << 5) | third);
+    uint8_t first = ((uint8_t)(str[ArrayIndex::INDEX_ZERO] - base)) & 0x7f;
+    uint8_t second = ((uint8_t)(str[ArrayIndex::INDEX_ONE] - base)) & 0x7f;
+    uint8_t third = ((uint8_t)(str[ArrayIndex::INDEX_TWO] - base)) & 0x7f;
+    return ((0x80 | (first << BitOperatorNum::BIT_TWO) | (second >> BitOperatorNum::BIT_THREE)) <<
+        BitOperatorNum::BIT_EIGHT) | ((second << BitOperatorNum::BIT_FIVE) | third);
 };
 
 bool Utils::StrCompare(const char *left, const char *right, size_t len, bool isCaseSensitive)
@@ -395,40 +396,40 @@ RState Utils::ConvertColorToUInt32(const char *s, uint32_t &outValue)
     RState parseState = SUCCESS;
     size_t len = strlen(s);
     if (*s == '#') {
-        if (len == 4) {
+        if (len == ArrayLen::LEN_FOUR) {
             color |= 0xFF000000;
-            color |= ParseHex(s[1], parseState) << 20;
-            color |= ParseHex(s[1], parseState) << 16;
-            color |= ParseHex(s[2], parseState) << 12;
-            color |= ParseHex(s[2], parseState) << 8;
-            color |= ParseHex(s[3], parseState) << 4;
-            color |= ParseHex(s[3], parseState);
-        } else if (len == 5) {
-            color |= ParseHex(s[1], parseState) << 28;
-            color |= ParseHex(s[1], parseState) << 24;
-            color |= ParseHex(s[2], parseState) << 20;
-            color |= ParseHex(s[2], parseState) << 16;
-            color |= ParseHex(s[3], parseState) << 12;
-            color |= ParseHex(s[3], parseState) << 8;
-            color |= ParseHex(s[4], parseState) << 4;
-            color |= ParseHex(s[4], parseState);
-        } else if (len == 7) {
+            color |= ParseHex(s[ArrayIndex::INDEX_ONE], parseState) << BitOperatorNum::BIT_TWENTY;
+            color |= ParseHex(s[ArrayIndex::INDEX_ONE], parseState) << BitOperatorNum::BIT_SIXTEEN;
+            color |= ParseHex(s[ArrayIndex::INDEX_TWO], parseState) << BitOperatorNum::BIT_TWELVE;
+            color |= ParseHex(s[ArrayIndex::INDEX_TWO], parseState) << BitOperatorNum::BIT_EIGHT;
+            color |= ParseHex(s[ArrayIndex::INDEX_THREE], parseState) << BitOperatorNum::BIT_FOUR;
+            color |= ParseHex(s[ArrayIndex::INDEX_THREE], parseState);
+        } else if (len == ArrayLen::LEN_FIVE) {
+            color |= ParseHex(s[ArrayIndex::INDEX_ONE], parseState) << BitOperatorNum::BIT_TWENTY_EIGHT;
+            color |= ParseHex(s[ArrayIndex::INDEX_ONE], parseState) << BitOperatorNum::BIT_TWENTY_FOUR;
+            color |= ParseHex(s[ArrayIndex::INDEX_TWO], parseState) << BitOperatorNum::BIT_TWENTY;
+            color |= ParseHex(s[ArrayIndex::INDEX_TWO], parseState) << BitOperatorNum::BIT_SIXTEEN;
+            color |= ParseHex(s[ArrayIndex::INDEX_THREE], parseState) << BitOperatorNum::BIT_TWELVE;
+            color |= ParseHex(s[ArrayIndex::INDEX_THREE], parseState) << BitOperatorNum::BIT_EIGHT;
+            color |= ParseHex(s[ArrayIndex::INDEX_FOUR], parseState) << BitOperatorNum::BIT_FOUR;
+            color |= ParseHex(s[ArrayIndex::INDEX_FOUR], parseState);
+        } else if (len == ArrayLen::LEN_SEVEN) {
             color |= 0xFF000000;
-            color |= ParseHex(s[1], parseState) << 20;
-            color |= ParseHex(s[2], parseState) << 16;
-            color |= ParseHex(s[3], parseState) << 12;
-            color |= ParseHex(s[4], parseState) << 8;
-            color |= ParseHex(s[5], parseState) << 4;
-            color |= ParseHex(s[6], parseState);
-        } else if (len == 9) {
-            color |= ParseHex(s[1], parseState) << 28;
-            color |= ParseHex(s[2], parseState) << 24;
-            color |= ParseHex(s[3], parseState) << 20;
-            color |= ParseHex(s[4], parseState) << 16;
-            color |= ParseHex(s[5], parseState) << 12;
-            color |= ParseHex(s[6], parseState) << 8;
-            color |= ParseHex(s[7], parseState) << 4;
-            color |= ParseHex(s[8], parseState);
+            color |= ParseHex(s[ArrayIndex::INDEX_ONE], parseState) << BitOperatorNum::BIT_TWENTY;
+            color |= ParseHex(s[ArrayIndex::INDEX_TWO], parseState) << BitOperatorNum::BIT_SIXTEEN;
+            color |= ParseHex(s[ArrayIndex::INDEX_THREE], parseState) << BitOperatorNum::BIT_TWELVE;
+            color |= ParseHex(s[ArrayIndex::INDEX_FOUR], parseState) << BitOperatorNum::BIT_EIGHT;
+            color |= ParseHex(s[ArrayIndex::INDEX_FIVE], parseState) << BitOperatorNum::BIT_FOUR;
+            color |= ParseHex(s[ArrayIndex::INDEX_SIX], parseState);
+        } else if (len == ArrayLen::LEN_NINE) {
+            color |= ParseHex(s[ArrayIndex::INDEX_ONE], parseState) << BitOperatorNum::BIT_TWENTY_EIGHT;
+            color |= ParseHex(s[ArrayIndex::INDEX_TWO], parseState) << BitOperatorNum::BIT_TWENTY_FOUR;
+            color |= ParseHex(s[ArrayIndex::INDEX_THREE], parseState) << BitOperatorNum::BIT_TWENTY;
+            color |= ParseHex(s[ArrayIndex::INDEX_FOUR], parseState) << BitOperatorNum::BIT_SIXTEEN;
+            color |= ParseHex(s[ArrayIndex::INDEX_FIVE], parseState) << BitOperatorNum::BIT_TWELVE;
+            color |= ParseHex(s[ArrayIndex::INDEX_SIX], parseState) << BitOperatorNum::BIT_EIGHT;
+            color |= ParseHex(s[ArrayIndex::INDEX_SEVEN], parseState) << BitOperatorNum::BIT_FOUR;
+            color |= ParseHex(s[ArrayIndex::INDEX_EIGHT], parseState);
         }
     } else {
         parseState = INVALID_FORMAT;

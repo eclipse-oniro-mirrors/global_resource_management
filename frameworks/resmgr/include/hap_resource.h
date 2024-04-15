@@ -304,6 +304,8 @@ private:
     // must call Init() after constructor
     bool Init();
 
+    bool InitMap(const std::shared_ptr<ResKey> &resKey, const std::pair<std::string, std::string> &resPath);
+
     // step of Init(), called in Init()
     bool InitIdList();
 

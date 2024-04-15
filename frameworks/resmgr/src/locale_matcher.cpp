@@ -46,7 +46,8 @@ uint64_t ClearRegion(uint64_t encodedLocale)
 
 uint64_t AddScript(uint64_t encodedLocale, uint32_t encodedScript)
 {
-    return  (encodedLocale | ((static_cast<uint64_t>(encodedScript) & 0x00000000FFFFFFFFLU) << 16));
+    return  (encodedLocale | ((static_cast<uint64_t>(encodedScript) & 0x00000000FFFFFFFFLU) <<
+        BitOperatorNum::BIT_SIXTEEN));
 }
 
 /**
@@ -159,14 +160,16 @@ uint32_t FindDefaultScriptEncode(const char *language, const char *region)
     size_t len = sizeof(LIKELY_TAGS_CODES_KEY) / sizeof(LIKELY_TAGS_CODES_KEY[0]);
     for (size_t i = 0; i < len; i++) {
         if (LIKELY_TAGS_CODES_KEY[i] == encodedLocale) {
-            return static_cast<uint32_t>((LIKELY_TAGS_CODES_VALUE[i] & 0x0000ffffffff0000) >> 16);
+            return static_cast<uint32_t>((LIKELY_TAGS_CODES_VALUE[i] & 0x0000ffffffff0000) >>
+                BitOperatorNum::BIT_SIXTEEN);
         }
     }
     if (region != nullptr) {
         encodedLocale = Utils::EncodeLocale(language, nullptr, nullptr);
         for (size_t i = 0; i < len; i++) {
             if (LIKELY_TAGS_CODES_KEY[i] == encodedLocale) {
-                return static_cast<uint32_t>((LIKELY_TAGS_CODES_VALUE[i] & 0x0000ffffffff0000) >> 16);
+                return static_cast<uint32_t>((LIKELY_TAGS_CODES_VALUE[i] & 0x0000ffffffff0000) >>
+                    BitOperatorNum::BIT_SIXTEEN);
             }
         }
     }
@@ -232,7 +235,7 @@ size_t ComputeTrackPathDistance(const uint64_t *requestPaths,
             }
         }
     }
-    return   len * 2;
+    return  len * 2; // targetpath not in request path,so distance is 2*len
 }
 
 int8_t CompareRegionWhenQaag(const ResLocale *current,
@@ -658,7 +661,7 @@ bool LocaleMatcher::IsLanguageTag(const char *str, int32_t len)
     if (len < 0) {
         len = strlen(str);
     }
-    if (len >= 2 && len <= 3 && Utils::IsAlphaString(str, len)) {
+    if (len >= 2 && len <= 3 && Utils::IsAlphaString(str, len)) { // 2 or 3 means Language legal length
         return true;
     }
     return false;
@@ -677,7 +680,7 @@ bool LocaleMatcher::IsScriptTag(const char *str, int32_t len)
     if (len < 0) {
         len = strlen(str);
     }
-    if (len == 4 && Utils::IsAlphaString(str, len)) {
+    if (len == 4 && Utils::IsAlphaString(str, len)) { // 4 means script legal length
         return true;
     }
     return false;
@@ -696,10 +699,10 @@ bool LocaleMatcher::IsRegionTag(const char *str, int32_t len)
     if (len < 0) {
         len = strlen(str);
     }
-    if (len == 2 && Utils::IsAlphaString(str, len)) {
+    if (len == 2 && Utils::IsAlphaString(str, len)) { // 2 means region legal length
         return true;
     }
-    if (len == 3 && Utils::IsNumericString(str, len)) {
+    if (len == 3 && Utils::IsNumericString(str, len)) { // 3 menas region legal length
         return true;
     }
     return false;

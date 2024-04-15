@@ -190,6 +190,30 @@ const std::shared_ptr<HapResource::ValueUnderQualifierDir> HapManager::FindQuali
     return this->GetBestMatchResource(candidates, density);
 }
 
+void HapManager::MatchBestResource(
+    std::shared_ptr<ResConfigImpl> &bestResConfig, std::shared_ptr<HapResource::ValueUnderQualifierDir> &result,
+    const std::vector<std::shared_ptr<HapResource::ValueUnderQualifierDir>> &paths, uint32_t density)
+{
+    size_t len = paths.size();
+    size_t i = 0;
+    for (i = 0; i < len; i++) {
+        std::shared_ptr<HapResource::ValueUnderQualifierDir> path = paths[i];
+        const auto resConfig = path->GetResConfig();
+        if (!this->resConfig_->Match(resConfig)) {
+            continue;
+        }
+        if (bestResConfig == nullptr) {
+            bestResConfig = resConfig;
+            result = paths[i];
+            continue;
+        }
+        if (!bestResConfig->IsMoreSuitable(resConfig, this->resConfig_, density)) {
+            bestResConfig = resConfig;
+            result = paths[i];
+        }
+    }
+}
+
 const std::shared_ptr<HapResource::ValueUnderQualifierDir> HapManager::GetBestMatchResource(
     std::vector<std::shared_ptr<HapResource::IdValues>> candidates, uint32_t density)
 {
@@ -197,44 +221,18 @@ const std::shared_ptr<HapResource::ValueUnderQualifierDir> HapManager::GetBestMa
     std::shared_ptr<ResConfigImpl> bestOverlayResConfig = nullptr;
     std::shared_ptr<HapResource::ValueUnderQualifierDir> result = nullptr;
     std::shared_ptr<HapResource::ValueUnderQualifierDir> overlayResult = nullptr;
-    const std::shared_ptr<ResConfigImpl> currentResConfig = this->resConfig_;
     // When there are multiple overlays, reverse the search to find the first match resource.
     for (auto iter = candidates.rbegin(); iter != candidates.rend(); iter++) {
-        const std::vector<std::shared_ptr<HapResource::ValueUnderQualifierDir>> paths = (*iter)->GetLimitPathsConst();
-        size_t len = paths.size();
-        size_t i = 0;
+        const auto paths = (*iter)->GetLimitPathsConst();
         bool isOverlayHapResource = paths[0]->IsOverlay();
-        for (i = 0; i < len; i++) {
-            std::shared_ptr<HapResource::ValueUnderQualifierDir> path = paths[i];
-            const auto resConfig = path->GetResConfig();
-            if (!this->resConfig_->Match(resConfig)) {
-                continue;
-            }
-            if (isOverlayHapResource) {
-                if (bestOverlayResConfig == nullptr) {
-                    bestOverlayResConfig = resConfig;
-                    overlayResult = paths[i];
-                    continue;
-                }
-                if (!bestOverlayResConfig->IsMoreSuitable(resConfig, currentResConfig, density)) {
-                    bestOverlayResConfig = resConfig;
-                    overlayResult = paths[i];
-                }
-            } else {
-                if (bestResConfig == nullptr) {
-                    bestResConfig = resConfig;
-                    result = paths[i];
-                    continue;
-                }
-                if (!bestResConfig->IsMoreSuitable(resConfig, currentResConfig, density)) {
-                    bestResConfig = resConfig;
-                    result = paths[i];
-                }
-            }
+        if (isOverlayHapResource) {
+            MatchBestResource(bestOverlayResConfig, overlayResult, paths, density);
+        } else {
+            MatchBestResource(bestResConfig, result, paths, density);
         }
     }
     if (bestOverlayResConfig != nullptr && result != nullptr) {
-        if (bestOverlayResConfig->IsMoreSuitable(bestResConfig, currentResConfig, density)) {
+        if (bestOverlayResConfig->IsMoreSuitable(bestResConfig, this->resConfig_, density)) {
             return overlayResult;
         }
     }
