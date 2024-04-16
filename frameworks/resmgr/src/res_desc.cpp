@@ -24,6 +24,7 @@
 #endif
 #include "utils/errors.h"
 #include "utils/string_utils.h"
+#include "utils/utils.h"
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 #include "parameters.h"
 #endif
@@ -154,9 +155,8 @@ const std::string KeyParam::ConvertToStr() const
         int j = 0;
         // 4 means langauges/region/script key value max length
         for (int i = 0; i < 4; ++i) {
-            // 3 means reverse temp value to temp2
-            if (tmp[3 - i]) {
-                tmp2[j++] = tmp[3 - i];
+            if (tmp[3 - i]) { // 3 means reverse temp value to temp2
+                tmp2[j++] = tmp[3 - i]; // 3 means reverse temp value to temp2
             }
         }
         tmp2[j] = '\0';
@@ -221,7 +221,7 @@ bool IdItem::HaveParent() const
     if (!(resType_ == THEME || resType_ == PATTERN)) {
         return false;
     }
-    return (values_.size() % 2 == 1);
+    return (values_.size() % 2 == 1); // Taking the remainder of 2 to determine the existence of a parent node
 }
 
 bool IdItem::IsRef(const std::string &value, ResType &resType, int &id)
@@ -232,7 +232,7 @@ bool IdItem::IsRef(const std::string &value, ResType &resType, int &id)
         return false;
     }
     auto index = value.find(":");
-    if (index == std::string::npos || index < 2) {
+    if (index == std::string::npos || index < ArrayIndex::INDEX_TWO) {
         return false;
     }
     std::string typeStr;

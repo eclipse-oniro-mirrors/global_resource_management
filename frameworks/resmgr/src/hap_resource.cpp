@@ -329,51 +329,58 @@ bool HapResource::Init()
     return InitIdList();
 }
 
+bool HapResource::InitMap(const std::shared_ptr<ResKey> &resKey, const std::pair<std::string, std::string> &resPath)
+{
+    for (size_t j = 0; j < resKey->resId_->idParams_.size(); ++j) {
+        std::shared_ptr<IdParam> idParam = resKey->resId_->idParams_[j];
+        uint32_t id = idParam->id_;
+        std::map<uint32_t, std::shared_ptr<IdValues>>::iterator iter = idValuesMap_.find(id);
+        if (iter == idValuesMap_.end()) {
+            auto idValues = std::make_shared<HapResource::IdValues>();
+            if (idValues == nullptr) {
+                HILOG_ERROR("new IdValues failed in HapResource::InitIdList");
+                return false;
+            }
+            auto limitPath = std::make_shared<HapResource::ValueUnderQualifierDir>(resKey,
+                idParam->idItem_, resPath, isOverlay_, isSystem_);
+            if (limitPath == nullptr) {
+                HILOG_ERROR("new ValueUnderQualifierDir failed in HapResource::InitIdList");
+                return false;
+            }
+            idValues->AddLimitPath(limitPath);
+            idValuesMap_.insert(std::make_pair(id, idValues));
+            std::string name = std::string(idParam->idItem_->name_);
+            idValuesNameMap_[idParam->idItem_->resType_]->insert(std::make_pair(name, idValues));
+            if (name == "system_color_change" && idParam->idItem_->value_ == "true") {
+                isThemeSystemResEnable_ = true;
+            }
+        } else {
+            std::shared_ptr<HapResource::IdValues> idValues = iter->second;
+            auto limitPath = std::make_shared<HapResource::ValueUnderQualifierDir>(resKey,
+                idParam->idItem_, resPath, isOverlay_, isSystem_);
+            if (limitPath == nullptr) {
+                HILOG_ERROR("new ValueUnderQualifierDir failed in HapResource::InitIdList");
+                return false;
+            }
+            idValues->AddLimitPath(limitPath);
+        }
+    }
+    return true;
+}
+
 bool HapResource::InitIdList()
 {
     if (resDesc_ == nullptr) {
         HILOG_ERROR("resDesc_ is null ! InitIdList failed");
         return false;
     }
-    auto resPath = std::make_pair(indexPath_, resourcePath_);
+    const auto resPath = std::make_pair(indexPath_, resourcePath_);
     for (size_t i = 0; i < resDesc_->keys_.size(); i++) {
-        std::shared_ptr<ResKey> resKey = resDesc_->keys_[i];
+        const auto resKey = resDesc_->keys_[i];
         // init resConfig of each resKey.
         resKey->resConfig_ = HapParser::CreateResConfigFromKeyParams(resKey->keyParams_);
-
-        for (size_t j = 0; j < resKey->resId_->idParams_.size(); ++j) {
-            std::shared_ptr<IdParam> idParam = resKey->resId_->idParams_[j];
-            uint32_t id = idParam->id_;
-            std::map<uint32_t, std::shared_ptr<IdValues>>::iterator iter = idValuesMap_.find(id);
-            if (iter == idValuesMap_.end()) {
-                auto idValues = std::make_shared<HapResource::IdValues>();
-                if (idValues == nullptr) {
-                    HILOG_ERROR("new IdValues failed in HapResource::InitIdList");
-                    return false;
-                }
-                auto limitPath = std::make_shared<HapResource::ValueUnderQualifierDir>(resKey,
-                    idParam->idItem_, resPath, isOverlay_, isSystem_);
-                if (limitPath == nullptr) {
-                    HILOG_ERROR("new ValueUnderQualifierDir failed in HapResource::InitIdList");
-                    return false;
-                }
-                idValues->AddLimitPath(limitPath);
-                idValuesMap_.insert(std::make_pair(id, idValues));
-                std::string name = std::string(idParam->idItem_->name_);
-                idValuesNameMap_[idParam->idItem_->resType_]->insert(std::make_pair(name, idValues));
-                if (name == "system_color_change" && idParam->idItem_->value_ == "true") {
-                    isThemeSystemResEnable_ = true;
-                }
-            } else {
-                std::shared_ptr<HapResource::IdValues> idValues = iter->second;
-                auto limitPath = std::make_shared<HapResource::ValueUnderQualifierDir>(resKey,
-                    idParam->idItem_, resPath, isOverlay_, isSystem_);
-                if (limitPath == nullptr) {
-                    HILOG_ERROR("new ValueUnderQualifierDir failed in HapResource::InitIdList");
-                    return false;
-                }
-                idValues->AddLimitPath(limitPath);
-            }
+        if (!HapResource::InitMap(resKey, resPath)) {
+            return false;
         }
     }
     return true;

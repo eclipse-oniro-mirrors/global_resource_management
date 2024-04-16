@@ -189,7 +189,7 @@ int TestLoadFromIndex(const char *filePath)
         return -1;
     }
     free(buf);
-    average = total / 1000.0;
+    average = total / 1000.0; // 1000.0 means Divide by the total number to obtain the average value
     g_logLevel = LOG_DEBUG;
     HILOG_DEBUG("parse index avg cost 001: %f us", average);
     EXPECT_LT(average, 2000); // 2000 means the cost of time

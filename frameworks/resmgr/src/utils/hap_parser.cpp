@@ -373,7 +373,7 @@ int32_t ParseString(const char *buffer, uint32_t &offset, std::string &id, bool 
     if (eret != OK || (includeTemi && strLen == 0)) {
         return SYS_ERROR;
     }
-    offset += 2;
+    offset += 2; // Offset value plus 2
     std::string tmp = std::string(const_cast<char *>(buffer) + offset, includeTemi ? (strLen - 1) : strLen);
     offset += includeTemi ? strLen : (strLen + 1);
     id = tmp;
@@ -394,7 +394,7 @@ int32_t ParseStringArray(const char *buffer, uint32_t &offset, std::vector<std::
     if (eret != OK) {
         return SYS_ERROR;
     }
-    offset += 2;
+    offset += 2; // Offset value plus 2
     // next arrLen bytes are several strings. then after, is one '\0'
     uint32_t startOffset = offset;
     while (true) {
@@ -458,8 +458,8 @@ int32_t ParseId(const char *buffer, uint32_t &offset, std::shared_ptr<ResId> id)
         return SYS_ERROR;
     }
     offset += ResId::RESID_HEADER_LEN;
-    if (id->tag_[0] != 'I' || id->tag_[1] != 'D'
-        || id->tag_[2] != 'S' || id->tag_[3] != 'S') {
+    if (id->tag_[ArrayIndex::INDEX_ZERO] != 'I' || id->tag_[ArrayIndex::INDEX_ONE] != 'D'
+        || id->tag_[ArrayIndex::INDEX_TWO] != 'S' || id->tag_[ArrayIndex::INDEX_THREE] != 'S') {
         return -1;
     }
     for (uint32_t i = 0; i < id->count_; ++i) {
@@ -515,8 +515,8 @@ int32_t ParseKey(const char *buffer, uint32_t &offset,  std::shared_ptr<ResKey> 
         return SYS_ERROR;
     }
     offset += ResKey::RESKEY_HEADER_LEN;
-    if (key->tag_[0] != 'K' || key->tag_[1] != 'E'
-        || key->tag_[2] != 'Y' || key->tag_[3] != 'S') {
+    if (key->tag_[ArrayIndex::INDEX_ZERO] != 'K' || key->tag_[ArrayIndex::INDEX_ONE] != 'E'
+        || key->tag_[ArrayIndex::INDEX_TWO] != 'Y' || key->tag_[ArrayIndex::INDEX_THREE] != 'S') {
         return -1;
     }
     for (uint32_t i = 0; i < key->keyParamsCount_; ++i) {

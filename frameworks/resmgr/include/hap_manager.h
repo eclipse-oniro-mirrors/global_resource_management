@@ -370,6 +370,10 @@ private:
     std::vector<std::shared_ptr<HapResource::IdValues>> GetResourceListByName(const char *name,
         const ResType resType) const;
 
+    void MatchBestResource(
+        std::shared_ptr<ResConfigImpl> &bestResConfig, std::shared_ptr<HapResource::ValueUnderQualifierDir> &result,
+        const std::vector<std::shared_ptr<HapResource::ValueUnderQualifierDir>> &paths, uint32_t density);
+
     const std::shared_ptr<HapResource::ValueUnderQualifierDir> GetBestMatchResource(
         std::vector<std::shared_ptr<HapResource::IdValues>> candidates, uint32_t density);
 
