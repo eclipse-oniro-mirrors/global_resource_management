@@ -19,7 +19,6 @@ ohos_shared_library("resourcemanager") {
     "../../../dfx/hisysevent_adapter",
     "../../../frameworks/resmgr/include",
     "../../inner_api/include",
-    "//third_party/node/src",
   ]
 
   sources = [
@@ -36,6 +35,7 @@ ohos_shared_library("resourcemanager") {
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   relative_install_dir = "module"

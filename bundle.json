@@ -49,25 +49,24 @@
         "rom": "600KB",
         "ram": "2500KB",
         "deps": {
-            "components": [
-              "ability_base",
-              "ability_runtime",
-              "hilog",
-              "hisysevent",
-              "hitrace",
-              "napi",
-              "ace_engine",
-              "bundle_framework",
-              "c_utils",
-              "init"
-            ],
-            "third_party": [
-              "zlib",
-              "bounds_checking_function",
-              "icu",
-              "cJSON"
-            ]
-        },
+          "components": [
+            "ability_base",
+            "ability_runtime",
+            "hilog",
+            "hisysevent",
+            "hitrace",
+            "napi",
+            "ace_engine",
+            "bundle_framework",
+            "c_utils",
+            "init",
+            "zlib",
+            "bounds_checking_function",
+            "icu",
+            "cJSON",
+            "node"
+          ]
+      },
         "build": {
             "sub_component": [
               "//base/global/resource_management/interfaces/js/kits:resourcemanager",
