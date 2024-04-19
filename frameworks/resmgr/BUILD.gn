@@ -129,7 +129,7 @@ ohos_shared_library("global_resmgr_win") {
     public_configs = [ ":resmgr_public_config" ]
 
     external_deps = [
-      "bounds_checking_function:libsec_static",
+      "bounds_checking_function:libsec_shared",
       "cJSON:cjson_static",
       "icu:static_icui18n",
       "zlib:libz",
