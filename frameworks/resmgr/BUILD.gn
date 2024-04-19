@@ -27,18 +27,8 @@ is_mac = "${current_os}_${current_cpu}" == "mac_x64" ||
 config("resmgr_config") {
   include_dirs = [
     "include",
-    "//third_party/zlib/contrib/minizip",
     "../../interfaces/inner_api/include",
-    "//third_party/bounds_checking_function/include",
   ]
-
-  if (resource_management_support_icu) {
-    include_dirs += [
-      "//third_party/icu/icu4c/source",
-      "//third_party/icu/icu4c/source/common",
-      "//third_party/icu/icu4c/source/i18n",
-    ]
-  }
 }
 
 manager_sources = [
@@ -68,7 +58,6 @@ config("resmgr_public_config") {
   include_dirs = [ "../../interfaces/inner_api/include" ]
 
   if (resource_management_support_icu) {
-    include_dirs += [ "//third_party/icu/icu4c/source/common" ]
     defines = [ "SUPPORT_GRAPHICS" ]
   }
 }
@@ -90,30 +79,28 @@ ohos_shared_library("global_resmgr") {
 
   include_dirs = [ "../../dfx/hisysevent_adapter" ]
 
-  public_configs = [ ":resmgr_public_config" ]
+  public_configs = [
+    ":resmgr_public_config",
+    ":global_resmgr_all_deps_config",
+  ]
 
   all_dependent_configs = [ ":global_resmgr_all_deps_config" ]
 
-  deps = [
-    "//third_party/bounds_checking_function:libsec_shared",
-    "//third_party/cJSON:cjson",
-    "//third_party/zlib:shared_libz",
-  ]
-
-  if (resource_management_support_icu) {
-    deps += [
-      "//third_party/icu/icu4c:shared_icui18n",
-      "//third_party/icu/icu4c:shared_icuuc",
-    ]
-  }
-
   external_deps = [
     "ability_base:extractortool",
+    "bounds_checking_function:libsec_shared",
+    "cJSON:cjson",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "init:libbegetutil",
+    "zlib:shared_libz",
   ]
+
+  if (resource_management_support_icu) {
+    external_deps += [ "icu:shared_icui18n" ]
+    public_external_deps = [ "icu:shared_icuuc" ]
+  }
 
   subsystem_name = "global"
   innerapi_tags = [
@@ -141,12 +128,13 @@ ohos_shared_library("global_resmgr_win") {
 
     public_configs = [ ":resmgr_public_config" ]
 
-    deps = [
-      "//third_party/cJSON:cjson_static",
-      "//third_party/icu/icu4c:static_icui18n",
-      "//third_party/icu/icu4c:static_icuuc",
-      "//third_party/zlib:libz",
+    external_deps = [
+      "bounds_checking_function:libsec_shared",
+      "cJSON:cjson_static",
+      "icu:static_icui18n",
+      "zlib:libz",
     ]
+    public_external_deps = [ "icu:static_icuuc" ]
 
     libs = [ "shlwapi" ]
   }
@@ -175,13 +163,13 @@ ohos_shared_library("global_resmgr_mac") {
     public_configs = [ ":resmgr_public_config" ]
 
     if (host_os == "mac") {
-      deps = [
-        "//third_party/bounds_checking_function:libsec_static",
-        "//third_party/cJSON:cjson_static",
-        "//third_party/icu/icu4c:static_icui18n",
-        "//third_party/icu/icu4c:static_icuuc",
-        "//third_party/zlib:libz",
+      external_deps = [
+        "bounds_checking_function:libsec_static",
+        "cJSON:cjson_static",
+        "icu:static_icui18n",
+        "zlib:libz",
       ]
+      public_external_deps = [ "icu:static_icuuc" ]
     }
   }
   subsystem_name = "global"
@@ -211,13 +199,13 @@ ohos_shared_library("global_resmgr_linux") {
 
     public_configs = [ ":resmgr_public_config" ]
 
-    deps = [
-      "//third_party/bounds_checking_function:libsec_shared",
-      "//third_party/cJSON:cjson_static",
-      "//third_party/icu/icu4c:shared_icui18n",
-      "//third_party/icu/icu4c:shared_icuuc",
-      "//third_party/zlib:shared_libz",
+    external_deps = [
+      "bounds_checking_function:libsec_shared",
+      "cJSON:cjson_static",
+      "icu:shared_icui18n",
+      "zlib:shared_libz",
     ]
+    public_external_deps = [ "icu:shared_icuuc" ]
   }
   subsystem_name = "global"
   part_name = "resource_management"
@@ -240,24 +228,22 @@ ohos_shared_library("librawfile") {
     "../../interfaces/js/innerkits/core/include",
   ]
 
-  if (resource_management_support_icu) {
-    include_dirs += [ "//third_party/icu/icu4c/source/i18n" ]
-  }
-
   cflags = [ "-Wno-error=inconsistent-missing-override" ]
 
-  deps = [
-    ":global_resmgr",
-    "//third_party/cJSON:cjson_static",
-  ]
+  deps = [ ":global_resmgr" ]
 
   external_deps = [
     "ability_base:configuration",
     "bundle_framework:appexecfwk_base",
+    "cJSON:cjson_static",
     "c_utils:utils",
     "hilog:libhilog",
     "napi:ace_napi",
   ]
+
+  if (resource_management_support_icu) {
+    external_deps += [ "icu:shared_icuuc" ]
+  }
 
   innerapi_tags = [ "platformsdk" ]
   subsystem_name = "global"
