@@ -456,6 +456,10 @@ RawFile64 *LoadRawFileFromHap64(const NativeResourceManager *mgr, const char *fi
     result->length = resMgrDescriptor.length;
     result->start = resMgrDescriptor.offset;
     result->resMgr = mgr;
+    if (result->pf == nullptr) {
+        HiLog::Error(LABEL, "failed to open %{public}s rawfile descriptor", fileName);
+        return nullptr;
+    }
     std::fseek(result->pf, result->start, SEEK_SET);
     return new RawFile64(std::move(result));
 }
