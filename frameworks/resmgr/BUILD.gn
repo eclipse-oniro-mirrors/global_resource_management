@@ -242,7 +242,7 @@ ohos_shared_library("librawfile") {
   ]
 
   if (resource_management_support_icu) {
-    external_deps += [ "icu:static_icuuc" ]
+    external_deps += [ "icu:shared_icuuc" ]
   }
 
   innerapi_tags = [ "platformsdk" ]
