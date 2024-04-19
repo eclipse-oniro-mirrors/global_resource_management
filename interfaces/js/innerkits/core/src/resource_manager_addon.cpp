@@ -32,6 +32,13 @@ napi_value ResourceManagerAddon::Create(
     return WrapResourceManager(env, addon);
 }
 
+napi_value ResourceManagerAddon::CreateOverrideAddon(napi_env env, const std::shared_ptr<ResourceManager>& resMgr)
+{
+    std::shared_ptr<ResourceManagerAddon> addon = std::make_shared<ResourceManagerAddon>(bundleName_, resMgr, context_);
+    addon->isOverrideAddon_ = true;
+    return WrapResourceManager(env, addon);
+}
+
 napi_value ResourceManagerAddon::WrapResourceManager(napi_env env, std::shared_ptr<ResourceManagerAddon> &addon)
 {
     if (!Init(env)) {
@@ -165,7 +172,10 @@ napi_property_descriptor ResourceManagerAddon::properties[] = {
     DECLARE_NAPI_FUNCTION("getLocales", GetLocales),
     DECLARE_NAPI_FUNCTION("getSymbol", GetSymbol),
     DECLARE_NAPI_FUNCTION("getSymbolByName", GetSymbolByName),
-    DECLARE_NAPI_FUNCTION("isRawDir", IsRawDir)
+    DECLARE_NAPI_FUNCTION("isRawDir", IsRawDir),
+    DECLARE_NAPI_FUNCTION("getOverrideResourceManager", GetOverrideResourceManager),
+    DECLARE_NAPI_FUNCTION("getOverrideConfiguration", GetOverrideConfiguration),
+    DECLARE_NAPI_FUNCTION("updateOverrideConfiguration", UpdateOverrideConfiguration)
 };
 
 bool ResourceManagerAddon::Init(napi_env env)
@@ -502,6 +512,21 @@ napi_value ResourceManagerAddon::GetSymbolByName(napi_env env, napi_callback_inf
 napi_value ResourceManagerAddon::IsRawDir(napi_env env, napi_callback_info info)
 {
     return AddonGetResource(env, info, "IsRawDir", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::GetOverrideResourceManager(napi_env env, napi_callback_info info)
+{
+    return AddonGetResource(env, info, "GetOverrideResourceManager", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::GetOverrideConfiguration(napi_env env, napi_callback_info info)
+{
+    return AddonGetResource(env, info, "GetOverrideConfiguration", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::UpdateOverrideConfiguration(napi_env env, napi_callback_info info)
+{
+    return AddonGetResource(env, info, "UpdateOverrideConfiguration", FunctionType::SYNC);
 }
 } // namespace Resource
 } // namespace Global

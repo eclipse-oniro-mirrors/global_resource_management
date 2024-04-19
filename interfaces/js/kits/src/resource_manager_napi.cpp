@@ -255,6 +255,16 @@ static napi_value InitScreenDensityObject(napi_env env)
     return object;
 }
 
+static napi_value InitColorModeObject(napi_env env)
+{
+    napi_value object;
+    NAPI_CALL(env, napi_create_object(env, &object));
+
+    NAPI_CALL(env, SetEnumItem(env, object, "DARK", DARK));
+    NAPI_CALL(env, SetEnumItem(env, object, "LIGHT", LIGHT));
+    return object;
+}
+
 static napi_value ResMgrInit(napi_env env, napi_value exports)
 {
     std::string traceVal = "GetResourceManager";
@@ -274,7 +284,8 @@ static napi_value ResMgrInit(napi_env env, napi_value exports)
     napi_property_descriptor static_prop[] = {
         DECLARE_NAPI_PROPERTY("Direction", InitDirectionObject(env)),
         DECLARE_NAPI_PROPERTY("DeviceType", InitDeviceTypeObject(env)),
-        DECLARE_NAPI_PROPERTY("ScreenDensity", InitScreenDensityObject(env))
+        DECLARE_NAPI_PROPERTY("ScreenDensity", InitScreenDensityObject(env)),
+        DECLARE_NAPI_PROPERTY("ColorMode", InitColorModeObject(env)),
     };
 
     status = napi_define_properties(env, exports, sizeof(static_prop) / sizeof(static_prop[0]), static_prop);

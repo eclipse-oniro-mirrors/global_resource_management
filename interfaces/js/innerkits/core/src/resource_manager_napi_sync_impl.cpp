@@ -19,6 +19,7 @@
 #include "drawable_descriptor.h"
 #include "js_drawable_descriptor.h"
 #include "resource_manager_napi_utils.h"
+#include "resource_manager_addon.h"
 namespace OHOS {
 namespace Global {
 namespace Resource {
@@ -65,7 +66,10 @@ std::unordered_map<std::string, std::function<napi_value(napi_env&, napi_callbac
     {"GetLocales", std::bind(&ResourceManagerNapiSyncImpl::GetLocales, _1, _2)},
     {"GetSymbol", std::bind(&ResourceManagerNapiSyncImpl::GetSymbol, _1, _2)},
     {"GetSymbolByName", std::bind(&ResourceManagerNapiSyncImpl::GetSymbolByName, _1, _2)},
-    {"IsRawDir", std::bind(&ResourceManagerNapiSyncImpl::IsRawDir, _1, _2)}
+    {"IsRawDir", std::bind(&ResourceManagerNapiSyncImpl::IsRawDir, _1, _2)},
+    {"GetOverrideResourceManager", std::bind(&ResourceManagerNapiSyncImpl::GetOverrideResourceManager, _1, _2)},
+    {"GetOverrideConfiguration", std::bind(&ResourceManagerNapiSyncImpl::GetOverrideConfiguration, _1, _2)},
+    {"UpdateOverrideConfiguration", std::bind(&ResourceManagerNapiSyncImpl::UpdateOverrideConfiguration, _1, _2)}
 };
 
 napi_value ResourceManagerNapiSyncImpl::GetResource(napi_env env, napi_callback_info info,
@@ -600,7 +604,7 @@ napi_value ResourceManagerNapiSyncImpl::GetPluralStringValueSync(napi_env env, n
 
     int32_t state = ResourceManagerNapiSyncImpl::InitIdResourceAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to init para in GetPluralStringValueSync",true);
+        dataContext->SetErrorMsg("Failed to init para in GetPluralStringValueSync", true);
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -1213,6 +1217,77 @@ napi_value ResourceManagerNapiSyncImpl::IsRawDir(napi_env env, napi_callback_inf
         return nullptr;
     }
     return ResourceManagerNapiUtils::CreateJsBool(env, *dataContext);
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetOverrideResourceManager(napi_env env, napi_callback_info info)
+{
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    int32_t state = getAddonAndConfig(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to get param in GetOverrideResourceManager", false);
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    std::shared_ptr<ResourceManager> resMgr = dataContext->addon_->GetResMgr();
+    std::shared_ptr<ResourceManager> overrideResMgr = resMgr->GetOverrideResourceManager(
+        dataContext->overrideResConfig_);
+    if (overrideResMgr == nullptr) {
+        dataContext->SetErrorMsg("GetOverrideResourceManager, overrideResMgr is null", false);
+        HiLog::Error(LABEL, "GetOverrideResourceManager, overrideResMgr is null");
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+
+    return dataContext->addon_->CreateOverrideAddon(env, overrideResMgr);
+}
+
+RState ResourceManagerNapiSyncImpl::getAddonAndConfig(napi_env env, napi_callback_info info,
+    std::unique_ptr<ResMgrDataContext> &dataContext)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+    dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
+    if (dataContext->addon_ == nullptr) {
+        HiLog::Error(LABEL, "getAddonAndConfig failed to get addon");
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+    if (ResourceManagerNapiUtils::GetConfigObject(env, argv[ARRAY_SUBCRIPTOR_ZERO], dataContext) != SUCCESS) {
+        HiLog::Error(LABEL, "getAddonAndConfig failed to get resConfig");
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+    return SUCCESS;
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetOverrideConfiguration(napi_env env, napi_callback_info info)
+{
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
+    if (dataContext->addon_ == nullptr) {
+        HiLog::Error(LABEL, "GetOverrideConfiguration failed to get addon");
+        return nullptr;
+    }
+    return ResourceManagerNapiUtils::CreateOverrideJsConfig(env, *dataContext);
+}
+
+napi_value ResourceManagerNapiSyncImpl::UpdateOverrideConfiguration(napi_env env, napi_callback_info info)
+{
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    int32_t state = getAddonAndConfig(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to get param in GetOverrideResourceManager", false);
+        HiLog::Error(LABEL, "Failed to get param in GetOverrideResourceManager");
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    std::shared_ptr<ResourceManager> resMgr = dataContext->addon_->GetResMgr();
+    state = resMgr->UpdateOverrideResConfig(*dataContext->overrideResConfig_);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("UpdateOverrideConfiguration failed due to invalid config", false);
+        HiLog::Error(LABEL, "UpdateOverrideConfiguration failed due to invalid config");
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+    }
+    return nullptr;
 }
 } // namespace Resource
 } // namespace Global

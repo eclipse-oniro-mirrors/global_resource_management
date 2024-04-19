@@ -28,7 +28,7 @@ namespace Global {
 namespace Resource {
 class ResourceManagerImpl : public ResourceManager {
 public:
-    ResourceManagerImpl();
+    ResourceManagerImpl(bool isOverrideResMgr = false);
 
     ~ResourceManagerImpl();
 
@@ -39,6 +39,14 @@ public:
      * @return true if init success, else false
      */
     bool Init(bool isSystem = false);
+
+    /**
+     * Init resource manager.
+     *
+     * @param hapManager hapManager.
+     * @return true if init success, else false
+     */
+    bool Init(std::shared_ptr<HapManager> hapManager);
 
     /**
      * Add system resource to hap resource vector.
@@ -633,6 +641,27 @@ public:
      */
     virtual RState IsRawDirFromHap(const std::string &pathName, bool &outValue);
 
+    /**
+     * Get override ResourceManager
+     *
+     * @param overrideResConfig the override resource config
+     * @return ResourceManager if success, else nullptr
+     */
+    virtual std::shared_ptr<ResourceManager> GetOverrideResourceManager(std::shared_ptr<ResConfig> overrideResConfig);
+
+    /**
+     * Update the override resConfig
+     * @param resConfig the override resource config
+     * @return SUCCESS if the override resConfig updated success, else ERROR
+     */
+    virtual RState UpdateOverrideResConfig(ResConfig &resConfig);
+
+    /**
+     * Get the override resConfig
+     * @param resConfig the override resource config
+     */
+    virtual void GetOverrideResConfig(ResConfig &resConfig);
+
 private:
     RState GetString(const std::shared_ptr<IdItem> idItem, std::string &outValue);
 
@@ -694,6 +723,10 @@ private:
 
     RState GetThemeValues(const std::string &value, std::string &outValue);
 
+    RState UpdateFakeLocaleFlag(ResConfig &resConfig);
+
+    std::shared_ptr<HapManager> GetHapManager();
+
     std::shared_ptr<HapManager> hapManager_;
 
     float fontRatio_ = 0.0f;
@@ -707,6 +740,8 @@ private:
     const std::string VIRTUAL_PIXEL = "vp";
 
     const std::string FONT_SIZE_PIXEL = "fp";
+
+    bool isOverrideResMgr_ = false;
 };
 } // namespace Resource
 } // namespace Global

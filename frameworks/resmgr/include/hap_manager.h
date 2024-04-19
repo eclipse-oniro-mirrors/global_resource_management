@@ -52,10 +52,24 @@ public:
     RState UpdateResConfig(ResConfig &resConfig);
 
     /**
+     * Update the override resConfig
+     * @param resConfig the override resource config
+     * @return SUCCESS if the override resConfig updated success, else ERROR
+     */
+    RState UpdateOverrideResConfig(ResConfig &resConfig);
+
+    /**
      * Get the resConfig
      * @param resConfig the resource config
      */
     void GetResConfig(ResConfig &resConfig);
+
+    /**
+     * Get the override resConfig
+     * @param resConfig the override resource config
+     * @return SUCCESS if the override resConfig updated success, else ERROR
+     */
+    void GetOverrideResConfig(ResConfig &resConfig);
 
     /**
      * Add resource path to hap paths
@@ -108,7 +122,7 @@ public:
      * @param id the resource id
      * @return the resources related to resource id
      */
-    const std::shared_ptr<IdItem> FindResourceById(uint32_t id);
+    const std::shared_ptr<IdItem> FindResourceById(uint32_t id, bool isGetOverrideResource = false);
 
     /**
      * Find resource by resource name
@@ -116,7 +130,8 @@ public:
      * @param resType the resource type
      * @return the resources related to resource name
      */
-    const std::shared_ptr<IdItem> FindResourceByName(const char *name, const ResType resType);
+    const std::shared_ptr<IdItem> FindResourceByName(
+        const char *name, const ResType resType, bool isGetOverrideResource = false);
 
     /**
      * Find best resource path by resource id
@@ -125,7 +140,7 @@ public:
      * @return the best resource path
      */
     const std::shared_ptr<HapResource::ValueUnderQualifierDir> FindQualifierValueById(uint32_t id,
-        uint32_t density = 0);
+        bool isGetOverrideResource = false, uint32_t density = 0);
     
     /**
      * Find best resource path by resource name
@@ -135,7 +150,7 @@ public:
      * @return the best resource path
      */
     const std::shared_ptr<HapResource::ValueUnderQualifierDir> FindQualifierValueByName(const char *name,
-        const ResType resType, uint32_t density = 0);
+        const ResType resType, bool isGetOverrideResource = false, uint32_t density = 0);
 
     /**
      * Find the raw file path
@@ -150,7 +165,7 @@ public:
      * @param quantity the language quantity
      * @return the language pluralRule related to quantity
      */
-    std::string GetPluralRulesAndSelect(int quantity);
+    std::string GetPluralRulesAndSelect(int quantity, bool isGetOverrideResource = false);
 
     /**
      * Get resource paths vector
@@ -370,12 +385,13 @@ private:
     std::vector<std::shared_ptr<HapResource::IdValues>> GetResourceListByName(const char *name,
         const ResType resType) const;
 
-    void MatchBestResource(
-        std::shared_ptr<ResConfigImpl> &bestResConfig, std::shared_ptr<HapResource::ValueUnderQualifierDir> &result,
-        const std::vector<std::shared_ptr<HapResource::ValueUnderQualifierDir>> &paths, uint32_t density);
+    void MatchBestResource(std::shared_ptr<ResConfigImpl> &bestResConfig,
+        std::shared_ptr<HapResource::ValueUnderQualifierDir> &result,
+        const std::vector<std::shared_ptr<HapResource::ValueUnderQualifierDir>> &paths,
+        uint32_t density, bool isGetOverrideResource);
 
     const std::shared_ptr<HapResource::ValueUnderQualifierDir> GetBestMatchResource(
-        std::vector<std::shared_ptr<HapResource::IdValues>> candidates, uint32_t density);
+        std::vector<std::shared_ptr<HapResource::IdValues>> candidates, uint32_t density, bool isGetOverrideResource);
 
     bool AddResourcePath(const char *path);
 
@@ -384,10 +400,15 @@ private:
 
     static bool Init();
 
+    std::shared_ptr<ResConfigImpl> getCompleteOverrideConfig(bool isGetOverrideResource);
+
     static bool icuInitialized;
 
     // app res config
     std::shared_ptr<ResConfigImpl> resConfig_;
+
+    // app override res config
+    std::shared_ptr<ResConfigImpl> overrideResConfig_ = std::make_shared<ResConfigImpl>();
 
     // set of hap Resources
     std::vector<std::shared_ptr<HapResource>> hapResources_;

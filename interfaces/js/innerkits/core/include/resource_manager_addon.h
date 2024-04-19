@@ -63,6 +63,14 @@ public:
     {
         return isSystem_;
     }
+
+    napi_value CreateOverrideAddon(napi_env env, const std::shared_ptr<ResourceManager>& resMgr);
+
+    bool isOverrideAddon()
+    {
+        return isOverrideAddon_;
+    }
+
 private:
     static napi_value AddonGetResource(napi_env env, napi_callback_info info, const std::string& name,
         FunctionType type);
@@ -192,12 +200,19 @@ private:
 
     static napi_value IsRawDir(napi_env env, napi_callback_info info);
 
+    static napi_value GetOverrideResourceManager(napi_env env, napi_callback_info info);
+
+    static napi_value GetOverrideConfiguration(napi_env env, napi_callback_info info);
+
+    static napi_value UpdateOverrideConfiguration(napi_env env, napi_callback_info info);
+
     std::string bundleName_;
     std::shared_ptr<ResourceManager> resMgr_;
     std::shared_ptr<AbilityRuntime::Context> context_;
     bool isSystem_;
     std::shared_ptr<ResourceManagerNapiContext> napiContext_;
     static napi_property_descriptor properties[];
+    bool isOverrideAddon_ = false;
 };
 } // namespace Resource
 } // namespace Global
