@@ -34,6 +34,7 @@
 
 #include "hap_parser.h"
 #include "utils/utils.h"
+#include "res_common.h"
 
 #ifdef __WINNT__
 #include <shlwapi.h>
@@ -97,17 +98,18 @@ bool HapManager::Init()
     return true;
 }
 
-std::string HapManager::GetPluralRulesAndSelect(int quantity)
+std::string HapManager::GetPluralRulesAndSelect(int quantity, bool isGetOverrideResource)
 {
     std::string defaultRet("other");
 #ifdef SUPPORT_GRAPHICS
     AutoMutex mutex(this->lock_);
-    if (this->resConfig_ == nullptr || this->resConfig_->GetResLocale() == nullptr ||
-        this->resConfig_->GetResLocale()->GetLanguage() == nullptr) {
+    std::shared_ptr<ResConfigImpl> config = getCompleteOverrideConfig(isGetOverrideResource);
+    if (config == nullptr || config->GetResLocale() == nullptr ||
+        config->GetResLocale()->GetLanguage() == nullptr) {
         HILOG_ERROR("GetPluralRules language is null!");
         return defaultRet;
     }
-    std::string language = this->resConfig_->GetResLocale()->GetLanguage();
+    std::string language = config->GetResLocale()->GetLanguage();
 
     icu::PluralRules *pluralRules = nullptr;
     for (uint32_t i = 0; i < plurRulesCache_.size(); i++) {
@@ -150,18 +152,19 @@ std::string HapManager::GetPluralRulesAndSelect(int quantity)
 #endif
 }
 
-const std::shared_ptr<IdItem> HapManager::FindResourceById(uint32_t id)
+const std::shared_ptr<IdItem> HapManager::FindResourceById(uint32_t id, bool isGetOverrideResource)
 {
-    auto qualifierValue = FindQualifierValueById(id);
+    auto qualifierValue = FindQualifierValueById(id, isGetOverrideResource);
     if (qualifierValue == nullptr) {
         return nullptr;
     }
     return qualifierValue->GetIdItem();
 }
 
-const std::shared_ptr<IdItem> HapManager::FindResourceByName(const char *name, const ResType resType)
+const std::shared_ptr<IdItem> HapManager::FindResourceByName(
+    const char *name, const ResType resType, bool isGetOverrideResource)
 {
-    auto qualifierValue = FindQualifierValueByName(name, resType);
+    auto qualifierValue = FindQualifierValueByName(name, resType, isGetOverrideResource);
     if (qualifierValue == nullptr) {
         return nullptr;
     }
@@ -169,37 +172,89 @@ const std::shared_ptr<IdItem> HapManager::FindResourceByName(const char *name, c
 }
 
 const std::shared_ptr<HapResource::ValueUnderQualifierDir> HapManager::FindQualifierValueByName(
-    const char *name, const ResType resType, uint32_t density)
+    const char *name, const ResType resType, bool isGetOverrideResource, uint32_t density)
 {
     AutoMutex mutex(this->lock_);
     std::vector<std::shared_ptr<HapResource::IdValues>> candidates = this->GetResourceListByName(name, resType);
     if (candidates.size() == 0) {
         return nullptr;
     }
-    return this->GetBestMatchResource(candidates, density);
+    return this->GetBestMatchResource(candidates, density, isGetOverrideResource);
 }
 
 const std::shared_ptr<HapResource::ValueUnderQualifierDir> HapManager::FindQualifierValueById(uint32_t id,
-    uint32_t density)
+    bool isGetOverrideResource, uint32_t density)
 {
     AutoMutex mutex(this->lock_);
     std::vector<std::shared_ptr<HapResource::IdValues>> candidates = this->GetResourceList(id);
     if (candidates.size() == 0) {
         return nullptr;
     }
-    return this->GetBestMatchResource(candidates, density);
+    return this->GetBestMatchResource(candidates, density, isGetOverrideResource);
 }
 
-void HapManager::MatchBestResource(
-    std::shared_ptr<ResConfigImpl> &bestResConfig, std::shared_ptr<HapResource::ValueUnderQualifierDir> &result,
-    const std::vector<std::shared_ptr<HapResource::ValueUnderQualifierDir>> &paths, uint32_t density)
+std::shared_ptr<ResConfigImpl> HapManager::getCompleteOverrideConfig(bool isGetOverrideResource)
 {
+    if (!isGetOverrideResource) {
+        return this->resConfig_;
+    }
+
+    std::shared_ptr<ResConfigImpl> completeOverrideConfig = std::make_shared<ResConfigImpl>();
+    if (!completeOverrideConfig || !this->resConfig_ || !this->overrideResConfig_) {
+        HILOG_ERROR("completeOverrideConfig or resConfig_ or overrideResConfig_ is nullptr");
+        return nullptr;
+    }
+
+    if (!completeOverrideConfig->Copy(*this->resConfig_)) {
+        HILOG_ERROR("getCompleteOverrideConfig copy failed");
+        return nullptr;
+    }
+
+    if (this->overrideResConfig_->isLocaleInfoSet()
+        && !completeOverrideConfig->CopyLocaleAndPreferredLocale(*this->overrideResConfig_)) {
+        HILOG_ERROR("getCompleteOverrideConfig CopyLocaleAndPreferredLocale failed");
+        return nullptr;
+    }
+    if (this->overrideResConfig_->GetDeviceType() != DEVICE_NOT_SET) {
+        completeOverrideConfig->SetDeviceType(this->overrideResConfig_->GetDeviceType());
+    }
+    if (this->overrideResConfig_->GetDirection() != DIRECTION_NOT_SET) {
+        completeOverrideConfig->SetDirection(this->overrideResConfig_->GetDirection());
+    }
+    if (this->overrideResConfig_->GetColorMode() != COLOR_MODE_NOT_SET) {
+        completeOverrideConfig->SetColorMode(this->overrideResConfig_->GetColorMode());
+    }
+    if (this->overrideResConfig_->GetInputDevice() != INPUTDEVICE_NOT_SET) {
+        completeOverrideConfig->SetInputDevice(this->overrideResConfig_->GetInputDevice());
+    }
+    if (this->overrideResConfig_->GetMcc() != MCC_UNDEFINED) {
+        completeOverrideConfig->SetMcc(this->overrideResConfig_->GetMcc());
+    }
+    if (this->overrideResConfig_->GetMnc() != MNC_UNDEFINED) {
+        completeOverrideConfig->SetMnc(this->overrideResConfig_->GetMnc());
+    }
+    if (this->overrideResConfig_->GetScreenDensity() != SCREEN_DENSITY_NOT_SET) {
+        completeOverrideConfig->SetScreenDensity(this->overrideResConfig_->GetScreenDensity());
+    }
+    return completeOverrideConfig;
+}
+
+void HapManager::MatchBestResource(std::shared_ptr<ResConfigImpl> &bestResConfig,
+    std::shared_ptr<HapResource::ValueUnderQualifierDir> &result,
+    const std::vector<std::shared_ptr<HapResource::ValueUnderQualifierDir>> &paths,
+    uint32_t density, bool isGetOverrideResource)
+{
+    const std::shared_ptr<ResConfigImpl> currentResConfig = getCompleteOverrideConfig(isGetOverrideResource);
+    if (!currentResConfig) {
+        result = nullptr;
+        return;
+    }
     size_t len = paths.size();
     size_t i = 0;
     for (i = 0; i < len; i++) {
         std::shared_ptr<HapResource::ValueUnderQualifierDir> path = paths[i];
         const auto resConfig = path->GetResConfig();
-        if (!this->resConfig_->Match(resConfig)) {
+        if (!currentResConfig->Match(resConfig)) {
             continue;
         }
         if (bestResConfig == nullptr) {
@@ -207,7 +262,7 @@ void HapManager::MatchBestResource(
             result = paths[i];
             continue;
         }
-        if (!bestResConfig->IsMoreSuitable(resConfig, this->resConfig_, density)) {
+        if (!bestResConfig->IsMoreSuitable(resConfig, currentResConfig, density)) {
             bestResConfig = resConfig;
             result = paths[i];
         }
@@ -215,7 +270,7 @@ void HapManager::MatchBestResource(
 }
 
 const std::shared_ptr<HapResource::ValueUnderQualifierDir> HapManager::GetBestMatchResource(
-    std::vector<std::shared_ptr<HapResource::IdValues>> candidates, uint32_t density)
+    std::vector<std::shared_ptr<HapResource::IdValues>> candidates, uint32_t density, bool isGetOverrideResource)
 {
     std::shared_ptr<ResConfigImpl> bestResConfig = nullptr;
     std::shared_ptr<ResConfigImpl> bestOverlayResConfig = nullptr;
@@ -226,9 +281,9 @@ const std::shared_ptr<HapResource::ValueUnderQualifierDir> HapManager::GetBestMa
         const auto paths = (*iter)->GetLimitPathsConst();
         bool isOverlayHapResource = paths[0]->IsOverlay();
         if (isOverlayHapResource) {
-            MatchBestResource(bestOverlayResConfig, overlayResult, paths, density);
+            MatchBestResource(bestOverlayResConfig, overlayResult, paths, density, isGetOverrideResource);
         } else {
-            MatchBestResource(bestResConfig, result, paths, density);
+            MatchBestResource(bestResConfig, result, paths, density, isGetOverrideResource);
         }
     }
     if (bestOverlayResConfig != nullptr && result != nullptr) {
@@ -289,11 +344,23 @@ RState HapManager::UpdateResConfig(ResConfig &resConfig)
     return SUCCESS;
 }
 
+RState HapManager::UpdateOverrideResConfig(ResConfig &resConfig)
+{
+    AutoMutex mutex(this->lock_);
+    this->overrideResConfig_->Copy(resConfig);
+    return SUCCESS;
+}
 
 void HapManager::GetResConfig(ResConfig &resConfig)
 {
     AutoMutex mutex(this->lock_);
     resConfig.Copy(*(this->resConfig_));
+}
+
+void HapManager::GetOverrideResConfig(ResConfig &resConfig)
+{
+    AutoMutex mutex(this->lock_);
+    resConfig.Copy(*(this->overrideResConfig_));
 }
 
 bool HapManager::AddResource(const char *path)

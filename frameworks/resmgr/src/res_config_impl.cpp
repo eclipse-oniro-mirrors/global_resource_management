@@ -116,6 +116,15 @@ RState ResConfigImpl::BuildLocaleInfo(const ResLocale *resLocale, Locale **local
 }
 #endif
 
+RState ResConfigImpl::SetLocaleInfo(const char* localeStr)
+{
+#ifdef SUPPORT_GRAPHICS
+    icu::Locale localeInfo(localeStr);
+    return this->SetLocaleInfo(localeInfo);
+#endif
+    return SUCCESS;
+}
+
 RState ResConfigImpl::SetLocaleInfo(const char *language,
     const char *script,
     const char *region)
@@ -194,6 +203,12 @@ void ResConfigImpl::SetScreenDensity(float screenDensity)
     this->screenDensityDpi_ = ConvertDensity(screenDensity);
 }
 
+void ResConfigImpl::SetScreenDensityDpi(ScreenDensity screenDensityDpi)
+{
+    this->density_ = screenDensityDpi / Utils::DPI_BASE;
+    this->screenDensityDpi_ = screenDensityDpi;
+}
+
 #ifdef SUPPORT_GRAPHICS
 const ResLocale *ResConfigImpl::GetResPreferredLocale() const
 {
@@ -224,6 +239,11 @@ Direction ResConfigImpl::GetDirection() const
 float ResConfigImpl::GetScreenDensity() const
 {
     return this->density_;
+}
+
+ScreenDensity ResConfigImpl::GetScreenDensityDpi() const
+{
+    return this->screenDensityDpi_;
 }
 
 ColorMode ResConfigImpl::GetColorMode() const
@@ -318,7 +338,16 @@ bool ResConfigImpl::CopyLocale(ResConfig &other)
     return false;
 #endif
 }
-bool ResConfigImpl::Copy(ResConfig &other)
+
+bool ResConfigImpl::isLocaleInfoSet()
+{
+#ifdef SUPPORT_GRAPHICS
+    return localeInfo_ != nullptr;
+#endif
+    return false;
+}
+
+bool ResConfigImpl::CopyLocaleAndPreferredLocale(ResConfig &other)
 {
     if (!this->CopyLocale(other)) {
         return false;
@@ -328,6 +357,14 @@ bool ResConfigImpl::Copy(ResConfig &other)
         return false;
     }
 #endif
+    return true;
+}
+
+bool ResConfigImpl::Copy(ResConfig &other)
+{
+    if (!this->CopyLocaleAndPreferredLocale(other)) {
+        return false;
+    }
     if (this->GetDeviceType() != other.GetDeviceType()) {
         this->SetDeviceType(other.GetDeviceType());
     }

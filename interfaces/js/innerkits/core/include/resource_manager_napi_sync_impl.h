@@ -100,6 +100,12 @@ private:
 
     static napi_value IsRawDir(napi_env env, napi_callback_info info);
 
+    static napi_value GetOverrideResourceManager(napi_env env, napi_callback_info info);
+
+    static napi_value GetOverrideConfiguration(napi_env env, napi_callback_info info);
+
+    static napi_value UpdateOverrideConfiguration(napi_env env, napi_callback_info info);
+
     static int32_t InitIdResourceAddon(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
 
@@ -164,6 +170,9 @@ private:
         std::unique_ptr<ResMgrDataContext> &dataContext);
 
     static int32_t ProcessSymbolResourceByName(napi_env env, napi_callback_info info,
+        std::unique_ptr<ResMgrDataContext> &dataContext);
+
+    static RState getAddonAndConfig(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
 };
 } // namespace Resource

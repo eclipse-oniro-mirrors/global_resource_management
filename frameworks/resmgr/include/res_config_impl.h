@@ -49,6 +49,13 @@ public:
      */
     RState SetLocaleInfo(const char *language, const char *script, const char *region);
 
+    /**
+     * Set locale information
+     * @param localeStr the locale info, for example, zh-Hans-CN.
+     * @return SUCCESS if set locale information success, else false
+     */
+    RState SetLocaleInfo(const char *localeStr);
+
 #ifdef SUPPORT_GRAPHICS
     RState SetPreferredLocaleInfo(Locale &preferredLocaleInfo);
 
@@ -90,6 +97,12 @@ public:
      */
     void SetScreenDensity(float screenDensity);
 
+    /**
+     * Set resConfig screenDensityDpi
+     * @param screenDensityDpi the resConfig screenDensityDpi
+     */
+    void SetScreenDensityDpi(ScreenDensity screenDensityDpi);
+
 #ifdef SUPPORT_GRAPHICS
     const ResLocale *GetResPreferredLocale() const;
 
@@ -103,6 +116,12 @@ public:
     Direction GetDirection() const;
 
     float GetScreenDensity() const;
+
+    ScreenDensity GetScreenDensityDpi() const;
+
+    bool CopyLocaleAndPreferredLocale(ResConfig &other);
+
+    bool isLocaleInfoSet();
 
     ColorMode GetColorMode() const;
 

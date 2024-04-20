@@ -78,6 +78,12 @@ public:
 
     virtual RState SetPreferredLocaleInfo(Locale &preferredLocaleInfo) = 0;
 #endif
+
+    virtual void SetScreenDensityDpi(ScreenDensity screenDensityDpi) = 0;
+
+    virtual RState SetLocaleInfo(const char *localeStr) = 0;
+
+    virtual ScreenDensity GetScreenDensityDpi() const = 0;
 };
 
 EXPORT_FUNC ResConfig *CreateResConfig();

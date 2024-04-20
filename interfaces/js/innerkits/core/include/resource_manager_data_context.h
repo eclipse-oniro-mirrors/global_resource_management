@@ -61,6 +61,7 @@ struct ResMgrDataContext {
     std::shared_ptr<ResourceManagerAddon> addon_;
     std::shared_ptr<ResourceManager> resMgr_;
     std::shared_ptr<ResourceManager::Resource> resource_;
+    std::shared_ptr<ResConfig> overrideResConfig_;
 
     ResMgrDataContext() : work_(nullptr), resId_(0), param_(0), iValue_(0), fValue_(0.0f), bValue_(false),
         colorValue_(0), createValueFunc_(nullptr), len_(0), deferred_(nullptr), callbackRef_(nullptr), success_(true),
