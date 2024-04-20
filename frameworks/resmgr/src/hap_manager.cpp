@@ -242,13 +242,8 @@ std::shared_ptr<ResConfigImpl> HapManager::getCompleteOverrideConfig(bool isGetO
 void HapManager::MatchBestResource(std::shared_ptr<ResConfigImpl> &bestResConfig,
     std::shared_ptr<HapResource::ValueUnderQualifierDir> &result,
     const std::vector<std::shared_ptr<HapResource::ValueUnderQualifierDir>> &paths,
-    uint32_t density, bool isGetOverrideResource)
+    uint32_t density, std::shared_ptr<ResConfigImpl> currentResConfig)
 {
-    const std::shared_ptr<ResConfigImpl> currentResConfig = getCompleteOverrideConfig(isGetOverrideResource);
-    if (!currentResConfig) {
-        result = nullptr;
-        return;
-    }
     size_t len = paths.size();
     size_t i = 0;
     for (i = 0; i < len; i++) {
@@ -276,18 +271,22 @@ const std::shared_ptr<HapResource::ValueUnderQualifierDir> HapManager::GetBestMa
     std::shared_ptr<ResConfigImpl> bestOverlayResConfig = nullptr;
     std::shared_ptr<HapResource::ValueUnderQualifierDir> result = nullptr;
     std::shared_ptr<HapResource::ValueUnderQualifierDir> overlayResult = nullptr;
+    const std::shared_ptr<ResConfigImpl> currentResConfig = getCompleteOverrideConfig(isGetOverrideResource);
+    if (!currentResConfig) {
+        return nullptr;
+    }
     // When there are multiple overlays, reverse the search to find the first match resource.
     for (auto iter = candidates.rbegin(); iter != candidates.rend(); iter++) {
         const auto paths = (*iter)->GetLimitPathsConst();
         bool isOverlayHapResource = paths[0]->IsOverlay();
         if (isOverlayHapResource) {
-            MatchBestResource(bestOverlayResConfig, overlayResult, paths, density, isGetOverrideResource);
+            MatchBestResource(bestOverlayResConfig, overlayResult, paths, density, currentResConfig);
         } else {
-            MatchBestResource(bestResConfig, result, paths, density, isGetOverrideResource);
+            MatchBestResource(bestResConfig, result, paths, density, currentResConfig);
         }
     }
     if (bestOverlayResConfig != nullptr && result != nullptr) {
-        if (bestOverlayResConfig->IsMoreSuitable(bestResConfig, this->resConfig_, density)) {
+        if (bestOverlayResConfig->IsMoreSuitable(bestResConfig, currentResConfig, density)) {
             return overlayResult;
         }
     }

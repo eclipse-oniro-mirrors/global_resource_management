@@ -388,7 +388,7 @@ private:
     void MatchBestResource(std::shared_ptr<ResConfigImpl> &bestResConfig,
         std::shared_ptr<HapResource::ValueUnderQualifierDir> &result,
         const std::vector<std::shared_ptr<HapResource::ValueUnderQualifierDir>> &paths,
-        uint32_t density, bool isGetOverrideResource);
+        uint32_t density, std::shared_ptr<ResConfigImpl> currentResConfig);
 
     const std::shared_ptr<HapResource::ValueUnderQualifierDir> GetBestMatchResource(
         std::vector<std::shared_ptr<HapResource::IdValues>> candidates, uint32_t density, bool isGetOverrideResource);
