@@ -674,6 +674,9 @@ RState ResourceManagerImpl::ParseFloat(const std::string &strValue, float &resul
         return ERROR;
     }
     std::string matchString(floatMatch.str());
+    if (floatMatch.size() - 1 < 0) {
+        return ERROR;
+    }
     unit = floatMatch[floatMatch.size() - 1];
     std::istringstream stream(matchString.substr(0, matchString.length() - unit.length()));
     stream >> result;
@@ -880,7 +883,7 @@ RState ResourceManagerImpl::GetSymbol(const std::shared_ptr<IdItem> idItem, uint
     std::string temp;
     RState state = ResolveReference(idItem->value_, temp);
     if (state == SUCCESS) {
-        outValue = strtol(temp.c_str(), nullptr, HEX_ADECIMAL);
+        outValue = static_cast<uint32_t>(strtol(temp.c_str(), nullptr, HEX_ADECIMAL));
     }
     return state;
 }
@@ -1024,7 +1027,7 @@ RState ResourceManagerImpl::CloseRawFileDescriptor(const std::string &name)
 
 void ResourceManagerImpl::ProcessPsuedoTranslate(std::string &outValue)
 {
-    int len = outValue.length() + 1;
+    auto len = outValue.length() + 1;
     char src[len];
     if (strcpy_s(src, len, outValue.c_str()) == EOK) {
         std::string resultMsg = psueManager_->Convert(src, outValue);
