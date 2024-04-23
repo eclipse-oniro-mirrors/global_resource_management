@@ -145,10 +145,6 @@ void ThemeResource::ParseJson(const std::string &bundleName, const std::string &
     FILE* pf = std::fopen(jsonPath.c_str(), "r");
     if (pf == nullptr) {
         HILOG_ERROR("fopen failed in ParseJson");
-        if (pf != nullptr) {
-            fclose(pf);
-            pf = nullptr;
-        }
         return;
     }
     std::fseek(pf, 0, SEEK_END);
