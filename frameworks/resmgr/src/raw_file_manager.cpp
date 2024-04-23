@@ -280,7 +280,7 @@ int OH_ResourceManager_ReadRawFile(const RawFile *rawFile, void *buf, size_t len
             HiLog::Error(LABEL, "failed to copy to buf");
             return 0;
         }
-        rawFile->actualOffset->offset += length;
+        rawFile->actualOffset->offset += static_cast<int64_t>(length);
         return static_cast<int>(length);
     } else {
         return std::fread(buf, 1, length, rawFile->pf);

@@ -311,6 +311,9 @@ bool HapResource::Init()
 #if defined(__IDE_PREVIEW__) || defined(__ARKUI_CROSS__)
     resourcePath_ = indexPath_.substr(0, index + 1);
 #else
+    if (index - 1 < 0) {
+        return false;
+    }
     index = indexPath_.rfind(separator, index - 1);
     if (index == std::string::npos) {
         HILOG_ERROR("index path format error, %s", indexPath_.c_str());

@@ -106,7 +106,7 @@ void ThemePackManager::ClearSkinResource(const std::string &themeFlag)
 
 void ThemePackManager::ClearSASkinResource(const std::string &themeFlag, int32_t userId)
 {
-    int idLength = std::to_string(userId).length();
+    auto idLength = std::to_string(userId).length();
     for (auto it = skinResource_.begin(); it != skinResource_.end();) {
         if ((*it) == nullptr || (*it)->GetThemePath().empty()) {
             continue;
@@ -316,7 +316,7 @@ void ThemePackManager::ClearIconResource(const std::string &themeFlag)
 
 void ThemePackManager::ClearSAIconResource(const std::string &themeFlag, int32_t userId)
 {
-    int idLength = std::to_string(userId).length();
+    auto idLength = std::to_string(userId).length();
     for (auto it = iconResource_.begin(); it != iconResource_.end();) {
         if ((*it) == nullptr || (*it)->GetThemePath().empty()) {
             continue;

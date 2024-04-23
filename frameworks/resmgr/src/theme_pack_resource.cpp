@@ -58,10 +58,19 @@ std::unordered_map<std::string, ResType> themeResTypeMap {
 std::string GetResKey(const std::string &jsonPath)
 {
     auto lastIndex = jsonPath.rfind('/');
+    if (lastIndex - 1 < 0) {
+        return std::string("");
+    }
     auto secondLastIndex = jsonPath.rfind('/', lastIndex - 1);
+    if (secondLastIndex - 1 < 0) {
+        return std::string("");
+    }
     auto thirdLastIndex = jsonPath.rfind('/', secondLastIndex - 1);
     if (lastIndex == std::string::npos || secondLastIndex == std::string::npos
         || thirdLastIndex == std::string::npos) {
+        return std::string("");
+    }
+    if (secondLastIndex - thirdLastIndex - 1 < 0) {
         return std::string("");
     }
     std::string res = jsonPath.substr(thirdLastIndex + 1, secondLastIndex - thirdLastIndex - 1);
@@ -108,12 +117,12 @@ void ThemeResource::InitThemeRes(std::pair<std::string, std::string> bundleInfo,
         cJSON *childValue = root->child;
         while (childValue != nullptr) {
             cJSON *name = cJSON_GetObjectItem(childValue, "name");
-            if (name == nullptr) {
+            if (name == nullptr || !cJSON_IsString(name)) {
                 HILOG_WARN("The resource name is not exist in childValue");
                 return;
             }
             cJSON *value = cJSON_GetObjectItem(childValue, "value");
-            if (value == nullptr) {
+            if (value == nullptr || !cJSON_IsString(value)) {
                 HILOG_WARN("The resource value is not exist in childValue");
                 return;
             }
@@ -132,7 +141,7 @@ void ThemeResource::InitThemeRes(std::pair<std::string, std::string> bundleInfo,
 void ThemeResource::ParseJson(const std::string &bundleName, const std::string &moduleName,
     const std::string &jsonPath)
 {
-    size_t len = 0;
+    auto len = 0;
     FILE* pf = std::fopen(jsonPath.c_str(), "r");
     if (pf == nullptr) {
         HILOG_ERROR("fopen failed in ParseJson");
@@ -144,6 +153,10 @@ void ThemeResource::ParseJson(const std::string &bundleName, const std::string &
     char *jsonData = (char *)malloc(len + 1);
     if (jsonData == nullptr) {
         HILOG_ERROR("failed malloc in ParseJson");
+        if (pf != nullptr) {
+            fclose(pf);
+            pf = nullptr;
+        }
         return;
     }
     std::fread(jsonData, len, 1, pf);
@@ -174,6 +187,9 @@ void ThemeResource::ParseIcon(const std::string &bundleName, const std::string &
     auto pos2 = iconPath.rfind('/');
     if (pos1 == std::string::npos || pos2 == std::string::npos) {
         HILOG_ERROR("invalid iconPath = %{public}s in ParseIcon", iconPath.c_str());
+        return;
+    }
+    if (pos1 - pos2 - 1 < 0) {
         return;
     }
     std::string iconName = iconPath.substr(pos2 + 1, pos1 - pos2 - 1);
@@ -248,6 +264,9 @@ std::tuple<std::string, std::string> GetBundleInfo(const std::string& rootDir, c
         HILOG_ERROR("invalid path = %{public}s in GetBundleInfo", path.c_str());
         return std::tuple<std::string, std::string>("", "");
     }
+    if (pos2 - len -1 < 0) {
+        return std::tuple<std::string, std::string>("", "");
+    }
     std::string moduleName = path.substr(len + 1, pos2 - len -1);
     std::tuple<std::string, std::string> bundleInfoTuple(bundleName, moduleName);
     return bundleInfoTuple;
@@ -316,6 +335,9 @@ const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeIconResource(const 
         if (pos1 == std::string::npos || pos2 == std::string::npos) {
             HILOG_ERROR("invalid path = %{public}s in LoadThemeIconResource", path.c_str());
             continue;
+        }
+        if (pos1 - pos2 - 1 < 0) {
+            return nullptr;
         }
         std::string iconName = path.substr(pos2 + 1, pos1 - pos2 - 1);
         ThemeKey themeKey = ThemeKey(bundleName, "", ResType::MEDIA, iconName);

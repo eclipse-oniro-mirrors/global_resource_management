@@ -124,6 +124,9 @@ std::string GetModuleName(const char *configStr, size_t len)
         return std::string();
     }
 
+    if (end - start - 1 < 0) {
+        return std::string();
+    }
     std::string retStr = std::string(configStr + start + 1, end - start - 1);
     return retStr;
 }
