@@ -117,12 +117,12 @@ void ThemeResource::InitThemeRes(std::pair<std::string, std::string> bundleInfo,
         cJSON *childValue = root->child;
         while (childValue != nullptr) {
             cJSON *name = cJSON_GetObjectItem(childValue, "name");
-            if (name == nullptr || cJSON_IsString(name)) {
+            if (name == nullptr || !cJSON_IsString(name)) {
                 HILOG_WARN("The resource name is not exist in childValue");
                 return;
             }
             cJSON *value = cJSON_GetObjectItem(childValue, "value");
-            if (value == nullptr || cJSON_IsString(value)) {
+            if (value == nullptr || !cJSON_IsString(value)) {
                 HILOG_WARN("The resource value is not exist in childValue");
                 return;
             }
