@@ -66,6 +66,13 @@ config("global_resmgr_all_deps_config") {
   include_dirs = [ "../../interfaces/inner_api/include" ]
 }
 
+config("rawfile_public_config") {
+  include_dirs = [
+    "./include",
+    "../../interfaces/native/resource/include",
+  ]
+}
+
 ohos_shared_library("global_resmgr") {
   sources = manager_sources
 
@@ -219,6 +226,7 @@ group("linux_resmgr") {
 
 ohos_shared_library("librawfile") {
   output_name = "rawfile"
+  public_configs = [ ":rawfile_public_config" ]
   sources = [ "src/raw_file_manager.cpp" ]
 
   include_dirs = [

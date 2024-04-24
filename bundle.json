@@ -133,6 +133,15 @@
                   ]
                 },
                 "name": "//base/global/resource_management/frameworks/resmgr:linux_resmgr"
+              },
+              {
+                "header": {
+                  "header_base": "//base/global/resource_management/interfaces/native/resource/include/",
+                  "header_files": [
+                    "raw_file.h"
+                  ]
+                },
+                "name": "//base/global/resource_management/frameworks/resmgr:librawfile"
               }
             ],
             "test": [
