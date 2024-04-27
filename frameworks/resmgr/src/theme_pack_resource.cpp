@@ -24,6 +24,7 @@ namespace Resource {
 constexpr int FIRST_ELEMENT = 0;
 constexpr int SECOND_ELEMENT = 1;
 constexpr int THIRED_ELEMENT = 2;
+const std::string DYNAMIC_ICON = "dynamic_icons";
 ThemeResource *ThemeResource::themeRes = nullptr;
 ThemeResource::ThemeResource(std::string path) : themePath_(path)
 {
@@ -332,16 +333,23 @@ const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeIconResource(const 
     for (const auto &path : resPaths) {
         auto pos1 = path.rfind('.');
         auto pos2 = path.rfind('/');
-        if (pos1 == std::string::npos || pos2 == std::string::npos) {
+        if (pos1 == std::string::npos || pos2 == std::string::npos || pos1 < pos2 + 1) {
             HILOG_ERROR("invalid path = %{public}s in LoadThemeIconResource", path.c_str());
             continue;
         }
-        if (pos1 - pos2 - 1 < 0) {
-            return nullptr;
-        }
         std::string iconName = path.substr(pos2 + 1, pos1 - pos2 - 1);
-        ThemeKey themeKey = ThemeKey(bundleName, "", ResType::MEDIA, iconName);
-        themeRes->iconValues_.emplace_back(std::make_pair(themeKey, path));
+        if (path.find(DYNAMIC_ICON) != std::string::npos) {
+            auto pos3 = path.find('/', iconPath.length() + 1);
+            if (pos3 == std::string::npos || pos3 < iconPath.length() + 1) {
+                continue;
+            }
+            std::string dynamicBundle = path.substr(iconPath.length() + 1, pos3 - iconPath.length() - 1);
+            ThemeKey themeKey = ThemeKey(bundleName, dynamicBundle, ResType::MEDIA, iconName);
+            themeRes->iconValues_.emplace_back(std::make_pair(themeKey, path));
+        } else {
+            ThemeKey themeKey = ThemeKey(bundleName, "", ResType::MEDIA, iconName);
+            themeRes->iconValues_.emplace_back(std::make_pair(themeKey, path));
+        }
     }
     return themeResource;
 }
@@ -350,7 +358,10 @@ const std::string ThemeResource::GetThemeAppIcon(const std::pair<std::string, st
     const std::string &iconName)
 {
     for (size_t i = 0; i < iconValues_.size(); i++) {
-        if (iconValues_[i].first.bundleName != bundleInfo.first) {
+        if (iconValues_[i].first.bundleName == DYNAMIC_ICON && iconValues_[i].first.moduleName != bundleInfo.first) {
+            continue;
+        }
+        if (iconValues_[i].first.bundleName != DYNAMIC_ICON && iconValues_[i].first.bundleName != bundleInfo.first) {
             continue;
         }
         if (iconName == iconValues_[i].first.resName) {
