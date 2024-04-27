@@ -37,7 +37,7 @@ public:
 
     typedef struct {
         /** the raw file fd */
-        int fd = 0;
+        int fd;
 
         /** the offset from where the raw file starts in the HAP */
         int64_t offset = 0;
