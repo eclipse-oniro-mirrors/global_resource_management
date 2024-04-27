@@ -37,13 +37,13 @@ public:
 
     typedef struct {
         /** the raw file fd */
-        int fd;
+        int fd = 0;
 
         /** the offset from where the raw file starts in the HAP */
-        int64_t offset;
+        int64_t offset = 0;
 
         /** the length of the raw file in the HAP. */
-        int64_t length;
+        int64_t length = 0;
     } RawFileDescriptor;
 
     struct Resource {
@@ -54,7 +54,7 @@ public:
         std::string moduleName;
 
         /** the resource id in hap */
-        int32_t id;
+        int32_t id = 0;
     };
 
     enum class NapiValueType {

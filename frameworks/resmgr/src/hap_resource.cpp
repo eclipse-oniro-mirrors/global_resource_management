@@ -311,7 +311,7 @@ bool HapResource::Init()
 #if defined(__IDE_PREVIEW__) || defined(__ARKUI_CROSS__)
     resourcePath_ = indexPath_.substr(0, index + 1);
 #else
-    if (index - 1 < 0) {
+    if (index < 1) {
         return false;
     }
     index = indexPath_.rfind(separator, index - 1);

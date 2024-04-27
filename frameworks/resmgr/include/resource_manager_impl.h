@@ -735,7 +735,7 @@ private:
 
     bool isBidirectionFakeLocale = false;
 
-    PsueManager *psueManager_;
+    std::shared_ptr<PsueManager> psueManager_;
 
     const std::string VIRTUAL_PIXEL = "vp";
 
