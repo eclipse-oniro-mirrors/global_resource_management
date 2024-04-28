@@ -40,10 +40,10 @@ public:
         int fd;
 
         /** the offset from where the raw file starts in the HAP */
-        int64_t offset = 0;
+        int64_t offset;
 
         /** the length of the raw file in the HAP. */
-        int64_t length = 0;
+        int64_t length;
     } RawFileDescriptor;
 
     struct Resource {
@@ -54,7 +54,7 @@ public:
         std::string moduleName;
 
         /** the resource id in hap */
-        int32_t id = 0;
+        int32_t id;
     };
 
     enum class NapiValueType {
