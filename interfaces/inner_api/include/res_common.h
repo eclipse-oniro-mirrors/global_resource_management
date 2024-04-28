@@ -104,6 +104,21 @@ typedef enum ResType {
     MAX_RES_TYPE     = 24,
 } ResType;
 
+static const uint32_t SELECT_INTEGER = 0x0001;
+static const uint32_t SELECT_STRING = 0x0002;
+static const uint32_t SELECT_STRINGARRAY = 0x0004;
+static const uint32_t SELECT_INTARRAY = 0x0008;
+static const uint32_t SELECT_BOOLEAN = 0x0010;
+static const uint32_t SELECT_COLOR = 0x0020;
+static const uint32_t SELECT_THEME = 0x0040;
+static const uint32_t SELECT_PLURALS = 0x0080;
+static const uint32_t SELECT_FLOAT = 0x0100;
+static const uint32_t SELECT_MEDIA = 0x0200;
+static const uint32_t SELECT_PROF = 0x0400;
+static const uint32_t SELECT_PATTERN = 0x0800;
+static const uint32_t SELECT_SYMBOL = 0x1000;
+static const uint32_t SELECT_ALL = 0xFFFF;
+
 enum DeviceType {
     DEVICE_NOT_SET  = -1,
     DEVICE_PHONE    = 0,

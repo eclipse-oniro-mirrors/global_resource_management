@@ -44,8 +44,9 @@ public:
      *     replace non-overlay resource.
      * @return pResource if create pResource success, else nullptr
      */
-    static const std::shared_ptr<HapResource> LoadFromIndex(const char *path,
-        const std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem = false, bool isOverlay = false);
+    static const std::shared_ptr<HapResource> LoadFromIndex(
+        const char *path, const std::shared_ptr<ResConfigImpl> defaultConfig,
+        bool isSystem = false, bool isOverlay = false, const uint32_t &selectedTypes = SELECT_ALL);
 
     /**
      * Creates an HapResource.
@@ -59,8 +60,9 @@ public:
      *     replace non-overlay resource.
      * @return pResource if create pResource success, else nullptr
      */
-    static const std::shared_ptr<HapResource> LoadFromHap(const char *path,
-        const std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem = false, bool isOverlay = false);
+    static const std::shared_ptr<HapResource> LoadFromHap(
+        const char *path, const std::shared_ptr<ResConfigImpl> defaultConfig,
+        bool isSystem = false, bool isOverlay = false, const uint32_t &selectedTypes = SELECT_ALL);
 
     /**
      * Creates an HapResource.
@@ -74,8 +76,9 @@ public:
      *     replace non-overlay resource.
      * @return pResource if create pResource success, else nullptr
      */
-    static const std::shared_ptr<HapResource> Load(const char* path,
-        const std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem = false, bool isOverlay = false);
+    static const std::shared_ptr<HapResource> Load(
+        const char* path, const std::shared_ptr<ResConfigImpl> defaultConfig,
+        bool isSystem = false, bool isOverlay = false, const uint32_t &selectedTypes = SELECT_ALL);
 
     /**
      * Load overlay resources

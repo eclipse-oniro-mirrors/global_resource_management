@@ -84,17 +84,17 @@ HapResource::~HapResource()
 }
 
 const std::shared_ptr<HapResource> HapResource::Load(const char *path,
-    const std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem, bool isOverlay)
+    const std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem, bool isOverlay, const uint32_t &selectedTypes)
 {
     if (Utils::ContainsTail(path, Utils::tailSet)) {
-        return LoadFromHap(path, defaultConfig, isSystem, isOverlay);
+        return LoadFromHap(path, defaultConfig, isSystem, isOverlay, selectedTypes);
     } else {
-        return LoadFromIndex(path, defaultConfig, isSystem, isOverlay);
+        return LoadFromIndex(path, defaultConfig, isSystem, isOverlay, selectedTypes);
     }
 }
 
 const std::shared_ptr<HapResource> HapResource::LoadFromIndex(const char *path,
-    const std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem, bool isOverlay)
+    const std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem, bool isOverlay, const uint32_t &selectedTypes)
 {
     char outPath[PATH_MAX + 1] = {0};
     Utils::CanonicalizePath(path, outPath, PATH_MAX);
@@ -127,7 +127,7 @@ const std::shared_ptr<HapResource> HapResource::LoadFromIndex(const char *path,
         free(buf);
         return nullptr;
     }
-    int32_t out = HapParser::ParseResHex(static_cast<char *>(buf), bufLen, *resDesc, defaultConfig);
+    int32_t out = HapParser::ParseResHex(static_cast<char *>(buf), bufLen, *resDesc, defaultConfig, selectedTypes);
     if (out != OK) {
         free(buf);
         HILOG_ERROR("ParseResHex failed! retcode:%d", out);
@@ -183,7 +183,7 @@ bool GetIndexData(const char *path, std::unique_ptr<uint8_t[]> &tmpBuf, size_t &
 }
 
 const std::shared_ptr<HapResource> HapResource::LoadFromHap(const char *path,
-    const std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem, bool isOverlay)
+    const std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem, bool isOverlay, const uint32_t &selectedTypes)
 {
     std::unique_ptr<uint8_t[]> tmpBuf;
     size_t tmpLen = 0;
@@ -197,7 +197,8 @@ const std::shared_ptr<HapResource> HapResource::LoadFromHap(const char *path,
         HILOG_ERROR("new ResDesc failed when LoadFromHap");
         return nullptr;
     }
-    int32_t out = HapParser::ParseResHex(reinterpret_cast<char *>(tmpBuf.get()), tmpLen, *resDesc, defaultConfig);
+    int32_t out = HapParser::ParseResHex(
+        reinterpret_cast<char *>(tmpBuf.get()), tmpLen, *resDesc, defaultConfig, selectedTypes);
     if (out != OK) {
         HILOG_ERROR("ParseResHex failed! retcode:%d", out);
         return nullptr;
@@ -380,8 +381,6 @@ bool HapResource::InitIdList()
     const auto resPath = std::make_pair(indexPath_, resourcePath_);
     for (size_t i = 0; i < resDesc_->keys_.size(); i++) {
         const auto resKey = resDesc_->keys_[i];
-        // init resConfig of each resKey.
-        resKey->resConfig_ = HapParser::CreateResConfigFromKeyParams(resKey->keyParams_);
         if (!HapResource::InitMap(resKey, resPath)) {
             return false;
         }

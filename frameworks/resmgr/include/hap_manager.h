@@ -76,7 +76,7 @@ public:
      * @param path the resource path
      * @return true if add resource path success, else false
      */
-    bool AddResource(const char *path);
+    bool AddResource(const char *path, const uint32_t &selectedTypes);
 
     /**
      * Add resource path to overlay paths
@@ -393,7 +393,7 @@ private:
     const std::shared_ptr<HapResource::ValueUnderQualifierDir> GetBestMatchResource(
         std::vector<std::shared_ptr<HapResource::IdValues>> candidates, uint32_t density, bool isGetOverrideResource);
 
-    bool AddResourcePath(const char *path);
+    bool AddResourcePath(const char *path, const uint32_t &selectedTypes = SELECT_ALL);
 
     // when resConfig_ updated we must call ReloadAll()
     RState ReloadAll();

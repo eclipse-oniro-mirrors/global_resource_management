@@ -1040,12 +1040,12 @@ void ResourceManagerImpl::ProcessPsuedoTranslate(std::string &outValue)
 ResourceManagerImpl::~ResourceManagerImpl()
 {}
 
-bool ResourceManagerImpl::AddResource(const char *path)
+bool ResourceManagerImpl::AddResource(const char *path, const uint32_t &selectedTypes)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
 #endif
-    return this->hapManager_->AddResource(path);
+    return this->hapManager_->AddResource(path, selectedTypes);
 }
 
 bool ResourceManagerImpl::AddResource(const std::string &path, const std::vector<std::string> &overlayPaths)
