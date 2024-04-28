@@ -200,7 +200,7 @@ bool ReplacePlaceholderWithParams(std::string &inputOutputValue, const ResConfig
                 HILOG_ERROR("index of placeholder is too large");
                 return false;
             }
-            if (std::stoul(placeholderIndex) - 1 < 0) {
+            if (std::stoul(placeholderIndex) < 1) {
                 return false;
             }
             paramIndex = std::stoul(placeholderIndex) - 1;

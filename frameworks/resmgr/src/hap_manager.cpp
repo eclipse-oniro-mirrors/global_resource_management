@@ -1030,7 +1030,7 @@ std::tuple<std::string, std::string> GetResTypeAndResName(const std::string &res
     if (pos1 == std::string::npos || pos2 == std::string::npos) {
         return std::make_tuple("", "");
     }
-    if (pos2 - pos1 - 1 < 0) {
+    if (pos2 < pos1 + 1) {
         return std::make_tuple("", "");
     }
     const std::string resType = resTypeName.substr(pos1 + 1, pos2 - pos1 - 1);
