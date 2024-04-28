@@ -22,6 +22,7 @@
 #include <unistd.h>
 #include <set>
 #include <sys/stat.h>
+#include <unordered_map>
 
 #include "hilog_wrapper.h"
 #include "locale_matcher.h"
@@ -43,6 +44,22 @@ namespace Resource {
 const char *HapParser::RES_FILE_NAME = "/resources.index";
 const std::string NOT_DEVICE_TYPE = "not_device_type";
 const std::string DEVICE_DEFAULT = "default";
+static const std::unordered_map<ResType, uint32_t> TYPE_MAP {
+    {INTEGER, SELECT_INTEGER},
+    {STRING, SELECT_STRING},
+    {STRINGARRAY, SELECT_STRINGARRAY},
+    {INTARRAY, SELECT_INTARRAY},
+    {BOOLEAN, SELECT_BOOLEAN},
+    {COLOR, SELECT_COLOR},
+    {THEME, SELECT_THEME},
+    {PLURALS, SELECT_PLURALS},
+    {FLOAT, SELECT_FLOAT},
+    {MEDIA, SELECT_MEDIA},
+    {PROF, SELECT_PROF},
+    {PATTERN, SELECT_PATTERN},
+    {SYMBOL, SELECT_SYMBOL}
+};
+
 int32_t LocateFile(unzFile &uf, const char *fileName)
 {
     if (unzLocateFile2(uf, fileName, 1)) { // try to locate file inside zip, 1 = case sensitive
@@ -400,15 +417,17 @@ int32_t ParseStringArray(const char *buffer, uint32_t &offset, std::vector<std::
     offset += 2; // Offset value plus 2
     // next arrLen bytes are several strings. then after, is one '\0'
     uint32_t startOffset = offset;
+    std::string value;
+    int32_t ret;
+    uint32_t readSize;
     while (true) {
-        std::string value;
-        int32_t ret = ParseString(buffer, offset, value, false);
+        ret = ParseString(buffer, offset, value, false);
         if (ret != OK) {
             return ret;
         }
         values.push_back(value);
 
-        uint32_t readSize = offset - startOffset;
+        readSize = offset - startOffset;
         if (readSize + 1 == arrLen) {
             offset += 1; // after arrLen, got '\0'
             break;
@@ -422,11 +441,23 @@ int32_t ParseStringArray(const char *buffer, uint32_t &offset, std::vector<std::
     return OK;
 }
 
-int32_t ParseIdItem(const char *buffer, uint32_t &offset, std::shared_ptr<IdItem> idItem)
+uint32_t ConvertType(ResType type)
+{
+    auto it = TYPE_MAP.find(type);
+    if (it == TYPE_MAP.end()) {
+        return SELECT_ALL;
+    }
+    return it->second;
+}
+
+int32_t ParseIdItem(const char *buffer, uint32_t &offset, std::shared_ptr<IdItem> idItem, const uint32_t &selectedTypes)
 {
     errno_t eret = memcpy_s(idItem.get(), sizeof(IdItem), buffer + offset, IdItem::HEADER_LEN);
     if (eret != OK) {
         return SYS_ERROR;
+    }
+    if (selectedTypes != SELECT_ALL && (selectedTypes & ConvertType(idItem->resType_)) == 0) {
+        return OK;
     }
     offset += IdItem::HEADER_LEN;
 
@@ -437,24 +468,20 @@ int32_t ParseIdItem(const char *buffer, uint32_t &offset, std::shared_ptr<IdItem
             return ret;
         }
     } else {
-        std::string value;
-        int32_t ret = ParseString(buffer, offset, value);
+        int32_t ret = ParseString(buffer, offset, idItem->value_);
         if (ret != OK) {
             return ret;
         }
-        idItem->value_ = std::string(value);
-        idItem->valueLen_ = value.size();
+        idItem->valueLen_ = idItem->value_.size();
     }
-    std::string name;
-    int32_t ret = ParseString(buffer, offset, name);
+    int32_t ret = ParseString(buffer, offset, idItem->name_);
     if (ret != OK) {
         return ret;
     }
-    idItem->name_ = std::string(name);
     return OK;
 }
 
-int32_t ParseId(const char *buffer, uint32_t &offset, std::shared_ptr<ResId> id)
+int32_t ParseId(const char *buffer, uint32_t &offset, std::shared_ptr<ResId> id, const uint32_t &selectedTypes)
 {
     errno_t eret = memcpy_s(id.get(), sizeof(ResId), buffer + offset, ResId::RESID_HEADER_LEN);
     if (eret != OK) {
@@ -482,7 +509,7 @@ int32_t ParseId(const char *buffer, uint32_t &offset, std::shared_ptr<ResId> id)
             return SYS_ERROR;
         }
         uint32_t ipOffset = ip->offset_;
-        int32_t ret = ParseIdItem(buffer, ipOffset, idItem);
+        int32_t ret = ParseIdItem(buffer, ipOffset, idItem, selectedTypes);
         if (ret != OK) {
             return ret;
         }
@@ -510,8 +537,8 @@ bool IsLocaleMatch(const std::shared_ptr<ResConfigImpl> defaultConfig,
     return false;
 }
 
-int32_t ParseKey(const char *buffer, uint32_t &offset,  std::shared_ptr<ResKey> key,
-                 bool &match, const std::shared_ptr<ResConfigImpl> defaultConfig, const std::string &deviceType)
+int32_t ParseKey(const char *buffer, uint32_t &offset, std::shared_ptr<ResKey> key, bool &match,
+    const std::shared_ptr<ResConfigImpl> defaultConfig, const std::string &deviceType, const uint32_t &selectedTypes)
 {
     errno_t eret = memcpy_s(key.get(), sizeof(ResKey), buffer + offset, ResKey::RESKEY_HEADER_LEN);
     if (eret != OK) {
@@ -538,17 +565,24 @@ int32_t ParseKey(const char *buffer, uint32_t &offset,  std::shared_ptr<ResKey> 
         auto resDeviceType = kp->GetDeviceTypeStr();
         if (deviceType != DEVICE_DEFAULT && resDeviceType != NOT_DEVICE_TYPE && resDeviceType != deviceType) {
             match = false;
+            return OK;
         }
 #endif
         key->keyParams_.push_back(kp);
     }
+    key->resConfig_ = HapParser::CreateResConfigFromKeyParams(key->keyParams_);
+    if (selectedTypes != SELECT_ALL && defaultConfig && !defaultConfig->Match(key->resConfig_)) {
+        match = false;
+        return OK;
+    }
+
     uint32_t idOffset = key->offset_;
     std::shared_ptr<ResId> id = std::make_shared<ResId>();
     if (id == nullptr) {
         HILOG_ERROR("new ResId failed when ParseKey");
         return SYS_ERROR;
     }
-    int32_t ret = ParseId(buffer, idOffset, id);
+    int32_t ret = ParseId(buffer, idOffset, id, selectedTypes);
     if (ret != OK) {
         return ret;
     }
@@ -558,7 +592,7 @@ int32_t ParseKey(const char *buffer, uint32_t &offset,  std::shared_ptr<ResKey> 
 
 
 int32_t HapParser::ParseResHex(const char *buffer, const size_t bufLen, ResDesc &resDesc,
-                               const std::shared_ptr<ResConfigImpl> defaultConfig)
+                               const std::shared_ptr<ResConfigImpl> defaultConfig, const uint32_t &selectedTypes)
 {
     ResHeader *resHeader = new (std::nothrow) ResHeader();
     if (resHeader == nullptr) {
@@ -586,7 +620,7 @@ int32_t HapParser::ParseResHex(const char *buffer, const size_t bufLen, ResDesc 
             return SYS_ERROR;
         }
         bool match = true;
-        int32_t ret = ParseKey(buffer, offset, key, match, defaultConfig, deviceType);
+        int32_t ret = ParseKey(buffer, offset, key, match, defaultConfig, deviceType, selectedTypes);
         if (ret != OK) {
             return ret;
         }

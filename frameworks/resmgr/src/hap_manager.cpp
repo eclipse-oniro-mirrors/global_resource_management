@@ -362,10 +362,10 @@ void HapManager::GetOverrideResConfig(ResConfig &resConfig)
     resConfig.Copy(*(this->overrideResConfig_));
 }
 
-bool HapManager::AddResource(const char *path)
+bool HapManager::AddResource(const char *path, const uint32_t &selectedTypes)
 {
     AutoMutex mutex(this->lock_);
-    return this->AddResourcePath(path);
+    return this->AddResourcePath(path, selectedTypes);
 }
 
 bool HapManager::AddResource(const std::string &path, const std::vector<std::string> &overlayPaths)
@@ -477,14 +477,14 @@ std::vector<std::shared_ptr<HapResource::IdValues>> HapManager::GetResourceListB
     return result;
 }
 
-bool HapManager::AddResourcePath(const char *path)
+bool HapManager::AddResourcePath(const char *path, const uint32_t &selectedTypes)
 {
     std::string sPath(path);
     auto it = loadedHapPaths_.find(sPath);
     if (it != loadedHapPaths_.end()) {
         return false;
     }
-    const std::shared_ptr<HapResource> pResource = HapResource::Load(path, resConfig_, isSystem_);
+    const std::shared_ptr<HapResource> pResource = HapResource::Load(path, resConfig_, isSystem_, false, selectedTypes);
     if (pResource == nullptr) {
         return false;
     }
