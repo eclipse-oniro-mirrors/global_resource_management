@@ -59,11 +59,11 @@ std::unordered_map<std::string, ResType> themeResTypeMap {
 std::string GetResKey(const std::string &jsonPath)
 {
     auto lastIndex = jsonPath.rfind('/');
-    if (lastIndex - 1 < 0) {
+    if (lastIndex < 1) {
         return std::string("");
     }
     auto secondLastIndex = jsonPath.rfind('/', lastIndex - 1);
-    if (secondLastIndex - 1 < 0) {
+    if (secondLastIndex < 1) {
         return std::string("");
     }
     auto thirdLastIndex = jsonPath.rfind('/', secondLastIndex - 1);
@@ -71,7 +71,7 @@ std::string GetResKey(const std::string &jsonPath)
         || thirdLastIndex == std::string::npos) {
         return std::string("");
     }
-    if (secondLastIndex - thirdLastIndex - 1 < 0) {
+    if (secondLastIndex < thirdLastIndex + 1) {
         return std::string("");
     }
     std::string res = jsonPath.substr(thirdLastIndex + 1, secondLastIndex - thirdLastIndex - 1);
@@ -190,7 +190,7 @@ void ThemeResource::ParseIcon(const std::string &bundleName, const std::string &
         HILOG_ERROR("invalid iconPath = %{public}s in ParseIcon", iconPath.c_str());
         return;
     }
-    if (pos1 - pos2 - 1 < 0) {
+    if (pos1 < pos2 + 1) {
         return;
     }
     std::string iconName = iconPath.substr(pos2 + 1, pos1 - pos2 - 1);
@@ -265,7 +265,7 @@ std::tuple<std::string, std::string> GetBundleInfo(const std::string& rootDir, c
         HILOG_ERROR("invalid path = %{public}s in GetBundleInfo", path.c_str());
         return std::tuple<std::string, std::string>("", "");
     }
-    if (pos2 - len -1 < 0) {
+    if (pos2 < len + 1) {
         return std::tuple<std::string, std::string>("", "");
     }
     std::string moduleName = path.substr(len + 1, pos2 - len -1);

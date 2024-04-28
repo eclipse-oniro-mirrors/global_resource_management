@@ -60,7 +60,7 @@ void ResourceManagerImpl::AddSystemResource(ResourceManagerImpl *systemResourceM
 ResourceManagerImpl::ResourceManagerImpl(bool isOverrideResMgr) : hapManager_(nullptr),
     isOverrideResMgr_(isOverrideResMgr)
 {
-    psueManager_ = new (std::nothrow) PsueManager();
+    psueManager_ = std::make_shared<PsueManager>();
 }
 
 bool ResourceManagerImpl::Init(bool isSystem)
@@ -674,7 +674,7 @@ RState ResourceManagerImpl::ParseFloat(const std::string &strValue, float &resul
         return ERROR;
     }
     std::string matchString(floatMatch.str());
-    if (floatMatch.size() - 1 < 0) {
+    if (floatMatch.size() < 1) {
         return ERROR;
     }
     unit = floatMatch[floatMatch.size() - 1];
@@ -1038,19 +1038,14 @@ void ResourceManagerImpl::ProcessPsuedoTranslate(std::string &outValue)
 }
 
 ResourceManagerImpl::~ResourceManagerImpl()
-{
-    if (psueManager_ != nullptr) {
-        delete (psueManager_);
-        psueManager_ = nullptr;
-    }
-}
+{}
 
-bool ResourceManagerImpl::AddResource(const char *path)
+bool ResourceManagerImpl::AddResource(const char *path, const uint32_t &selectedTypes)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
 #endif
-    return this->hapManager_->AddResource(path);
+    return this->hapManager_->AddResource(path, selectedTypes);
 }
 
 bool ResourceManagerImpl::AddResource(const std::string &path, const std::vector<std::string> &overlayPaths)

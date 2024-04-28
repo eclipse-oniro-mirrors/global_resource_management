@@ -60,7 +60,7 @@ public:
      * @param path the resource path
      * @return true if add resource path success, else false
      */
-    virtual bool AddResource(const char *path);
+    virtual bool AddResource(const char *path, const uint32_t &selectedTypes = SELECT_ALL);
 
     /**
      * Add resource path to overlay paths
@@ -738,7 +738,7 @@ private:
 
     bool isBidirectionFakeLocale = false;
 
-    PsueManager *psueManager_;
+    std::shared_ptr<PsueManager> psueManager_;
 
     const std::string VIRTUAL_PIXEL = "vp";
 

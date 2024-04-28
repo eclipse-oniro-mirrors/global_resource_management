@@ -137,7 +137,7 @@ public:
      * @return OK if the resource hex parse success, else SYS_ERROR
      */
     static int32_t ParseResHex(const char *buffer, const size_t bufLen, ResDesc &resDesc,
-                               const std::shared_ptr<ResConfigImpl> defaultConfig = nullptr);
+        const std::shared_ptr<ResConfigImpl> defaultConfig = nullptr, const uint32_t &selectedTypes = SELECT_ALL);
 
     /**
      * Create resource config from KeyParams

@@ -64,7 +64,18 @@ public:
 
     virtual ~ResourceManager() = 0;
 
-    virtual bool AddResource(const char *path) = 0;
+    /**
+     * Add resource of hap.
+     *
+     * @param path The path of hap.
+     * @param selectedTypes If this param is setted, will only add resource of types specified by this param,
+     *     it will be faster than add all resource, you can set this param by combining flags
+     *     named SELECT_XXX defined in res_common.h. What's more, if you call UpdateResConfig()
+     *     before calling this method, will only add resource that matching the config, for example,
+     *     only add resource of current language, which means it will be further faster.
+     * @return true if init success, else false
+     */
+    virtual bool AddResource(const char *path, const uint32_t &selectedTypes = SELECT_ALL) = 0;
 
     virtual RState UpdateResConfig(ResConfig &resConfig, bool isUpdateTheme = false) = 0;
 
