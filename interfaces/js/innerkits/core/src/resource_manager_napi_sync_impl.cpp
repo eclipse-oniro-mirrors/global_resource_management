@@ -912,7 +912,6 @@ napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptorByName(napi_env env
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
-
     auto dataContext = std::make_unique<ResMgrDataContext>();
     // density optional parameters
     if (ResourceManagerNapiUtils::GetDataType(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
@@ -926,25 +925,32 @@ napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptorByName(napi_env env
     }
     dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
     if (dataContext->addon_ == nullptr) {
-        HiLog::Error(LABEL, "Failed to get addon_ in GetDrawableDescriptorByName");
         return nullptr;
     }
     dataContext->resName_ = ResourceManagerNapiUtils::GetResNameOrPath(env, argc, argv);
     auto resMgr = dataContext->addon_->GetResMgr();
     RState state = SUCCESS;
-    Ace::Napi::DrawableDescriptor::DrawableType drawableType;
+    Ace::Napi::DrawableDescriptor::DrawableType drawableType = Ace::Napi::DrawableDescriptor::DrawableType::BASE;
     if (dataContext->iconType_ == 1) {
-        std::tuple<const char *, uint32_t, uint32_t> drawableInfo(dataContext->resName_.c_str(),
-        dataContext->iconType_, dataContext->density_);
-        auto drawableDescriptor = Ace::Napi::DrawableDescriptorFactory::Create(drawableInfo, resMgr,
-            state, drawableType);
-        if (state != SUCCESS) {
-            dataContext->SetErrorMsg("Failed to Create drawableDescriptor ", false);
-            ResourceManagerNapiUtils::NapiThrow(env, state);
-            return nullptr;
+        std::string themeMask = resMgr->GetThemeMask();
+        std::pair<std::unique_ptr<uint8_t[]>, size_t> foregroundInfo;
+        std::pair<std::unique_ptr<uint8_t[]>, size_t> backgroundInfo;
+        if (resMgr->GetThemeIcons(0, foregroundInfo, backgroundInfo, dataContext->density_) == SUCCESS) {
+            auto drawableDescriptor = Ace::Napi::DrawableDescriptorFactory::Create(foregroundInfo, backgroundInfo,
+                themeMask, drawableType, resMgr);
+            return Ace::Napi::JsDrawableDescriptor::ToNapi(env, drawableDescriptor.release(), drawableType);
         }
-        return Ace::Napi::JsDrawableDescriptor::ToNapi(env, drawableDescriptor.release(), drawableType);
     }
+
+    if (dataContext->iconType_ == 2) { // 2 means get the dynamic icon from theme
+        std::pair<std::unique_ptr<uint8_t[]>, size_t> iconInfo;
+        if (resMgr->GetDynamicIcon(dataContext->resName_, iconInfo, dataContext->density_) == SUCCESS) {
+            auto drawableDescriptor = std::make_unique<Ace::Napi::DrawableDescriptor>(std::move(iconInfo.first),
+                iconInfo.second);
+            return Ace::Napi::JsDrawableDescriptor::ToNapi(env, drawableDescriptor.release(), drawableType);
+        }
+    }
+
     auto drawableDescriptor = Ace::Napi::DrawableDescriptorFactory::Create(dataContext->resName_.c_str(),
         resMgr, state, drawableType, dataContext->density_);
     if (state != SUCCESS) {

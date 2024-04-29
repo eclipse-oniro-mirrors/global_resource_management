@@ -662,6 +662,9 @@ public:
      */
     virtual void GetOverrideResConfig(ResConfig &resConfig);
 
+    virtual RState GetDynamicIcon(const std::string &resName, std::pair<std::unique_ptr<uint8_t[]>, size_t> &iconInfo,
+        uint32_t density = 0);
+
 private:
     RState GetString(const std::shared_ptr<IdItem> idItem, std::string &outValue);
 

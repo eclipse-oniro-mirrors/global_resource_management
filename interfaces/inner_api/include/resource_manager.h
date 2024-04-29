@@ -223,6 +223,9 @@ public:
     virtual RState UpdateOverrideResConfig(ResConfig &resConfig) = 0;
 
     virtual void GetOverrideResConfig(ResConfig &resConfig) = 0;
+
+    virtual RState GetDynamicIcon(const std::string &resName, std::pair<std::unique_ptr<uint8_t[]>, size_t> &iconInfo,
+        uint32_t density = 0) = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();

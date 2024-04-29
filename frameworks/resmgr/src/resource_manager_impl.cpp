@@ -1532,8 +1532,8 @@ RState ResourceManagerImpl::GetThemeIconInfo(const std::string &iconName, size_t
     return SUCCESS;
 }
 
-RState ResourceManagerImpl::GetThemeIcons(uint32_t resId, std::pair<std::unique_ptr<uint8_t[]>, size_t> &foregroundInfo,
-    std::pair<std::unique_ptr<uint8_t[]>, size_t> &backgroundInfo, uint32_t density)
+RState ResourceManagerImpl::GetThemeIcons(uint32_t resId, std::pair<std::unique_ptr<uint8_t[]>, size_t>
+    &foregroundInfo, std::pair<std::unique_ptr<uint8_t[]>, size_t> &backgroundInfo, uint32_t density)
 {
     RState foreState = GetThemeIconInfo(FOREGROUND, foregroundInfo.second, foregroundInfo.first);
     RState backState = GetThemeIconInfo(BACKGROUND, backgroundInfo.second, backgroundInfo.first);
@@ -1541,6 +1541,12 @@ RState ResourceManagerImpl::GetThemeIcons(uint32_t resId, std::pair<std::unique_
         return SUCCESS;
     }
     return ERROR_CODE_RES_ID_NOT_FOUND;
+}
+
+RState ResourceManagerImpl::GetDynamicIcon(const std::string &resName,
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> &iconInfo, uint32_t density)
+{
+    return GetThemeIconInfo(resName, iconInfo.second, iconInfo.first);
 }
 
 std::string ResourceManagerImpl::GetThemeMask()
