@@ -117,7 +117,7 @@ static const uint32_t SELECT_MEDIA = 0x0200;
 static const uint32_t SELECT_PROF = 0x0400;
 static const uint32_t SELECT_PATTERN = 0x0800;
 static const uint32_t SELECT_SYMBOL = 0x1000;
-static const uint32_t SELECT_ALL = 0xFFFF;
+static const uint32_t SELECT_ALL = 0xFFFFFFFF;
 
 enum DeviceType {
     DEVICE_NOT_SET  = -1,

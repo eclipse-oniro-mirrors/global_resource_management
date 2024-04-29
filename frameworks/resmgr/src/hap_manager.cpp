@@ -60,6 +60,7 @@ Lock g_rawFileLock;
 HapManager::HapManager(std::shared_ptr<ResConfigImpl> resConfig, bool isSystem)
     : resConfig_(resConfig), isSystem_(isSystem)
 {
+    overrideResConfig_->SetColorMode(COLOR_MODE_NOT_SET);
 }
 
 bool HapManager::icuInitialized = HapManager::Init();

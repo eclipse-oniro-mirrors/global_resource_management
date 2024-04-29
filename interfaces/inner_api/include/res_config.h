@@ -88,6 +88,8 @@ public:
 
 EXPORT_FUNC ResConfig *CreateResConfig();
 
+EXPORT_FUNC ResConfig *CreateDefaultResConfig();
+
 #ifdef SUPPORT_GRAPHICS
 EXPORT_FUNC const Locale *GetSysDefault();
 
