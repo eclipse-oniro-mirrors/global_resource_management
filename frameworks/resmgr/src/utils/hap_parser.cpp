@@ -565,13 +565,12 @@ int32_t ParseKey(const char *buffer, uint32_t &offset, std::shared_ptr<ResKey> k
         auto resDeviceType = kp->GetDeviceTypeStr();
         if (deviceType != DEVICE_DEFAULT && resDeviceType != NOT_DEVICE_TYPE && resDeviceType != deviceType) {
             match = false;
-            return OK;
         }
 #endif
         key->keyParams_.push_back(kp);
     }
     key->resConfig_ = HapParser::CreateResConfigFromKeyParams(key->keyParams_);
-    if (selectedTypes != SELECT_ALL && defaultConfig && !defaultConfig->Match(key->resConfig_)) {
+    if (match == false || (selectedTypes != SELECT_ALL && defaultConfig && !defaultConfig->Match(key->resConfig_))) {
         match = false;
         return OK;
     }
