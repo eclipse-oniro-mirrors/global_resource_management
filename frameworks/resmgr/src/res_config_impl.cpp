@@ -756,6 +756,15 @@ ResConfig *CreateResConfig()
     ResConfigImpl *temp = new(std::nothrow) ResConfigImpl;
     return temp;
 }
+
+ResConfig *CreateDefaultResConfig()
+{
+    ResConfigImpl *temp = new(std::nothrow) ResConfigImpl;
+    if (temp != nullptr) {
+        temp->SetColorMode(COLOR_MODE_NOT_SET);
+    }
+    return temp;
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

@@ -565,7 +565,13 @@ RState ResourceManagerNapiUtils::GetConfigObject(napi_env env,
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
 
-    dataContext->overrideResConfig_.reset(CreateResConfig());
+    ResConfig *config = CreateDefaultResConfig();
+    if (config == nullptr) {
+        HiLog::Error(LABEL, "GetConfigObject, new config failed");
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+    dataContext->overrideResConfig_.reset(config);
+
     if (!GetEnumParamOfConfig(env, dataContext->overrideResConfig_, object)) {
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
