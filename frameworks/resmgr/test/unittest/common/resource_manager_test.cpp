@@ -1839,4 +1839,20 @@ HWTEST_F(ResourceManagerTest, RawFileTest001, TestSize.Level1)
     rmc->TestGetRawFilePathByName("test_rawfile.txt",
         "/data/test/all/assets/entry/resources/rawfile/test_rawfile.txt");
 }
+
+/*
+ * @tc.name: ResourceManagerCreateDefaultResConfigTest001
+ * @tc.desc: Test CreateDefaultResConfig function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerCreateDefaultResConfigTest001, TestSize.Level1)
+{
+    ResConfig *rc = CreateDefaultResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    EXPECT_EQ(rc->GetColorMode(), COLOR_MODE_NOT_SET);
+    delete(rc);
+}
 }
