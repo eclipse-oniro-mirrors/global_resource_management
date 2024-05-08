@@ -30,8 +30,8 @@ const std::unordered_map<int32_t, std::string> ResourceManagerNapiUtils::ErrorCo
     {ERROR_CODE_RES_NOT_FOUND_BY_NAME, "No matching resource is found based on the resource name"},
     {ERROR_CODE_RES_PATH_INVALID, "Invalid relative path"},
     {ERROR_CODE_RES_REF_TOO_MUCH, "The resource is referenced cyclically"},
-    {ERROR_CODE_RES_ID_FORMAT_ERROR, "Failed to format the resorce obtained based on the resource ID"},
-    {ERROR_CODE_RES_NAME_FORMAT_ERROR, "Failed to format the resorce obtained based on the resource Name"},
+    {ERROR_CODE_RES_ID_FORMAT_ERROR, "Failed to format the resource obtained based on the resource ID"},
+    {ERROR_CODE_RES_NAME_FORMAT_ERROR, "Failed to format the resource obtained based on the resource Name"},
     {ERROR_CODE_SYSTEM_RES_MANAGER_GET_FAILED, "Failed to access the system resource"},
     {ERROR_CODE_OVERLAY_RES_PATH_INVALID, "Invalid overlay path"},
     {ERROR, "Unknow error"}
