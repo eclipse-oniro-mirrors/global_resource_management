@@ -42,3 +42,18 @@ ohos_shared_library("resourcemanager") {
   subsystem_name = "global"
   part_name = "resource_management"
 }
+
+ohos_shared_library("sendableresource") {
+  include_dirs = []
+
+  sources = [ "src/sendable_resource_napi.cpp" ]
+
+  external_deps = [
+    "hilog:libhilog",
+    "napi:ace_napi",
+  ]
+
+  relative_install_dir = "module"
+  subsystem_name = "global"
+  part_name = "resource_management"
+}

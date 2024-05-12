@@ -71,6 +71,7 @@
         "build": {
             "sub_component": [
               "//base/global/resource_management/interfaces/js/kits:resourcemanager",
+              "//base/global/resource_management/interfaces/js/kits:sendableresource",
               "//base/global/resource_management/interfaces/cj:cj_resource_manager_ffi",
               "//base/global/resource_management/frameworks/resmgr:global_resmgr",
               "//base/global/resource_management/frameworks/resmgr:librawfile",
