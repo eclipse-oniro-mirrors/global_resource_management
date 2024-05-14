@@ -43,10 +43,10 @@ ohos_shared_library("resourcemanager") {
   part_name = "resource_management"
 }
 
-ohos_shared_library("sendableresource") {
-  include_dirs = []
+ohos_shared_library("sendableresourcemanager") {
+  include_dirs = [ "../../inner_api/include" ]
 
-  sources = [ "src/sendable_resource_napi.cpp" ]
+  sources = [ "src/sendable_resource_manager_napi.cpp" ]
 
   external_deps = [
     "hilog:libhilog",
