@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -55,6 +55,9 @@ namespace Global {
 namespace Resource {
 #ifdef SUPPORT_GRAPHICS
 constexpr uint32_t PLURAL_CACHE_MAX_COUNT = 3;
+#endif
+#if defined(__ARKUI_CROSS__)
+const std::string RAW_FILE_PATH = "resources/rawfile/";
 #endif
 Lock g_rawFileLock;
 HapManager::HapManager(std::shared_ptr<ResConfigImpl> resConfig, bool isSystem)
@@ -1116,10 +1119,18 @@ RState HapManager::IsRawDirFromHap(const std::string &pathName, bool &outValue)
                 continue;
             }
         } else { // if file path is uncompressed
+#if !defined(__ARKUI_CROSS__)
             RState state = HapParser::IsRawDirUnCompressed(pathName, outValue);
             if (state != SUCCESS) {
                 continue;
             }
+#else
+            const std::string finalPath = (*iter)->GetResourcePath() + RAW_FILE_PATH + pathName;
+            RState state = HapParser::IsRawDirUnCompressed(finalPath, outValue);
+            if (state != SUCCESS) {
+                continue;
+            }
+#endif
         }
         return SUCCESS;
     }
