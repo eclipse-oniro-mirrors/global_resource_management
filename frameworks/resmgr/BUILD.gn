@@ -257,3 +257,36 @@ ohos_shared_library("librawfile") {
   subsystem_name = "global"
   part_name = "resource_management"
 }
+
+ohos_shared_library("ohresmgr") {
+  public_configs = [ ":rawfile_public_config" ]
+  sources = [ "src/native_resource_manager.cpp" ]
+  output_extension = "so"
+  output_name = "ohresmgr"
+
+  include_dirs = [
+    "./include",
+    "../../interfaces/native/resource/include",
+    "../../interfaces/inner_api/include",
+    "../../interfaces/js/innerkits/core/include",
+  ]
+
+  cflags = [ "-Wno-error=inconsistent-missing-override" ]
+
+  deps = [ ":global_resmgr" ]
+
+  external_deps = [
+    "ability_base:configuration",
+    "ace_engine:ace_ndk",
+    "ace_engine:drawable_descriptor",
+    "bundle_framework:appexecfwk_base",
+    "cJSON:cjson_static",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "napi:ace_napi",
+  ]
+
+  innerapi_tags = [ "ndk" ]
+  subsystem_name = "global"
+  part_name = "resource_management"
+}
