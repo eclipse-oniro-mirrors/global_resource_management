@@ -61,7 +61,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64(const NativeResource
     return errorCode;
 }
 
-ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64Byname(const NativeResourceManager *mgr,
+ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64ByName(const NativeResourceManager *mgr,
     const char *resName, char **resultValue, uint64_t *resultLen, uint32_t density)
 {
     if (mgr == nullptr || resultValue == nullptr || resultLen == nullptr) {
