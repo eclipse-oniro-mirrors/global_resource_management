@@ -77,7 +77,8 @@
               "//base/global/resource_management/frameworks/resmgr:librawfile",
               "//base/global/resource_management/frameworks/resmgr:win_resmgr",
               "//base/global/resource_management/frameworks/resmgr:linux_resmgr",
-              "//base/global/resource_management/frameworks/resmgr:mac_resmgr"
+              "//base/global/resource_management/frameworks/resmgr:mac_resmgr",
+              "//base/global/resource_management/frameworks/resmgr:ohresmgr"
             ],
             "inner_kits": [
               {

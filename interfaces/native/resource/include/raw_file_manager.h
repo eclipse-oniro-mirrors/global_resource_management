@@ -35,8 +35,8 @@
  * @since 8
  * @version 1.0
  */
-#ifndef GLOBAL_NATIVE_RESOURCE_MANAGER_H
-#define GLOBAL_NATIVE_RESOURCE_MANAGER_H
+#ifndef GLOBAL_RAW_FILE_MANAGER_H
+#define GLOBAL_RAW_FILE_MANAGER_H
 
 #include "napi/native_api.h"
 #include "raw_dir.h"
@@ -152,4 +152,4 @@ bool OH_ResourceManager_IsRawDir(const NativeResourceManager *mgr, const char *p
 #endif
 
 /** @} */
-#endif // GLOBAL_NATIVE_RESOURCE_MANAGER_H
+#endif // GLOBAL_RAW_FILE_MANAGER_H
