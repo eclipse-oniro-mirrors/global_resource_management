@@ -49,13 +49,13 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64(const NativeResource
     *resultValue = (char*)malloc(tempResultValue.size() + 1);
     if (*resultValue == nullptr) {
         HiLog::Error(LABEL, "GetMediaBase64 malloc error");
-        return ResourceManager_ErrorCode::ERROE_CODE_OUT_OF_MEMORY;
+        return ResourceManager_ErrorCode::ERROR_CODE_OUT_OF_MEMORY;
     }
     if (strncpy_s(*resultValue, tempResultValue.size() + 1, tempResultValue.c_str(), tempResultValue.size()) != 0) {
         HiLog::Error(LABEL, "GetMediaBase64 strncpy_s error");
         free(*resultValue);
         *resultValue = nullptr;
-        return ResourceManager_ErrorCode::ERROE_CODE_OUT_OF_MEMORY;
+        return ResourceManager_ErrorCode::ERROR_CODE_OUT_OF_MEMORY;
     }
     *resultLen = static_cast<uint64_t>(tempResultValue.size());
     return errorCode;
@@ -78,13 +78,13 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64ByName(const NativeRe
     *resultValue = (char*)malloc(tempResultValue.size() + 1);
     if (*resultValue == nullptr) {
         HiLog::Error(LABEL, "GetMediaBase64Byname malloc error");
-        return ResourceManager_ErrorCode::ERROE_CODE_OUT_OF_MEMORY;
+        return ResourceManager_ErrorCode::ERROR_CODE_OUT_OF_MEMORY;
     }
     if (strncpy_s(*resultValue, tempResultValue.size() + 1, tempResultValue.c_str(), tempResultValue.size()) != 0) {
         HiLog::Error(LABEL, "GetMediaBase64Byname strncpy_s error");
         free(*resultValue);
         *resultValue = nullptr;
-        return ResourceManager_ErrorCode::ERROE_CODE_OUT_OF_MEMORY;
+        return ResourceManager_ErrorCode::ERROR_CODE_OUT_OF_MEMORY;
     }
     *resultLen = static_cast<uint64_t>(tempResultValue.size());
     return errorCode;
@@ -109,7 +109,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMedia(const NativeResourceManage
     *resultValue = static_cast<uint8_t*>(malloc(len));
     if (*resultValue == nullptr) {
         HiLog::Error(LABEL, "GetMedia malloc error");
-        return ResourceManager_ErrorCode::ERROE_CODE_OUT_OF_MEMORY;
+        return ResourceManager_ErrorCode::ERROR_CODE_OUT_OF_MEMORY;
     }
     std::copy(temPtr, temPtr + len, *resultValue);
     *resultLen = static_cast<uint64_t>(len);
@@ -135,7 +135,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaByName(const NativeResource
     *resultValue = static_cast<uint8_t*>(malloc(len));
     if (*resultValue == nullptr) {
         HiLog::Error(LABEL, "GetMediaByName malloc error");
-        return ResourceManager_ErrorCode::ERROE_CODE_OUT_OF_MEMORY;
+        return ResourceManager_ErrorCode::ERROR_CODE_OUT_OF_MEMORY;
     }
     std::copy(temPtr, temPtr + len, *resultValue);
     *resultLen = static_cast<uint64_t>(len);
