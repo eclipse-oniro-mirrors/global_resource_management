@@ -24,16 +24,16 @@ constexpr int PARAMS_NUM_TWO = 2;
 
 const std::unordered_map<int32_t, std::string> ResourceManagerNapiUtils::ErrorCodeToMsg {
     {ERROR_CODE_INVALID_INPUT_PARAMETER, "Invalid input parameter"},
-    {ERROR_CODE_RES_ID_NOT_FOUND, "Resource id invalid"},
-    {ERROR_CODE_RES_NAME_NOT_FOUND, "Resource name invalid"},
-    {ERROR_CODE_RES_NOT_FOUND_BY_ID, "Resource not found by id"},
-    {ERROR_CODE_RES_NOT_FOUND_BY_NAME, "Resource not found by name"},
-    {ERROR_CODE_RES_PATH_INVALID, "Rawfile path is invalid"},
-    {ERROR_CODE_RES_REF_TOO_MUCH, "Resource re-ref too much"},
-    {ERROR_CODE_RES_ID_FORMAT_ERROR, "Resource obtained by resId formatting error"},
-    {ERROR_CODE_RES_NAME_FORMAT_ERROR, "Resource obtained by resName formatting error"},
-    {ERROR_CODE_SYSTEM_RES_MANAGER_GET_FAILED, "Get system resource manager failed"},
-    {ERROR_CODE_OVERLAY_RES_PATH_INVALID, "Overlay resource path is invalid"},
+    {ERROR_CODE_RES_ID_NOT_FOUND, "Invalid resource ID"},
+    {ERROR_CODE_RES_NAME_NOT_FOUND, "Invalid resource name"},
+    {ERROR_CODE_RES_NOT_FOUND_BY_ID, "No matching resource is found based on the resource ID"},
+    {ERROR_CODE_RES_NOT_FOUND_BY_NAME, "No matching resource is found based on the resource name"},
+    {ERROR_CODE_RES_PATH_INVALID, "Invalid relative path"},
+    {ERROR_CODE_RES_REF_TOO_MUCH, "The resource is referenced cyclically"},
+    {ERROR_CODE_RES_ID_FORMAT_ERROR, "Failed to format the resource obtained based on the resource ID"},
+    {ERROR_CODE_RES_NAME_FORMAT_ERROR, "Failed to format the resource obtained based on the resource Name"},
+    {ERROR_CODE_SYSTEM_RES_MANAGER_GET_FAILED, "Failed to access the system resource"},
+    {ERROR_CODE_OVERLAY_RES_PATH_INVALID, "Invalid overlay path"},
     {ERROR, "Unknow error"}
 };
 
