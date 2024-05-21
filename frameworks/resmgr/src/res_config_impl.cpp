@@ -594,8 +594,8 @@ int ResConfigImpl::IsMccMncMoreSuitable(uint32_t otherMcc, uint32_t otherMnc, ui
  * return 0
  *
  */
-int ResConfigImpl::IsDensityMoreSuitable(ScreenDensity otherDensity, ScreenDensity requestDensity,
-    uint32_t density) const
+__attribute__((no_sanitize("integer"))) int ResConfigImpl::IsDensityMoreSuitable(ScreenDensity otherDensity,
+    ScreenDensity requestDensity, uint32_t density) const
 {
     int ret = 0;
     int thisDistance;
