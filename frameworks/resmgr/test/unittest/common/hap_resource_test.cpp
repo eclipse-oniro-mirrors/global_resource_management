@@ -102,7 +102,8 @@ void TestGetIdValuesByName(const std::shared_ptr<HapResource> pResource)
 HWTEST_F(HapResourceTest, HapResourceFuncTest001, TestSize.Level0)
 {
     auto start = CurrentTimeUsec();
-    auto pResource = HapResource::LoadFromIndex(FormatFullPath(g_resFilePath).c_str(), nullptr);
+    std::shared_ptr<ResConfigImpl> rc = nullptr;
+    auto pResource = HapResource::LoadFromIndex(FormatFullPath(g_resFilePath).c_str(), rc);
     auto cost = CurrentTimeUsec() - start;
     HILOG_DEBUG("load cost: %ld us.", cost);
 
@@ -220,7 +221,8 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest002, TestSize.Level1)
 HWTEST_F(HapResourceTest, HapResourceFuncTest003, TestSize.Level1)
 {
     auto start = CurrentTimeUsec();
-    auto pResource = HapResource::LoadFromIndex(FormatFullPath(g_resFilePath).c_str(), nullptr);
+    std::shared_ptr<ResConfigImpl> rc = nullptr;
+    auto pResource = HapResource::LoadFromIndex(FormatFullPath(g_resFilePath).c_str(), rc);
     auto cost = CurrentTimeUsec() - start;
     HILOG_DEBUG("load cost: %ld us.", cost);
 
