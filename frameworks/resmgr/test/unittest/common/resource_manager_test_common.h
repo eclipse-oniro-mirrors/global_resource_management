@@ -50,6 +50,8 @@ public:
 public:
     ResourceManager *rm;
 
+    std::shared_ptr<ResConfigImpl> defaultResConfig = InitDefaultResConfig();
+
     int GetResId(const std::string &name, ResType resType);
 
     void TestStringByName(const char *name, const char *cmp);

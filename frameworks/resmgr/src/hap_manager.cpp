@@ -209,7 +209,7 @@ std::shared_ptr<ResConfigImpl> HapManager::getCompleteOverrideConfig(bool isGetO
         return nullptr;
     }
 
-    if (!completeOverrideConfig->Copy(*this->resConfig_)) {
+    if (!completeOverrideConfig->Copy(*this->resConfig_, true)) {
         HILOG_ERROR("getCompleteOverrideConfig copy failed");
         return nullptr;
     }
@@ -357,7 +357,7 @@ RState HapManager::UpdateOverrideResConfig(ResConfig &resConfig)
 void HapManager::GetResConfig(ResConfig &resConfig)
 {
     AutoMutex mutex(this->lock_);
-    resConfig.Copy(*(this->resConfig_));
+    resConfig.Copy(*(this->resConfig_), true);
 }
 
 void HapManager::GetOverrideResConfig(ResConfig &resConfig)

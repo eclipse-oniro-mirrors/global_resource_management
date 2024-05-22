@@ -84,7 +84,7 @@ HapResource::~HapResource()
 }
 
 const std::shared_ptr<HapResource> HapResource::Load(const char *path,
-    const std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem, bool isOverlay, const uint32_t &selectedTypes)
+    std::shared_ptr<ResConfigImpl> &defaultConfig, bool isSystem, bool isOverlay, const uint32_t &selectedTypes)
 {
     if (Utils::ContainsTail(path, Utils::tailSet)) {
         return LoadFromHap(path, defaultConfig, isSystem, isOverlay, selectedTypes);
@@ -94,7 +94,7 @@ const std::shared_ptr<HapResource> HapResource::Load(const char *path,
 }
 
 const std::shared_ptr<HapResource> HapResource::LoadFromIndex(const char *path,
-    const std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem, bool isOverlay, const uint32_t &selectedTypes)
+    std::shared_ptr<ResConfigImpl> &defaultConfig, bool isSystem, bool isOverlay, const uint32_t &selectedTypes)
 {
     char outPath[PATH_MAX + 1] = {0};
     Utils::CanonicalizePath(path, outPath, PATH_MAX);
@@ -141,7 +141,7 @@ const std::shared_ptr<HapResource> HapResource::LoadFromIndex(const char *path,
         HILOG_ERROR("new HapResource failed when LoadFromIndex");
         return nullptr;
     }
-    if (!pResource->Init()) {
+    if (!pResource->Init(defaultConfig)) {
         return nullptr;
     }
     return pResource;
@@ -183,7 +183,7 @@ bool GetIndexData(const char *path, std::unique_ptr<uint8_t[]> &tmpBuf, size_t &
 }
 
 const std::shared_ptr<HapResource> HapResource::LoadFromHap(const char *path,
-    const std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem, bool isOverlay, const uint32_t &selectedTypes)
+    std::shared_ptr<ResConfigImpl> &defaultConfig, bool isSystem, bool isOverlay, const uint32_t &selectedTypes)
 {
     std::unique_ptr<uint8_t[]> tmpBuf;
     size_t tmpLen = 0;
@@ -209,14 +209,14 @@ const std::shared_ptr<HapResource> HapResource::LoadFromHap(const char *path,
         return nullptr;
     }
 
-    if (!pResource->Init()) {
+    if (!pResource->Init(defaultConfig)) {
         return nullptr;
     }
     return pResource;
 }
 
 const std::unordered_map<std::string, std::shared_ptr<HapResource>> HapResource::LoadOverlays(const std::string &path,
-    const std::vector<std::string> &overlayPaths, const std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem)
+    const std::vector<std::string> &overlayPaths, std::shared_ptr<ResConfigImpl> &defaultConfig, bool isSystem)
 {
     std::unordered_map<std::string, std::shared_ptr<HapResource>> result;
     do {
@@ -297,7 +297,7 @@ void HapResource::UpdateOverlayInfo(std::unordered_map<std::string, std::unorder
     idValuesMap_.swap(newIdValuesMap);
 }
 
-bool HapResource::Init()
+bool HapResource::Init(std::shared_ptr<ResConfigImpl> &defaultConfig)
 {
 #ifdef __WINNT__
     char separator = '\\';
@@ -330,10 +330,11 @@ bool HapResource::Init()
         }
         idValuesNameMap_.push_back(mptr);
     }
-    return InitIdList();
+    return InitIdList(defaultConfig);
 }
 
-bool HapResource::InitMap(const std::shared_ptr<ResKey> &resKey, const std::pair<std::string, std::string> &resPath)
+bool HapResource::InitMap(const std::shared_ptr<ResKey> &resKey, const std::pair<std::string, std::string> &resPath,
+    std::shared_ptr<ResConfigImpl> &defaultConfig)
 {
     for (size_t j = 0; j < resKey->resId_->idParams_.size(); ++j) {
         std::shared_ptr<IdParam> idParam = resKey->resId_->idParams_[j];
@@ -352,6 +353,7 @@ bool HapResource::InitMap(const std::shared_ptr<ResKey> &resKey, const std::pair
                 return false;
             }
             idValues->AddLimitPath(limitPath);
+            HapResource::IsAppDarkRes(limitPath, defaultConfig);
             idValuesMap_.insert(std::make_pair(id, idValues));
             std::string name = std::string(idParam->idItem_->name_);
             idValuesNameMap_[idParam->idItem_->resType_]->insert(std::make_pair(name, idValues));
@@ -367,12 +369,13 @@ bool HapResource::InitMap(const std::shared_ptr<ResKey> &resKey, const std::pair
                 return false;
             }
             idValues->AddLimitPath(limitPath);
+            HapResource::IsAppDarkRes(limitPath, defaultConfig);
         }
     }
     return true;
 }
 
-bool HapResource::InitIdList()
+bool HapResource::InitIdList(std::shared_ptr<ResConfigImpl> &defaultConfig)
 {
     if (resDesc_ == nullptr) {
         HILOG_ERROR("resDesc_ is null ! InitIdList failed");
@@ -381,7 +384,7 @@ bool HapResource::InitIdList()
     const auto resPath = std::make_pair(indexPath_, resourcePath_);
     for (size_t i = 0; i < resDesc_->keys_.size(); i++) {
         const auto resKey = resDesc_->keys_[i];
-        if (!HapResource::InitMap(resKey, resPath)) {
+        if (!HapResource::InitMap(resKey, resPath, defaultConfig)) {
             return false;
         }
     }
@@ -527,6 +530,21 @@ void HapResource::GetKeyParamsLocales(const std::vector<std::shared_ptr<KeyParam
 bool HapResource::IsThemeSystemResEnable() const
 {
     return this->isThemeSystemResEnable_;
+}
+
+void HapResource::IsAppDarkRes(const std::shared_ptr<HapResource::ValueUnderQualifierDir> &limitPath,
+    std::shared_ptr<ResConfigImpl> &defaultConfig)
+{
+    if (!defaultConfig) {
+        return;
+    }
+    if (isSystem_ || isOverlay_ || defaultConfig->GetAppDarkRes()) {
+        return;
+    }
+    std::string folder = limitPath->GetFolder();
+    if (folder.find("dark") != std::string::npos) {
+        defaultConfig->SetAppDarkRes(true);
+    }
 }
 } // namespace Resource
 } // namespace Global

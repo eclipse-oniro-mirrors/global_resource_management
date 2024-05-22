@@ -63,7 +63,7 @@ public:
 
     virtual uint32_t GetMnc() const = 0;
 
-    virtual bool Copy(ResConfig &other) = 0;
+    virtual bool Copy(ResConfig &other, bool isRead = false) = 0;
 	
     virtual void SetInputDevice(InputDevice inputDevice) = 0;
 	
@@ -84,6 +84,12 @@ public:
     virtual RState SetLocaleInfo(const char *localeStr) = 0;
 
     virtual ScreenDensity GetScreenDensityDpi() const = 0;
+
+    virtual void SetAppColorMode(bool isAppColorMode) = 0;
+
+    virtual bool GetAppColorMode() const = 0;
+
+    virtual bool GetAppDarkRes() const = 0;
 };
 
 EXPORT_FUNC ResConfig *CreateResConfig();
