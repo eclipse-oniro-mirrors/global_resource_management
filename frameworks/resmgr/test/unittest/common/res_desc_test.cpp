@@ -49,13 +49,13 @@ void ResDescTest::TearDownTestCase(void)
 void ResDescTest::SetUp()
 {
     // step 3: input testcase setup step
-    HILOG_DEBUG("ResDescTest setup");
+    RESMGR_HILOGD(RESMGR_TAG, "ResDescTest setup");
 }
 
 void ResDescTest::TearDown()
 {
     // step 4: input testcase teardown step
-    HILOG_DEBUG("ResDescTest teardown");
+    RESMGR_HILOGD(RESMGR_TAG, "ResDescTest teardown");
 }
 
 /*

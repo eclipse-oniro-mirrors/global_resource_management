@@ -26,6 +26,8 @@ ohos_shared_library("resourcemanager") {
     "src/resource_manager_napi.cpp",
   ]
 
+  defines = [ "CONFIG_HILOG" ]
+
   deps = [ "../innerkits/core:resmgr_napi_core" ]
 
   external_deps = [
@@ -47,6 +49,8 @@ ohos_shared_library("sendableresourcemanager") {
   include_dirs = [ "../../inner_api/include" ]
 
   sources = [ "src/sendable_resource_manager_napi.cpp" ]
+
+  defines = [ "CONFIG_HILOG" ]
 
   external_deps = [
     "hilog:libhilog",

@@ -150,7 +150,7 @@ const std::string KeyParam::ConvertToStr() const
         char tmp2[5];
         errno_t eret = memcpy_s(tmp, sizeof(tmp), &value_, 4);
         if (eret != OK) {
-            HILOG_ERROR("memcpy_s error : %d", eret);
+            RESMGR_HILOGE(RESMGR_TAG, "memcpy_s error : %d", eret);
         }
         int j = 0;
         // 4 means langauges/region/script key value max length
@@ -301,7 +301,7 @@ std::string ResId::ToString() const
 
 ResKey::~ResKey()
 {
-    HILOG_DEBUG("~ResKey()");
+    RESMGR_HILOGD(RESMGR_TAG, "~ResKey()");
     keyParams_.clear();
 }
 
@@ -321,7 +321,7 @@ ResDesc::ResDesc() : resHeader_(nullptr)
 
 ResDesc::~ResDesc()
 {
-    HILOG_DEBUG("~ResDesc()");
+    RESMGR_HILOGD(RESMGR_TAG, "~ResDesc()");
     if (resHeader_ != nullptr) {
         delete (resHeader_);
         resHeader_ = nullptr;

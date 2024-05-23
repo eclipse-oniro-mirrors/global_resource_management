@@ -65,14 +65,14 @@ Ability* GetGlobalAbility(napi_env env)
     napi_value global;
     napi_status status = napi_get_global(env, &global);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to get global");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get global");
         return nullptr;
     }
 
     napi_value abilityObj;
     status = napi_get_named_property(env, global, "ability", &abilityObj);
     if (status != napi_ok || abilityObj == nullptr) {
-        HiLog::Warn(LABEL, "Failed to get ability property");
+        RESMGR_HILOGI(RESMGR_JS_TAG, "Failed to get ability property");
         return nullptr;
     }
 
@@ -124,7 +124,7 @@ static napi_value getResult(napi_env env, std::unique_ptr<ResMgrDataContext> &as
     }
 
     if (!InitAsyncContext(env, bundleName, GetGlobalAbility(env), abilityRuntimeContext, *asyncContext)) {
-        HiLog::Error(LABEL, "init async context failed");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "init async context failed");
         ReportInitResourceManagerFail(bundleName, "failed to init async context");
         return nullptr;
     }
@@ -134,12 +134,12 @@ static napi_value getResult(napi_env env, std::unique_ptr<ResMgrDataContext> &as
     napi_status status = napi_create_async_work(env, nullptr, resource, ExecuteGetResMgr,
         ResourceManagerNapiAsyncImpl::Complete, static_cast<void*>(asyncContext.get()), &asyncContext->work_);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to create async work for getResourceManager %{public}d", status);
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to create async work for getResourceManager %{public}d", status);
         return result;
     }
     status = napi_queue_async_work_with_qos(env, asyncContext->work_, napi_qos_user_initiated);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to queue async work for getResourceManager %{public}d", status);
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to queue async work for getResourceManager %{public}d", status);
         return result;
     }
     asyncContext.release();
@@ -161,12 +161,12 @@ static napi_value GetResourceManager(napi_env env, napi_callback_info info)
             WeakContextPtr objContext;
             napi_status status = napi_unwrap(env, argv[0], reinterpret_cast<void **>(&objContext));
             if (status != napi_ok || objContext == nullptr) {
-                HiLog::Error(LABEL, "Failed to get objContext");
+                RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get objContext");
                 return nullptr;
             }
             auto context = objContext->lock();
             if (context == nullptr) {
-                HiLog::Error(LABEL, "Failed to get context");
+                RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get context");
                 return nullptr;
             }
             abilityRuntimeContext = context;
@@ -174,13 +174,13 @@ static napi_value GetResourceManager(napi_env env, napi_callback_info info)
             size_t len = 0;
             napi_status status = napi_get_value_string_utf8(env, argv[i], nullptr, 0, &len);
             if (status != napi_ok) {
-                HiLog::Error(LABEL, "Failed to get bundle name length");
+                RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get bundle name length");
                 return nullptr;
             }
             std::vector<char> buf(len + 1);
             status = napi_get_value_string_utf8(env, argv[i], buf.data(), len + 1, &len);
             if (status != napi_ok) {
-                HiLog::Error(LABEL, "Failed to get bundle name");
+                RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get bundle name");
                 return nullptr;
             }
             bundleName = buf.data();
@@ -277,7 +277,7 @@ static napi_value ResMgrInit(napi_env env, napi_value exports)
         creatorProp);
     FinishTrace(HITRACE_TAG_GLOBAL_RESMGR);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to set getResourceManager at init");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to set getResourceManager at init");
         return nullptr;
     }
 
@@ -290,7 +290,7 @@ static napi_value ResMgrInit(napi_env env, napi_value exports)
 
     status = napi_define_properties(env, exports, sizeof(static_prop) / sizeof(static_prop[0]), static_prop);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "failed to define properties for exports");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "failed to define properties for exports");
         return nullptr;
     }
 

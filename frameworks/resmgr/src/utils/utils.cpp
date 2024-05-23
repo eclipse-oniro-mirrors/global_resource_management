@@ -55,7 +55,7 @@ RState Utils::GetMediaBase64Data(const std::string& iconPath, std::string &base6
     size_t len = 0;
     auto tempData = Utils::LoadResourceFile(iconPath, len);
     if (tempData == nullptr) {
-        HILOG_ERROR("get the tempData error");
+        RESMGR_HILOGE(RESMGR_TAG, "get the tempData error");
         return NOT_FOUND;
     }
     auto pos = iconPath.find_last_of('.');
@@ -76,7 +76,7 @@ std::unique_ptr<uint8_t[]> Utils::LoadResourceFile(const std::string &path, size
     mediaStream.seekg(0, std::ios::end);
     int length = mediaStream.tellg();
     if (length == ERROR_RESULT) {
-        HILOG_ERROR("failed to get the file length");
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get the file length");
         return nullptr;
     } else {
         len = static_cast<size_t>(length);
@@ -441,7 +441,7 @@ RState Utils::ConvertColorToUInt32(const char *s, uint32_t &outValue)
 bool Utils::endWithTail(const std::string& path, const std::string& tail)
 {
     if (path.size() < tail.size()) {
-        HILOG_ERROR("the path is shorter than tail");
+        RESMGR_HILOGE(RESMGR_TAG, "the path is shorter than tail");
         return false;
     }
     return path.compare(path.size() - tail.size(), tail.size(), tail) == 0;
@@ -469,21 +469,21 @@ void Utils::CanonicalizePath(const char *path, char *outPath, size_t len)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
 #endif
     if (path == nullptr) {
-        HILOG_ERROR("path is null");
+        RESMGR_HILOGE(RESMGR_TAG, "path is null");
         return;
     }
     if (strlen(path) >= len) {
-        HILOG_ERROR("the length of path longer than len");
+        RESMGR_HILOGE(RESMGR_TAG, "the length of path longer than len");
         return;
     }
 #ifdef __WINNT__
     if (!PathCanonicalizeA(outPath, path)) {
-        HILOG_ERROR("failed to canonicalize the path");
+        RESMGR_HILOGE(RESMGR_TAG, "failed to canonicalize the path");
         return;
     }
 #else
     if (realpath(path, outPath) == nullptr) {
-        HILOG_ERROR("failed to realpath the path, %{public}s, errno:%{public}d", path, errno);
+        RESMGR_HILOGE(RESMGR_TAG, "failed to realpath the path, %{public}s, errno:%{public}d", path, errno);
         return;
     }
 #endif
@@ -500,13 +500,13 @@ RState Utils::GetFiles(const std::string &strCurrentDir, std::vector<std::string
     char outPath[PATH_MAX + 1] = {0};
     Utils::CanonicalizePath(strCurrentDir.c_str(), outPath, PATH_MAX);
     if (outPath[0] == '\0') {
-        HILOG_ERROR("invalid path, %{public}s", strCurrentDir.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "invalid path, %{public}s", strCurrentDir.c_str());
         return ERROR_CODE_RES_PATH_INVALID;
     }
     DIR *dir;
     struct dirent *pDir;
     if ((dir = opendir(strCurrentDir.c_str())) == nullptr) {
-        HILOG_ERROR("opendir failed strCurrentDir = %{public}s", strCurrentDir.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "opendir failed strCurrentDir = %{public}s", strCurrentDir.c_str());
         return ERROR_CODE_RES_PATH_INVALID;
     }
     while ((pDir = readdir(dir)) != nullptr) {

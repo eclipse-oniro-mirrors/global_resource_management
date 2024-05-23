@@ -61,12 +61,12 @@ ResourceManagerImpl *SystemResourceManager::GetSystemResourceManager()
 
 ResourceManagerImpl *SystemResourceManager::GetSystemResourceManagerNoSandBox()
 {
-    HILOG_INFO("GetSystemResourceManagerNoSandBox");
+    RESMGR_HILOGI(RESMGR_TAG, "GetSystemResourceManagerNoSandBox");
     // appspawn can only add no sandbox system resource path, so all app that forked from appspawn have
     // one global resourceManager.
     bool isCreated = CreateSystemResourceManager(false);
     if (!isCreated) {
-        HILOG_WARN("CreateSystemResourceManager failed when GetSystemResourceManagerNoSandBox");
+        RESMGR_HILOGW(RESMGR_TAG, "CreateSystemResourceManager failed when GetSystemResourceManagerNoSandBox");
         return nullptr;
     }
     return resourceManager_;
@@ -81,7 +81,7 @@ bool SystemResourceManager::CreateSystemResourceManager(bool isSandbox)
     if (resourceManager_ == nullptr) {
         ResourceManagerImpl *impl = new (std::nothrow) ResourceManagerImpl;
         if (impl == nullptr) {
-            HILOG_ERROR("new ResourceManagerImpl failed when CreateSystemResourceManager");
+            RESMGR_HILOGE(RESMGR_TAG, "new ResourceManagerImpl failed when CreateSystemResourceManager");
             return false;
         }
         if (!impl->Init(true)) {

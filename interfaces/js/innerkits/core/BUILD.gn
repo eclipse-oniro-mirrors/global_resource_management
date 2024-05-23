@@ -32,6 +32,8 @@ ohos_shared_library("resmgr_napi_core") {
     "src/resource_manager_napi_utils.cpp",
   ]
 
+  defines = [ "CONFIG_HILOG" ]
+
   version_script = "libresmgr_napi_core.versionscript"
 
   public_configs = [ ":resmgr_napi_core_public_config" ]
@@ -49,7 +51,7 @@ ohos_shared_library("resmgr_napi_core") {
   ]
 
   if (resource_management_support_icu) {
-    defines = [ "SUPPORT_GRAPHICS" ]
+    defines += [ "SUPPORT_GRAPHICS" ]
   }
 
   subsystem_name = "global"

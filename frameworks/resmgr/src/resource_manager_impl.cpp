@@ -67,12 +67,12 @@ bool ResourceManagerImpl::Init(bool isSystem)
 {
     auto resConfig = std::make_shared<ResConfigImpl>();
     if (resConfig == nullptr) {
-        HILOG_ERROR("new ResConfigImpl failed when ResourceManagerImpl::Init");
+        RESMGR_HILOGE(RESMGR_TAG, "new ResConfigImpl failed when ResourceManagerImpl::Init");
         return false;
     }
     hapManager_ = std::make_shared<HapManager>(resConfig, isSystem);
     if (hapManager_ == nullptr) {
-        HILOG_ERROR("new HapManager failed when ResourceManagerImpl::Init");
+        RESMGR_HILOGE(RESMGR_TAG, "new HapManager failed when ResourceManagerImpl::Init");
         return false;
     }
     return true;
@@ -81,7 +81,7 @@ bool ResourceManagerImpl::Init(bool isSystem)
 bool ResourceManagerImpl::Init(std::shared_ptr<HapManager> hapManager)
 {
     if (hapManager == nullptr) {
-        HILOG_ERROR("ResourceManagerImpl::Init, hapManager is nullptr");
+        RESMGR_HILOGE(RESMGR_TAG, "ResourceManagerImpl::Init, hapManager is nullptr");
         return false;
     }
     this->hapManager_ = hapManager;
@@ -92,7 +92,7 @@ RState ResourceManagerImpl::GetStringById(uint32_t id, std::string &outValue)
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by string id error id = %{public}d", id);
+        RESMGR_HILOGE(RESMGR_TAG, "find resource by string id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     RState state = GetString(idItem, outValue);
@@ -106,7 +106,7 @@ RState ResourceManagerImpl::GetStringByName(const char *name, std::string &outVa
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::STRING, isOverrideResMgr_);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by string name error name = %{public}s", name);
+        RESMGR_HILOGE(RESMGR_TAG, "find resource by string name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     RState state = GetString(idItem, outValue);
@@ -169,7 +169,7 @@ RState ResourceManagerImpl::GetStringArrayById(uint32_t id, std::vector<std::str
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by string array id error id = %{public}d", id);
+        RESMGR_HILOGE(RESMGR_TAG, "find resource by string array id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     RState state = GetStringArray(idItem, outValue);
@@ -184,7 +184,7 @@ RState ResourceManagerImpl::GetStringArrayByName(const char *name, std::vector<s
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(
         name, ResType::STRINGARRAY, isOverrideResMgr_);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by string array name error name = %{public}s", name);
+        RESMGR_HILOGE(RESMGR_TAG, "find resource by string array name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     RState state = GetStringArray(idItem, outValue);
@@ -206,7 +206,8 @@ RState ResourceManagerImpl::GetStringArray(const std::shared_ptr<IdItem> idItem,
         std::string resolvedValue;
         RState rrRet = ResolveReference(idItem->values_[i], resolvedValue);
         if (rrRet != SUCCESS) {
-            HILOG_DEBUG("GetStringArray ResolveReference failed, value:%{public}s", idItem->values_[i].c_str());
+            RESMGR_HILOGD(RESMGR_TAG,
+                "GetStringArray ResolveReference failed, value:%{public}s", idItem->values_[i].c_str());
             return rrRet;
         }
         outValue.push_back(resolvedValue);
@@ -228,7 +229,7 @@ RState ResourceManagerImpl::GetPatternById(uint32_t id, std::map<std::string, st
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by pattern id error id = %{public}d", id);
+        RESMGR_HILOGE(RESMGR_TAG, "find resource by pattern id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     RState state = GetPattern(idItem, outValue);
@@ -242,7 +243,7 @@ RState ResourceManagerImpl::GetPatternByName(const char *name, std::map<std::str
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::PATTERN, isOverrideResMgr_);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by Pattern name error name = %{public}s", name);
+        RESMGR_HILOGE(RESMGR_TAG, "find resource by Pattern name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     RState state = GetPattern(idItem, outValue);
@@ -257,7 +258,8 @@ RState ResourceManagerImpl::GetPattern(const std::shared_ptr<IdItem> idItem, std
 {
     //type invalid
     if (idItem->resType_ != ResType::PATTERN) {
-        HILOG_ERROR("actual resType = %{public}d, expect resType = %{public}d", idItem->resType_, ResType::PATTERN);
+        RESMGR_HILOGE(RESMGR_TAG,
+            "actual resType = %{public}d, expect resType = %{public}d", idItem->resType_, ResType::PATTERN);
         return NOT_FOUND;
     }
     return ResolveParentReference(idItem, outValue);
@@ -282,7 +284,7 @@ RState ResourceManagerImpl::GetPluralStringByIdFormat(std::string &outValue, uin
     const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd = hapManager_->FindQualifierValueById(id,
         isOverrideResMgr_);
     if (vuqd == nullptr) {
-        HILOG_ERROR("find qualifier value by plural id error id = %{public}d", id);
+        RESMGR_HILOGE(RESMGR_TAG, "find qualifier value by plural id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     std::string temp;
@@ -307,7 +309,7 @@ RState ResourceManagerImpl::GetPluralStringByNameFormat(std::string &outValue, c
     const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd =
         hapManager_->FindQualifierValueByName(name, ResType::PLURALS, isOverrideResMgr_);
     if (vuqd == nullptr) {
-        HILOG_ERROR("find qualifier value by plural name error name = %{public}s", name);
+        RESMGR_HILOGE(RESMGR_TAG, "find qualifier value by plural name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     std::string temp;
@@ -350,7 +352,7 @@ RState ResourceManagerImpl::GetPluralString(const std::shared_ptr<HapResource::V
             std::string resolvedValue;
             RState rrRet = ResolveReference(value, resolvedValue);
             if (rrRet != SUCCESS) {
-                HILOG_DEBUG("ResolveReference failed, value:%{public}s", value.c_str());
+                RESMGR_HILOGD(RESMGR_TAG, "ResolveReference failed, value:%{public}s", value.c_str());
                 return rrRet;
             }
             map[key] = resolvedValue;
@@ -391,24 +393,25 @@ RState ResourceManagerImpl::ResolveReference(const std::string value, std::strin
 
         if (IdItem::IsArrayOfType(resType)) {
             // can't be array
-            HILOG_DEBUG("ref %{public}s can't be array", refStr.c_str());
+            RESMGR_HILOGD(RESMGR_TAG, "ref %{public}s can't be array", refStr.c_str());
             return ERROR;
         }
         const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
         if (idItem == nullptr) {
-            HILOG_ERROR("ref %s id not found", refStr.c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "ref %s id not found", refStr.c_str());
             return ERROR;
         }
         // unless compile bug
         if (resType != idItem->resType_) {
-            HILOG_ERROR("impossible. ref %s type mismatch, found type: %d", refStr.c_str(), idItem->resType_);
+            RESMGR_HILOGE(RESMGR_TAG,
+                "impossible. ref %s type mismatch, found type: %d", refStr.c_str(), idItem->resType_);
             return ERROR;
         }
 
         refStr = idItem->value_;
 
         if (++count > MAX_DEPTH_REF_SEARCH) {
-            HILOG_ERROR("ref %s has re-ref too much", value.c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "ref %s has re-ref too much", value.c_str());
             return ERROR_CODE_RES_REF_TOO_MUCH;
         }
     }
@@ -458,7 +461,7 @@ RState ResourceManagerImpl::ResolveParentReference(const std::shared_ptr<IdItem>
             }
             RState rrRet = ResolveReference(value, resolvedValue);
             if (rrRet != SUCCESS) {
-                HILOG_DEBUG("ResolveReference failed, value:%{public}s", value.c_str());
+                RESMGR_HILOGD(RESMGR_TAG, "ResolveReference failed, value:%{public}s", value.c_str());
                 return ERROR;
             }
             outValue[key] = resolvedValue;
@@ -469,18 +472,19 @@ RState ResourceManagerImpl::ResolveParentReference(const std::shared_ptr<IdItem>
             ResType resType;
             bool isRef = IdItem::IsRef(currItem->values_[0], resType, id);
             if (!isRef) {
-                HILOG_ERROR("something wrong, pls check HaveParent(). idItem: %{public}s", idItem->ToString().c_str());
+                RESMGR_HILOGE(RESMGR_TAG,
+                    "something wrong, pls check HaveParent(). idItem: %{public}s", idItem->ToString().c_str());
                 return ERROR;
             }
             currItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
             if (currItem == nullptr) {
-                HILOG_ERROR("ref %s id not found", idItem->values_[0].c_str());
+                RESMGR_HILOGE(RESMGR_TAG, "ref %s id not found", idItem->values_[0].c_str());
                 return ERROR;
             }
         }
 
         if (++count > MAX_DEPTH_REF_SEARCH) {
-            HILOG_ERROR(" %u has too many parents", idItem->id_);
+            RESMGR_HILOGE(RESMGR_TAG, " %u has too many parents", idItem->id_);
             return ERROR;
         }
     } while (haveParent);
@@ -492,7 +496,7 @@ RState ResourceManagerImpl::GetBooleanById(uint32_t id, bool &outValue)
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by Boolean id error id = %{public}d", id);
+        RESMGR_HILOGE(RESMGR_TAG, "find resource by Boolean id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     RState state = GetBoolean(idItem, outValue);
@@ -506,7 +510,7 @@ RState ResourceManagerImpl::GetBooleanByName(const char *name, bool &outValue)
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::BOOLEAN, isOverrideResMgr_);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by Boolean name error name = %{public}s", name);
+        RESMGR_HILOGE(RESMGR_TAG, "find resource by Boolean name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     RState state = GetBoolean(idItem, outValue);
@@ -572,7 +576,7 @@ RState ResourceManagerImpl::GetFloatById(uint32_t id, float &outValue)
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by Float id error id = %{public}d", id);
+        RESMGR_HILOGE(RESMGR_TAG, "find resource by Float id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
 
@@ -596,7 +600,7 @@ RState ResourceManagerImpl::GetFloatById(uint32_t id, float &outValue, std::stri
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by Float id error with unit id = %{public}d", id);
+        RESMGR_HILOGE(RESMGR_TAG, "find resource by Float id error with unit id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
 
@@ -619,7 +623,7 @@ RState ResourceManagerImpl::GetFloatByName(const char *name, float &outValue)
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::FLOAT, isOverrideResMgr_);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by Float name error name = %{public}s", name);
+        RESMGR_HILOGE(RESMGR_TAG, "find resource by Float name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
 
@@ -651,7 +655,7 @@ RState ResourceManagerImpl::RecalculateFloat(const std::string &unit, float &res
     GetResConfig(rc);
     float density = rc.GetScreenDensity();
     if (density == SCREEN_DENSITY_NOT_SET) {
-        HILOG_DEBUG("RecalculateFloat srcDensity SCREEN_DENSITY_NOT_SET ");
+        RESMGR_HILOGD(RESMGR_TAG, "RecalculateFloat srcDensity SCREEN_DENSITY_NOT_SET ");
         return SUCCESS;
     }
     if (unit == VIRTUAL_PIXEL) {
@@ -670,7 +674,7 @@ RState ResourceManagerImpl::ParseFloat(const std::string &strValue, float &resul
     std::regex reg("(\\+|-)?\\d+(\\.\\d+)? *(px|vp|fp)?");
     std::smatch floatMatch;
     if (!regex_search(strValue, floatMatch, reg)) {
-        HILOG_DEBUG("not valid float value %{public}s", strValue.c_str());
+        RESMGR_HILOGD(RESMGR_TAG, "not valid float value %{public}s", strValue.c_str());
         return ERROR;
     }
     std::string matchString(floatMatch.str());
@@ -700,7 +704,7 @@ RState ResourceManagerImpl::GetIntegerById(uint32_t id, int &outValue)
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by Integer id error id = %{public}d", id);
+        RESMGR_HILOGE(RESMGR_TAG, "find resource by Integer id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     RState state = GetInteger(idItem, outValue);
@@ -714,7 +718,7 @@ RState ResourceManagerImpl::GetIntegerByName(const char *name, int &outValue)
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::INTEGER, isOverrideResMgr_);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by Integer name error name = %{public}s", name);
+        RESMGR_HILOGE(RESMGR_TAG, "find resource by Integer name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     RState state = GetInteger(idItem, outValue);
@@ -754,25 +758,26 @@ RState ResourceManagerImpl::ProcessReference(const std::string value,
 
         if (IdItem::IsArrayOfType(resType)) {
             // can't be array
-            HILOG_DEBUG("ref %{public}s can't be array", refStr.c_str());
+            RESMGR_HILOGD(RESMGR_TAG, "ref %{public}s can't be array", refStr.c_str());
             return ERROR;
         }
         const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
         idItems.emplace_back(idItem);
         if (idItem == nullptr) {
-            HILOG_ERROR("ref %s id not found", refStr.c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "ref %s id not found", refStr.c_str());
             return ERROR;
         }
         // unless compile bug
         if (resType != idItem->resType_) {
-            HILOG_ERROR("impossible. ref %s type mismatch, found type: %d", refStr.c_str(), idItem->resType_);
+            RESMGR_HILOGE(RESMGR_TAG,
+                "impossible. ref %s type mismatch, found type: %d", refStr.c_str(), idItem->resType_);
             return ERROR;
         }
 
         refStr = idItem->value_;
 
         if (++count > MAX_DEPTH_REF_SEARCH) {
-            HILOG_ERROR("ref %s has re-ref too much", value.c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "ref %s has re-ref too much", value.c_str());
             return ERROR_CODE_RES_REF_TOO_MUCH;
         }
     }
@@ -798,7 +803,7 @@ RState ResourceManagerImpl::GetColorById(uint32_t id, uint32_t &outValue)
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by string id error id = %{public}d", id);
+        RESMGR_HILOGE(RESMGR_TAG, "find resource by string id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
 
@@ -818,7 +823,7 @@ RState ResourceManagerImpl::GetColorByName(const char *name, uint32_t &outValue)
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::COLOR, isOverrideResMgr_);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by string id error name = %{public}s", name);
+        RESMGR_HILOGE(RESMGR_TAG, "find resource by string id error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
 
@@ -851,7 +856,7 @@ RState ResourceManagerImpl::GetSymbolById(uint32_t id, uint32_t &outValue)
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by symbol id error id = %{public}d", id);
+        RESMGR_HILOGE(RESMGR_TAG, "find resource by symbol id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     RState state = GetSymbol(idItem, outValue);
@@ -865,7 +870,7 @@ RState ResourceManagerImpl::GetSymbolByName(const char *name, uint32_t &outValue
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::SYMBOL, isOverrideResMgr_);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by symbol name error name = %{public}s", name);
+        RESMGR_HILOGE(RESMGR_TAG, "find resource by symbol name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     RState state = GetSymbol(idItem, outValue);
@@ -912,7 +917,7 @@ RState ResourceManagerImpl::GetIntArray(const std::shared_ptr<IdItem> idItem, st
         std::string resolvedValue;
         RState rrRet = ResolveReference(idItem->values_[i], resolvedValue);
         if (rrRet != SUCCESS) {
-            HILOG_DEBUG("ResolveReference failed, value:%{public}s", idItem->values_[i].c_str());
+            RESMGR_HILOGD(RESMGR_TAG, "ResolveReference failed, value:%{public}s", idItem->values_[i].c_str());
             return ERROR;
         }
         outValue.push_back(stoi(resolvedValue));
@@ -924,7 +929,7 @@ RState ResourceManagerImpl::GetThemeById(uint32_t id, std::map<std::string, std:
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by Theme id error id = %{public}d", id);
+        RESMGR_HILOGE(RESMGR_TAG, "find resource by Theme id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     RState state = GetTheme(idItem, outValue);
@@ -938,7 +943,7 @@ RState ResourceManagerImpl::GetThemeByName(const char *name, std::map<std::strin
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::THEME, isOverrideResMgr_);
     if (idItem == nullptr) {
-        HILOG_ERROR("find resource by Theme name error name = %{public}s", name);
+        RESMGR_HILOGE(RESMGR_TAG, "find resource by Theme name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     RState state = GetTheme(idItem, outValue);
@@ -952,7 +957,8 @@ RState ResourceManagerImpl::GetTheme(const std::shared_ptr<IdItem> idItem, std::
 {
     //type invalid
     if (idItem->resType_ != ResType::THEME) {
-        HILOG_ERROR("actual resType = %{public}d, expect resType = %{public}d", idItem->resType_, ResType::THEME);
+        RESMGR_HILOGE(RESMGR_TAG,
+            "actual resType = %{public}d, expect resType = %{public}d", idItem->resType_, ResType::THEME);
         return NOT_FOUND;
     }
     return ResolveParentReference(idItem, outValue);
@@ -962,7 +968,7 @@ RState ResourceManagerImpl::GetProfileById(uint32_t id, std::string &outValue)
 {
     auto qd = hapManager_->FindQualifierValueById(id, isOverrideResMgr_);
     if (qd == nullptr) {
-        HILOG_ERROR("GetProfileById find qualifier value by profile id error id = %{public}d", id);
+        RESMGR_HILOGE(RESMGR_TAG, "GetProfileById find qualifier value by profile id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     RState state = hapManager_->GetFilePath(qd, ResType::PROF, outValue);
@@ -973,7 +979,8 @@ RState ResourceManagerImpl::GetProfileByName(const char *name, std::string &outV
 {
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::PROF, isOverrideResMgr_);
     if (qd == nullptr) {
-        HILOG_ERROR("GetProfileByName find qualifier value by profile name error name = %{public}s", name);
+        RESMGR_HILOGE(RESMGR_TAG,
+            "GetProfileByName find qualifier value by profile name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     RState state = hapManager_->GetFilePath(qd, ResType::PROF, outValue);
@@ -983,12 +990,12 @@ RState ResourceManagerImpl::GetProfileByName(const char *name, std::string &outV
 RState ResourceManagerImpl::GetMediaById(uint32_t id, std::string &outValue, uint32_t density)
 {
     if (!IsDensityValid(density)) {
-        HILOG_ERROR("density invalid");
+        RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     auto qd = hapManager_->FindQualifierValueById(id, isOverrideResMgr_, density);
     if (qd == nullptr) {
-        HILOG_ERROR("GetMediaById find qualifier value by Media id error id = %{public}d", id);
+        RESMGR_HILOGE(RESMGR_TAG, "GetMediaById find qualifier value by Media id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     RState state = hapManager_->GetFilePath(qd, ResType::MEDIA, outValue);
@@ -998,12 +1005,12 @@ RState ResourceManagerImpl::GetMediaById(uint32_t id, std::string &outValue, uin
 RState ResourceManagerImpl::GetMediaByName(const char *name, std::string &outValue, uint32_t density)
 {
     if (!IsDensityValid(density)) {
-        HILOG_ERROR("density invalid");
+        RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, isOverrideResMgr_, density);
     if (qd == nullptr) {
-        HILOG_ERROR("GetMediaByName find qualifier value by Media name error name = %{public}s", name);
+        RESMGR_HILOGE(RESMGR_TAG, "GetMediaByName find qualifier value by Media name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     RState state = hapManager_->GetFilePath(qd, ResType::MEDIA, outValue);
@@ -1032,7 +1039,7 @@ void ResourceManagerImpl::ProcessPsuedoTranslate(std::string &outValue)
     if (strcpy_s(src, len, outValue.c_str()) == EOK) {
         std::string resultMsg = psueManager_->Convert(src, outValue);
         if (resultMsg != "") {
-            HILOG_ERROR("Psuedo translate failed, value:%s", src);
+            RESMGR_HILOGE(RESMGR_TAG, "Psuedo translate failed, value:%s", src);
         }
     }
 }
@@ -1100,7 +1107,7 @@ RState ResourceManagerImpl::UpdateFakeLocaleFlag(ResConfig &resConfig)
 RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig, bool isUpdateTheme)
 {
     if (isUpdateTheme) {
-        HILOG_DEBUG("The theme enabled");
+        RESMGR_HILOGD(RESMGR_TAG, "The theme enabled");
         ThemePackManager::GetThemePackManager()->LoadThemeRes(bundleInfo.first, bundleInfo.second, userId);
     }
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
@@ -1169,12 +1176,12 @@ RState ResourceManagerImpl::GetMediaDataById(uint32_t id, size_t &len, std::uniq
     uint32_t density)
 {
     if (!IsDensityValid(density)) {
-        HILOG_ERROR("density invalid");
+        RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     auto qd = hapManager_->FindQualifierValueById(id, isOverrideResMgr_, density);
     if (qd == nullptr) {
-        HILOG_ERROR("GetMediaDataById find qualifier value by media id error id = %{public}d", id);
+        RESMGR_HILOGE(RESMGR_TAG, "GetMediaDataById find qualifier value by media id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
 
@@ -1192,13 +1199,14 @@ RState ResourceManagerImpl::GetMediaDataByName(const char *name, size_t &len, st
     uint32_t density)
 {
     if (!IsDensityValid(density)) {
-        HILOG_ERROR("density invalid");
+        RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
 
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, isOverrideResMgr_, density);
     if (qd == nullptr) {
-        HILOG_ERROR("GetMediaDataByName find qualifier value by media name error name = %{public}s", name);
+        RESMGR_HILOGE(RESMGR_TAG,
+            "GetMediaDataByName find qualifier value by media name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
 
@@ -1227,13 +1235,13 @@ RState ResourceManagerImpl::GetThemeMediaBase64(const std::shared_ptr<IdItem> id
 RState ResourceManagerImpl::GetMediaBase64DataById(uint32_t id, std::string &outValue, uint32_t density)
 {
     if (!IsDensityValid(density)) {
-        HILOG_ERROR("density invalid");
+        RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     
     auto qd = hapManager_->FindQualifierValueById(id, isOverrideResMgr_, density);
     if (qd == nullptr) {
-        HILOG_ERROR("GetMediaBase64DataById find qualifier value by media id error id = %{public}d", id);
+        RESMGR_HILOGE(RESMGR_TAG, "GetMediaBase64DataById find qualifier value by media id error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
 
@@ -1249,12 +1257,13 @@ RState ResourceManagerImpl::GetMediaBase64DataById(uint32_t id, std::string &out
 RState ResourceManagerImpl::GetMediaBase64DataByName(const char *name, std::string &outValue, uint32_t density)
 {
     if (!IsDensityValid(density)) {
-        HILOG_ERROR("density invalid");
+        RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, isOverrideResMgr_, density);
     if (qd == nullptr) {
-        HILOG_ERROR("GetMediaBase64DataByName find qualifier value by media name error name = %{public}s", name);
+        RESMGR_HILOGE(RESMGR_TAG,
+            "GetMediaBase64DataByName find qualifier value by media name error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
 
@@ -1271,7 +1280,7 @@ RState ResourceManagerImpl::GetProfileDataById(uint32_t id, size_t &len, std::un
 {
     auto qd = hapManager_->FindQualifierValueById(id, isOverrideResMgr_);
     if (qd == nullptr) {
-        HILOG_ERROR("GetProfileDataById find qualifier value by profile id error id = %{public}d", id);
+        RESMGR_HILOGE(RESMGR_TAG, "GetProfileDataById find qualifier value by profile id error id = %{public}d", id);
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
     return hapManager_->GetProfileData(qd, len, outValue);
@@ -1281,7 +1290,8 @@ RState ResourceManagerImpl::GetProfileDataByName(const char *name, size_t &len, 
 {
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::PROF, isOverrideResMgr_);
     if (qd == nullptr) {
-        HILOG_ERROR("GetProfileDataByName find qualifier value by profile name error name = %{public}s", name);
+        RESMGR_HILOGE(RESMGR_TAG,
+            "GetProfileDataByName find qualifier value by profile name error name = %{public}s", name);
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
     }
     return hapManager_->GetProfileData(qd, len, outValue);
@@ -1341,7 +1351,8 @@ RState ResourceManagerImpl::GetThemeIcon(const std::shared_ptr<IdItem> idItem, s
     std::string iconName = idItem->GetItemResName();
     std::string result = ThemePackManager::GetThemePackManager()->FindThemeIconResource(bundleInfo, iconName);
     if (result.empty()) {
-        HILOG_DEBUG("GetThemeIcon FAILED bundlename = %{public}s, modulename = %{public}s, iconName = %{public}s",
+        RESMGR_HILOGD(RESMGR_TAG,
+            "GetThemeIcon FAILED bundlename = %{public}s, modulename = %{public}s, iconName = %{public}s",
             bundleInfo.first.c_str(), bundleInfo.second.c_str(), iconName.c_str());
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
@@ -1366,17 +1377,17 @@ RState ResourceManagerImpl::GetDrawableInfoById(uint32_t id, std::string &type, 
     std::unique_ptr<uint8_t[]> &outValue, uint32_t density)
 {
     if (!IsDensityValid(density)) {
-        HILOG_ERROR("density invalid");
+        RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     auto qd = hapManager_->FindQualifierValueById(id, isOverrideResMgr_, density);
     if (qd == nullptr) {
-        HILOG_ERROR("find qualifier value error by drawable id id = %{public}d", id);
+        RESMGR_HILOGE(RESMGR_TAG, "find qualifier value error by drawable id id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     type = GetSuffix(qd);
     if (type.empty()) {
-        HILOG_ERROR("failed to get resourceType");
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get resourceType");
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
     return hapManager_->GetMediaData(qd, len, outValue);
@@ -1386,17 +1397,17 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name, std::string 
     std::unique_ptr<uint8_t[]> &outValue, uint32_t density)
 {
     if (!IsDensityValid(density)) {
-        HILOG_ERROR("density invalid");
+        RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, isOverrideResMgr_, density);
     if (qd == nullptr) {
-        HILOG_ERROR("find qualifier value error by drawable name name = %{public}s", name);
+        RESMGR_HILOGE(RESMGR_TAG, "find qualifier value error by drawable name name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     type = GetSuffix(qd);
     if (type.empty()) {
-        HILOG_ERROR("failed to get resourceType");
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get resourceType");
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
     }
     return hapManager_->GetMediaData(qd, len, outValue);
@@ -1407,17 +1418,17 @@ RState ResourceManagerImpl::GetDrawableInfoById(uint32_t id,
     std::unique_ptr<uint8_t[]> &outValue, uint32_t iconType, uint32_t density)
 {
     if (!IsDensityValid(density)) {
-        HILOG_ERROR("density invalid");
+        RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     auto qd = hapManager_->FindQualifierValueById(id, isOverrideResMgr_, density);
     if (qd == nullptr) {
-        HILOG_ERROR("find qualifier value error by drawable id id = %{public}d", id);
+        RESMGR_HILOGE(RESMGR_TAG, "find qualifier value error by drawable id id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     std::string type = GetSuffix(qd);
     if (type.empty()) {
-        HILOG_ERROR("failed to get resourceType");
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get resourceType");
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
     size_t len = 0;
@@ -1439,17 +1450,17 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name,
     std::unique_ptr<uint8_t[]> &outValue, uint32_t iconType, uint32_t density)
 {
     if (!IsDensityValid(density)) {
-        HILOG_ERROR("density invalid");
+        RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, isOverrideResMgr_, density);
     if (qd == nullptr) {
-        HILOG_ERROR("find qualifier value error by drawable name name = %{public}s", name);
+        RESMGR_HILOGE(RESMGR_TAG, "find qualifier value error by drawable name name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     std::string type = GetSuffix(qd);
     if (type.empty()) {
-        HILOG_ERROR("failed to get resourceType");
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get resourceType");
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
     }
     size_t len = 0;
@@ -1499,7 +1510,7 @@ RState ResourceManagerImpl::GetStringFormatByName(const char *name, std::string 
 uint32_t ResourceManagerImpl::GetResourceLimitKeys()
 {
     if (hapManager_ == nullptr) {
-        HILOG_ERROR("resource manager get limit keys failed, hapManager_ is nullptr");
+        RESMGR_HILOGE(RESMGR_TAG, "resource manager get limit keys failed, hapManager_ is nullptr");
         return 0;
     }
     return hapManager_->GetResourceLimitKeys();
@@ -1525,7 +1536,7 @@ RState ResourceManagerImpl::GetThemeIconInfo(const std::string &iconName, size_t
 {
     std::string result = ThemePackManager::GetThemePackManager()->FindThemeIconResource(bundleInfo, iconName);
     if (result.empty()) {
-        HILOG_DEBUG("GetThemeIconInfo FAILED bundlename = %{public}s,", result.c_str());
+        RESMGR_HILOGD(RESMGR_TAG, "GetThemeIconInfo FAILED bundlename = %{public}s,", result.c_str());
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     outValue = Utils::LoadResourceFile(result, len);
@@ -1569,7 +1580,7 @@ std::shared_ptr<ResourceManager> ResourceManagerImpl::GetOverrideResourceManager
 {
     ResourceManagerImpl *impl = new (std::nothrow) ResourceManagerImpl(true);
     if (impl == nullptr) {
-        HILOG_ERROR("new ResourceManagerImpl failed when GetOverrideResourceManager");
+        RESMGR_HILOGE(RESMGR_TAG, "new ResourceManagerImpl failed when GetOverrideResourceManager");
         return nullptr;
     }
 
@@ -1580,7 +1591,7 @@ std::shared_ptr<ResourceManager> ResourceManagerImpl::GetOverrideResourceManager
 
     std::shared_ptr<ResourceManager> overrideResMgr(impl);
     if (overrideResMgr == nullptr) {
-        HILOG_ERROR("GetOverrideResourceManager failed bundleName = %{public}s, moduleName = %{public}s",
+        RESMGR_HILOGE(RESMGR_TAG, "GetOverrideResourceManager failed bundleName = %{public}s, moduleName = %{public}s",
             this->bundleInfo.first.c_str(), this->bundleInfo.second.c_str());
         return nullptr;
     }
@@ -1588,7 +1599,7 @@ std::shared_ptr<ResourceManager> ResourceManagerImpl::GetOverrideResourceManager
     overrideResMgr->bundleInfo.first = this->bundleInfo.first;
     overrideResMgr->bundleInfo.second = this->bundleInfo.second;
     if (overrideResConfig && overrideResMgr->UpdateOverrideResConfig(*overrideResConfig) != SUCCESS) {
-        HILOG_ERROR("GetOverrideResourceManager UpdateOverrideResConfig failed bundleName = %{public}s, \
+        RESMGR_HILOGE(RESMGR_TAG, "GetOverrideResourceManager UpdateOverrideResConfig failed bundleName = %{public}s, \
             moduleName = %{public}s", this->bundleInfo.first.c_str(), this->bundleInfo.second.c_str());
         return nullptr;
     }

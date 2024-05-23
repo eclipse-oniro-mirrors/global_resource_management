@@ -229,6 +229,8 @@ ohos_shared_library("librawfile") {
   public_configs = [ ":rawfile_public_config" ]
   sources = [ "src/raw_file_manager.cpp" ]
 
+  defines = [ "CONFIG_HILOG" ]
+
   include_dirs = [
     "./include",
     "../../interfaces/native/resource/include",
@@ -263,6 +265,8 @@ ohos_shared_library("ohresmgr") {
   sources = [ "src/native_resource_manager.cpp" ]
   output_extension = "so"
   output_name = "ohresmgr"
+
+  defines = [ "CONFIG_HILOG" ]
 
   include_dirs = [
     "./include",

@@ -46,7 +46,7 @@ void PrintIdValues(const std::shared_ptr<HapResource::IdValues> &idValues)
     }
     for (size_t i = 0; i < idValues->GetLimitPathsConst().size(); ++i) {
         auto limitPath = idValues->GetLimitPathsConst()[i];
-        HILOG_DEBUG("%zu: folder is: %s, value: %s", i, limitPath->GetFolder().c_str(),
+        RESMGR_HILOGD(RESMGR_TAG, "%zu: folder is: %s, value: %s", i, limitPath->GetFolder().c_str(),
             limitPath->GetIdItem()->ToString().c_str());
     }
 }
@@ -57,7 +57,7 @@ void PrintMapString(const std::map<std::string, std::string> &value)
     for (; iter != value.end(); ++iter) {
         std::string key = iter->first;
         std::string val = iter->second;
-        HILOG_DEBUG("%s : %s", key.c_str(), val.c_str());
+        RESMGR_HILOGD(RESMGR_TAG, "%s : %s", key.c_str(), val.c_str());
     }
 }
 
@@ -65,7 +65,7 @@ void PrintVectorString(const std::vector<std::string> &value)
 {
     for (size_t i = 0; i < value.size(); ++i) {
         std::string val = value[i];
-        HILOG_DEBUG("%zu : %s", i, val.c_str());
+        RESMGR_HILOGD(RESMGR_TAG, "%zu : %s", i, val.c_str());
     }
 }
 

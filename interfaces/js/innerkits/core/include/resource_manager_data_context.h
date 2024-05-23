@@ -18,12 +18,10 @@
 #include "napi/native_node_api.h"
 #include "resource_manager.h"
 #include "resource_manager_addon.h"
-#include "hilog/log_cpp.h"
+#include "hilog_wrapper.h"
 namespace OHOS {
 namespace Global {
 namespace Resource {
-static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, 0xD001E00, "ResourceManagerJs" };
-using namespace OHOS::HiviewDFX;
 struct ResMgrDataContext {
     napi_async_work work_;
 
@@ -73,9 +71,9 @@ struct ResMgrDataContext {
         success_ = false;
         errCode_ = errCode;
         if (withResId) {
-            HiLog::Error(LABEL, "%{public}s id = %{public}d", msg.c_str(), resId_);
+            RESMGR_HILOGE(RESMGR_JS_TAG, "%{public}s id = %{public}d", msg.c_str(), resId_);
         } else {
-            HiLog::Error(LABEL, "%{public}s name = %{public}s", msg.c_str(), resName_.c_str());
+            RESMGR_HILOGE(RESMGR_JS_TAG, "%{public}s name = %{public}s", msg.c_str(), resName_.c_str());
         }
     }
 
@@ -86,7 +84,7 @@ struct ResMgrDataContext {
         std::shared_ptr<ResourceManagerAddon> *addonPtr = nullptr;
         napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&addonPtr));
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "Failed to unwrap");
+            RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to unwrap");
             return nullptr;
         }
         return *addonPtr;

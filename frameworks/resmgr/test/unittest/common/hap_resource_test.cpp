@@ -71,7 +71,7 @@ void TestGetIdValuesByName(const std::shared_ptr<HapResource> pResource)
     auto cost = CurrentTimeUsec() - start;
     // 3 compare with the size of LimitPaths
     EXPECT_EQ(static_cast<size_t>(3), idValues->GetLimitPathsConst().size());
-    HILOG_DEBUG("GetIdValues by name cost: %ld us.", cost);
+    RESMGR_HILOGD(RESMGR_TAG, "GetIdValues by name cost: %ld us.", cost);
     PrintIdValues(idValues);
     {
         auto limitPath = idValues->GetLimitPathsConst()[0];
@@ -105,7 +105,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest001, TestSize.Level0)
     std::shared_ptr<ResConfigImpl> rc = nullptr;
     auto pResource = HapResource::LoadFromIndex(FormatFullPath(g_resFilePath).c_str(), rc);
     auto cost = CurrentTimeUsec() - start;
-    HILOG_DEBUG("load cost: %ld us.", cost);
+    RESMGR_HILOGD(RESMGR_TAG, "load cost: %ld us.", cost);
 
     if (pResource == nullptr) {
         EXPECT_TRUE(false);
@@ -117,7 +117,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest001, TestSize.Level0)
     auto idValues = pResource->GetIdValues(id);
     cost = CurrentTimeUsec() - start;
     EXPECT_EQ(static_cast<size_t>(3), idValues->GetLimitPathsConst().size());
-    HILOG_DEBUG("GetIdValues by id cost: %ld us.", cost);
+    RESMGR_HILOGD(RESMGR_TAG, "GetIdValues by id cost: %ld us.", cost);
     PrintIdValues(idValues);
     {
         auto limitPath = idValues->GetLimitPathsConst()[0];
@@ -148,7 +148,7 @@ void GetIdValuesByNameFuncTest002(const std::shared_ptr<HapResource> pResource, 
     auto idValues = pResource->GetIdValuesByName(name, ResType::STRING);
     auto cost = CurrentTimeUsec() - start;
     EXPECT_EQ(static_cast<size_t>(3), idValues->GetLimitPathsConst().size()); // 3 means the number of candidates
-    HILOG_DEBUG("GetIdValues by name cost: %ld us.", cost);
+    RESMGR_HILOGD(RESMGR_TAG, "GetIdValues by name cost: %ld us.", cost);
     PrintIdValues(idValues);
 
     {
@@ -181,7 +181,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest002, TestSize.Level1)
     auto start = CurrentTimeUsec();
     auto pResource = HapResource::LoadFromIndex(path, rc);
     auto cost = CurrentTimeUsec() - start;
-    HILOG_DEBUG("load cost: %ld us.", cost);
+    RESMGR_HILOGD(RESMGR_TAG, "load cost: %ld us.", cost);
 
     if (pResource == nullptr) {
         EXPECT_TRUE(false);
@@ -193,7 +193,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest002, TestSize.Level1)
     auto idValues = pResource->GetIdValues(id);
     cost = CurrentTimeUsec() - start;
     EXPECT_EQ(static_cast<size_t>(3), idValues->GetLimitPathsConst().size());
-    HILOG_DEBUG("GetIdValues by id cost: %ld us.", cost);
+    RESMGR_HILOGD(RESMGR_TAG, "GetIdValues by id cost: %ld us.", cost);
     PrintIdValues(idValues);
 
     {
@@ -224,7 +224,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest003, TestSize.Level1)
     std::shared_ptr<ResConfigImpl> rc = nullptr;
     auto pResource = HapResource::LoadFromIndex(FormatFullPath(g_resFilePath).c_str(), rc);
     auto cost = CurrentTimeUsec() - start;
-    HILOG_DEBUG("load cost: %ld us.", cost);
+    RESMGR_HILOGD(RESMGR_TAG, "load cost: %ld us.", cost);
 
     if (pResource == nullptr) {
         EXPECT_TRUE(false);
@@ -265,19 +265,19 @@ ResDesc *LoadFromHap(const char *hapPath, const std::shared_ptr<ResConfigImpl> d
     size_t bufLen;
     int32_t out = HapParser::ReadIndexFromFile(hapPath, buf, bufLen);
     if (out != OK) {
-        HILOG_ERROR("ReadIndexFromFile failed! retcode:%d", out);
+        RESMGR_HILOGE(RESMGR_TAG, "ReadIndexFromFile failed! retcode:%d", out);
         return nullptr;
     }
-    HILOG_DEBUG("extract success, bufLen:%zu", bufLen);
+    RESMGR_HILOGD(RESMGR_TAG, "extract success, bufLen:%zu", bufLen);
 
     ResDesc *resDesc = new ResDesc();
     out = HapParser::ParseResHex(reinterpret_cast<char *>(buf.get()), bufLen, *resDesc, defaultConfig);
     if (out != OK) {
         delete (resDesc);
-        HILOG_ERROR("ParseResHex failed! retcode:%d", out);
+        RESMGR_HILOGE(RESMGR_TAG, "ParseResHex failed! retcode:%d", out);
         return nullptr;
     } else {
-        HILOG_DEBUG("ParseResHex success:\n%s", resDesc->ToString().c_str());
+        RESMGR_HILOGD(RESMGR_TAG, "ParseResHex success:\n%s", resDesc->ToString().c_str());
     }
     // construct hapresource
     return resDesc;

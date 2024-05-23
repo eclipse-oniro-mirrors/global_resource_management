@@ -67,7 +67,7 @@ void ThemeManagerTest::SetUp(void)
 
 void ThemeManagerTest::TearDown(void)
 {
-    HILOG_DEBUG("ThemeManagerTest teardown");
+    RESMGR_HILOGD(RESMGR_TAG, "ThemeManagerTest teardown");
 }
 
 /*

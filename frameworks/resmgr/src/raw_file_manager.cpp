@@ -29,8 +29,7 @@
 #include "resource_manager.h"
 #include "resource_manager_addon.h"
 #include "resource_manager_impl.h"
-#include "hilog/log_c.h"
-#include "hilog/log_cpp.h"
+#include "hilog_wrapper.h"
 
 #ifdef __WINNT__
 #include <shlwapi.h>
@@ -38,11 +37,6 @@
 #endif
 
 using namespace OHOS::Global::Resource;
-using namespace OHOS::HiviewDFX;
-
-namespace {
-    constexpr HiLogLabel LABEL = {LOG_CORE, 0xD001E00, "RawFile"};
-}
 
 Lock g_rawDirLock;
 Lock g_rawFileLock;
@@ -101,13 +95,13 @@ NativeResourceManager *OH_ResourceManager_InitNativeResourceManager(napi_env env
     napi_valuetype valueType;
     napi_typeof(env, jsResMgr, &valueType);
     if (valueType != napi_object) {
-        HiLog::Error(LABEL, "jsResMgr is not an object");
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "jsResMgr is not an object");
         return nullptr;
     }
     std::shared_ptr<ResourceManagerAddon> *addonPtr = nullptr;
     napi_status status = napi_unwrap(env, jsResMgr, reinterpret_cast<void **>(&addonPtr));
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to get native resourcemanager");
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "Failed to get native resourcemanager");
         return nullptr;
     }
     std::unique_ptr<NativeResourceManager> result = std::make_unique<NativeResourceManager>();
@@ -133,7 +127,7 @@ RawDir *LoadRawDirFromHap(const NativeResourceManager *mgr, const std::string di
     std::unique_ptr<RawDir> result = std::make_unique<RawDir>();
     RState state = mgr->resManager->GetRawFileList(dirName, result->fileNameCache.names);
     if (state != RState::SUCCESS) {
-        HiLog::Debug(LABEL, "failed to get RawDir dirName, %{public}s", dirName.c_str());
+        RESMGR_HILOGD(RESMGR_RAWFILE_TAG, "failed to get RawDir dirName, %{public}s", dirName.c_str());
         return nullptr;
     }
     return result.release();
@@ -188,18 +182,18 @@ RawFile *LoadRawFileFromHap(const NativeResourceManager *mgr, const char *fileNa
     std::unique_ptr<uint8_t[]> tmpBuf;
     RState state = mgr->resManager->GetRawFileFromHap(fileName, len, tmpBuf);
     if (state != SUCCESS) {
-        HiLog::Debug(LABEL, "failed to get %{public}s rawfile", fileName);
+        RESMGR_HILOGD(RESMGR_RAWFILE_TAG, "failed to get %{public}s rawfile", fileName);
         return nullptr;
     }
     auto result = std::make_unique<RawFile>(fileName);
     result->buffer = tmpBuf.release();
     if (result->buffer == nullptr) {
-        HiLog::Error(LABEL, "failed get file buffer");
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed get file buffer");
         return nullptr;
     }
     int zipFd = open(hapPath.c_str(), O_RDONLY);
     if (zipFd < 0) {
-        HiLog::Error(LABEL, "failed open file %{public}s", hapPath.c_str());
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed open file %{public}s", hapPath.c_str());
         return nullptr;
     }
     result->pf = fdopen(zipFd, "r");
@@ -277,7 +271,7 @@ int OH_ResourceManager_ReadRawFile(const RawFile *rawFile, void *buf, size_t len
         }
         int ret = memcpy_s(buf, length, rawFile->buffer + rawFile->actualOffset->offset, length);
         if (ret != 0) {
-            HiLog::Error(LABEL, "failed to copy to buf");
+            RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to copy to buf");
             return 0;
         }
         rawFile->actualOffset->offset += static_cast<int64_t>(length);
@@ -360,7 +354,7 @@ static bool GetRawFileDescriptorFromHap(const RawFile *rawFile, RawFileDescripto
     RState state = rawFile->resMgr->resManager->
         GetRawFdNdkFromHap(rawFile->filePath, resMgrDescriptor);
     if (state != SUCCESS) {
-        HiLog::Error(LABEL, "GetRawFileDescriptorFromHap failed to get rawFile descriptor");
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "GetRawFileDescriptorFromHap failed to get rawFile descriptor");
         return false;
     }
     descriptor.fd = resMgrDescriptor.fd;
@@ -380,11 +374,11 @@ bool OH_ResourceManager_GetRawFileDescriptor(const RawFile *rawFile, RawFileDesc
     char paths[PATH_MAX] = {0};
 #ifdef __WINNT__
     if (!PathCanonicalizeA(paths, rawFile->filePath.c_str())) {
-        HiLog::Error(LABEL, "failed to PathCanonicalizeA the rawFile path");
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to PathCanonicalizeA the rawFile path");
     }
 #else
     if (realpath(rawFile->filePath.c_str(), paths) == nullptr) {
-        HiLog::Error(LABEL, "failed to realpath the rawFile path");
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to realpath the rawFile path");
     }
 #endif
     int fd = open(paths, O_RDONLY);
@@ -447,7 +441,7 @@ RawFile64 *LoadRawFileFromHap64(const NativeResourceManager *mgr, const char *fi
     ResourceManager::RawFileDescriptor resMgrDescriptor;
     RState state = mgr->resManager->GetRawFdNdkFromHap(fileName, resMgrDescriptor);
     if (state != SUCCESS) {
-        HiLog::Error(LABEL, "failed to get %{public}s rawfile descriptor", fileName);
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to get %{public}s rawfile descriptor", fileName);
         return nullptr;
     }
     auto result = std::make_unique<Raw>(fileName);
@@ -457,7 +451,7 @@ RawFile64 *LoadRawFileFromHap64(const NativeResourceManager *mgr, const char *fi
     result->start = resMgrDescriptor.offset;
     result->resMgr = mgr;
     if (result->pf == nullptr) {
-        HiLog::Error(LABEL, "failed to open %{public}s rawfile descriptor", fileName);
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to open %{public}s rawfile descriptor", fileName);
         return nullptr;
     }
     std::fseek(result->pf, result->start, SEEK_SET);
@@ -502,7 +496,7 @@ int64_t OH_ResourceManager_ReadRawFile64(const RawFile64 *rawFile, void *buf, in
     }
     size_t ret = std::fread(buf, 1, length, rawFile->raw->pf);
     if (ret == 0) {
-        HiLog::Error(LABEL, "failed to fread");
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to fread");
         return 0;
     }
     rawFile->raw->offset += length;
@@ -586,7 +580,7 @@ static bool GetRawFileDescriptorFromHap64(const RawFile64 *rawFile, RawFileDescr
     RState state = rawFile->raw->resMgr->resManager->
         GetRawFdNdkFromHap(rawFile->raw->filePath, resMgrDescriptor);
     if (state != SUCCESS) {
-        HiLog::Error(LABEL, "GetRawFileDescriptorFromHap64 failed to get rawFile descriptor");
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "GetRawFileDescriptorFromHap64 failed to get rawFile descriptor");
         return false;
     }
     descriptor->fd = resMgrDescriptor.fd;
@@ -606,11 +600,11 @@ bool OH_ResourceManager_GetRawFileDescriptor64(const RawFile64 *rawFile, RawFile
     char paths[PATH_MAX] = {0};
 #ifdef __WINNT__
     if (!PathCanonicalizeA(paths, rawFile->raw->filePath.c_str())) {
-        HiLog::Error(LABEL, "failed to PathCanonicalizeA the rawFile path");
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to PathCanonicalizeA the rawFile path");
     }
 #else
     if (realpath(rawFile->raw->filePath.c_str(), paths) == nullptr) {
-        HiLog::Error(LABEL, "failed to realpath the rawFile path");
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to realpath the rawFile path");
     }
 #endif
     int fd = open(paths, O_RDONLY);
@@ -640,7 +634,7 @@ bool OH_ResourceManager_IsRawDir(const NativeResourceManager *mgr, const char *p
     }
     RState state = mgr->resManager->IsRawDirFromHap(path, result);
     if (state != SUCCESS) {
-        HiLog::Error(LABEL, "failed to determine whether the path is a directory");
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to determine whether the path is a directory");
         return result;
     }
     return result;

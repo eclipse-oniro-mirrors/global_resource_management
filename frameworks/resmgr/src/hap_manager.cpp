@@ -110,7 +110,7 @@ std::string HapManager::GetPluralRulesAndSelect(int quantity, bool isGetOverride
     std::shared_ptr<ResConfigImpl> config = getCompleteOverrideConfig(isGetOverrideResource);
     if (config == nullptr || config->GetResLocale() == nullptr ||
         config->GetResLocale()->GetLanguage() == nullptr) {
-        HILOG_ERROR("GetPluralRules language is null!");
+        RESMGR_HILOGE(RESMGR_TAG, "GetPluralRules language is null!");
         return defaultRet;
     }
     std::string language = config->GetResLocale()->GetLanguage();
@@ -129,18 +129,18 @@ std::string HapManager::GetPluralRulesAndSelect(int quantity, bool isGetOverride
         // no cache hit
         icu::Locale locale(language.c_str());
         if (locale.isBogus()) {
-            HILOG_ERROR("icu::Locale init error : %s", language.c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "icu::Locale init error : %s", language.c_str());
             return defaultRet;
         }
         UErrorCode status = U_ZERO_ERROR;
         pluralRules = icu::PluralRules::forLocale(locale, status);
         if (status != U_ZERO_ERROR) {
-            HILOG_ERROR("icu::PluralRules::forLocale error : %d", status);
+            RESMGR_HILOGE(RESMGR_TAG, "icu::PluralRules::forLocale error : %d", status);
             return defaultRet;
         }
         // after PluralRules created, we add it to cache, if > 3 delete oldest one
         if (plurRulesCache_.size() >= PLURAL_CACHE_MAX_COUNT) {
-            HILOG_DEBUG("cache rotate delete plurRulesMap_ %s", plurRulesCache_[0].first.c_str());
+            RESMGR_HILOGD(RESMGR_TAG, "cache rotate delete plurRulesMap_ %s", plurRulesCache_[0].first.c_str());
             delete (plurRulesCache_[0].second);
             plurRulesCache_.erase(plurRulesCache_.begin());
         }
@@ -205,18 +205,18 @@ std::shared_ptr<ResConfigImpl> HapManager::getCompleteOverrideConfig(bool isGetO
 
     std::shared_ptr<ResConfigImpl> completeOverrideConfig = std::make_shared<ResConfigImpl>();
     if (!completeOverrideConfig || !this->resConfig_ || !this->overrideResConfig_) {
-        HILOG_ERROR("completeOverrideConfig or resConfig_ or overrideResConfig_ is nullptr");
+        RESMGR_HILOGE(RESMGR_TAG, "completeOverrideConfig or resConfig_ or overrideResConfig_ is nullptr");
         return nullptr;
     }
 
     if (!completeOverrideConfig->Copy(*this->resConfig_, true)) {
-        HILOG_ERROR("getCompleteOverrideConfig copy failed");
+        RESMGR_HILOGE(RESMGR_TAG, "getCompleteOverrideConfig copy failed");
         return nullptr;
     }
 
     if (this->overrideResConfig_->isLocaleInfoSet()
         && !completeOverrideConfig->CopyLocaleAndPreferredLocale(*this->overrideResConfig_)) {
-        HILOG_ERROR("getCompleteOverrideConfig CopyLocaleAndPreferredLocale failed");
+        RESMGR_HILOGE(RESMGR_TAG, "getCompleteOverrideConfig CopyLocaleAndPreferredLocale failed");
         return nullptr;
     }
     if (this->overrideResConfig_->GetDeviceType() != DEVICE_NOT_SET) {
@@ -308,7 +308,7 @@ RState HapManager::FindRawFile(const std::string &name, std::string &outValue)
         std::string indexPath = (*iter)->GetIndexPath();
         auto index = indexPath.rfind(seperator);
         if (index == std::string::npos) {
-            HILOG_ERROR("index path format error, %s", indexPath.c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "index path format error, %s", indexPath.c_str());
             continue;
         }
         std::string resourcesIndexPath = indexPath.substr(0, index);
@@ -325,7 +325,7 @@ RState HapManager::FindRawFile(const std::string &name, std::string &outValue)
         }
 #else
         if (realpath((resourcesIndexPath + "/resources/" + tempName).c_str(), tmpPath) == nullptr) {
-            HILOG_ERROR("FindRawFile path to realpath error");
+            RESMGR_HILOGE(RESMGR_TAG, "FindRawFile path to realpath error");
             continue;
         }
 #endif
@@ -377,7 +377,7 @@ bool HapManager::AddResource(const std::string &path, const std::vector<std::str
     AutoMutex mutex(this->lock_);
     std::vector<std::string> targetOverlay = loadedHapPaths_[path];
     if (!targetOverlay.empty() && targetOverlay == overlayPaths) {
-        HILOG_INFO("the overlay for %{public}s already been loaded", path.c_str());
+        RESMGR_HILOGI(RESMGR_TAG, "the overlay for %{public}s already been loaded", path.c_str());
         return true;
     }
     loadedHapPaths_[path] = overlayPaths;
@@ -407,11 +407,11 @@ std::string HapManager::GetValidAppPath()
 
 bool HapManager::AddAppOverlay(const std::string &overlayPath)
 {
-    HILOG_INFO("AddAppOverlay overlayPath = %{public}s", overlayPath.c_str());
+    RESMGR_HILOGI(RESMGR_TAG, "AddAppOverlay overlayPath = %{public}s", overlayPath.c_str());
     char outPath[PATH_MAX + 1] = {0};
     Utils::CanonicalizePath(overlayPath.c_str(), outPath, PATH_MAX);
     if (outPath[0] == '\0') {
-        HILOG_ERROR("invalid overlayPath, %{public}s", overlayPath.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "invalid overlayPath, %{public}s", overlayPath.c_str());
         return false;
     }
     std::vector<std::string> overlayPaths;
@@ -422,11 +422,11 @@ bool HapManager::AddAppOverlay(const std::string &overlayPath)
 
 bool HapManager::RemoveAppOverlay(const std::string &overlayPath)
 {
-    HILOG_INFO("RemoveAppOverlay overlayPath = %{public}s", overlayPath.c_str());
+    RESMGR_HILOGI(RESMGR_TAG, "RemoveAppOverlay overlayPath = %{public}s", overlayPath.c_str());
     char outPath[PATH_MAX + 1] = {0};
     Utils::CanonicalizePath(overlayPath.c_str(), outPath, PATH_MAX);
     if (outPath[0] == '\0') {
-        HILOG_ERROR("invalid overlayPath, %{public}s", overlayPath.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "invalid overlayPath, %{public}s", overlayPath.c_str());
         return false;
     }
     std::vector<std::string> overlayPaths;
@@ -442,7 +442,7 @@ HapManager::~HapManager()
 #ifdef SUPPORT_GRAPHICS
     auto iter = plurRulesCache_.begin();
     for (; iter != plurRulesCache_.end(); iter++) {
-        HILOG_DEBUG("delete plurRulesMap_ %s", iter->first.c_str());
+        RESMGR_HILOGD(RESMGR_TAG, "delete plurRulesMap_ %s", iter->first.c_str());
         if (iter->second != nullptr) {
             auto ptr = iter->second;
             delete (ptr);
@@ -535,7 +535,7 @@ std::vector<std::string> HapManager::GetResourcePaths()
         std::string indexPath = (*iter)->GetIndexPath();
         auto index = indexPath.rfind('/');
         if (index == std::string::npos) {
-            HILOG_ERROR("index path format error, %s", indexPath.c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "index path format error, %s", indexPath.c_str());
             continue;
         }
 
@@ -563,7 +563,7 @@ std::string GetFilePathFromHap(std::shared_ptr<AbilityBase::Extractor> &extracto
     const std::shared_ptr<IdItem> idItem = qd->GetIdItem();
     if (idItem == nullptr || idItem->resType_ != resType) {
         std::string hapPath = qd->GetIndexPath();
-        HILOG_ERROR("actual resType = %{public}d, expect resType = %{public}d, hapPath = %{public}s",
+        RESMGR_HILOGE(RESMGR_TAG, "actual resType = %{public}d, expect resType = %{public}d, hapPath = %{public}s",
             idItem == nullptr ? -1 : idItem->resType_, resType, hapPath.c_str());
         return filePath;
     }
@@ -571,7 +571,7 @@ std::string GetFilePathFromHap(std::shared_ptr<AbilityBase::Extractor> &extracto
         std::string tempFilePath(idItem->value_);
         auto index = tempFilePath.find('/');
         if (index == std::string::npos) {
-            HILOG_ERROR("resource path format error, %s", tempFilePath.c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "resource path format error, %s", tempFilePath.c_str());
             return filePath;
         }
         filePath = idItem->value_.substr(index + 1);
@@ -600,17 +600,17 @@ RState HapManager::GetProfileData(const std::shared_ptr<HapResource::ValueUnderQ
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     auto extractor = GetAbilityExtractor(qd);
     if (extractor == nullptr) {
-        HILOG_ERROR("failed to get extractor from ability");
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor from ability");
         return NOT_FOUND;
     }
     std::string filePath = GetFilePathFromHap(extractor, qd, ResType::PROF);
     if (filePath.empty()) {
-        HILOG_ERROR("get file path failed in GetProfileData");
+        RESMGR_HILOGE(RESMGR_TAG, "get file path failed in GetProfileData");
         return NOT_FOUND;
     }
     bool ret = extractor->ExtractToBufByName(filePath, outValue, len);
     if (!ret) {
-        HILOG_ERROR("failed to get config data from ability");
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get config data from ability");
         return NOT_FOUND;
     }
 #endif
@@ -637,17 +637,17 @@ RState HapManager::GetMediaDataFromHap(const std::shared_ptr<HapResource::ValueU
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
     auto extractor = GetAbilityExtractor(qd);
     if (extractor == nullptr) {
-        HILOG_ERROR("failed to get extractor from ability");
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor from ability");
         return NOT_FOUND;
     }
     std::string filePath = GetFilePathFromHap(extractor, qd, ResType::MEDIA);
     if (filePath.empty()) {
-        HILOG_ERROR("get file path failed in GetMediaDataFromHap");
+        RESMGR_HILOGE(RESMGR_TAG, "get file path failed in GetMediaDataFromHap");
         return NOT_FOUND;
     }
     bool ret = extractor->ExtractToBufByName(filePath, outValue, len);
     if (!ret) {
-        HILOG_ERROR("failed to get media data from ability");
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get media data from ability");
         return NOT_FOUND;
     }
 #endif
@@ -685,7 +685,7 @@ RState HapManager::GetMediaBase64DataFromHap(const std::shared_ptr<HapResource::
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     auto extractor = GetAbilityExtractor(qd);
     if (extractor == nullptr) {
-        HILOG_ERROR("failed to get extractor from ability");
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor from ability");
         return NOT_FOUND;
     }
     std::string filePath = GetFilePathFromHap(extractor, qd, ResType::MEDIA);
@@ -693,7 +693,7 @@ RState HapManager::GetMediaBase64DataFromHap(const std::shared_ptr<HapResource::
     size_t tmpLen;
     bool ret = extractor->ExtractToBufByName(filePath, buffer, tmpLen);
     if (!ret) {
-        HILOG_ERROR("failed to get mediabase64 data from ability");
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get mediabase64 data from ability");
         return NOT_FOUND;
     }
     std::string imgType = GetImageType(filePath);
@@ -838,7 +838,7 @@ RState HapManager::GetFilePath(const std::shared_ptr<HapResource::ValueUnderQual
 #if defined(__ARKUI_CROSS__)
     auto index = idItem->value_.find('/');
     if (index == std::string::npos) {
-        HILOG_ERROR("resource path format error, %s", idItem->value_.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "resource path format error, %s", idItem->value_.c_str());
         return NOT_FOUND;
     }
     auto nameWithoutModule = idItem->value_.substr(index + 1);
@@ -850,7 +850,7 @@ RState HapManager::GetFilePath(const std::shared_ptr<HapResource::ValueUnderQual
     }
     auto index = idItem->value_.find('/');
     if (index == std::string::npos) {
-        HILOG_ERROR("resource path format error, %s", idItem->value_.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "resource path format error, %s", idItem->value_.c_str());
         return NOT_FOUND;
     }
     auto nameWithoutModule = idItem->value_.substr(index + 1);
@@ -912,20 +912,20 @@ RState HapManager::CloseRawFileDescriptor(const std::string &name)
 bool HapManager::RemoveResource(const std::string &path, const std::vector<std::string> &overlayPaths)
 {
     AutoMutex mutex(this->lock_);
-    HILOG_INFO("remove overlay for path, %{public}s", path.c_str());
+    RESMGR_HILOGI(RESMGR_TAG, "remove overlay for path, %{public}s", path.c_str());
     if (loadedHapPaths_.find(path) == loadedHapPaths_.end()) {
         return false;
     }
     std::vector<std::string> targetOverlay = loadedHapPaths_[path];
     if (targetOverlay.empty()) {
-        HILOG_ERROR("the %{public}s have not overlay", path.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "the %{public}s have not overlay", path.c_str());
         return false;
     }
     char outPath[PATH_MAX] = {0};
     for (auto iter = overlayPaths.begin(); iter != overlayPaths.end(); iter++) {
         Utils::CanonicalizePath((*iter).c_str(), outPath, PATH_MAX);
         if (outPath[0] == '\0') {
-            HILOG_ERROR("invalid overlayPath, %{public}s", (*iter).c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "invalid overlayPath, %{public}s", (*iter).c_str());
             continue;
         }
         if (std::find(targetOverlay.begin(), targetOverlay.end(), outPath) != targetOverlay.end()) {
@@ -934,7 +934,7 @@ bool HapManager::RemoveResource(const std::string &path, const std::vector<std::
         }
         for (auto resIter = hapResources_.begin(); resIter != hapResources_.end(); ) {
             if ((*resIter) == nullptr) {
-                HILOG_ERROR("hapResource is nullptr");
+                RESMGR_HILOGE(RESMGR_TAG, "hapResource is nullptr");
                 return false;
             }
             std::string hapPath = (*resIter)->GetIndexPath();
@@ -957,11 +957,11 @@ std::vector<std::shared_ptr<HapResource>> HapManager::GetHapResource()
 void HapManager::AddSystemResource(const std::shared_ptr<HapManager> &systemHapManager)
 {
     if (systemHapManager == nullptr) {
-        HILOG_ERROR("add system resource failed, systemHapManager is nullptr");
+        RESMGR_HILOGE(RESMGR_TAG, "add system resource failed, systemHapManager is nullptr");
         return;
     }
     if (!systemHapManager->isSystem_) {
-        HILOG_ERROR("add system resource failed, the added hapManager is not system");
+        RESMGR_HILOGE(RESMGR_TAG, "add system resource failed, the added hapManager is not system");
         return;
     }
     AutoMutex mutex(this->lock_);
@@ -989,7 +989,7 @@ uint32_t HapManager::GetResourceLimitKeys()
     for (size_t i = 0; i < hapResources_.size(); i++) {
         limitKeysValue |= hapResources_[i]->GetResourceLimitKeys();
     }
-    HILOG_INFO("hap manager limit key is %{public}u", limitKeysValue);
+    RESMGR_HILOGD(RESMGR_TAG, "hap manager limit key is %{public}u", limitKeysValue);
     return limitKeysValue;
 }
 
@@ -1055,13 +1055,13 @@ RState HapManager::GetResId(const std::string &resTypeName, uint32_t &resId)
     const std::string resType =  std::get<0>(typeNameTuple);
     const std::string resName =  std::get<1>(typeNameTuple);
     if (resType.empty() || resName.empty()) {
-        HILOG_ERROR("invalid resTypeName = %{public}s", resTypeName.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "invalid resTypeName = %{public}s", resTypeName.c_str());
         return NOT_FOUND;
     }
     bool isSystem = IsPrefix("sys", resTypeName);
     bool isApp = IsPrefix("app", resTypeName);
     if (!isSystem && !isApp) {
-        HILOG_ERROR("invalid resTypeName = %{public}s", resTypeName.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "invalid resTypeName = %{public}s", resTypeName.c_str());
         return NOT_FOUND;
     }
     for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
@@ -1087,7 +1087,8 @@ RState HapManager::GetResId(const std::string &resTypeName, uint32_t &resId)
         }
         resId = GetRealResId(resType, candidates);
         if (resId == 0) {
-            HILOG_ERROR("GetResId name = %{public}s, resType = %{public}s", resName.c_str(), resType.c_str());
+            RESMGR_HILOGE(RESMGR_TAG,
+                "GetResId name = %{public}s, resType = %{public}s", resName.c_str(), resType.c_str());
             return NOT_FOUND;
         }
     }

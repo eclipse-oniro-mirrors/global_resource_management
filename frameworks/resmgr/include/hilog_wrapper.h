@@ -16,29 +16,29 @@
 #ifndef HILOG_WRAPPER_H
 #define HILOG_WRAPPER_H
 
+#undef RESMGR_TAG
+#define RESMGR_TAG "ResourceManager"
+
+#undef RESMGR_JS_TAG
+#define RESMGR_JS_TAG "ResourceManagerJs"
+
+#undef RESMGR_NATIVE_TAG
+#define RESMGR_NATIVE_TAG "ResourceManagerNative"
+
+#undef RESMGR_RAWFILE_TAG
+#define RESMGR_RAWFILE_TAG "ResourceManagerRawFile"
+
 #ifdef CONFIG_HILOG
 
 #include "hilog/log.h"
 
-#ifdef HILOG_FATAL
-#undef HILOG_FATAL
-#endif
-
-#ifdef HILOG_ERROR
-#undef HILOG_ERROR
-#endif
-
-#ifdef HILOG_WARN
-#undef HILOG_WARN
-#endif
-
-#ifdef HILOG_INFO
-#undef HILOG_INFO
-#endif
-
-#ifdef HILOG_DEBUG
-#undef HILOG_DEBUG
-#endif
+namespace OHOS::HiviewDFX {
+    #define RESMGR_HILOGE(tag, fmt, ...) HILOG_IMPL(LOG_CORE, LOG_ERROR, 0xD001E00, tag, fmt, ##__VA_ARGS__)
+    #define RESMGR_HILOGW(tag, fmt, ...) HILOG_IMPL(LOG_CORE, LOG_WARN, 0xD001E00, tag, fmt, ##__VA_ARGS__)
+    #define RESMGR_HILOGI(tag, fmt, ...) HILOG_IMPL(LOG_CORE, LOG_INFO, 0xD001E00, tag, fmt, ##__VA_ARGS__)
+    #define RESMGR_HILOGD(tag, fmt, ...) HILOG_IMPL(LOG_CORE, LOG_DEBUG, 0xD001E00, tag, fmt, ##__VA_ARGS__)
+    #define RESMGR_HILOGF(tag, fmt, ...) HILOG_IMPL(LOG_CORE, LOG_FATAL, 0xD001E00, tag, fmt, ##__VA_ARGS__)
+}
 
 namespace OHOS {
 namespace Global {
@@ -48,35 +48,14 @@ extern LogLevel g_logLevel;
 } // namespace Global
 } // namespace OHOS
 
-static constexpr OHOS::HiviewDFX::HiLogLabel LOG_LABEL = {LOG_CORE, 0xD001E00, "ResourceManager"};
-
-#define HILOG_FATAL(...) (void)OHOS::HiviewDFX::HiLog::Fatal(LOG_LABEL, __VA_ARGS__)
-#define HILOG_ERROR(...) (void)OHOS::HiviewDFX::HiLog::Error(LOG_LABEL, __VA_ARGS__)
-#define HILOG_WARN(...) {                                            \
-if (OHOS::Global::Resource::g_logLevel <= LOG_WARN) {                \
-    (void)OHOS::HiviewDFX::HiLog::Warn(LOG_LABEL, __VA_ARGS__);      \
-}                                                                    \
-}
-
-#define HILOG_INFO(...) {                                            \
-if (OHOS::Global::Resource::g_logLevel <= LOG_INFO) {                \
-    (void)OHOS::HiviewDFX::HiLog::Info(LOG_LABEL, __VA_ARGS__);      \
-}                                                                    \
-}
-
-#define HILOG_DEBUG(...) {                                           \
-if (OHOS::Global::Resource::g_logLevel <= LOG_DEBUG) {               \
-    (void)OHOS::HiviewDFX::HiLog::Debug(LOG_LABEL, __VA_ARGS__);     \
-}                                                                    \
-}
-
 #else
 
-#define HILOG_FATAL(...)
-#define HILOG_ERROR(...)
-#define HILOG_WARN(...)
-#define HILOG_INFO(...)
-#define HILOG_DEBUG(...)
+#define RESMGR_HILOGE(tag, fmt, ...)
+#define RESMGR_HILOGW(tag, fmt, ...)
+#define RESMGR_HILOGI(tag, fmt, ...)
+#define RESMGR_HILOGD(tag, fmt, ...)
+#define RESMGR_HILOGF(tag, fmt, ...)
+
 #endif  // CONFIG_HILOG
 
 #endif  // HILOG_WRAPPER_H

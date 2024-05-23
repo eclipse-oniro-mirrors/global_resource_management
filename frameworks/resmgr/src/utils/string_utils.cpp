@@ -76,7 +76,7 @@ bool LocalizeNumber(std::string &inputOutputNum, const ResConfigImpl &resConfig,
 #ifdef SUPPORT_GRAPHICS
     const ResLocale *resLocale = resConfig.GetResLocale();
     if (resLocale == nullptr) {
-        HILOG_WARN("LocalizeNumber resLocale is null");
+        RESMGR_HILOGW(RESMGR_TAG, "LocalizeNumber resLocale is null");
         return true;
     }
 
@@ -85,7 +85,7 @@ bool LocalizeNumber(std::string &inputOutputNum, const ResConfigImpl &resConfig,
     if (language != nullptr && strlen(language) > 0) {
         localeInfo.assign(language);
     } else {
-        HILOG_WARN("LocalizeNumber language is null");
+        RESMGR_HILOGW(RESMGR_TAG, "LocalizeNumber language is null");
         return true;
     }
     std::string temp;
@@ -116,7 +116,7 @@ bool LocalizeNumber(std::string &inputOutputNum, const ResConfigImpl &resConfig,
     inputOutputNum.clear();
     numberFormat.formatDouble(num, status).toString(status).toUTF8String(inputOutputNum);
     if (status == U_ZERO_ERROR) {
-        HILOG_ERROR("LocalizeNumber failed, status = %{public}d", status);
+        RESMGR_HILOGE(RESMGR_TAG, "LocalizeNumber failed, status = %{public}d", status);
         return false;
     }
     return true;
@@ -129,7 +129,7 @@ bool GetReplaceStr(const std::vector<std::tuple<ResourceManager::NapiValueType, 
     const size_t &paramIndex, const std::string &placeHolderType, const ResConfigImpl &config, std::string &replaceStr)
 {
     if (paramIndex >= jsParams.size()) {
-        HILOG_ERROR("index of placeholder out of range");
+        RESMGR_HILOGE(RESMGR_TAG, "index of placeholder out of range");
         return false;
     }
 
@@ -139,7 +139,7 @@ bool GetReplaceStr(const std::vector<std::tuple<ResourceManager::NapiValueType, 
     // string type
     if (placeHolderType == "s") {
         if (paramType != ResourceManager::NapiValueType::NAPI_STRING) {
-            HILOG_ERROR("the type of placeholder and param does not match");
+            RESMGR_HILOGE(RESMGR_TAG, "the type of placeholder and param does not match");
             return false;
         }
         replaceStr = paramValue;
@@ -148,7 +148,7 @@ bool GetReplaceStr(const std::vector<std::tuple<ResourceManager::NapiValueType, 
 
     // number type
     if (paramType != ResourceManager::NapiValueType::NAPI_NUMBER) {
-        HILOG_ERROR("the type of placeholder and param does not match");
+        RESMGR_HILOGE(RESMGR_TAG, "the type of placeholder and param does not match");
         return false;
     }
 
@@ -197,7 +197,7 @@ bool ReplacePlaceholderWithParams(std::string &inputOutputValue, const ResConfig
         if (placeholderIndex.length() != 0) {
             if (placeholderIndex.size() > SIZE_T_MAX_STR.size() ||
                 (placeholderIndex.size() == SIZE_T_MAX_STR.size() && placeholderIndex > SIZE_T_MAX_STR)) {
-                HILOG_ERROR("index of placeholder is too large");
+                RESMGR_HILOGE(RESMGR_TAG, "index of placeholder is too large");
                 return false;
             }
             if (std::stoul(placeholderIndex) < 1) {

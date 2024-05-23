@@ -35,7 +35,7 @@ ResourceManager *CreateResourceManager()
 {
     ResourceManagerImpl *impl = new (std::nothrow) ResourceManagerImpl;
     if (impl == nullptr) {
-        HILOG_ERROR("new ResourceManagerImpl failed when CreateResourceManager");
+        RESMGR_HILOGE(RESMGR_TAG, "new ResourceManagerImpl failed when CreateResourceManager");
         return nullptr;
     }
     if (!impl->Init()) {
@@ -55,12 +55,12 @@ std::shared_ptr<ResourceManager> CreateResourceManagerDef(
     ResConfig &resConfig, int32_t userId)
 {
     if (bundleName.empty()) {
-        HILOG_ERROR("bundleName or hapPath is empty when CreateResourceManagerDef");
+        RESMGR_HILOGE(RESMGR_TAG, "bundleName or hapPath is empty when CreateResourceManagerDef");
         return nullptr;
     }
     std::shared_ptr<ResourceManager> resourceManagerImpl(CreateResourceManager());
     if (resourceManagerImpl == nullptr) {
-        HILOG_ERROR("CreateResourceManagerDef failed bundleName = %{public}s moduleName = %{public}s",
+        RESMGR_HILOGE(RESMGR_TAG, "CreateResourceManagerDef failed bundleName = %{public}s moduleName = %{public}s",
             bundleName.c_str(), moduleName.c_str());
         return nullptr;
     }
@@ -75,13 +75,13 @@ std::shared_ptr<ResourceManager> CreateResourceManagerDef(
 std::shared_ptr<ResourceManager> CreateResourceManagerExt(const std::string &bundleName, const int32_t appType)
 {
     if (bundleName.empty()) {
-        HILOG_ERROR("bundleName is empty when CreateResourceManagerExt");
+        RESMGR_HILOGE(RESMGR_TAG, "bundleName is empty when CreateResourceManagerExt");
         return nullptr;
     }
     std::lock_guard<std::mutex> lock(resMgrExtLock);
     std::shared_ptr<ResourceManager> resMgrExt;
     if (!resMgrExtMgr->Init(resMgrExt, bundleName, appType) || resMgrExt == nullptr) {
-        HILOG_ERROR("ResourceManagerExt init fail");
+        RESMGR_HILOGE(RESMGR_TAG, "ResourceManagerExt init fail");
         return nullptr;
     }
     return resMgrExt;

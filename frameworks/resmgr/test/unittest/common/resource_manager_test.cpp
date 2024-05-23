@@ -1779,7 +1779,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerResolveParentReferenceTest001, Test
     ASSERT_EQ(SUCCESS, ret);
     PrintMapString(outValue);
 
-    HILOG_DEBUG("=====");
+    RESMGR_HILOGD(RESMGR_TAG, "=====");
     id = rmc->GetResId("child", ResType::PATTERN);
     idItem = ((ResourceManagerImpl *)rm)->hapManager_->FindResourceById(id);
     ASSERT_TRUE(idItem != nullptr);
@@ -1787,7 +1787,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerResolveParentReferenceTest001, Test
     ASSERT_EQ(SUCCESS, ret);
     PrintMapString(outValue);
 
-    HILOG_DEBUG("=====");
+    RESMGR_HILOGD(RESMGR_TAG, "=====");
     id = rmc->GetResId("ccchild", ResType::PATTERN);
     idItem = ((ResourceManagerImpl *)rm)->hapManager_->FindResourceById(id);
     ASSERT_TRUE(idItem != nullptr);

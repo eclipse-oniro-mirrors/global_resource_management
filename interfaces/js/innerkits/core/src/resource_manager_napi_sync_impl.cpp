@@ -77,7 +77,7 @@ napi_value ResourceManagerNapiSyncImpl::GetResource(napi_env env, napi_callback_
 {
     auto functionIndex = syncFuncMatch.find(functionName);
     if (functionIndex == syncFuncMatch.end()) {
-        HiLog::Info(LABEL, "Invalid functionName, %{public}s", functionName.c_str());
+        RESMGR_HILOGI(RESMGR_JS_TAG, "Invalid functionName, %{public}s", functionName.c_str());
         return nullptr;
     }
     return functionIndex->second(env, info);
@@ -89,7 +89,7 @@ int32_t ResourceManagerNapiSyncImpl::InitPathAddon(napi_env env, napi_callback_i
     GET_PARAMS(env, info, PARAMS_NUM_TWO);
     dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
     if (dataContext->addon_ == nullptr) {
-        HiLog::Error(LABEL, "Failed to get addon in InitPathAddon");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get addon in InitPathAddon");
         return NOT_FOUND;
     }
     if (ResourceManagerNapiUtils::IsNapiString(env, info)) {
@@ -108,7 +108,8 @@ napi_value ResourceManagerNapiSyncImpl::GetRawFileListSync(napi_env env, napi_ca
 
     int32_t ret = InitPathAddon(env, info, dataContext);
     if (ret != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to init para in GetRawFileListSync by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG,
+            "Failed to init para in GetRawFileListSync by %{public}s", dataContext->path_.c_str());
         ResourceManagerNapiUtils::NapiThrow(env, ret);
         return nullptr;
     }
@@ -116,7 +117,7 @@ napi_value ResourceManagerNapiSyncImpl::GetRawFileListSync(napi_env env, napi_ca
     RState state = dataContext->addon_->GetResMgr()->GetRawFileList(dataContext->path_.c_str(),
         dataContext->arrayValue_);
     if (state != RState::SUCCESS || dataContext->arrayValue_.empty()) {
-        HiLog::Error(LABEL, "Failed to get rawfile list by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get rawfile list by %{public}s", dataContext->path_.c_str());
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_RES_PATH_INVALID);
         return nullptr;
     }
@@ -132,7 +133,8 @@ napi_value ResourceManagerNapiSyncImpl::GetRawFileContentSync(napi_env env, napi
 
     int32_t ret = InitPathAddon(env, info, dataContext);
     if (ret != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to init para in GetRawFileContentSync by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG,
+            "Failed to init para in GetRawFileContentSync by %{public}s", dataContext->path_.c_str());
         ResourceManagerNapiUtils::NapiThrow(env, ret);
         return nullptr;
     }
@@ -140,7 +142,7 @@ napi_value ResourceManagerNapiSyncImpl::GetRawFileContentSync(napi_env env, napi
     RState state = dataContext->addon_->GetResMgr()->GetRawFileFromHap(dataContext->path_,
         dataContext->len_, dataContext->mediaData);
     if (state != SUCCESS) {
-        HiLog::Error(LABEL, "Failed to get rawfile by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get rawfile by %{public}s", dataContext->path_.c_str());
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -156,7 +158,7 @@ napi_value ResourceManagerNapiSyncImpl::GetRawFdSync(napi_env env, napi_callback
 
     int32_t ret = InitPathAddon(env, info, dataContext);
     if (ret != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to init para in GetRawFdSync by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to init para in GetRawFdSync by %{public}s", dataContext->path_.c_str());
         ResourceManagerNapiUtils::NapiThrow(env, ret);
         return nullptr;
     }
@@ -164,7 +166,7 @@ napi_value ResourceManagerNapiSyncImpl::GetRawFdSync(napi_env env, napi_callback
     RState state = dataContext->addon_->GetResMgr()->GetRawFileDescriptorFromHap(dataContext->path_,
         dataContext->descriptor_);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to get rawfd by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get rawfd by %{public}s", dataContext->path_.c_str());
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -179,14 +181,14 @@ napi_value ResourceManagerNapiSyncImpl::CloseRawFdSync(napi_env env, napi_callba
 
     int32_t ret = InitPathAddon(env, info, dataContext);
     if (ret != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to init para in CloseRawFdSync by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to init para in CloseRawFdSync by %{public}s", dataContext->path_.c_str());
         ResourceManagerNapiUtils::NapiThrow(env, ret);
         return nullptr;
     }
 
     RState state = dataContext->addon_->GetResMgr()->CloseRawFileDescriptor(dataContext->path_);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to close rawfd by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to close rawfd by %{public}s", dataContext->path_.c_str());
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -205,7 +207,7 @@ bool ResourceManagerNapiSyncImpl::InitParamsFromParamArray(napi_env env, napi_va
     if (valuetype == napi_number) {
         double param;
         if (napi_get_value_double(env, value, &param) != napi_ok) {
-            HiLog::Error(LABEL, "Failed to get parameter value in InitParamsFromParamArray");
+            RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get parameter value in InitParamsFromParamArray");
             return false;
         }
         jsParams.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_NUMBER, std::to_string(param)));
@@ -214,12 +216,12 @@ bool ResourceManagerNapiSyncImpl::InitParamsFromParamArray(napi_env env, napi_va
     if (valuetype == napi_string) {
         size_t len = 0;
         if (napi_get_value_string_utf8(env, value, nullptr, 0, &len) != napi_ok) {
-            HiLog::Error(LABEL, "Failed to get parameter length in InitParamsFromParamArray");
+            RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get parameter length in InitParamsFromParamArray");
             return false;
         }
         std::vector<char> buf(len + 1);
         if (napi_get_value_string_utf8(env, value, buf.data(), len + 1, &len) != napi_ok) {
-            HiLog::Error(LABEL, "Failed to get parameter value in InitParamsFromParamArray");
+            RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get parameter value in InitParamsFromParamArray");
             return false;
         }
         jsParams.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_STRING, buf.data()));
@@ -254,7 +256,7 @@ int32_t ResourceManagerNapiSyncImpl::InitIdResourceAddon(napi_env env, napi_call
     GET_PARAMS(env, info, PARAMS_NUM_TWO);
     dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
     if (dataContext->addon_ == nullptr) {
-        HiLog::Error(LABEL, "Failed to get addon in InitIdResourceAddon");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get addon in InitIdResourceAddon");
         return NOT_FOUND;
     }
     if (ResourceManagerNapiUtils::IsNapiNumber(env, info)) {
@@ -277,12 +279,12 @@ int32_t ResourceManagerNapiSyncImpl::ProcessStrResource(napi_env env, napi_callb
     int32_t resId = 0;
     bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
-        HiLog::Error(LABEL, "Failed to get resMgr in GetStringSync");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in GetStringSync");
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
 
     if (!InitNapiParameters(env, info, dataContext->jsParams_)) {
-        HiLog::Error(LABEL, "GetStringSync formatting error");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "GetStringSync formatting error");
         return ERROR_CODE_RES_ID_FORMAT_ERROR;
     }
 
@@ -325,7 +327,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessSymbolResource(napi_env env, napi_ca
     int32_t resId = 0;
     bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
-        HiLog::Error(LABEL, "Failed to get resMgr in GetSymbol");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in GetSymbol");
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
 
@@ -367,7 +369,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessColorResource(napi_env env, napi_cal
     int32_t resId = 0;
     bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
-        HiLog::Error(LABEL, "Failed to get resMgr in ProcessColorResource");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in ProcessColorResource");
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
 
@@ -410,7 +412,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessNumResource(napi_env env, napi_callb
     int32_t resId = 0;
     bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
-        HiLog::Error(LABEL, "Failed to ResourceManagerNapiUtils::GetHapResourceManager in GetNumber");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to ResourceManagerNapiUtils::GetHapResourceManager in GetNumber");
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
 
@@ -452,7 +454,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessBoolResource(napi_env env, napi_call
     int32_t resId = 0;
     bool ret2 = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret2) {
-        HiLog::Error(LABEL, "Failed to get resMgr in GetBoolean");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in GetBoolean");
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
     RState state = resMgr->GetBooleanById(resId, dataContext->bValue_);
@@ -493,7 +495,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcesstMediaContentBase64Resource(napi_env
     int32_t resId = 0;
     bool ret2 = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret2) {
-        HiLog::Error(LABEL, "Failed to get resMgr in GetMediaContentBase64Sync");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in GetMediaContentBase64Sync");
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
     RState state = resMgr->GetMediaBase64DataById(resId, dataContext->value_, dataContext->density_);
@@ -538,7 +540,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessMediaContentResource(napi_env env, n
     int32_t resId = 0;
     bool ret2 = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret2) {
-        HiLog::Error(LABEL, "Failed to get resMgr in GetMediaContentSync");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in GetMediaContentSync");
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
     RState state = resMgr->GetMediaDataById(resId, dataContext->len_, dataContext->mediaData,
@@ -584,7 +586,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessPluralStringValueResource(napi_env e
     int32_t resId = 0;
     bool ret2 = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret2) {
-        HiLog::Error(LABEL, "Failed to get resMgr in GetPluralStringValueSync");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in GetPluralStringValueSync");
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
     RState state = resMgr->GetPluralStringByIdFormat(dataContext->value_,
@@ -610,7 +612,7 @@ napi_value ResourceManagerNapiSyncImpl::GetPluralStringValueSync(napi_env env, n
     }
 
     if (ResourceManagerNapiUtils::GetType(env, argv[ARRAY_SUBCRIPTOR_ONE]) != napi_number) {
-        HiLog::Error(LABEL, "Parameter type is not napi_number in GetPluralStringValueSync");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Parameter type is not napi_number in GetPluralStringValueSync");
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
@@ -633,7 +635,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessStringArrayValueResource(napi_env en
     int32_t resId = 0;
     bool ret2 = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret2) {
-        HiLog::Error(LABEL, "Failed to get resMgr in GetStringArrayValueSync");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in GetStringArrayValueSync");
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
     RState state = resMgr->GetStringArrayById(resId, dataContext->arrayValue_);
@@ -724,7 +726,7 @@ int32_t ResourceManagerNapiSyncImpl::InitNameAddon(napi_env env, napi_callback_i
     GET_PARAMS(env, info, PARAMS_NUM_TWO);
     dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
     if (dataContext->addon_ == nullptr) {
-        HiLog::Error(LABEL, "Failed to get addon in InitNameAddon");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get addon in InitNameAddon");
         return NOT_FOUND;
     }
     if (ResourceManagerNapiUtils::IsNapiString(env, info)) {
@@ -739,7 +741,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessStrResourceByName(napi_env env, napi
     std::unique_ptr<ResMgrDataContext> &dataContext)
 {
     if (!InitNapiParameters(env, info, dataContext->jsParams_)) {
-        HiLog::Error(LABEL, "GetStringByNameSync formatting error");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "GetStringByNameSync formatting error");
         return ERROR_CODE_RES_NAME_FORMAT_ERROR;
     }
 
@@ -965,7 +967,7 @@ std::shared_ptr<ResourceManager> GetNativeResoruceManager(napi_env env, napi_cal
 {
     auto addon = ResMgrDataContext::GetResourceManagerAddon(env, info);
     if (addon == nullptr) {
-        HiLog::Error(LABEL, "Failed to get addon_ in GetNativeResoruceManager");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get addon_ in GetNativeResoruceManager");
         return nullptr;
     }
     return addon->GetResMgr();
@@ -982,7 +984,7 @@ napi_value ResourceManagerNapiSyncImpl::AddResource(napi_env env, napi_callback_
     dataContext->path_ = ResourceManagerNapiUtils::GetResNameOrPath(env, argc, argv);
     auto resMgr = GetNativeResoruceManager(env, info);
     if (!resMgr->AddAppOverlay(dataContext->path_)) {
-        HiLog::Error(LABEL, "Failed to add overlay path = %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to add overlay path = %{public}s", dataContext->path_.c_str());
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_OVERLAY_RES_PATH_INVALID);
         return nullptr;
     }
@@ -1000,7 +1002,7 @@ napi_value ResourceManagerNapiSyncImpl::RemoveResource(napi_env env, napi_callba
     dataContext->path_ = ResourceManagerNapiUtils::GetResNameOrPath(env, argc, argv);
     auto resMgr = GetNativeResoruceManager(env, info);
     if (!resMgr->RemoveAppOverlay(dataContext->path_)) {
-        HiLog::Error(LABEL, "Failed to add overlay path = %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to add overlay path = %{public}s", dataContext->path_.c_str());
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_OVERLAY_RES_PATH_INVALID);
         return nullptr;
     }
@@ -1035,7 +1037,7 @@ napi_value ResourceManagerNapiSyncImpl::GetPluralStringByNameSync(napi_env env, 
     }
 
     if (ResourceManagerNapiUtils::GetType(env, argv[ARRAY_SUBCRIPTOR_ONE]) != napi_number) {
-        HiLog::Error(LABEL, "Parameter type is not napi_number in GetPluralStringByNameSync");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Parameter type is not napi_number in GetPluralStringByNameSync");
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
@@ -1210,7 +1212,7 @@ napi_value ResourceManagerNapiSyncImpl::IsRawDir(napi_env env, napi_callback_inf
 
     int32_t ret = InitPathAddon(env, info, dataContext);
     if (ret != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to init para in IsRawDir by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to init para in IsRawDir by %{public}s", dataContext->path_.c_str());
         ResourceManagerNapiUtils::NapiThrow(env, ret);
         return nullptr;
     }
@@ -1218,7 +1220,8 @@ napi_value ResourceManagerNapiSyncImpl::IsRawDir(napi_env env, napi_callback_inf
     RState state = dataContext->addon_->GetResMgr()->IsRawDirFromHap(dataContext->path_,
         dataContext->bValue_);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to determine the raw file is directory by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG,
+            "Failed to determine the raw file is directory by %{public}s", dataContext->path_.c_str());
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -1240,7 +1243,7 @@ napi_value ResourceManagerNapiSyncImpl::GetOverrideResourceManager(napi_env env,
         dataContext->overrideResConfig_);
     if (overrideResMgr == nullptr) {
         dataContext->SetErrorMsg("GetOverrideResourceManager, overrideResMgr is null", false);
-        HiLog::Error(LABEL, "GetOverrideResourceManager, overrideResMgr is null");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "GetOverrideResourceManager, overrideResMgr is null");
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
@@ -1254,11 +1257,11 @@ RState ResourceManagerNapiSyncImpl::getAddonAndConfig(napi_env env, napi_callbac
     GET_PARAMS(env, info, PARAMS_NUM_TWO);
     dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
     if (dataContext->addon_ == nullptr) {
-        HiLog::Error(LABEL, "getAddonAndConfig failed to get addon");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "getAddonAndConfig failed to get addon");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     if (ResourceManagerNapiUtils::GetConfigObject(env, argv[ARRAY_SUBCRIPTOR_ZERO], dataContext) != SUCCESS) {
-        HiLog::Error(LABEL, "getAddonAndConfig failed to get resConfig");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "getAddonAndConfig failed to get resConfig");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     return SUCCESS;
@@ -1269,7 +1272,7 @@ napi_value ResourceManagerNapiSyncImpl::GetOverrideConfiguration(napi_env env, n
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
     if (dataContext->addon_ == nullptr) {
-        HiLog::Error(LABEL, "GetOverrideConfiguration failed to get addon");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "GetOverrideConfiguration failed to get addon");
         return nullptr;
     }
     return ResourceManagerNapiUtils::CreateOverrideJsConfig(env, *dataContext);
@@ -1281,7 +1284,7 @@ napi_value ResourceManagerNapiSyncImpl::UpdateOverrideConfiguration(napi_env env
     int32_t state = getAddonAndConfig(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to get param in GetOverrideResourceManager", false);
-        HiLog::Error(LABEL, "Failed to get param in GetOverrideResourceManager");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get param in GetOverrideResourceManager");
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -1290,7 +1293,7 @@ napi_value ResourceManagerNapiSyncImpl::UpdateOverrideConfiguration(napi_env env
     state = resMgr->UpdateOverrideResConfig(*dataContext->overrideResConfig_);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("UpdateOverrideConfiguration failed due to invalid config", false);
-        HiLog::Error(LABEL, "UpdateOverrideConfiguration failed due to invalid config");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "UpdateOverrideConfiguration failed due to invalid config");
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
     }
     return nullptr;
