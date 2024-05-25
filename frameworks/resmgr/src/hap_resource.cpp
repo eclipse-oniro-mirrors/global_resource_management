@@ -105,13 +105,13 @@ const std::shared_ptr<HapResource> HapResource::LoadFromIndex(const char *path,
     inFile.seekg(0, std::ios::end);
     int bufLen = inFile.tellg();
     if (bufLen <= 0) {
-        HILOG_ERROR("file size is zero");
+        RESMGR_HILOGE(RESMGR_TAG, "file size is zero");
         inFile.close();
         return nullptr;
     }
     void *buf = malloc(bufLen);
     if (buf == nullptr) {
-        HILOG_ERROR("Error allocating memory");
+        RESMGR_HILOGE(RESMGR_TAG, "Error allocating memory");
         inFile.close();
         return nullptr;
     }
@@ -119,18 +119,18 @@ const std::shared_ptr<HapResource> HapResource::LoadFromIndex(const char *path,
     inFile.read(static_cast<char *>(buf), bufLen);
     inFile.close();
 
-    HILOG_DEBUG("extract success, bufLen:%d", bufLen);
+    RESMGR_HILOGD(RESMGR_TAG, "extract success, bufLen:%d", bufLen);
 
     std::shared_ptr<ResDesc> resDesc = std::make_shared<ResDesc>();
     if (resDesc == nullptr) {
-        HILOG_ERROR("new ResDesc failed when LoadFromIndex");
+        RESMGR_HILOGE(RESMGR_TAG, "new ResDesc failed when LoadFromIndex");
         free(buf);
         return nullptr;
     }
     int32_t out = HapParser::ParseResHex(static_cast<char *>(buf), bufLen, *resDesc, defaultConfig, selectedTypes);
     if (out != OK) {
         free(buf);
-        HILOG_ERROR("ParseResHex failed! retcode:%d", out);
+        RESMGR_HILOGE(RESMGR_TAG, "ParseResHex failed! retcode:%d", out);
         return nullptr;
     }
     free(buf);
@@ -138,7 +138,7 @@ const std::shared_ptr<HapResource> HapResource::LoadFromIndex(const char *path,
     std::shared_ptr<HapResource> pResource = std::make_shared<HapResource>(std::string(path),
         0, resDesc, isSystem, isOverlay);
     if (pResource == nullptr) {
-        HILOG_ERROR("new HapResource failed when LoadFromIndex");
+        RESMGR_HILOGE(RESMGR_TAG, "new HapResource failed when LoadFromIndex");
         return nullptr;
     }
     if (!pResource->Init(defaultConfig)) {
@@ -175,7 +175,7 @@ bool GetIndexData(const char *path, std::unique_ptr<uint8_t[]> &tmpBuf, size_t &
     }
     bool ret = extractor->ExtractToBufByName(indexFilePath, tmpBuf, len);
     if (!ret) {
-        HILOG_ERROR("failed to get buf data indexFilePath, %{public}s", indexFilePath.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get buf data indexFilePath, %{public}s", indexFilePath.c_str());
         return false;
     }
 #endif
@@ -189,18 +189,18 @@ const std::shared_ptr<HapResource> HapResource::LoadFromHap(const char *path,
     size_t tmpLen = 0;
     bool ret = GetIndexData(path, tmpBuf, tmpLen);
     if (!ret) {
-        HILOG_ERROR("read Index from file failed path, %{public}s", path);
+        RESMGR_HILOGE(RESMGR_TAG, "read Index from file failed path, %{public}s", path);
         return nullptr;
     }
     std::shared_ptr<ResDesc> resDesc = std::make_shared<ResDesc>();
     if (resDesc == nullptr) {
-        HILOG_ERROR("new ResDesc failed when LoadFromHap");
+        RESMGR_HILOGE(RESMGR_TAG, "new ResDesc failed when LoadFromHap");
         return nullptr;
     }
     int32_t out = HapParser::ParseResHex(
         reinterpret_cast<char *>(tmpBuf.get()), tmpLen, *resDesc, defaultConfig, selectedTypes);
     if (out != OK) {
-        HILOG_ERROR("ParseResHex failed! retcode:%d", out);
+        RESMGR_HILOGE(RESMGR_TAG, "ParseResHex failed! retcode:%d", out);
         return nullptr;
     }
 
@@ -222,7 +222,7 @@ const std::unordered_map<std::string, std::shared_ptr<HapResource>> HapResource:
     do {
         const std::shared_ptr<HapResource> targetResource = Load(path.c_str(), defaultConfig, isSystem);
         if (targetResource == nullptr) {
-            HILOG_ERROR("load target failed");
+            RESMGR_HILOGE(RESMGR_TAG, "load target failed");
             break;
         }
         result[path] = targetResource;
@@ -233,7 +233,7 @@ const std::unordered_map<std::string, std::shared_ptr<HapResource>> HapResource:
             // load overlay hap, the isOverlay flag set true.
             const std::shared_ptr<HapResource> overlayResource = Load(iter->c_str(), defaultConfig, isSystem, true);
             if (overlayResource == nullptr) {
-                HILOG_ERROR("load overlay failed");
+                RESMGR_HILOGE(RESMGR_TAG, "load overlay failed");
                 success = false;
                 break;
             }
@@ -241,7 +241,7 @@ const std::unordered_map<std::string, std::shared_ptr<HapResource>> HapResource:
         }
 
         if (!success) {
-            HILOG_ERROR("load overlay failed");
+            RESMGR_HILOGE(RESMGR_TAG, "load overlay failed");
             break;
         }
 
@@ -306,7 +306,7 @@ bool HapResource::Init(std::shared_ptr<ResConfigImpl> &defaultConfig)
 #endif
     auto index = indexPath_.rfind(separator);
     if (index == std::string::npos) {
-        HILOG_ERROR("index path format error, %s", indexPath_.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "index path format error, %s", indexPath_.c_str());
         return false;
     }
 #if defined(__IDE_PREVIEW__) || defined(__ARKUI_CROSS__)
@@ -317,7 +317,7 @@ bool HapResource::Init(std::shared_ptr<ResConfigImpl> &defaultConfig)
     }
     index = indexPath_.rfind(separator, index - 1);
     if (index == std::string::npos) {
-        HILOG_ERROR("index path format error, %s", indexPath_.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "index path format error, %s", indexPath_.c_str());
         return false;
     }
     resourcePath_ = indexPath_.substr(0, index + 1);
@@ -325,7 +325,7 @@ bool HapResource::Init(std::shared_ptr<ResConfigImpl> &defaultConfig)
     for (int i = 0; i < ResType::MAX_RES_TYPE; ++i) {
         auto mptr = new (std::nothrow) std::map<std::string, std::shared_ptr<IdValues>>();
         if (mptr == nullptr) {
-            HILOG_ERROR("new std::map failed in HapResource::Init");
+            RESMGR_HILOGE(RESMGR_TAG, "new std::map failed in HapResource::Init");
             return false;
         }
         idValuesNameMap_.push_back(mptr);
@@ -343,13 +343,13 @@ bool HapResource::InitMap(const std::shared_ptr<ResKey> &resKey, const std::pair
         if (iter == idValuesMap_.end()) {
             auto idValues = std::make_shared<HapResource::IdValues>();
             if (idValues == nullptr) {
-                HILOG_ERROR("new IdValues failed in HapResource::InitIdList");
+                RESMGR_HILOGE(RESMGR_TAG, "new IdValues failed in HapResource::InitIdList");
                 return false;
             }
             auto limitPath = std::make_shared<HapResource::ValueUnderQualifierDir>(resKey,
                 idParam->idItem_, resPath, isOverlay_, isSystem_);
             if (limitPath == nullptr) {
-                HILOG_ERROR("new ValueUnderQualifierDir failed in HapResource::InitIdList");
+                RESMGR_HILOGE(RESMGR_TAG, "new ValueUnderQualifierDir failed in HapResource::InitIdList");
                 return false;
             }
             idValues->AddLimitPath(limitPath);
@@ -365,7 +365,7 @@ bool HapResource::InitMap(const std::shared_ptr<ResKey> &resKey, const std::pair
             auto limitPath = std::make_shared<HapResource::ValueUnderQualifierDir>(resKey,
                 idParam->idItem_, resPath, isOverlay_, isSystem_);
             if (limitPath == nullptr) {
-                HILOG_ERROR("new ValueUnderQualifierDir failed in HapResource::InitIdList");
+                RESMGR_HILOGE(RESMGR_TAG, "new ValueUnderQualifierDir failed in HapResource::InitIdList");
                 return false;
             }
             idValues->AddLimitPath(limitPath);
@@ -378,7 +378,7 @@ bool HapResource::InitMap(const std::shared_ptr<ResKey> &resKey, const std::pair
 bool HapResource::InitIdList(std::shared_ptr<ResConfigImpl> &defaultConfig)
 {
     if (resDesc_ == nullptr) {
-        HILOG_ERROR("resDesc_ is null ! InitIdList failed");
+        RESMGR_HILOGE(RESMGR_TAG, "resDesc_ is null ! InitIdList failed");
         return false;
     }
     const auto resPath = std::make_pair(indexPath_, resourcePath_);
@@ -394,7 +394,7 @@ bool HapResource::InitIdList(std::shared_ptr<ResConfigImpl> &defaultConfig)
 const std::shared_ptr<HapResource::IdValues> HapResource::GetIdValues(const uint32_t id) const
 {
     if (idValuesMap_.empty()) {
-        HILOG_ERROR("idValuesMap_ is empty");
+        RESMGR_HILOGE(RESMGR_TAG, "idValuesMap_ is empty");
         return nullptr;
     }
     uint32_t uid = id;
@@ -431,12 +431,12 @@ int HapResource::GetIdByName(const char *name, const ResType resType) const
     const std::shared_ptr<IdValues> ids = iter->second;
 
     if (ids->GetLimitPathsConst().size() == 0) {
-        HILOG_ERROR("limitPaths empty");
+        RESMGR_HILOGE(RESMGR_TAG, "limitPaths empty");
         return UNKNOWN_ERROR;
     }
 
     if (ids->GetLimitPathsConst()[0]->GetIdItem()->resType_ != resType) {
-        HILOG_ERROR("ResType mismatch");
+        RESMGR_HILOGE(RESMGR_TAG, "ResType mismatch");
         return UNKNOWN_ERROR;
     }
     return ids->GetLimitPathsConst()[0]->GetIdItem()->id_;

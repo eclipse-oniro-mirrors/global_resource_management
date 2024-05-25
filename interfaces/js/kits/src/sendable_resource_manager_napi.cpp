@@ -13,20 +13,14 @@
  * limitations under the License.
  */
 #include "rstate.h"
-#include "hilog/log.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "native_engine.h"
+#include "../../../../frameworks/resmgr/include/hilog_wrapper.h"
 
 namespace OHOS {
 namespace Global {
 namespace Resource {
-using namespace OHOS::HiviewDFX;
-#undef LOG_DOMAIN
-#define LOG_DOMAIN 0xD001E00
-
-#undef LOG_TAG
-#define LOG_TAG "ResourceJs"
 #define GET_PARAMS(env, info, num)    \
     size_t argc = num;                \
     napi_value argv[num] = {nullptr}; \
@@ -40,7 +34,7 @@ static bool IsNapiObject(napi_env env, napi_callback_info info)
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[0], &valueType);
     if (valueType != napi_object) {
-        HILOG_WARN(LOG_CORE, "Parameter type is not napi_object");
+        RESMGR_HILOGW(RESMGR_JS_TAG, "Parameter type is not napi_object");
         return false;
     }
     return true;
@@ -64,7 +58,7 @@ static void NapiThrow(napi_env env, int32_t errCode)
 static bool GetResourceProp(napi_env env, napi_callback_info info, std::vector<napi_value> &props)
 {
     if (!IsNapiObject(env, info)) {
-        HILOG_ERROR(LOG_CORE, "Failed to get resource object");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resource object");
         return false;
     }
     GET_PARAMS(env, info, 1);
@@ -72,7 +66,7 @@ static bool GetResourceProp(napi_env env, napi_callback_info info, std::vector<n
     napi_valuetype bundleNameType = napi_undefined;
     if (napi_get_named_property(env, argv[0], "bundleName", &bundleName) != napi_ok ||
         napi_typeof(env, bundleName, &bundleNameType) != napi_ok || bundleNameType != napi_string) {
-        HILOG_ERROR(LOG_CORE, "Failed to get resource bundleName property");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resource bundleName property");
         return false;
     }
 
@@ -80,7 +74,7 @@ static bool GetResourceProp(napi_env env, napi_callback_info info, std::vector<n
     napi_valuetype moduleNameType = napi_undefined;
     if (napi_get_named_property(env, argv[0], "moduleName", &moduleName) != napi_ok ||
         napi_typeof(env, moduleName, &moduleNameType) != napi_ok || moduleNameType != napi_string) {
-        HILOG_ERROR(LOG_CORE, "Failed to get resource moduleName property");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resource moduleName property");
         return false;
     }
 
@@ -88,19 +82,19 @@ static bool GetResourceProp(napi_env env, napi_callback_info info, std::vector<n
     napi_valuetype idType = napi_undefined;
     if (napi_get_named_property(env, argv[0], "id", &id) != napi_ok ||
         napi_typeof(env, id, &idType) != napi_ok || idType != napi_number) {
-        HILOG_ERROR(LOG_CORE, "Failed to get resource id property");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resource id property");
         return false;
     }
 
     napi_value params = nullptr;
     if (napi_get_named_property(env, argv[0], "params", &params) != napi_ok) {
-        HILOG_ERROR(LOG_CORE, "Failed to get resource params property");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resource params property");
         return false;
     }
 
     napi_value type = nullptr;
     if (napi_get_named_property(env, argv[0], "type", &type) != napi_ok) {
-        HILOG_ERROR(LOG_CORE, "Failed to get resource type property");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resource type property");
         return false;
     }
     props.emplace_back(bundleName);
@@ -119,7 +113,7 @@ static bool GetParams(napi_env env, napi_value params, napi_value *newParams, bo
     napi_value length = nullptr;
     napi_valuetype paramsType = napi_undefined;
     if (napi_typeof(env, params, &paramsType) != napi_ok) {
-        HILOG_ERROR(LOG_CORE, "Failed to get resource params property type");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resource params property type");
         return false;
     }
     if (paramsType == napi_undefined) {
@@ -128,7 +122,7 @@ static bool GetParams(napi_env env, napi_value params, napi_value *newParams, bo
     if (napi_is_array(env, params, &isArray) != napi_ok || !isArray ||
         napi_get_named_property(env, params, "length", &length) != napi_ok ||
         napi_get_value_uint32(env, length, &len) != napi_ok) {
-        HILOG_ERROR(LOG_CORE, "Resource params property params is error");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Resource params property params is error");
         return false;
     }
     if (isSendable) {
@@ -137,17 +131,17 @@ static bool GetParams(napi_env env, napi_value params, napi_value *newParams, bo
         status = napi_create_array_with_length(env, len, newParams);
     }
     if (status != napi_ok) {
-        HILOG_ERROR(LOG_CORE, "Failed to create array, status = %{public}d", status);
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to create array, status = %{public}d", status);
         return false;
     }
     napi_value jsValue = nullptr;
     for (uint32_t i = 0; i < len; i++) {
         if (napi_get_element(env, params, i, &jsValue) != napi_ok) {
-            HILOG_ERROR(LOG_CORE, "Failed to get element");
+            RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get element");
             return false;
         }
         if (napi_set_element(env, *(newParams), i, jsValue) != napi_ok) {
-            HILOG_ERROR(LOG_CORE, "Failed to set element");
+            RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to set element");
             return false;
         }
     }
@@ -180,12 +174,12 @@ static napi_value InstanceResource(napi_env env, napi_callback_info info, bool i
     napi_value type = props[4]; // index 4
     napi_valuetype valueType = napi_undefined;
     if (napi_typeof(env, type, &valueType) != napi_ok) {
-        HILOG_ERROR(LOG_CORE, "Resource type property type is error");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Resource type property type is error");
         return nullptr;
     }
     if (valueType != napi_undefined) {
         if (valueType != napi_number) {
-            HILOG_ERROR(LOG_CORE, "Resource type property type is not number");
+            RESMGR_HILOGE(RESMGR_JS_TAG, "Resource type property type is not number");
             return nullptr;
         }
         creatorProp[4] = DECLARE_NAPI_DEFAULT_PROPERTY("type", type); // index 4
@@ -201,7 +195,7 @@ static napi_value InstanceResource(napi_env env, napi_callback_info info, bool i
             creatorProp);
     }
     if (status != napi_ok) {
-        HILOG_ERROR(LOG_CORE, "Failed to create object with properties, status = %{public}d", status);
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to create object with properties, status = %{public}d", status);
         return nullptr;
     }
     return result;
@@ -237,7 +231,7 @@ static napi_value SendableResourceManagerInit(napi_env env, napi_value exports)
     napi_status status = napi_define_properties(env, exports, sizeof(functionProp) / sizeof(functionProp[0]),
         functionProp);
     if (status != napi_ok) {
-        HILOG_ERROR(LOG_CORE, "Failed to set function at init");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to set function at init");
         return nullptr;
     }
 

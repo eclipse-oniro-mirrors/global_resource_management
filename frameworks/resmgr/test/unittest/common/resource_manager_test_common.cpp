@@ -69,7 +69,7 @@ void ResourceManagerTestCommon::TestStringByName(const char *name, const char *c
     std::string outValue;
     RState rState = rm->GetStringByName(name, outValue);
     ASSERT_EQ(SUCCESS, rState);
-    HILOG_DEBUG("%s : %s", name, outValue.c_str());
+    RESMGR_HILOGD(RESMGR_TAG, "%s : %s", name, outValue.c_str());
     ASSERT_EQ(std::string(cmp), outValue);
 }
 
@@ -168,7 +168,7 @@ void ResourceManagerTestCommon::TestGetRawFilePathByName(const std::string &name
 {
     std::string outValue;
     rm->GetRawFilePathByName(name, outValue);
-    HILOG_DEBUG("%s : %s", name.c_str(), outValue.c_str());
+    RESMGR_HILOGD(RESMGR_TAG, "%s : %s", name.c_str(), outValue.c_str());
     ASSERT_EQ(cmp, outValue);
 }
 

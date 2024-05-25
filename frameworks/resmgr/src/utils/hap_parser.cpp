@@ -74,7 +74,7 @@ int32_t GetCurrentFileInfo(unzFile &uf, unz_file_info &fileInfo)
     char filenameInzip[256];  // for unzGetCurrentFileInfo
     int err = unzGetCurrentFileInfo(uf, &fileInfo, filenameInzip, sizeof(filenameInzip), nullptr, 0, nullptr, 0);
     if (err != UNZ_OK) {
-        HILOG_ERROR("GetCurrentFileInfo failed");
+        RESMGR_HILOGE(RESMGR_TAG, "GetCurrentFileInfo failed");
         return UNKNOWN_ERROR;
     }
     return OK;
@@ -86,19 +86,19 @@ int32_t ReadCurrentFile(unzFile &uf, unz_file_info &fileInfo, std::unique_ptr<ui
     buffer = std::make_unique<uint8_t[]>(fileInfo.uncompressed_size);
     bufLen = fileInfo.uncompressed_size;
     if (buffer == nullptr) {
-        HILOG_ERROR("Error allocating memory for read buffer");
+        RESMGR_HILOGE(RESMGR_TAG, "Error allocating memory for read buffer");
         return UNKNOWN_ERROR;
     }
 
     int err = unzOpenCurrentFilePassword(uf, nullptr);
     if (err != UNZ_OK) {
-        HILOG_ERROR("Error %d in unzOpenCurrentFilePassword.", err);
+        RESMGR_HILOGE(RESMGR_TAG, "Error %d in unzOpenCurrentFilePassword.", err);
         return UNKNOWN_ERROR;
     } // file inside the zip is open
 
     err = unzReadCurrentFile(uf, buffer.get(), bufLen);
     if (err < 0) {
-        HILOG_ERROR("Error %d in unzReadCurrentFile", err);
+        RESMGR_HILOGE(RESMGR_TAG, "Error %d in unzReadCurrentFile", err);
         return UNKNOWN_ERROR;
     }
 
@@ -164,13 +164,13 @@ std::string ParseModuleNameFromHap(unzFile &uf)
     size_t tmpLen;
     ret = HapParser::ReadFileFromZip(uf, "config.json", tmpBuf, tmpLen);
     if (ret != OK) {
-        HILOG_ERROR("read config.json error");
+        RESMGR_HILOGE(RESMGR_TAG, "read config.json error");
         return std::string();
     }
     // parse config.json
     std::string mName = GetModuleName(reinterpret_cast<char *>(tmpBuf.get()), tmpLen);
     if (mName.size() == 0) {
-        HILOG_ERROR("parse moduleName from config.json error");
+        RESMGR_HILOGE(RESMGR_TAG, "parse moduleName from config.json error");
         return std::string();
     }
     return mName;
@@ -201,7 +201,7 @@ int32_t HapParser::ReadIndexFromFile(const char *zipFile, std::unique_ptr<uint8_
 {
     unzFile uf = unzOpen64(zipFile);
     if (uf == nullptr) {
-        HILOG_ERROR("Error open %{public}s in ReadIndexFromFile %{public}d", zipFile, errno);
+        RESMGR_HILOGE(RESMGR_TAG, "Error open %{public}s in ReadIndexFromFile %{public}d", zipFile, errno);
         return UNKNOWN_ERROR;
     } // file is open
     if (IsStageMode(uf)) {
@@ -233,13 +233,13 @@ std::string HapParser::ParseModuleName(std::shared_ptr<AbilityBase::Extractor> &
     size_t len;
     bool ret = extractor->ExtractToBufByName("config.json", configBuf, len);
     if (!ret) {
-        HILOG_ERROR("failed to get config data from ability");
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get config data from ability");
         return std::string();
     }
     // parse config.json
     std::string mName = GetModuleName(reinterpret_cast<char *>(configBuf.get()), len);
     if (mName.size() == 0) {
-        HILOG_ERROR("parse moduleName from config.json error");
+        RESMGR_HILOGE(RESMGR_TAG, "parse moduleName from config.json error");
         return std::string();
     }
     return mName;
@@ -284,17 +284,18 @@ RState HapParser::ReadRawFileFromHap(const std::string &hapPath, const std::stri
     bool isNewExtractor = false;
     auto extractor = AbilityBase::ExtractorUtil::GetExtractor(hapPath, isNewExtractor);
     if (extractor == nullptr) {
-        HILOG_ERROR("failed to get extractor hapPath, %{public}s", hapPath.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor hapPath, %{public}s", hapPath.c_str());
         return NOT_FOUND;
     }
     std::string rawfilePath = HapParser::GetRawFilePath(extractor, rawFileName);
     if (!extractor->HasEntry(rawfilePath)) {
-        HILOG_DEBUG("the rawfile file %{public}s is not exist in %{public}s", rawfilePath.c_str(), hapPath.c_str());
+        RESMGR_HILOGD(RESMGR_TAG,
+            "the rawfile file %{public}s is not exist in %{public}s", rawfilePath.c_str(), hapPath.c_str());
         return ERROR_CODE_RES_PATH_INVALID;
     }
     bool ret = extractor->ExtractToBufByName(rawfilePath, outValue, len);
     if (!ret) {
-        HILOG_ERROR("failed to get rawfile data rawfilePath, %{public}s, hapPath, %{public}s",
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get rawfile data rawfilePath, %{public}s, hapPath, %{public}s",
             rawfilePath.c_str(), hapPath.c_str());
         return NOT_FOUND;
     }
@@ -312,23 +313,24 @@ RState HapParser::ReadRawFileDescriptor(const char *hapPath, const std::string &
     bool isNewExtractor = false;
     auto extractor = AbilityBase::ExtractorUtil::GetExtractor(outPath, isNewExtractor);
     if (extractor == nullptr) {
-        HILOG_ERROR("failed to get extractor in ReadRawFileDescriptor hapPath, %{public}s", outPath);
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor in ReadRawFileDescriptor hapPath, %{public}s", outPath);
         return NOT_FOUND;
     }
     std::string rawfilePath = HapParser::GetRawFilePath(extractor, rawFileName);
     if (!extractor->HasEntry(rawfilePath)) {
-        HILOG_DEBUG("the rawfile file %{public}s is not exist in %{public}s", rawfilePath.c_str(), hapPath);
+        RESMGR_HILOGD(RESMGR_TAG,
+            "the rawfile file %{public}s is not exist in %{public}s", rawfilePath.c_str(), hapPath);
         return ERROR_CODE_RES_PATH_INVALID;
     }
     AbilityBase::FileInfo fileInfo;
     bool ret = extractor->GetFileInfo(rawfilePath, fileInfo);
     if (!ret) {
-        HILOG_ERROR("failed to get rawFileDescriptor rawfilePath, %{public}s", rawfilePath.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get rawFileDescriptor rawfilePath, %{public}s", rawfilePath.c_str());
         return NOT_FOUND;
     }
     int zipFd = open(outPath, O_RDONLY);
     if (zipFd < 0) {
-        HILOG_ERROR("failed open file %{public}s", outPath);
+        RESMGR_HILOGE(RESMGR_TAG, "failed open file %{public}s", outPath);
         return NOT_FOUND;
     }
     descriptor.offset = static_cast<long>(fileInfo.offset);
@@ -346,18 +348,20 @@ RState HapParser::GetRawFileList(const std::string &hapPath, const std::string &
     bool isNewExtractor = false;
     auto extractor = AbilityBase::ExtractorUtil::GetExtractor(hapPath, isNewExtractor);
     if (extractor == nullptr) {
-        HILOG_ERROR("failed to get extractor from ability in GetRawFileList hapPath, %{public}s", hapPath.c_str());
+        RESMGR_HILOGE(RESMGR_TAG,
+            "failed to get extractor from ability in GetRawFileList hapPath, %{public}s", hapPath.c_str());
         return NOT_FOUND;
     }
     std::set<std::string> fileSet;
     std::string rawfilePath = HapParser::GetRawFilePath(extractor, rawDirPath);
     if (!extractor->IsDirExist(rawfilePath)) {
-        HILOG_DEBUG("the rawfile dir %{public}s is not exist in %{public}s", rawfilePath.c_str(), hapPath.c_str());
+        RESMGR_HILOGD(RESMGR_TAG,
+            "the rawfile dir %{public}s is not exist in %{public}s", rawfilePath.c_str(), hapPath.c_str());
         return ERROR_CODE_RES_PATH_INVALID;
     }
     bool ret = extractor->GetFileList(rawfilePath, fileSet);
     if (!ret) {
-        HILOG_ERROR("failed to get fileSet from ability rawfilePath, %{public}s", rawfilePath.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get fileSet from ability rawfilePath, %{public}s", rawfilePath.c_str());
         return ERROR_CODE_RES_PATH_INVALID;
     }
     for (auto it = fileSet.begin(); it != fileSet.end(); it++) {
@@ -495,7 +499,7 @@ int32_t ParseId(const char *buffer, uint32_t &offset, std::shared_ptr<ResId> id,
     for (uint32_t i = 0; i < id->count_; ++i) {
         std::shared_ptr<IdParam> ip = std::make_shared<IdParam>();
         if (ip == nullptr) {
-            HILOG_ERROR("new IdParam failed when ParseId");
+            RESMGR_HILOGE(RESMGR_TAG, "new IdParam failed when ParseId");
             return SYS_ERROR;
         }
         errno_t eret = memcpy_s(ip.get(), sizeof(IdParam), buffer + offset, ResId::IDPARAM_HEADER_LEN);
@@ -505,7 +509,7 @@ int32_t ParseId(const char *buffer, uint32_t &offset, std::shared_ptr<ResId> id,
         offset += ResId::IDPARAM_HEADER_LEN;
         std::shared_ptr<IdItem> idItem = std::make_shared<IdItem>();
         if (idItem == nullptr) {
-            HILOG_ERROR("new IdItem failed when ParseId");
+            RESMGR_HILOGE(RESMGR_TAG, "new IdItem failed when ParseId");
             return SYS_ERROR;
         }
         uint32_t ipOffset = ip->offset_;
@@ -533,7 +537,7 @@ bool IsLocaleMatch(const std::shared_ptr<ResConfigImpl> defaultConfig,
     if (LocaleMatcher::Match(defaultConfig->GetResLocale(), config->GetResLocale())) {
         return true;
     }
-    HILOG_DEBUG("mismatch, do not parse %s", HapParser::ToFolderPath(keyParams).c_str());
+    RESMGR_HILOGD(RESMGR_TAG, "mismatch, do not parse %s", HapParser::ToFolderPath(keyParams).c_str());
     return false;
 }
 
@@ -552,7 +556,7 @@ int32_t ParseKey(const char *buffer, uint32_t &offset, std::shared_ptr<ResKey> k
     for (uint32_t i = 0; i < key->keyParamsCount_; ++i) {
         std::shared_ptr<KeyParam> kp = std::make_shared<KeyParam>();
         if (kp == nullptr) {
-            HILOG_ERROR("new KeyParam failed when ParseKey");
+            RESMGR_HILOGE(RESMGR_TAG, "new KeyParam failed when ParseKey");
             return SYS_ERROR;
         }
         errno_t eret = memcpy_s(kp.get(), sizeof(KeyParam), buffer + offset, ResKey::KEYPARAM_HEADER_LEN);
@@ -578,7 +582,7 @@ int32_t ParseKey(const char *buffer, uint32_t &offset, std::shared_ptr<ResKey> k
     uint32_t idOffset = key->offset_;
     std::shared_ptr<ResId> id = std::make_shared<ResId>();
     if (id == nullptr) {
-        HILOG_ERROR("new ResId failed when ParseKey");
+        RESMGR_HILOGE(RESMGR_TAG, "new ResId failed when ParseKey");
         return SYS_ERROR;
     }
     int32_t ret = ParseId(buffer, idOffset, id, selectedTypes);
@@ -595,7 +599,7 @@ int32_t HapParser::ParseResHex(const char *buffer, const size_t bufLen, ResDesc 
 {
     ResHeader *resHeader = new (std::nothrow) ResHeader();
     if (resHeader == nullptr) {
-        HILOG_ERROR("new ResHeader failed when ParseResHex");
+        RESMGR_HILOGE(RESMGR_TAG, "new ResHeader failed when ParseResHex");
         return SYS_ERROR;
     }
     uint32_t offset = 0;
@@ -615,7 +619,7 @@ int32_t HapParser::ParseResHex(const char *buffer, const size_t bufLen, ResDesc 
     for (uint32_t i = 0; i < resHeader->keyCount_; i++) {
         std::shared_ptr<ResKey> key = std::make_shared<ResKey>();
         if (key == nullptr) {
-            HILOG_ERROR("new ResKey failed when ParseResHex");
+            RESMGR_HILOGE(RESMGR_TAG, "new ResKey failed when ParseResHex");
             return SYS_ERROR;
         }
         bool match = true;
@@ -635,7 +639,7 @@ std::shared_ptr<ResConfigImpl> HapParser::CreateResConfigFromKeyParams(
 {
     auto resConfig = std::make_shared<ResConfigImpl>();
     if (resConfig == nullptr) {
-        HILOG_ERROR("new ResConfigImpl failed when CreateResConfigFromKeyParams");
+        RESMGR_HILOGE(RESMGR_TAG, "new ResConfigImpl failed when CreateResConfigFromKeyParams");
         return nullptr;
     }
     size_t len = keyParams.size();
@@ -681,12 +685,12 @@ std::shared_ptr<ResConfigImpl> HapParser::CreateResConfigFromKeyParams(
 std::shared_ptr<ResConfigImpl> HapParser::BuildResConfig(ResConfigKey *configKey)
 {
     if (configKey == nullptr) {
-        HILOG_ERROR("configKey is null");
+        RESMGR_HILOGE(RESMGR_TAG, "configKey is null");
         return nullptr;
     }
     auto resConfig = std::make_shared<ResConfigImpl>();
     if (resConfig == nullptr) {
-        HILOG_ERROR("new ResConfigImpl failed when BuildResConfig");
+        RESMGR_HILOGE(RESMGR_TAG, "new ResConfigImpl failed when BuildResConfig");
         return nullptr;
     }
     resConfig->SetDeviceType(configKey->deviceType);
@@ -698,8 +702,8 @@ std::shared_ptr<ResConfigImpl> HapParser::BuildResConfig(ResConfigKey *configKey
     resConfig->SetScreenDensity((configKey->screenDensity) / Utils::DPI_BASE);
     RState r = resConfig->SetLocaleInfo(configKey->language, configKey->script, configKey->region);
     if (r != SUCCESS) {
-        HILOG_ERROR("error set locale,lang %s,script %s,region %s", configKey->language, configKey->script,
-            configKey->region);
+        RESMGR_HILOGE(RESMGR_TAG,
+            "error set locale,lang %s,script %s,region %s", configKey->language, configKey->script, configKey->region);
     }
 
     return resConfig;
@@ -837,7 +841,7 @@ std::string HapParser::BuildFolderPath(Determiner *determiner)
 {
     std::string path;
     if (determiner == nullptr) {
-        HILOG_ERROR("determiner is null");
+        RESMGR_HILOGE(RESMGR_TAG, "determiner is null");
         return path;
     }
     std::string connecter1("_");
@@ -870,13 +874,13 @@ RState HapParser::IsRawDirFromHap(const char *hapPath, const std::string &pathNa
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     if (pathName.empty()) {
-        HILOG_ERROR("the rawfile path is empty");
+        RESMGR_HILOGE(RESMGR_TAG, "the rawfile path is empty");
         return ERROR_CODE_RES_PATH_INVALID;
     }
     bool isNewExtractor = false;
     auto extractor = AbilityBase::ExtractorUtil::GetExtractor(hapPath, isNewExtractor);
     if (extractor == nullptr) {
-        HILOG_ERROR("failed to get extractor hapPath, %{public}s", hapPath);
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor hapPath, %{public}s", hapPath);
         return NOT_FOUND;
     }
     std::string rawPath = HapParser::GetRawFilePath(extractor, pathName);
@@ -885,7 +889,7 @@ RState HapParser::IsRawDirFromHap(const char *hapPath, const std::string &pathNa
     } else if (extractor->IsDirExist(rawPath)) {
         outValue = true;
     } else {
-        HILOG_ERROR("the rawfile file %{public}s is not exist in %{public}s", rawPath.c_str(), hapPath);
+        RESMGR_HILOGE(RESMGR_TAG, "the rawfile file %{public}s is not exist in %{public}s", rawPath.c_str(), hapPath);
         return ERROR_CODE_RES_PATH_INVALID;
     }
 #endif
@@ -898,7 +902,7 @@ RState HapParser::IsRawDirUnCompressed(const std::string &pathName, bool &outVal
     Utils::CanonicalizePath(pathName.c_str(), outPath, PATH_MAX);
     struct stat fileStat {};
     if (stat(outPath, &fileStat) != 0) {
-        HILOG_ERROR("failed to get rawfile file info, %{public}s", outPath);
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get rawfile file info, %{public}s", outPath);
         return ERROR_CODE_RES_PATH_INVALID;
     }
     if ((fileStat.st_mode & S_IFDIR)) {
@@ -906,7 +910,7 @@ RState HapParser::IsRawDirUnCompressed(const std::string &pathName, bool &outVal
     } else if ((fileStat.st_mode & S_IFREG)) {
         outValue = false;
     } else {
-        HILOG_ERROR("the rawfile file %{public}s is not exist", outPath);
+        RESMGR_HILOGE(RESMGR_TAG, "the rawfile file %{public}s is not exist", outPath);
         return ERROR_CODE_RES_PATH_INVALID;
     }
     return SUCCESS;

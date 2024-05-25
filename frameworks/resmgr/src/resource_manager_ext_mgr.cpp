@@ -45,7 +45,7 @@ bool ResourceManagerExtMgr::Init(std::shared_ptr<ResourceManager> &resMgrExt, co
         std::string pluginPath = "system/lib64/libglobal_resmgr_broker.z.so";
         handle_ = dlopen(pluginPath.c_str(), RTLD_LAZY);
         if (handle_ == nullptr) {
-            HILOG_ERROR("open so fail");
+            RESMGR_HILOGE(RESMGR_TAG, "open so fail");
             return false;
         }
     }
@@ -58,7 +58,7 @@ bool ResourceManagerExtMgr::Init(std::shared_ptr<ResourceManager> &resMgrExt, co
     IResMgrExt iResMgrExt = (IResMgrExt)dlsym(handle_, "CreateResMgrExt");
     int ret = (*iResMgrExt)(resMgrExt, bundleName, appType);
     if (ret) {
-        HILOG_ERROR("CreateResMgrExt fail.");
+        RESMGR_HILOGE(RESMGR_TAG, "CreateResMgrExt fail.");
         return false;
     }
     resMgrExtMap_[bundleName] = resMgrExt;

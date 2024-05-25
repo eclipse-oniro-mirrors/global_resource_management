@@ -131,7 +131,7 @@ void ThemePackManager::LoadThemeSkinResource(const std::string &bundleName, cons
     for (const auto &dir : rootDirs) {
         auto pos = dir.rfind('/');
         if (pos == std::string::npos) {
-            HILOG_ERROR("invalid dir = %{public}s in LoadThemeSkinResource", dir.c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "invalid dir = %{public}s in LoadThemeSkinResource", dir.c_str());
             continue;
         }
         std::string tempBundleName = dir.substr(pos + 1);
@@ -234,7 +234,7 @@ const std::string ThemePackManager::GetThemeResource(const std::pair<std::string
 {
     auto themeQualifierValue = GetThemeQualifierValue(bundInfo, resType, resName, resConfig);
     if (themeQualifierValue == nullptr) {
-        HILOG_DEBUG("themeQualifierValue == nullptr");
+        RESMGR_HILOGD(RESMGR_TAG, "themeQualifierValue == nullptr");
         return std::string("");
     }
     return themeQualifierValue->GetResValue();
@@ -341,7 +341,7 @@ void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, con
     for (const auto &dir : rootDirs) {
         auto pos = dir.rfind('/');
         if (pos == std::string::npos) {
-            HILOG_ERROR("invalid dir = %{public}s in LoadThemeIconsResource", dir.c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "invalid dir = %{public}s in LoadThemeIconsResource", dir.c_str());
             continue;
         }
         auto pThemeResource = ThemeResource::LoadThemeIconResource(dir);

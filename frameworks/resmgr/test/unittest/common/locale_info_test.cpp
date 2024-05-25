@@ -604,7 +604,7 @@ HWTEST_F(LocaleInfoTest, LocaleInfoPerformanceFuncTest001, TestSize.Level1)
         total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
     }
     average = total / 1000.0;
-    HILOG_DEBUG("avg cost FindAndSort: %f us", average);
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost FindAndSort: %f us", average);
     EXPECT_LT(average, 500);
 };
 }

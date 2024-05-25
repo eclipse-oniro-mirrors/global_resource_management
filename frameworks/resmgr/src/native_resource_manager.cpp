@@ -17,17 +17,12 @@
 
 #include <securec.h>
 #include "drawable_descriptor.h"
-#include "hilog/log_cpp.h"
+#include "hilog_wrapper.h"
 #include "resource_manager_impl.h"
 #include "rstate.h"
 
 using namespace OHOS::Global::Resource;
-using namespace OHOS::HiviewDFX;
 using namespace OHOS::Ace::Napi;
-
-namespace {
-    constexpr HiLogLabel LABEL = {LOG_CORE, 0xD001E00, "NativeResourceManager"};
-}
 
 struct NativeResourceManager {
     std::shared_ptr<ResourceManager> resManager = nullptr;
@@ -43,16 +38,17 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64(const NativeResource
     RState state = mgr->resManager->GetMediaBase64DataById(resId, tempResultValue, density);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
-        HiLog::Error(LABEL, "failed get media base64 id = %{public}d, errorCode = %{public}d", resId, errorCode);
+        RESMGR_HILOGE(RESMGR_NATIVE_TAG,
+            "failed get media base64 id = %{public}d, errorCode = %{public}d", resId, errorCode);
         return errorCode;
     }
     *resultValue = (char*)malloc(tempResultValue.size() + 1);
     if (*resultValue == nullptr) {
-        HiLog::Error(LABEL, "GetMediaBase64 malloc error");
+        RESMGR_HILOGE(RESMGR_NATIVE_TAG, "GetMediaBase64 malloc error");
         return ResourceManager_ErrorCode::ERROR_CODE_OUT_OF_MEMORY;
     }
     if (strncpy_s(*resultValue, tempResultValue.size() + 1, tempResultValue.c_str(), tempResultValue.size()) != 0) {
-        HiLog::Error(LABEL, "GetMediaBase64 strncpy_s error");
+        RESMGR_HILOGE(RESMGR_NATIVE_TAG, "GetMediaBase64 strncpy_s error");
         free(*resultValue);
         *resultValue = nullptr;
         return ResourceManager_ErrorCode::ERROR_CODE_OUT_OF_MEMORY;
@@ -72,16 +68,17 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64ByName(const NativeRe
     RState state = mgr->resManager->GetMediaBase64DataByName(resName, tempResultValue, density);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
-        HiLog::Error(LABEL, "failed get media base64 name = %{public}s, errorCode = %{public}d", resName, errorCode);
+        RESMGR_HILOGE(RESMGR_NATIVE_TAG,
+            "failed get media base64 name = %{public}s, errorCode = %{public}d", resName, errorCode);
         return errorCode;
     }
     *resultValue = (char*)malloc(tempResultValue.size() + 1);
     if (*resultValue == nullptr) {
-        HiLog::Error(LABEL, "GetMediaBase64Byname malloc error");
+        RESMGR_HILOGE(RESMGR_NATIVE_TAG, "GetMediaBase64Byname malloc error");
         return ResourceManager_ErrorCode::ERROR_CODE_OUT_OF_MEMORY;
     }
     if (strncpy_s(*resultValue, tempResultValue.size() + 1, tempResultValue.c_str(), tempResultValue.size()) != 0) {
-        HiLog::Error(LABEL, "GetMediaBase64Byname strncpy_s error");
+        RESMGR_HILOGE(RESMGR_NATIVE_TAG, "GetMediaBase64Byname strncpy_s error");
         free(*resultValue);
         *resultValue = nullptr;
         return ResourceManager_ErrorCode::ERROR_CODE_OUT_OF_MEMORY;
@@ -102,13 +99,14 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMedia(const NativeResourceManage
     RState state = mgr->resManager->GetMediaDataById(resId, len, tempResultValue, density);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
-        HiLog::Error(LABEL, "failed get media resource id = %{public}d, errorCode = %{public}d", resId, errorCode);
+        RESMGR_HILOGE(RESMGR_NATIVE_TAG,
+            "failed get media resource id = %{public}d, errorCode = %{public}d", resId, errorCode);
         return errorCode;
     }
     uint8_t *temPtr = tempResultValue.get();
     *resultValue = static_cast<uint8_t*>(malloc(len));
     if (*resultValue == nullptr) {
-        HiLog::Error(LABEL, "GetMedia malloc error");
+        RESMGR_HILOGE(RESMGR_NATIVE_TAG, "GetMedia malloc error");
         return ResourceManager_ErrorCode::ERROR_CODE_OUT_OF_MEMORY;
     }
     std::copy(temPtr, temPtr + len, *resultValue);
@@ -128,13 +126,14 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaByName(const NativeResource
     RState state = mgr->resManager->GetMediaDataByName(resName, len, tempResultValue, density);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
-        HiLog::Error(LABEL, "failed get media resource name = %{public}s, errorCode = %{public}d", resName, errorCode);
+        RESMGR_HILOGE(RESMGR_NATIVE_TAG,
+            "failed get media resource name = %{public}s, errorCode = %{public}d", resName, errorCode);
         return errorCode;
     }
     uint8_t *temPtr = tempResultValue.get();
     *resultValue = static_cast<uint8_t*>(malloc(len));
     if (*resultValue == nullptr) {
-        HiLog::Error(LABEL, "GetMediaByName malloc error");
+        RESMGR_HILOGE(RESMGR_NATIVE_TAG, "GetMediaByName malloc error");
         return ResourceManager_ErrorCode::ERROR_CODE_OUT_OF_MEMORY;
     }
     std::copy(temPtr, temPtr + len, *resultValue);
@@ -165,7 +164,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptor(const NativeR
     }
     auto descriptor = DrawableDescriptorFactory::Create(resId, mgr->resManager, state, drawableType, density);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to Create drawableDescriptor");
+        RESMGR_HILOGE(RESMGR_NATIVE_TAG, "Failed to Create drawableDescriptor");
         return static_cast<ResourceManager_ErrorCode>(state);
     }
     *drawableDescriptor = OH_ArkUI_CreateFromNapiDrawable(descriptor.get());
@@ -207,7 +206,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptorByName(const N
 
     auto descriptor = DrawableDescriptorFactory::Create(resName, mgr->resManager, state, drawableType, density);
     if (state != RState::SUCCESS) {
-        HiLog::Error(LABEL, "Failed to Create drawableDescriptor");
+        RESMGR_HILOGE(RESMGR_NATIVE_TAG, "Failed to Create drawableDescriptor");
         return static_cast<ResourceManager_ErrorCode>(state);
     }
     *drawableDescriptor = OH_ArkUI_CreateFromNapiDrawable(descriptor.get());

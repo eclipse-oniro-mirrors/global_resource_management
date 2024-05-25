@@ -42,20 +42,20 @@ napi_value ResourceManagerAddon::CreateOverrideAddon(napi_env env, const std::sh
 napi_value ResourceManagerAddon::WrapResourceManager(napi_env env, std::shared_ptr<ResourceManagerAddon> &addon)
 {
     if (!Init(env)) {
-        HiLog::Error(LABEL, "Failed to init resource manager addon");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to init resource manager addon");
         return nullptr;
     }
 
     napi_value constructor = nullptr;
     napi_status status = napi_get_reference_value(env, g_constructor, &constructor);
     if (status != napi_ok || constructor == nullptr) {
-        HiLog::Error(LABEL, "Failed to get reference value in Create, status = %{public}d", status);
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get reference value in Create, status = %{public}d", status);
         return nullptr;
     }
     napi_value result = nullptr;
     status = napi_new_instance(env, constructor, 0, nullptr, &result);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to new instance in Create, status = %{public}d", status);
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to new instance in Create, status = %{public}d", status);
         return nullptr;
     }
 
@@ -63,7 +63,7 @@ napi_value ResourceManagerAddon::WrapResourceManager(napi_env env, std::shared_p
     status = napi_wrap(env, result, reinterpret_cast<void *>(addonPtr.get()), ResourceManagerAddon::Destructor,
         nullptr, nullptr);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to wrape in Create");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to wrape in Create");
         return nullptr;
     }
     addonPtr.release();
@@ -93,20 +93,20 @@ ResourceManagerAddon::ResourceManagerAddon(
     const std::shared_ptr<AbilityRuntime::Context>& context, bool isSystem)
     : bundleName_(bundleName), resMgr_(resMgr), context_(context), isSystem_(isSystem)
 {
-    HiLog::Debug(LABEL, "create ResourceManagerAddon %{public}s", bundleName_.c_str());
+    RESMGR_HILOGD(RESMGR_JS_TAG, "create ResourceManagerAddon %{public}s", bundleName_.c_str());
     napiContext_ = std::make_shared<ResourceManagerNapiContext>();
 }
 
 ResourceManagerAddon::ResourceManagerAddon(const std::shared_ptr<ResourceManager>& resMgr, bool isSystem)
     : resMgr_(resMgr), isSystem_(isSystem)
 {
-    HiLog::Debug(LABEL, "create ResourceManagerAddon.");
+    RESMGR_HILOGD(RESMGR_JS_TAG, "create ResourceManagerAddon.");
     napiContext_ = std::make_shared<ResourceManagerNapiContext>();
 }
 
 ResourceManagerAddon::~ResourceManagerAddon()
 {
-    HiLog::Debug(LABEL, "~ResourceManagerAddon %{public}s", bundleName_.c_str());
+    RESMGR_HILOGD(RESMGR_JS_TAG, "~ResourceManagerAddon %{public}s", bundleName_.c_str());
 }
 
 void ResourceManagerAddon::Destructor(napi_env env, void *nativeObject, void *hint)
@@ -188,13 +188,13 @@ bool ResourceManagerAddon::Init(napi_env env)
     napi_status status = napi_define_class(env, "ResourceManager", NAPI_AUTO_LENGTH, New, nullptr,
         sizeof(properties) / sizeof(napi_property_descriptor), properties, &constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to define class at Init");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to define class at Init");
         return false;
     }
 
     status = napi_create_reference(env, constructor, 1, &g_constructor);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to create reference at init");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to create reference at init");
         return false;
     }
     return true;

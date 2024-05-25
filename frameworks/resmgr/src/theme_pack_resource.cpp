@@ -109,7 +109,7 @@ void ThemeResource::InitThemeRes(std::pair<std::string, std::string> bundleInfo,
     std::shared_ptr<ThemeConfig> themeConfig, const std::string &resTypeStr)
 {
     if (root == nullptr) {
-        HILOG_WARN("The json file has not resType = %{public}s", resTypeStr.c_str());
+        RESMGR_HILOGD(RESMGR_TAG, "The json file has not resType = %{public}s", resTypeStr.c_str());
         return;
     }
 
@@ -119,12 +119,12 @@ void ThemeResource::InitThemeRes(std::pair<std::string, std::string> bundleInfo,
         while (childValue != nullptr) {
             cJSON *name = cJSON_GetObjectItem(childValue, "name");
             if (name == nullptr || !cJSON_IsString(name)) {
-                HILOG_WARN("The resource name is not exist in childValue");
+                RESMGR_HILOGW(RESMGR_TAG, "The resource name is not exist in childValue");
                 return;
             }
             cJSON *value = cJSON_GetObjectItem(childValue, "value");
             if (value == nullptr || !cJSON_IsString(value)) {
-                HILOG_WARN("The resource value is not exist in childValue");
+                RESMGR_HILOGW(RESMGR_TAG, "The resource value is not exist in childValue");
                 return;
             }
             auto themeValue = std::make_shared<ThemeValue>();
@@ -145,7 +145,7 @@ void ThemeResource::ParseJson(const std::string &bundleName, const std::string &
     auto len = 0;
     FILE* pf = std::fopen(jsonPath.c_str(), "r");
     if (pf == nullptr) {
-        HILOG_ERROR("fopen failed in ParseJson");
+        RESMGR_HILOGE(RESMGR_TAG, "fopen failed in ParseJson");
         return;
     }
     std::fseek(pf, 0, SEEK_END);
@@ -153,7 +153,7 @@ void ThemeResource::ParseJson(const std::string &bundleName, const std::string &
     std::fseek(pf, 0, SEEK_SET);
     char *jsonData = (char *)malloc(len + 1);
     if (jsonData == nullptr) {
-        HILOG_ERROR("failed malloc in ParseJson");
+        RESMGR_HILOGE(RESMGR_TAG, "failed malloc in ParseJson");
         if (pf != nullptr) {
             fclose(pf);
             pf = nullptr;
@@ -187,7 +187,7 @@ void ThemeResource::ParseIcon(const std::string &bundleName, const std::string &
     auto pos1 = iconPath.rfind('.');
     auto pos2 = iconPath.rfind('/');
     if (pos1 == std::string::npos || pos2 == std::string::npos) {
-        HILOG_ERROR("invalid iconPath = %{public}s in ParseIcon", iconPath.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "invalid iconPath = %{public}s in ParseIcon", iconPath.c_str());
         return;
     }
     if (pos1 < pos2 + 1) {
@@ -227,7 +227,7 @@ std::vector<std::string> GetFiles(const std::string &strCurrentDir)
     DIR *dir;
     struct dirent *pDir;
     if ((dir = opendir(strCurrentDir.c_str())) == nullptr) {
-        HILOG_ERROR("opendir failed strCurrentDir = %{public}s", strCurrentDir.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "opendir failed strCurrentDir = %{public}s", strCurrentDir.c_str());
         return vFiles;
     }
     while ((pDir = readdir(dir)) != nullptr) {
@@ -256,13 +256,13 @@ std::tuple<std::string, std::string> GetBundleInfo(const std::string& rootDir, c
     size_t len = rootDir.size();
     auto pos = rootDir.rfind('/');
     if (pos == std::string::npos) {
-        HILOG_ERROR("invalid rootDir = %{public}s in GetBundleInfo", rootDir.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "invalid rootDir = %{public}s in GetBundleInfo", rootDir.c_str());
         return std::tuple<std::string, std::string>("", "");
     }
     std::string bundleName = rootDir.substr(pos + 1);
     auto pos2 = path.find('/', len + 1);
     if (pos2 == std::string::npos) {
-        HILOG_ERROR("invalid path = %{public}s in GetBundleInfo", path.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "invalid path = %{public}s in GetBundleInfo", path.c_str());
         return std::tuple<std::string, std::string>("", "");
     }
     if (pos2 < len + 1) {
@@ -276,7 +276,7 @@ std::tuple<std::string, std::string> GetBundleInfo(const std::string& rootDir, c
 const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeResource(const std::string& rootDir)
 {
     if (rootDir.empty()) {
-        HILOG_ERROR("Invalid rootDir in LoadThemeResource = %{public}s", rootDir.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "Invalid rootDir in LoadThemeResource = %{public}s", rootDir.c_str());
         return nullptr;
     }
     auto themeResource = std::make_shared<ThemeResource>(rootDir);
@@ -285,7 +285,7 @@ const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeResource(const std:
         auto bundleInfo = GetBundleInfo(rootDir, path);
         auto pos = path.rfind('.');
         if (pos == std::string::npos) {
-            HILOG_ERROR("invalid resPath = %{public}s", path.c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "invalid resPath = %{public}s", path.c_str());
             continue;
         }
         std::string tail = path.substr(pos + 1);
@@ -302,7 +302,7 @@ std::string ThemeResource::GetThemeResBundleName(const std::string &themePath)
 {
     auto pos = themePath.rfind('/');
     if (pos == std::string::npos) {
-        HILOG_ERROR("invalid themePath = %{public}s", themePath.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "invalid themePath = %{public}s", themePath.c_str());
         return std::string("");
     }
     std::string bundleName = themePath.substr(pos + 1);
@@ -316,7 +316,7 @@ std::string GetIconsBundleName(const std::string& iconPath)
     }
     auto pos = iconPath.rfind('/');
     if (pos == std::string::npos) {
-        HILOG_ERROR("invalid iconPath = %{public}s in GetIconsBundleName", iconPath.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "invalid iconPath = %{public}s in GetIconsBundleName", iconPath.c_str());
         return std::string("");
     }
     return iconPath.substr(pos + 1);
@@ -334,7 +334,7 @@ const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeIconResource(const 
         auto pos1 = path.rfind('.');
         auto pos2 = path.rfind('/');
         if (pos1 == std::string::npos || pos2 == std::string::npos || pos1 < pos2 + 1) {
-            HILOG_ERROR("invalid path = %{public}s in LoadThemeIconResource", path.c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "invalid path = %{public}s in LoadThemeIconResource", path.c_str());
             continue;
         }
         std::string iconName = path.substr(pos2 + 1, pos1 - pos2 - 1);

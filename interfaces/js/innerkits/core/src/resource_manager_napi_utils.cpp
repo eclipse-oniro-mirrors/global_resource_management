@@ -44,7 +44,7 @@ bool ResourceManagerNapiUtils::IsNapiString(napi_env env, napi_callback_info inf
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[ARRAY_SUBCRIPTOR_ZERO], &valueType);
     if (valueType != napi_string) {
-        HiLog::Warn(LABEL, "Parameter type is not napi_string");
+        RESMGR_HILOGD(RESMGR_JS_TAG, "Parameter type is not napi_string");
         return false;
     }
     return true;
@@ -69,7 +69,7 @@ bool ResourceManagerNapiUtils::IsNapiObject(napi_env env, napi_callback_info inf
     napi_valuetype valueType = napi_valuetype::napi_undefined;
     napi_typeof(env, argv[ARRAY_SUBCRIPTOR_ZERO], &valueType);
     if (valueType != napi_object) {
-        HiLog::Warn(LABEL, "Parameter type is not napi_object");
+        RESMGR_HILOGI(RESMGR_JS_TAG, "Parameter type is not napi_object");
         return false;
     }
     return true;
@@ -91,19 +91,19 @@ std::string ResourceManagerNapiUtils::GetResNameOrPath(napi_env env, size_t argc
     napi_valuetype valuetype;
     napi_typeof(env, argv[ARRAY_SUBCRIPTOR_ZERO], &valuetype);
     if (valuetype != napi_string) {
-        HiLog::Error(LABEL, "Invalid param, not string");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Invalid param, not string");
         return "";
     }
     size_t len = 0;
     napi_status status = napi_get_value_string_utf8(env, argv[ARRAY_SUBCRIPTOR_ZERO], nullptr, 0, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to get resName or rawfile path length");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resName or rawfile path length");
         return "";
     }
     std::vector<char> buf(len + 1);
     status = napi_get_value_string_utf8(env, argv[ARRAY_SUBCRIPTOR_ZERO], buf.data(), len + 1, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to get resName or raw file path");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resName or raw file path");
         return "";
     }
     return buf.data();
@@ -118,17 +118,17 @@ int ResourceManagerNapiUtils::GetResId(napi_env env, size_t argc, napi_value *ar
     napi_valuetype valuetype;
     napi_status status = napi_typeof(env, argv[ARRAY_SUBCRIPTOR_ZERO], &valuetype);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to get value type");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get value type");
         return 0;
     }
     if (valuetype != napi_number) {
-        HiLog::Error(LABEL, "Invalid param, not number");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Invalid param, not number");
         return 0;
     }
     int resId = 0;
     status = napi_get_value_int32(env, argv[ARRAY_SUBCRIPTOR_ZERO], &resId);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to get id number");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get id number");
         return 0;
     }
 
@@ -186,7 +186,7 @@ napi_value ResourceManagerNapiUtils::CreateJsUint8Array(napi_env env, ResMgrData
     napi_value buffer;
     napi_status status = napi_create_external_arraybuffer(env, context.mediaData.get(), context.len_,
         [](napi_env env, void *data, void *hint) {
-            HiLog::Debug(LABEL, "Media buffer finalized");
+            RESMGR_HILOGD(RESMGR_JS_TAG, "Media buffer finalized");
             delete[] static_cast<char*>(data);
         }, nullptr, &buffer);
     if (status != napi_ok) {
@@ -309,23 +309,23 @@ bool ResourceManagerNapiUtils::GetResourceObjectName(napi_env env,
     napi_value name;
     napi_status status = napi_get_named_property(env, value, typeName.c_str(), &name);
     if (status != napi_ok || name == nullptr) {
-        HiLog::Error(LABEL, "Failed to get resource name property");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resource name property");
         return false;
     }
     if (ResourceManagerNapiUtils::GetType(env, name) != napi_string) {
-        HiLog::Error(LABEL, "Failed to get resource name string");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resource name string");
         return false;
     }
     size_t len = 0;
     status = napi_get_value_string_utf8(env, name, nullptr, 0, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to get resource len");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resource len");
         return false;
     }
     std::vector<char> buf(len + 1);
     status = napi_get_value_string_utf8(env, name, buf.data(), len + 1, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to get resource name value");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resource name value");
         return false;
     }
     if (type == 0) {
@@ -342,17 +342,17 @@ bool ResourceManagerNapiUtils::GetResourceObjectId(napi_env env,
     napi_value id;
     napi_status status = napi_get_named_property(env, value, "id", &id);
     if (status != napi_ok || id == nullptr) {
-        HiLog::Error(LABEL, "Failed to get resource id property");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resource id property");
         return false;
     }
     if (ResourceManagerNapiUtils::GetType(env, id) != napi_number) {
-        HiLog::Error(LABEL, "Failed to get resource id number");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resource id number");
         return false;
     }
     int32_t resId = 0;
     status = napi_get_value_int32(env, id, &resId);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to get resource id value");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resource id value");
         return false;
     }
     resourcePtr->id = resId;
@@ -363,19 +363,19 @@ int32_t ResourceManagerNapiUtils::GetResourceObject(napi_env env,
     std::shared_ptr<ResourceManager::Resource> &resourcePtr, napi_value &value)
 {
     if (resourcePtr == nullptr) {
-        HiLog::Error(LABEL, "resourcePtr == nullptr");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "resourcePtr == nullptr");
         return ERROR;
     }
     if (!GetResourceObjectName(env, resourcePtr, value, 0)) {
-        HiLog::Error(LABEL, "Failed to get bundleName");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get bundleName");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     if (!GetResourceObjectName(env, resourcePtr, value, 1)) {
-        HiLog::Error(LABEL, "Failed to get moduleName");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get moduleName");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     if (!GetResourceObjectId(env, resourcePtr, value)) {
-        HiLog::Error(LABEL, "Failed to get id");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get id");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
 
@@ -407,12 +407,12 @@ bool ResourceManagerNapiUtils::GetHapResourceManager(const ResMgrDataContext* da
     }
     auto context = dataContext->addon_->GetContext();
     if (context == nullptr) {
-        HiLog::Error(LABEL, "GetHapResourceManager context == nullptr");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "GetHapResourceManager context == nullptr");
         return false;
     }
     auto moduleContext = context->CreateModuleContext(resource->bundleName, resource->moduleName);
     if (moduleContext == nullptr) {
-        HiLog::Error(LABEL, "GetHapResourceManager moduleContext == nullptr, bundleName = %{public}s," \
+        RESMGR_HILOGE(RESMGR_JS_TAG, "GetHapResourceManager moduleContext == nullptr, bundleName = %{public}s," \
             "moduleName = %{public}s", resource->bundleName.c_str(), resource->moduleName.c_str());
         return false;
     }
@@ -557,17 +557,17 @@ RState ResourceManagerNapiUtils::GetConfigObject(napi_env env,
     napi_valuetype valueType;
     napi_typeof(env, object, &valueType);
     if (valueType == napi_undefined || valueType == napi_null) {
-        HiLog::Debug(LABEL, "GetConfigObject, no config");
+        RESMGR_HILOGD(RESMGR_JS_TAG, "GetConfigObject, no config");
         return SUCCESS;
     }
     if (valueType != napi_object) {
-        HiLog::Error(LABEL, "GetConfigObject, param not object");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "GetConfigObject, param not object");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
 
     ResConfig *config = CreateDefaultResConfig();
     if (config == nullptr) {
-        HiLog::Error(LABEL, "GetConfigObject, new config failed");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "GetConfigObject, new config failed");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     dataContext->overrideResConfig_.reset(config);
@@ -590,25 +590,27 @@ bool ResourceManagerNapiUtils::GetEnumParamOfConfig(napi_env env,
         napi_value napi_val;
         napi_status status = napi_get_named_property(env, object, property.c_str(), &napi_val);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "GetEnumParamOfConfig failed to get property %{public}s", property.c_str());
+            RESMGR_HILOGE(RESMGR_JS_TAG, "GetEnumParamOfConfig failed to get property %{public}s", property.c_str());
             return false;
         }
         if (napi_val == nullptr) {
-            HiLog::Debug(LABEL, "GetEnumParamOfConfig property %{public}s not set", property.c_str());
+            RESMGR_HILOGD(RESMGR_JS_TAG, "GetEnumParamOfConfig property %{public}s not set", property.c_str());
             continue;
         }
         if (ResourceManagerNapiUtils::GetType(env, napi_val) != napi_number) {
-            HiLog::Error(LABEL, "GetEnumParamOfConfig type of property %{public}s is not number", property.c_str());
+            RESMGR_HILOGE(RESMGR_JS_TAG,
+                "GetEnumParamOfConfig type of property %{public}s is not number", property.c_str());
             return false;
         }
         int value;
         status = napi_get_value_int32(env, napi_val, &value);
         if (status != napi_ok) {
-            HiLog::Error(LABEL, "GetEnumParamOfConfig failed to get value of property %{public}s", property.c_str());
+            RESMGR_HILOGE(RESMGR_JS_TAG,
+                "GetEnumParamOfConfig failed to get value of property %{public}s", property.c_str());
             return false;
         }
 
-        HiLog::Debug(LABEL, "GetEnumParamOfConfig, %{public}s = %{public}d", property.c_str(), value);
+        RESMGR_HILOGD(RESMGR_JS_TAG, "GetEnumParamOfConfig, %{public}s = %{public}d", property.c_str(), value);
         if (property == "direction") {
             configPtr->SetDirection(static_cast<Direction>(value));
         } else if (property == "deviceType") {
@@ -633,38 +635,38 @@ bool ResourceManagerNapiUtils::GetLocaleOfConfig(
     napi_value locale;
     napi_status status = napi_get_named_property(env, object, "locale", &locale);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "GetLocaleOfConfig failed to get property locale");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "GetLocaleOfConfig failed to get property locale");
         return false;
     }
     if (locale == nullptr) {
-        HiLog::Debug(LABEL, "GetLocaleOfConfig property locale not set");
+        RESMGR_HILOGD(RESMGR_JS_TAG, "GetLocaleOfConfig property locale not set");
         return true;
     }
     if (ResourceManagerNapiUtils::GetType(env, locale) != napi_string) {
-        HiLog::Error(LABEL, "GetLocaleOfConfig type of property locale is not string");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "GetLocaleOfConfig type of property locale is not string");
         return false;
     }
 
     size_t len = 0;
     status = napi_get_value_string_utf8(env, locale, nullptr, 0, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "GetLocaleOfConfig failed to get locale len");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "GetLocaleOfConfig failed to get locale len");
         return false;
     }
     if (len == 0) {
-        HiLog::Debug(LABEL, "GetLocaleOfConfig locale not set or empty");
+        RESMGR_HILOGD(RESMGR_JS_TAG, "GetLocaleOfConfig locale not set or empty");
         return true;
     }
 
     std::vector<char> buf(len + 1);
     status = napi_get_value_string_utf8(env, locale, buf.data(), len + 1, &len);
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "GetLocaleOfConfig failed to get locale value");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "GetLocaleOfConfig failed to get locale value");
         return false;
     }
 
     if (configPtr->SetLocaleInfo(buf.data()) != SUCCESS) {
-        HiLog::Error(LABEL, "GetLocaleOfConfig failed to SetLocaleInfo");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "GetLocaleOfConfig failed to SetLocaleInfo");
         return false;
     }
 #endif
@@ -675,7 +677,7 @@ napi_value ResourceManagerNapiUtils::CreateJsColor(napi_env env, ResMgrDataConte
 {
     napi_value jsColorValue;
     if (napi_create_uint32(env, context.colorValue_, &jsColorValue) != napi_ok) {
-        HiLog::Error(LABEL, "Failed to get density");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get density");
         return nullptr;
     }
     return jsColorValue;
@@ -685,7 +687,7 @@ napi_value ResourceManagerNapiUtils::CreateJsSymbol(napi_env env, ResMgrDataCont
 {
     napi_value jsSymbolValue;
     if (napi_create_uint32(env, context.symbolValue_, &jsSymbolValue) != napi_ok) {
-        HiLog::Error(LABEL, "Failed to get symbol");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get symbol");
         return nullptr;
     }
     return jsSymbolValue;
@@ -699,12 +701,12 @@ RState ResourceManagerNapiUtils::GetDataType(napi_env env, napi_value value, uin
         return SUCCESS;
     }
     if (valuetype != napi_number) {
-        HiLog::Error(LABEL, "Invalid param, not number");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Invalid param, not number");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
 
     if (napi_get_value_uint32(env, value, &density) != napi_ok) {
-        HiLog::Error(LABEL, "Failed to get density");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get density");
         return NOT_FOUND;
     }
     return SUCCESS;
@@ -718,12 +720,12 @@ RState ResourceManagerNapiUtils::GetIncludeSystem(napi_env env, napi_value value
         return SUCCESS;
     }
     if (valuetype != napi_boolean) {
-        HiLog::Error(LABEL, "Invalid param, not boolean");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Invalid param, not boolean");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
 
     if (napi_get_value_bool(env, value, &includeSystem) != napi_ok) {
-        HiLog::Error(LABEL, "Failed to get includeSystem");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get includeSystem");
         return NOT_FOUND;
     }
     return SUCCESS;

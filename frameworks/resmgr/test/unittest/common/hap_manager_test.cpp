@@ -53,13 +53,13 @@ void HapManagerTest::TearDownTestCase()
 void HapManagerTest::SetUp()
 {
     // step 3: input testcase setup step
-    HILOG_DEBUG("HapManagerTest setup");
+    RESMGR_HILOGD(RESMGR_TAG, "HapManagerTest setup");
 }
 
 void HapManagerTest::TearDown()
 {
     // step 4: input testcase teardown step
-    HILOG_DEBUG("HapManagerTest teardown");
+    RESMGR_HILOGD(RESMGR_TAG, "HapManagerTest teardown");
 }
 
 /*

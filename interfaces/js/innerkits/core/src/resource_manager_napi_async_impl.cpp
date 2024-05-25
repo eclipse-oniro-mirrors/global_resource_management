@@ -69,7 +69,7 @@ napi_value ResourceManagerNapiAsyncImpl::GetResource(napi_env env, napi_callback
 {
     auto functionIndex = asyncFuncMatch.find(functionName);
     if (functionIndex == asyncFuncMatch.end()) {
-        HiLog::Info(LABEL, "Invalid functionName, %{public}s", functionName.c_str());
+        RESMGR_HILOGI(RESMGR_JS_TAG, "Invalid functionName, %{public}s", functionName.c_str());
         return nullptr;
     }
     return functionIndex->second(env, info);
@@ -108,12 +108,12 @@ void ResourceManagerNapiAsyncImpl::Complete(napi_env env, napi_status status, vo
     if (dataContext->deferred_) {
         if (dataContext->success_) {
             if (napi_resolve_deferred(env, dataContext->deferred_, result[1]) != napi_ok) {
-                HiLog::Error(LABEL, "napi_resolve_deferred failed");
+                RESMGR_HILOGE(RESMGR_JS_TAG, "napi_resolve_deferred failed");
             }
         } else {
             result[0] = GetCallbackErrorCode(env, dataContext->errCode_, dataContext->errMsg_.c_str());
             if (napi_reject_deferred(env, dataContext->deferred_, result[0]) != napi_ok) {
-                HiLog::Error(LABEL, "napi_reject_deferred failed");
+                RESMGR_HILOGE(RESMGR_JS_TAG, "napi_reject_deferred failed");
             }
         }
     } else {
@@ -121,18 +121,18 @@ void ResourceManagerNapiAsyncImpl::Complete(napi_env env, napi_status status, vo
             napi_value callback = nullptr;
             napi_status status = napi_get_reference_value(env, dataContext->callbackRef_, &callback);
             if (status != napi_ok) {
-                HiLog::Error(LABEL, "napi_get_reference_value failed status=%{public}d", status);
+                RESMGR_HILOGE(RESMGR_JS_TAG, "napi_get_reference_value failed status=%{public}d", status);
                 break;
             }
             napi_value userRet = nullptr;
             status = napi_call_function(env, nullptr, callback, sizeof(result) / sizeof(napi_value), result, &userRet);
             if (status != napi_ok) {
-                HiLog::Error(LABEL, "napi_call_function failed status=%{public}d", status);
+                RESMGR_HILOGE(RESMGR_JS_TAG, "napi_call_function failed status=%{public}d", status);
                 break;
             }
             status = napi_delete_reference(env, dataContext->callbackRef_);
             if (status != napi_ok) {
-                HiLog::Error(LABEL, "napi_call_function failed status=%{public}d", status);
+                RESMGR_HILOGE(RESMGR_JS_TAG, "napi_call_function failed status=%{public}d", status);
                 break;
             }
         } while (false);
@@ -154,11 +154,11 @@ napi_value ResourceManagerNapiAsyncImpl::GetResult(napi_env env, std::unique_ptr
     napi_create_string_utf8(env, name.c_str(), NAPI_AUTO_LENGTH, &resource);
     if (napi_create_async_work(env, nullptr, resource, execute, ResourceManagerNapiAsyncImpl::Complete,
         static_cast<void*>(dataContext.get()), &dataContext->work_) != napi_ok) {
-        HiLog::Error(LABEL, "Failed to create async work for %{public}s", name.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to create async work for %{public}s", name.c_str());
         return result;
     }
     if (napi_queue_async_work_with_qos(env, dataContext->work_, napi_qos_user_initiated) != napi_ok) {
-        HiLog::Error(LABEL, "Failed to queue async work for %{public}s", name.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to queue async work for %{public}s", name.c_str());
         return result;
     }
     dataContext.release();
@@ -247,7 +247,7 @@ napi_value ResourceManagerNapiAsyncImpl::ProcessResourceParamV9(napi_env env, na
             auto resourcePtr = std::make_shared<ResourceManager::Resource>();
             int32_t retCode = ResourceManagerNapiUtils::GetResourceObject(env, resourcePtr, argv[0]);
             if (retCode != SUCCESS) {
-                HiLog::Error(LABEL, "Failed to get native Resource object");
+                RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get native Resource object");
                 ResourceManagerNapiUtils::NapiThrow(env, retCode);
                 return nullptr;
             }
@@ -324,12 +324,12 @@ napi_value ResourceManagerNapiAsyncImpl::ProcessIdNameParam(napi_env env, napi_c
             std::shared_ptr<ResourceManager::Resource> resourcePtr = std::make_shared<ResourceManager::Resource>();
             int32_t retCode = ResourceManagerNapiUtils::GetResourceObject(env, resourcePtr, argv[0]);
             if (retCode != SUCCESS) {
-                HiLog::Error(LABEL, "Failed to get native Resource object");
+                RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get native Resource object");
                 return nullptr;
             }
             dataContext->resource_ = resourcePtr;
         } else if (i == 1 && valueType != napi_number) { // the second quantity param
-            HiLog::Error(LABEL, "Parameter type is not napi_number");
+            RESMGR_HILOGE(RESMGR_JS_TAG, "Parameter type is not napi_number");
             ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
             return nullptr;
         } else if (i == 1 && valueType == napi_number) {
@@ -354,7 +354,7 @@ napi_value ResourceManagerNapiAsyncImpl::ProcessNoParam(napi_env env, napi_callb
     std::shared_ptr<ResourceManagerAddon> *addonPtr = nullptr;
     napi_status status = napi_unwrap(env, thisVar, reinterpret_cast<void **>(&addonPtr));
     if (status != napi_ok) {
-        HiLog::Error(LABEL, "Failed to unwrap ProcessNoParam");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to unwrap ProcessNoParam");
         return nullptr;
     }
     dataContext->addon_ = *addonPtr;
@@ -375,7 +375,7 @@ auto getStringFunc = [](napi_env env, void* data) {
 
     bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext, resMgr, resId);
     if (!ret) {
-        HiLog::Error(LABEL, "Failed to GetHapResourceManager in getStringFunc");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to GetHapResourceManager in getStringFunc");
         return;
     }
     RState state = resMgr->GetStringById(resId, dataContext->value_);
@@ -434,7 +434,7 @@ auto getStringArrayFunc = [](napi_env env, void* data) {
     if (dataContext->resId_ != 0 || dataContext->resource_ != nullptr) {
         bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext, resMgr, resId);
         if (!ret) {
-            HiLog::Error(LABEL, "Failed to GetHapResourceManager in getStringArrayFunc");
+            RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to GetHapResourceManager in getStringArrayFunc");
             return;
         }
         state = resMgr->GetStringArrayById(resId, dataContext->arrayValue_);
@@ -486,7 +486,7 @@ auto getMediaFunc = [](napi_env env, void *data) {
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext, resMgr, resId);
     if (!ret) {
-        HiLog::Error(LABEL, "Failed to GetHapResourceManager in getMediaFunc");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to GetHapResourceManager in getMediaFunc");
         return;
     }
     RState state = resMgr->GetMediaDataById(resId, dataContext->len_, dataContext->mediaData,
@@ -528,7 +528,7 @@ auto getMediaBase64Func = [](napi_env env, void *data) {
         std::shared_ptr<ResourceManager> resMgr = nullptr;
         bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext, resMgr, resId);
         if (!ret) {
-            HiLog::Error(LABEL, "Failed to GetHapResourceManager in getMediaBase64Func");
+            RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to GetHapResourceManager in getMediaBase64Func");
             return;
         }
         state = resMgr->GetMediaBase64DataById(resId, dataContext->value_, dataContext->density_);
@@ -590,7 +590,7 @@ auto getPluralCapFunc = [](napi_env env, void *data) {
         std::shared_ptr<ResourceManager> resMgr = nullptr;
         bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext, resMgr, resId);
         if (!ret) {
-            HiLog::Error(LABEL, "Failed to GetHapResourceManager in getPluralCapFunc");
+            RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to GetHapResourceManager in getPluralCapFunc");
             return;
         }
         state = resMgr->GetPluralStringByIdFormat(dataContext->value_,
@@ -771,7 +771,7 @@ auto getColorFunc = [](napi_env env, void* data) {
     int32_t resId = 0;
 
     if (!ResourceManagerNapiUtils::GetHapResourceManager(dataContext, resMgr, resId)) {
-        HiLog::Error(LABEL, "Failed to GetHapResourceManager in getColorFunc");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to GetHapResourceManager in getColorFunc");
         return;
     }
     RState state = resMgr->GetColorById(resId, dataContext->colorValue_);
