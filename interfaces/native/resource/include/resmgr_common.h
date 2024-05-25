@@ -42,7 +42,7 @@ extern "C" {
  *
  * @since 12
  */
-typedef enum {
+typedef enum ResourceManager_ErrorCode {
     /** @error Success */
     SUCCESS = 0,
     /** @error Invalid input parameter */
