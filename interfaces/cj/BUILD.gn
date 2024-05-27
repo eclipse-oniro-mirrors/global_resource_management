@@ -24,6 +24,7 @@ ohos_shared_library("cj_resource_manager_ffi") {
     deps = [ "../../frameworks/resmgr:global_resmgr" ]
 
     external_deps = [
+      "ability_runtime:ability_connect_callback_stub",
       "ability_runtime:ability_manager",
       "ability_runtime:abilitykit_native",
       "ability_runtime:napi_base_context",
