@@ -20,7 +20,7 @@ ohos_shared_library("cj_resource_manager_ffi") {
     "../inner_api/include",
   ]
 
-  if (product_name != "ohos-sdk") {
+  if (!build_ohos_sdk) {
     deps = [ "../../frameworks/resmgr:global_resmgr" ]
 
     external_deps = [
@@ -47,6 +47,7 @@ ohos_shared_library("cj_resource_manager_ffi") {
     sources = [ "src/resource_manager_mock.cpp" ]
   }
 
+  innerapi_tags = [ "platformsdk" ]
   subsystem_name = "global"
   part_name = "resource_management"
 }
