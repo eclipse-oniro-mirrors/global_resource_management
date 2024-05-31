@@ -55,8 +55,9 @@ void ResConfigImplTest::TearDown()
 
 std::shared_ptr<ResConfigImpl> CreateResConfigImpl(const char *language, const char *script, const char *region)
 {
-    auto resConfigImpl = std::make_shared<ResConfigImpl>() ;
+    auto resConfigImpl = std::make_shared<ResConfigImpl>();
     resConfigImpl->SetLocaleInfo(language, script, region);
+    resConfigImpl->SetAppDarkRes(true);
     return resConfigImpl;
 }
 
@@ -574,6 +575,21 @@ HWTEST_F(ResConfigImplTest, ResConfigImplMatchTest036, TestSize.Level1)
     locale = GetLocale("en", nullptr, "CA");
     current->SetPreferredLocaleInfo(locale);
     EXPECT_TRUE(current->Match(other));
+};
+
+/*
+ * @tc.name: ResConfigImplMatchTest037
+ * @tc.desc: Test ResConfig Match
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResConfigImplTest, ResConfigImplMatchTest037, TestSize.Level1)
+{
+    auto other = CreateResConfigImpl("en", nullptr, nullptr);
+    auto current = CreateResConfigImpl("en", nullptr, nullptr);
+    current->SetColorMode(ColorMode::DARK);
+    current->SetAppDarkRes(false);
+    other->SetColorMode(ColorMode::DARK);
+    EXPECT_FALSE(current->Match(other));
 };
 
 /*

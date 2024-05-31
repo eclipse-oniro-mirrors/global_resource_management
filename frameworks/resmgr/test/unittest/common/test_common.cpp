@@ -86,6 +86,16 @@ Locale GetLocale(const char *language, const char *script, const char *region)
         .setRegion(region).setScript(script).build(errCode);
     return locale;
 }
+
+std::shared_ptr<ResConfigImpl> InitDefaultResConfig()
+{
+    std::shared_ptr<ResConfigImpl> resConfig = std::make_shared<ResConfigImpl>();
+    if (resConfig == nullptr) {
+        return nullptr;
+    }
+    resConfig->SetAppDarkRes(true);
+    return resConfig;
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

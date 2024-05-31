@@ -174,7 +174,7 @@ void ResourceManagerTestCommon::TestGetRawFilePathByName(const std::string &name
 
 void ResourceManagerTestCommon::TestGetProfileById(HapResource *tmp)
 {
-    tmp->Init();
+    tmp->Init(this->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/base/profile/test_profile.json");
 
@@ -189,7 +189,7 @@ void ResourceManagerTestCommon::TestGetProfileById(HapResource *tmp)
 
 void ResourceManagerTestCommon::TestGetProfileByName(HapResource *tmp)
 {
-    tmp->Init();
+    tmp->Init(this->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/base/profile/test_profile.json");
 
@@ -201,7 +201,7 @@ void ResourceManagerTestCommon::TestGetProfileByName(HapResource *tmp)
 
 void ResourceManagerTestCommon::TestGetMediaById(HapResource *tmp)
 {
-    tmp->Init();
+    tmp->Init(this->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/base/media/icon1.png");
 
@@ -215,7 +215,7 @@ void ResourceManagerTestCommon::TestGetMediaById(HapResource *tmp)
 
 void ResourceManagerTestCommon::TestGetMediaWithDensityById(HapResource *tmp)
 {
-    tmp->Init();
+    tmp->Init(this->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/sdpi/media/icon.png");
 
@@ -241,7 +241,7 @@ void ResourceManagerTestCommon::TestGetMediaWithDensityById(HapResource *tmp)
 
 void ResourceManagerTestCommon::TestGetMediaByName(HapResource *tmp)
 {
-    tmp->Init();
+    tmp->Init(this->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/base/media/icon1.png");
 
@@ -253,7 +253,7 @@ void ResourceManagerTestCommon::TestGetMediaByName(HapResource *tmp)
 
 void ResourceManagerTestCommon::TestGetMediaWithDensityByName(HapResource *tmp)
 {
-    tmp->Init();
+    tmp->Init(this->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/sdpi/media/icon.png");
 

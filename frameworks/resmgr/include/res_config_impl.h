@@ -141,9 +141,10 @@ public:
     /**
      * Copy other resConfig to this resConfig
      * @param other the other resConfig
+     * @param isRead the isAppDarkRes_ is read-only
      * @return true if copy other resConfig to this resConfig success, else false
      */
-    bool Copy(ResConfig &other);
+    bool Copy(ResConfig &other, bool isRead = false);
 
     /**
      * Complete the local script
@@ -175,6 +176,30 @@ public:
     ScreenDensity ConvertDensity(float density);
 
     virtual ~ResConfigImpl();
+
+    /**
+     * Set colorMode is setted by app
+     * @param isAppColorMode whether colorMode is setted by app
+     */
+    void SetAppColorMode(bool isAppColorMode);
+
+    /**
+     * Get whether colorMode is setted by app
+     * @return True if colorMode is setted by app
+     */
+    bool GetAppColorMode() const;
+
+    /**
+     * Set whether the app has dark resources
+     * @param isAppDarkRes whether the app has dark resources
+     */
+    void SetAppDarkRes(bool isAppDarkRes);
+
+    /**
+     * Get whether the app has dark resources
+     * @return True if the app has dark resources
+     */
+    bool GetAppDarkRes() const;
 
 private:
     bool IsMoreSpecificThan(const std::shared_ptr<ResConfigImpl> other, uint32_t density = 0) const;
@@ -227,6 +252,8 @@ private:
     Locale *localeInfo_;
 #endif
     bool isCompletedScript_;
+    bool isAppColorMode_;
+    bool isAppDarkRes_;
 };
 } // namespace Resource
 } // namespace Global

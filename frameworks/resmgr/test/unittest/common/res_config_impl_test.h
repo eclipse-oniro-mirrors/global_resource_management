@@ -55,6 +55,7 @@ int ResConfigImplMatchTest033(void);
 int ResConfigImplMatchTest034(void);
 int ResConfigImplMatchTest035(void);
 int ResConfigImplMatchTest036(void);
+int ResConfigImplMatchTest037(void);
 int ResConfigImplIsMoreSuitableTest001(void);
 int ResConfigImplIsMoreSuitableTest002(void);
 int ResConfigImplIsMoreSuitableTest003(void);
