@@ -42,7 +42,9 @@ bool ThemeConfig::Match(const std::shared_ptr<ThemeConfig> &themeConfig, const R
             return false;
         }
     }
-
+    if (colorMode == DARK && !resConfig.GetAppColorMode() && !resConfig.GetAppDarkRes()) {
+        return themeColorMode_ == COLOR_MODE_NOT_SET;
+    }
     if (colorMode != COLOR_MODE_NOT_SET && themeColorMode_ != COLOR_MODE_NOT_SET) {
         if (colorMode != themeColorMode_) {
             return false;

@@ -54,7 +54,9 @@ ResConfigImpl::ResConfigImpl()
     preferredLocaleInfo_(nullptr),
     localeInfo_(nullptr),
 #endif
-    isCompletedScript_(false)
+    isCompletedScript_(false),
+    isAppColorMode_(false),
+    isAppDarkRes_(false)
 {}
 
 #ifdef SUPPORT_GRAPHICS
@@ -360,7 +362,7 @@ bool ResConfigImpl::CopyLocaleAndPreferredLocale(ResConfig &other)
     return true;
 }
 
-bool ResConfigImpl::Copy(ResConfig &other)
+bool ResConfigImpl::Copy(ResConfig &other, bool isRead)
 {
     if (!this->CopyLocaleAndPreferredLocale(other)) {
         return false;
@@ -385,6 +387,12 @@ bool ResConfigImpl::Copy(ResConfig &other)
     }
     if (this->GetScreenDensity() != other.GetScreenDensity()) {
         this->SetScreenDensity(other.GetScreenDensity());
+    }
+    if (this->GetAppColorMode() != other.GetAppColorMode()) {
+        this->SetAppColorMode(other.GetAppColorMode());
+    }
+    if (isRead) {
+        this->SetAppDarkRes(other.GetAppDarkRes());
     }
     return true;
 }
@@ -461,6 +469,9 @@ bool ResConfigImpl::IsDeviceTypeMatch(DeviceType deviceType) const
 
 bool ResConfigImpl::IsColorModeMatch(ColorMode colorMode) const
 {
+    if (this->colorMode_ == DARK && !this->GetAppColorMode() && !this->GetAppDarkRes()) {
+        return colorMode == COLOR_MODE_NOT_SET;
+    }
     if (this->colorMode_ != COLOR_MODE_NOT_SET && colorMode != COLOR_MODE_NOT_SET) {
         if (this->colorMode_ != colorMode) {
             return false;
@@ -764,6 +775,26 @@ ResConfig *CreateDefaultResConfig()
         temp->SetColorMode(COLOR_MODE_NOT_SET);
     }
     return temp;
+}
+
+void ResConfigImpl::SetAppColorMode(bool isAppColorMode)
+{
+    this->isAppColorMode_ = isAppColorMode;
+}
+
+bool ResConfigImpl::GetAppColorMode() const
+{
+    return this->isAppColorMode_;
+}
+
+void ResConfigImpl::SetAppDarkRes(bool isAppDarkRes)
+{
+    this->isAppDarkRes_ = isAppDarkRes;
+}
+
+bool ResConfigImpl::GetAppDarkRes() const
+{
+    return this->isAppDarkRes_;
 }
 } // namespace Resource
 } // namespace Global

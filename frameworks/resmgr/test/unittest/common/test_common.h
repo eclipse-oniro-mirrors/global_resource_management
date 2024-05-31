@@ -47,6 +47,8 @@ void PrintVectorString(const std::vector<std::string> &value);
 ResConfig *CreateResConfig(const char *language, const char *script, const char *region);
 
 Locale GetLocale(const char *language, const char *script, const char *region);
+
+std::shared_ptr<ResConfigImpl> InitDefaultResConfig();
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

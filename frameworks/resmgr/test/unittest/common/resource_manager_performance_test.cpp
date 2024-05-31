@@ -113,6 +113,7 @@ void ResourceManagerPerformanceTest::TearDown(void)
 int ParseIndexCost(const std::string &pstr, char *buf, const size_t& bufLen)
 {
     long long total = 0;
+    auto defaultResConfig = InitDefaultResConfig();
     for (int k = 0; k < 1000; ++k) {
         auto t1 = std::chrono::high_resolution_clock::now();
         auto resDesc = std::make_shared<ResDesc>();
@@ -136,7 +137,7 @@ int ParseIndexCost(const std::string &pstr, char *buf, const size_t& bufLen)
             free(buf);
             return -1;
         }
-        if (!pResource->Init()) {
+        if (!pResource->Init(defaultResConfig)) {
             free(buf);
             return -1;
         }
