@@ -43,7 +43,7 @@ public:
 
     int32_t GetRawFileContent(const std::string &name, size_t &len, std::unique_ptr<uint8_t[]> &outValue) override;
 
-    int32_t GetRawFileList(const std::string rawDirPath, std::vector<std::string>& rawfileList) override;
+    int32_t GetRawFileList(const std::string &rawDirPath, std::vector<std::string>& rawfileList) override;
 
     int32_t GetPluralStringValue(uint32_t resId, int64_t num, std::string &outValue) override;
 
@@ -121,7 +121,8 @@ public:
     {
         return GetClassType();
     }
-    explicit DrawableDescriptorImpl(OHOS::Ace::Napi::DrawableDescriptor* drawableDescriptor);
+    explicit DrawableDescriptorImpl(OHOS::Ace::Napi::DrawableDescriptor* drawableDescriptor)
+        :drawableDescriptor_(std::shared_ptr<OHOS::Ace::Napi::DrawableDescriptor>(drawableDescriptor)){};
 private:
     friend class OHOS::FFI::RuntimeType;
     friend class OHOS::FFI::TypeBase;

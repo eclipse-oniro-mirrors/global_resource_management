@@ -35,7 +35,7 @@ public:
     virtual int32_t GetRawFd(const std::string &rawFileName,
         Global::Resource::ResourceManager::RawFileDescriptor &descriptor) = 0;
     virtual int32_t GetRawFileContent(const std::string &name, size_t &len, std::unique_ptr<uint8_t[]> &outValue) = 0;
-    virtual int32_t GetRawFileList(const std::string rawDirPath, std::vector<std::string>& rawfileList) = 0;
+    virtual int32_t GetRawFileList(const std::string &rawDirPath, std::vector<std::string>& rawfileList) = 0;
     virtual int32_t GetColorByName(const char *name, uint32_t &outValue) = 0;
     virtual int32_t GetColorById(uint32_t id, uint32_t &outValue) = 0;
     virtual int32_t GetBooleanById(uint32_t id, bool &outValue) = 0;
