@@ -35,7 +35,7 @@
 
 #include "resmgr_common.h"
 #include "raw_file_manager.h"
-#include "interfaces/native/node/native_drawable_descriptor.h"
+#include "native/node/native_drawable_descriptor.h"
 
 #ifdef __cplusplus
 extern "C" {

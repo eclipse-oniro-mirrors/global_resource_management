@@ -16,8 +16,8 @@
 #include "resource_manager_napi_sync_impl.h"
 
 #include <unordered_map>
-#include "drawable_descriptor.h"
-#include "js_drawable_descriptor.h"
+#include "drawable_descriptor/drawable_descriptor.h"
+#include "drawable_descriptor/js_drawable_descriptor.h"
 #include "resource_manager_napi_utils.h"
 #include "resource_manager_addon.h"
 namespace OHOS {
