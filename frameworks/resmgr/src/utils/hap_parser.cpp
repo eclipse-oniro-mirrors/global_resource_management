@@ -422,16 +422,14 @@ int32_t ParseStringArray(const char *buffer, uint32_t &offset, std::vector<std::
     // next arrLen bytes are several strings. then after, is one '\0'
     uint32_t startOffset = offset;
     std::string value;
-    int32_t ret;
-    uint32_t readSize;
     while (true) {
-        ret = ParseString(buffer, offset, value, false);
+        int32_t ret = ParseString(buffer, offset, value, false);
         if (ret != OK) {
             return ret;
         }
         values.push_back(value);
 
-        readSize = offset - startOffset;
+        uint32_t readSize = offset - startOffset;
         if (readSize + 1 == arrLen) {
             offset += 1; // after arrLen, got '\0'
             break;
