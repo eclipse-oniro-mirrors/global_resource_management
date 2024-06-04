@@ -273,7 +273,6 @@ ohos_shared_library("librawfile") {
     integer_overflow = true
     ubsan = true
   }
-  innerapi_tags = [ "platformsdk" ]
   subsystem_name = "global"
   part_name = "resource_management"
 }
