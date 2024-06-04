@@ -20,7 +20,7 @@
 #include "resource_manager.h"
 #include "ffi_remote_data.h"
 #include "resource_manager_interface.h"
-#include "drawable_descriptor.h"
+#include "drawable_descriptor/drawable_descriptor.h"
 #include "uv.h"
 
 #include <cstdint>

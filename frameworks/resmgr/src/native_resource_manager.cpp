@@ -16,7 +16,7 @@
 #include "ohresmgr.h"
 
 #include <securec.h>
-#include "drawable_descriptor.h"
+#include "drawable_descriptor/drawable_descriptor.h"
 #include "hilog_wrapper.h"
 #include "resource_manager_impl.h"
 #include "rstate.h"
