@@ -665,6 +665,24 @@ public:
     virtual RState GetDynamicIcon(const std::string &resName, std::pair<std::unique_ptr<uint8_t[]>, size_t> &iconInfo,
         uint32_t density = 0);
 
+    /**
+     * Get string format by resource id
+     * @param id the resource id
+     * @param outValue the resource write to
+     * @param args the variable argument list
+     * @return SUCCESS if resource exists and was formatted successfully, else ERROR
+     */
+    virtual RState GetStringFormatById(std::string &outValue, uint32_t id, va_list args);
+
+    /**
+     * Get string format by resource name
+     * @param name the resource name
+     * @param outValue the resource write to
+     * @param args the variable argument list
+     * @return SUCCESS if resource exists and was formatted successfully, else ERROR
+     */
+    virtual RState GetStringFormatByName(std::string &outValue, const char *name, va_list args);
+
 private:
     RState GetString(const std::shared_ptr<IdItem> idItem, std::string &outValue);
 
