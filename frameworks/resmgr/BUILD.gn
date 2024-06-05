@@ -253,7 +253,6 @@ ohos_shared_library("librawfile") {
     external_deps += [ "icu:shared_icuuc" ]
   }
 
-  innerapi_tags = [ "platformsdk" ]
   subsystem_name = "global"
   part_name = "resource_management"
 }
