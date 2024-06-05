@@ -41,6 +41,7 @@ ohos_shared_library("resmgr_napi_core") {
   external_deps = [
     "ability_base:configuration",
     "ace_engine:drawable_descriptor",
+    "bounds_checking_function:libsec_shared",
     "bundle_framework:appexecfwk_base",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
