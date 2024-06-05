@@ -48,7 +48,7 @@ static void NapiThrow(napi_env env, int32_t errCode)
     napi_value message = nullptr;
     std::string errMsg = "Invalid input parameter";
     napi_create_string_latin1(env, errMsg.c_str(), NAPI_AUTO_LENGTH, &message);
-    if (errMsg != "") {
+    if (message != nullptr) {
         napi_value error = nullptr;
         napi_create_error(env, code, message, &error);
         napi_throw(env, error);
