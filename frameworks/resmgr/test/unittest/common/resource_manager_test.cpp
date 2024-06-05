@@ -283,6 +283,35 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest005, TestSize.Le
 }
 
 /*
+ * @tc.name: ResourceManagerUpdateResConfigTest006
+ * @tc.desc: Test UpdateResConfig function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest006, TestSize.Level1)
+{
+    // make a fake locale, then getString
+    rmc->AddResource("en", nullptr, "US");
+    ResConfig *rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetLocaleInfo("en", nullptr, "XA");
+    RState state = rm->UpdateResConfig(*rc);
+    delete rc;
+    EXPECT_EQ(SUCCESS, state);
+
+    int id = rmc->GetResId("app_name", ResType::STRING);
+    std::string outValue;
+    rm->GetStringById(id, outValue);
+    EXPECT_TRUE(outValue != "App Name");
+    
+    rc->SetLocaleInfo("ar", nullptr, "XB");
+    rm->GetStringById(id, outValue);
+    EXPECT_TRUE(outValue != "App Name");
+}
+
+/*
  * @tc.name: ResourceManagerGetResConfigTest001
  * @tc.desc: Test GetResConfig function
  * @tc.type: FUNC
@@ -1854,5 +1883,179 @@ HWTEST_F(ResourceManagerTest, ResourceManagerCreateDefaultResConfigTest001, Test
     }
     EXPECT_EQ(rc->GetColorMode(), COLOR_MODE_NOT_SET);
     delete(rc);
+}
+
+/*
+ * @tc.name: ResourceManagerGetOverrideResourceManager001
+ * @tc.desc: Test GetOverrideResourceManager function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetOverrideResourceManager001, TestSize.Level1)
+{
+    std::shared_ptr<ResConfigImpl> rc = std::make_shared<ResConfigImpl>();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    std::shared_ptr<ResourceManager> manager = rm->GetOverrideResourceManager(rc);
+    EXPECT_TRUE(manager != nullptr);
+}
+
+/*
+ * @tc.name: ResourceManagerGetOverrideResourceManager002
+ * @tc.desc: Test GetOverrideResourceManager function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetOverrideResourceManager002, TestSize.Level1)
+{
+    std::shared_ptr<ResConfigImpl> rc = std::make_shared<ResConfigImpl>();
+    rc->SetLocaleInfo("zh-CN");
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetDirection(DIRECTION_HORIZONTAL);
+    rc->SetColorMode(DARK);
+    rc->SetInputDevice(INPUTDEVICE_POINTINGDEVICE);
+    rc->SetMcc(460);
+    rc->SetMnc(1);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI);
+    std::shared_ptr<ResourceManager> manager = rm->GetOverrideResourceManager(rc);
+    EXPECT_TRUE(manager != nullptr);
+    bool addRet = manager->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(addRet);
+
+    // test override resource manager
+    ResourceManagerTestCommon *overrideRmc = new ResourceManagerTestCommon(manager);
+    std::map<std::string, std::string> outValue;
+    RState state;
+    state = manager->GetPatternByName("child", outValue);
+    EXPECT_EQ(state, SUCCESS);
+
+    int id = overrideRmc->GetResId("child", ResType::PATTERN);
+    state = manager->GetPatternById(id, outValue);
+    EXPECT_EQ(state, SUCCESS);
+    ASSERT_EQ(static_cast<size_t>(4), outValue.size());
+
+    // not found case
+    state = manager->GetPatternByName(g_nonExistName, outValue);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_NOT_FOUND, state);
+
+    delete overrideRmc;
+}
+
+/*
+ * @tc.name: ResourceManagerGetOverrideResConfig001
+ * @tc.desc: Test GetOverrideResConfig function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetOverrideResConfig001, TestSize.Level1)
+{
+    std::unique_ptr<ResConfig> config(CreateResConfig());
+    rm->GetOverrideResConfig(*config);
+    EXPECT_EQ(config->GetScreenDensity(), 0);
+    config->SetScreenDensity(SCREEN_DENSITY_XXLDPI);
+    RState state = rm->UpdateOverrideResConfig(*config);
+    EXPECT_TRUE(state == SUCCESS);
+}
+
+/*
+ * @tc.name: ResourceManagerIsLoadHap001
+ * @tc.desc: Test IsLoadHap function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerIsLoadHap001, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    std::string fullPath = FormatFullPath(g_hapPath);
+    RState state = rm->IsLoadHap(fullPath);
+    EXPECT_TRUE(state == SUCCESS);
+}
+
+/*
+ * @tc.name: ResourceManagerIsLoadHap002
+ * @tc.desc: Test IsLoadHap function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerIsLoadHap002, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath("no_exist.hap").c_str());
+    ASSERT_FALSE(ret);
+    std::string fullPath = FormatFullPath(g_hapPath);
+    RState state = rm->IsLoadHap(fullPath);
+    EXPECT_TRUE(state != SUCCESS);
+}
+
+/*
+ * @tc.name: ResourceManagerIsRawDirFromHap001
+ * @tc.desc: Test IsRawDirFromHap function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerIsRawDirFromHap001, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    RState state = rm->IsRawDirFromHap("test_rawfile.txt", ret);
+    EXPECT_TRUE(state == SUCCESS);
+}
+
+/*
+ * @tc.name: ResourceManagerIsRawDirFromHap002
+ * @tc.desc: Test IsRawDirFromHap function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerIsRawDirFromHap002, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    RState state = rm->IsRawDirFromHap("no_test_rawfile.txt", ret);
+    EXPECT_TRUE(state != SUCCESS);
+}
+
+/*
+ * @tc.name: ResourceManagerGetRawFileList001
+ * @tc.desc: Test GetRawFile function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetRawFileList001, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    std::vector<std::string> rawfileList;
+    RState state = rm->GetRawFileList("", rawfileList);
+    EXPECT_TRUE(state == SUCCESS);
+}
+
+/*
+ * @tc.name: ResourceManagerGetRawFileList002
+ * @tc.desc: Test GetRawFile function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetRawFileList002, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    std::vector<std::string> rawfileList;
+    RState state = rm->GetRawFileList("no_exist_dir", rawfileList);
+    EXPECT_EQ(state, ERROR_CODE_RES_PATH_INVALID);
+}
+
+/*
+ * @tc.name: CreateResourceManagerTest001
+ * @tc.desc: Test CreateResourceManager function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, CreateResourceManagerTest001, TestSize.Level1)
+{
+    ResConfigImpl *rc = new ResConfigImpl;
+    std::string hapPath;
+    std::vector<std::string> overlayPath;
+    int32_t appType = 1;
+    int32_t userId = 100; // userId is 100
+    std::shared_ptr<ResourceManager> bundleRm =
+        CreateResourceManager("ohos.global.test.all", "entry", hapPath, overlayPath, *rc, appType, userId);
+    EXPECT_TRUE(bundleRm == nullptr);
+
+    bundleRm = CreateResourceManager("", "entry", hapPath, overlayPath, *rc, appType, userId);
+    EXPECT_TRUE(bundleRm == nullptr);
+    delete rc;
 }
 }
