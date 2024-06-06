@@ -1529,6 +1529,10 @@ RState ResourceManagerImpl::GetThemeIconInfo(const std::string &iconName, size_t
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     outValue = Utils::LoadResourceFile(result, len);
+    if (outValue == nullptr) {
+        HILOG_DEBUG("LoadResourceFile FAILED");
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
     return SUCCESS;
 }
 
