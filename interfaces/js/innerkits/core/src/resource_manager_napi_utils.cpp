@@ -16,7 +16,6 @@
 #include "resource_manager_napi_utils.h"
 
 #include "hilog/log_cpp.h"
-#include "securec.h"
 namespace OHOS {
 namespace Global {
 namespace Resource {
@@ -185,13 +184,13 @@ napi_value ResourceManagerNapiUtils::CreateJsArray(napi_env env, ResMgrDataConte
 napi_value ResourceManagerNapiUtils::CreateJsUint8Array(napi_env env, ResMgrDataContext &context)
 {
     napi_value buffer;
-    uint8_t *data;
-    napi_status status = napi_create_arraybuffer(env, context.len_, reinterpret_cast<void **>(&data), &buffer);
-    uint8_t *temp = context.mediaData.release();
-    int ret = memcpy_s(data, context.len_, temp, context.len_);
-    delete[] temp;
-    if (status != napi_ok || ret != 0) {
-        context.SetErrorMsg("Failed to create media array buffer");
+    napi_status status = napi_create_external_arraybuffer(env, context.mediaData.get(), context.len_,
+        [](napi_env env, void *data, void *hint) {
+            HiLog::Debug(LABEL, "Media buffer finalized");
+            delete[] static_cast<char*>(data);
+        }, nullptr, &buffer);
+    if (status != napi_ok) {
+        context.SetErrorMsg("Failed to create media external array buffer");
         return nullptr;
     }
 
@@ -201,6 +200,7 @@ napi_value ResourceManagerNapiUtils::CreateJsUint8Array(napi_env env, ResMgrData
         context.SetErrorMsg("Failed to create media typed array");
         return nullptr;
     }
+    context.mediaData.release();
     return result;
 }
 
