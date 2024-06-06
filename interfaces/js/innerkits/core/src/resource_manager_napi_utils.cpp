@@ -186,7 +186,7 @@ napi_value ResourceManagerNapiUtils::CreateJsUint8Array(napi_env env, ResMgrData
     napi_value buffer;
     napi_status status = napi_create_external_arraybuffer(env, context.mediaData.get(), context.len_,
         [](napi_env env, void *data, void *hint) {
-            HiLog::Debug(LABEL, "Media buffer finalized");
+            RESMGR_HILOGD(RESMGR_JS_TAG, "Media buffer finalized");
             delete[] static_cast<char*>(data);
         }, nullptr, &buffer);
     if (status != napi_ok) {
