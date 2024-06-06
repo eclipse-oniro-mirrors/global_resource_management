@@ -570,7 +570,8 @@ int32_t ParseKey(const char *buffer, uint32_t &offset, std::shared_ptr<ResKey> k
         key->keyParams_.push_back(kp);
     }
     key->resConfig_ = HapParser::CreateResConfigFromKeyParams(key->keyParams_);
-    if (match == false || (selectedTypes != SELECT_ALL && defaultConfig && !defaultConfig->Match(key->resConfig_))) {
+    if (match == false
+        || (selectedTypes != SELECT_ALL && defaultConfig && !defaultConfig->Match(key->resConfig_, false))) {
         match = false;
         return OK;
     }

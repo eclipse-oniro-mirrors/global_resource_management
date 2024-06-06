@@ -397,7 +397,7 @@ bool ResConfigImpl::Copy(ResConfig &other, bool isRead)
     return true;
 }
 
-bool ResConfigImpl::Match(const std::shared_ptr<ResConfigImpl> other) const
+bool ResConfigImpl::Match(const std::shared_ptr<ResConfigImpl> other, bool isCheckDarkAdaptation) const
 {
     if (other == nullptr) {
         return false;
@@ -422,7 +422,7 @@ bool ResConfigImpl::Match(const std::shared_ptr<ResConfigImpl> other) const
     if (!IsDeviceTypeMatch(other->deviceType_)) {
         return false;
     }
-    if (!IsColorModeMatch(other->colorMode_)) {
+    if (!IsColorModeMatch(other->colorMode_, isCheckDarkAdaptation)) {
         return false;
     }
     if (!IsInputDeviceMatch(other->inputDevice_)) {
@@ -467,9 +467,9 @@ bool ResConfigImpl::IsDeviceTypeMatch(DeviceType deviceType) const
     return true;
 }
 
-bool ResConfigImpl::IsColorModeMatch(ColorMode colorMode) const
+bool ResConfigImpl::IsColorModeMatch(ColorMode colorMode, bool isCheckDarkAdaptation) const
 {
-    if (this->colorMode_ == DARK && !this->GetAppColorMode() && !this->GetAppDarkRes()) {
+    if (isCheckDarkAdaptation && this->colorMode_ == DARK && !this->GetAppColorMode() && !this->GetAppDarkRes()) {
         return colorMode == COLOR_MODE_NOT_SET;
     }
     if (this->colorMode_ != COLOR_MODE_NOT_SET && colorMode != COLOR_MODE_NOT_SET) {
