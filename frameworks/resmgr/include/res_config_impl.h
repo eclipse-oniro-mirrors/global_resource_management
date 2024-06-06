@@ -134,9 +134,10 @@ public:
     /**
      * Whether this resConfig match other resConfig
      * @param other the other resConfig
+     * @param isCheckDarkAdaptation whether check the color mode match the dark mode
      * @return true if this resConfig match other resConfig, else false
      */
-    bool Match(const std::shared_ptr<ResConfigImpl> other) const;
+    bool Match(const std::shared_ptr<ResConfigImpl> other, bool isCheckDarkAdaptation = true) const;
 
     /**
      * Copy other resConfig to this resConfig
@@ -156,13 +157,13 @@ public:
      * @return true if resLocal script completed, else false
      */
     bool IsCompletedScript() const;
-	
+
     /**
      * Set resConfig input device
      * @param inputDevice the resConfig input device
      */
     void SetInputDevice(InputDevice inputDevice);
-	
+
     /**
      * Get resConfig input device
      * @return the resConfig input device
@@ -219,7 +220,7 @@ private:
 
     bool IsDeviceTypeMatch(DeviceType deviceType) const;
 
-    bool IsColorModeMatch(ColorMode colorMode) const;
+    bool IsColorModeMatch(ColorMode colorMode, bool isCheckDarkAdaptation) const;
 
     bool IsInputDeviceMatch(InputDevice inputDevice) const;
 
