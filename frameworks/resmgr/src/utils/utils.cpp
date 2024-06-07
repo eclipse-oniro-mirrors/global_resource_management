@@ -101,7 +101,7 @@ RState Utils::EncodeBase64(std::unique_ptr<uint8_t[]> &data, int srcLen,
     base64data += "data:image/" + imgType + ";base64,";
     int i = 0;
     // encode in groups of every 3 bytes
-    for (; i < srcLen - 3; i += 3) {
+    for (; i <= srcLen - 3; i += 3) {
         unsigned char byte1 = static_cast<unsigned char>(srcData[i]);
         unsigned char byte2 = static_cast<unsigned char>(srcData[i + 1]);
         unsigned char byte3 = static_cast<unsigned char>(srcData[i + 2]);
@@ -110,6 +110,12 @@ RState Utils::EncodeBase64(std::unique_ptr<uint8_t[]> &data, int srcLen,
         base64data += g_codes[((byte2 & 0xF) << BitOperatorNum::BIT_TWO) | (byte3 >> BitOperatorNum::BIT_SIX)];
         base64data += g_codes[byte3 & 0x3F];
     }
+
+    if (i >= srcLen) {
+        dstData = base64data;
+        return SUCCESS;
+    }
+ 
     // Handle the case where there is one element left
     if (srcLen % ArrayLen::LEN_THREE == 1) {
         unsigned char byte1 = static_cast<unsigned char>(srcData[i]);
@@ -117,7 +123,7 @@ RState Utils::EncodeBase64(std::unique_ptr<uint8_t[]> &data, int srcLen,
         base64data += g_codes[(byte1 & 0x3) << BitOperatorNum::BIT_FOUR];
         base64data += '=';
         base64data += '=';
-    } else {
+    } else if (srcLen % ArrayLen::LEN_THREE == ArrayIndex::INDEX_TWO) {
         unsigned char byte1 = static_cast<unsigned char>(srcData[i]);
         unsigned char byte2 = static_cast<unsigned char>(srcData[i + 1]);
         base64data += g_codes[byte1 >> BitOperatorNum::BIT_TWO];
