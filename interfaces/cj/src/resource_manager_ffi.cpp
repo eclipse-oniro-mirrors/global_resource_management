@@ -164,7 +164,7 @@ RetDataCString CJ_GetPluralStringValueByResource(int64_t id, CResource resource,
         return ret;
     }
     OHOS::Global::Resource::ResourceManager::Resource res = { .bundleName = std::string(resource.bundleName),
-        .moduleName = std::string(resource.moduleName), id = resource.id };
+        .moduleName = std::string(resource.moduleName), .id = resource.id };
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     int32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {
@@ -173,7 +173,7 @@ RetDataCString CJ_GetPluralStringValueByResource(int64_t id, CResource resource,
         return ret;
     }
     std::string value;
-    ret.code = resMgr->GetPluralStringByIdFormat(value, resId, num);
+    ret.code = resMgr->GetPluralStringByIdFormat(value, resId, num, num);
     if (ret.code != RState::SUCCESS) {
         LOGE("ResourceManagerImpl::GetPluralStringByIdFormat failed %{public}" PRIu32, ret.code);
         return ret;
@@ -227,7 +227,7 @@ RetDataCArrString CJ_GetStringArrayValueByResource(int64_t id, CResource resourc
         return ret;
     }
     OHOS::Global::Resource::ResourceManager::Resource res = { .bundleName = std::string(resource.bundleName),
-        .moduleName = std::string(resource.moduleName), id = resource.id };
+        .moduleName = std::string(resource.moduleName), .id = resource.id };
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     int32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {
@@ -292,7 +292,7 @@ RetDataCString CJ_GetStringByResource(int64_t id, CResource resource)
         return ret;
     }
     OHOS::Global::Resource::ResourceManager::Resource res = { .bundleName = std::string(resource.bundleName),
-        .moduleName = std::string(resource.moduleName), id = resource.id };
+        .moduleName = std::string(resource.moduleName), .id = resource.id };
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     int32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {
@@ -359,7 +359,7 @@ int32_t CJ_GetColorByResource(int64_t id, CResource resource, uint32_t &data)
         return ERR_INVALID_INSTANCE_CODE;
     }
     OHOS::Global::Resource::ResourceManager::Resource res = { .bundleName = std::string(resource.bundleName),
-        .moduleName = std::string(resource.moduleName), id = resource.id };
+        .moduleName = std::string(resource.moduleName), .id = resource.id };
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     int32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {
@@ -389,7 +389,7 @@ int32_t CJ_GetBooleanByResource(int64_t id, CResource resource, bool &data)
         return ERR_INVALID_INSTANCE_CODE;
     }
     OHOS::Global::Resource::ResourceManager::Resource res = { .bundleName = std::string(resource.bundleName),
-        .moduleName = std::string(resource.moduleName), id = resource.id };
+        .moduleName = std::string(resource.moduleName), .id = resource.id };
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     int32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {
@@ -436,7 +436,7 @@ int32_t CJ_GetNumberByResource(int64_t id, CResource resource, RetGetNumber &dat
         return ERR_INVALID_INSTANCE_CODE;
     }
     OHOS::Global::Resource::ResourceManager::Resource res = { .bundleName = std::string(resource.bundleName),
-        .moduleName = std::string(resource.moduleName), id = resource.id };
+        .moduleName = std::string(resource.moduleName), .id = resource.id };
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     int32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {
@@ -541,7 +541,7 @@ RetDataCArrUI8 CJ_GetMediaContentByResource(int64_t id, CResource resource, uint
         return ret;
     }
     OHOS::Global::Resource::ResourceManager::Resource res = { .bundleName = std::string(resource.bundleName),
-        .moduleName = std::string(resource.moduleName), id = resource.id };
+        .moduleName = std::string(resource.moduleName), .id = resource.id };
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     int32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {
@@ -587,7 +587,7 @@ RetDataCString CJ_GetMediaContentBase64ByResource(int64_t id, CResource resource
         return ret;
     }
     OHOS::Global::Resource::ResourceManager::Resource res = { .bundleName = std::string(resource.bundleName),
-        .moduleName = std::string(resource.moduleName), id = resource.id };
+        .moduleName = std::string(resource.moduleName), .id = resource.id };
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     int32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {
@@ -648,7 +648,7 @@ RetDataI64 CJ_GetDrawableDescriptorByResource(int64_t id, CResource resource, ui
         return ret;
     }
     OHOS::Global::Resource::ResourceManager::Resource res = { .bundleName = std::string(resource.bundleName),
-        .moduleName = std::string(resource.moduleName), id = resource.id };
+        .moduleName = std::string(resource.moduleName), .id = resource.id };
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     int32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {

@@ -78,7 +78,7 @@ int32_t ResourceManagerImpl::GetRawFileContent(const std::string &name, size_t &
     return state;
 }
 
-int32_t ResourceManagerImpl::GetRawFileList(const std::string rawDirPath, std::vector<std::string>& rawfileList)
+int32_t ResourceManagerImpl::GetRawFileList(const std::string &rawDirPath, std::vector<std::string>& rawfileList)
 {
     RState state = resMgr_->GetRawFileList(rawDirPath, rawfileList);
     if (state != RState::SUCCESS) {
@@ -114,7 +114,7 @@ int32_t ResourceManagerImpl::GetColorById(uint32_t id, uint32_t &outValue)
 
 int32_t ResourceManagerImpl::GetPluralStringValue(uint32_t resId, int64_t num, std::string &outValue)
 {
-    RState state = resMgr_->GetPluralStringByIdFormat(outValue, resId, num);
+    RState state = resMgr_->GetPluralStringByIdFormat(outValue, resId, num, num);
     if (state != RState::SUCCESS) {
         LOGE("ResourceManagerImpl::GetPluralStringByIdFormat failed %{public}" PRIu32, state);
     } else {
@@ -169,7 +169,7 @@ int32_t ResourceManagerImpl::GetStringByName(const char *name, std::string &outV
 
 int32_t ResourceManagerImpl::GetPluralStringValue(const char *name, int64_t num, std::string &outValue)
 {
-    RState state = resMgr_->GetPluralStringByName(name, num, outValue);
+    RState state = resMgr_->GetPluralStringByNameFormat(outValue, name, num, num);
     if (state != RState::SUCCESS) {
         LOGE("ResourceManagerImpl::GetPluralStringByName failed %{public}" PRIu32, state);
     } else {
@@ -415,11 +415,6 @@ std::string ResourceManagerImpl::GetLocale(std::unique_ptr<Global::Resource::Res
         }
     #endif
     return result;
-}
-
-DrawableDescriptorImpl::DrawableDescriptorImpl(OHOS::Ace::Napi::DrawableDescriptor* drawableDescriptor)
-{
-    drawableDescriptor_ = std::shared_ptr<OHOS::Ace::Napi::DrawableDescriptor>(drawableDescriptor);
 }
 
 OHOS::Ace::Napi::DrawableDescriptor* GetDrawableDescriptorPtr(uint32_t id,
