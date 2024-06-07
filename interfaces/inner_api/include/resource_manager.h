@@ -226,6 +226,10 @@ public:
 
     virtual RState GetDynamicIcon(const std::string &resName, std::pair<std::unique_ptr<uint8_t[]>, size_t> &iconInfo,
         uint32_t density = 0) = 0;
+
+    virtual RState GetStringFormatById(std::string &outValue, uint32_t id, va_list args) = 0;
+
+    virtual RState GetStringFormatByName(std::string &outValue, const char *name, va_list args) = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();

@@ -645,3 +645,47 @@ ResourceManager_ErrorCode OH_ResourceManager_ReleaseStringArray(char ***resValue
     *resValue = nullptr;
     return ResourceManager_ErrorCode::SUCCESS;
 }
+
+ResourceManager_ErrorCode OH_ResourceManager_GetString(const NativeResourceManager *mgr, uint32_t resId,
+    char **resultValue, ...)
+{
+    if (mgr == nullptr || resultValue == nullptr) {
+        return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+    RState state = RState::SUCCESS;
+    string tempResultValue;
+
+    va_list args;
+    va_start(args, resultValue);
+    state = mgr->resManager->GetStringFormatById(tempResultValue, resId, args);
+    va_end(args);
+    ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
+    if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
+        RESMGR_HILOGE(RESMGR_NATIVE_TAG,
+            "failed get string id = %{public}d, errorCode = %{public}d", resId, errorCode);
+        return errorCode;
+    }
+    return copyString(resultValue, tempResultValue, "GetString");
+}
+
+ResourceManager_ErrorCode OH_ResourceManager_GetStringByName(const NativeResourceManager *mgr, const char *resName,
+    char **resultValue, ...)
+{
+    if (mgr == nullptr || resultValue == nullptr) {
+        return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+    RState state = RState::SUCCESS;
+    string tempResultValue;
+
+    va_list args;
+    va_start(args, resultValue);
+    state = mgr->resManager->GetStringFormatByName(tempResultValue, resName, args);
+    va_end(args);
+    ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
+    if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
+        RESMGR_HILOGE(RESMGR_NATIVE_TAG,
+            "failed get string name = %{public}s, errorCode = %{public}d", resName, errorCode);
+        return errorCode;
+    }
+    return copyString(resultValue, tempResultValue, "GetStringByName");
+}

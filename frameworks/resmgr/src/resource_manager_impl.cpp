@@ -146,6 +146,42 @@ RState ResourceManagerImpl::GetStringFormatByName(std::string &outValue, const c
     return SUCCESS;
 }
 
+RState ResourceManagerImpl::GetStringFormatById(std::string &outValue, uint32_t id, va_list args)
+{
+    RState state = GetStringById(id, outValue);
+    if (state != SUCCESS) {
+        return state;
+    }
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams;
+    if (parseArgs(outValue, args, jsParams)) {
+        ResConfigImpl resConfig;
+        GetResConfig(resConfig);
+        if (!ReplacePlaceholderWithParams(outValue, resConfig, jsParams)) {
+            return ERROR_CODE_RES_ID_FORMAT_ERROR;
+        }
+        return SUCCESS;
+    }
+    return ERROR_CODE_INVALID_INPUT_PARAMETER;
+}
+
+RState ResourceManagerImpl::GetStringFormatByName(std::string &outValue, const char *name, va_list args)
+{
+    RState state = GetStringByName(name, outValue);
+    if (state != SUCCESS) {
+        return state;
+    }
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams;
+    if (parseArgs(outValue, args, jsParams)) {
+        ResConfigImpl resConfig;
+        GetResConfig(resConfig);
+        if (!ReplacePlaceholderWithParams(outValue, resConfig, jsParams)) {
+            return ERROR_CODE_RES_NAME_FORMAT_ERROR;
+        }
+        return SUCCESS;
+    }
+    return ERROR_CODE_INVALID_INPUT_PARAMETER;
+}
+
 RState ResourceManagerImpl::GetString(const std::shared_ptr<IdItem> idItem, std::string &outValue)
 {
     // not found or type invalid

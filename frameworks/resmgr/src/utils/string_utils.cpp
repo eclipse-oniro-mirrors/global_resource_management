@@ -21,6 +21,7 @@
 #include <limits>
 #include <vector>
 #include <regex>
+#include <algorithm>
 #include "hilog_wrapper.h"
 
 #ifdef SUPPORT_GRAPHICS
@@ -69,6 +70,97 @@ std::string FormatString(const char *fmt, va_list args)
         }
     }
     return strResult;
+}
+
+bool getJsParams(const std::string &inputOutputValue, va_list args,
+    std::vector<std::pair<int, std::string>> paramsWithOutNum,
+    std::vector<std::pair<int, std::string>> paramsWithNum,
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
+{
+    std::sort(paramsWithNum.begin(), paramsWithNum.end(),
+        [](const std::pair<int, std::string>& a, const std::pair<int, std::string>& b) {
+            return a.first < b.first;
+        });
+    for (size_t i = 0; i < paramsWithOutNum.size(); i++) {
+        std::string type = paramsWithOutNum[i].second;
+        if (type == "d") {
+            int temp = va_arg(args, int);
+            jsParams.emplace_back(ResourceManager::NapiValueType::NAPI_NUMBER, std::to_string(temp));
+        } else if (type == "s") {
+            char *temp = va_arg(args, char*);
+            jsParams.emplace_back(ResourceManager::NapiValueType::NAPI_STRING, temp);
+        } else if (type == "f") {
+            float temp = va_arg(args, double);
+            jsParams.emplace_back(ResourceManager::NapiValueType::NAPI_NUMBER, std::to_string(temp));
+        }
+    }
+    for (size_t i = 0; i < paramsWithNum.size(); i++) {
+        int index = paramsWithNum[i].first;
+        std::string type = paramsWithNum[i].second;
+        if (index < paramsWithOutNum.size()) {
+            if (type != paramsWithOutNum[index].second) {
+                return false;
+            }
+        } else if (index == paramsWithOutNum.size()) {
+            paramsWithOutNum.push_back({index, type});
+            if (type == "d") {
+                int temp = va_arg(args, int);
+                jsParams.emplace_back(ResourceManager::NapiValueType::NAPI_NUMBER, std::to_string(temp));
+            } else if (type == "s") {
+                char *temp = va_arg(args, char*);
+                jsParams.emplace_back(ResourceManager::NapiValueType::NAPI_STRING, temp);
+            } else if (type == "f") {
+                float temp = va_arg(args, double);
+                jsParams.emplace_back(ResourceManager::NapiValueType::NAPI_NUMBER, std::to_string(temp));
+            }
+        } else {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool parseArgs(const std::string &inputOutputValue, va_list args,
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
+{
+    if (inputOutputValue.empty()) {
+        return true;
+    }
+    std::string::const_iterator start = inputOutputValue.begin();
+    std::string::const_iterator end = inputOutputValue.end();
+    std::smatch matches;
+    size_t matchCount = 0;
+    int prefixLength = 0;
+    int offset = 2;
+    std::vector<std::pair<int, std::string>> paramsWithOutNum;
+    std::vector<std::pair<int, std::string>> paramsWithNum;
+    while (std::regex_search(start, end, matches, PLACEHOLDER_MATCHING_RULES)) {
+        prefixLength = matches[0].first - inputOutputValue.begin();
+        if (matches[1].length() != 0) {
+            start = inputOutputValue.begin() + prefixLength + offset;
+            continue;
+        }
+        std::string placeholderIndex = matches[3];
+        std::string placeholderType = matches[4];
+        size_t paramIndex;
+        if (placeholderIndex.length() != 0) {
+            if (placeholderIndex.size() > SIZE_T_MAX_STR.size() ||
+                (placeholderIndex.size() == SIZE_T_MAX_STR.size() && placeholderIndex > SIZE_T_MAX_STR)) {
+                RESMGR_HILOGE(RESMGR_TAG, "index of placeholder is too large");
+                return false;
+            }
+            if (std::stoul(placeholderIndex) == 0) {
+                return false;
+            }
+            paramIndex = std::stoul(placeholderIndex) - 1;
+            paramsWithNum.push_back({paramIndex, placeholderType});
+        } else {
+            paramIndex = matchCount++;
+            paramsWithOutNum.push_back({paramIndex, placeholderType});
+        }
+        start = inputOutputValue.begin() + prefixLength + matches[0].length();
+    }
+    return getJsParams(inputOutputValue, args, paramsWithOutNum, paramsWithNum, jsParams);
 }
 
 bool LocalizeNumber(std::string &inputOutputNum, const ResConfigImpl &resConfig, bool isKeepPrecision = true)

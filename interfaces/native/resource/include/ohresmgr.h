@@ -54,7 +54,7 @@ extern "C" {
  * @param resultValue the result write to resultValue.
  * @param resultLen the media length write to resultLen.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid. Possible causes:
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid. Possible causes:
  *         1.Incorrect parameter types; 2.Parameter verification failed.
            {@link ERROR_CODE_RES_ID_NOT_FOUND} 9001001 - Invalid resource ID.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_ID} 9001002 - No matching resource is found based on the resource ID.
@@ -77,7 +77,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64(const NativeResource
  * @param resultValue the result write to resultValue.
  * @param resultLen the media length write to resultLen.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid. Possible causes:
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid. Possible causes:
  *         1.Incorrect parameter types; 2.Parameter verification failed.
            {@link ERROR_CODE_RES_NAME_NOT_FOUND} 9001003 - Invalid resource name.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_NAME} 9001004 - No matching resource is found based on the resource name.
@@ -100,7 +100,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64ByName(const NativeRe
  * @param resultValue the result write to resultValue.
  * @param resultLen the media length write to resultLen.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid. Possible causes:
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid. Possible causes:
  *         1.Incorrect parameter types; 2.Parameter verification failed.
            {@link ERROR_CODE_RES_ID_NOT_FOUND} 9001001 - Invalid resource ID.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_ID} 9001002 - No matching resource is found based on the resource ID.
@@ -123,7 +123,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMedia(const NativeResourceManage
  * @param resultValue the result write to resultValue.
  * @param resultLen the media length write to resultLen.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid. Possible causes:
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid. Possible causes:
  *         1.Incorrect parameter types; 2.Parameter verification failed.
            {@link ERROR_CODE_RES_NAME_NOT_FOUND} 9001003 - Invalid resource name.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_NAME} 9001004 - No matching resource is found based on the resource name.
@@ -146,7 +146,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaByName(const NativeResource
  * @param type The optional parameter means the media type, 0 means the normal media, 1 means the the theme style media.
  * @param drawableDescriptor the result write to drawableDescriptor.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid. Possible causes:
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid. Possible causes:
  *         1.Incorrect parameter types; 2.Parameter verification failed.
            {@link ERROR_CODE_RES_ID_NOT_FOUND} 9001001 - Invalid resource ID.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_ID} 9001002 - No matching resource is found based on the resource ID.
@@ -168,7 +168,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptor(const NativeR
  * 2 means the theme dynamic media.
  * @param drawableDescriptor the result write to drawableDescriptor.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid. Possible causes:
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid. Possible causes:
  *         1.Incorrect parameter types; 2.Parameter verification failed.
            {@link ERROR_CODE_RES_NAME_NOT_FOUND} 9001003 - Invalid resource name.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_NAME} 9001004 - No matching resource is found based on the resource name.
@@ -183,11 +183,11 @@ ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptorByName(const N
  * Obtains the symbol resource corresponding to the specified resource ID.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
- * {@link OH_ResourceManager_InitNativeResourceManager}.
+ *        {@link OH_ResourceManager_InitNativeResourceManager}.
  * @param resId Indicates the resource ID.
  * @param resultValue the result write to resultValue.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
            {@link ERROR_CODE_RES_ID_NOT_FOUND} 9001001 - Invalid resource ID.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_ID} 9001002 - No matching resource is found based on the resource ID.
@@ -203,11 +203,11 @@ ResourceManager_ErrorCode OH_ResourceManager_GetSymbol(const NativeResourceManag
  * Obtains the symbol resource corresponding to the specified resource name.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
- * {@link OH_ResourceManager_InitNativeResourceManager}.
+ *        {@link OH_ResourceManager_InitNativeResourceManager}.
  * @param resName Indicates the resource name.
  * @param resultValue the result write to resultValue.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
            {@link ERROR_CODE_RES_NAME_NOT_FOUND} 9001003 - Invalid resource name.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_NAME} 9001004 - No matching resource is found based on the resource name.
@@ -223,13 +223,13 @@ ResourceManager_ErrorCode OH_ResourceManager_GetSymbolByName(const NativeResourc
  * You need to call the OH_ResourceManager_ReleaseStringArray() method to release the memory of localinfo.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
- * {@link OH_ResourceManager_InitNativeResourceManager}.
+ *        {@link OH_ResourceManager_InitNativeResourceManager}.
  * @param resultValue the result write to resultValue.
  * @param resultLen the locales length write to resultLen.
  * @param includeSystem the parameter controls whether to include system resources,
  * the default value is false, it has no effect when only system resources query the locales list.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
  *         {@link ERROR_CODE_OUT_OF_MEMORY} 9001100 - Out of memory.
  * @since 12
@@ -244,10 +244,10 @@ ResourceManager_ErrorCode OH_ResourceManager_GetLocales(const NativeResourceMana
  * If you use malloc to create a ResourceManager_Configuration object, you also need to call free to release it.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
- * {@link OH_ResourceManager_InitNativeResourceManager}.
+ *        {@link OH_ResourceManager_InitNativeResourceManager}.
  * @param configuration the result write to ResourceManager_Configuration.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
            {@link ERROR_CODE_SYSTEM_RES_MANAGER_GET_FAILED} 9001009 - If failed to access the system resource.
            {@link ERROR_CODE_OUT_OF_MEMORY} 9001100 - Out of memory.
@@ -260,7 +260,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetConfiguration(const NativeResour
  * @brief Release the device configuration.
  * @param configuration the object need to release.
  * @return {@link SUCCESS} 0 - Success.
-           {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+           {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
  * @since 12
  */
@@ -270,15 +270,18 @@ ResourceManager_ErrorCode OH_ResourceManager_ReleaseConfiguration(ResourceManage
  * @brief Obtains the character string.
  *
  * Obtains the character string corresponding to a specified resource ID.
+ * Obtain normal resource by calling OH_ResourceManager_GetString(mgr, resId, resultValue),
+   obtain a formatted resource with replacements for %d, %s, %f,
+   call OH_ResourceManager_GetString(mgr, resId, resultValue, 10, "format", 10.10).
  * You need to call free() to release the memory for the string.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
- * {@link OH_ResourceManager_InitNativeResourceManager}.
+ *        {@link OH_ResourceManager_InitNativeResourceManager}.
  * @param resId Indicates the resource ID.
  * @param resultValue the result write to resultValue.
  * @param { const char* | int | float } args - Indicates the formatting string resource parameters.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
            {@link ERROR_CODE_RES_ID_NOT_FOUND} 9001001 - Invalid resource ID.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_ID} 9001002 - No matching resource is found based on the resource ID.
@@ -293,15 +296,18 @@ ResourceManager_ErrorCode OH_ResourceManager_GetString(const NativeResourceManag
  * @brief Obtains the character string.
  *
  * Obtains the character string corresponding to a specified resource name.
+ * Obtain normal resource by calling OH_ResourceManager_GetString(mgr, resName, resultValue),
+   obtain a formatted resource with replacements for %d, %s, %f,
+   call OH_ResourceManager_GetString(mgr, resName, resultValue, 10, "format", 10.10).
  * You need to call free() to release the memory for the string.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
- * {@link OH_ResourceManager_InitNativeResourceManager}.
+ *        {@link OH_ResourceManager_InitNativeResourceManager}.
  * @param resName Indicates the resource name.
  * @param resultValue the result write to resultValue.
  * @param { const char* | int | float } args - Indicates the formatting string resource parameters.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
            {@link ERROR_CODE_RES_NAME_NOT_FOUND} 9001003 - Invalid resource name.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_NAME} 9001004 - No matching resource is found based on the resource name.
@@ -319,12 +325,12 @@ ResourceManager_ErrorCode OH_ResourceManager_GetStringByName(const NativeResourc
  * You need to call the OH_ResourceManager_ReleaseStringArray() method to release the memory of string array.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
- * {@link OH_ResourceManager_InitNativeResourceManager}.
+ *        {@link OH_ResourceManager_InitNativeResourceManager}.
  * @param resId Indicates the resource ID.
  * @param resultValue the result write to resultValue.
  * @param resultLen the StringArray length write to resultLen.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
            {@link ERROR_CODE_RES_ID_NOT_FOUND} 9001001 - Invalid resource ID.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_ID} 9001002 - No matching resource is found based on the resource ID.
@@ -342,12 +348,12 @@ ResourceManager_ErrorCode OH_ResourceManager_GetStringArray(const NativeResource
  * You need to call the OH_ResourceManager_ReleaseStringArray() method to release the memory of string array.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
- * {@link OH_ResourceManager_InitNativeResourceManager}.
+ *        {@link OH_ResourceManager_InitNativeResourceManager}.
  * @param resName Indicates the resource name.
  * @param resultValue the result write to resultValue.
  * @param resultLen the StringArray length write to resultLen.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
            {@link ERROR_CODE_RES_NAME_NOT_FOUND} 9001003 - Invalid resource name.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_NAME} 9001004 - No matching resource is found based on the resource name.
@@ -363,7 +369,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetStringArrayByName(const NativeRe
  * @param resValue the array of character strings corresponding to the specified resource name.
  * @param len the length of array.
  * @return {@link SUCCESS} 0 - Success.
-           {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+           {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
  * @since 12
  */
@@ -376,12 +382,12 @@ ResourceManager_ErrorCode OH_ResourceManager_ReleaseStringArray(char ***resValue
  * You need to call free() to release the memory for the string.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
- * {@link OH_ResourceManager_InitNativeResourceManager}.
+ *        {@link OH_ResourceManager_InitNativeResourceManager}.
  * @param resId Indicates the resource ID.
  * @param num - Indicates the number.
  * @param resultValue the result write to resultValue.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
            {@link ERROR_CODE_RES_ID_NOT_FOUND} 9001001 - Invalid resource ID.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_ID} 9001002 - No matching resource is found based on the resource ID.
@@ -399,12 +405,12 @@ ResourceManager_ErrorCode OH_ResourceManager_GetPluralString(const NativeResourc
  * You need to call free() to release the memory for the string.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
- * {@link OH_ResourceManager_InitNativeResourceManager}.
+ *        {@link OH_ResourceManager_InitNativeResourceManager}.
  * @param resName Indicates the resource name.
  * @param num - Indicates the number.
  * @param resultValue the result write to resultValue.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
            {@link ERROR_CODE_RES_NAME_NOT_FOUND} 9001003 - Invalid resource name.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_NAME} 9001004 - No matching resource is found based on the resource name.
@@ -421,11 +427,11 @@ ResourceManager_ErrorCode OH_ResourceManager_GetPluralStringByName(const NativeR
  * Obtains the color resource corresponding to the specified resource ID.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
- * {@link OH_ResourceManager_InitNativeResourceManager}.
+ *        {@link OH_ResourceManager_InitNativeResourceManager}.
  * @param resId Indicates the resource ID.
  * @param resultValue the result write to resultValue.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
            {@link ERROR_CODE_RES_ID_NOT_FOUND} 9001001 - Invalid resource ID.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_ID} 9001002 - No matching resource is found based on the resource ID.
@@ -441,11 +447,11 @@ ResourceManager_ErrorCode OH_ResourceManager_GetColor(const NativeResourceManage
  * Obtains the color resource corresponding to the specified resource name.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
- * {@link OH_ResourceManager_InitNativeResourceManager}.
+ *        {@link OH_ResourceManager_InitNativeResourceManager}.
  * @param resName Indicates the resource name.
  * @param resultValue the result write to resultValue.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
            {@link ERROR_CODE_RES_NAME_NOT_FOUND} 9001003 - Invalid resource name.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_NAME} 9001004 - No matching resource is found based on the resource name.
@@ -461,11 +467,11 @@ ResourceManager_ErrorCode OH_ResourceManager_GetColorByName(const NativeResource
  * Obtains the Int resource corresponding to the specified resource ID.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
- * {@link OH_ResourceManager_InitNativeResourceManager}.
+ *        {@link OH_ResourceManager_InitNativeResourceManager}.
  * @param resId Indicates the resource ID.
  * @param resultValue the result write to resultValue.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
            {@link ERROR_CODE_RES_ID_NOT_FOUND} 9001001 - Invalid resource ID.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_ID} 9001002 - No matching resource is found based on the resource ID.
@@ -481,11 +487,11 @@ ResourceManager_ErrorCode OH_ResourceManager_GetInt(const NativeResourceManager 
  * Obtains the Int resource corresponding to the specified resource name.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
- * {@link OH_ResourceManager_InitNativeResourceManager}.
+ *        {@link OH_ResourceManager_InitNativeResourceManager}.
  * @param resName Indicates the resource name.
  * @param resultValue the result write to resultValue.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
            {@link ERROR_CODE_RES_NAME_NOT_FOUND} 9001003 - Invalid resource name.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_NAME} 9001004 - No matching resource is found based on the resource name.
@@ -501,11 +507,11 @@ ResourceManager_ErrorCode OH_ResourceManager_GetIntByName(const NativeResourceMa
  * Obtains the Int resource corresponding to the specified resource ID.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
- * {@link OH_ResourceManager_InitNativeResourceManager}.
+ *        {@link OH_ResourceManager_InitNativeResourceManager}.
  * @param resId Indicates the resource ID.
  * @param resultValue the result write to resultValue.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
            {@link ERROR_CODE_RES_ID_NOT_FOUND} 9001001 - Invalid resource ID.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_ID} 9001002 - No matching resource is found based on the resource ID.
@@ -521,11 +527,11 @@ ResourceManager_ErrorCode OH_ResourceManager_GetFloat(const NativeResourceManage
  * Obtains the Float resource corresponding to the specified resource name.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
- * {@link OH_ResourceManager_InitNativeResourceManager}.
+ *        {@link OH_ResourceManager_InitNativeResourceManager}.
  * @param resName Indicates the resource name.
  * @param resultValue the result write to resultValue.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
            {@link ERROR_CODE_RES_NAME_NOT_FOUND} 9001003 - Invalid resource name.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_NAME} 9001004 - No matching resource is found based on the resource name.
@@ -541,11 +547,11 @@ ResourceManager_ErrorCode OH_ResourceManager_GetFloatByName(const NativeResource
  * Obtains the boolean result with a specified resource ID.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
- * {@link OH_ResourceManager_InitNativeResourceManager}.
+ *        {@link OH_ResourceManager_InitNativeResourceManager}.
  * @param resId Indicates the resource ID.
  * @param resultValue the result write to resultValue.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
            {@link ERROR_CODE_RES_ID_NOT_FOUND} 9001001 - Invalid resource ID.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_ID} 9001002 - No matching resource is found based on the resource ID.
@@ -561,11 +567,11 @@ ResourceManager_ErrorCode OH_ResourceManager_GetBool(const NativeResourceManager
  * Obtains the boolean result with a specified resource name.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
- * {@link OH_ResourceManager_InitNativeResourceManager}.
+ *        {@link OH_ResourceManager_InitNativeResourceManager}.
  * @param resName Indicates the resource name.
  * @param resultValue the result write to resultValue.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
            {@link ERROR_CODE_RES_NAME_NOT_FOUND} 9001003 - Invalid resource name.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_NAME} 9001004 - No matching resource is found based on the resource name.
@@ -578,10 +584,10 @@ ResourceManager_ErrorCode OH_ResourceManager_GetBoolByName(const NativeResourceM
 /**
  * @brief Add overlay resources during application runtime.
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
- * {@link OH_ResourceManager_InitNativeResourceManager}.
+ *        {@link OH_ResourceManager_InitNativeResourceManager}.
  * @param path Indicates the application overlay path.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
            {@link ERROR_CODE_OVERLAY_RES_PATH_INVALID} 9001010 - Invalid overlay path.
  * @since 12
@@ -591,10 +597,10 @@ ResourceManager_ErrorCode OH_ResourceManager_AddResource(const NativeResourceMan
 /**
  * @brief Remove overlay resources during application runtime.
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
- * {@link OH_ResourceManager_InitNativeResourceManager}.
+ *        {@link OH_ResourceManager_InitNativeResourceManager}.
  * @param path Indicates the application overlay path.
  * @return {@link SUCCESS} 0 - Success.
- *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - If the input parameter invalid.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
            Possible causes: Incorrect parameter types.
            {@link ERROR_CODE_OVERLAY_RES_PATH_INVALID} 9001010 - Invalid overlay path.
  * @since 12
