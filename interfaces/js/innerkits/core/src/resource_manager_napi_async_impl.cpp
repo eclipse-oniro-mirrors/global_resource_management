@@ -376,6 +376,8 @@ auto getStringFunc = [](napi_env env, void* data) {
     bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext, resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to GetHapResourceManager in getStringFunc");
+        dataContext->SetErrorMsg("Failed to get string, invalid bundleName or moduleName",
+            false, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return;
     }
     RState state = resMgr->GetStringById(resId, dataContext->value_);
@@ -435,6 +437,8 @@ auto getStringArrayFunc = [](napi_env env, void* data) {
         bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext, resMgr, resId);
         if (!ret) {
             RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to GetHapResourceManager in getStringArrayFunc");
+            dataContext->SetErrorMsg("Failed to get string array, invalid bundleName or moduleName",
+                false, ERROR_CODE_INVALID_INPUT_PARAMETER);
             return;
         }
         state = resMgr->GetStringArrayById(resId, dataContext->arrayValue_);
@@ -487,6 +491,8 @@ auto getMediaFunc = [](napi_env env, void *data) {
     bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext, resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to GetHapResourceManager in getMediaFunc");
+        dataContext->SetErrorMsg("Failed to get media data, invalid bundleName or moduleName",
+            false, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return;
     }
     RState state = resMgr->GetMediaDataById(resId, dataContext->len_, dataContext->mediaData,
@@ -529,6 +535,8 @@ auto getMediaBase64Func = [](napi_env env, void *data) {
         bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext, resMgr, resId);
         if (!ret) {
             RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to GetHapResourceManager in getMediaBase64Func");
+            dataContext->SetErrorMsg("Failed to get media data, invalid bundleName or moduleName",
+                false, ERROR_CODE_INVALID_INPUT_PARAMETER);
             return;
         }
         state = resMgr->GetMediaBase64DataById(resId, dataContext->value_, dataContext->density_);
@@ -591,6 +599,8 @@ auto getPluralCapFunc = [](napi_env env, void *data) {
         bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext, resMgr, resId);
         if (!ret) {
             RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to GetHapResourceManager in getPluralCapFunc");
+            dataContext->SetErrorMsg("Failed to get plural string, invalid bundleName or moduleName",
+                false, ERROR_CODE_INVALID_INPUT_PARAMETER);
             return;
         }
         state = resMgr->GetPluralStringByIdFormat(dataContext->value_,
@@ -772,6 +782,8 @@ auto getColorFunc = [](napi_env env, void* data) {
 
     if (!ResourceManagerNapiUtils::GetHapResourceManager(dataContext, resMgr, resId)) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to GetHapResourceManager in getColorFunc");
+        dataContext->SetErrorMsg("Failed to get color, invalid bundleName or moduleName",
+            false, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return;
     }
     RState state = resMgr->GetColorById(resId, dataContext->colorValue_);
