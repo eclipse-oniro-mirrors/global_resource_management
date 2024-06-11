@@ -626,6 +626,7 @@ ResourceManager_ErrorCode OH_ResourceManager_ReleaseConfiguration(ResourceManage
     }
     if (configuration->locale != nullptr) {
         free(configuration->locale);
+        configuration->locale = nullptr;
     }
     return ResourceManager_ErrorCode::SUCCESS;
 }
