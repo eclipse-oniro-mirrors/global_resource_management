@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,18 +13,25 @@
  * limitations under the License.
  */
 
-#ifndef RESOURCE_MANAGER_STRING_UTILS_TEST_H
-#define RESOURCE_MANAGER_STRING_UTILS_TEST_H
+#ifndef THEME_CONFIG_TEST_H
+#define THEME_CONFIG_TEST_H
 
 namespace OHOS {
 namespace Global {
 namespace Resource {
-int StringUtilsFuncTest001(void);
-int LockFuncTest001(void);
-int ReplacePlaceholderWithParamsTest001(void);
-int ReplacePlaceholderWithParamsTest002(void);
-int ReplacePlaceholderWithParamsTest003(void);
-int ReplacePlaceholderWithParamsTest004(void);
+int ThemeConfigSetThemeDirectionTest001(void);
+int ThemeConfigSetColorModeTest001(void);
+int ThemeConfigMatchTest001(void);
+int ThemeConfigMatchTest002(void);
+int ThemeConfigMatchTest003(void);
+int ThemeConfigMatchTest004(void);
+int ThemeConfigMatchTest005(void);
+int ThemeConfigMatchTest006(void);
+int ThemeConfigBestMatchTest001(void);
+int ThemeConfigBestMatchTest002(void);
+int ThemeConfigBestMatchTest003(void);
+int ThemeConfigBestMatchTest004(void);
+int ThemeConfigBestMatchTest005(void);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

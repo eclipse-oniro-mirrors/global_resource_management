@@ -30,6 +30,7 @@ int ResourceManagerUpdateResConfigTest002(void);
 int ResourceManagerUpdateResConfigTest003(void);
 int ResourceManagerUpdateResConfigTest004(void);
 int ResourceManagerUpdateResConfigTest005(void);
+int ResourceManagerUpdateResConfigTest006(void);
 int ResourceManagerGetResConfigTest001(void);
 int ResourceManagerGetResConfigTest002(void);
 int ResourceManagerGetPatternByIdTest001(void);
@@ -103,6 +104,17 @@ int ResourceManagerResolveReferenceTest002(void);
 int ResourceManagerResolveParentReferenceTest001(void);
 int ResourceManagerSameNameTest001(void);
 int RawFileTest001(void);
+int ResourceManagerCreateDefaultResConfigTest001(void);
+int ResourceManagerGetOverrideResourceManager001(void);
+int ResourceManagerGetOverrideResourceManager002(void);
+int ResourceManagerGetOverrideResConfig001(void);
+int ResourceManagerIsLoadHap001(void);
+int ResourceManagerIsLoadHap002(void);
+int ResourceManagerIsRawDirFromHap001(void);
+int ResourceManagerIsRawDirFromHap002(void);
+int ResourceManagerGetRawFileList001(void);
+int ResourceManagerGetRawFileList002(void);
+int CreateResourceManagerTest001(void);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

@@ -275,6 +275,88 @@ void ResourceManagerTestCommon::TestGetMediaWithDensityByName(HapResource *tmp)
     EXPECT_EQ(res, outValue);
 }
 
+void ResourceManagerTestCommon::TestGetDrawableInfoById(HapResource *tmp)
+{
+    tmp->Init(this->defaultResConfig);
+    int id = GetResId("icon1", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    std::string type;
+    size_t len;
+    std::unique_ptr<uint8_t[]> jsonBuf;
+    RState state = rm->GetDrawableInfoById(id, type, len, jsonBuf);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_TRUE(jsonBuf != nullptr);
+}
+
+void ResourceManagerTestCommon::TestGetDrawableInfoWithDensityById(HapResource *tmp)
+{
+    tmp->Init(this->defaultResConfig);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 120;
+    int id = GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    std::string type;
+    size_t len;
+    std::unique_ptr<uint8_t[]> jsonBuf;
+    RState state = rm->GetDrawableInfoById(id, type, len, jsonBuf, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_TRUE(jsonBuf != nullptr);
+
+    // invalid density
+    int invalidDensity = 1000;
+    state = rm->GetDrawableInfoById(id, type, len, jsonBuf, invalidDensity);
+    EXPECT_TRUE(state == ERROR_CODE_INVALID_INPUT_PARAMETER);
+}
+
+void ResourceManagerTestCommon::TestGetDrawableInfoByName(HapResource *tmp)
+{
+    tmp->Init(this->defaultResConfig);
+    std::string type;
+    size_t len;
+    std::unique_ptr<uint8_t[]> jsonBuf;
+    RState state = rm->GetDrawableInfoByName("icon1", type, len, jsonBuf);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_TRUE(jsonBuf != nullptr);
+}
+
+void ResourceManagerTestCommon::TestGetDrawableInfoWithDensityByName(HapResource *tmp)
+{
+    tmp->Init(this->defaultResConfig);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    uint32_t density = 120;
+    std::string type;
+    size_t len;
+    std::unique_ptr<uint8_t[]> jsonBuf;
+    RState state = rm->GetDrawableInfoByName("icon1", type, len, jsonBuf, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_TRUE(jsonBuf != nullptr);
+    
+    // invalid density
+    int invalidDensity = 1000;
+    state = rm->GetDrawableInfoByName("icon1", type, len, jsonBuf, invalidDensity);
+    EXPECT_TRUE(state == ERROR_CODE_INVALID_INPUT_PARAMETER);
+}
+
 void ResourceManagerTestCommon::TestGetStringFormatById(const char *name, const char *cmp)
 {
     int id = GetResId(name, ResType::STRING);

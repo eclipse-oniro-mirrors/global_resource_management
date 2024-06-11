@@ -86,6 +86,10 @@ int ResourceManagerGetResIdTest006(void);
 int ResourceManagerGetLocalesTest001(void);
 int ResourceManagerGetLocalesTest002(void);
 int ResourceManagerGetLocalesTest003(void);
+int ResourceManagerGetDrawableInfoByIdFromHapTest001(void);
+int ResourceManagerGetDrawableInfoByIdFromHapTest002(void);
+int ResourceManagerGetDrawableInfoByNameFromHapTest001(void);
+int ResourceManagerGetDrawableInfoByNameFromHapTest002(void);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

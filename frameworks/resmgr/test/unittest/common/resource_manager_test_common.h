@@ -119,6 +119,14 @@ public:
     void TestGetMediaWithDensityByName(HapResource *tmp);
 
     void TestGetMediaByName(HapResource *tmp);
+    
+    void TestGetDrawableInfoWithDensityById(HapResource *tmp);
+
+    void TestGetDrawableInfoById(HapResource *tmp);
+
+    void TestGetDrawableInfoWithDensityByName(HapResource *tmp);
+
+    void TestGetDrawableInfoByName(HapResource *tmp);
 
     void TestGetResourceLimitKeys(uint32_t expectedLimitKeys);
 };

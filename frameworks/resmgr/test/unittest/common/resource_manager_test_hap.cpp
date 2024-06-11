@@ -1200,4 +1200,64 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetLocalesTest003, TestSize.Leve
     rm->GetLocales(outValue, true);
     EXPECT_EQ(static_cast<size_t>(4), outValue.size());
 }
+
+/*
+ * @tc.name: ResourceManagerGetDrawableInfoByIdFromHapTest001
+ * @tc.desc: Test GetDrawableInfo
+ * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetDrawableInfoByIdFromHapTest001, TestSize.Level1)
+{
+    rmc->AddHapResource("zh", nullptr, "CN");
+
+    HapResource *tmp = new HapResource(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
+    rmc->TestGetDrawableInfoById(tmp);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetDrawableInfoByIdFromHapTest002
+ * @tc.desc: Test GetDrawableInfo, to match sdpi determinder
+ * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetDrawableInfoByIdFromHapTest002, TestSize.Level1)
+{
+    rmc->AddHapResource("en", nullptr, "US");
+
+    HapResource *tmp = new HapResource(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
+    rmc->TestGetDrawableInfoWithDensityById(tmp);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetDrawableInfoByNameFromHapTest001
+ * @tc.desc: Test GetDrawableInfo
+ * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetDrawableInfoByNameFromHapTest001, TestSize.Level1)
+{
+    rmc->AddHapResource("zh", nullptr, "CN");
+
+    HapResource *tmp = new HapResource(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
+    rmc->TestGetDrawableInfoByName(tmp);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetDrawableInfoByNameFromHapTest002
+ * @tc.desc: Test GetDrawableInfo, to match sdpi determinder
+ * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetDrawableInfoByNameFromHapTest002, TestSize.Level1)
+{
+    rmc->AddHapResource("en", nullptr, "US");
+
+    HapResource *tmp = new HapResource(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
+    rmc->TestGetDrawableInfoWithDensityByName(tmp);
+    delete tmp;
+}
 }
