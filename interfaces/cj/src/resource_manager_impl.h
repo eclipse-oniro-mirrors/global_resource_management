@@ -16,12 +16,11 @@
 #ifndef RESOURCE_MANAGER_IMPL_H
 #define RESOURCE_MANAGER_IMPL_H
 
-#include "ability_context_impl.h"
+#include "foundation/ability/ability_runtime/interfaces/kits/native/appkit/ability_runtime/context/context.h"
 #include "resource_manager.h"
 #include "ffi_remote_data.h"
 #include "resource_manager_interface.h"
 #include "drawable_descriptor/drawable_descriptor.h"
-#include "uv.h"
 
 #include <cstdint>
 #include <string>

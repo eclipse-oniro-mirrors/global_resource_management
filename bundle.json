@@ -64,8 +64,7 @@
             "bounds_checking_function",
             "icu",
             "cJSON",
-            "node",
-            "ipc"
+            "node"
           ]
       },
         "build": {

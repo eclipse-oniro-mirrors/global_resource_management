@@ -14,7 +14,6 @@
  */
 
 #include "resource_manager_impl.h"
-#include "ability.h"
 #include "hitrace_meter.h"
 #include "resource_manager.h"
 #include "resource_manager_log.h"
