@@ -16,7 +16,6 @@
 #ifndef RESOURCE_MANAGER_FFI_H
 #define RESOURCE_MANAGER_FFI_H
 
-#include "napi_base_context.h"
 #include "ffi_remote_data.h"
 #include "cj_common_ffi.h"
 #include "resource_manager_log.h"
