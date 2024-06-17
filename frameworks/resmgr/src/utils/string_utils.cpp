@@ -95,7 +95,7 @@ bool getJsParams(const std::string &inputOutputValue, va_list args,
         }
     }
     for (size_t i = 0; i < paramsWithNum.size(); i++) {
-        int index = paramsWithNum[i].first;
+        size_t index = static_cast<size_t>(paramsWithNum[i].first);
         std::string type = paramsWithNum[i].second;
         if (index < paramsWithOutNum.size()) {
             if (type != paramsWithOutNum[index].second) {

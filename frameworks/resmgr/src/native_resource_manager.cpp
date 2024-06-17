@@ -37,8 +37,8 @@ ResourceManager_ErrorCode copyStringArray(char ***resultValue, uint32_t *resultL
         RESMGR_HILOGE(RESMGR_NATIVE_TAG, "%{public}s malloc error", apiName.c_str());
         return ResourceManager_ErrorCode::ERROR_CODE_OUT_OF_MEMORY;
     }
-    for (int i = 0; i < len; i++) {
-        int strLen = tempResultValue[i].size();
+    for (size_t i = 0; i < len; i++) {
+        size_t strLen = tempResultValue[i].size();
         (*resultValue)[i] = new char[strLen + 1];
         if ((*resultValue)[i] == nullptr) {
             RESMGR_HILOGE(RESMGR_NATIVE_TAG, "%{public}s malloc error", apiName.c_str());
@@ -636,7 +636,7 @@ ResourceManager_ErrorCode OH_ResourceManager_ReleaseStringArray(char ***resValue
     if (resValue == nullptr || *resValue == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    for (int i = 0; i < len; i++) {
+    for (uint32_t i = 0; i < len; i++) {
         if ((*resValue)[i] != nullptr) {
             delete [] (*resValue)[i];
             (*resValue)[i] = nullptr;
