@@ -406,21 +406,16 @@ struct Raw {
     int64_t length;
     int64_t start; // offset base on the Hap
     FILE* pf;
-    int fd;
     const NativeResourceManager *resMgr;
 
     explicit Raw(const std::string &path) : filePath(path), offset(0), length(0), start(0),
-        pf(nullptr), fd(0), resMgr(nullptr) {}
+        pf(nullptr), resMgr(nullptr) {}
 
     ~Raw()
     {
         if (pf != nullptr) {
             fclose(pf);
             pf = nullptr;
-        }
-        if (fd > 0) {
-            close(fd);
-            fd = 0;
         }
     }
 
@@ -446,14 +441,17 @@ RawFile64 *LoadRawFileFromHap64(const NativeResourceManager *mgr, const char *fi
     }
     auto result = std::make_unique<Raw>(fileName);
     result->pf = fdopen(resMgrDescriptor.fd, "rb");
-    result->fd = resMgrDescriptor.fd;
-    result->length = resMgrDescriptor.length;
-    result->start = resMgrDescriptor.offset;
-    result->resMgr = mgr;
     if (result->pf == nullptr) {
+        if (resMgrDescriptor.fd > 0) {
+            close(resMgrDescriptor.fd);
+            resMgrDescriptor.fd = 0;
+        }
         RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to open %{public}s rawfile descriptor", fileName);
         return nullptr;
     }
+    result->length = resMgrDescriptor.length;
+    result->start = resMgrDescriptor.offset;
+    result->resMgr = mgr;
     std::fseek(result->pf, result->start, SEEK_SET);
     return new RawFile64(std::move(result));
 }
