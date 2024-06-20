@@ -34,34 +34,60 @@ ResourceManagerNapiAsyncImpl::~ResourceManagerNapiAsyncImpl()
 std::unordered_map<std::string, std::function<napi_value(napi_env&, napi_callback_info&)>>
     ResourceManagerNapiAsyncImpl::asyncFuncMatch {
     /*===========================since 6 but deprecated since 9======================================*/
-    {"GetString", std::bind(&ResourceManagerNapiAsyncImpl::GetString, _1, _2)},
-    {"GetStringArray", std::bind(&ResourceManagerNapiAsyncImpl::GetStringArray, _1, _2)},
-    {"GetMedia", std::bind(&ResourceManagerNapiAsyncImpl::GetMedia, _1, _2)},
-    {"GetMediaBase64", std::bind(&ResourceManagerNapiAsyncImpl::GetMediaBase64, _1, _2)},
-    {"GetPluralString", std::bind(&ResourceManagerNapiAsyncImpl::GetPluralString, _1, _2)},
-    {"GetRawFile", std::bind(&ResourceManagerNapiAsyncImpl::GetRawFile, _1, _2)},
-    {"GetRawFileDescriptor", std::bind(&ResourceManagerNapiAsyncImpl::GetRawFileDescriptor, _1, _2)},
-    {"CloseRawFileDescriptor", std::bind(&ResourceManagerNapiAsyncImpl::CloseRawFileDescriptor, _1, _2)},
+    {"GetString", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetString(env, info);}},
+    {"GetStringArray", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetStringArray(env, info);}},
+    {"GetMedia", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetMedia(env, info);}},
+    {"GetMediaBase64", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetMediaBase64(env, info);}},
+    {"GetPluralString", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetPluralString(env, info);}},
+    {"GetRawFile", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetRawFile(env, info);}},
+    {"GetRawFileDescriptor", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetRawFileDescriptor(env, info);}},
+    {"CloseRawFileDescriptor", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::CloseRawFileDescriptor(env, info);}},
     /*===========================since 6 but deprecated since 9========================================*/
 
-    {"GetStringValue", std::bind(&ResourceManagerNapiAsyncImpl::GetStringValue, _1, _2)},
-    {"GetStringArrayValue", std::bind(&ResourceManagerNapiAsyncImpl::GetStringArrayValue, _1, _2)},
-    {"GetMediaContent", std::bind(&ResourceManagerNapiAsyncImpl::GetMediaContent, _1, _2)},
-    {"GetMediaContentBase64", std::bind(&ResourceManagerNapiAsyncImpl::GetMediaContentBase64, _1, _2)},
-    {"GetPluralStringValue", std::bind(&ResourceManagerNapiAsyncImpl::GetPluralStringValue, _1, _2)},
-    {"GetRawFileContent", std::bind(&ResourceManagerNapiAsyncImpl::GetRawFileContent, _1, _2)},
-    {"GetRawFd", std::bind(&ResourceManagerNapiAsyncImpl::GetRawFd, _1, _2)},
-    {"CloseRawFd", std::bind(&ResourceManagerNapiAsyncImpl::CloseRawFd, _1, _2)},
-    {"GetConfiguration", std::bind(&ResourceManagerNapiAsyncImpl::GetConfiguration, _1, _2)},
-    {"GetDeviceCapability", std::bind(&ResourceManagerNapiAsyncImpl::GetDeviceCapability, _1, _2)},
-    {"GetStringByName", std::bind(&ResourceManagerNapiAsyncImpl::GetStringByName, _1, _2)},
-    {"GetStringArrayByName", std::bind(&ResourceManagerNapiAsyncImpl::GetStringArrayByName, _1, _2)},
-    {"GetMediaByName", std::bind(&ResourceManagerNapiAsyncImpl::GetMediaByName, _1, _2)},
-    {"GetMediaBase64ByName", std::bind(&ResourceManagerNapiAsyncImpl::GetMediaBase64ByName, _1, _2)},
-    {"GetPluralStringByName", std::bind(&ResourceManagerNapiAsyncImpl::GetPluralStringByName, _1, _2)},
-    {"GetRawFileList", std::bind(&ResourceManagerNapiAsyncImpl::GetRawFileList, _1, _2)},
-    {"GetColor", std::bind(&ResourceManagerNapiAsyncImpl::GetColor, _1, _2)},
-    {"GetColorByName", std::bind(&ResourceManagerNapiAsyncImpl::GetColorByName, _1, _2)},
+    {"GetStringValue", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetStringValue(env, info);}},
+    {"GetStringArrayValue", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetStringArrayValue(env, info);}},
+    {"GetMediaContent", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetMediaContent(env, info);}},
+    {"GetMediaContentBase64", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetMediaContentBase64(env, info);}},
+    {"GetPluralStringValue", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetPluralStringValue(env, info);}},
+    {"GetRawFileContent", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetRawFileContent(env, info);}},
+    {"GetRawFd", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetRawFd(env, info);}},
+    {"CloseRawFd", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::CloseRawFd(env, info);}},
+    {"GetConfiguration", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetConfiguration(env, info);}},
+    {"GetDeviceCapability", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetDeviceCapability(env, info);}},
+    {"GetStringByName", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetStringByName(env, info);}},
+    {"GetStringArrayByName", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetStringArrayByName(env, info);}},
+    {"GetMediaByName", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetMediaByName(env, info);}},
+    {"GetMediaBase64ByName", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetMediaBase64ByName(env, info);}},
+    {"GetPluralStringByName", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetPluralStringByName(env, info);}},
+    {"GetRawFileList", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetRawFileList(env, info);}},
+    {"GetColor", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetColor(env, info);}},
+    {"GetColorByName", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiAsyncImpl::GetColorByName(env, info);}},
 };
 
 napi_value ResourceManagerNapiAsyncImpl::GetResource(napi_env env, napi_callback_info info,

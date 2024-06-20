@@ -37,39 +37,72 @@ ResourceManagerNapiSyncImpl::~ResourceManagerNapiSyncImpl()
 
 std::unordered_map<std::string, std::function<napi_value(napi_env&, napi_callback_info&)>>
     ResourceManagerNapiSyncImpl::syncFuncMatch {
-    {"GetStringSync", std::bind(&ResourceManagerNapiSyncImpl::GetStringSync, _1, _2)},
-    {"GetStringByNameSync", std::bind(&ResourceManagerNapiSyncImpl::GetStringByNameSync, _1, _2)},
-    {"GetBoolean", std::bind(&ResourceManagerNapiSyncImpl::GetBoolean, _1, _2)},
-    {"GetBooleanByName", std::bind(&ResourceManagerNapiSyncImpl::GetBooleanByName, _1, _2)},
-    {"GetNumber", std::bind(&ResourceManagerNapiSyncImpl::GetNumber, _1, _2)},
-    {"GetNumberByName", std::bind(&ResourceManagerNapiSyncImpl::GetNumberByName, _1, _2)},
-    {"GetDrawableDescriptor", std::bind(&ResourceManagerNapiSyncImpl::GetDrawableDescriptor, _1, _2)},
-    {"GetDrawableDescriptorByName", std::bind(&ResourceManagerNapiSyncImpl::GetDrawableDescriptorByName, _1, _2)},
-    {"GetColorSync", std::bind(&ResourceManagerNapiSyncImpl::GetColorSync, _1, _2)},
-    {"GetColorByNameSync", std::bind(&ResourceManagerNapiSyncImpl::GetColorByNameSync, _1, _2)},
-    {"AddResource", std::bind(&ResourceManagerNapiSyncImpl::AddResource, _1, _2)},
-    {"RemoveResource", std::bind(&ResourceManagerNapiSyncImpl::RemoveResource, _1, _2)},
-    {"GetMediaContentBase64Sync", std::bind(&ResourceManagerNapiSyncImpl::GetMediaContentBase64Sync, _1, _2)},
-    {"GetMediaContentSync", std::bind(&ResourceManagerNapiSyncImpl::GetMediaContentSync, _1, _2)},
-    {"GetPluralStringValueSync", std::bind(&ResourceManagerNapiSyncImpl::GetPluralStringValueSync, _1, _2)},
-    {"GetStringArrayValueSync", std::bind(&ResourceManagerNapiSyncImpl::GetStringArrayValueSync, _1, _2)},
-    {"GetRawFileContentSync", std::bind(&ResourceManagerNapiSyncImpl::GetRawFileContentSync, _1, _2)},
-    {"GetRawFdSync", std::bind(&ResourceManagerNapiSyncImpl::GetRawFdSync, _1, _2)},
-    {"CloseRawFdSync", std::bind(&ResourceManagerNapiSyncImpl::CloseRawFdSync, _1, _2)},
-    {"GetRawFileListSync", std::bind(&ResourceManagerNapiSyncImpl::GetRawFileListSync, _1, _2)},
-    {"GetPluralStringByNameSync", std::bind(&ResourceManagerNapiSyncImpl::GetPluralStringByNameSync, _1, _2)},
-    {"GetMediaBase64ByNameSync", std::bind(&ResourceManagerNapiSyncImpl::GetMediaBase64ByNameSync, _1, _2)},
-    {"GetMediaByNameSync", std::bind(&ResourceManagerNapiSyncImpl::GetMediaByNameSync, _1, _2)},
-    {"GetStringArrayByNameSync", std::bind(&ResourceManagerNapiSyncImpl::GetStringArrayByNameSync, _1, _2)},
-    {"GetConfigurationSync", std::bind(&ResourceManagerNapiSyncImpl::GetConfigurationSync, _1, _2)},
-    {"GetDeviceCapabilitySync", std::bind(&ResourceManagerNapiSyncImpl::GetDeviceCapabilitySync, _1, _2)},
-    {"GetLocales", std::bind(&ResourceManagerNapiSyncImpl::GetLocales, _1, _2)},
-    {"GetSymbol", std::bind(&ResourceManagerNapiSyncImpl::GetSymbol, _1, _2)},
-    {"GetSymbolByName", std::bind(&ResourceManagerNapiSyncImpl::GetSymbolByName, _1, _2)},
-    {"IsRawDir", std::bind(&ResourceManagerNapiSyncImpl::IsRawDir, _1, _2)},
-    {"GetOverrideResourceManager", std::bind(&ResourceManagerNapiSyncImpl::GetOverrideResourceManager, _1, _2)},
-    {"GetOverrideConfiguration", std::bind(&ResourceManagerNapiSyncImpl::GetOverrideConfiguration, _1, _2)},
-    {"UpdateOverrideConfiguration", std::bind(&ResourceManagerNapiSyncImpl::UpdateOverrideConfiguration, _1, _2)}
+    {"GetStringSync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetStringSync(env, info);}},
+    {"GetStringByNameSync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetStringByNameSync(env, info);}},
+    {"GetBoolean", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetBoolean(env, info);}},
+    {"GetBooleanByName", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetBooleanByName(env, info);}},
+    {"GetNumber", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetNumber(env, info);}},
+    {"GetNumberByName", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetNumberByName(env, info);}},
+    {"GetDrawableDescriptor", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetDrawableDescriptor(env, info);}},
+    {"GetDrawableDescriptorByName", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetDrawableDescriptorByName(env, info);}},
+    {"GetColorSync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetColorSync(env, info);}},
+    {"GetColorByNameSync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetColorByNameSync(env, info);}},
+    {"AddResource", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::AddResource(env, info);}},
+    {"RemoveResource", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::RemoveResource(env, info);}},
+    {"GetMediaContentBase64Sync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetMediaContentBase64Sync(env, info);}},
+    {"GetMediaContentSync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetMediaContentSync(env, info);}},
+    {"GetPluralStringValueSync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetPluralStringValueSync(env, info);}},
+    {"GetStringArrayValueSync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetStringArrayValueSync(env, info);}},
+    {"GetRawFileContentSync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetRawFileContentSync(env, info);}},
+    {"GetRawFdSync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetRawFdSync(env, info);}},
+    {"CloseRawFdSync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::CloseRawFdSync(env, info);}},
+    {"GetRawFileListSync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetRawFileListSync(env, info);}},
+    {"GetPluralStringByNameSync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetPluralStringByNameSync(env, info);}},
+    {"GetMediaBase64ByNameSync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetMediaBase64ByNameSync(env, info);}},
+    {"GetMediaByNameSync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetMediaByNameSync(env, info);}},
+    {"GetStringArrayByNameSync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetStringArrayByNameSync(env, info);}},
+    {"GetConfigurationSync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetConfigurationSync(env, info);}},
+    {"GetDeviceCapabilitySync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetDeviceCapabilitySync(env, info);}},
+    {"GetLocales", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetLocales(env, info);}},
+    {"GetSymbol", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetSymbol(env, info);}},
+    {"GetSymbolByName", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetSymbolByName(env, info);}},
+    {"IsRawDir", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::IsRawDir(env, info);}},
+    {"GetOverrideResourceManager", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetOverrideResourceManager(env, info);}},
+    {"GetOverrideConfiguration", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetOverrideConfiguration(env, info);}},
+    {"UpdateOverrideConfiguration", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::UpdateOverrideConfiguration(env, info);}}
 };
 
 napi_value ResourceManagerNapiSyncImpl::GetResource(napi_env env, napi_callback_info info,
