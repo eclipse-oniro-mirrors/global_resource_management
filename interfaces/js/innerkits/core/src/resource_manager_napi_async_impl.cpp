@@ -359,7 +359,16 @@ napi_value ResourceManagerNapiAsyncImpl::ProcessIdNameParam(napi_env env, napi_c
             ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
             return nullptr;
         } else if (i == 1 && valueType == napi_number) {
+            // dataContext->param_ is the quantity to select plural string
             napi_get_value_int32(env, argv[i], &dataContext->param_);
+            // param is the value to replace placeholder in the plural string
+            double param;
+            if (napi_get_value_double(env, argv[i], &param) != napi_ok) {
+                RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get parameter value in ProcessIdNameParam");
+                return nullptr;
+            }
+            dataContext->jsParams_.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_NUMBER,
+                std::to_string(param)));
         } else if (i == 2 && valueType == napi_function) { // the third callback param
             napi_create_reference(env, argv[i], 1, &dataContext->callbackRef_);
             break;
@@ -629,15 +638,15 @@ auto getPluralCapFunc = [](napi_env env, void *data) {
                 false, ERROR_CODE_INVALID_INPUT_PARAMETER);
             return;
         }
-        state = resMgr->GetPluralStringByIdFormat(dataContext->value_,
-            resId, dataContext->param_, dataContext->param_);
+        state = resMgr->GetFormatPluralStringById(dataContext->value_, resId, dataContext->param_,
+            dataContext->jsParams_);
         if (state != RState::SUCCESS) {
             dataContext->SetErrorMsg("GetPluralString failed", true, state);
             return;
         }
     } else {
-        state = dataContext->addon_->GetResMgr()->GetPluralStringByNameFormat(dataContext->value_,
-            dataContext->resName_.c_str(), dataContext->param_, dataContext->param_);
+        state = dataContext->addon_->GetResMgr()->GetFormatPluralStringByName(dataContext->value_,
+            dataContext->resName_.c_str(), dataContext->param_, dataContext->jsParams_);
         if (state != RState::SUCCESS) {
             dataContext->SetErrorMsg("GetPluralString failed", false, state);
             return;

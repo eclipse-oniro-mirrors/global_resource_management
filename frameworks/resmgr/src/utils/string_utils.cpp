@@ -40,7 +40,6 @@ namespace Resource {
 const std::regex PLACEHOLDER_MATCHING_RULES(R"((%%)|%((\d+)\$){0,1}([dsf]))");
 const std::string SIZE_T_MAX_STR = std::to_string(std::numeric_limits<size_t>::max());
 #ifdef SUPPORT_GRAPHICS
-const int PRECISION_OF_NUMBER = 6;
 #endif
 
 std::string FormatString(const char *fmt, ...)
@@ -163,7 +162,7 @@ bool parseArgs(const std::string &inputOutputValue, va_list args,
     return getJsParams(inputOutputValue, args, paramsWithOutNum, paramsWithNum, jsParams);
 }
 
-bool LocalizeNumber(std::string &inputOutputNum, const ResConfigImpl &resConfig, bool isKeepPrecision = true)
+bool LocalizeNumber(std::string &inputOutputNum, const ResConfigImpl &resConfig)
 {
 #ifdef SUPPORT_GRAPHICS
     const ResLocale *resLocale = resConfig.GetResLocale();
@@ -199,10 +198,6 @@ bool LocalizeNumber(std::string &inputOutputNum, const ResConfigImpl &resConfig,
 
     icu::number::LocalizedNumberFormatter numberFormat = icu::number::NumberFormatter::withLocale(locale);
     numberFormat = numberFormat.grouping(UNumberGroupingStrategy::UNUM_GROUPING_OFF);
-    if (isKeepPrecision) {
-        numberFormat = numberFormat.precision(icu::number::Precision::minFraction(PRECISION_OF_NUMBER));
-    }
-
     UErrorCode status = U_ZERO_ERROR;
     double num = std::stod(inputOutputNum);
     inputOutputNum.clear();
@@ -248,7 +243,7 @@ bool GetReplaceStr(const std::vector<std::tuple<ResourceManager::NapiValueType, 
     if (placeHolderType == "d") {
         size_t posOfDecimalPoint = paramValue.find(".");
         replaceStr = paramValue.substr(0, posOfDecimalPoint);
-        return LocalizeNumber(replaceStr, config, false);
+        return LocalizeNumber(replaceStr, config);
     }
 
     // double type
