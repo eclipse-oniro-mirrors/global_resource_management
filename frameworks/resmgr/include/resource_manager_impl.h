@@ -547,6 +547,32 @@ public:
         std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams);
 
     /**
+     * Get the plural format string by resource id
+     * @param outValue the resource write to
+     * @param id the resource id
+     * @param quantity the language quantity
+     * @param jsParams the formatting string resource js parameters, the tuple first parameter represents the type,
+     *     napi_number is denoted by NAPI_NUMBER, napi_string is denoted by NAPI_STRING,
+     *     the tuple second parameter represents the value
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetFormatPluralStringById(std::string &outValue, uint32_t id, int quantity,
+        std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams);
+
+    /**
+     * Get the plural format string by resource name
+     * @param outValue the resource write to
+     * @param id the resource id
+     * @param quantity the language quantity
+     * @param jsParams the formatting string resource js parameters, the tuple first parameter represents the type,
+     *     napi_number is denoted by NAPI_NUMBER, napi_string is denoted by NAPI_STRING,
+     *     the tuple second parameter represents the value
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetFormatPluralStringByName(std::string &outValue, const char *name, int quantity,
+        std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams);
+
+    /**
      * Get the resource limit keys value which every binary bit corresponds to existing limit key {@link KeyType},
      *     enum KeyType {
      *         LANGUAGES       = 0,

@@ -622,10 +622,14 @@ int32_t ResourceManagerNapiSyncImpl::ProcessPluralStringValueResource(napi_env e
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in GetPluralStringValueSync");
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
-    RState state = resMgr->GetPluralStringByIdFormat(dataContext->value_,
-        resId, dataContext->param_, dataContext->param_);
+    if (!InitNapiParameters(env, info, dataContext->jsParams_)) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "GetPluralStringValueSync formatting error");
+        return ERROR_CODE_RES_ID_FORMAT_ERROR;
+    }
+    RState state = resMgr->GetFormatPluralStringById(dataContext->value_, resId, dataContext->param_,
+        dataContext->jsParams_);
     if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to GetPluralStringValueSync state", true);
+        dataContext->SetErrorMsg("Failed to GetPluralStringValueSync state", true, state);
         return state;
     }
     return SUCCESS;
@@ -1045,8 +1049,12 @@ napi_value ResourceManagerNapiSyncImpl::RemoveResource(napi_env env, napi_callba
 int32_t ResourceManagerNapiSyncImpl::ProcessPluralStrResourceByName(napi_env env, napi_callback_info info,
     std::unique_ptr<ResMgrDataContext> &dataContext)
 {
-    RState state = dataContext->addon_->GetResMgr()->GetPluralStringByNameFormat(dataContext->value_,
-        dataContext->resName_.c_str(), dataContext->param_, dataContext->param_);
+    if (!InitNapiParameters(env, info, dataContext->jsParams_)) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "GetPluralStringByNameSync formatting error");
+        return ERROR_CODE_RES_ID_FORMAT_ERROR;
+    }
+    RState state = dataContext->addon_->GetResMgr()->GetFormatPluralStringByName(dataContext->value_,
+        dataContext->resName_.c_str(), dataContext->param_, dataContext->jsParams_);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("GetPluralStringByNameSync failed state", false);
         return state;

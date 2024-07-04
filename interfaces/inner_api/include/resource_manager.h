@@ -230,6 +230,12 @@ public:
     virtual RState GetStringFormatById(std::string &outValue, uint32_t id, va_list args) = 0;
 
     virtual RState GetStringFormatByName(std::string &outValue, const char *name, va_list args) = 0;
+
+    virtual RState GetFormatPluralStringById(std::string &outValue, uint32_t id, int quantity,
+        std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams) = 0;
+
+    virtual RState GetFormatPluralStringByName(std::string &outValue, const char *name, int quantity,
+        std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams) = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();

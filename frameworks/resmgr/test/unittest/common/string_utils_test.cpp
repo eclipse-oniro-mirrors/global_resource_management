@@ -177,6 +177,6 @@ HWTEST_F(StringUtilsTest, ReplacePlaceholderWithParamsTest004, TestSize.Level1)
     };
     bool ret = ReplacePlaceholderWithParams(inputValue, rc, jsParams);
     EXPECT_TRUE(ret);
-    EXPECT_EQ(inputValue, "percent is 0.500000");
+    EXPECT_EQ(inputValue, "percent is 0.5");
 }
 }

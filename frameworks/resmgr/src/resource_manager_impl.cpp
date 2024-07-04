@@ -1543,6 +1543,60 @@ RState ResourceManagerImpl::GetStringFormatByName(const char *name, std::string 
     return SUCCESS;
 }
 
+RState ResourceManagerImpl::GetFormatPluralStringById(std::string &outValue, uint32_t id, int quantity,
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
+{
+    const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd = hapManager_->FindQualifierValueById(id,
+        isOverrideResMgr_);
+    if (vuqd == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "find qualifier value by plural id error id = %{public}d", id);
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
+    RState rState = GetPluralString(vuqd, quantity, outValue);
+    if (rState == ERROR_CODE_RES_REF_TOO_MUCH) {
+        RESMGR_HILOGE(RESMGR_TAG, "find too much ref by plural id = %{public}d", id);
+        return rState;
+    }
+    if (rState != SUCCESS) {
+        RESMGR_HILOGE(RESMGR_TAG, "plural res not found, id = %{public}d", id);
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+    ResConfigImpl resConfig;
+    GetResConfig(resConfig);
+    if (!ReplacePlaceholderWithParams(outValue, resConfig, jsParams)) {
+        RESMGR_HILOGE(RESMGR_TAG, "format plural string error, id = %{public}d", id);
+        return ERROR_CODE_RES_NAME_FORMAT_ERROR;
+    }
+    return SUCCESS;
+}
+
+RState ResourceManagerImpl::GetFormatPluralStringByName(std::string &outValue, const char *name, int quantity,
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
+{
+    const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd =
+        hapManager_->FindQualifierValueByName(name, ResType::PLURALS, isOverrideResMgr_);
+    if (vuqd == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "find qualifier value by plural name error name = %{public}s", name);
+        return ERROR_CODE_RES_NAME_NOT_FOUND;
+    }
+    RState rState = GetPluralString(vuqd, quantity, outValue);
+    if (rState == ERROR_CODE_RES_REF_TOO_MUCH) {
+        RESMGR_HILOGE(RESMGR_TAG, "find too much ref by plural name = %{public}s", name);
+        return rState;
+    }
+    if (rState != SUCCESS) {
+        RESMGR_HILOGE(RESMGR_TAG, "plural res not found, name = %{public}s", name);
+        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
+    }
+    ResConfigImpl resConfig;
+    GetResConfig(resConfig);
+    if (!ReplacePlaceholderWithParams(outValue, resConfig, jsParams)) {
+        RESMGR_HILOGE(RESMGR_TAG, "format plural string error, name = %{public}s", name);
+        return ERROR_CODE_RES_NAME_FORMAT_ERROR;
+    }
+    return SUCCESS;
+}
+
 uint32_t ResourceManagerImpl::GetResourceLimitKeys()
 {
     if (hapManager_ == nullptr) {
