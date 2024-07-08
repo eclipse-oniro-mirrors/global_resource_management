@@ -87,6 +87,10 @@ struct ResMgrDataContext {
             RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to unwrap");
             return nullptr;
         }
+        if (addonPtr == nullptr) {
+            RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to unwrap, addonPtr is null");
+            return nullptr;
+        }
         return *addonPtr;
     }
 };
