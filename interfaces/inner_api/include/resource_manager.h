@@ -236,6 +236,8 @@ public:
 
     virtual RState GetFormatPluralStringByName(std::string &outValue, const char *name, int quantity,
         std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams) = 0;
+    
+    virtual bool AddPatchResource(const char *path, const char *patchPath) = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();
@@ -270,6 +272,7 @@ EXPORT_FUNC ResourceManager *GetSystemResourceManagerNoSandBox();
 EXPORT_FUNC std::shared_ptr<ResourceManager> CreateResourceManager(const std::string &bundleName,
     const std::string &moduleName, const std::string &hapPath, const std::vector<std::string> &overlayPath,
     ResConfig &resConfig, int32_t appType = 0, int32_t userId = 0);
+
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

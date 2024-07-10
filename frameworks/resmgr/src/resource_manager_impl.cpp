@@ -1091,6 +1091,11 @@ bool ResourceManagerImpl::AddResource(const char *path, const uint32_t &selected
     return this->hapManager_->AddResource(path, selectedTypes);
 }
 
+bool ResourceManagerImpl::AddPatchResource(const char *path, const char *patchPath)
+{
+    return this->hapManager_->AddPatchResource(path, patchPath);
+}
+
 bool ResourceManagerImpl::AddResource(const std::string &path, const std::vector<std::string> &overlayPaths)
 {
     return this->hapManager_->AddResource(path, overlayPaths);
