@@ -462,7 +462,8 @@ RState ResourceManagerImpl::GetThemeValues(const std::string &value, std::string
     if (ProcessReference(value, idItems) != SUCCESS) {
         return NOT_FOUND;
     }
-    outValue = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig);
+    outValue = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig,
+        hapManager_->IsThemeSystemResEnableHap());
     return outValue.empty() ? NOT_FOUND : SUCCESS;
 }
 
