@@ -433,38 +433,31 @@ bool ResConfigImpl::Match(const std::shared_ptr<ResConfigImpl> other, bool isChe
 
 bool ResConfigImpl::IsMccMncMatch(uint32_t mcc,  uint32_t mnc) const
 {
-    if (this->mcc_ != MCC_UNDEFINED && this->mnc_ != MNC_UNDEFINED) {
-        if (mcc != MCC_UNDEFINED && mnc != MNC_UNDEFINED) {
-            if (this->mcc_ != mcc || this->mnc_ != mnc) {
-                return false;
-            }
-        }
-    } else if (this->mcc_ != MCC_UNDEFINED && this->mnc_ == MNC_UNDEFINED) {
-        if (mcc != MCC_UNDEFINED && this->mcc_ != mcc) {
-            return false;
+    if (mcc == MCC_UNDEFINED && mnc == MNC_UNDEFINED) {
+        return true;
+    }
+    if (this->mcc_ == mcc) {
+        if (mnc == MNC_UNDEFINED || this->mnc_ == mnc) {
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 bool ResConfigImpl::IsDirectionMatch(Direction direction) const
 {
-    if (this->direction_ != DIRECTION_NOT_SET && direction != DIRECTION_NOT_SET) {
-        if (this->direction_ != direction) {
-            return false;
-        }
+    if (direction == DIRECTION_NOT_SET || this->direction_ == direction) {
+        return true;
     }
-    return true;
+    return false;
 }
 
 bool ResConfigImpl::IsDeviceTypeMatch(DeviceType deviceType) const
 {
-    if (this->deviceType_ != DEVICE_NOT_SET && deviceType != DEVICE_NOT_SET) {
-        if (this->deviceType_ != deviceType) {
-            return false;
-        }
+    if (deviceType == DEVICE_NOT_SET || this->deviceType_ == deviceType) {
+        return true;
     }
-    return true;
+    return false;
 }
 
 bool ResConfigImpl::IsColorModeMatch(ColorMode colorMode, bool isCheckDarkAdaptation) const
@@ -472,26 +465,18 @@ bool ResConfigImpl::IsColorModeMatch(ColorMode colorMode, bool isCheckDarkAdapta
     if (isCheckDarkAdaptation && this->colorMode_ == DARK && !this->GetAppColorMode() && !this->GetAppDarkRes()) {
         return colorMode == COLOR_MODE_NOT_SET;
     }
-    if (this->colorMode_ != COLOR_MODE_NOT_SET && colorMode != COLOR_MODE_NOT_SET) {
-        if (this->colorMode_ != colorMode) {
-            return false;
-        }
+    if (colorMode == COLOR_MODE_NOT_SET || this->colorMode_ == colorMode) {
+        return true;
     }
-    return true;
+    return false;
 }
 
 bool ResConfigImpl::IsInputDeviceMatch(InputDevice inputDevice) const
 {
-    if (this->inputDevice_ == INPUTDEVICE_NOT_SET && inputDevice != INPUTDEVICE_NOT_SET) {
-        return false;
+    if (inputDevice == INPUTDEVICE_NOT_SET || this->inputDevice_ == inputDevice) {
+        return true;
     }
-    // reserve for future InputDevice expansion
-    if (this->inputDevice_ != INPUTDEVICE_NOT_SET && inputDevice != INPUTDEVICE_NOT_SET) {
-        if (this->inputDevice_ != inputDevice) {
-            return false;
-        }
-    }
-    return true;
+    return false;
 }
 
 /**
@@ -567,22 +552,12 @@ int ResConfigImpl::IsMccMncMoreSuitable(uint32_t otherMcc, uint32_t otherMnc, ui
     bool mccDefined = requestMcc != MCC_UNDEFINED && requestMnc == MNC_UNDEFINED;
     bool isMccOrMncDiff = this->mcc_ != otherMcc || this->mnc_ != otherMnc;
     bool isMccDiff = this->mcc_ != otherMcc;
-    if (defined && isMccOrMncDiff) {
-        if ((this->mcc_ != MCC_UNDEFINED) && (this->mnc_ != MNC_UNDEFINED)) {
-            // the mcc/mnc of this resConfig is suitable than other resConfig
-            ret = 1;
-        } else {
-            // the mcc/mnc of other resConfig mcc/mnc is suitable than this resConfig
-            ret = -1;
-        }
-    } else if (mccDefined && isMccDiff) {
-        if (this->mcc_ != MCC_UNDEFINED) {
-            // the mcc of this resConfig is suitable than other resConfig
-            ret = 1;
-        } else {
-            // the mcc of other resConfig is suitable than this resConfig
-            ret = -1;
-        }
+    int weightsThis = static_cast<int>(this->mcc_ != MCC_UNDEFINED) + static_cast<int>(this->mnc_ != MNC_UNDEFINED);
+    int weightsOther = static_cast<int>(otherMcc != MCC_UNDEFINED) + static_cast<int>(otherMnc != MNC_UNDEFINED);
+    if ((defined && isMccOrMncDiff) || (mccDefined && isMccDiff)) {
+        // 1 means the mcc/mnc of this resConfig is suitable than other resConfig
+        // -1 means the mcc/mnc of other resConfig mcc/mnc is suitable than this resConfig
+        ret = weightsThis > weightsOther ? 1 : -1;
     }
     return ret;
 }
