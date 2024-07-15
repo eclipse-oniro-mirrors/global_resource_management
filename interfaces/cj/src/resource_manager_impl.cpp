@@ -434,18 +434,4 @@ void ResourceManagerImpl::GetLocales(bool includeSystem, std::vector<std::string
 {
     return resMgr_->GetLocales(outValue, includeSystem);
 }
-
-char** g_vectorToCharPointer(std::vector<std::string>& vec)
-{
-    char** result = new char* [vec.size()];
-    for (size_t i = 0; i < vec.size(); i++) {
-        result[i] = new char[vec[i].length() + 1];
-        errno_t ret = strcpy_s(result[i], vec[i].length() + 1, vec[i].c_str());
-        if (ret != 0) {
-            delete result[i];
-            result[i] = nullptr;
-        }
-    }
-    return result;
-}
 }
