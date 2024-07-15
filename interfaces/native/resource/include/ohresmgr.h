@@ -60,9 +60,34 @@ extern "C" {
            {@link ERROR_CODE_RES_NOT_FOUND_BY_ID} 9001002 - No matching resource is found based on the resource ID.
            {@link ERROR_CODE_OUT_OF_MEMORY} 9001100 - Out of memory.
  * @since 12
+ * @deprecated since 12
+ * @useinstead OH_ResourceManager_GetMediaBase64Data
  */
 ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64(const NativeResourceManager *mgr, uint32_t resId,
     char **resultValue, uint64_t *resultLen, uint32_t density = 0);
+
+/**
+ * @brief Obtains the Base64 code of the image resource.
+ *
+ * Obtains the Base64 code of the image resource corresponding to the specified resource ID.\n
+ *
+ * @param mgr Indicates the pointer to {@link NativeResourceManager}
+ * {@link OH_ResourceManager_InitNativeResourceManager}.
+ * @param resId Indicates the resource ID.
+ * @param density The optional parameter ScreenDensity{@link ScreenDensity}, A value of 0 means
+ * to use the density of current system dpi. If this attribute is not required, set this parameter to 0.
+ * @param resultValue the result write to resultValue.
+ * @param resultLen the media length write to resultLen.
+ * @return {@link SUCCESS} 0 - Success.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid. Possible causes:
+ *         1.Incorrect parameter types; 2.Parameter verification failed.
+           {@link ERROR_CODE_RES_ID_NOT_FOUND} 9001001 - Invalid resource ID.
+           {@link ERROR_CODE_RES_NOT_FOUND_BY_ID} 9001002 - No matching resource is found based on the resource ID.
+           {@link ERROR_CODE_OUT_OF_MEMORY} 9001100 - Out of memory.
+ * @since 12
+ */
+ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64Data(const NativeResourceManager *mgr, uint32_t resId,
+    char **resultValue, uint64_t *resultLen, uint32_t density);
 
 /**
  * @brief Obtains the Base64 code of the image resource.
@@ -83,9 +108,34 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64(const NativeResource
            {@link ERROR_CODE_RES_NOT_FOUND_BY_NAME} 9001004 - No matching resource is found based on the resource name.
            {@link ERROR_CODE_OUT_OF_MEMORY} 9001100 - Out of memory.
  * @since 12
+ * @deprecated since 12
+ * @useinstead OH_ResourceManager_GetMediaBase64DataByName
  */
 ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64ByName(const NativeResourceManager *mgr,
     const char *resName, char **resultValue, uint64_t *resultLen, uint32_t density = 0);
+
+/**
+ * @brief Obtains the Base64 code of the image resource.
+ *
+ * Obtains the Base64 code of the image resource corresponding to the specified resource name.\n
+ *
+ * @param mgr Indicates the pointer to {@link NativeResourceManager}
+ * {@link OH_ResourceManager_InitNativeResourceManager}.
+ * @param resName Indicates the resource name.
+ * @param density The optional parameter ScreenDensity{@link ScreenDensity}, A value of 0 means
+ * to use the density of current system dpi. If this attribute is not required, set this parameter to 0.
+ * @param resultValue the result write to resultValue.
+ * @param resultLen the media length write to resultLen.
+ * @return {@link SUCCESS} 0 - Success.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid. Possible causes:
+ *         1.Incorrect parameter types; 2.Parameter verification failed.
+           {@link ERROR_CODE_RES_NAME_NOT_FOUND} 9001003 - Invalid resource name.
+           {@link ERROR_CODE_RES_NOT_FOUND_BY_NAME} 9001004 - No matching resource is found based on the resource name.
+           {@link ERROR_CODE_OUT_OF_MEMORY} 9001100 - Out of memory.
+ * @since 12
+ */
+ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64DataByName(const NativeResourceManager *mgr,
+    const char *resName, char **resultValue, uint64_t *resultLen, uint32_t density);
 
 /**
  * @brief Obtains the content of the image resource.
@@ -106,9 +156,34 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64ByName(const NativeRe
            {@link ERROR_CODE_RES_NOT_FOUND_BY_ID} 9001002 - No matching resource is found based on the resource ID.
            {@link ERROR_CODE_OUT_OF_MEMORY} 9001100 - Out of memory.
  * @since 12
+ * @deprecated since 12
+ * @useinstead OH_ResourceManager_GetMediaData
  */
 ResourceManager_ErrorCode OH_ResourceManager_GetMedia(const NativeResourceManager *mgr, uint32_t resId,
     uint8_t **resultValue, uint64_t *resultLen, uint32_t density = 0);
+
+/**
+ * @brief Obtains the content of the image resource.
+ *
+ * Obtains the content of the specified screen density media file corresponding to a specified resource ID.\n
+ *
+ * @param mgr Indicates the pointer to {@link NativeResourceManager}
+ * {@link OH_ResourceManager_InitNativeResourceManager}.
+ * @param resId Indicates the resource ID.
+ * @param density The optional parameter ScreenDensity{@link ScreenDensity}, A value of 0 means
+ * to use the density of current system dpi. If this attribute is not required, set this parameter to 0.
+ * @param resultValue the result write to resultValue.
+ * @param resultLen the media length write to resultLen.
+ * @return {@link SUCCESS} 0 - Success.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid. Possible causes:
+ *         1.Incorrect parameter types; 2.Parameter verification failed.
+           {@link ERROR_CODE_RES_ID_NOT_FOUND} 9001001 - Invalid resource ID.
+           {@link ERROR_CODE_RES_NOT_FOUND_BY_ID} 9001002 - No matching resource is found based on the resource ID.
+           {@link ERROR_CODE_OUT_OF_MEMORY} 9001100 - Out of memory.
+ * @since 12
+ */
+ResourceManager_ErrorCode OH_ResourceManager_GetMediaData(const NativeResourceManager *mgr, uint32_t resId,
+    uint8_t **resultValue, uint64_t *resultLen, uint32_t density);
 
 /**
  * @brief Obtains the content of the image resource.
@@ -129,9 +204,34 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMedia(const NativeResourceManage
            {@link ERROR_CODE_RES_NOT_FOUND_BY_NAME} 9001004 - No matching resource is found based on the resource name.
            {@link ERROR_CODE_OUT_OF_MEMORY} 9001100 - Out of memory.
  * @since 12
+ * @deprecated since 12
+ * @useinstead OH_ResourceManager_GetMediaDataByName
  */
 ResourceManager_ErrorCode OH_ResourceManager_GetMediaByName(const NativeResourceManager *mgr, const char *resName,
     uint8_t **resultValue, uint64_t *resultLen, uint32_t density = 0);
+
+/**
+ * @brief Obtains the content of the image resource.
+ *
+ * Obtains the content of the specified screen density media file corresponding to a specified resource name.\n
+ *
+ * @param mgr Indicates the pointer to {@link NativeResourceManager}
+ * {@link OH_ResourceManager_InitNativeResourceManager}.
+ * @param resName Indicates the resource name.
+ * @param density The optional parameter ScreenDensity{@link ScreenDensity}, A value of 0 means
+ * to use the density of current system dpi. If this attribute is not required, set this parameter to 0.
+ * @param resultValue the result write to resultValue.
+ * @param resultLen the media length write to resultLen.
+ * @return {@link SUCCESS} 0 - Success.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid. Possible causes:
+ *         1.Incorrect parameter types; 2.Parameter verification failed.
+           {@link ERROR_CODE_RES_NAME_NOT_FOUND} 9001003 - Invalid resource name.
+           {@link ERROR_CODE_RES_NOT_FOUND_BY_NAME} 9001004 - No matching resource is found based on the resource name.
+           {@link ERROR_CODE_OUT_OF_MEMORY} 9001100 - Out of memory.
+ * @since 12
+ */
+ResourceManager_ErrorCode OH_ResourceManager_GetMediaDataByName(const NativeResourceManager *mgr, const char *resName,
+    uint8_t **resultValue, uint64_t *resultLen, uint32_t density);
 
 /**
  * @brief Obtains the DrawableDescriptor of the media file.
@@ -151,9 +251,34 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaByName(const NativeResource
            {@link ERROR_CODE_RES_ID_NOT_FOUND} 9001001 - Invalid resource ID.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_ID} 9001002 - No matching resource is found based on the resource ID.
  * @since 12
+ * @deprecated since 12
+ * @useinstead OH_ResourceManager_GetDrawableDescriptorData
  */
 ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptor(const NativeResourceManager *mgr,
     uint32_t resId, ArkUI_DrawableDescriptor **drawableDescriptor, uint32_t density = 0, uint32_t type = 0);
+
+/**
+ * @brief Obtains the DrawableDescriptor of the media file.
+ *
+ * Obtains the DrawableDescriptor of the media file corresponding to a specified resource ID.\n
+ *
+ * @param mgr Indicates the pointer to {@link NativeResourceManager}
+ * {@link OH_ResourceManager_InitNativeResourceManager}.
+ * @param resId Indicates the resource ID.
+ * @param density The optional parameter ScreenDensity{@link ScreenDensity}, A value of 0 means
+ * to use the density of current system dpi. If this attribute is not required, set this parameter to 0.
+ * @param type The optional parameter means the media type, 0 means the normal media, 1 means the the theme style media.
+ * If this attribute is not required, set this parameter to 0.
+ * @param drawableDescriptor the result write to drawableDescriptor.
+ * @return {@link SUCCESS} 0 - Success.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid. Possible causes:
+ *         1.Incorrect parameter types; 2.Parameter verification failed.
+           {@link ERROR_CODE_RES_ID_NOT_FOUND} 9001001 - Invalid resource ID.
+           {@link ERROR_CODE_RES_NOT_FOUND_BY_ID} 9001002 - No matching resource is found based on the resource ID.
+ * @since 12
+ */
+ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptorData(const NativeResourceManager *mgr,
+    uint32_t resId, ArkUI_DrawableDescriptor **drawableDescriptor, uint32_t density, uint32_t type);
 
 /**
  * @brief Obtains the DrawableDescriptor of the media file.
@@ -173,9 +298,34 @@ ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptor(const NativeR
            {@link ERROR_CODE_RES_NAME_NOT_FOUND} 9001003 - Invalid resource name.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_NAME} 9001004 - No matching resource is found based on the resource name.
  * @since 12
+ * @deprecated since 12
+ * @useinstead OH_ResourceManager_GetDrawableDescriptorDataByName
  */
 ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptorByName(const NativeResourceManager *mgr,
     const char *resName, ArkUI_DrawableDescriptor **drawableDescriptor, uint32_t density = 0, uint32_t type = 0);
+
+/**
+ * @brief Obtains the DrawableDescriptor of the media file.
+ *
+ * Obtains the DrawableDescriptor of the media file corresponding to a specified resource name.\n
+ *
+ * @param mgr Indicates the pointer to {@link NativeResourceManager}
+ * {@link OH_ResourceManager_InitNativeResourceManager}.
+ * @param resName Indicates the resource name.
+ * @param density The optional parameter ScreenDensity{@link ScreenDensity}, A value of 0 means
+ * to use the density of current system dpi. If this attribute is not required, set this parameter to 0.
+ * @param type The optional parameter means the media type, 0 means the normal media, 1 means the the theme style media,
+ * 2 means the theme dynamic media. If this attribute is not required, set this parameter to 0.
+ * @param drawableDescriptor the result write to drawableDescriptor.
+ * @return {@link SUCCESS} 0 - Success.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid. Possible causes:
+ *         1.Incorrect parameter types; 2.Parameter verification failed.
+           {@link ERROR_CODE_RES_NAME_NOT_FOUND} 9001003 - Invalid resource name.
+           {@link ERROR_CODE_RES_NOT_FOUND_BY_NAME} 9001004 - No matching resource is found based on the resource name.
+ * @since 12
+ */
+ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptorDataByName(const NativeResourceManager *mgr,
+    const char *resName, ArkUI_DrawableDescriptor **drawableDescriptor, uint32_t density, uint32_t type);
 
 /**
  * @brief Obtains the symbol resource.
@@ -233,9 +383,31 @@ ResourceManager_ErrorCode OH_ResourceManager_GetSymbolByName(const NativeResourc
            Possible causes: Incorrect parameter types.
  *         {@link ERROR_CODE_OUT_OF_MEMORY} 9001100 - Out of memory.
  * @since 12
+ * @deprecated since 12
+ * @useinstead OH_ResourceManager_GetLocalesData
  */
 ResourceManager_ErrorCode OH_ResourceManager_GetLocales(const NativeResourceManager *mgr, char ***resultValue,
     uint32_t *resultLen, bool includeSystem = false);
+
+/**
+ * @brief Obtains locales list.
+ *
+ * You need to call the OH_ResourceManager_ReleaseStringArray() method to release the memory of localinfo.\n
+ *
+ * @param mgr Indicates the pointer to {@link NativeResourceManager}
+ *        {@link OH_ResourceManager_InitNativeResourceManager}.
+ * @param resultValue the result write to resultValue.
+ * @param resultLen the locales length write to resultLen.
+ * @param includeSystem the parameter controls whether to include system resources.
+ * If this attribute is not required, set this parameter to false.
+ * @return {@link SUCCESS} 0 - Success.
+ *         {@link ERROR_CODE_INVALID_INPUT_PARAMETER} 401 - The input parameter invalid.
+           Possible causes: Incorrect parameter types.
+ *         {@link ERROR_CODE_OUT_OF_MEMORY} 9001100 - Out of memory.
+ * @since 12
+ */
+ResourceManager_ErrorCode OH_ResourceManager_GetLocalesData(const NativeResourceManager *mgr, char ***resultValue,
+    uint32_t *resultLen, bool includeSystem);
 
 /**
  * @brief Obtains the device configuration.
