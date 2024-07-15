@@ -38,7 +38,6 @@ ohos_shared_library("resourcemanager") {
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "napi:ace_napi",
-    "node:node_header_notice",
   ]
 
   stack_protector_ret = true
