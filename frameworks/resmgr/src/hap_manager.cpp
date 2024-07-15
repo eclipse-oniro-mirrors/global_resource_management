@@ -932,7 +932,7 @@ bool HapManager::RemoveResource(const std::string &path, const std::vector<std::
             targetOverlay.erase(std::remove(targetOverlay.begin(), targetOverlay.end(), outPath),
                 targetOverlay.end());
         }
-        for (auto resIter = hapResources_.begin(); resIter != hapResources_.end(); ) {
+        for (auto resIter = hapResources_.begin(); resIter != hapResources_.end();) {
             if ((*resIter) == nullptr) {
                 RESMGR_HILOGE(RESMGR_TAG, "hapResource is nullptr");
                 return false;
