@@ -446,18 +446,22 @@ bool ResConfigImpl::IsMccMncMatch(uint32_t mcc,  uint32_t mnc) const
 
 bool ResConfigImpl::IsDirectionMatch(Direction direction) const
 {
-    if (direction == DIRECTION_NOT_SET || this->direction_ == direction) {
-        return true;
+    if (this->direction_ != DIRECTION_NOT_SET && direction != DIRECTION_NOT_SET) {
+        if (this->direction_ != direction) {
+            return false;
+        }
     }
-    return false;
+    return true;
 }
 
 bool ResConfigImpl::IsDeviceTypeMatch(DeviceType deviceType) const
 {
-    if (deviceType == DEVICE_NOT_SET || this->deviceType_ == deviceType) {
-        return true;
+    if (this->deviceType_ != DEVICE_NOT_SET && deviceType != DEVICE_NOT_SET) {
+        if (this->deviceType_ != deviceType) {
+            return false;
+        }
     }
-    return false;
+    return true;
 }
 
 bool ResConfigImpl::IsColorModeMatch(ColorMode colorMode, bool isCheckDarkAdaptation) const
@@ -465,18 +469,26 @@ bool ResConfigImpl::IsColorModeMatch(ColorMode colorMode, bool isCheckDarkAdapta
     if (isCheckDarkAdaptation && this->colorMode_ == DARK && !this->GetAppColorMode() && !this->GetAppDarkRes()) {
         return colorMode == COLOR_MODE_NOT_SET;
     }
-    if (colorMode == COLOR_MODE_NOT_SET || this->colorMode_ == colorMode) {
-        return true;
+    if (this->colorMode_ != COLOR_MODE_NOT_SET && colorMode != COLOR_MODE_NOT_SET) {
+        if (this->colorMode_ != colorMode) {
+            return false;
+        }
     }
-    return false;
+    return true;
 }
 
 bool ResConfigImpl::IsInputDeviceMatch(InputDevice inputDevice) const
 {
-    if (inputDevice == INPUTDEVICE_NOT_SET || this->inputDevice_ == inputDevice) {
-        return true;
+    if (this->inputDevice_ == INPUTDEVICE_NOT_SET && inputDevice != INPUTDEVICE_NOT_SET) {
+        return false;
     }
-    return false;
+    // reserve for future InputDevice expansion
+    if (this->inputDevice_ != INPUTDEVICE_NOT_SET && inputDevice != INPUTDEVICE_NOT_SET) {
+        if (this->inputDevice_ != inputDevice) {
+            return false;
+        }
+    }
+    return true;
 }
 
 /**
