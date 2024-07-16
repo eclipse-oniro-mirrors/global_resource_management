@@ -14,7 +14,6 @@
  */
 
 #include "resource_manager_ffi.h"
-
 #include <vector>
 #include "utils.h"
 
@@ -24,13 +23,47 @@ using namespace OHOS::Global::Resource;
 namespace OHOS {
 namespace Resource {
 extern "C" {
+void ClearCharPointer(char** ptr, int count)
+{
+    for (int i = 0; i < count; i++) {
+        free(ptr[i]);
+    }
+}
+
+CArrString VectorToCArrString(std::vector<std::string>& vec, int32_t &code)
+{
+    CArrString ret = { .head = nullptr, .size = 0};
+    if (vec.size() == 0) {
+        return ret;
+    }
+    char** result = reinterpret_cast<char**>(malloc(sizeof(char*) * vec.size()));
+    if (result == nullptr) {
+        code = RState::NOT_ENOUGH_MEM;
+        return ret;
+    }
+    for (size_t i = 0; i < vec.size(); i++) {
+        result[i] = ::Utils::MallocCString(vec[i]);
+        if (result[i] == nullptr) {
+            ClearCharPointer(result, i);
+            free(result);
+            code = RState::NOT_ENOUGH_MEM;
+            return ret;
+        }
+    }
+    ret.head = result;
+    ret.size = static_cast<int64_t>(vec.size());
+    return ret;
+}
 
 int64_t CJ_GetResourceManagerStageMode(OHOS::AbilityRuntime::Context* context)
 {
     if (context == nullptr) {
-        return -1;
+        return ERR_INVALID_INSTANCE_CODE;
     }
     auto nativeResMgrLibrary = FFIData::Create<ResourceManagerImpl>(context);
+    if (!nativeResMgrLibrary) {
+        return ERR_INVALID_INSTANCE_CODE;
+    }
     return nativeResMgrLibrary->GetID();
 }
 
@@ -96,27 +129,12 @@ RetDataCArrString CJ_GetRawFileList(int64_t id, const char* path)
     if (!instance) {
         return ret;
     }
-    std::vector<std::string> data;
-    auto state = instance->GetRawFileList(path, data);
-    ret.code = state;
-
-    if (state == SUCCESS_CODE) {
-        auto size = data.size();
-        if (size <= 0) {
-            return ret;
-        }
-        auto arr = static_cast<char**>(malloc(sizeof(char*) * size));
-        if (arr == nullptr) {
-            ret.code = RState::ERROR;
-            return ret;
-        }
-        for (int i = 0; i < static_cast<int>(size); ++i) {
-            arr[i] = ::Utils::MallocCString(data[i]);
-        }
-        ret.code = SUCCESS_CODE;
-        ret.data.head = arr;
-        ret.data.size = static_cast<int64_t>(data.size());
+    std::vector<std::string> value;
+    ret.code = instance->GetRawFileList(path, value);
+    if (ret.code != RState::SUCCESS) {
+        return ret;
     }
+    ret.data = VectorToCArrString(value, ret.code);
     return ret;
 }
 
@@ -213,8 +231,7 @@ RetDataCArrString CJ_GetStringArrayValue(int64_t id, uint32_t resId)
     if (ret.code != RState::SUCCESS) {
         return ret;
     }
-    ret.data.head = g_vectorToCharPointer(value);
-    ret.data.size = (int64_t)value.size();
+    ret.data = VectorToCArrString(value, ret.code);
     return ret;
 }
 
@@ -241,8 +258,7 @@ RetDataCArrString CJ_GetStringArrayValueByResource(int64_t id, CResource resourc
         LOGE("ResourceManagerImpl::GetStringArrayById failed %{public}" PRIu32, ret.code);
         return ret;
     }
-    ret.data.head = g_vectorToCharPointer(value);
-    ret.data.size = (int64_t)value.size();
+    ret.data = VectorToCArrString(value, ret.code);
     return ret;
 }
 
@@ -260,8 +276,7 @@ RetDataCArrString CJ_GetStringArrayByName(int64_t id, const char *name)
     if (ret.code != RState::SUCCESS) {
         return ret;
     }
-    ret.data.head = g_vectorToCharPointer(value);
-    ret.data.size = (int64_t)value.size();
+    ret.data = VectorToCArrString(value, ret.code);
     return ret;
 }
 
@@ -545,7 +560,7 @@ RetDataCArrUI8 CJ_GetMediaContentByResource(int64_t id, CResource resource, uint
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     int32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {
-        LOGE("ResourceManager CJ_GetNumberByResource failed at GetHapResourceManager");
+        LOGE("ResourceManager CJ_GetMediaContentByResource failed at GetHapResourceManager");
         ret.code = RState::ERROR_CODE_RES_NOT_FOUND_BY_ID;
         return ret;
     }
@@ -591,7 +606,7 @@ RetDataCString CJ_GetMediaContentBase64ByResource(int64_t id, CResource resource
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     int32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {
-        LOGE("ResourceManager CJ_GetNumberByResource failed at GetHapResourceManager");
+        LOGE("ResourceManager CJ_GetMediaContentBase64ByResource failed at GetHapResourceManager");
         ret.code = RState::ERROR_CODE_RES_NOT_FOUND_BY_ID;
         return ret;
     }
@@ -652,7 +667,7 @@ RetDataI64 CJ_GetDrawableDescriptorByResource(int64_t id, CResource resource, ui
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     int32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {
-        LOGE("ResourceManager CJ_GetNumberByResource failed at GetHapResourceManager");
+        LOGE("ResourceManager CJ_GetDrawableDescriptorByResource failed at GetHapResourceManager");
         ret.code = RState::ERROR_CODE_RES_NOT_FOUND_BY_ID;
         return ret;
     }
@@ -696,8 +711,7 @@ RetDataCArrString CJ_GetLocales(int64_t id, bool includeSystem)
     std::vector<std::string> value;
     instance->GetLocales(includeSystem, value);
     ret.code = RState::SUCCESS;
-    ret.data.head = g_vectorToCharPointer(value);
-    ret.data.size = (int64_t)value.size();
+    ret.data = VectorToCArrString(value, ret.code);
     return ret;
 }
 }
