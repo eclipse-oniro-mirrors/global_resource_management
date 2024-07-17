@@ -332,7 +332,7 @@ private:
 
     // the key is name, each restype holds one map
     // name may conflict in same restype !
-    std::vector<std::map<std::string, std::shared_ptr<IdValues>> *> idValuesNameMap_;
+    std::vector<std::shared_ptr<std::map<std::string, std::shared_ptr<IdValues>>>> idValuesNameMap_;
 
     // judge the hap resource is system or not.
     bool isSystem_;
