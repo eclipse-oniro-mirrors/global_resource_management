@@ -286,9 +286,7 @@ std::string IdParam::ToString() const
 }
 
 ResId::~ResId()
-{
-    idParams_.clear();
-}
+{}
 
 std::string ResId::ToString() const
 {
@@ -302,7 +300,6 @@ std::string ResId::ToString() const
 ResKey::~ResKey()
 {
     RESMGR_HILOGD(RESMGR_TAG, "~ResKey()");
-    keyParams_.clear();
 }
 
 std::string ResKey::ToString() const
@@ -326,7 +323,6 @@ ResDesc::~ResDesc()
         delete (resHeader_);
         resHeader_ = nullptr;
     }
-    keys_.clear();
 }
 
 std::string ResDesc::ToString() const

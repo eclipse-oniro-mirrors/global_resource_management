@@ -61,9 +61,7 @@ HapResource::ValueUnderQualifierDir::~ValueUnderQualifierDir()
 
 // IdValues
 HapResource::IdValues::~IdValues()
-{
-    limitPaths_.clear();
-}
+{}
 
 // HapResource
 HapResource::HapResource(const std::string path, time_t lastModTime, std::shared_ptr<ResDesc> resDes,
@@ -73,13 +71,6 @@ HapResource::HapResource(const std::string path, time_t lastModTime, std::shared
 
 HapResource::~HapResource()
 {
-    idValuesMap_.clear();
-    for (size_t i = 0; i < idValuesNameMap_.size(); ++i) {
-        if (idValuesNameMap_[i] != nullptr) {
-            delete (idValuesNameMap_[i]);
-            idValuesNameMap_[i] = nullptr;
-        }
-    }
     lastModTime_ = 0;
 }
 
@@ -323,7 +314,7 @@ bool HapResource::Init(std::shared_ptr<ResConfigImpl> &defaultConfig)
     resourcePath_ = indexPath_.substr(0, index + 1);
 #endif
     for (int i = 0; i < ResType::MAX_RES_TYPE; ++i) {
-        auto mptr = new (std::nothrow) std::map<std::string, std::shared_ptr<IdValues>>();
+        auto mptr = std::make_shared<std::map<std::string, std::shared_ptr<IdValues>>>();
         if (mptr == nullptr) {
             RESMGR_HILOGE(RESMGR_TAG, "new std::map failed in HapResource::Init");
             return false;
@@ -409,7 +400,7 @@ const std::shared_ptr<HapResource::IdValues> HapResource::GetIdValues(const uint
 const std::shared_ptr<HapResource::IdValues> HapResource::GetIdValuesByName(
     const std::string name, const ResType resType) const
 {
-    const std::map<std::string, std::shared_ptr<IdValues>> *map = idValuesNameMap_[resType];
+    const auto map = idValuesNameMap_[resType];
     std::map<std::string, std::shared_ptr<IdValues>>::const_iterator iter = map->find(name);
     if (iter == map->end()) {
         return nullptr;
@@ -423,7 +414,7 @@ int HapResource::GetIdByName(const char *name, const ResType resType) const
     if (name == nullptr) {
         return -1;
     }
-    const std::map<std::string, std::shared_ptr<IdValues>> *map = idValuesNameMap_[resType];
+    const auto map = idValuesNameMap_[resType];
     std::map<std::string, std::shared_ptr<IdValues>>::const_iterator iter = map->find(name);
     if (iter == map->end()) {
         return OBJ_NOT_FOUND;
