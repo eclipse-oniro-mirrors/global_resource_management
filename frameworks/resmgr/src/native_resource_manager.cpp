@@ -306,9 +306,8 @@ ResourceManager_ErrorCode OH_ResourceManager_GetSymbol(const NativeResourceManag
     if (mgr == nullptr || resultValue == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    RState state = RState::SUCCESS;
     uint32_t tempResultValue;
-    state = mgr->resManager->GetSymbolById(resId, tempResultValue);
+    RState state = mgr->resManager->GetSymbolById(resId, tempResultValue);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG,
@@ -325,9 +324,8 @@ ResourceManager_ErrorCode OH_ResourceManager_GetSymbolByName(const NativeResourc
     if (mgr == nullptr || resultValue == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    RState state = RState::SUCCESS;
     uint32_t tempResultValue;
-    state = mgr->resManager->GetSymbolByName(resName, tempResultValue);
+    RState state = mgr->resManager->GetSymbolByName(resName, tempResultValue);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG,
@@ -380,9 +378,8 @@ ResourceManager_ErrorCode OH_ResourceManager_GetStringArray(const NativeResource
     if (mgr == nullptr || resultValue == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    RState state = RState::SUCCESS;
     std::vector<std::string> tempResultValue;
-    state = mgr->resManager->GetStringArrayById(resId, tempResultValue);
+    RState state = mgr->resManager->GetStringArrayById(resId, tempResultValue);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG,
@@ -398,9 +395,8 @@ ResourceManager_ErrorCode OH_ResourceManager_GetStringArrayByName(const NativeRe
     if (mgr == nullptr || resultValue == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    RState state = RState::SUCCESS;
     std::vector<std::string> tempResultValue;
-    state = mgr->resManager->GetStringArrayByName(resName, tempResultValue);
+    RState state = mgr->resManager->GetStringArrayByName(resName, tempResultValue);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG,
@@ -416,9 +412,8 @@ ResourceManager_ErrorCode OH_ResourceManager_GetPluralStringByName(const NativeR
     if (mgr == nullptr || resultValue == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    RState state = RState::SUCCESS;
     std::string tempResultValue;
-    state = mgr->resManager->GetPluralStringByNameFormat(tempResultValue, resName, num, num);
+    RState state = mgr->resManager->GetPluralStringByNameFormat(tempResultValue, resName, num, num);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG,
@@ -434,9 +429,8 @@ ResourceManager_ErrorCode OH_ResourceManager_GetPluralString(const NativeResourc
     if (mgr == nullptr || resultValue == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    RState state = RState::SUCCESS;
     std::string tempResultValue;
-    state = mgr->resManager->GetPluralStringByIdFormat(tempResultValue, resId, num, num);
+    RState state = mgr->resManager->GetPluralStringByIdFormat(tempResultValue, resId, num, num);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG,
@@ -452,9 +446,8 @@ ResourceManager_ErrorCode OH_ResourceManager_GetColor(const NativeResourceManage
     if (mgr == nullptr || resultValue == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    RState state = RState::SUCCESS;
     uint32_t tempResultValue;
-    state = mgr->resManager->GetColorById(resId, tempResultValue);
+    RState state = mgr->resManager->GetColorById(resId, tempResultValue);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG, "failed get color id = %{public}d, errorCode = %{public}d", resId, errorCode);
@@ -470,9 +463,8 @@ ResourceManager_ErrorCode OH_ResourceManager_GetColorByName(const NativeResource
     if (mgr == nullptr || resultValue == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    RState state = RState::SUCCESS;
     uint32_t tempResultValue;
-    state = mgr->resManager->GetColorByName(resName, tempResultValue);
+    RState state = mgr->resManager->GetColorByName(resName, tempResultValue);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG,
@@ -489,9 +481,8 @@ ResourceManager_ErrorCode OH_ResourceManager_GetInt(const NativeResourceManager 
     if (mgr == nullptr || resultValue == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    RState state = RState::SUCCESS;
     int tempResultValue;
-    state = mgr->resManager->GetIntegerById(resId, tempResultValue);
+    RState state = mgr->resManager->GetIntegerById(resId, tempResultValue);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG,
@@ -508,9 +499,8 @@ ResourceManager_ErrorCode OH_ResourceManager_GetIntByName(const NativeResourceMa
     if (mgr == nullptr || resultValue == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    RState state = RState::SUCCESS;
     int tempResultValue;
-    state = mgr->resManager->GetIntegerByName(resName, tempResultValue);
+    RState state = mgr->resManager->GetIntegerByName(resName, tempResultValue);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG,
@@ -527,9 +517,8 @@ ResourceManager_ErrorCode OH_ResourceManager_GetFloat(const NativeResourceManage
     if (mgr == nullptr || resultValue == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    RState state = RState::SUCCESS;
     float tempResultValue;
-    state = mgr->resManager->GetFloatById(resId, tempResultValue);
+    RState state = mgr->resManager->GetFloatById(resId, tempResultValue);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG, "failed get float id = %{public}d, errorCode = %{public}d", resId, errorCode);
@@ -545,9 +534,8 @@ ResourceManager_ErrorCode OH_ResourceManager_GetFloatByName(const NativeResource
     if (mgr == nullptr || resultValue == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    RState state = RState::SUCCESS;
     float tempResultValue;
-    state = mgr->resManager->GetFloatByName(resName, tempResultValue);
+    RState state = mgr->resManager->GetFloatByName(resName, tempResultValue);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG,
@@ -564,9 +552,8 @@ ResourceManager_ErrorCode OH_ResourceManager_GetBool(const NativeResourceManager
     if (mgr == nullptr || resultValue == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    RState state = RState::SUCCESS;
     bool tempResultValue;
-    state = mgr->resManager->GetBooleanById(resId, tempResultValue);
+    RState state = mgr->resManager->GetBooleanById(resId, tempResultValue);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG, "failed get bool id = %{public}d, errorCode = %{public}d", resId, errorCode);
@@ -582,9 +569,8 @@ ResourceManager_ErrorCode OH_ResourceManager_GetBoolByName(const NativeResourceM
     if (mgr == nullptr || resultValue == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    RState state = RState::SUCCESS;
     bool tempResultValue;
-    state = mgr->resManager->GetBooleanByName(resName, tempResultValue);
+    RState state = mgr->resManager->GetBooleanByName(resName, tempResultValue);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG,
@@ -653,12 +639,11 @@ ResourceManager_ErrorCode OH_ResourceManager_GetString(const NativeResourceManag
     if (mgr == nullptr || resultValue == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    RState state = RState::SUCCESS;
     string tempResultValue;
 
     va_list args;
     va_start(args, resultValue);
-    state = mgr->resManager->GetStringFormatById(tempResultValue, resId, args);
+    RState state = mgr->resManager->GetStringFormatById(tempResultValue, resId, args);
     va_end(args);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
@@ -675,12 +660,11 @@ ResourceManager_ErrorCode OH_ResourceManager_GetStringByName(const NativeResourc
     if (mgr == nullptr || resultValue == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    RState state = RState::SUCCESS;
     string tempResultValue;
 
     va_list args;
     va_start(args, resultValue);
-    state = mgr->resManager->GetStringFormatByName(tempResultValue, resName, args);
+    RState state = mgr->resManager->GetStringFormatByName(tempResultValue, resName, args);
     va_end(args);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
