@@ -134,6 +134,40 @@ public:
     }
 
     /**
+     * Get the hqf resource path.
+     */
+    inline std::string GetPatchPath() const
+    {
+        return patchPath_;
+    }
+
+    /**
+     * Get the hqf flag of HapResource.
+     *
+     * @return true if isPatch_ is true, false otherwise
+     */
+    inline bool IsPatch() const
+    {
+        return isPatch_;
+    }
+
+    /**
+     * Set the hqf resource path.
+     */
+    inline void SetPatchPath(const std::string& patchPath)
+    {
+        patchPath_ = patchPath;
+    }
+
+    /**
+     * Set the hqf flag of HapResource.
+     */
+    inline void IsPatch(bool isPatch)
+    {
+        isPatch_ = isPatch;
+    }
+
+    /**
      * Get the resource information
      */
     const std::vector<std::string> GetQualifiers() const;
@@ -340,8 +374,14 @@ private:
     // judge the hap resource is overlay or not.
     bool isOverlay_;
 
-    //judge the theme SystemRes is enabled or not.
+    // judge the theme SystemRes is enabled or not.
     bool isThemeSystemResEnable_;
+
+    // hqf resource path.
+    std::string patchPath_;
+
+    // judge the hqf is enabled or not.
+    bool isPatch_ = false;
 };
 } // namespace Resource
 } // namespace Global

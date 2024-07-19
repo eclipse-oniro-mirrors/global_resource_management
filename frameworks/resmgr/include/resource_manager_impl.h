@@ -62,6 +62,8 @@ public:
      */
     virtual bool AddResource(const char *path, const uint32_t &selectedTypes = SELECT_ALL);
 
+    virtual bool AddPatchResource(const char *path, const char *patchPath);
+
     /**
      * Add resource path to overlay paths
      * @param path the resource path
