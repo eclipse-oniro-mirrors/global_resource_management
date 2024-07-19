@@ -1323,6 +1323,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetMcc(460);
+    rc->SetMnc(101);
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(LIGHT);
     rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);

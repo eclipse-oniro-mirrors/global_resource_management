@@ -179,4 +179,125 @@ HWTEST_F(StringUtilsTest, ReplacePlaceholderWithParamsTest004, TestSize.Level1)
     EXPECT_TRUE(ret);
     EXPECT_EQ(inputValue, "percent is 0.5");
 }
+
+/*
+ * @tc.name: ReplacePlaceholderWithParamsTest005
+ * @tc.desc: Test ReplacePlaceholderWithParams function
+ * @tc.type: FUNC
+ */
+HWTEST_F(StringUtilsTest, ReplacePlaceholderWithParamsTest005, TestSize.Level1)
+{
+    ResConfigImpl rc;
+    rc.SetLocaleInfo("zh", nullptr, "CN");
+    std::string inputValue = "percent is %1$.2f, count is %2$d, name is %3$s";
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams = {
+        { ResourceManager::NapiValueType::NAPI_NUMBER, "59.557" },
+        { ResourceManager::NapiValueType::NAPI_NUMBER, "100" },
+        { ResourceManager::NapiValueType::NAPI_STRING, "hello" }
+    };
+    bool ret = ReplacePlaceholderWithParams(inputValue, rc, jsParams);
+    EXPECT_TRUE(ret);
+    EXPECT_EQ(inputValue, "percent is 59.56, count is 100, name is hello");
+}
+
+/*
+ * @tc.name: ReplacePlaceholderWithParamsTest006
+ * @tc.desc: Test ReplacePlaceholderWithParams function
+ * @tc.type: FUNC
+ */
+HWTEST_F(StringUtilsTest, ReplacePlaceholderWithParamsTest006, TestSize.Level1)
+{
+    ResConfigImpl rc;
+    rc.SetLocaleInfo("zh", nullptr, "CN");
+    std::string inputValue = "percent is %.2f, count is %d, name is %s";
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams = {
+        { ResourceManager::NapiValueType::NAPI_NUMBER, "59.557" },
+        { ResourceManager::NapiValueType::NAPI_NUMBER, "100" },
+        { ResourceManager::NapiValueType::NAPI_STRING, "hello" }
+    };
+    bool ret = ReplacePlaceholderWithParams(inputValue, rc, jsParams);
+    EXPECT_TRUE(ret);
+    EXPECT_EQ(inputValue, "percent is 59.56, count is 100, name is hello");
+}
+
+/*
+ * @tc.name: ReplacePlaceholderWithParamsTest007
+ * @tc.desc: Test ReplacePlaceholderWithParams function
+ * @tc.type: FUNC
+ */
+HWTEST_F(StringUtilsTest, ReplacePlaceholderWithParamsTest007, TestSize.Level1)
+{
+    ResConfigImpl rc;
+    rc.SetLocaleInfo("zh", nullptr, "CN");
+    std::string inputValue = "percent is %%f, count is %d, name is %s";
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams = {
+        { ResourceManager::NapiValueType::NAPI_NUMBER, "59.557" },
+        { ResourceManager::NapiValueType::NAPI_NUMBER, "100" },
+        { ResourceManager::NapiValueType::NAPI_STRING, "hello" }
+    };
+    bool ret = ReplacePlaceholderWithParams(inputValue, rc, jsParams);
+    EXPECT_FALSE(ret);
+}
+
+/*
+ * @tc.name: ReplacePlaceholderWithParamsTest008
+ * @tc.desc: Test ReplacePlaceholderWithParams function
+ * @tc.type: FUNC
+ */
+HWTEST_F(StringUtilsTest, ReplacePlaceholderWithParamsTest008, TestSize.Level1)
+{
+    ResConfigImpl rc;
+    rc.SetLocaleInfo("zh", nullptr, "CN");
+    std::string inputValue = "percent is %%f, count is %2$d, name is %3$s";
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams = {
+        { ResourceManager::NapiValueType::NAPI_NUMBER, "59.557" },
+        { ResourceManager::NapiValueType::NAPI_NUMBER, "100" },
+        { ResourceManager::NapiValueType::NAPI_STRING, "hello" }
+    };
+    bool ret = ReplacePlaceholderWithParams(inputValue, rc, jsParams);
+    EXPECT_TRUE(ret);
+    EXPECT_EQ(inputValue, "percent is %f, count is 100, name is hello");
+}
+
+/*
+ * @tc.name: ReplacePlaceholderWithParamsTest009
+ * @tc.desc: Test ReplacePlaceholderWithParams function
+ * @tc.type: FUNC
+ */
+HWTEST_F(StringUtilsTest, ReplacePlaceholderWithParamsTest009, TestSize.Level1)
+{
+    ResConfigImpl rc;
+    rc.SetLocaleInfo("zh", nullptr, "CN");
+    std::string inputValue = "percent is %%f, count is %1$d, name is %2$s";
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams = {
+        { ResourceManager::NapiValueType::NAPI_NUMBER, "100" },
+        { ResourceManager::NapiValueType::NAPI_STRING, "hello" }
+    };
+    bool ret = ReplacePlaceholderWithParams(inputValue, rc, jsParams);
+    EXPECT_TRUE(ret);
+    EXPECT_EQ(inputValue, "percent is %f, count is 100, name is hello");
+}
+
+/*
+ * @tc.name: ReplacePlaceholderWithParamsTest010
+ * @tc.desc: Test ReplacePlaceholderWithParams function
+ * @tc.type: FUNC
+ */
+HWTEST_F(StringUtilsTest, ReplacePlaceholderWithParamsTest010, TestSize.Level1)
+{
+    ResConfigImpl rc;
+    rc.SetLocaleInfo("zh", nullptr, "CN");
+    std::string inputValue = "percent is %.0f";
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams = {
+        { ResourceManager::NapiValueType::NAPI_NUMBER, "59.557" },
+    };
+    bool ret = ReplacePlaceholderWithParams(inputValue, rc, jsParams);
+    EXPECT_TRUE(ret);
+    EXPECT_EQ(inputValue, "percent is 60");
+
+    inputValue = "percent is %.6f";
+    ret = ReplacePlaceholderWithParams(inputValue, rc, jsParams);
+    EXPECT_TRUE(ret);
+    EXPECT_EQ(inputValue, "percent is 59.557000");
+}
 }
