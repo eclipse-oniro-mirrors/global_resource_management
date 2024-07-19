@@ -1284,7 +1284,6 @@ napi_value ResourceManagerNapiSyncImpl::GetOverrideResourceManager(napi_env env,
         dataContext->overrideResConfig_);
     if (overrideResMgr == nullptr) {
         dataContext->SetErrorMsg("GetOverrideResourceManager, overrideResMgr is null", false);
-        RESMGR_HILOGE(RESMGR_JS_TAG, "GetOverrideResourceManager, overrideResMgr is null");
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
@@ -1325,7 +1324,6 @@ napi_value ResourceManagerNapiSyncImpl::UpdateOverrideConfiguration(napi_env env
     int32_t state = getAddonAndConfig(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to get param in GetOverrideResourceManager", false);
-        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get param in GetOverrideResourceManager");
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -1334,7 +1332,6 @@ napi_value ResourceManagerNapiSyncImpl::UpdateOverrideConfiguration(napi_env env
     state = resMgr->UpdateOverrideResConfig(*dataContext->overrideResConfig_);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("UpdateOverrideConfiguration failed due to invalid config", false);
-        RESMGR_HILOGE(RESMGR_JS_TAG, "UpdateOverrideConfiguration failed due to invalid config");
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
     }
     return nullptr;

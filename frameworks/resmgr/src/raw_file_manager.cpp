@@ -354,7 +354,7 @@ static bool GetRawFileDescriptorFromHap(const RawFile *rawFile, RawFileDescripto
     RState state = rawFile->resMgr->resManager->
         GetRawFdNdkFromHap(rawFile->filePath, resMgrDescriptor);
     if (state != SUCCESS) {
-        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "GetRawFileDescriptorFromHap failed to get rawFile descriptor");
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "GetRawFileDescriptorFromHap failed");
         return false;
     }
     descriptor.fd = resMgrDescriptor.fd;
@@ -578,7 +578,7 @@ static bool GetRawFileDescriptorFromHap64(const RawFile64 *rawFile, RawFileDescr
     RState state = rawFile->raw->resMgr->resManager->
         GetRawFdNdkFromHap(rawFile->raw->filePath, resMgrDescriptor);
     if (state != SUCCESS) {
-        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "GetRawFileDescriptorFromHap64 failed to get rawFile descriptor");
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "GetRawFileDescriptorFromHap64 failed");
         return false;
     }
     descriptor->fd = resMgrDescriptor.fd;

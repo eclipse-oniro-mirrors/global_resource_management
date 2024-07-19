@@ -28,7 +28,7 @@ void ReportInitResourceManagerFail(const std::string& bundleName, const std::str
         "BUNDLENAME", bundleName,
         "ERROR_MSG", errMsg);
     if (ret != 0) {
-        RESMGR_HILOGE(RESMGR_TAG, "hisysevent write failed! ret %{public}d, bundleName %{public}s, errMsg %{public}s",
+        RESMGR_HILOGE(RESMGR_TAG, "HiSysEventWrite failed! ret %{public}d, bundleName %{public}s, errMsg %{public}s",
             ret, bundleName.c_str(), errMsg.c_str());
     }
 }
@@ -42,7 +42,7 @@ void ReportGetResourceByIdFail(int32_t resId, const std::string& result, const s
         "ERROR_MSG", errMsg);
     if (ret != 0) {
         RESMGR_HILOGE(RESMGR_TAG,
-            "hisysevent write failed! ret %{public}d, resId %{public}d, result %{public}s, errMsg %{public}s.",
+            "HiSysEventWrite failed! ret %{public}d, resId %{public}d, result %{public}s, errMsg %{public}s.",
             ret, resId, result.c_str(), errMsg.c_str());
     }
 }
@@ -56,7 +56,7 @@ void ReportGetResourceByNameFail(const std::string& resName, const std::string& 
         "ERROR_MSG", errMsg);
     if (ret != 0) {
         RESMGR_HILOGE(RESMGR_TAG,
-            "hisysevent write failed! ret %{public}d, resName %{public}s, result %{public}s, errMsg %{public}s",
+            "HiSysEventWrite failed! ret %{public}d, resName %{public}s, result %{public}s, errMsg %{public}s",
             ret, resName.c_str(), result.c_str(), errMsg.c_str());
     }
 }
@@ -69,7 +69,7 @@ void ReportAddResourcePathFail(const char* resourcePath, const std::string& errM
         "ERROR_MSG", errMsg);
     if (ret != 0) {
         RESMGR_HILOGE(RESMGR_TAG,
-            "hisysevent write failed! ret %{public}d, resourcePath %{public}s, errMsg %{public}s.",
+            "HiSysEventWrite failed! ret %{public}d, resourcePath %{public}s, errMsg %{public}s.",
             ret, resourcePath, errMsg.c_str());
     }
 }

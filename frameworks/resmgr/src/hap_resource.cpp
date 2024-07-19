@@ -224,7 +224,6 @@ const std::unordered_map<std::string, std::shared_ptr<HapResource>> HapResource:
             // load overlay hap, the isOverlay flag set true.
             const std::shared_ptr<HapResource> overlayResource = Load(iter->c_str(), defaultConfig, isSystem, true);
             if (overlayResource == nullptr) {
-                RESMGR_HILOGE(RESMGR_TAG, "load overlay failed");
                 success = false;
                 break;
             }
