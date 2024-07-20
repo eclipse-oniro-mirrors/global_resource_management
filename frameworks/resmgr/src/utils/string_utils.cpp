@@ -37,7 +37,18 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
-const std::regex PLACEHOLDER_MATCHING_RULES(R"((%%)|%((\d+)\$){0,1}([dsf]))");
+const std::regex PLACEHOLDER_MATCHING_RULES(R"((%%)|%((\d+)\$){0,1}(\.\d)?([dsf]))");
+// the whole string match the regex, such as "%1$.2f" in the string "count is %1$.2f"
+constexpr uint8_t MATCHE_INDEX_WHOLE_STRING = 0;
+// match %%
+constexpr uint8_t MATCHE_INDEX_DOUBLE_PERCENT = 1;
+// match the placeholder index number, such as 1 in 1$
+constexpr uint8_t MATCHE_INDEX_PLACEHOLDER_INDEX = 3;
+// match precision, such as .2f
+constexpr uint8_t MATCHE_INDEX_PRECISION = 4;
+// match type [dsf]
+constexpr uint8_t MATCHE_INDEX_PLACEHOLDER_TYPE = 5;
+constexpr int32_t INVALID_PRECISION = -1;
 const std::string SIZE_T_MAX_STR = std::to_string(std::numeric_limits<size_t>::max());
 #ifdef SUPPORT_GRAPHICS
 #endif
@@ -162,7 +173,8 @@ bool parseArgs(const std::string &inputOutputValue, va_list args,
     return getJsParams(inputOutputValue, args, paramsWithOutNum, paramsWithNum, jsParams);
 }
 
-bool LocalizeNumber(std::string &inputOutputNum, const ResConfigImpl &resConfig)
+bool LocalizeNumber(std::string &inputOutputNum, const ResConfigImpl &resConfig,
+    const int32_t precision = INVALID_PRECISION)
 {
 #ifdef SUPPORT_GRAPHICS
     const ResLocale *resLocale = resConfig.GetResLocale();
@@ -198,6 +210,10 @@ bool LocalizeNumber(std::string &inputOutputNum, const ResConfigImpl &resConfig)
 
     icu::number::LocalizedNumberFormatter numberFormat = icu::number::NumberFormatter::withLocale(locale);
     numberFormat = numberFormat.grouping(UNumberGroupingStrategy::UNUM_GROUPING_OFF);
+    numberFormat = numberFormat.roundingMode(UNUM_ROUND_HALFUP);
+    if (precision != INVALID_PRECISION) {
+        numberFormat = numberFormat.precision(icu::number::Precision::fixedFraction(precision));
+    }
     UErrorCode status = U_ZERO_ERROR;
     double num = std::stod(inputOutputNum);
     inputOutputNum.clear();
@@ -212,16 +228,11 @@ bool LocalizeNumber(std::string &inputOutputNum, const ResConfigImpl &resConfig)
 #endif
 }
 
-bool GetReplaceStr(const std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams,
-    const size_t &paramIndex, const std::string &placeHolderType, const ResConfigImpl &config, std::string &replaceStr)
+bool GetReplaceStr(const std::tuple<ResourceManager::NapiValueType, std::string> &jsParam,
+    const std::string &placeHolderType, int32_t precision, const ResConfigImpl &config, std::string &replaceStr)
 {
-    if (paramIndex >= jsParams.size()) {
-        RESMGR_HILOGE(RESMGR_TAG, "index of placeholder out of range");
-        return false;
-    }
-
-    ResourceManager::NapiValueType paramType = std::get<0>(jsParams[paramIndex]);
-    std::string paramValue = std::get<1>(jsParams[paramIndex]);
+    ResourceManager::NapiValueType paramType = std::get<0>(jsParam);
+    std::string paramValue = std::get<1>(jsParam);
 
     // string type
     if (placeHolderType == "s") {
@@ -248,7 +259,34 @@ bool GetReplaceStr(const std::vector<std::tuple<ResourceManager::NapiValueType, 
 
     // double type
     replaceStr = paramValue;
-    return LocalizeNumber(replaceStr, config);
+    return LocalizeNumber(replaceStr, config, precision);
+}
+
+bool MatchPlaceholderIndex(std::string placeholderIndex, size_t &paramIndex, size_t &matchCount)
+{
+    if (placeholderIndex.length() != 0) {
+        if (placeholderIndex.size() > SIZE_T_MAX_STR.size() ||
+            (placeholderIndex.size() == SIZE_T_MAX_STR.size() && placeholderIndex > SIZE_T_MAX_STR)) {
+            RESMGR_HILOGE(RESMGR_TAG, "index of placeholder is too large");
+            return false;
+        }
+        if (std::stoul(placeholderIndex) < 1) {
+            return false;
+        }
+        paramIndex = std::stoul(placeholderIndex) - 1;
+    } else {
+        paramIndex = matchCount++;
+    }
+    return true;
+}
+
+int32_t GetPrecision(const std::string &precisionStr)
+{
+    size_t posOfDecimalPoint = precisionStr.find(".");
+    if (posOfDecimalPoint != std::string::npos) {
+        return std::stoi(precisionStr.substr(posOfDecimalPoint + 1));
+    }
+    return INVALID_PRECISION;
 }
 
 bool ReplacePlaceholderWithParams(std::string &inputOutputValue, const ResConfigImpl &resConfig,
@@ -265,10 +303,10 @@ bool ReplacePlaceholderWithParams(std::string &inputOutputValue, const ResConfig
     int prefixLength = 0;
     
     while (std::regex_search(start, end, matches, PLACEHOLDER_MATCHING_RULES)) {
-        prefixLength = matches[0].first - inputOutputValue.begin();
+        prefixLength = matches[MATCHE_INDEX_WHOLE_STRING].first - inputOutputValue.begin();
         // Matched to %%, replace it with %
-        if (matches[1].length() != 0) {
-            inputOutputValue.erase(matches[1].first);
+        if (matches[MATCHE_INDEX_DOUBLE_PERCENT].length() != 0) {
+            inputOutputValue.erase(matches[MATCHE_INDEX_DOUBLE_PERCENT].first);
             start = inputOutputValue.begin() + prefixLength + 1;
             end = inputOutputValue.end();
             continue;
@@ -278,29 +316,23 @@ bool ReplacePlaceholderWithParams(std::string &inputOutputValue, const ResConfig
         }
 
         // Matched to placeholder, check and parse param index
-        std::string placeholderIndex = matches[3];
-        std::string placeholderType = matches[4];
+        std::string placeholderIndex = matches[MATCHE_INDEX_PLACEHOLDER_INDEX];
         size_t paramIndex;
-        if (placeholderIndex.length() != 0) {
-            if (placeholderIndex.size() > SIZE_T_MAX_STR.size() ||
-                (placeholderIndex.size() == SIZE_T_MAX_STR.size() && placeholderIndex > SIZE_T_MAX_STR)) {
-                RESMGR_HILOGE(RESMGR_TAG, "index of placeholder is too large");
-                return false;
-            }
-            if (std::stoul(placeholderIndex) < 1) {
-                return false;
-            }
-            paramIndex = std::stoul(placeholderIndex) - 1;
-        } else {
-            paramIndex = matchCount++;
-        }
-
-        // Replace placeholder with corresponding param
-        std::string replaceStr;
-        if (!GetReplaceStr(jsParams, paramIndex, placeholderType, resConfig, replaceStr)) {
+        if (!MatchPlaceholderIndex(placeholderIndex, paramIndex, matchCount)) {
             return false;
         }
-        inputOutputValue.replace(prefixLength, matches[0].length(), replaceStr);
+        if (paramIndex >= jsParams.size()) {
+            RESMGR_HILOGE(RESMGR_TAG, "index of placeholder out of range");
+            return false;
+        }
+        // Replace placeholder with corresponding param
+        std::string replaceStr;
+        uint32_t precision = GetPrecision(matches[MATCHE_INDEX_PRECISION]);
+        std::string placeholderType = matches[MATCHE_INDEX_PLACEHOLDER_TYPE];
+        if (!GetReplaceStr(jsParams[paramIndex], placeholderType, precision, resConfig, replaceStr)) {
+            return false;
+        }
+        inputOutputValue.replace(prefixLength, matches[MATCHE_INDEX_WHOLE_STRING].length(), replaceStr);
 
         // Update iterator
         start = inputOutputValue.begin() + prefixLength + replaceStr.length();

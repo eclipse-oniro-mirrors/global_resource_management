@@ -25,6 +25,12 @@ int ReplacePlaceholderWithParamsTest001(void);
 int ReplacePlaceholderWithParamsTest002(void);
 int ReplacePlaceholderWithParamsTest003(void);
 int ReplacePlaceholderWithParamsTest004(void);
+int ReplacePlaceholderWithParamsTest005(void);
+int ReplacePlaceholderWithParamsTest006(void);
+int ReplacePlaceholderWithParamsTest007(void);
+int ReplacePlaceholderWithParamsTest008(void);
+int ReplacePlaceholderWithParamsTest009(void);
+int ReplacePlaceholderWithParamsTest010(void);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
