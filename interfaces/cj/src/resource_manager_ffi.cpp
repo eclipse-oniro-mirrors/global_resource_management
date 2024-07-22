@@ -679,6 +679,10 @@ RetDataI64 CJ_GetDrawableDescriptorByResource(int64_t id, CResource resource, ui
         return ret;
     }
     auto ptr = FFIData::Create<DrawableDescriptorImpl>(drawableDescriptor);
+    if (!ptr) {
+        ret.code = ERR_INVALID_INSTANCE_CODE;
+        return ret;
+    }
     ret.data = ptr->GetID();
     return ret;
 }
