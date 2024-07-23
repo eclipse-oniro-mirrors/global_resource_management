@@ -19,6 +19,7 @@
 #include "resource_manager_log.h"
 #include "securec.h"
 #include "utils.h"
+#include "cj_common_ffi.h"
 
 using namespace OHOS::Global::Resource;
 using namespace OHOS::Ace;
@@ -345,6 +346,9 @@ int32_t ResourceManagerImpl::GetDrawableDescriptor(uint32_t id, int64_t &outValu
         return state;
     }
     auto ptr = FFIData::Create<DrawableDescriptorImpl>(drawableDescriptor.release());
+    if (!ptr) {
+        return ERR_INVALID_INSTANCE_CODE;
+    }
     outValue = ptr->GetID();
     return state;
 }
@@ -359,6 +363,9 @@ int32_t ResourceManagerImpl::GetDrawableDescriptorByName(const char *name, int64
         return state;
     }
     auto ptr = FFIData::Create<DrawableDescriptorImpl>(drawableDescriptor.release());
+    if (!ptr) {
+        return ERR_INVALID_INSTANCE_CODE;
+    }
     outValue = ptr->GetID();
     return state;
 }
@@ -392,7 +399,7 @@ bool ResourceManagerImpl::GetHapResourceManager(Global::Resource::ResourceManage
 std::string ResourceManagerImpl::GetLocale(std::unique_ptr<Global::Resource::ResConfig> &cfg)
 {
     std::string result;
-    #ifdef SUPPORT_GRAPHICS
+#ifdef SUPPORT_GRAPHICS
         const icu::Locale *localeInfo = cfg->GetLocaleInfo();
         if (localeInfo == nullptr) {
             return result;
@@ -412,7 +419,7 @@ std::string ResourceManagerImpl::GetLocale(std::unique_ptr<Global::Resource::Res
         if (region != nullptr) {
             result += std::string("_") + region;
         }
-    #endif
+#endif
     return result;
 }
 
