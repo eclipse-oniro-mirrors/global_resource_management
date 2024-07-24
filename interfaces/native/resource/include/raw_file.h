@@ -206,7 +206,7 @@ bool OH_ResourceManager_GetRawFileDescriptor(const RawFile *rawFile, RawFileDesc
 /**
  * @brief Obtains the file descriptor of a raw file based on the long offset and file length.
  *
- * The obtains raw file descriptor is used to read the raw file.\n
+ * The obtains raw file descriptor is used to read the raw file.
  *
  * @param rawFile Indicates the pointer to {@link RawFile}.
  * @param descriptor Indicates the raw file's file descriptor, start position and the length in the HAP.
@@ -233,7 +233,7 @@ bool OH_ResourceManager_ReleaseRawFileDescriptor(const RawFileDescriptor &descri
 /**
  * @brief Release the file descriptor of a raw file.
  *
- * The opened raw file descriptor must be released after used to avoid the file descriptor leak.\n
+ * The opened raw file descriptor must be released after used to avoid the file descriptor leak.
  *
  * @param descriptor Indicates the raw file's file descriptor, start position and the length in the HAP.
  * @return Returns true: release the raw file descriptor successfully, false: release the raw file descriptor failed.
