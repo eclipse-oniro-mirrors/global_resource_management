@@ -19,8 +19,8 @@
 #include <cstdint>
 #include <cstdio>
 #include <string>
-#include <unzip.h>
 #include <set>
+#include <unzip.h>
 #include "res_desc.h"
 #include "res_config_impl.h"
 #include "resource_manager.h"
