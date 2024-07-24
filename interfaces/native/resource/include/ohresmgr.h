@@ -69,7 +69,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64(const NativeResource
 /**
  * @brief Obtains the Base64 code of the image resource.
  *
- * Obtains the Base64 code of the image resource corresponding to the specified resource ID.\n
+ * Obtains the Base64 code of the image resource corresponding to the specified resource ID.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
  * {@link OH_ResourceManager_InitNativeResourceManager}.
@@ -117,7 +117,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64ByName(const NativeRe
 /**
  * @brief Obtains the Base64 code of the image resource.
  *
- * Obtains the Base64 code of the image resource corresponding to the specified resource name.\n
+ * Obtains the Base64 code of the image resource corresponding to the specified resource name.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
  * {@link OH_ResourceManager_InitNativeResourceManager}.
@@ -165,7 +165,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMedia(const NativeResourceManage
 /**
  * @brief Obtains the content of the image resource.
  *
- * Obtains the content of the specified screen density media file corresponding to a specified resource ID.\n
+ * Obtains the content of the specified screen density media file corresponding to a specified resource ID.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
  * {@link OH_ResourceManager_InitNativeResourceManager}.
@@ -213,7 +213,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaByName(const NativeResource
 /**
  * @brief Obtains the content of the image resource.
  *
- * Obtains the content of the specified screen density media file corresponding to a specified resource name.\n
+ * Obtains the content of the specified screen density media file corresponding to a specified resource name.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
  * {@link OH_ResourceManager_InitNativeResourceManager}.
@@ -260,7 +260,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptor(const NativeR
 /**
  * @brief Obtains the DrawableDescriptor of the media file.
  *
- * Obtains the DrawableDescriptor of the media file corresponding to a specified resource ID.\n
+ * Obtains the DrawableDescriptor of the media file corresponding to a specified resource ID.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
  * {@link OH_ResourceManager_InitNativeResourceManager}.
@@ -307,8 +307,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptorByName(const N
 /**
  * @brief Obtains the DrawableDescriptor of the media file.
  *
- * Obtains the DrawableDescriptor of the media file corresponding to a specified resource name.\n
- *
+ * Obtains the DrawableDescriptor of the media file corresponding to a specified resource name.
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
  * {@link OH_ResourceManager_InitNativeResourceManager}.
  * @param resName Indicates the resource name.
@@ -392,7 +391,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetLocales(const NativeResourceMana
 /**
  * @brief Obtains locales list.
  *
- * You need to call the OH_ResourceManager_ReleaseStringArray() method to release the memory of localinfo.\n
+ * You need to call the OH_ResourceManager_ReleaseStringArray() method to release the memory of localinfo.
  *
  * @param mgr Indicates the pointer to {@link NativeResourceManager}
  *        {@link OH_ResourceManager_InitNativeResourceManager}.
