@@ -314,10 +314,6 @@ bool HapResource::Init(std::shared_ptr<ResConfigImpl> &defaultConfig)
 #endif
     for (int i = 0; i < ResType::MAX_RES_TYPE; ++i) {
         auto mptr = std::make_shared<std::map<std::string, std::shared_ptr<IdValues>>>();
-        if (mptr == nullptr) {
-            RESMGR_HILOGE(RESMGR_TAG, "new std::map failed in HapResource::Init");
-            return false;
-        }
         idValuesNameMap_.push_back(mptr);
     }
     return InitIdList(defaultConfig);
