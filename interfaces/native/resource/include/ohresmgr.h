@@ -60,8 +60,6 @@ extern "C" {
            {@link ERROR_CODE_RES_NOT_FOUND_BY_ID} 9001002 - No matching resource is found based on the resource ID.
            {@link ERROR_CODE_OUT_OF_MEMORY} 9001100 - Out of memory.
  * @since 12
- * @deprecated since 12
- * @useinstead OH_ResourceManager_GetMediaBase64Data
  */
 ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64(const NativeResourceManager *mgr, uint32_t resId,
     char **resultValue, uint64_t *resultLen, uint32_t density = 0);
@@ -108,8 +106,6 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64Data(const NativeReso
            {@link ERROR_CODE_RES_NOT_FOUND_BY_NAME} 9001004 - No matching resource is found based on the resource name.
            {@link ERROR_CODE_OUT_OF_MEMORY} 9001100 - Out of memory.
  * @since 12
- * @deprecated since 12
- * @useinstead OH_ResourceManager_GetMediaBase64DataByName
  */
 ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64ByName(const NativeResourceManager *mgr,
     const char *resName, char **resultValue, uint64_t *resultLen, uint32_t density = 0);
@@ -156,8 +152,6 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64DataByName(const Nati
            {@link ERROR_CODE_RES_NOT_FOUND_BY_ID} 9001002 - No matching resource is found based on the resource ID.
            {@link ERROR_CODE_OUT_OF_MEMORY} 9001100 - Out of memory.
  * @since 12
- * @deprecated since 12
- * @useinstead OH_ResourceManager_GetMediaData
  */
 ResourceManager_ErrorCode OH_ResourceManager_GetMedia(const NativeResourceManager *mgr, uint32_t resId,
     uint8_t **resultValue, uint64_t *resultLen, uint32_t density = 0);
@@ -204,8 +198,6 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaData(const NativeResourceMa
            {@link ERROR_CODE_RES_NOT_FOUND_BY_NAME} 9001004 - No matching resource is found based on the resource name.
            {@link ERROR_CODE_OUT_OF_MEMORY} 9001100 - Out of memory.
  * @since 12
- * @deprecated since 12
- * @useinstead OH_ResourceManager_GetMediaDataByName
  */
 ResourceManager_ErrorCode OH_ResourceManager_GetMediaByName(const NativeResourceManager *mgr, const char *resName,
     uint8_t **resultValue, uint64_t *resultLen, uint32_t density = 0);
@@ -251,8 +243,6 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaDataByName(const NativeReso
            {@link ERROR_CODE_RES_ID_NOT_FOUND} 9001001 - Invalid resource ID.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_ID} 9001002 - No matching resource is found based on the resource ID.
  * @since 12
- * @deprecated since 12
- * @useinstead OH_ResourceManager_GetDrawableDescriptorData
  */
 ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptor(const NativeResourceManager *mgr,
     uint32_t resId, ArkUI_DrawableDescriptor **drawableDescriptor, uint32_t density = 0, uint32_t type = 0);
@@ -298,8 +288,6 @@ ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptorData(const Nat
            {@link ERROR_CODE_RES_NAME_NOT_FOUND} 9001003 - Invalid resource name.
            {@link ERROR_CODE_RES_NOT_FOUND_BY_NAME} 9001004 - No matching resource is found based on the resource name.
  * @since 12
- * @deprecated since 12
- * @useinstead OH_ResourceManager_GetDrawableDescriptorDataByName
  */
 ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptorByName(const NativeResourceManager *mgr,
     const char *resName, ArkUI_DrawableDescriptor **drawableDescriptor, uint32_t density = 0, uint32_t type = 0);
@@ -382,8 +370,6 @@ ResourceManager_ErrorCode OH_ResourceManager_GetSymbolByName(const NativeResourc
            Possible causes: Incorrect parameter types.
  *         {@link ERROR_CODE_OUT_OF_MEMORY} 9001100 - Out of memory.
  * @since 12
- * @deprecated since 12
- * @useinstead OH_ResourceManager_GetLocalesData
  */
 ResourceManager_ErrorCode OH_ResourceManager_GetLocales(const NativeResourceManager *mgr, char ***resultValue,
     uint32_t *resultLen, bool includeSystem = false);
