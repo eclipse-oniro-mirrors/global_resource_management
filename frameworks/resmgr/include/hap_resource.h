@@ -162,7 +162,7 @@ public:
     /**
      * Set the hqf flag of HapResource.
      */
-    inline void IsPatch(bool isPatch)
+    inline void SetIsPatch(bool isPatch)
     {
         isPatch_ = isPatch;
     }

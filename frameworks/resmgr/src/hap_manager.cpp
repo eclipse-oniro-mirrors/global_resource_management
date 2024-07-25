@@ -513,7 +513,7 @@ bool HapManager::AddPatchResourcePath(const char *path, const char *patchPath)
     for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
         if ((*iter)->GetIndexPath() == sPath) {
             (*iter)->SetPatchPath(sPatchPath);
-            (*iter)->IsPatch(true);
+            (*iter)->SetIsPatch(true);
             return true;
         }
     }
@@ -772,7 +772,7 @@ RState HapManager::FindRawFileFromHap(const std::string &rawFileName, size_t &le
             continue;
         }
         std::string tempPath = (*iter)->GetIndexPath();
-        std::string tempPatchPath = "";
+        std::string tempPatchPath;
         if ((*iter)->IsPatch()) {
             tempPatchPath = (*iter)->GetPatchPath();
         }
@@ -820,7 +820,7 @@ RState HapManager::GetRawFd(const std::string &rawFileName, ResourceManager::Raw
             continue;
         }
         std::string tempPath = (*iter)->GetIndexPath();
-        std::string tempPatchPath = "";
+        std::string tempPatchPath;
         if ((*iter)->IsPatch()) {
             tempPatchPath = (*iter)->GetPatchPath();
         }
