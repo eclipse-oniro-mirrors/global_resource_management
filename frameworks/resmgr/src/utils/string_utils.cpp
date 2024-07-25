@@ -327,7 +327,7 @@ bool ReplacePlaceholderWithParams(std::string &inputOutputValue, const ResConfig
         }
         // Replace placeholder with corresponding param
         std::string replaceStr;
-        uint32_t precision = GetPrecision(matches[MATCHE_INDEX_PRECISION]);
+        int32_t precision = GetPrecision(matches[MATCHE_INDEX_PRECISION]);
         std::string placeholderType = matches[MATCHE_INDEX_PLACEHOLDER_TYPE];
         if (!GetReplaceStr(jsParams[paramIndex], placeholderType, precision, resConfig, replaceStr)) {
             return false;

@@ -298,7 +298,6 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest006, TestSize.Le
     }
     rc->SetLocaleInfo("en", nullptr, "XA");
     RState state = rm->UpdateResConfig(*rc);
-    delete rc;
     EXPECT_EQ(SUCCESS, state);
 
     int id = rmc->GetResId("app_name", ResType::STRING);
@@ -308,6 +307,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest006, TestSize.Le
     
     rc->SetLocaleInfo("ar", nullptr, "XB");
     rm->GetStringById(id, outValue);
+    delete rc;
     EXPECT_TRUE(outValue != "App Name");
 }
 
