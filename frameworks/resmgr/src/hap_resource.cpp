@@ -289,6 +289,9 @@ void HapResource::UpdateOverlayInfo(std::unordered_map<std::string, std::unorder
 
 bool HapResource::Init(std::shared_ptr<ResConfigImpl> &defaultConfig)
 {
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
+#endif
 #ifdef __WINNT__
     char separator = '\\';
 #else
