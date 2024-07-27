@@ -365,11 +365,16 @@ static bool GetRawFileDescriptorFromHap(const RawFile *rawFile, RawFileDescripto
 
 bool OH_ResourceManager_GetRawFileDescriptor(const RawFile *rawFile, RawFileDescriptor &descriptor)
 {
+    return OH_ResourceManager_GetRawFileDescriptorData(rawFile, &descriptor);
+}
+
+bool OH_ResourceManager_GetRawFileDescriptorData(const RawFile *rawFile, RawFileDescriptor *descriptor)
+{
     if (rawFile == nullptr || rawFile->actualOffset == nullptr) {
         return false;
     }
     if (rawFile->resMgr != nullptr) {
-        return GetRawFileDescriptorFromHap(rawFile, descriptor);
+        return GetRawFileDescriptorFromHap(rawFile, *descriptor);
     }
     char paths[PATH_MAX] = {0};
 #ifdef __WINNT__
@@ -383,9 +388,9 @@ bool OH_ResourceManager_GetRawFileDescriptor(const RawFile *rawFile, RawFileDesc
 #endif
     int fd = open(paths, O_RDONLY);
     if (fd > 0) {
-        descriptor.fd = fd;
-        descriptor.length = static_cast<long>(rawFile->length);
-        descriptor.start = static_cast<long>(rawFile->actualOffset->offset);
+        descriptor->fd = fd;
+        descriptor->length = static_cast<long>(rawFile->length);
+        descriptor->start = static_cast<long>(rawFile->actualOffset->offset);
     } else {
         return false;
     }
@@ -394,8 +399,13 @@ bool OH_ResourceManager_GetRawFileDescriptor(const RawFile *rawFile, RawFileDesc
 
 bool OH_ResourceManager_ReleaseRawFileDescriptor(const RawFileDescriptor &descriptor)
 {
-    if (descriptor.fd > 0) {
-        return close(descriptor.fd) == 0;
+    return OH_ResourceManager_ReleaseRawFileDescriptorData(&descriptor);
+}
+
+bool OH_ResourceManager_ReleaseRawFileDescriptorData(const RawFileDescriptor *descriptor)
+{
+    if (descriptor->fd > 0) {
+        return close(descriptor->fd) == 0;
     }
     return true;
 }

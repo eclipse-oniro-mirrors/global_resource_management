@@ -148,7 +148,7 @@ typedef struct ResourceManager_Configuration {
     /** Indicates the screen direction of the current device. */
     ResourceManager_Direction direction;
     /** Indicates the current system language, for example, zh-Hans-CN. */
-    char* locale = nullptr;
+    char* locale;
     /** Indicates the device type. */
     ResourceManager_DeviceType deviceType;
     /** Indicates the screen density. */
@@ -156,9 +156,9 @@ typedef struct ResourceManager_Configuration {
     /** Indicates the color mode. */
     ResourceManager_ColorMode colorMode;
     /** Indicates the mcc. */
-    uint32_t mcc = 0;
+    uint32_t mcc;
     /** Indicates the mnc. */
-    uint32_t mnc = 0;
+    uint32_t mnc;
     /** Reserved attributes. */
     uint32_t reserved[20];
 } ResourceManager_Configuration;

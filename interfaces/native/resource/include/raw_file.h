@@ -38,7 +38,9 @@
 #ifndef GLOBAL_RAW_FILE_H
 #define GLOBAL_RAW_FILE_H
 
-#include <string>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -196,8 +198,23 @@ long OH_ResourceManager_GetRawFileOffset(const RawFile *rawFile);
  * @return Returns true: open the raw file descriptor successfully, false: the raw file is not allowed to access.
  * @since 8
  * @version 1.0
+ * @deprecated since 12
+ * @useinstead OH_ResourceManager_GetRawFileDescriptorData
  */
 bool OH_ResourceManager_GetRawFileDescriptor(const RawFile *rawFile, RawFileDescriptor &descriptor);
+
+/**
+ * @brief Obtains the file descriptor of a raw file based on the long offset and file length.
+ *
+ * The obtains raw file descriptor is used to read the raw file.
+ *
+ * @param rawFile Indicates the pointer to {@link RawFile}.
+ * @param descriptor Indicates the raw file's file descriptor, start position and the length in the HAP.
+ * @return Returns true: obtains the raw file descriptor successfully, false: the raw file is not allowed to access.
+ * @since 12
+ * @version 1.0
+ */
+bool OH_ResourceManager_GetRawFileDescriptorData(const RawFile *rawFile, RawFileDescriptor *descriptor);
 
 /**
  * @brief Closes the file descriptor of a raw file.
@@ -208,8 +225,22 @@ bool OH_ResourceManager_GetRawFileDescriptor(const RawFile *rawFile, RawFileDesc
  * @return Returns true: closes the raw file descriptor successfully, false: closes the raw file descriptor failed.
  * @since 8
  * @version 1.0
+ * @deprecated since 12
+ * @useinstead OH_ResourceManager_ReleaseRawFileDescriptorData
  */
 bool OH_ResourceManager_ReleaseRawFileDescriptor(const RawFileDescriptor &descriptor);
+
+/**
+ * @brief Release the file descriptor of a raw file.
+ *
+ * The opened raw file descriptor must be released after used to avoid the file descriptor leak.
+ *
+ * @param descriptor Indicates the raw file's file descriptor, start position and the length in the HAP.
+ * @return Returns true: release the raw file descriptor successfully, false: release the raw file descriptor failed.
+ * @since 12
+ * @version 1.0
+ */
+bool OH_ResourceManager_ReleaseRawFileDescriptorData(const RawFileDescriptor *descriptor);
 
 /**
  * @brief Reads a raw file.

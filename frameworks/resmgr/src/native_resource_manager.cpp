@@ -80,9 +80,6 @@ ResourceManager_ErrorCode copyLocalInfo(const icu::Locale *localeInfo, ResourceM
     if (region != nullptr) {
         locale += std::string("_") + region;
     }
-    if (configuration->locale != nullptr) {
-        free(configuration->locale);
-    }
     configuration->locale = (char*)malloc(locale.size() + 1);
     if (configuration->locale == nullptr) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG, "GetConfiguration malloc error");
@@ -117,6 +114,12 @@ ResourceManager_ErrorCode copyString(char **resultValue, string tempResultValue,
 ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64(const NativeResourceManager *mgr, uint32_t resId,
     char **resultValue, uint64_t *resultLen, uint32_t density)
 {
+    return OH_ResourceManager_GetMediaBase64Data(mgr, resId, resultValue, resultLen, density);
+}
+
+ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64Data(const NativeResourceManager *mgr, uint32_t resId,
+    char **resultValue, uint64_t *resultLen, uint32_t density)
+{
     if (mgr == nullptr || resultValue == nullptr || resultLen == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
@@ -144,6 +147,12 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64(const NativeResource
 }
 
 ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64ByName(const NativeResourceManager *mgr,
+    const char *resName, char **resultValue, uint64_t *resultLen, uint32_t density)
+{
+    return OH_ResourceManager_GetMediaBase64DataByName(mgr, resName, resultValue, resultLen, density);
+}
+
+ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64DataByName(const NativeResourceManager *mgr,
     const char *resName, char **resultValue, uint64_t *resultLen, uint32_t density)
 {
     if (mgr == nullptr || resultValue == nullptr || resultLen == nullptr) {
@@ -176,6 +185,12 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64ByName(const NativeRe
 ResourceManager_ErrorCode OH_ResourceManager_GetMedia(const NativeResourceManager *mgr, uint32_t resId,
     uint8_t **resultValue, uint64_t *resultLen, uint32_t density)
 {
+    return OH_ResourceManager_GetMediaData(mgr, resId, resultValue, resultLen, density);
+}
+
+ResourceManager_ErrorCode OH_ResourceManager_GetMediaData(const NativeResourceManager *mgr, uint32_t resId,
+    uint8_t **resultValue, uint64_t *resultLen, uint32_t density)
+{
     if (mgr == nullptr || resultValue == nullptr || resultLen == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
@@ -203,6 +218,12 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMedia(const NativeResourceManage
 ResourceManager_ErrorCode OH_ResourceManager_GetMediaByName(const NativeResourceManager *mgr, const char *resName,
     uint8_t **resultValue, uint64_t *resultLen, uint32_t density)
 {
+    return OH_ResourceManager_GetMediaDataByName(mgr, resName, resultValue, resultLen, density);
+}
+
+ResourceManager_ErrorCode OH_ResourceManager_GetMediaDataByName(const NativeResourceManager *mgr, const char *resName,
+    uint8_t **resultValue, uint64_t *resultLen, uint32_t density)
+{
     if (mgr == nullptr || resultValue == nullptr || resultLen == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
@@ -228,6 +249,12 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaByName(const NativeResource
 }
 
 ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptor(const NativeResourceManager *mgr,
+    uint32_t resId, ArkUI_DrawableDescriptor **drawableDescriptor, uint32_t density, uint32_t type)
+{
+    return OH_ResourceManager_GetDrawableDescriptorData(mgr, resId, drawableDescriptor, density, type);
+}
+
+ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptorData(const NativeResourceManager *mgr,
     uint32_t resId, ArkUI_DrawableDescriptor **drawableDescriptor, uint32_t density, uint32_t type)
 {
     if (mgr == nullptr || drawableDescriptor == nullptr) {
@@ -259,6 +286,12 @@ ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptor(const NativeR
 }
 
 ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptorByName(const NativeResourceManager *mgr,
+    const char *resName, ArkUI_DrawableDescriptor **drawableDescriptor, uint32_t density, uint32_t type)
+{
+    return OH_ResourceManager_GetDrawableDescriptorDataByName(mgr, resName, drawableDescriptor, density, type);
+}
+
+ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptorDataByName(const NativeResourceManager *mgr,
     const char *resName, ArkUI_DrawableDescriptor **drawableDescriptor, uint32_t density, uint32_t type)
 {
     if (mgr == nullptr || drawableDescriptor == nullptr) {
@@ -337,6 +370,12 @@ ResourceManager_ErrorCode OH_ResourceManager_GetSymbolByName(const NativeResourc
 }
 
 ResourceManager_ErrorCode OH_ResourceManager_GetLocales(const NativeResourceManager *mgr, char ***resultValue,
+    uint32_t *resultLen, bool includeSystem)
+{
+    return OH_ResourceManager_GetLocalesData(mgr, resultValue, resultLen, includeSystem);
+}
+
+ResourceManager_ErrorCode OH_ResourceManager_GetLocalesData(const NativeResourceManager *mgr, char ***resultValue,
     uint32_t *resultLen, bool includeSystem)
 {
     if (mgr == nullptr || resultValue == nullptr) {
