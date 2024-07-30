@@ -145,13 +145,13 @@ bool parseArgs(const std::string &inputOutputValue, va_list args,
     std::vector<std::pair<int, std::string>> paramsWithOutNum;
     std::vector<std::pair<int, std::string>> paramsWithNum;
     while (std::regex_search(start, end, matches, PLACEHOLDER_MATCHING_RULES)) {
-        prefixLength = matches[0].first - inputOutputValue.begin();
+        prefixLength = matches[MATCHE_INDEX_WHOLE_STRING].first - inputOutputValue.begin();
         if (matches[1].length() != 0) {
             start = inputOutputValue.begin() + prefixLength + offset;
             continue;
         }
-        std::string placeholderIndex = matches[3];
-        std::string placeholderType = matches[4];
+        std::string placeholderIndex = matches[MATCHE_INDEX_PLACEHOLDER_INDEX];
+        std::string placeholderType = matches[MATCHE_INDEX_PLACEHOLDER_TYPE];
         size_t paramIndex;
         if (placeholderIndex.length() != 0) {
             if (placeholderIndex.size() > SIZE_T_MAX_STR.size() ||
