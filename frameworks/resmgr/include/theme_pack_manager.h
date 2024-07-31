@@ -41,7 +41,7 @@ public:
      * @param moduleName the hap moduleName
      * @param userId the uesr id
      */
-    void LoadThemeRes(const std::string &bundleName, const std::string &moduleName, int32_t userId, bool isUpdate);
+    void LoadThemeRes(const std::string &bundleName, const std::string &moduleName, int32_t userId);
 
     /**
      * Load the theme resource.
@@ -61,7 +61,7 @@ public:
      * @param rootDirs the theme skins dirs
      */
     void LoadThemeSkinResource(const std::string &bundleName, const std::string &moduleName,
-        const std::vector<std::string> &rootDirs, int32_t userId);
+        const std::vector<std::string> &rootDirs, const std::string &themeFlag, bool isAbslutePath, int32_t userId);
 
     /**
      * Load the icons dir resource int theme pack.
@@ -71,7 +71,7 @@ public:
      * @param rootDirs the theme icons dirs
      */
     void LoadThemeIconsResource(const std::string &bundleName, const std::string &moduleName,
-        const std::vector<std::string> &rootDirs, int32_t userId);
+        const std::vector<std::string> &rootDirs, const std::string &themeFlag, bool isAbslutePath, int32_t userId);
     
     /**
      * Get the theme resource related to bundlename, modulename, resType, resName and resConfig.
@@ -114,9 +114,13 @@ public:
     const std::string ReplaceUserIdInPath(const std::string &originalPath, int32_t userId);
 private:
     ThemePackManager();
+    std::string themeFlag;
+    std::string sysResFlag;
     std::string themeMask;
-    void ClearSkinResource();
-    void ClearIconResource();
+    void ClearSkinResource(const std::string &themeFlag);
+    void ClearIconResource(const std::string &themeFlag);
+    void ClearSASkinResource(const std::string &themeFlag, int32_t userId);
+    void ClearSAIconResource(const std::string &themeFlag, int32_t userId);
     std::vector<std::shared_ptr<ThemeResource>> skinResource_;
     std::vector<std::shared_ptr<ThemeResource>> iconResource_;
     std::vector<std::shared_ptr<ThemeResource::ThemeValue> > GetThemeResourceList(
