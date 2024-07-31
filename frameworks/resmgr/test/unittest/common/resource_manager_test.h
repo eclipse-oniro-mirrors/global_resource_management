@@ -115,6 +115,7 @@ int ResourceManagerIsRawDirFromHap002(void);
 int ResourceManagerGetRawFileList001(void);
 int ResourceManagerGetRawFileList002(void);
 int CreateResourceManagerTest001(void);
+int GetSystemResourceManagerTest001(void);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

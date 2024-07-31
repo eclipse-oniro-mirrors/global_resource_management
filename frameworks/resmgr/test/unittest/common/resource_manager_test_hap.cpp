@@ -684,6 +684,12 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetMediaDataByIdFromHapTest0041,
     state = rm->GetMediaDataById(id, len, outValue, density);
     EXPECT_EQ(static_cast<int>(len), 6790); // the length of icon
     EXPECT_TRUE(state == SUCCESS);
+
+    density = 1; // invalid density
+    size_t len2;
+    state = rm->GetMediaDataById(id, len2, outValue, density);
+    EXPECT_EQ(static_cast<int>(len2), 0);
+    EXPECT_TRUE(state == ERROR_CODE_INVALID_INPUT_PARAMETER);
 }
 
 /*
@@ -714,6 +720,12 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetMediaDataByNameFromHapTest004
     state = rm->GetMediaDataByName("icon", len, outValue, density);
     EXPECT_EQ(static_cast<int>(len), 6790); // the length of icon
     EXPECT_TRUE(state == SUCCESS);
+
+    density = 1; // invalid density
+    size_t len2;
+    state = rm->GetMediaDataByName("icon", len2, outValue, density);
+    EXPECT_EQ(static_cast<int>(len2), 0);
+    EXPECT_TRUE(state == ERROR_CODE_INVALID_INPUT_PARAMETER);
 }
 
 /*
@@ -744,6 +756,10 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetMediaBase64DataByIdFromHapTes
     EXPECT_TRUE(id > 0);
     state = rm->GetMediaBase64DataById(id, outValue, density);
     EXPECT_TRUE(state == SUCCESS);
+
+    density = 1; // invalid density
+    state = rm->GetMediaBase64DataById(id, outValue, density);
+    EXPECT_TRUE(state == ERROR_CODE_INVALID_INPUT_PARAMETER);
 }
 
 /*
@@ -772,6 +788,10 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetMediaBase64DataByNameFromHapT
     RState state;
     state = rm->GetMediaBase64DataByName("icon", outValue, density);
     EXPECT_TRUE(state == SUCCESS);
+
+    density = 1; // invalid density
+    state = rm->GetMediaBase64DataByName("icon", outValue, density);
+    EXPECT_TRUE(state == ERROR_CODE_INVALID_INPUT_PARAMETER);
 }
 
 /*

@@ -14,6 +14,7 @@
  */
 
 #include "resource_manager_test.h"
+#include "system_resource_manager.h"
 
 #include "resource_manager_test_common.h"
 
@@ -62,6 +63,10 @@ void ResourceManagerTest::TearDown(void)
 {
     delete this->rm;
     delete this->rmc;
+    if (SystemResourceManager::resourceManager_) {
+        delete SystemResourceManager::resourceManager_;
+        SystemResourceManager::resourceManager_ = nullptr;
+    }
 }
 
 /*
@@ -2057,5 +2062,17 @@ HWTEST_F(ResourceManagerTest, CreateResourceManagerTest001, TestSize.Level1)
     bundleRm = CreateResourceManager("", "entry", hapPath, overlayPath, *rc, appType, userId);
     EXPECT_TRUE(bundleRm == nullptr);
     delete rc;
+}
+
+/*
+ * @tc.name: GetSystemResourceManagerTest001
+ * @tc.desc: Test CreateResourceManager function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, GetSystemResourceManagerTest001, TestSize.Level1)
+{
+    ResourceManager *bundleRm = GetSystemResourceManagerNoSandBox();
+    EXPECT_TRUE(bundleRm != nullptr);
+    bundleRm = nullptr;
 }
 }

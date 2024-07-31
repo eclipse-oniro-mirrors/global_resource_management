@@ -42,6 +42,7 @@ int ResourceManagerGetMediaByIdTest020(void);
 int ResourceManagerGetMediaByIdTest021(void);
 int ResourceManagerGetMediaByIdTest022(void);
 int ResourceManagerGetMediaByIdTest023(void);
+int ResourceManagerGetDrawableInfoByIdTest001(void);
 int ResourceManagerGetMediaByNameTest001(void);
 int ResourceManagerGetMediaByNameTest002(void);
 int ResourceManagerGetMediaByNameTest003(void);
@@ -64,6 +65,7 @@ int ResourceManagerGetMediaByNameTest019(void);
 int ResourceManagerGetMediaByNameTest020(void);
 int ResourceManagerGetMediaByNameTest021(void);
 int ResourceManagerGetMediaByNameTest022(void);
+int ResourceManagerGetDrawableInfoByNameTest001(void);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
