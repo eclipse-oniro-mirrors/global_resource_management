@@ -17,9 +17,7 @@
 #define RESOURCE_MANAGER_IMPL_EXT_H
 
 #include "resource_manager.h"
-#if defined(RESMGR_BROKER_ENABLE)
 #include "resource_manager_broker_client.h"
-#endif
 
 namespace OHOS {
 namespace Global {
@@ -445,9 +443,7 @@ public:
     virtual bool AddPatchResource(const char *path, const char *patchPath);
 
 private:
-#if defined(RESMGR_BROKER_ENABLE)
     std::shared_ptr<ANCO::ResourceManagerBrokerClient> client_;
-#endif
 };
 } // namespace Resource
 }  // namespace Global
