@@ -40,8 +40,8 @@ manager_sources = [
   "src/res_desc.cpp",
   "src/res_locale.cpp",
   "src/resource_manager.cpp",
-  "src/resource_manager_ext_mgr.cpp",
   "src/resource_manager_impl.cpp",
+  "src/resource_manager_impl_ext.cpp",
   "src/system_resource_manager.cpp",
   "src/theme_pack_config.cpp",
   "src/theme_pack_manager.cpp",
@@ -95,12 +95,15 @@ ohos_shared_library("global_resmgr") {
 
   external_deps = [
     "ability_base:extractortool",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libtokenid_sdk",
     "bounds_checking_function:libsec_shared",
     "cJSON:cjson",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "zlib:shared_libz",
   ]
 
@@ -118,6 +121,12 @@ ohos_shared_library("global_resmgr") {
     integer_overflow = true
     ubsan = true
   }
+
+  if (resmgr_broker_enable) {
+    external_deps += [ "container_hmos_service_broker:resmgr_broker_client" ]
+    defines += [ "RESMGR_BROKER_ENABLE" ]
+  }
+
   subsystem_name = "global"
   innerapi_tags = [
     "platformsdk_indirect",

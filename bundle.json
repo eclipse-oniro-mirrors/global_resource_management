@@ -52,6 +52,8 @@
           "components": [
             "ability_base",
             "ability_runtime",
+            "access_token",
+            "ipc",
             "hilog",
             "hisysevent",
             "hitrace",
@@ -64,7 +66,7 @@
             "bounds_checking_function",
             "icu",
             "cJSON",
-            "node"
+            "container_hmos_service_broker"
           ]
       },
         "build": {
