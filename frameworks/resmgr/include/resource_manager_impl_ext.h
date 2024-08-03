@@ -29,7 +29,9 @@ public:
 
     ~ResourceManagerImplExt();
 
+#if defined(RESMGR_BROKER_ENABLE)
     bool Init(int32_t appType, std::string bundleName);
+#endif
 
     /* *
      * Null function
@@ -72,7 +74,9 @@ public:
      * @param outValue the string resource write to
      * @return SUCCESS if resource exist, else NOT_FOUND
      */
+#if defined(RESMGR_BROKER_ENABLE)
     virtual RState GetStringById(uint32_t id, std::string &outValue);
+#endif
 
     /* *
      * Null function
@@ -243,8 +247,10 @@ public:
      * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
      * @return SUCCESS if resource exist, else NOT_FOUND
      */
+#if defined(RESMGR_BROKER_ENABLE)
     virtual RState GetMediaDataById(
         uint32_t id, size_t &len, std::unique_ptr<uint8_t[]> &outValue, uint32_t density = 0);
+#endif
 
     /* *
      * Null function
