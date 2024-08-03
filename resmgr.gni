@@ -18,7 +18,7 @@ declare_args() {
 
   resmgr_broker_enable = true
   if (defined(global_parts_info) &&
-      defined(global_parts_info.virt_service_container_hmos_service_broker)) {
+      !defined(global_parts_info.virt_service_container_hmos_service_broker)) {
     resmgr_broker_enable = false
   }
 }
