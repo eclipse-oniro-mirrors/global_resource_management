@@ -19,12 +19,12 @@
 #include "accesstoken_kit.h"
 #include "ipc_skeleton.h"
 #include "tokenid_kit.h"
+#include "securec.h"
 #endif
 
 #include "hilog_wrapper.h"
 #include "utils/utils.h"
 #include "res_config.h"
-#include "securec.h"
 #include "utils/common.h"
 #include "utils/string_utils.h"
 
