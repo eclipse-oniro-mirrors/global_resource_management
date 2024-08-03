@@ -54,6 +54,7 @@ ResourceManagerImplExt::ResourceManagerImplExt()
 ResourceManagerImplExt::~ResourceManagerImplExt()
 {}
 
+#if defined(RESMGR_BROKER_ENABLE)
 bool ResourceManagerImplExt::Init(int32_t appType, std::string bundleName)
 {
     if (!VerifyCallingPermission("ohos.permission.GET_BUNDLE_INFO_PRIVILEGED")) {
@@ -68,7 +69,9 @@ bool ResourceManagerImplExt::Init(int32_t appType, std::string bundleName)
     client_->init(appType, bundleName);
     return true;
 }
+#endif
 
+#if defined(RESMGR_BROKER_ENABLE)
 RState ResourceManagerImplExt::GetStringById(uint32_t id, std::string &outValue)
 {
     if (client_ != nullptr) {
@@ -76,6 +79,7 @@ RState ResourceManagerImplExt::GetStringById(uint32_t id, std::string &outValue)
     }
     return ERROR_CODE_RES_NOT_FOUND_BY_ID;
 }
+#endif
 
 RState ResourceManagerImplExt::GetStringFormatById(uint32_t id, std::string &outValue,
     std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
@@ -92,6 +96,7 @@ RState ResourceManagerImplExt::GetStringFormatById(uint32_t id, std::string &out
     return SUCCESS;
 }
 
+#if defined(RESMGR_BROKER_ENABLE)
 RState ResourceManagerImplExt::GetMediaDataById(uint32_t id, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue, uint32_t density)
 {
@@ -100,6 +105,7 @@ RState ResourceManagerImplExt::GetMediaDataById(uint32_t id, size_t &len,
     }
     return ERROR_CODE_RES_NOT_FOUND_BY_ID;
 }
+#endif
 
 RState ResourceManagerImplExt::GetMediaBase64DataById(uint32_t id, std::string &outValue, uint32_t density)
 {
