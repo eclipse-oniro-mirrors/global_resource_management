@@ -17,7 +17,9 @@
 #define RESOURCE_MANAGER_IMPL_EXT_H
 
 #include "resource_manager.h"
+#if defined(RESMGR_BROKER_ENABLE)
 #include "resource_manager_broker_client.h"
+#endif
 
 namespace OHOS {
 namespace Global {
