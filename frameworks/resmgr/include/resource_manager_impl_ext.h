@@ -445,7 +445,9 @@ public:
     virtual bool AddPatchResource(const char *path, const char *patchPath);
 
 private:
+#if defined(RESMGR_BROKER_ENABLE)
     std::shared_ptr<ANCO::ResourceManagerBrokerClient> client_;
+#endif
 };
 } // namespace Resource
 }  // namespace Global
