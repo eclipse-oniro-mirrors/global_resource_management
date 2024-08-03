@@ -11,6 +11,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/ohos.gni")
+
 declare_args() {
   resource_management_support_icu = true
+
+  resmgr_broker_enable = true
+  if (defined(global_patts_info) &&
+      !defined(global_parts_info.virt_service_container_hmos_service_broker)) {
+    resmgr_broker_enable = false
+  }
 }

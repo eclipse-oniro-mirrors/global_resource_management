@@ -19,17 +19,13 @@
 #include "resource_manager_impl.h"
 #include "system_resource_manager.h"
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-#include "resource_manager_ext_mgr.h"
+#include "resource_manager_impl_ext.h"
 #endif
 #include "theme_pack_manager.h"
 namespace OHOS {
 namespace Global {
 namespace Resource {
 static std::map<std::string, std::shared_ptr<ResourceManager>> resMgrMap;
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-static std::mutex resMgrExtLock;
-static std::shared_ptr<ResourceManagerExtMgr> resMgrExtMgr = std::make_shared<ResourceManagerExtMgr>();
-#endif
 
 ResourceManager *CreateResourceManager()
 {
@@ -71,20 +67,29 @@ std::shared_ptr<ResourceManager> CreateResourceManagerDef(
     return resourceManagerImpl;
 }
 
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__) && defined(RESMGR_BROKER_ENABLE)
 std::shared_ptr<ResourceManager> CreateResourceManagerExt(const std::string &bundleName, const int32_t appType)
 {
     if (bundleName.empty()) {
         RESMGR_HILOGE(RESMGR_TAG, "bundleName is empty when CreateResourceManagerExt");
         return nullptr;
     }
-    std::lock_guard<std::mutex> lock(resMgrExtLock);
-    std::shared_ptr<ResourceManager> resMgrExt;
-    if (!resMgrExtMgr->Init(resMgrExt, bundleName, appType) || resMgrExt == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "ResourceManagerExt init fail");
+    ResourceManagerImplExt *impl = new (std::nothrow) ResourceManagerImplExt;
+    if (impl == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "new ResourceManagerImpl failed when CreateResourceManager");
         return nullptr;
     }
-    return resMgrExt;
+    if (!impl->Init(appType, bundleName)) {
+        delete (impl);
+        return nullptr;
+    }
+    std::shared_ptr<ResourceManager> resMgrImplExt(impl);
+    if (resMgrImplExt == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "CreateResourceManagerExt failed bundleName = %{public}s",
+                      bundleName.c_str());
+        return nullptr;
+    }
+    return resMgrImplExt;
 }
 #endif
 
@@ -95,7 +100,7 @@ std::shared_ptr<ResourceManager> CreateResourceManager(const std::string &bundle
     if (appType == 0) {
         return CreateResourceManagerDef(bundleName, moduleName, hapPath, overlayPath, resConfig, userId);
     } else {
-    #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__) && defined(RESMGR_BROKER_ENABLE)
         return CreateResourceManagerExt(bundleName, appType);
     #else
         return nullptr;
