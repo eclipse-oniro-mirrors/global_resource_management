@@ -18,13 +18,13 @@
 #if defined(RESMGR_BROKER_ENABLE)
 #include "accesstoken_kit.h"
 #include "ipc_skeleton.h"
+#include "tokenid_kit.h"
 #endif
 
 #include "hilog_wrapper.h"
 #include "utils/utils.h"
 #include "res_config.h"
 #include "securec.h"
-#include "tokenid_kit.h"
 #include "utils/common.h"
 #include "utils/string_utils.h"
 
