@@ -15,7 +15,9 @@
 
 #include "resource_manager_impl_ext.h"
 
+#if defined(RESMGR_BROKER_ENABLE)
 #include "accesstoken_kit.h"
+#endif
 
 #include "hilog_wrapper.h"
 #include "ipc_skeleton.h"
@@ -34,6 +36,7 @@ constexpr uint32_t DEFAULT_RETURN_VALUE = 0;
 constexpr int LINUX_TYPE = 2;
 #endif
 
+#if defined(RESMGR_BROKER_ENABLE)
 bool VerifyCallingPermission(const std::string &permissionName)
 {
     Security::AccessToken::AccessTokenID callerToken = IPCSkeleton::GetCallingTokenID();
@@ -47,6 +50,7 @@ bool VerifyCallingPermission(const std::string &permissionName)
     }
     return true;
 }
+#endif
 
 ResourceManagerImplExt::ResourceManagerImplExt()
 {}
