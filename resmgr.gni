@@ -16,9 +16,9 @@ import("//build/ohos.gni")
 declare_args() {
   resource_management_support_icu = true
 
-  resmgr_broker_enable = true
+  resmgr_broker_enable = false
   if (defined(global_patts_info) &&
-      !defined(global_parts_info.virt_service_container_hmos_service_broker)) {
-    resmgr_broker_enable = false
+      defined(global_parts_info.virt_service_container_hmos_service_broker)) {
+    resmgr_broker_enable = true
   }
 }
