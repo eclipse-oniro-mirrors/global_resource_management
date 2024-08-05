@@ -369,6 +369,16 @@ const std::string ThemePackManager::FindThemeIconResource(const std::pair<std::s
     }
     return result;
 }
+
+void ThemePackManager::SetThemeId(uint32_t themeId)
+{
+    this->themeId_ = themeId;
+}
+
+uint32_t ThemePackManager::GetThemeId() const
+{
+    return this->themeId_;
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

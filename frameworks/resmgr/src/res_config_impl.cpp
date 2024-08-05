@@ -56,7 +56,8 @@ ResConfigImpl::ResConfigImpl()
 #endif
     isCompletedScript_(false),
     isAppColorMode_(false),
-    isAppDarkRes_(false)
+    isAppDarkRes_(false),
+    themeId_(0)
 {}
 
 #ifdef SUPPORT_GRAPHICS
@@ -186,6 +187,11 @@ void ResConfigImpl::SetMnc(uint32_t mnc)
     this->mnc_ = mnc;
 }
 
+void ResConfigImpl::SetThemeId(uint32_t themeId)
+{
+    this->themeId_ = themeId;
+}
+
 ScreenDensity ResConfigImpl::ConvertDensity(float density)
 {
     float deviceDpi = density * Utils::DPI_BASE;
@@ -266,6 +272,11 @@ uint32_t ResConfigImpl::GetMcc() const
 uint32_t ResConfigImpl::GetMnc() const
 {
     return this->mnc_;
+}
+
+uint32_t ResConfigImpl::GetThemeId() const
+{
+    return this->themeId_;
 }
 
 DeviceType ResConfigImpl::GetDeviceType() const
@@ -393,6 +404,9 @@ bool ResConfigImpl::Copy(ResConfig &other, bool isRead)
     }
     if (isRead) {
         this->SetAppDarkRes(other.GetAppDarkRes());
+    }
+    if (this->GetThemeId() != other.GetThemeId()) {
+        this->SetThemeId(other.GetThemeId());
     }
     return true;
 }

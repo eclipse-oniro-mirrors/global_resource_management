@@ -1148,9 +1148,17 @@ RState ResourceManagerImpl::UpdateFakeLocaleFlag(ResConfig &resConfig)
 
 RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig, bool isUpdateTheme)
 {
-    if (isUpdateTheme) {
+    auto themePackManager = ThemePackManager::GetThemePackManager();
+    uint32_t lastId = themePackManager->GetThemeId();
+    uint32_t currentId = resConfig.GetThemeId();
+    bool isThemeIdChanged = (currentId != 0 && (lastId != currentId));
+    if (isThemeIdChanged) {
+        RESMGR_HILOGI(RESMGR_TAG, "update theme, lastId = %{public}d, currentId = %{public}d", lastId, currentId);
+        themePackManager->SetThemeId(resConfig.GetThemeId());
+    }
+    if (isUpdateTheme || isThemeIdChanged) {
         RESMGR_HILOGD(RESMGR_TAG, "The theme enabled");
-        ThemePackManager::GetThemePackManager()->LoadThemeRes(bundleInfo.first, bundleInfo.second, userId);
+        themePackManager->LoadThemeRes(bundleInfo.first, bundleInfo.second, userId);
     }
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
