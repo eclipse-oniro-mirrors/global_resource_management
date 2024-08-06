@@ -370,14 +370,14 @@ const std::string ThemePackManager::FindThemeIconResource(const std::pair<std::s
     return result;
 }
 
-void ThemePackManager::SetThemeId(uint32_t themeId)
+bool ThemePackManager::UpdateThemeId(uint32_t newThemeId)
 {
-    this->themeId_ = themeId;
-}
-
-uint32_t ThemePackManager::GetThemeId() const
-{
-    return this->themeId_;
+    AutoMutex mutex(this->lockThemeId_);
+    if (newThemeId != 0 && newThemeId != themeId_) {
+        themeId_ = newThemeId;
+        return true;
+    }
+    return false;
 }
 } // namespace Resource
 } // namespace Global
