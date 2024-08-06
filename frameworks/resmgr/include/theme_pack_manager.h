@@ -113,9 +113,7 @@ public:
 
     const std::string ReplaceUserIdInPath(const std::string &originalPath, int32_t userId);
 
-    uint32_t GetThemeId() const;
-
-    void SetThemeId(uint32_t themeId);
+    bool UpdateThemeId(uint32_t newThemeId);
 private:
     ThemePackManager();
     std::string themeFlag;
@@ -141,6 +139,7 @@ private:
     std::vector<std::string> GetRootDir(const std::string &strCurrentDir);
     Lock lockSkin_;
     Lock lockIcon_;
+    Lock lockThemeId_;
     uint32_t themeId_;
 };
 } // namespace Resource

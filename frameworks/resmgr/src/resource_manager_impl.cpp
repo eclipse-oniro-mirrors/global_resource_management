@@ -1149,14 +1149,7 @@ RState ResourceManagerImpl::UpdateFakeLocaleFlag(ResConfig &resConfig)
 RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig, bool isUpdateTheme)
 {
     auto themePackManager = ThemePackManager::GetThemePackManager();
-    uint32_t lastId = themePackManager->GetThemeId();
-    uint32_t currentId = resConfig.GetThemeId();
-    bool isThemeIdChanged = (currentId != 0 && (lastId != currentId));
-    if (isThemeIdChanged) {
-        RESMGR_HILOGI(RESMGR_TAG, "update theme, lastId = %{public}d, currentId = %{public}d", lastId, currentId);
-        themePackManager->SetThemeId(resConfig.GetThemeId());
-    }
-    if (isUpdateTheme || isThemeIdChanged) {
+    if (themePackManager->UpdateThemeId(resConfig.GetThemeId())) {
         RESMGR_HILOGD(RESMGR_TAG, "The theme enabled");
         themePackManager->LoadThemeRes(bundleInfo.first, bundleInfo.second, userId);
     }
