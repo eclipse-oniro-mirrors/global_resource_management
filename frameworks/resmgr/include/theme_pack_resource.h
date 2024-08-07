@@ -137,7 +137,18 @@ public:
         return themePath_;
     }
 
+    inline bool IsNewResource()
+    {
+        return isNewResource_;
+    }
+
+    inline void SetNewResource(bool isNew)
+    {
+        isNewResource_ = isNew;
+    }
+
     std::string themePath_;
+    bool isNewResource_ = true;
 private:
     std::vector<std::tuple<ResType, std::string, std::shared_ptr<ThemeValue>> > themeValueVec_;
     std::vector<std::pair<ThemeKey, std::string> > iconValues_;

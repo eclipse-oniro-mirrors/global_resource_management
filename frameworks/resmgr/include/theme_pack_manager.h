@@ -61,7 +61,7 @@ public:
      * @param rootDirs the theme skins dirs
      */
     void LoadThemeSkinResource(const std::string &bundleName, const std::string &moduleName,
-        const std::vector<std::string> &rootDirs, const std::string &themeFlag, bool isAbslutePath, int32_t userId);
+        const std::vector<std::string> &rootDirs, int32_t userId);
 
     /**
      * Load the icons dir resource int theme pack.
@@ -71,7 +71,7 @@ public:
      * @param rootDirs the theme icons dirs
      */
     void LoadThemeIconsResource(const std::string &bundleName, const std::string &moduleName,
-        const std::vector<std::string> &rootDirs, const std::string &themeFlag, bool isAbslutePath, int32_t userId);
+        const std::vector<std::string> &rootDirs, int32_t userId);
     
     /**
      * Get the theme resource related to bundlename, modulename, resType, resName and resConfig.
@@ -114,15 +114,13 @@ public:
     const std::string ReplaceUserIdInPath(const std::string &originalPath, int32_t userId);
 
     bool UpdateThemeId(uint32_t newThemeId);
+
+    bool IsFirstLoadResource();
 private:
     ThemePackManager();
-    std::string themeFlag;
-    std::string sysResFlag;
     std::string themeMask;
-    void ClearSkinResource(const std::string &themeFlag);
-    void ClearIconResource(const std::string &themeFlag);
-    void ClearSASkinResource(const std::string &themeFlag, int32_t userId);
-    void ClearSAIconResource(const std::string &themeFlag, int32_t userId);
+    void ClearSkinResource();
+    void ClearIconResource();
     std::vector<std::shared_ptr<ThemeResource>> skinResource_;
     std::vector<std::shared_ptr<ThemeResource>> iconResource_;
     std::vector<std::shared_ptr<ThemeResource::ThemeValue> > GetThemeResourceList(
@@ -141,6 +139,7 @@ private:
     Lock lockIcon_;
     Lock lockThemeId_;
     uint32_t themeId_;
+    bool isFirstCreate = true;
 };
 } // namespace Resource
 } // namespace Global

@@ -41,10 +41,6 @@ const std::string absoluteThemeSkinA = "/data/service/el1/public/themes/<current
 const std::string absoluteThemeSkinB = "/data/service/el1/public/themes/<currentUserId>/b/app/skin";
 const std::string absoluteThemeIconsA = "/data/service/el1/public/themes/<currentUserId>/a/app/icons";
 const std::string absoluteThemeIconsB = "/data/service/el1/public/themes/<currentUserId>/b/app/icons";
-const std::string flagA = "a";
-const std::string flagB = "b";
-const int ENABLE_THEME_POS = 13;
-const int ABSOLUTE_THEME_POS = 33;
 ThemePackManager::ThemePackManager()
 {}
 
@@ -89,30 +85,14 @@ std::vector<std::string> ThemePackManager::GetRootDir(const std::string &strCurr
     return vDir;
 }
 
-void ThemePackManager::ClearSkinResource(const std::string &themeFlag)
+void ThemePackManager::ClearSkinResource()
 {
     for (auto it = skinResource_.begin(); it != skinResource_.end();) {
-        if ((*it) == nullptr || (*it)->GetThemePath().empty()) {
+        if ((*it) == nullptr) {
             continue;
         }
         // 1 means get the enable theme
-        if ((*it)->GetThemePath().substr(ENABLE_THEME_POS, 1) != themeFlag) {
-            it = skinResource_.erase(it);
-        } else {
-            ++it;
-        }
-    }
-}
-
-void ThemePackManager::ClearSASkinResource(const std::string &themeFlag, int32_t userId)
-{
-    auto idLength = std::to_string(userId).length();
-    for (auto it = skinResource_.begin(); it != skinResource_.end();) {
-        if ((*it) == nullptr || (*it)->GetThemePath().length() <= ABSOLUTE_THEME_POS + idLength) {
-            continue;
-        }
-        // 1 means get the enable theme
-        if ((*it)->GetThemePath().substr(ABSOLUTE_THEME_POS + idLength, 1) != themeFlag) {
+        if (!(*it)->IsNewResource()) {
             it = skinResource_.erase(it);
         } else {
             ++it;
@@ -121,11 +101,18 @@ void ThemePackManager::ClearSASkinResource(const std::string &themeFlag, int32_t
 }
 
 void ThemePackManager::LoadThemeSkinResource(const std::string &bundleName, const std::string &moduleName,
-    const std::vector<std::string> &rootDirs, const std::string &themeFlag, bool isAbslutePath, int32_t userId)
+    const std::vector<std::string> &rootDirs, int32_t userId)
 {
     AutoMutex mutex(this->lockSkin_);
+    for (size_t i = 0; i < skinResource_.size(); ++i) {
+        auto pThemeResource = skinResource_[i];
+        if (pThemeResource == nullptr) {
+            continue;
+        }
+        pThemeResource->SetNewResource(false);
+    }
     if (rootDirs.empty()) {
-        isAbslutePath ? ClearSASkinResource(themeFlag, userId) : ClearSkinResource(themeFlag);
+        ClearSkinResource();
         return;
     }
     for (const auto &dir : rootDirs) {
@@ -138,57 +125,39 @@ void ThemePackManager::LoadThemeSkinResource(const std::string &bundleName, cons
         if (tempBundleName != bundleName && tempBundleName != "systemRes") {
             continue;
         }
-        if (tempBundleName == "systemRes") {
-            if (themeFlag == sysResFlag) {
-                continue;
-            }
-            sysResFlag = themeFlag;
-        }
         auto pThemeResource = ThemeResource::LoadThemeResource(dir);
         if (pThemeResource != nullptr) {
             this->skinResource_.emplace_back(pThemeResource);
         }
     }
-    isAbslutePath ? ClearSASkinResource(themeFlag, userId) : ClearSkinResource(themeFlag);
+    ClearSkinResource();
 }
 
 void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::string &moduleName, int32_t userId)
 {
     std::vector<std::string> rootDirs;
     std::vector<std::string> iconDirs;
-    bool isAbslutePath = false;
     if (Utils::IsFileExist(themeFlagA)) {
-        if (themeFlag == flagA) {
-            return;
-        }
-        themeFlag = flagA;
         rootDirs = GetRootDir(themeSkinA);
         iconDirs = GetRootDir(themeIconsA);
     } else if (Utils::IsFileExist(themeFlagB)) {
-        if (themeFlag == flagB) {
-            return;
-        }
-        themeFlag = flagB;
         rootDirs = GetRootDir(themeSkinB);
         iconDirs = GetRootDir(themeIconsB);
     } else {
         LoadSAThemeRes(bundleName, moduleName, userId, rootDirs, iconDirs);
-        isAbslutePath = true;
     }
-    LoadThemeSkinResource(bundleName, moduleName, rootDirs, themeFlag, isAbslutePath, userId);
-    LoadThemeIconsResource(bundleName, moduleName, iconDirs, themeFlag, isAbslutePath, userId);
+    LoadThemeSkinResource(bundleName, moduleName, rootDirs, userId);
+    LoadThemeIconsResource(bundleName, moduleName, iconDirs, userId);
     return;
 }
 
 void ThemePackManager::LoadSAThemeRes(const std::string &bundleName, const std::string &moduleName,
     int32_t userId, std::vector<std::string> &rootDirs, std::vector<std::string> &iconDirs)
 {
-    if (Utils::IsFileExist(ReplaceUserIdInPath(absoluteThemeFlagA, userId)) && themeFlag != flagA) {
-        themeFlag = flagA;
+    if (Utils::IsFileExist(ReplaceUserIdInPath(absoluteThemeFlagA, userId))) {
         rootDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeSkinA, userId));
         iconDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeIconsA, userId));
-    } else if (Utils::IsFileExist(ReplaceUserIdInPath(absoluteThemeFlagB, userId)) && themeFlag != flagB) {
-        themeFlag = flagB;
+    } else if (Utils::IsFileExist(ReplaceUserIdInPath(absoluteThemeFlagB, userId))) {
         rootDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeSkinB, userId));
         iconDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeIconsB, userId));
     }
@@ -299,30 +268,14 @@ const std::shared_ptr<ThemeResource::ThemeQualifierValue> ThemePackManager::GetB
     return result;
 }
 
-void ThemePackManager::ClearIconResource(const std::string &themeFlag)
+void ThemePackManager::ClearIconResource()
 {
     for (auto it = iconResource_.begin(); it != iconResource_.end();) {
-        if ((*it) == nullptr || (*it)->GetThemePath().empty()) {
+        if ((*it) == nullptr) {
             continue;
         }
         // 1 means get the enable theme
-        if ((*it)->GetThemePath().substr(ENABLE_THEME_POS, 1) != themeFlag) {
-            it = iconResource_.erase(it);
-        } else {
-            ++it;
-        }
-    }
-}
-
-void ThemePackManager::ClearSAIconResource(const std::string &themeFlag, int32_t userId)
-{
-    auto idLength = std::to_string(userId).length();
-    for (auto it = iconResource_.begin(); it != iconResource_.end();) {
-        if ((*it) == nullptr || (*it)->GetThemePath().length() <= ABSOLUTE_THEME_POS + idLength) {
-            continue;
-        }
-        // 1 means get the enable theme
-        if ((*it)->GetThemePath().substr(ABSOLUTE_THEME_POS + idLength, 1) != themeFlag) {
+        if (!(*it)->IsNewResource()) {
             it = iconResource_.erase(it);
         } else {
             ++it;
@@ -331,11 +284,18 @@ void ThemePackManager::ClearSAIconResource(const std::string &themeFlag, int32_t
 }
 
 void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, const std::string &moduleName,
-    const std::vector<std::string> &rootDirs, const std::string &themeFlag, bool isAbslutePath, int32_t userId)
+    const std::vector<std::string> &rootDirs, int32_t userId)
 {
     AutoMutex mutex(this->lockIcon_);
+    for (size_t i = 0; i < iconResource_.size(); ++i) {
+        auto pThemeResource = iconResource_[i];
+        if (pThemeResource == nullptr) {
+            continue;
+        }
+        pThemeResource->SetNewResource(false);
+    }
     if (rootDirs.empty()) {
-        isAbslutePath ? ClearSAIconResource(themeFlag, userId) : ClearIconResource(themeFlag);
+        ClearIconResource();
         return;
     }
     for (const auto &dir : rootDirs) {
@@ -349,7 +309,7 @@ void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, con
             this->iconResource_.emplace_back(pThemeResource);
         }
     }
-    isAbslutePath ? ClearSAIconResource(themeFlag, userId) : ClearIconResource(themeFlag);
+    ClearIconResource();
 }
 
 const std::string ThemePackManager::FindThemeIconResource(const std::pair<std::string, std::string> &bundleInfo,
@@ -375,6 +335,15 @@ bool ThemePackManager::UpdateThemeId(uint32_t newThemeId)
     AutoMutex mutex(this->lockThemeId_);
     if (newThemeId != 0 && newThemeId != themeId_) {
         themeId_ = newThemeId;
+        return true;
+    }
+    return false;
+}
+
+bool ThemePackManager::IsFirstLoadResource()
+{
+    if (isFirstCreate) {
+        isFirstCreate = false;
         return true;
     }
     return false;
