@@ -322,45 +322,6 @@ uint16_t Utils::EncodeLanguageOrRegion(const char *str, char base)
         BitOperatorNum::BIT_EIGHT) | ((second << BitOperatorNum::BIT_FIVE) | third);
 };
 
-bool Utils::StrCompare(const char *left, const char *right, size_t len, bool isCaseSensitive)
-{
-    if (left == nullptr && right == nullptr) {
-        return true;
-    }
-
-    if (left == nullptr || right == nullptr) {
-        return false;
-    }
-
-    int rc;
-    unsigned char c1;
-    unsigned char c2;
-    while (len--) {
-        c1 = (unsigned char)*left;
-        c2 = (unsigned char)*right;
-        if (c1 == 0) {
-            if (c2 == 0) {
-                return true;
-            }
-            return false;
-        } else if (c2 == 0) {
-            return false;
-        } else {
-            if (isCaseSensitive) {
-                rc = (int)(c1) - (int)(c2);
-            } else {
-                rc = tolower(c1) - tolower(c2);
-            }
-            if (rc != 0) {
-                return false;
-            }
-        }
-        ++left;
-        ++right;
-    }
-    return true;
-}
-
 /**
  * @brief convert hex char as int value
  *
@@ -401,7 +362,7 @@ RState Utils::ConvertColorToUInt32(const char *s, uint32_t &outValue)
     uint32_t color = 0;
     RState parseState = SUCCESS;
     size_t len = strlen(s);
-    if (*s == '#') {
+    if (*s == '#' && len >= ArrayLen::LEN_FOUR) {
         if (len == ArrayLen::LEN_FOUR) {
             color |= 0xFF000000;
             color |= ParseHex(s[ArrayIndex::INDEX_ONE], parseState) << BitOperatorNum::BIT_TWENTY;

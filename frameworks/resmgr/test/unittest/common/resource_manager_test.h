@@ -25,6 +25,7 @@ int ResourceManagerAddResourceTest003(void);
 int ResourceManagerAddResourceTest004(void);
 int ResourceManagerAddResourceTest005(void);
 int ResourceManagerAddResourceTest006(void);
+int ResourceManagerAddPatchResourcePathTest001(void);
 int ResourceManagerUpdateResConfigTest001(void);
 int ResourceManagerUpdateResConfigTest002(void);
 int ResourceManagerUpdateResConfigTest003(void);

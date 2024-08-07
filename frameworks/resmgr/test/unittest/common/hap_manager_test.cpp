@@ -170,6 +170,7 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest003, TestSize.Level1)
     rc->SetLocaleInfo("zh", nullptr, "CN");
     HapManager *hapManager = new HapManager(std::make_shared<ResConfigImpl>());
     hapManager->UpdateResConfig(*rc);
+    hapManager->ReloadAll();
     if (hapManager == nullptr) {
         EXPECT_TRUE(false);
         return;
@@ -211,11 +212,9 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest004, TestSize.Level1)
     }
     rc->SetLocaleInfo("en", nullptr, "US");
     HapManager *hapManager = new HapManager(std::make_shared<ResConfigImpl>());
+    EXPECT_FALSE(hapManager == nullptr);
     hapManager->UpdateResConfig(*rc);
-    if (hapManager == nullptr) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    hapManager->ReloadAll();
     bool ret = hapManager->AddResourcePath(FormatFullPath(g_hapPath).c_str());
     EXPECT_TRUE(ret);
     int id = 16777221; // 16777221 means 'AboutPageFA' 'aboutPage_title_primary'

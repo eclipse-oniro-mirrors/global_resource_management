@@ -72,4 +72,31 @@ HWTEST_F(ResConfigTest, ResConfigFuncTest001, TestSize.Level1)
     EXPECT_TRUE(rc->Match(current));
     EXPECT_TRUE(!(rc->Match(target)));
 };
+
+/*
+ * @tc.name: TestScreenDensity001
+ * @tc.desc: Test ScreenDensity.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResConfigTest, TestScreenDensity001, TestSize.Level1)
+{
+    auto rc = std::make_shared<ResConfigImpl>();
+    rc->SetScreenDensityDpi(OHOS::Global::Resource::SCREEN_DENSITY_MDPI);
+    EXPECT_EQ(OHOS::Global::Resource::SCREEN_DENSITY_MDPI, rc->GetScreenDensityDpi());
+    EXPECT_FLOAT_EQ(1, rc->GetScreenDensity());
+}
+
+/*
+ * @tc.name: TestCompleteScript001
+ * @tc.desc: Test CompleteScript.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResConfigTest, TestCompleteScript001, TestSize.Level1)
+{
+    auto target = std::make_shared<ResConfigImpl>();
+    target->SetLocaleInfo("zh", nullptr, "CN");
+    target->CompleteScript();
+    EXPECT_TRUE(target->IsCompletedScript());
+    target->CompleteScript();
+}
 }

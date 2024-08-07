@@ -297,10 +297,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest006, TestSize.Le
     // make a fake locale, then getString
     rmc->AddResource("en", nullptr, "US");
     ResConfig *rc = CreateResConfig();
-    if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
-    }
+    EXPECT_FALSE(rc == nullptr);
     rc->SetLocaleInfo("en", nullptr, "XA");
     RState state = rm->UpdateResConfig(*rc);
     EXPECT_EQ(SUCCESS, state);
@@ -309,8 +306,9 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest006, TestSize.Le
     std::string outValue;
     rm->GetStringById(id, outValue);
     EXPECT_TRUE(outValue != "App Name");
-    
+
     rc->SetLocaleInfo("ar", nullptr, "XB");
+    EXPECT_EQ(SUCCESS, rm->UpdateResConfig(*rc, true));
     rm->GetStringById(id, outValue);
     delete rc;
     EXPECT_TRUE(outValue != "App Name");
@@ -2057,7 +2055,7 @@ HWTEST_F(ResourceManagerTest, CreateResourceManagerTest001, TestSize.Level1)
     int32_t userId = 100; // userId is 100
     std::shared_ptr<ResourceManager> bundleRm =
         CreateResourceManager("ohos.global.test.all", "entry", hapPath, overlayPath, *rc, appType, userId);
-    EXPECT_TRUE(bundleRm == nullptr);
+    EXPECT_FALSE(bundleRm == nullptr);
 
     bundleRm = CreateResourceManager("", "entry", hapPath, overlayPath, *rc, appType, userId);
     EXPECT_TRUE(bundleRm == nullptr);
@@ -2073,6 +2071,20 @@ HWTEST_F(ResourceManagerTest, GetSystemResourceManagerTest001, TestSize.Level1)
 {
     ResourceManager *bundleRm = GetSystemResourceManagerNoSandBox();
     EXPECT_TRUE(bundleRm != nullptr);
+    EXPECT_TRUE(GetSystemResourceManager() != nullptr);
     bundleRm = nullptr;
+}
+
+/*
+ * @tc.name: AddPatchResourcePathTest001
+ * @tc.desc: Test AddPatchResourcePath function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, AddPatchResourcePathTest001, TestSize.Level1)
+{
+    std::string path = FormatFullPath(g_resFilePath);
+    ASSERT_TRUE(rm->AddResource(path.c_str()));
+    EXPECT_TRUE(rm->AddPatchResource(path.c_str(), "testPatch"));
+    EXPECT_FALSE(rm->AddPatchResource("not_exit_path", "testPatch"));
 }
 }
