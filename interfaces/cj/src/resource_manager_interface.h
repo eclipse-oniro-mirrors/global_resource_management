@@ -63,6 +63,8 @@ public:
     virtual int32_t GetDrawableDescriptor(uint32_t id, int64_t &outValue, uint32_t density) = 0;
     virtual int32_t GetDrawableDescriptorByName(const char *name, int64_t &outValue, uint32_t density) = 0;
     virtual void GetLocales(bool includeSystem, std::vector<std::string> &outValue) = 0;
+    virtual int32_t GetSymbolById(uint32_t id, uint32_t &outValue) = 0;
+    virtual int32_t GetSymbolByName(const char *name, uint32_t &outValue) = 0;
 };
 } // namespace Resource
 } // namespace OHOS

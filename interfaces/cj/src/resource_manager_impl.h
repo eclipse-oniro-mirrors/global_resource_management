@@ -29,11 +29,13 @@ namespace OHOS::Resource {
 
 class ResourceManagerImpl : public virtual IResourceManager, public OHOS::FFI::FFIData {
 public:
-    OHOS::FFI::RuntimeType *GetRuntimeType() override
-    {
-        return GetClassType();
-    }
+    DECL_TYPE(ResourceManagerImpl, OHOS::FFI::FFIData);
+
     explicit ResourceManagerImpl(OHOS::AbilityRuntime::Context* context);
+
+    ResourceManagerImpl();
+
+    bool IsEmpty();
 
     int32_t CloseRawFd(const std::string &name) override;
 
@@ -96,17 +98,13 @@ public:
 
     void GetLocales(bool includeSystem, std::vector<std::string> &outValue) override;
 
+    int32_t GetSymbolById(uint32_t id, uint32_t &outValue) override;
+
+    int32_t GetSymbolByName(const char *name, uint32_t &outValue) override;
+
     bool GetHapResourceManager(Global::Resource::ResourceManager::Resource resource,
         std::shared_ptr<Global::Resource::ResourceManager> &resMgr, int32_t &resId);
 private:
-    friend class OHOS::FFI::RuntimeType;
-    friend class OHOS::FFI::TypeBase;
-    static OHOS::FFI::RuntimeType *GetClassType()
-    {
-        static OHOS::FFI::RuntimeType runtimeType =
-            OHOS::FFI::RuntimeType::Create<OHOS::FFI::FFIData>("ResourceManagerImpl");
-        return &runtimeType;
-    }
     std::shared_ptr<Global::Resource::ResourceManager> resMgr_;
     bool isSystem_ = false;
     std::string bundleName_;
@@ -116,26 +114,16 @@ private:
 
 class DrawableDescriptorImpl : public OHOS::FFI::FFIData {
 public:
-    OHOS::FFI::RuntimeType *GetRuntimeType() override
-    {
-        return GetClassType();
-    }
+    DECL_TYPE(DrawableDescriptorImpl, OHOS::FFI::FFIData);
     explicit DrawableDescriptorImpl(OHOS::Ace::Napi::DrawableDescriptor* drawableDescriptor)
         :drawableDescriptor_(std::shared_ptr<OHOS::Ace::Napi::DrawableDescriptor>(drawableDescriptor)){};
 private:
-    friend class OHOS::FFI::RuntimeType;
-    friend class OHOS::FFI::TypeBase;
-    static OHOS::FFI::RuntimeType *GetClassType()
-    {
-        static OHOS::FFI::RuntimeType runtimeType =
-            OHOS::FFI::RuntimeType::Create<OHOS::FFI::FFIData>("DrawableDescriptorImpl");
-        return &runtimeType;
-    }
     std::shared_ptr<OHOS::Ace::Napi::DrawableDescriptor> drawableDescriptor_;
 };
 
 OHOS::Ace::Napi::DrawableDescriptor* GetDrawableDescriptorPtr(uint32_t id,
     std::shared_ptr<Global::Resource::ResourceManager> resMgr, uint32_t density, Global::Resource::RState &state);
+char** g_vectorToCharPointer(std::vector<std::string>& vec);
 } // namespace OHOS::Resource
 
 #endif // RESOURCE_MANAGER_IMPL_H

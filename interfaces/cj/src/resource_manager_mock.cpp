@@ -17,6 +17,7 @@
 
 extern "C" {
 FFI_EXPORT int CJ_GetResourceManagerStageMode = 0;
+FFI_EXPORT int CJ_GetSystemResMgr = 0
 FFI_EXPORT int CJ_CloseRawFd = 0;
 FFI_EXPORT int CJ_GetRawFd = 0;
 FFI_EXPORT int CJ_GetRawFileContent = 0;
@@ -53,4 +54,7 @@ FFI_EXPORT int CJ_GetDrawableDescriptorByName = 0;
 FFI_EXPORT int CJ_AddResource = 0;
 FFI_EXPORT int CJ_RemoveResource = 0;
 FFI_EXPORT int CJ_GetLocales = 0;
+FFI_EXPORT int CJ_GetSymbol = 0;
+FFI_EXPORT int CJ_GetSymbolByResource = 0;
+FFI_EXPORT int CJ_GetSymbolByName = 0;
 }

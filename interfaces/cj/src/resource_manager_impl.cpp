@@ -42,6 +42,20 @@ ResourceManagerImpl::ResourceManagerImpl(OHOS::AbilityRuntime::Context* context)
     LOGI("ResourceManagerImpl::ResourceManagerImpl success");
 }
 
+ResourceManagerImpl::ResourceManagerImpl()
+{
+    std::shared_ptr<Global::Resource::ResourceManager> resMgr(Global::Resource::GetSystemResourceManager());
+    resMgr_ = resMgr;
+    context_ = nullptr;
+    bundleName_ = "";
+    isSystem_ = true;
+}
+
+bool ResourceManagerImpl::IsEmpty()
+{
+    return resMgr_ == nullptr;
+}
+
 int32_t ResourceManagerImpl::CloseRawFd(const std::string &name)
 {
     RState state = resMgr_->CloseRawFileDescriptor(name);
@@ -433,5 +447,41 @@ OHOS::Ace::Napi::DrawableDescriptor* GetDrawableDescriptorPtr(uint32_t id,
 void ResourceManagerImpl::GetLocales(bool includeSystem, std::vector<std::string> &outValue)
 {
     return resMgr_->GetLocales(outValue, includeSystem);
+}
+
+int32_t ResourceManagerImpl::GetSymbolById(uint32_t id, uint32_t &outValue)
+{
+    RState state = resMgr_->GetSymbolById(id, outValue);
+    if (state != RState::SUCCESS) {
+        LOGE("ResourceManagerImpl::GetSymbolById failed %{public}" PRIu32, state);
+    } else {
+        LOGI("ResourceManagerImpl::GetSymbolById success");
+    }
+    return state;
+}
+
+int32_t ResourceManagerImpl::GetSymbolByName(const char *name, uint32_t &outValue)
+{
+    RState state = resMgr_->GetSymbolByName(name, outValue);
+    if (state != RState::SUCCESS) {
+        LOGE("ResourceManagerImpl::GetSymbolByName failed %{public}" PRIu32, state);
+    } else {
+        LOGI("ResourceManagerImpl::GetSymbolByName success");
+    }
+    return state;
+}
+
+char** g_vectorToCharPointer(std::vector<std::string>& vec)
+{
+    char** result = new char* [vec.size()];
+    for (size_t i = 0; i < vec.size(); i++) {
+        result[i] = new char[vec[i].length() + 1];
+        errno_t ret = strcpy_s(result[i], vec[i].length() + 1, vec[i].c_str());
+        if (ret != 0) {
+            delete result[i];
+            result[i] = nullptr;
+        }
+    }
+    return result;
 }
 }

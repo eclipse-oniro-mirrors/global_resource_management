@@ -41,7 +41,13 @@ extern "C" {
         int32_t id;
     };
 
+    struct RetDataU32 {
+        int32_t code;
+        uint32_t data;
+    };
+
     FFI_EXPORT int64_t CJ_GetResourceManagerStageMode(OHOS::AbilityRuntime::Context* context);
+    FFI_EXPORT RetDataI64 CJ_GetSystemResMgr();
     FFI_EXPORT int32_t CJ_CloseRawFd(int64_t id, const char* path);
     FFI_EXPORT int32_t CJ_GetRawFd(int64_t id, const char* rawFileName,
         OHOS::Global::Resource::ResourceManager::RawFileDescriptor &descriptor);
@@ -79,6 +85,9 @@ extern "C" {
     FFI_EXPORT int32_t CJ_AddResource(int64_t id, const char *path);
     FFI_EXPORT int32_t CJ_RemoveResource(int64_t id, const char *path);
     FFI_EXPORT RetDataCArrString CJ_GetLocales(int64_t id, bool includeSystem);
+    FFI_EXPORT RetDataU32 CJ_GetSymbol(int64_t id, uint32_t resId);
+    FFI_EXPORT RetDataU32 CJ_GetSymbolByResource(int64_t id, CResource resource);
+    FFI_EXPORT RetDataU32 CJ_GetSymbolByName(int64_t id, const char* name);
 }
 
 #endif
