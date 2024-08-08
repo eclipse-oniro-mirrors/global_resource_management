@@ -115,7 +115,6 @@ private:
 
     static uint16_t EncodeLanguageOrRegion(const char *str, char base);
 
-    static bool StrCompare(const char *left, const char *right, size_t len, bool isCaseSensitive);
     static constexpr uint64_t ROOT_LOCALE = 0x0;
     static constexpr uint16_t NULL_LANGUAGE = 0x00;
     static constexpr uint16_t NULL_REGION = 0x00;
