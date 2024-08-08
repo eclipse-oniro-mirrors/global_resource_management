@@ -14,7 +14,7 @@
  */
 
 #include "resource_manager.h"
-
+   
 #include "hilog_wrapper.h"
 #include "resource_manager_impl.h"
 #include "system_resource_manager.h"

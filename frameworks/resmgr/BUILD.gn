@@ -13,7 +13,7 @@
 
 import("//build/ohos.gni")
 import("../../resmgr.gni")
-
+    
 # source code for win.
 is_win = "${current_os}_${current_cpu}" == "mingw_x86_64"
 
