@@ -651,7 +651,8 @@ public:
      * @return SUCCESS if resource exist, else not found
      */
     virtual RState GetThemeIcons(uint32_t resId, std::pair<std::unique_ptr<uint8_t[]>, size_t> &foregroundInfo,
-        std::pair<std::unique_ptr<uint8_t[]>, size_t> &backgroundInfo, uint32_t density = 0);
+        std::pair<std::unique_ptr<uint8_t[]>, size_t> &backgroundInfo, uint32_t density = 0,
+        const std::string &abilityName = "");
 
     /**
      * Get the theme mask
@@ -768,7 +769,8 @@ private:
 
     RState ProcessReference(const std::string value, std::vector<std::shared_ptr<IdItem>> &idItems);
 
-    RState GetThemeIconInfo(const std::string &iconName, size_t &len, std::unique_ptr<uint8_t[]> &outValue);
+    RState GetThemeIconInfo(const std::string &iconName, size_t &len, std::unique_ptr<uint8_t[]> &outValue,
+        const std::string &abilityName = "");
 
     RState GetThemeValues(const std::string &value, std::string &outValue);
 

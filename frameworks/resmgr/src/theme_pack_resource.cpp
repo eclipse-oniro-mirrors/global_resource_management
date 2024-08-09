@@ -346,17 +346,38 @@ const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeIconResource(const 
             std::string dynamicBundle = path.substr(iconPath.length() + 1, pos3 - iconPath.length() - 1);
             ThemeKey themeKey = ThemeKey(bundleName, dynamicBundle, ResType::MEDIA, iconName);
             themeRes->iconValues_.emplace_back(std::make_pair(themeKey, path));
-        } else {
+            continue;
+        }
+
+        auto pos3 = path.find('/', iconPath.length() + 1);
+        if (pos3 == std::string::npos || pos3 < iconPath.length() + 1) {
             ThemeKey themeKey = ThemeKey(bundleName, "", ResType::MEDIA, iconName);
             themeRes->iconValues_.emplace_back(std::make_pair(themeKey, path));
+            continue;
         }
+
+        auto pos4 = path.find('/', pos3 + 1);
+        if (pos4 == std::string::npos || pos4 < pos3 + 1 || pos4 != pos2) {
+            ThemeKey themeKey = ThemeKey(bundleName, "", ResType::MEDIA, iconName);
+            themeRes->iconValues_.emplace_back(std::make_pair(themeKey, path));
+            continue;
+        }
+
+        std::string abilityName = path.substr(pos3 + 1, pos4 - pos3 - 1);
+        ThemeKey themeKey = ThemeKey(bundleName, "", ResType::MEDIA, iconName, abilityName);
+        themeRes->iconValues_.emplace_back(std::make_pair(themeKey, path));
     }
     return themeResource;
 }
 
 const std::string ThemeResource::GetThemeAppIcon(const std::pair<std::string, std::string> &bundleInfo,
-    const std::string &iconName)
+    const std::string &iconName, const std::string &abilityName)
 {
+    std::string iconPath = GetThemeAppIconByAbilityName(bundleInfo, iconName, abilityName);
+    if (iconPath.length() != 0) {
+        return iconPath;
+    }
+
     for (size_t i = 0; i < iconValues_.size(); i++) {
         if (iconValues_[i].first.bundleName == DYNAMIC_ICON && iconValues_[i].first.moduleName != bundleInfo.first) {
             continue;
@@ -364,7 +385,28 @@ const std::string ThemeResource::GetThemeAppIcon(const std::pair<std::string, st
         if (iconValues_[i].first.bundleName != DYNAMIC_ICON && iconValues_[i].first.bundleName != bundleInfo.first) {
             continue;
         }
-        if (iconName == iconValues_[i].first.resName) {
+        if (iconValues_[i].first.abilityName.length() == 0 && iconName == iconValues_[i].first.resName) {
+            return iconValues_[i].second;
+        }
+    }
+    return std::string("");
+}
+
+const std::string ThemeResource::GetThemeAppIconByAbilityName(const std::pair<std::string, std::string> &bundleInfo,
+    const std::string &iconName, const std::string &abilityName)
+{
+    if (abilityName.length() == 0) {
+        return std::string("");
+    }
+
+    for (size_t i = 0; i < iconValues_.size(); i++) {
+        if (iconValues_[i].first.bundleName == DYNAMIC_ICON && iconValues_[i].first.moduleName != bundleInfo.first) {
+            continue;
+        }
+        if (iconValues_[i].first.bundleName != DYNAMIC_ICON && iconValues_[i].first.bundleName != bundleInfo.first) {
+            continue;
+        }
+        if (abilityName == iconValues_[i].first.abilityName && iconName == iconValues_[i].first.resName) {
             return iconValues_[i].second;
         }
     }
