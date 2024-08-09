@@ -718,6 +718,65 @@ RetDataCArrString CJ_GetLocales(int64_t id, bool includeSystem)
     ret.data = VectorToCArrString(value, ret.code);
     return ret;
 }
+
+RetDataU32 CJ_GetSymbol(int64_t id, uint32_t resId)
+{
+    LOGI("CJ_GetSymbol start");
+    RetDataU32 ret = { .code = ERR_INVALID_INSTANCE_CODE, .data = -1 };
+    auto instance = FFIData::GetData<ResourceManagerImpl>(id);
+    if (!instance) {
+        LOGE("ResourceManager instance not exist %{public}" PRId64, id);
+        return ret;
+    }
+    ret.code = instance->GetSymbolById(resId, ret.data);
+    if (ret.code != RState::SUCCESS) {
+        return ret;
+    }
+    return ret;
+}
+
+RetDataU32 CJ_GetSymbolByResource(int64_t id, CResource resource)
+{
+    LOGI("CJ_GetSymbol start");
+    RetDataU32 ret = { .code = ERR_INVALID_INSTANCE_CODE, .data = -1 };
+    auto instance = FFIData::GetData<ResourceManagerImpl>(id);
+    if (!instance) {
+        LOGE("ResourceManager instance not exist %{public}" PRId64, id);
+        return ret;
+    }
+    OHOS::Global::Resource::ResourceManager::Resource res = { .bundleName = std::string(resource.bundleName),
+        .moduleName = std::string(resource.moduleName), .id = resource.id };
+    std::shared_ptr<ResourceManager> resMgr = nullptr;
+    int32_t resId = 0;
+    if (!instance->GetHapResourceManager(res, resMgr, resId)) {
+        LOGE("ResourceManager CJ_GetSymbolByResource failed at GetHapResourceManager");
+        ret.code = RState::ERROR_CODE_RES_NOT_FOUND_BY_ID;
+        return ret;
+    }
+    ret.code = resMgr->GetSymbolById(resId, ret.data);
+    if (ret.code != RState::SUCCESS) {
+        LOGE("ResourceManagerImpl::GetSymbolByResource failed %{public}" PRIu32, ret.code);
+        return ret;
+    }
+    LOGI("ResourceManagerImpl::GetSymbolByResource success")
+    return ret;
+}
+
+RetDataU32 CJ_GetSymbolByName(int64_t id, const char* name)
+{
+    LOGI("CJ_GetSymbolByName start");
+    RetDataU32 ret = { .code = ERR_INVALID_INSTANCE_CODE, .data = -1 };
+    auto instance = FFIData::GetData<ResourceManagerImpl>(id);
+    if (!instance) {
+        LOGE("ResourceManager instance not exist %{public}" PRId64, id);
+        return ret;
+    }
+    ret.code = instance->GetSymbolByName(name, ret.data);
+    if (ret.code != RState::SUCCESS) {
+        return ret;
+    }
+    return ret;
+}
 }
 }
 }
