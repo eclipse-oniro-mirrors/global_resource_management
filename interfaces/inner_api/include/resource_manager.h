@@ -211,7 +211,8 @@ public:
     virtual RState GetSymbolByName(const char *name, uint32_t &outValue) = 0;
 
     virtual RState GetThemeIcons(uint32_t resId, std::pair<std::unique_ptr<uint8_t[]>, size_t> &foregroundInfo,
-        std::pair<std::unique_ptr<uint8_t[]>, size_t> &backgroundInfo, uint32_t density = 0) = 0;
+        std::pair<std::unique_ptr<uint8_t[]>, size_t> &backgroundInfo, uint32_t density = 0,
+        const std::string &abilityName = "") = 0;
 
     virtual std::string GetThemeMask() = 0;
 

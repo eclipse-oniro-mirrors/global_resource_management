@@ -353,7 +353,7 @@ void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, con
 }
 
 const std::string ThemePackManager::FindThemeIconResource(const std::pair<std::string, std::string> &bundleInfo,
-    const std::string &iconName)
+    const std::string &iconName, const std::string &abilityName)
 {
     AutoMutex mutex(this->lockIcon_);
     std::string result;
@@ -362,7 +362,7 @@ const std::string ThemePackManager::FindThemeIconResource(const std::pair<std::s
         if (pThemeResource == nullptr) {
             return std::string("");
         }
-        result = pThemeResource->GetThemeAppIcon(bundleInfo, iconName);
+        result = pThemeResource->GetThemeAppIcon(bundleInfo, iconName, abilityName);
         if (!result.empty()) {
             break;
         }
