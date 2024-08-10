@@ -104,7 +104,7 @@ public:
      * @return the best resource or empty
      */
     const std::string FindThemeIconResource(const std::pair<std::string, std::string> &bundleInfo,
-        const std::string &iconName);
+        const std::string &iconName, const std::string &abilityName = "");
 
     inline const std::string GetMask() const
     {

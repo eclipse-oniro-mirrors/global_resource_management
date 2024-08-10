@@ -1629,9 +1629,10 @@ void ResourceManagerImpl::GetLocales(std::vector<std::string> &outValue, bool in
 }
 
 RState ResourceManagerImpl::GetThemeIconInfo(const std::string &iconName, size_t &len,
-    std::unique_ptr<uint8_t[]> &outValue)
+    std::unique_ptr<uint8_t[]> &outValue, const std::string &abilityName)
 {
-    std::string result = ThemePackManager::GetThemePackManager()->FindThemeIconResource(bundleInfo, iconName);
+    std::string result = ThemePackManager::GetThemePackManager()->FindThemeIconResource(
+        bundleInfo, iconName, abilityName);
     if (result.empty()) {
         RESMGR_HILOGD(RESMGR_TAG, "GetThemeIconInfo FAILED bundlename = %{public}s,", result.c_str());
         return ERROR_CODE_RES_ID_NOT_FOUND;
@@ -1645,10 +1646,11 @@ RState ResourceManagerImpl::GetThemeIconInfo(const std::string &iconName, size_t
 }
 
 RState ResourceManagerImpl::GetThemeIcons(uint32_t resId, std::pair<std::unique_ptr<uint8_t[]>, size_t>
-    &foregroundInfo, std::pair<std::unique_ptr<uint8_t[]>, size_t> &backgroundInfo, uint32_t density)
+    &foregroundInfo, std::pair<std::unique_ptr<uint8_t[]>, size_t> &backgroundInfo, uint32_t density,
+    const std::string &abilityName)
 {
-    RState foreState = GetThemeIconInfo(FOREGROUND, foregroundInfo.second, foregroundInfo.first);
-    RState backState = GetThemeIconInfo(BACKGROUND, backgroundInfo.second, backgroundInfo.first);
+    RState foreState = GetThemeIconInfo(FOREGROUND, foregroundInfo.second, foregroundInfo.first, abilityName);
+    RState backState = GetThemeIconInfo(BACKGROUND, backgroundInfo.second, backgroundInfo.first, abilityName);
     if (foreState == SUCCESS && backState == SUCCESS) {
         return SUCCESS;
     }
