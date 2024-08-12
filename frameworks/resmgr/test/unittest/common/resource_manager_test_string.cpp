@@ -957,7 +957,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest022,
 
 /*
  * @tc.name: ResourceManagerGetStringFormatByNameTest023
- * @tc.desc: Test GetStringFormatById function
+ * @tc.desc: Test GetStringFormatByName with va_list function
  * @tc.type: FUNC
  */
 HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest023, TestSize.Level1)
@@ -965,6 +965,78 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest023,
     const char *name = "test_string22";
     const char *cmp = "112";
     rmc->TestGetStringFormatByNameWithVaArgs(name, cmp, 1, 2, 3);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest024
+ * @tc.desc: Test GetStringFormatByName with va_list function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest024, TestSize.Level1)
+{
+    const char *name = "test_string1";
+    const char *cmp = "%10%d%%d%%";
+    rmc->TestGetStringFormatByNameWithVaArgs(name, cmp, 10);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest025
+ * @tc.desc: Test GetStringFormatByName with va_list function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest025, TestSize.Level1)
+{
+    const char *name = "test_string2";
+    const char *cmp = "-9.999000 你好";
+    rmc->TestGetStringFormatByNameWithVaArgs(name, cmp, -9.999, " 你好");
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest026
+ * @tc.desc: Test GetStringFormatByName with va_list function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest026, TestSize.Level1)
+{
+    const char *name = "test_string13";
+    const char *cmp = "11";
+    rmc->TestGetStringFormatByNameWithVaArgs(name, cmp, 1);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest027
+ * @tc.desc: Test GetStringFormatByName with va_list function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest027, TestSize.Level1)
+{
+    const char *name = "test_string15";
+    const char *cmp = "100";
+    rmc->TestGetStringFormatByNameWithVaArgs(name, cmp, 100);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest028
+ * @tc.desc: Test GetStringFormatByName with va_list function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest028, TestSize.Level1)
+{
+    const char *name = "test_string16";
+    const char *cmp = "1.230000";
+    rmc->TestGetStringFormatByNameWithVaArgs(name, cmp, 1.23);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest029
+ * @tc.desc: Test GetStringFormatByName with va_list function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest029, TestSize.Level1)
+{
+    const char *name = "test_string17";
+    const char *cmp = "Hello World";
+    rmc->TestGetStringFormatByNameWithVaArgs(name, cmp, "Hello World");
 }
 
 /*

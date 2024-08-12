@@ -16,9 +16,11 @@
     <target name="resmgr_test">
         <preparer>
             <option name="push" value="data/all.hap -> /data/test/" src="res"/>
+            <option name="push" value="data/all_fa.hap -> /data/test/" src="res"/>
             <option name="push" value="data/err-config.json-1.hap -> /data/test/" src="res"/>
             <option name="push" value="data/err-config.json-2.hap -> /data/test/" src="res"/>
             <option name="push" value="data/all/assets/entry/resources.index -> /data/test/all/assets/entry/" src="res"/>
+            <option name="push" value="data/all/assets/entry/resources_fa.index -> /data/test/all/assets/entry/" src="res"/>
             <option name="push" value="data/all/assets/entry/resources/rawfile/test_rawfile.txt -> /data/test/all/assets/entry/resources/rawfile/" src="res"/>        
             <option name="push" value="data/all/assets/entry/resources/base/media/icon.png -> /data/test/all/assets/entry/resources/base/media/" src="res"/>
             <option name="push" value="data/all/assets/entry/resources/base/profile/test_profile.json -> /data/test/all/assets/entry/resources/base/profile/" src="res"/>

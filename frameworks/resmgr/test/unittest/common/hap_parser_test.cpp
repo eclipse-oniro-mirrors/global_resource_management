@@ -18,9 +18,8 @@
 #include <gtest/gtest.h>
 
 #include "test_common.h"
+#include "utils/errors.h"
 #include "utils/string_utils.h"
-
-#define private public
 
 #include "hap_parser.h"
 
@@ -198,5 +197,287 @@ HWTEST_F(HapParserTest, HapParserFuncTest005, TestSize.Level1)
 {
     ASSERT_EQ(DARK, HapParser::GetColorMode(DARK));
     ASSERT_EQ(LIGHT, HapParser::GetColorMode(LIGHT));
+}
+
+/*
+ * @tc.name: ReadIndexFromFileTest001
+ * @tc.desc: Test ReadIndexFromFile
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, ReadIndexFromFileTest001, TestSize.Level1)
+{
+    std::string zipFile = FormatFullPath("not_exist_all.hap");
+    std::unique_ptr<uint8_t[]> buffer;
+    size_t len;
+    int32_t ret = HapParser::ReadIndexFromFile(zipFile.c_str(), buffer, len);
+    EXPECT_EQ(ret, UNKNOWN_ERROR);
+}
+
+/*
+ * @tc.name: ReadIndexFromFileTest002
+ * @tc.desc: Test ReadIndexFromFile
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, ReadIndexFromFileTest002, TestSize.Level1)
+{
+    std::string zipFile = FormatFullPath(g_hapPath);
+    std::unique_ptr<uint8_t[]> buffer;
+    size_t len;
+    int32_t ret = HapParser::ReadIndexFromFile(zipFile.c_str(), buffer, len);
+    EXPECT_EQ(ret, OK);
+}
+
+/*
+ * @tc.name: ReadIndexFromFileTest002
+ * @tc.desc: Test ReadIndexFromFile
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, ReadIndexFromFileTest003, TestSize.Level1)
+{
+    std::string zipFile = FormatFullPath(HAP_PATH_FA);
+    std::unique_ptr<uint8_t[]> buffer;
+    size_t len;
+    int32_t ret = HapParser::ReadIndexFromFile(zipFile.c_str(), buffer, len);
+    EXPECT_EQ(ret, OK);
+}
+
+/*
+ * @tc.name: ReadRawFileFromHapTest001
+ * @tc.desc: Test ReadRawFileFromHap
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, ReadRawFileFromHapTest001, TestSize.Level1)
+{
+    std::string hapPath = FormatFullPath(HAP_PATH_FA);
+    size_t len;
+    std::unique_ptr<uint8_t[]> outValue;
+    RState state = HapParser::ReadRawFileFromHap(hapPath, "", "no_exist_file.txt", len, outValue);
+    EXPECT_EQ(state, ERROR_CODE_RES_PATH_INVALID);
+}
+
+/*
+ * @tc.name: ReadRawFileFromHapTest002
+ * @tc.desc: Test ReadRawFileFromHap
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, ReadRawFileFromHapTest002, TestSize.Level1)
+{
+    std::string hapPath = FormatFullPath(HAP_PATH_FA);
+    size_t len;
+    std::unique_ptr<uint8_t[]> outValue;
+    RState state = HapParser::ReadRawFileFromHap(hapPath, "", "test_rawfile.txt", len, outValue);
+    EXPECT_EQ(state, SUCCESS);
+    EXPECT_EQ(static_cast<int>(len), 17);
+}
+
+/*
+ * @tc.name: ReadRawFileFromHapTest003
+ * @tc.desc: Test ReadRawFileFromHap
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, ReadRawFileFromHapTest003, TestSize.Level1)
+{
+    std::string hapPath = FormatFullPath("all_fa_no_exist.hap");
+    size_t len;
+    std::unique_ptr<uint8_t[]> outValue;
+    RState state = HapParser::ReadRawFileFromHap(hapPath, "", "test_rawfile.txt", len, outValue);
+    EXPECT_EQ(state, NOT_FOUND);
+}
+
+/*
+ * @tc.name: ReadRawFileFromHapTest004
+ * @tc.desc: Test ReadRawFileFromHap
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, ReadRawFileFromHapTest004, TestSize.Level1)
+{
+    std::string hapPath = FormatFullPath(HAP_PATH_FA);
+    size_t len;
+    std::unique_ptr<uint8_t[]> outValue;
+    RState state = HapParser::ReadRawFileFromHap(hapPath, FormatFullPath("no_patch.hap"), "test_rawfile.txt", len,
+        outValue);
+    EXPECT_EQ(state, NOT_FOUND);
+}
+
+/*
+ * @tc.name: ReadRawFileFromHapTest005
+ * @tc.desc: Test ReadRawFileFromHap
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, ReadRawFileFromHapTest005, TestSize.Level1)
+{
+    std::string hapPath = FormatFullPath(HAP_PATH_FA);
+    size_t len;
+    std::unique_ptr<uint8_t[]> outValue;
+    RState state = HapParser::ReadRawFileFromHap(hapPath, hapPath, "test_rawfile.txt", len, outValue);
+    EXPECT_EQ(state, SUCCESS);
+    EXPECT_EQ(static_cast<int>(len), 17);
+}
+
+/*
+ * @tc.name: ReadRawFileFromHapTest006
+ * @tc.desc: Test ReadRawFileFromHap
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, ReadRawFileFromHapTest006, TestSize.Level1)
+{
+    std::string hapPath = FormatFullPath(HAP_PATH_FA);
+    size_t len;
+    std::unique_ptr<uint8_t[]> outValue;
+    RState state = HapParser::ReadRawFileFromHap(hapPath, hapPath, "no_exist_file.txt", len, outValue);
+    EXPECT_EQ(state, ERROR_CODE_RES_PATH_INVALID);
+}
+
+/*
+ * @tc.name: ReadRawFileDescriptorTest001
+ * @tc.desc: Test ReadRawFileDescriptor
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, ReadRawFileDescriptorTest001, TestSize.Level1)
+{
+    std::string hapPath = FormatFullPath(HAP_PATH_FA);
+    ResourceManager::RawFileDescriptor descriptor;
+    RState state = HapParser::ReadRawFileDescriptor(hapPath.c_str(), "", "no_exist_file.txt", descriptor);
+    EXPECT_EQ(state, ERROR_CODE_RES_PATH_INVALID);
+}
+
+/*
+ * @tc.name: ReadRawFileDescriptorTest002
+ * @tc.desc: Test ReadRawFileDescriptor
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, ReadRawFileDescriptorTest002, TestSize.Level1)
+{
+    std::string hapPath = FormatFullPath(HAP_PATH_FA);
+    ResourceManager::RawFileDescriptor descriptor;
+    RState state = HapParser::ReadRawFileDescriptor(hapPath.c_str(), "", "test_rawfile.txt", descriptor);
+    EXPECT_EQ(state, SUCCESS);
+    if (descriptor.fd > 0) {
+        close(descriptor.fd);
+    }
+}
+
+/*
+ * @tc.name: ReadRawFileDescriptorTest003
+ * @tc.desc: Test ReadRawFileDescriptor
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, ReadRawFileDescriptorTest003, TestSize.Level1)
+{
+    std::string hapPath = FormatFullPath("all_fa_no_exist.hap");
+    ResourceManager::RawFileDescriptor descriptor;
+    RState state = HapParser::ReadRawFileDescriptor(hapPath.c_str(), "", "test_rawfile.txt", descriptor);
+    EXPECT_EQ(state, NOT_FOUND);
+}
+
+/*
+ * @tc.name: ReadRawFileDescriptorTest004
+ * @tc.desc: Test ReadRawFileDescriptor
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, ReadRawFileDescriptorTest004, TestSize.Level1)
+{
+    std::string hapPath = FormatFullPath(HAP_PATH_FA);
+    ResourceManager::RawFileDescriptor descriptor;
+    RState state = HapParser::ReadRawFileDescriptor(hapPath.c_str(), "/data/test/no_patch.hap", "1.txt", descriptor);
+    EXPECT_EQ(state, NOT_FOUND);
+}
+
+/*
+ * @tc.name: ReadRawFileDescriptorTest005
+ * @tc.desc: Test ReadRawFileDescriptor
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, ReadRawFileDescriptorTest005, TestSize.Level1)
+{
+    std::string hapPath = FormatFullPath(HAP_PATH_FA);
+    ResourceManager::RawFileDescriptor descriptor;
+    RState state = HapParser::ReadRawFileDescriptor(hapPath.c_str(), hapPath.c_str(), "test_rawfile.txt", descriptor);
+    EXPECT_EQ(state, SUCCESS);
+    if (descriptor.fd > 0) {
+        close(descriptor.fd);
+    }
+}
+
+/*
+ * @tc.name: ReadRawFileDescriptorTest006
+ * @tc.desc: Test ReadRawFileDescriptor
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, ReadRawFileDescriptorTest006, TestSize.Level1)
+{
+    std::string hapPath = FormatFullPath(HAP_PATH_FA);
+    ResourceManager::RawFileDescriptor descriptor;
+    RState state = HapParser::ReadRawFileDescriptor(hapPath.c_str(), hapPath.c_str(), "111.txt", descriptor);
+    EXPECT_EQ(state, ERROR_CODE_RES_PATH_INVALID);
+}
+
+/*
+ * @tc.name: GetRawFileListUnCompressedTest001
+ * @tc.desc: Test GetRawFileListUnCompressed
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, GetRawFileListUnCompressedTest001, TestSize.Level1)
+{
+    std::string indexPath = FormatFullPath(g_resFilePath);
+    std::vector<std::string> fileList;
+    RState state = HapParser::GetRawFileListUnCompressed(indexPath, "", fileList);
+    EXPECT_EQ(state, SUCCESS);
+}
+
+/*
+ * @tc.name: IsRawDirFromHapTest001
+ * @tc.desc: Test IsRawDirFromHap
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, IsRawDirFromHapTest001, TestSize.Level1)
+{
+    std::string hapPath = FormatFullPath(g_hapPath);
+    bool outValue;
+    RState state = HapParser::IsRawDirFromHap(hapPath.c_str(), "", outValue);
+    EXPECT_EQ(state, ERROR_CODE_RES_PATH_INVALID);
+    EXPECT_FALSE(outValue);
+}
+
+/*
+ * @tc.name: IsRawDirFromHapTest002
+ * @tc.desc: Test IsRawDirFromHap
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, IsRawDirFromHapTest002, TestSize.Level1)
+{
+    std::string hapPath = FormatFullPath("no_exist_hap");
+    bool outValue;
+    RState state = HapParser::IsRawDirFromHap(hapPath.c_str(), "test", outValue);
+    EXPECT_EQ(state, NOT_FOUND);
+    EXPECT_FALSE(outValue);
+}
+
+/*
+ * @tc.name: IsRawDirUnCompressedTest001
+ * @tc.desc: Test IsRawDirUnCompressed
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, IsRawDirUnCompressedTest001, TestSize.Level1)
+{
+    std::string hapPath = FormatFullPath(g_hapPath);
+    bool outValue;
+    RState state = HapParser::IsRawDirUnCompressed(hapPath.c_str(), outValue);
+    EXPECT_EQ(state, SUCCESS);
+    EXPECT_FALSE(outValue);
+}
+
+/*
+ * @tc.name: IsRawDirUnCompressedTest002
+ * @tc.desc: Test IsRawDirUnCompressed
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, IsRawDirUnCompressedTest002, TestSize.Level1)
+{
+    std::string hapPath = FormatFullPath("no_exist_hap");
+    bool outValue;
+    RState state = HapParser::IsRawDirUnCompressed(hapPath.c_str(), outValue);
+    EXPECT_EQ(state, ERROR_CODE_RES_PATH_INVALID);
+    EXPECT_FALSE(outValue);
 }
 }
