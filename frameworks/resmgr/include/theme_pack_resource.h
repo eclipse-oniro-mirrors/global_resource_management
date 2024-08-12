@@ -34,13 +34,14 @@ struct ThemeKey {
     std::string moduleName;
     ResType resType;
     std::string resName;
+    std::string abilityName;
 
-    ThemeKey(std::string bundle, std::string module, ResType type, std::string name) : bundleName(bundle),
-        moduleName(module), resType(type), resName(name) {};
+    ThemeKey(std::string bundle, std::string module, ResType type, std::string name, std::string ability = "")
+        : bundleName(bundle), moduleName(module), resType(type), resName(name), abilityName(ability) {};
     bool operator == (const ThemeKey& theme) const
     {
         return bundleName == theme.bundleName && moduleName == theme.moduleName
-            && resType == theme.resType && resName == theme.resName;
+            && resType == theme.resType && resName == theme.resName && abilityName == theme.abilityName;
     }
 };
 
@@ -51,7 +52,8 @@ struct HashTk {
         std::size_t h2 = std::hash<std::string>()(theme.moduleName);
         std::size_t h3 = std::hash<int32_t>()(theme.resType);
         std::size_t h4 = std::hash<std::string>()(theme.resName);
-        return h1 ^ h2 ^ h3 ^ h4;
+        std::size_t h5 = std::hash<std::string>()(theme.abilityName);
+        return h1 ^ h2 ^ h3 ^ h4 ^ h5;
     }
 };
 
@@ -120,7 +122,8 @@ public:
      * @param name the icon name
      * @return the icon path
      */
-    const std::string GetThemeAppIcon(const std::pair<std::string, std::string> &bundleInfo, const std::string &name);
+    const std::string GetThemeAppIcon(const std::pair<std::string, std::string> &bundleInfo, const std::string &name,
+        const std::string &abilityName = "");
 
     /**
      * Get the theme value related bundlename, modulename, resType and resource name.
@@ -145,6 +148,8 @@ private:
     void ParseIcon(const std::string &bundleName, const std::string &moduleName, const std::string &iconPath);
     void InitThemeRes(std::pair<std::string, std::string> bundleInfo, cJSON *root,
         std::shared_ptr<ThemeConfig> themeConfig, const std::string &resTypeStr);
+    const std::string GetThemeAppIconByAbilityName(const std::pair<std::string, std::string> &bundleInfo,
+        const std::string &name, const std::string &abilityName = "");
     static ThemeResource *themeRes;
 };
 } // namespace Resource
