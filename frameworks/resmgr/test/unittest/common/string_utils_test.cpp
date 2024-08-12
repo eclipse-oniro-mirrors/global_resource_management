@@ -300,4 +300,113 @@ HWTEST_F(StringUtilsTest, ReplacePlaceholderWithParamsTest010, TestSize.Level1)
     EXPECT_TRUE(ret);
     EXPECT_EQ(inputValue, "percent is 59.557000");
 }
+
+/*
+ * @tc.name: FormatStringTest001
+ * @tc.desc: Test FormatString function
+ * @tc.type: FUNC
+ */
+HWTEST_F(StringUtilsTest, FormatStringTest001, TestSize.Level1)
+{
+    std::string result = FormatString(nullptr);
+    EXPECT_EQ(result, "");
+
+    va_list args;
+    result = FormatString(nullptr, args);
+    EXPECT_EQ(result, "");
+}
+
+bool TestParseArgs(const std::string inputOutputValue, ...)
+{
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams;
+    va_list args;
+    va_start(args, inputOutputValue);
+    bool ret = parseArgs(inputOutputValue, args, jsParams);
+    va_end(args);
+    return ret;
+}
+
+/*
+ * @tc.name: ParseArgsTest001
+ * @tc.desc: Test FormatString function
+ * @tc.type: FUNC
+ */
+HWTEST_F(StringUtilsTest, ParseArgsTest001, TestSize.Level1)
+{
+    std::string inputOutputValue = "";
+    bool ret = TestParseArgs(inputOutputValue);
+    EXPECT_TRUE(ret);
+}
+
+/*
+ * @tc.name: ParseArgsTest002
+ * @tc.desc: Test FormatString function
+ * @tc.type: FUNC
+ */
+HWTEST_F(StringUtilsTest, ParseArgsTest002, TestSize.Level1)
+{
+    std::string inputOutputValue = "%184467440737095516150$d";
+    bool ret = TestParseArgs(inputOutputValue);
+    EXPECT_FALSE(ret);
+}
+
+/*
+ * @tc.name: ParseArgsTest003
+ * @tc.desc: Test FormatString function
+ * @tc.type: FUNC
+ */
+HWTEST_F(StringUtilsTest, ParseArgsTest003, TestSize.Level1)
+{
+    std::string inputOutputValue = "%0$d";
+    bool ret = TestParseArgs(inputOutputValue);
+    EXPECT_FALSE(ret);
+}
+
+/*
+ * @tc.name: ParseArgsTest004
+ * @tc.desc: Test FormatString function
+ * @tc.type: FUNC
+ */
+HWTEST_F(StringUtilsTest, ParseArgsTest004, TestSize.Level1)
+{
+    std::string inputOutputValue = "%1$d%s";
+    bool ret = TestParseArgs(inputOutputValue, "1", "2");
+    EXPECT_FALSE(ret);
+}
+
+/*
+ * @tc.name: ParseArgsTest005
+ * @tc.desc: Test FormatString function
+ * @tc.type: FUNC
+ */
+HWTEST_F(StringUtilsTest, ParseArgsTest005, TestSize.Level1)
+{
+    std::string inputOutputValue = "%2$d";
+    bool ret = TestParseArgs(inputOutputValue, 1);
+    EXPECT_FALSE(ret);
+}
+
+/*
+ * @tc.name: ParseArgsTest006
+ * @tc.desc: Test FormatString function
+ * @tc.type: FUNC
+ */
+HWTEST_F(StringUtilsTest, ParseArgsTest006, TestSize.Level1)
+{
+    std::string inputOutputValue = "%18446744073709551615$d";
+    bool ret = TestParseArgs(inputOutputValue);
+    EXPECT_FALSE(ret);
+}
+
+/*
+ * @tc.name: ParseArgsTest007
+ * @tc.desc: Test FormatString function
+ * @tc.type: FUNC
+ */
+HWTEST_F(StringUtilsTest, ParseArgsTest007, TestSize.Level1)
+{
+    std::string inputOutputValue = "%18446744073709551616$d";
+    bool ret = TestParseArgs(inputOutputValue);
+    EXPECT_FALSE(ret);
+}
 }

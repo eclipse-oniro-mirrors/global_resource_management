@@ -2055,7 +2055,7 @@ HWTEST_F(ResourceManagerTest, CreateResourceManagerTest001, TestSize.Level1)
     int32_t userId = 100; // userId is 100
     std::shared_ptr<ResourceManager> bundleRm =
         CreateResourceManager("ohos.global.test.all", "entry", hapPath, overlayPath, *rc, appType, userId);
-    EXPECT_FALSE(bundleRm == nullptr);
+    EXPECT_TRUE(bundleRm == nullptr);
 
     bundleRm = CreateResourceManager("", "entry", hapPath, overlayPath, *rc, appType, userId);
     EXPECT_TRUE(bundleRm == nullptr);

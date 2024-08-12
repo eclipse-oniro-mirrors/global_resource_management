@@ -36,6 +36,7 @@ static const char *g_nonExistName = "non_existent_name";
 static const char *g_overlayResFilePath = "overlay/assets/entry/resources.index";
 static const float BASE_DPI = 160.0f;
 static const int NON_EXIST_ID = 1111;
+static const char *HAP_PATH_FA = "all_fa.hap";
 std::string FormatFullPath(const char *fileRelativePath);
 
 void PrintIdValues(const std::shared_ptr<HapResource::IdValues> &idValues);

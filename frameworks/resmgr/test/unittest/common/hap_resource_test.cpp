@@ -259,7 +259,8 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest003, TestSize.Level1)
     PrintIdValues(idv);
 }
 
-ResDesc *LoadFromHap(const char *hapPath, const std::shared_ptr<ResConfigImpl> defaultConfig)
+ResDesc *LoadFromHap(const char *hapPath, const std::shared_ptr<ResConfigImpl> defaultConfig,
+    const uint32_t &selectedTypes = SELECT_ALL)
 {
     std::unique_ptr<uint8_t[]> buf;
     size_t bufLen;
@@ -271,7 +272,7 @@ ResDesc *LoadFromHap(const char *hapPath, const std::shared_ptr<ResConfigImpl> d
     RESMGR_HILOGD(RESMGR_TAG, "extract success, bufLen:%zu", bufLen);
 
     ResDesc *resDesc = new ResDesc();
-    out = HapParser::ParseResHex(reinterpret_cast<char *>(buf.get()), bufLen, *resDesc, defaultConfig);
+    out = HapParser::ParseResHex(reinterpret_cast<char *>(buf.get()), bufLen, *resDesc, defaultConfig, selectedTypes);
     if (out != OK) {
         delete (resDesc);
         RESMGR_HILOGE(RESMGR_TAG, "ParseResHex failed! retcode:%d", out);
@@ -301,5 +302,9 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest004, TestSize.Level1)
     // 3. hap file exists, config.json error: missing "moduleName"
     resDesc = LoadFromHap(FormatFullPath("err-config.json-2.hap").c_str(), nullptr);
     ASSERT_TRUE(resDesc == nullptr);
+
+    // 4. load select string type res
+    resDesc = LoadFromHap(FormatFullPath("all.hap").c_str(), nullptr, SELECT_STRING);
+    ASSERT_TRUE(resDesc != nullptr);
 }
 }

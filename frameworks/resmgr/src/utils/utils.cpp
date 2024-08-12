@@ -342,6 +342,52 @@ static uint32_t ParseHex(char c, RState &state)
     return -1;
 }
 
+void ConvertColorRgbToUInt32(const char *s, uint32_t &color, RState &parseState)
+{
+    color |= 0xFF000000;
+    color |= ParseHex(s[ArrayIndex::INDEX_ONE], parseState) << BitOperatorNum::BIT_TWENTY;
+    color |= ParseHex(s[ArrayIndex::INDEX_ONE], parseState) << BitOperatorNum::BIT_SIXTEEN;
+    color |= ParseHex(s[ArrayIndex::INDEX_TWO], parseState) << BitOperatorNum::BIT_TWELVE;
+    color |= ParseHex(s[ArrayIndex::INDEX_TWO], parseState) << BitOperatorNum::BIT_EIGHT;
+    color |= ParseHex(s[ArrayIndex::INDEX_THREE], parseState) << BitOperatorNum::BIT_FOUR;
+    color |= ParseHex(s[ArrayIndex::INDEX_THREE], parseState);
+}
+
+void ConvertColorArgbToUInt32(const char *s, uint32_t &color, RState &parseState)
+{
+    color |= ParseHex(s[ArrayIndex::INDEX_ONE], parseState) << BitOperatorNum::BIT_TWENTY_EIGHT;
+    color |= ParseHex(s[ArrayIndex::INDEX_ONE], parseState) << BitOperatorNum::BIT_TWENTY_FOUR;
+    color |= ParseHex(s[ArrayIndex::INDEX_TWO], parseState) << BitOperatorNum::BIT_TWENTY;
+    color |= ParseHex(s[ArrayIndex::INDEX_TWO], parseState) << BitOperatorNum::BIT_SIXTEEN;
+    color |= ParseHex(s[ArrayIndex::INDEX_THREE], parseState) << BitOperatorNum::BIT_TWELVE;
+    color |= ParseHex(s[ArrayIndex::INDEX_THREE], parseState) << BitOperatorNum::BIT_EIGHT;
+    color |= ParseHex(s[ArrayIndex::INDEX_FOUR], parseState) << BitOperatorNum::BIT_FOUR;
+    color |= ParseHex(s[ArrayIndex::INDEX_FOUR], parseState);
+}
+
+void ConvertColorSixRgbToUInt32(const char *s, uint32_t &color, RState &parseState)
+{
+    color |= 0xFF000000;
+    color |= ParseHex(s[ArrayIndex::INDEX_ONE], parseState) << BitOperatorNum::BIT_TWENTY;
+    color |= ParseHex(s[ArrayIndex::INDEX_TWO], parseState) << BitOperatorNum::BIT_SIXTEEN;
+    color |= ParseHex(s[ArrayIndex::INDEX_THREE], parseState) << BitOperatorNum::BIT_TWELVE;
+    color |= ParseHex(s[ArrayIndex::INDEX_FOUR], parseState) << BitOperatorNum::BIT_EIGHT;
+    color |= ParseHex(s[ArrayIndex::INDEX_FIVE], parseState) << BitOperatorNum::BIT_FOUR;
+    color |= ParseHex(s[ArrayIndex::INDEX_SIX], parseState);
+}
+
+void ConvertColorEightRgbToUInt32(const char *s, uint32_t &color, RState &parseState)
+{
+    color |= ParseHex(s[ArrayIndex::INDEX_ONE], parseState) << BitOperatorNum::BIT_TWENTY_EIGHT;
+    color |= ParseHex(s[ArrayIndex::INDEX_TWO], parseState) << BitOperatorNum::BIT_TWENTY_FOUR;
+    color |= ParseHex(s[ArrayIndex::INDEX_THREE], parseState) << BitOperatorNum::BIT_TWENTY;
+    color |= ParseHex(s[ArrayIndex::INDEX_FOUR], parseState) << BitOperatorNum::BIT_SIXTEEN;
+    color |= ParseHex(s[ArrayIndex::INDEX_FIVE], parseState) << BitOperatorNum::BIT_TWELVE;
+    color |= ParseHex(s[ArrayIndex::INDEX_SIX], parseState) << BitOperatorNum::BIT_EIGHT;
+    color |= ParseHex(s[ArrayIndex::INDEX_SEVEN], parseState) << BitOperatorNum::BIT_FOUR;
+    color |= ParseHex(s[ArrayIndex::INDEX_EIGHT], parseState);
+}
+
 /**
  * @brief  convert color string to 32 bits value 0xaarrggbb.
  * color string format is
@@ -362,41 +408,17 @@ RState Utils::ConvertColorToUInt32(const char *s, uint32_t &outValue)
     uint32_t color = 0;
     RState parseState = SUCCESS;
     size_t len = strlen(s);
-    if (*s == '#' && len >= ArrayLen::LEN_FOUR) {
+    if (*s == '#') {
         if (len == ArrayLen::LEN_FOUR) {
-            color |= 0xFF000000;
-            color |= ParseHex(s[ArrayIndex::INDEX_ONE], parseState) << BitOperatorNum::BIT_TWENTY;
-            color |= ParseHex(s[ArrayIndex::INDEX_ONE], parseState) << BitOperatorNum::BIT_SIXTEEN;
-            color |= ParseHex(s[ArrayIndex::INDEX_TWO], parseState) << BitOperatorNum::BIT_TWELVE;
-            color |= ParseHex(s[ArrayIndex::INDEX_TWO], parseState) << BitOperatorNum::BIT_EIGHT;
-            color |= ParseHex(s[ArrayIndex::INDEX_THREE], parseState) << BitOperatorNum::BIT_FOUR;
-            color |= ParseHex(s[ArrayIndex::INDEX_THREE], parseState);
+            ConvertColorRgbToUInt32(s, color, parseState);
         } else if (len == ArrayLen::LEN_FIVE) {
-            color |= ParseHex(s[ArrayIndex::INDEX_ONE], parseState) << BitOperatorNum::BIT_TWENTY_EIGHT;
-            color |= ParseHex(s[ArrayIndex::INDEX_ONE], parseState) << BitOperatorNum::BIT_TWENTY_FOUR;
-            color |= ParseHex(s[ArrayIndex::INDEX_TWO], parseState) << BitOperatorNum::BIT_TWENTY;
-            color |= ParseHex(s[ArrayIndex::INDEX_TWO], parseState) << BitOperatorNum::BIT_SIXTEEN;
-            color |= ParseHex(s[ArrayIndex::INDEX_THREE], parseState) << BitOperatorNum::BIT_TWELVE;
-            color |= ParseHex(s[ArrayIndex::INDEX_THREE], parseState) << BitOperatorNum::BIT_EIGHT;
-            color |= ParseHex(s[ArrayIndex::INDEX_FOUR], parseState) << BitOperatorNum::BIT_FOUR;
-            color |= ParseHex(s[ArrayIndex::INDEX_FOUR], parseState);
+            ConvertColorArgbToUInt32(s, color, parseState);
         } else if (len == ArrayLen::LEN_SEVEN) {
-            color |= 0xFF000000;
-            color |= ParseHex(s[ArrayIndex::INDEX_ONE], parseState) << BitOperatorNum::BIT_TWENTY;
-            color |= ParseHex(s[ArrayIndex::INDEX_TWO], parseState) << BitOperatorNum::BIT_SIXTEEN;
-            color |= ParseHex(s[ArrayIndex::INDEX_THREE], parseState) << BitOperatorNum::BIT_TWELVE;
-            color |= ParseHex(s[ArrayIndex::INDEX_FOUR], parseState) << BitOperatorNum::BIT_EIGHT;
-            color |= ParseHex(s[ArrayIndex::INDEX_FIVE], parseState) << BitOperatorNum::BIT_FOUR;
-            color |= ParseHex(s[ArrayIndex::INDEX_SIX], parseState);
+            ConvertColorSixRgbToUInt32(s, color, parseState);
         } else if (len == ArrayLen::LEN_NINE) {
-            color |= ParseHex(s[ArrayIndex::INDEX_ONE], parseState) << BitOperatorNum::BIT_TWENTY_EIGHT;
-            color |= ParseHex(s[ArrayIndex::INDEX_TWO], parseState) << BitOperatorNum::BIT_TWENTY_FOUR;
-            color |= ParseHex(s[ArrayIndex::INDEX_THREE], parseState) << BitOperatorNum::BIT_TWENTY;
-            color |= ParseHex(s[ArrayIndex::INDEX_FOUR], parseState) << BitOperatorNum::BIT_SIXTEEN;
-            color |= ParseHex(s[ArrayIndex::INDEX_FIVE], parseState) << BitOperatorNum::BIT_TWELVE;
-            color |= ParseHex(s[ArrayIndex::INDEX_SIX], parseState) << BitOperatorNum::BIT_EIGHT;
-            color |= ParseHex(s[ArrayIndex::INDEX_SEVEN], parseState) << BitOperatorNum::BIT_FOUR;
-            color |= ParseHex(s[ArrayIndex::INDEX_EIGHT], parseState);
+            ConvertColorEightRgbToUInt32(s, color, parseState);
+        } else {
+            return INVALID_FORMAT;
         }
     } else {
         parseState = INVALID_FORMAT;
