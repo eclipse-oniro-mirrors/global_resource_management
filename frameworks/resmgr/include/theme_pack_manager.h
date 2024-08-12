@@ -138,7 +138,7 @@ private:
     Lock lockSkin_;
     Lock lockIcon_;
     Lock lockThemeId_;
-    uint32_t themeId_;
+    uint32_t themeId_{0};
     bool isFirstCreate = true;
 };
 } // namespace Resource
