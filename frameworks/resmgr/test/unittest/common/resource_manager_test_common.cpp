@@ -164,6 +164,28 @@ void ResourceManagerTestCommon::TestPluralStringByName(int quantity, const char 
     ASSERT_EQ(std::string(cmp), outValue);
 }
 
+void ResourceManagerTestCommon::TestFormatPluralStringById(const int id, double quantity, const char *cmp)
+{
+    RState ret;
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
+    params.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_NUMBER, std::to_string(quantity)));
+    ret = rm->GetFormatPluralStringById(outValue, id, quantity, params);
+    ASSERT_EQ(SUCCESS, ret);
+    ASSERT_EQ(std::string(cmp), outValue);
+}
+
+void ResourceManagerTestCommon::TestFormatPluralStringByName(const std::string name, double quantity, const char *cmp)
+{
+    RState ret;
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
+    params.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_NUMBER, std::to_string(quantity)));
+    ret = rm->GetFormatPluralStringByName(outValue, name.c_str(), quantity, params);
+    ASSERT_EQ(SUCCESS, ret);
+    ASSERT_EQ(std::string(cmp), outValue);
+}
+
 void ResourceManagerTestCommon::TestGetRawFilePathByName(const std::string &name, const std::string &cmp)
 {
     std::string outValue;

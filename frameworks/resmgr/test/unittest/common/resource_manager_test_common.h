@@ -62,6 +62,10 @@ public:
 
     void TestPluralStringByName(int quantity, const char *cmp, bool format = false);
 
+    void TestFormatPluralStringById(const int id, double quantity, const char *cmp);
+
+    void TestFormatPluralStringByName(const std::string name, double quantity, const char *cmp);
+
     void TestGetRawFilePathByName(const std::string &name, const std::string &cmp);
 
     void AddResource(const char *language, const char *script, const char *region);

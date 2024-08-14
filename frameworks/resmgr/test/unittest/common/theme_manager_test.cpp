@@ -138,5 +138,55 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeIconsResourceTest001, TestSi
     tm->LoadThemeIconsResource("ohos.global.test.all", "entry", rootDirs, userId);
     state = rm->GetThemeIcons(resId, foregroundInfo, backgroundInfo);
     EXPECT_TRUE(state == SUCCESS);
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", {}, userId);
+}
+
+/*
+ * @tc.name: ThemeManagerTestLoadThemeIconsResourceTest002
+ * @tc.desc: Test GetThemeIcons function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeIconsResourceTest002, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    uint32_t resId = 16777306;
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> foregroundInfo;
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> backgroundInfo;
+    RState state = rm->GetThemeIcons(resId, foregroundInfo, backgroundInfo);
+    EXPECT_EQ(state, ERROR_CODE_RES_ID_NOT_FOUND);
+
+    std::vector<std::string> rootDirs;
+    rootDirs.emplace_back("/data/test/theme/icons/dynamic_icons");
+    int32_t userId = 100; // userId is 100
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", rootDirs, userId);
+    state = rm->GetThemeIcons(resId, foregroundInfo, backgroundInfo);
+    EXPECT_EQ(state, SUCCESS);
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", {}, userId);
+}
+
+/*
+ * @tc.name: ThemeManagerTestLoadThemeIconsResourceTest003
+ * @tc.desc: Test GetThemeIcons function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeIconsResourceTest003, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    std::vector<std::string> rootDirs;
+    std::string rootDir = "/data/test/theme/icons/ohos.global.test.all";
+    uint32_t resId = 16777306;
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> foregroundInfo;
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> backgroundInfo;
+    RState state = rm->GetThemeIcons(resId, foregroundInfo, backgroundInfo, 0, "ohos.global.test.all.EntryAbility");
+    EXPECT_EQ(state, ERROR_CODE_RES_ID_NOT_FOUND);
+
+    rootDirs.emplace_back(rootDir);
+    int32_t userId = 100; // userId is 100
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", rootDirs, userId);
+    state = rm->GetThemeIcons(resId, foregroundInfo, backgroundInfo, 0, "ohos.global.test.all.EntryAbility");
+    EXPECT_EQ(state, SUCCESS);
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", {}, userId);
 }
 }

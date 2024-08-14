@@ -2063,6 +2063,27 @@ HWTEST_F(ResourceManagerTest, CreateResourceManagerTest001, TestSize.Level1)
 }
 
 /*
+ * @tc.name: CreateResourceManagerTest002
+ * @tc.desc: Test CreateResourceManager function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, CreateResourceManagerTest002, TestSize.Level1)
+{
+    ResConfigImpl *rc = new ResConfigImpl;
+    std::string hapPath;
+    std::vector<std::string> overlayPath;
+    int32_t appType = 0;
+    int32_t userId = 100; // userId is 100
+    std::shared_ptr<ResourceManager> bundleRm =
+        CreateResourceManager("ohos.global.test.all", "entry", hapPath, overlayPath, *rc, appType, userId);
+    EXPECT_TRUE(bundleRm != nullptr);
+
+    bundleRm = CreateResourceManager("", "entry", hapPath, overlayPath, *rc, appType, userId);
+    EXPECT_TRUE(bundleRm == nullptr);
+    delete rc;
+}
+
+/*
  * @tc.name: GetSystemResourceManagerTest001
  * @tc.desc: Test CreateResourceManager function
  * @tc.type: FUNC
