@@ -1286,6 +1286,91 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetPluralStringByIdFormatTest
 }
 
 /*
+ * @tc.name: ResourceManagerGetFormatPluralStringByIdTest001
+ * @tc.desc: Test GetFormatPluralStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByIdTest001, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    double quantity = 1;
+    int id = rmc->GetResId("eat_apple", ResType::PLURALS);
+    ASSERT_TRUE(id > 0);
+    rmc->TestFormatPluralStringById(id, quantity, "1 apples");
+}
+
+/*
+ * @tc.name: ResourceManagerGetFormatPluralStringByIdTest002
+ * @tc.desc: Test GetFormatPluralStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByIdTest002, TestSize.Level1)
+{
+    rmc->AddResource("en", nullptr, "US");
+    double quantity = 1;
+    int id = rmc->GetResId("eat_apple", ResType::PLURALS);
+    ASSERT_TRUE(id > 0);
+    rmc->TestFormatPluralStringById(id, quantity, "1 apple");
+
+    quantity = 10;
+    rmc->TestFormatPluralStringById(id, quantity, "10 apples");
+}
+
+/*
+ * @tc.name: ResourceManagerGetFormatPluralStringByIdTest003
+ * @tc.desc: Test GetFormatPluralStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByIdTest003, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    double quantity = 1;
+    int id = 0;
+    RState state;
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams;
+    state = rm->GetFormatPluralStringById(outValue, id, quantity, jsParams);
+    EXPECT_EQ(state, ERROR_CODE_RES_ID_NOT_FOUND);
+}
+
+/*
+ * @tc.name: ResourceManagerGetFormatPluralStringByIdTest004
+ * @tc.desc: Test GetFormatPluralStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByIdTest004, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    double quantity = 1;
+    int id = rmc->GetResId("app_name", ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    RState state;
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams;
+    state = rm->GetFormatPluralStringById(outValue, id, quantity, jsParams);
+    EXPECT_EQ(state, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+}
+
+/*
+ * @tc.name: ResourceManagerGetFormatPluralStringByIdTest005
+ * @tc.desc: Test GetFormatPluralStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByIdTest005, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    double quantity = 1;
+    int id = rmc->GetResId("eat_apple", ResType::PLURALS);
+    ASSERT_TRUE(id > 0);
+    RState state;
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams;
+    jsParams.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_STRING, "1"));
+    state = rm->GetFormatPluralStringById(outValue, id, quantity, jsParams);
+    EXPECT_EQ(state, ERROR_CODE_RES_NAME_FORMAT_ERROR);
+}
+
+/*
  * @tc.name: ResourceManagerGetPluralStringByNameFormatTest001
  * @tc.desc: Test GetPluralStringByNameFormat function, file case.
  * @tc.type: FUNC
@@ -1345,6 +1430,66 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetPluralStringByNameFormatTe
     int quantity = 1;
     RState state = rm->GetPluralStringByNameFormat(outValue, eatApple, quantity);
     ASSERT_EQ(ERROR_CODE_RES_REF_TOO_MUCH, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetFormatPluralStringByNameTest001
+ * @tc.desc: Test GetFormatPluralStringByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByNameTest001, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    double quantity = 1;
+    rmc->TestFormatPluralStringByName("eat_apple", quantity, "1 apples");
+}
+
+/*
+ * @tc.name: ResourceManagerGetFormatPluralStringByNameTest002
+ * @tc.desc: Test GetFormatPluralStringByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByNameTest002, TestSize.Level1)
+{
+    rmc->AddResource("en", nullptr, "US");
+    double quantity = 1;
+    rmc->TestFormatPluralStringByName("eat_apple", quantity, "1 apple");
+
+    quantity = 10;
+    rmc->TestFormatPluralStringByName("eat_apple", quantity, "10 apples");
+}
+
+/*
+ * @tc.name: ResourceManagerGetFormatPluralStringByNameTest003
+ * @tc.desc: Test GetFormatPluralStringByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByNameTest003, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    double quantity = 1;
+    RState state;
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams;
+    state = rm->GetFormatPluralStringByName(outValue, "no_exist_plural", quantity, jsParams);
+    EXPECT_EQ(state, ERROR_CODE_RES_NAME_NOT_FOUND);
+}
+
+/*
+ * @tc.name: ResourceManagerGetFormatPluralStringByNameTest004
+ * @tc.desc: Test GetFormatPluralStringByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByNameTest004, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    double quantity = 1;
+    RState state;
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams;
+    jsParams.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_STRING, "1"));
+    state = rm->GetFormatPluralStringByName(outValue, "eat_apple", quantity, jsParams);
+    EXPECT_EQ(state, ERROR_CODE_RES_NAME_FORMAT_ERROR);
 }
 
 /*

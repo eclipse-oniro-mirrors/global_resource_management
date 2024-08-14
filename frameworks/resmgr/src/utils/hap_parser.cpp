@@ -548,23 +548,6 @@ int32_t ParseId(const char *buffer, uint32_t &offset, std::shared_ptr<ResId> id,
     return OK;
 }
 
-bool IsLocaleMatch(const std::shared_ptr<ResConfigImpl> defaultConfig,
-    const std::vector<std::shared_ptr<KeyParam>> &keyParams)
-{
-    if (defaultConfig == nullptr) {
-        return true;
-    }
-    auto config = HapParser::CreateResConfigFromKeyParams(keyParams);
-    if (config == nullptr) {
-        return false;
-    }
-    if (LocaleMatcher::Match(defaultConfig->GetResLocale(), config->GetResLocale())) {
-        return true;
-    }
-    RESMGR_HILOGD(RESMGR_TAG, "mismatch, do not parse %s", HapParser::ToFolderPath(keyParams).c_str());
-    return false;
-}
-
 int32_t ParseKey(const char *buffer, uint32_t &offset, std::shared_ptr<ResKey> key, bool &match,
     const std::shared_ptr<ResConfigImpl> defaultConfig, const std::string &deviceType, const uint32_t &selectedTypes)
 {
