@@ -369,6 +369,17 @@ const std::string ThemePackManager::FindThemeIconResource(const std::pair<std::s
     }
     return result;
 }
+
+bool ThemePackManager::UpdateThemeId(uint32_t newThemeId)
+{
+    AutoMutex mutex(this->lockThemeId_);
+    if (newThemeId != 0 && newThemeId != themeId_) {
+        RESMGR_HILOGI(RESMGR_TAG, "update theme, themeId_= %{public}d, newThemeId= %{public}d", themeId_, newThemeId);
+        themeId_ = newThemeId;
+        return true;
+    }
+    return false;
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
