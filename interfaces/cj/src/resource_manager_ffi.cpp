@@ -67,6 +67,18 @@ int64_t CJ_GetResourceManagerStageMode(OHOS::AbilityRuntime::Context* context)
     return nativeResMgrLibrary->GetID();
 }
 
+RetDataI64 CJ_GetSystemResMgr()
+{
+    RetDataI64 ret = { .code = SUCCESS_CODE, .data = -1 };
+    auto resMgr = FFIData::Create<ResourceManagerImpl>();
+    if (resMgr->IsEmpty()) {
+        ret.code = ERROR_CODE_SYSTEM_RES_MANAGER_GET_FAILED;
+        return ret;
+    }
+    ret.data = resMgr->GetID();
+    return ret;
+}
+
 int32_t CJ_CloseRawFd(int64_t id, const char* path)
 {
     auto instance = FFIData::GetData<ResourceManagerImpl>(id);
