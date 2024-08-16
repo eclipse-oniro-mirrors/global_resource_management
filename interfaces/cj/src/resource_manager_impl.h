@@ -123,7 +123,6 @@ private:
 
 OHOS::Ace::Napi::DrawableDescriptor* GetDrawableDescriptorPtr(uint32_t id,
     std::shared_ptr<Global::Resource::ResourceManager> resMgr, uint32_t density, Global::Resource::RState &state);
-char** g_vectorToCharPointer(std::vector<std::string>& vec);
 } // namespace OHOS::Resource
 
 #endif // RESOURCE_MANAGER_IMPL_H
