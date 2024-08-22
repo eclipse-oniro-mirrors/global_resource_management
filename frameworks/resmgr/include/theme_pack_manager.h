@@ -101,6 +101,7 @@ public:
      *
      * @param bundleInfo which contains bundlename, modulename
      * @param iconName the icon resource name
+     * @param abilityName the hap abilityName
      * @return the best resource or empty
      */
     const std::string FindThemeIconResource(const std::pair<std::string, std::string> &bundleInfo,
@@ -116,6 +117,36 @@ public:
     bool UpdateThemeId(uint32_t newThemeId);
 
     bool IsFirstLoadResource();
+
+    /**
+     * Whether an icon exists in the theme
+     *
+     * @param bundleName the hap bundleName
+     * @return true if icon exists, else no exists
+     */
+    bool HasIconInTheme(const std::string &bundleName);
+
+    /**
+     * Get icons info in other icons by icon name
+     *
+     * @param iconName the icon name
+     * @param outValue the obtain resource wirte to
+     * @param len the data len wirte to
+     * @param isGlobalMask true if the global mask, else other icons
+     * @return SUCCESS if the theme icon get success, else failed
+     */
+    RState GetOtherIconsInfo(const std::string &iconName,
+        std::unique_ptr<uint8_t[]> &outValue, size_t &len, bool isGlobalMask);
+
+    /**
+     * Get the theme icon from cache
+     *
+     * @param iconTag the tag of icon info
+     * @param outValue the obtain resource wirte to
+     * @param len the data len wirte to
+     * @return SUCCESS if the theme icon get success, else failed
+     */
+    RState GetThemeIconFromCache(const std::string &iconTag, std::unique_ptr<uint8_t[]> &outValue, size_t &len);
 private:
     ThemePackManager();
     std::string themeMask;
@@ -123,6 +154,7 @@ private:
     void ClearIconResource();
     std::vector<std::shared_ptr<ThemeResource>> skinResource_;
     std::vector<std::shared_ptr<ThemeResource>> iconResource_;
+    std::vector<std::tuple<std::string, std::unique_ptr<uint8_t[]>, size_t>> iconMaskValues_;
     std::vector<std::shared_ptr<ThemeResource::ThemeValue> > GetThemeResourceList(
         const std::pair<std::string, std::string> &bundInfo, const ResType &resType, const std::string &resName);
 
@@ -138,6 +170,7 @@ private:
     Lock lockSkin_;
     Lock lockIcon_;
     Lock lockThemeId_;
+    Lock lockIconValue_;
     uint32_t themeId_{0};
     bool isFirstCreate = true;
 };

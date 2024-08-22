@@ -216,6 +216,11 @@ public:
 
     virtual std::string GetThemeMask() = 0;
 
+    virtual bool HasIconInTheme(const std::string &bundleName) = 0;
+
+    virtual RState GetOtherIconsInfo(const std::string &iconName,
+        std::unique_ptr<uint8_t[]> &outValue, size_t &len, bool isGlobalMask) = 0;
+
     virtual RState IsRawDirFromHap(const std::string &pathName, bool &outValue) = 0;
 
     virtual std::shared_ptr<ResourceManager> GetOverrideResourceManager(

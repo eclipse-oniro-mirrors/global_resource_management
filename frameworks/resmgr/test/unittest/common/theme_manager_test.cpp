@@ -189,4 +189,72 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeIconsResourceTest003, TestSi
     EXPECT_EQ(state, SUCCESS);
     tm->LoadThemeIconsResource("ohos.global.test.all", "entry", {}, userId);
 }
+
+/*
+ * @tc.name: ThemeManagerTestHasIconInThemeTest001
+ * @tc.desc: Test HasIconInTheme function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestHasIconInThemeTest001, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    std::vector<std::string> rootDirs;
+    std::string rootDir = "/data/test/theme/icons/ohos.global.test.all";
+    rootDirs.emplace_back(rootDir);
+    int32_t userId = 100; // userId is 100
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", rootDirs, userId);
+    bool result = rm->HasIconInTheme("ohos.global.test");
+    EXPECT_TRUE(result == false);
+
+    result = rm->HasIconInTheme("ohos.global.test.all");
+    EXPECT_TRUE(result == true);
+}
+
+/*
+ * @tc.name: ThemeManagerTestGetOtherIconsInfoTest001
+ * @tc.desc: Test GetOtherIconsInfo function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestGetOtherIconsInfoTest001, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    std::vector<std::string> rootDirs;
+    std::string rootDir = "/data/test/theme/icons/other_icons";
+    rootDirs.emplace_back(rootDir);
+    int32_t userId = 100; // userId is 100
+    tm->LoadThemeIconsResource("other_icons", "", rootDirs, userId);
+    std::unique_ptr<uint8_t[]> outValue;
+    size_t len;
+    RState state = rm->GetOtherIconsInfo("other_icons", outValue, len, true);
+    EXPECT_EQ(state, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
+
+    state = rm->GetOtherIconsInfo("foreground", outValue, len, false);
+    EXPECT_EQ(state, SUCCESS);
+}
+
+/*
+ * @tc.name: ThemeManagerTestGetThemeIconFromCacheTest001
+ * @tc.desc: Test GetThemeIconFromCache function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestGetThemeIconFromCacheTest001, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    std::vector<std::string> rootDirs;
+    std::string rootDir = "/data/test/theme/icons/other_icons";
+    rootDirs.emplace_back(rootDir);
+    int32_t userId = 100; // userId is 100
+    tm->LoadThemeIconsResource("other_icons", "", rootDirs, userId);
+    std::unique_ptr<uint8_t[]> outValue;
+    size_t len;
+    RState state = tm->GetThemeIconFromCache("other_icons_background", outValue, len);
+    EXPECT_EQ(state, NOT_FOUND);
+    state = tm->GetOtherIconsInfo("background", outValue, len, false);
+    EXPECT_EQ(state, SUCCESS);
+    state = tm->GetThemeIconFromCache("other_icons_background", outValue, len);
+    EXPECT_EQ(state, SUCCESS);
+}
 }
