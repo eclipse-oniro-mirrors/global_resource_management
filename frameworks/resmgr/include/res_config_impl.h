@@ -103,6 +103,12 @@ public:
      */
     void SetScreenDensityDpi(ScreenDensity screenDensityDpi);
 
+    /**
+     * Set resConfig themeId
+     * @param themeId the resConfig themeId
+     */
+    void SetThemeId(uint32_t themeId);
+
 #ifdef SUPPORT_GRAPHICS
     const ResLocale *GetResPreferredLocale() const;
 
@@ -128,6 +134,8 @@ public:
     uint32_t GetMcc() const;
 
     uint32_t GetMnc() const;
+
+    uint32_t GetThemeId() const;
 
     DeviceType GetDeviceType() const;
 
@@ -255,6 +263,7 @@ private:
     bool isCompletedScript_;
     bool isAppColorMode_;
     bool isAppDarkRes_;
+    uint32_t themeId_;
 };
 } // namespace Resource
 } // namespace Global
