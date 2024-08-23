@@ -22,6 +22,9 @@ namespace Resource {
 int ThemeManagerTestLoadThemeSkinResourceTest001(void);
 int ThemeManagerTestLoadThemeSkinResourceTest002(void);
 int ThemeManagerTestLoadThemeIconsResourceTest001(void);
+int ThemeManagerTestHasIconInThemeTest001(void);
+int ThemeManagerTestGetOtherIconsInfoTest001(void);
+int ThemeManagerTestGetThemeIconFromCacheTest001(void);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

@@ -1668,6 +1668,27 @@ std::string ResourceManagerImpl::GetThemeMask()
     return ThemePackManager::GetThemePackManager()->GetMask();
 }
 
+bool ResourceManagerImpl::HasIconInTheme(const std::string &bundleName)
+{
+    return ThemePackManager::GetThemePackManager()->HasIconInTheme(bundleName);
+}
+
+RState ResourceManagerImpl::GetOtherIconsInfo(const std::string &iconName,
+    std::unique_ptr<uint8_t[]> &outValue, size_t &len, bool isGlobalMask)
+{
+    std::string iconTag;
+    if (iconName.find("icon_mask") != std::string::npos && isGlobalMask) {
+        iconTag = "global_" + iconName;
+    } else {
+        iconTag = "other_icons_" + iconName;
+    }
+    RState result = ThemePackManager::GetThemePackManager()->GetThemeIconFromCache(iconTag, outValue, len);
+    if (result == SUCCESS) {
+        return SUCCESS;
+    }
+    return ThemePackManager::GetThemePackManager()->GetOtherIconsInfo(iconName, outValue, len, isGlobalMask);
+}
+
 RState ResourceManagerImpl::IsRawDirFromHap(const std::string &pathName, bool &outValue)
 {
     return hapManager_->IsRawDirFromHap(pathName, outValue);
