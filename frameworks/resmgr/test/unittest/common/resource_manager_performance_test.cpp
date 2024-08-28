@@ -127,8 +127,6 @@ int ParseIndexCost(const std::string &pstr, char *buf, const size_t& bufLen)
             free(buf);
             RESMGR_HILOGE(RESMGR_TAG, "ParseResHex failed! retcode:%d", out);
             return -1;
-        } else {
-            RESMGR_HILOGD(RESMGR_TAG, "ParseResHex success:\n%s", resDesc->ToString().c_str());
         }
 
         auto pResource = new(std::nothrow) HapResource(pstr, 0, resDesc);
