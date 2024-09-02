@@ -147,6 +147,14 @@ public:
      * @return SUCCESS if the theme icon get success, else failed
      */
     RState GetThemeIconFromCache(const std::string &iconTag, std::unique_ptr<uint8_t[]> &outValue, size_t &len);
+
+    /**
+     * Whether to update theme by the user id
+     *
+     * @param userId the current user id
+     * @return true if update theme by the user id, else not update
+     */
+    bool IsUpdateByUserId(int32_t userId);
 private:
     ThemePackManager();
     std::string themeMask;
@@ -167,12 +175,15 @@ private:
         const ResConfigImpl &resConfig);
 
     std::vector<std::string> GetRootDir(const std::string &strCurrentDir);
+    void UpdateUserId(int32_t userId);
     Lock lockSkin_;
     Lock lockIcon_;
     Lock lockThemeId_;
     Lock lockIconValue_;
+    Lock lockUserId_;
     uint32_t themeId_{0};
     bool isFirstCreate = true;
+    int32_t currentUserId_ = 100;
 };
 } // namespace Resource
 } // namespace Global

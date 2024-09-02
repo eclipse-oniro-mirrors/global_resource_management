@@ -257,4 +257,21 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestGetThemeIconFromCacheTest001, TestSiz
     state = tm->GetThemeIconFromCache("other_icons_background", outValue, len);
     EXPECT_EQ(state, SUCCESS);
 }
+
+/*
+ * @tc.name: ThemeManagerTestIsUpdateByUserIdTest001
+ * @tc.desc: Test IsUpdateByUserId function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestIsUpdateByUserIdTest001, TestSize.Level1)
+{
+    int32_t userId = 100;
+    tm->UpdateUserId(userId);
+    bool result = tm->IsUpdateByUserId(userId);
+    ASSERT_FALSE(result);
+
+    userId = 101;
+    result = tm->IsUpdateByUserId(userId);
+    ASSERT_TRUE(result);
+}
 }
