@@ -533,6 +533,14 @@ void HapResource::IsAppDarkRes(const std::shared_ptr<HapResource::ValueUnderQual
     std::string folder = limitPath->GetFolder();
     if (folder.find("dark") != std::string::npos) {
         defaultConfig->SetAppDarkRes(true);
+        hasDarkRes_ = true;
+    }
+}
+
+void HapResource::UpdateDarkConfig(std::shared_ptr<ResConfigImpl> &defaultConfig)
+{
+    if (hasDarkRes_) {
+        defaultConfig->SetAppDarkRes(hasDarkRes_);
     }
 }
 } // namespace Resource

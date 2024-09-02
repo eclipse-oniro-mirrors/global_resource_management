@@ -34,6 +34,7 @@ config("resmgr_config") {
 manager_sources = [
   "src/hap_manager.cpp",
   "src/hap_resource.cpp",
+  "src/hap_resource_manager.cpp",
   "src/locale_matcher.cpp",
   "src/lock.cpp",
   "src/res_config_impl.cpp",

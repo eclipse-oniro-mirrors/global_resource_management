@@ -17,6 +17,7 @@
 
 #include "res_config_impl.h"
 #include "hap_resource.h"
+#include "hap_resource_manager.h"
 #include "res_desc.h"
 #include "resource_manager.h"
 #include "lock.h"

@@ -329,6 +329,13 @@ public:
         bool isSystem = false, bool isOverlay = false);
 
     bool IsThemeSystemResEnable() const;
+
+    /**
+     * update dark mode resconfig
+     *
+     * @param defaultConfig default config
+     */
+    void UpdateDarkConfig(std::shared_ptr<ResConfigImpl> &defaultConfig);
 private:
 
     void UpdateOverlayInfo(std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> &nameTypeId);
@@ -382,6 +389,9 @@ private:
 
     // judge the hqf is enabled or not.
     bool isPatch_ = false;
+
+    // judge the resource is adapt dark mode or not.
+    bool hasDarkRes_ = false;
 };
 } // namespace Resource
 } // namespace Global

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "hap_manager.h"
+#include "hap_resource_manager.h"
 
 #include <algorithm>
 #include <fstream>
@@ -386,16 +387,50 @@ bool HapManager::AddResource(const std::string &path, const std::vector<std::str
         RESMGR_HILOGI(RESMGR_TAG, "the overlay for %{public}s already been loaded", path.c_str());
         return true;
     }
-    loadedHapPaths_[path] = overlayPaths;
-    std::unordered_map<std::string, std::shared_ptr<HapResource>> result = HapResource::LoadOverlays(path, overlayPaths,
-        resConfig_, isSystem_);
-    if (result.size() > 0) {
-        for (auto iter = result.begin(); iter != result.end(); iter++) {
-            this->hapResources_.push_back(iter->second);
-        }
-        return true;
+    
+    std::vector<std::string> tempOverlays;
+    bool isPathLoad = false;
+    std::shared_ptr<HapResource> hapResource = HapResourceManager::GetInstance()->getHapResource(path);
+    if (hapResource) {
+        hapResources_.push_back(hapResource);
+        hapResource->UpdateDarkConfig(this->resConfig_);
+        isPathLoad = true;
     }
-    return false;
+    for (const std::string& overlayPath : overlayPaths) {
+        std::shared_ptr<HapResource> overlayResource = HapResourceManager::GetInstance()->getHapResource(overlayPath);
+        if (overlayResource) {
+            hapResources_.push_back(overlayResource);
+            overlayResource->UpdateDarkConfig(this->resConfig_);
+        } else {
+            tempOverlays.push_back(overlayPath);
+        }
+    }
+
+    std::unordered_map<std::string, std::shared_ptr<HapResource>> result;
+    if (!isPathLoad || tempOverlays.size() > 0) {
+        result = HapResource::LoadOverlays(path, tempOverlays, resConfig_, isSystem_);
+        if (result.size() == 0) {
+            return false;
+        }
+    }
+
+    if (!isPathLoad && result.find(path) != result.end()) {
+        std::shared_ptr<HapResource> pResource =
+            HapResourceManager::GetInstance()->PutAndGetResource(path, result[path]);
+        hapResources_.push_back(pResource);
+        result[path]->UpdateDarkConfig(this->resConfig_);
+    }
+    
+    for (auto iter = result.begin(); iter != result.end(); iter++) {
+        if (iter->second->IsOverlayResource()) {
+            std::shared_ptr<HapResource> pResource =
+                HapResourceManager::GetInstance()->PutAndGetResource(iter->first, iter->second);
+            hapResources_.push_back(pResource);
+            iter->second->UpdateDarkConfig(this->resConfig_);
+        }
+    }
+    loadedHapPaths_[path] = overlayPaths;
+    return true;
 }
 
 std::string HapManager::GetValidAppPath()
@@ -492,12 +527,28 @@ bool HapManager::AddResourcePath(const char *path, const uint32_t &selectedTypes
     if (it != loadedHapPaths_.end()) {
         return false;
     }
-    const std::shared_ptr<HapResource> pResource = HapResource::Load(path, resConfig_, isSystem_, false, selectedTypes);
+    if (selectedTypes == SELECT_ALL) {
+        std::shared_ptr<HapResource> hapResource = HapResourceManager::GetInstance()->getHapResource(sPath);
+        if (hapResource) {
+            RESMGR_HILOGD(RESMGR_TAG, "resource is loaded, path is %{public}s", sPath.c_str());
+            hapResources_.push_back(hapResource);
+            hapResource->UpdateDarkConfig(this->resConfig_);
+            this->loadedHapPaths_[sPath] = std::vector<std::string>();
+            return true;
+        }
+    }
+
+    std::shared_ptr<HapResource> pResource = HapResource::Load(path, resConfig_, isSystem_, false, selectedTypes);
     if (pResource == nullptr) {
         return false;
     }
-    this->hapResources_.push_back(pResource);
+    if (selectedTypes == SELECT_ALL) {
+        pResource = HapResourceManager::GetInstance()->PutAndGetResource(sPath, pResource);
+    }
     this->loadedHapPaths_[sPath] = std::vector<std::string>();
+    this->hapResources_.push_back(pResource);
+    pResource->UpdateDarkConfig(this->resConfig_);
+
     return true;
 }
 
@@ -510,14 +561,7 @@ bool HapManager::AddPatchResourcePath(const char *path, const char *patchPath)
         return false;
     }
     std::string sPatchPath(patchPath);
-    for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
-        if ((*iter)->GetIndexPath() == sPath) {
-            (*iter)->SetPatchPath(sPatchPath);
-            (*iter)->SetIsPatch(true);
-            return true;
-        }
-    }
-    return false;
+    return HapResourceManager::GetInstance()->PutPatchResource(sPath, sPatchPath);
 }
 
 RState HapManager::ReloadAll()
