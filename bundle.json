@@ -63,8 +63,7 @@
             "zlib",
             "bounds_checking_function",
             "icu",
-            "cJSON",
-            "node"
+            "cJSON"
           ]
       },
         "build": {
