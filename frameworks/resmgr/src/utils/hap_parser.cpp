@@ -596,10 +596,10 @@ int32_t ParseKey(const char *buffer, uint32_t &offset, std::shared_ptr<ResKey> k
 
 int32_t HapParser::ParseResHex(const char *buffer, const size_t bufLen, ResDesc &resDesc,
                                const std::shared_ptr<ResConfigImpl> defaultConfig, const uint32_t &selectedTypes)
+{
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
 #endif
-{
     ResHeader *resHeader = new (std::nothrow) ResHeader();
     if (resHeader == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "new ResHeader failed when ParseResHex");
