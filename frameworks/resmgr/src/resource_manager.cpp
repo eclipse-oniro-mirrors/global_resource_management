@@ -68,7 +68,6 @@ std::shared_ptr<ResourceManager> CreateResourceManagerDef(
     resourceManagerImpl->bundleInfo.second = moduleName;
     resourceManagerImpl->userId = userId;
     uint32_t currentId = resConfig.GetThemeId();
-    uint32_t currentId = resConfig.GetThemeId();
     auto themePackManager = ThemePackManager::GetThemePackManager();
     if (themePackManager->IsFirstLoadResource() || themePackManager->UpdateThemeId(currentId)) {
         themePackManager->LoadThemeRes(bundleName, moduleName, userId);
