@@ -398,21 +398,6 @@ void ResourceManagerTestCommon::TestGetStringFormatById(const char *name,
     ASSERT_EQ(cmp, outValue);
 }
 
-void ResourceManagerTestCommon::TestGetStringFormatByIdWithVaArgs(const char *name, const char *cmp, ...)
-{
-    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
-    ASSERT_TRUE(ret);
-    uint32_t id = GetResId(name, ResType::STRING);
-    ASSERT_TRUE(id > 0);
-    std::string outValue;
-    va_list args;
-    va_start(args, cmp);
-    RState state = rm->GetStringFormatById(outValue, id, args);
-    va_end(args);
-    ASSERT_EQ(SUCCESS, state);
-    ASSERT_EQ(cmp, outValue);
-}
-
 void ResourceManagerTestCommon::TestGetStringFormatByName(const char *name,
     std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams,  const char *cmp)
 {
@@ -420,19 +405,6 @@ void ResourceManagerTestCommon::TestGetStringFormatByName(const char *name,
     ASSERT_TRUE(ret);
     std::string outValue;
     RState state = rm->GetStringFormatByName(name, outValue, jsParams);
-    ASSERT_EQ(SUCCESS, state);
-    ASSERT_EQ(cmp, outValue);
-}
-
-void ResourceManagerTestCommon::TestGetStringFormatByNameWithVaArgs(const char *name, const char *cmp, ...)
-{
-    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
-    ASSERT_TRUE(ret);
-    std::string outValue;
-    va_list args;
-    va_start(args, cmp);
-    RState state = rm->GetStringFormatByName(outValue, name, args);
-    va_end(args);
     ASSERT_EQ(SUCCESS, state);
     ASSERT_EQ(cmp, outValue);
 }
@@ -535,7 +507,6 @@ void ResourceManagerTestCommon::TestGetIntegerByName(const char* integer1, const
     RState state = rm->GetIntegerByName(integer1, outValue);
     ASSERT_EQ(SUCCESS, state);
     EXPECT_EQ(101, outValue); // 101 means the result of int resource
-
 
     state = rm->GetIntegerByName(integerRef, outValue);
     ASSERT_EQ(SUCCESS, state);

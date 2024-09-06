@@ -19,7 +19,6 @@
 #include <cstdint>
 #include <cstdio>
 #include <string>
-#include <set>
 #include <unzip.h>
 #include "res_desc.h"
 #include "res_config_impl.h"
@@ -91,25 +90,23 @@ public:
     /**
      * Get the raw file data from hap
      * @param hapPath the hap path
-     * @param patchPath the hqf path
      * @param rawFileName the rawFile path
      * @param len the rawFile path
      * @param outValue the rawFile path
      * @return the rawFile path
      */
-    static RState ReadRawFileFromHap(const std::string &hapPath, const std::string &patchPath,
-        const std::string &rawFileName, size_t &len, std::unique_ptr<uint8_t[]> &outValue);
+    static RState ReadRawFileFromHap(const std::string &hapPath, const std::string &rawFileName,
+        size_t &len, std::unique_ptr<uint8_t[]> &outValue);
 
     /**
      * Get the raw file descriptor
      * @param hapPath the hap path
-     * @param patchPath the hqf path
      * @param rawFileName the rawFile path
      * @param descriptor the rawFile path
      * @return the rawFile path
      */
-    static RState ReadRawFileDescriptor(const char *hapPath, const char *patchPath,
-        const std::string &rawFileName, ResourceManager::RawFileDescriptor &descriptor);
+    static RState ReadRawFileDescriptor(const char *hapPath, const std::string &rawFileName,
+        ResourceManager::RawFileDescriptor &descriptor);
     
     /**
      * Get the raw file list
@@ -119,7 +116,7 @@ public:
      * @return SUCCESS if resource exist, else not found
      */
     static RState GetRawFileList(const std::string &hapPath, const std::string &rawDirPath,
-        std::set<std::string>& fileList);
+        std::vector<std::string>& fileList);
 
     /**
      * Get the raw file list in UnCompressed
