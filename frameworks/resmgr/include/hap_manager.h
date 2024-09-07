@@ -78,8 +78,6 @@ public:
      */
     bool AddResource(const char *path, const uint32_t &selectedTypes);
 
-    bool AddPatchResource(const char *path, const char *patchPath);
-
     /**
      * Add resource path to overlay paths
      * @param path the resource path
@@ -396,8 +394,6 @@ private:
         std::vector<std::shared_ptr<HapResource::IdValues>> candidates, uint32_t density, bool isGetOverrideResource);
 
     bool AddResourcePath(const char *path, const uint32_t &selectedTypes = SELECT_ALL);
-
-    bool AddPatchResourcePath(const char *path, const char *patchPath);
 
     // when resConfig_ updated we must call ReloadAll()
     RState ReloadAll();

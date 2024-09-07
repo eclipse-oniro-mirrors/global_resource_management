@@ -372,12 +372,6 @@ bool HapManager::AddResource(const char *path, const uint32_t &selectedTypes)
     return this->AddResourcePath(path, selectedTypes);
 }
 
-bool HapManager::AddPatchResource(const char *path, const char *patchPath)
-{
-    AutoMutex mutex(this->lock_);
-    return this->AddPatchResourcePath(path, patchPath);
-}
-
 bool HapManager::AddResource(const std::string &path, const std::vector<std::string> &overlayPaths)
 {
     AutoMutex mutex(this->lock_);
@@ -499,25 +493,6 @@ bool HapManager::AddResourcePath(const char *path, const uint32_t &selectedTypes
     this->hapResources_.push_back(pResource);
     this->loadedHapPaths_[sPath] = std::vector<std::string>();
     return true;
-}
-
-bool HapManager::AddPatchResourcePath(const char *path, const char *patchPath)
-{
-    std::string sPath(path);
-    auto it = loadedHapPaths_.find(sPath);
-    if (it == loadedHapPaths_.end()) {
-        RESMGR_HILOGW(RESMGR_TAG, "AddPatchResourcePath hapPath not load, hapPath = %{public}s", sPath.c_str());
-        return false;
-    }
-    std::string sPatchPath(patchPath);
-    for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
-        if ((*iter)->GetIndexPath() == sPath) {
-            (*iter)->SetPatchPath(sPatchPath);
-            (*iter)->SetIsPatch(true);
-            return true;
-        }
-    }
-    return false;
 }
 
 RState HapManager::ReloadAll()
@@ -771,13 +746,9 @@ RState HapManager::FindRawFileFromHap(const std::string &rawFileName, size_t &le
         if ((*iter)->IsSystemResource() || (*iter)->IsOverlayResource()) {
             continue;
         }
-        std::string tempPath = (*iter)->GetIndexPath();
-        std::string tempPatchPath;
-        if ((*iter)->IsPatch()) {
-            tempPatchPath = (*iter)->GetPatchPath();
-        }
+        const std::string tempPath = (*iter)->GetIndexPath();
         if (Utils::ContainsTail(tempPath, Utils::tailSet)) { // if file path is compressed
-            RState state = HapParser::ReadRawFileFromHap(tempPath, tempPatchPath, rawFileName, len, outValue);
+            RState state = HapParser::ReadRawFileFromHap(tempPath, rawFileName, len, outValue);
             if (state != SUCCESS) {
                 continue;
             }
@@ -819,13 +790,9 @@ RState HapManager::GetRawFd(const std::string &rawFileName, ResourceManager::Raw
         if ((*iter)->IsSystemResource() || (*iter)->IsOverlayResource()) {
             continue;
         }
-        std::string tempPath = (*iter)->GetIndexPath();
-        std::string tempPatchPath;
-        if ((*iter)->IsPatch()) {
-            tempPatchPath = (*iter)->GetPatchPath();
-        }
+        const std::string tempPath = (*iter)->GetIndexPath();
         if (Utils::ContainsTail(tempPath, Utils::tailSet)) { // if file path is compressed
-            state = HapParser::ReadRawFileDescriptor(tempPath.c_str(), tempPatchPath.c_str(), rawFileName, descriptor);
+            state = HapParser::ReadRawFileDescriptor(tempPath.c_str(), rawFileName, descriptor);
         } else { // if file path is uncompressed
             state = HapManager::FindRawFileDescriptor(rawFileName, descriptor);
         }
@@ -841,22 +808,7 @@ RState HapManager::GetRawFileList(const std::string &rawDirPath, std::vector<std
 {
     std::string hapOrIndexPath;
     if (HapManager::GetValidHapPath(hapOrIndexPath) == OK) {
-        std::string temPatchPath;
-        for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
-            if ((*iter)->IsSystemResource() || (*iter)->IsOverlayResource()) {
-                continue;
-            }
-            if ((*iter)->GetIndexPath() == hapOrIndexPath && (*iter)->IsPatch()) {
-                temPatchPath = (*iter)->GetPatchPath();
-            }
-        }
-        std::set<std::string> fileSet;
-        RState hapState = HapParser::GetRawFileList(hapOrIndexPath, rawDirPath, fileSet);
-        RState hqfState = HapParser::GetRawFileList(temPatchPath, rawDirPath, fileSet);
-        for (auto it = fileSet.begin(); it != fileSet.end(); it++) {
-            fileList.emplace_back(*it);
-        }
-        return (hapState != SUCCESS && hqfState != SUCCESS) ? ERROR_CODE_RES_PATH_INVALID : SUCCESS;
+        return HapParser::GetRawFileList(hapOrIndexPath, rawDirPath, fileList);
     }
     if (HapManager::GetValidIndexPath(hapOrIndexPath) == OK) {
         return  HapParser::GetRawFileListUnCompressed(hapOrIndexPath, rawDirPath, fileList);

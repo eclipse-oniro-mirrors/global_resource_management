@@ -601,18 +601,6 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest022, T
 }
 
 /*
- * @tc.name: ResourceManagerGetStringFormatByIdTest023
- * @tc.desc: Test GetStringFormatById function
- * @tc.type: FUNC
- */
-HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest023, TestSize.Level1)
-{
-    const char *name = "test_string22";
-    const char *cmp = "112";
-    rmc->TestGetStringFormatByIdWithVaArgs(name, cmp, 1, 2, 3);
-}
-
-/*
  * @tc.name: ResourceManagerGetStringFormatByNameTest001
  * @tc.desc: Test GetStringFormatByName function
  * @tc.type: FUNC
@@ -953,18 +941,6 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest022,
         {ResourceManager::NapiValueType::NAPI_NUMBER, "2"},
         {ResourceManager::NapiValueType::NAPI_NUMBER, "3"}};
     rmc->TestGetStringFormatByName(name, jsParams, cmp);
-}
-
-/*
- * @tc.name: ResourceManagerGetStringFormatByNameTest023
- * @tc.desc: Test GetStringFormatById function
- * @tc.type: FUNC
- */
-HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest023, TestSize.Level1)
-{
-    const char *name = "test_string22";
-    const char *cmp = "112";
-    rmc->TestGetStringFormatByNameWithVaArgs(name, cmp, 1, 2, 3);
 }
 
 /*

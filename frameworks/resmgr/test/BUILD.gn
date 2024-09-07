@@ -39,11 +39,6 @@ ohos_unittest("resmgr_test") {
     "unittest/common/theme_manager_test.cpp",
   ]
 
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
-
   include_dirs = [
     "unittest/common",
     "../include",

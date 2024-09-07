@@ -237,8 +237,6 @@ public:
 
     virtual RState GetFormatPluralStringByName(std::string &outValue, const char *name, int quantity,
         std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams) = 0;
-    
-    virtual bool AddPatchResource(const char *path, const char *patchPath) = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();

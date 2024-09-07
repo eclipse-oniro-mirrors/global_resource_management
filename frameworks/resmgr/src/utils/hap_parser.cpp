@@ -276,56 +276,40 @@ std::string HapParser::GetRawFilePath(std::shared_ptr<AbilityBase::Extractor> &e
 }
 #endif
 
-RState HapParser::ReadRawFileFromHap(const std::string &hapPath, const std::string &patchPath,
-    const std::string &rawFileName, size_t &len, std::unique_ptr<uint8_t[]> &outValue)
+RState HapParser::ReadRawFileFromHap(const std::string &hapPath, const std::string &rawFileName, size_t &len,
+    std::unique_ptr<uint8_t[]> &outValue)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
     bool isNewExtractor = false;
-    std::string tempPath = patchPath.empty() ? hapPath : patchPath;
-    auto extractor = AbilityBase::ExtractorUtil::GetExtractor(tempPath, isNewExtractor);
+    auto extractor = AbilityBase::ExtractorUtil::GetExtractor(hapPath, isNewExtractor);
     if (extractor == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor hapPath, %{public}s", tempPath.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor hapPath, %{public}s", hapPath.c_str());
         return NOT_FOUND;
     }
     std::string rawfilePath = HapParser::GetRawFilePath(extractor, rawFileName);
-    if (!extractor->HasEntry(rawfilePath) && patchPath.empty()) {
+    if (!extractor->HasEntry(rawfilePath)) {
         RESMGR_HILOGD(RESMGR_TAG,
-            "the rawfile file %{public}s is not exist in %{public}s", rawfilePath.c_str(), tempPath.c_str());
+            "the rawfile file %{public}s is not exist in %{public}s", rawfilePath.c_str(), hapPath.c_str());
         return ERROR_CODE_RES_PATH_INVALID;
-    }
-    if (!extractor->HasEntry(rawfilePath) && !patchPath.empty()) {
-        extractor = AbilityBase::ExtractorUtil::GetExtractor(hapPath, isNewExtractor);
-        if (extractor == nullptr) {
-            RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor hapPath, %{public}s", tempPath.c_str());
-            return NOT_FOUND;
-        }
-        rawfilePath = HapParser::GetRawFilePath(extractor, rawFileName);
-        if (!extractor->HasEntry(rawfilePath)) {
-            RESMGR_HILOGD(RESMGR_TAG,
-                "the rawfile file %{public}s is not exist in %{public}s", rawfilePath.c_str(), tempPath.c_str());
-            return ERROR_CODE_RES_PATH_INVALID;
-        }
     }
     bool ret = extractor->ExtractToBufByName(rawfilePath, outValue, len);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get rawfile data rawfilePath, %{public}s, hapPath, %{public}s",
-            rawfilePath.c_str(), tempPath.c_str());
+            rawfilePath.c_str(), hapPath.c_str());
         return NOT_FOUND;
     }
 #endif
     return SUCCESS;
 }
 
-RState HapParser::ReadRawFileDescriptor(const char *hapPath, const char *patchPath, const std::string &rawFileName,
+RState HapParser::ReadRawFileDescriptor(const char *hapPath, const std::string &rawFileName,
     ResourceManager::RawFileDescriptor &descriptor)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
     char outPath[PATH_MAX + 1] = {0};
-    std::string sPatchPath(patchPath);
-    const char *tempPath = sPatchPath.empty() ? hapPath : patchPath;
-    Utils::CanonicalizePath(tempPath, outPath, PATH_MAX);
+    Utils::CanonicalizePath(hapPath, outPath, PATH_MAX);
     bool isNewExtractor = false;
     auto extractor = AbilityBase::ExtractorUtil::GetExtractor(outPath, isNewExtractor);
     if (extractor == nullptr) {
@@ -333,24 +317,10 @@ RState HapParser::ReadRawFileDescriptor(const char *hapPath, const char *patchPa
         return NOT_FOUND;
     }
     std::string rawfilePath = HapParser::GetRawFilePath(extractor, rawFileName);
-    if (!extractor->HasEntry(rawfilePath) && sPatchPath.empty()) {
+    if (!extractor->HasEntry(rawfilePath)) {
         RESMGR_HILOGD(RESMGR_TAG,
-            "the rawfile file %{public}s is not exist in %{public}s", rawfilePath.c_str(), outPath);
+            "the rawfile file %{public}s is not exist in %{public}s", rawfilePath.c_str(), hapPath);
         return ERROR_CODE_RES_PATH_INVALID;
-    }
-    if (!extractor->HasEntry(rawfilePath) && !sPatchPath.empty()) {
-        Utils::CanonicalizePath(hapPath, outPath, PATH_MAX);
-        extractor = AbilityBase::ExtractorUtil::GetExtractor(outPath, isNewExtractor);
-        if (extractor == nullptr) {
-            RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor hapPath, %{public}s", outPath);
-            return NOT_FOUND;
-        }
-        rawfilePath = HapParser::GetRawFilePath(extractor, rawFileName);
-        if (!extractor->HasEntry(rawfilePath)) {
-            RESMGR_HILOGD(RESMGR_TAG,
-                "the rawfile file %{public}s is not exist in %{public}s", rawfilePath.c_str(), outPath);
-            return ERROR_CODE_RES_PATH_INVALID;
-        }
     }
     AbilityBase::FileInfo fileInfo;
     bool ret = extractor->GetFileInfo(rawfilePath, fileInfo);
@@ -371,7 +341,7 @@ RState HapParser::ReadRawFileDescriptor(const char *hapPath, const char *patchPa
 }
 
 RState HapParser::GetRawFileList(const std::string &hapPath, const std::string &rawDirPath,
-    std::set<std::string>& fileSet)
+    std::vector<std::string>& fileList)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
@@ -382,6 +352,7 @@ RState HapParser::GetRawFileList(const std::string &hapPath, const std::string &
             "failed to get extractor from ability in GetRawFileList hapPath, %{public}s", hapPath.c_str());
         return NOT_FOUND;
     }
+    std::set<std::string> fileSet;
     std::string rawfilePath = HapParser::GetRawFilePath(extractor, rawDirPath);
     if (!extractor->IsDirExist(rawfilePath)) {
         RESMGR_HILOGD(RESMGR_TAG,
@@ -392,6 +363,9 @@ RState HapParser::GetRawFileList(const std::string &hapPath, const std::string &
     if (!ret) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get fileSet from ability rawfilePath, %{public}s", rawfilePath.c_str());
         return ERROR_CODE_RES_PATH_INVALID;
+    }
+    for (auto it = fileSet.begin(); it != fileSet.end(); it++) {
+        fileList.emplace_back(*it);
     }
 #endif
     return SUCCESS;

@@ -84,10 +84,6 @@ public:
     void TestGetStringFormatByName(const char *name,
         std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams,  const char *cmp);
 
-    void TestGetStringFormatByIdWithVaArgs(const char *name, const char *cmp, ...);
-
-    void TestGetStringFormatByNameWithVaArgs(const char *name, const char *cmp, ...);
-
     void TestGetPatternById(const char *name);
 
     void TestGetPatternByName(const char *name);

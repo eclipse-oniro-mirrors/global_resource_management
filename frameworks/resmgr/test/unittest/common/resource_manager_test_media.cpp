@@ -801,36 +801,6 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest023, TestSize.
 }
 
 /*
- * @tc.name: ResourceManagerGetDrawableInfoByIdTest001
- * @tc.desc: Test GetDrawableInfoById
- * @tc.type: FUNC
- */
-HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetDrawableInfoByIdTest001, TestSize.Level1)
-{
-    rmc->AddResource("zh", nullptr, "CN");
-
-    auto rc = CreateResConfig();
-    if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
-    }
-    rc->SetDeviceType(DEVICE_TABLET);
-    rc->SetColorMode(COLOR_MODE_NOT_SET);
-    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
-    rm->UpdateResConfig(*rc);
-    delete rc;
-
-    int density = 480;
-    std::unique_ptr<uint8_t[]> outValue;
-    RState state;
-    int id = rmc->GetResId("icon", ResType::MEDIA);
-    EXPECT_TRUE(id > 0);
-    std::tuple<std::string, size_t, std::string> info;
-    state = rm->GetDrawableInfoById(id, info, outValue, 1, density);
-    EXPECT_TRUE(state == SUCCESS);
-}
-
-/*
  * @tc.name: ResourceManagerGetMediaByNameTest001
  * @tc.desc: Test GetMediaByName
  * @tc.type: FUNC
@@ -1512,33 +1482,5 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest022, TestSiz
     EXPECT_TRUE(state == SUCCESS);
     EXPECT_EQ(res, outValue);
     delete tmp;
-}
-
-/*
- * @tc.name: ResourceManagerGetDrawableInfoByNameTest001
- * @tc.desc: Test GetDrawableInfoByName
- * @tc.type: FUNC
- */
-HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetDrawableInfoByNameTest001, TestSize.Level1)
-{
-    rmc->AddResource("zh", nullptr, "CN");
-
-    auto rc = CreateResConfig();
-    if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
-    }
-    rc->SetDeviceType(DEVICE_TABLET);
-    rc->SetColorMode(COLOR_MODE_NOT_SET);
-    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
-    rm->UpdateResConfig(*rc);
-    delete rc;
-
-    int density = 480;
-    std::unique_ptr<uint8_t[]> outValue;
-    RState state;
-    std::tuple<std::string, size_t, std::string> info;
-    state = rm->GetDrawableInfoByName("icon", info, outValue, 1, density);
-    EXPECT_TRUE(state == SUCCESS);
 }
 }
