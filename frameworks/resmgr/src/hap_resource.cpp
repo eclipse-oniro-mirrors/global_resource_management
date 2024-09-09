@@ -539,7 +539,7 @@ void HapResource::IsAppDarkRes(const std::shared_ptr<HapResource::ValueUnderQual
 
 void HapResource::UpdateDarkConfig(std::shared_ptr<ResConfigImpl> &defaultConfig)
 {
-    if (hasDarkRes_) {
+    if (hasDarkRes_ && defaultConfig != nullptr) {
         defaultConfig->SetAppDarkRes(hasDarkRes_);
     }
 }
