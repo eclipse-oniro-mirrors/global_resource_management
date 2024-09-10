@@ -412,6 +412,20 @@ const std::string ThemeResource::GetThemeAppIconByAbilityName(const std::pair<st
     }
     return std::string("");
 }
+
+bool ThemeResource::HasIconInTheme(const std::string &bundleName)
+{
+    for (size_t i = 0; i < iconValues_.size(); i++) {
+        if (iconValues_[i].first.bundleName == DYNAMIC_ICON) {
+            continue;
+        }
+
+        if (iconValues_[i].first.moduleName == bundleName || iconValues_[i].first.bundleName == bundleName) {
+            return true;
+        }
+    }
+    return false;
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

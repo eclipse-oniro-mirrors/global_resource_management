@@ -21,11 +21,15 @@
 #include <cstring>
 #include "hilog_wrapper.h"
 #include "theme_pack_resource.h"
+#include <securec.h>
 #include "utils/utils.h"
 
 namespace OHOS {
 namespace Global {
 namespace Resource {
+constexpr int FIRST_ELEMENT = 0;
+constexpr int SECOND_ELEMENT = 1;
+constexpr int THIRED_ELEMENT = 2;
 static std::shared_ptr<ThemePackManager> themeMgr = nullptr;
 static std::once_flag themeMgrFlag;
 const std::string sysResIdPreFix = "125";
@@ -48,6 +52,7 @@ ThemePackManager::~ThemePackManager()
 {
     skinResource_.clear();
     iconResource_.clear();
+    iconMaskValues_.clear();
 }
 
 std::shared_ptr<ThemePackManager> ThemePackManager::GetThemePackManager()
@@ -281,6 +286,7 @@ void ThemePackManager::ClearIconResource()
             ++it;
         }
     }
+    iconMaskValues_.clear();
 }
 
 void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, const std::string &moduleName,
@@ -348,6 +354,86 @@ bool ThemePackManager::IsFirstLoadResource()
         return true;
     }
     return false;
+}
+
+bool ThemePackManager::HasIconInTheme(const std::string &bundleName)
+{
+    AutoMutex mutex(this->lockIcon_);
+    bool result = false;
+    for (size_t i = 0; i < iconResource_.size(); i++) {
+        auto pThemeResource = iconResource_[i];
+        if (pThemeResource == nullptr) {
+            continue;
+        }
+        result = pThemeResource->HasIconInTheme(bundleName);
+        if (result) {
+            break;
+        }
+    }
+    return result;
+}
+
+RState ThemePackManager::GetOtherIconsInfo(const std::string &iconName,
+    std::unique_ptr<uint8_t[]> &outValue, size_t &len, bool isGlobalMask)
+{
+    AutoMutex mutex(this->lockIconValue_);
+    std::string iconPath;
+    std::string iconTag;
+    if (iconName.find("icon_mask") != std::string::npos && isGlobalMask) {
+        iconPath = themeMask;
+        iconTag = "global_" + iconName;
+    } else {
+        std::pair<std::string, std::string> bundleInfo;
+        bundleInfo.first = "other_icons";
+        iconPath = FindThemeIconResource(bundleInfo, iconName);
+        iconTag = "other_icons_" + iconName;
+    }
+
+    if (iconPath.empty()) {
+        RESMGR_HILOGE(RESMGR_TAG, "no found, iconName = %{public}s", iconName.c_str());
+        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
+    }
+
+    outValue = Utils::LoadResourceFile(iconPath, len);
+    if (outValue != nullptr && len != 0) {
+        auto tmpInfo = std::make_unique<uint8_t[]>(len);
+        errno_t ret = memcpy_s(tmpInfo.get(), len, outValue.get(), len);
+        if (ret != 0) {
+            RESMGR_HILOGE(RESMGR_TAG, "save fail, iconName = %{public}s, ret = %{public}d", iconName.c_str(), ret);
+            return SUCCESS;
+        }
+        iconMaskValues_.emplace_back(std::make_tuple(iconTag, std::move(tmpInfo), len));
+        return SUCCESS;
+    }
+    return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
+}
+
+RState ThemePackManager::GetThemeIconFromCache(
+    const std::string &iconTag, std::unique_ptr<uint8_t[]> &outValue, size_t &len)
+{
+    AutoMutex mutex(this->lockIconValue_);
+    if (iconMaskValues_.empty()) {
+        return NOT_FOUND;
+    }
+
+    for (const auto &iconValue : iconMaskValues_) {
+        std::string tag = std::get<FIRST_ELEMENT>(iconValue);
+        if (iconTag != tag) {
+            continue;
+        }
+        size_t length = std::get<THIRED_ELEMENT>(iconValue);
+        auto iconInfo = std::make_unique<uint8_t[]>(length);
+        auto tmpInfo = std::get<SECOND_ELEMENT>(iconValue).get();
+        errno_t ret = memcpy_s(iconInfo.get(), length, tmpInfo, length);
+        if (ret != 0) {
+            RESMGR_HILOGE(RESMGR_TAG, "get icon info fail, ret = %{public}d", ret);
+            continue;
+        }
+        len = length;
+        outValue = std::move(iconInfo);
+        return SUCCESS;
+    }
+    return NOT_FOUND;
 }
 } // namespace Resource
 } // namespace Global

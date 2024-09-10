@@ -26,6 +26,8 @@
             <option name="push" value="data/theme/base/element/pattern.json -> /data/test/theme/skin/ohos.global.test.all/entry/base/element/" src="res"/>
             <option name="push" value="data/theme/base/media/foreground.png -> /data/test/theme/icons/ohos.global.test.all/" src="res"/>
             <option name="push" value="data/theme/base/media/background.png -> /data/test/theme/icons/ohos.global.test.all/" src="res"/>
+            <option name="push" value="data/theme/base/media/foreground.png -> /data/test/theme/icons/other_icons/" src="res"/>
+            <option name="push" value="data/theme/base/media/background.png -> /data/test/theme/icons/other_icons/" src="res"/>
         </preparer>
     </target>
 </configuration>
