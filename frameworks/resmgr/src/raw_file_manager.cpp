@@ -104,6 +104,10 @@ NativeResourceManager *OH_ResourceManager_InitNativeResourceManager(napi_env env
         RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "Failed to get native resourcemanager");
         return nullptr;
     }
+    if (addonPtr == nullptr) {
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "Failed to unwrap, addonPtr is null");
+        return nullptr;
+    }
     std::unique_ptr<NativeResourceManager> result = std::make_unique<NativeResourceManager>();
     result->resManager = (*addonPtr)->GetResMgr();
     return result.release();
