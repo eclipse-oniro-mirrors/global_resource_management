@@ -120,6 +120,7 @@ public:
      *
      * @param bundleInfo which contains bundlename, modulename
      * @param name the icon name
+     * @param abilityName the hap abilityName
      * @return the icon path
      */
     const std::string GetThemeAppIcon(const std::pair<std::string, std::string> &bundleInfo, const std::string &name,
@@ -134,6 +135,14 @@ public:
      * @return the theme value vector
      */
     std::string GetThemeResBundleName(const std::string &themePath);
+
+    /**
+     * Whether an icon exists in the theme
+     *
+     * @param bundleName the hap bundleName
+     * @return true if icon exists, else no exists
+     */
+    bool HasIconInTheme(const std::string &bundleName);
 
     inline std::string GetThemePath()
     {

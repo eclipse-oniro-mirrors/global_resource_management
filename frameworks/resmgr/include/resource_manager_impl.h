@@ -646,6 +646,7 @@ public:
      * @param foregroundInfo the foreground info
      * @param backgroundInfo the background info
      * @param density the drawable density
+     * @param abilityName the hap abilityName
      * @return SUCCESS if resource exist, else not found
      */
     virtual RState GetThemeIcons(uint32_t resId, std::pair<std::unique_ptr<uint8_t[]>, size_t> &foregroundInfo,
@@ -658,6 +659,26 @@ public:
      * @return the theme mask path, else empty
      */
     virtual std::string GetThemeMask();
+
+    /**
+     * Whether an icon exists in the theme
+     *
+     * @param bundleName the hap bundleName
+     * @return true if icon exists, else no exists
+     */
+    virtual bool HasIconInTheme(const std::string &bundleName);
+
+    /**
+     * Get icons info in other icons by icon name
+     *
+     * @param iconName the icon name
+     * @param outValue the obtain resource wirte to
+     * @param len the data len wirte to
+     * @param isGlobalMask true if the global mask, else other icons
+     * @return SUCCESS if the theme icon get success, else failed
+     */
+    virtual RState GetOtherIconsInfo(const std::string &iconName,
+        std::unique_ptr<uint8_t[]> &outValue, size_t &len, bool isGlobalMask);
 
     /**
      * Whether this raw resource is a directory
