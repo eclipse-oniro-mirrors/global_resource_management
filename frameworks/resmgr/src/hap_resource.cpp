@@ -36,6 +36,7 @@
 #include "extractor.h"
 #endif
 #include "hap_parser.h"
+#include "hap_resource_manager.h"
 #include "hilog_wrapper.h"
 #include "utils/errors.h"
 
@@ -77,11 +78,22 @@ HapResource::~HapResource()
 const std::shared_ptr<HapResource> HapResource::Load(const char *path,
     std::shared_ptr<ResConfigImpl> &defaultConfig, bool isSystem, bool isOverlay, const uint32_t &selectedTypes)
 {
-    if (Utils::ContainsTail(path, Utils::tailSet)) {
-        return LoadFromHap(path, defaultConfig, isSystem, isOverlay, selectedTypes);
-    } else {
-        return LoadFromIndex(path, defaultConfig, isSystem, isOverlay, selectedTypes);
+    std::shared_ptr<HapResource> pResource;
+    if (selectedTypes == SELECT_ALL) {
+        pResource = HapResourceManager::GetInstance()->GetHapResource(path);
+        if (pResource) {
+            return pResource;
+        }
     }
+    if (Utils::ContainsTail(path, Utils::tailSet)) {
+        pResource = LoadFromHap(path, defaultConfig, isSystem, isOverlay, selectedTypes);
+    } else {
+        pResource = LoadFromIndex(path, defaultConfig, isSystem, isOverlay, selectedTypes);
+    }
+    if (pResource != nullptr && selectedTypes == SELECT_ALL) {
+        pResource = HapResourceManager::GetInstance()->PutAndGetResource(path, pResource);
+    }
+    return pResource;
 }
 
 const std::shared_ptr<HapResource> HapResource::LoadFromIndex(const char *path,
@@ -537,11 +549,9 @@ void HapResource::IsAppDarkRes(const std::shared_ptr<HapResource::ValueUnderQual
     }
 }
 
-void HapResource::UpdateDarkConfig(std::shared_ptr<ResConfigImpl> &defaultConfig)
+bool HapResource::HasDarkRes()
 {
-    if (hasDarkRes_ && defaultConfig != nullptr) {
-        defaultConfig->SetAppDarkRes(hasDarkRes_);
-    }
+    return hasDarkRes_;
 }
 } // namespace Resource
 } // namespace Global

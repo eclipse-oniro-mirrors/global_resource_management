@@ -56,7 +56,7 @@ public:
      *
      * @return the resource
      */
-    std::shared_ptr<HapResource> getHapResource(const std::string path);
+    std::shared_ptr<HapResource> GetHapResource(const std::string path);
 
 private:
     static std::recursive_mutex mutex_;

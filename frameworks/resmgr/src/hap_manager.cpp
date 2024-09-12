@@ -387,44 +387,20 @@ bool HapManager::AddResource(const std::string &path, const std::vector<std::str
         RESMGR_HILOGI(RESMGR_TAG, "the overlay for %{public}s already been loaded", path.c_str());
         return true;
     }
-    std::unordered_map<std::string, std::shared_ptr<HapResource>> tmpHapResources;
-    std::vector<std::string> tempOverlays;
-    bool isPathLoad = false;
-    std::shared_ptr<HapResource> hapResource = HapResourceManager::GetInstance()->getHapResource(path);
-    if (hapResource) {
-        hapResources_.push_back(hapResource);
-        hapResource->UpdateDarkConfig(this->resConfig_);
-        isPathLoad = true;
+
+    std::unordered_map<std::string, std::shared_ptr<HapResource>> result = HapResource::LoadOverlays(path, overlayPaths,
+        resConfig_, isSystem_);
+    if (result.size() == 0) {
+        return false;
     }
-    for (const std::string& overlayPath : overlayPaths) {
-        std::shared_ptr<HapResource> overlayResource = HapResourceManager::GetInstance()->getHapResource(overlayPath);
-        if (overlayResource) {
-            tmpHapResources[overlayPath] = overlayResource;
-        } else {
-            tempOverlays.push_back(overlayPath);
-            tmpHapResources[overlayPath] = nullptr;
-        }
-    }
-    std::unordered_map<std::string, std::shared_ptr<HapResource>> result;
-    if (!isPathLoad || tempOverlays.size() > 0) {
-        result = HapResource::LoadOverlays(path, tempOverlays, resConfig_, isSystem_);
-        if (result.size() == 0) {
-            return false;
-        }
-    }
-    if (!isPathLoad && result.find(path) != result.end()) {
-        std::shared_ptr<HapResource> pResource =
-            HapResourceManager::GetInstance()->PutAndGetResource(path, result[path]);
-        hapResources_.push_back(pResource);
-        result[path]->UpdateDarkConfig(this->resConfig_);
+    if (result.find(path) != result.end()) {
+        hapResources_.push_back(result[path]);
+        this->resConfig_->SetAppDarkRes(result[path]->HasDarkRes());
     }
     for (auto iter = overlayPaths.rbegin(); iter != overlayPaths.rend(); iter++) {
-        std::shared_ptr<HapResource> pResource = tmpHapResources[*iter];
-        if (pResource == nullptr) {
-            pResource = HapResourceManager::GetInstance()->PutAndGetResource(*iter, result[*iter]);
+        if (result.find(*iter) != result.end()) {
+            hapResources_.push_back(result[*iter]);
         }
-        hapResources_.push_back(pResource);
-        pResource->UpdateDarkConfig(this->resConfig_);
     }
     loadedHapPaths_[path] = overlayPaths;
     return true;
@@ -524,27 +500,14 @@ bool HapManager::AddResourcePath(const char *path, const uint32_t &selectedTypes
     if (it != loadedHapPaths_.end()) {
         return false;
     }
-    if (selectedTypes == SELECT_ALL) {
-        std::shared_ptr<HapResource> hapResource = HapResourceManager::GetInstance()->getHapResource(sPath);
-        if (hapResource) {
-            RESMGR_HILOGD(RESMGR_TAG, "resource is loaded, path is %{public}s", sPath.c_str());
-            hapResources_.push_back(hapResource);
-            hapResource->UpdateDarkConfig(this->resConfig_);
-            this->loadedHapPaths_[sPath] = std::vector<std::string>();
-            return true;
-        }
-    }
 
     std::shared_ptr<HapResource> pResource = HapResource::Load(path, resConfig_, isSystem_, false, selectedTypes);
     if (pResource == nullptr) {
         return false;
     }
-    if (selectedTypes == SELECT_ALL) {
-        pResource = HapResourceManager::GetInstance()->PutAndGetResource(sPath, pResource);
-    }
     this->loadedHapPaths_[sPath] = std::vector<std::string>();
     this->hapResources_.push_back(pResource);
-    pResource->UpdateDarkConfig(this->resConfig_);
+    this->resConfig_->SetAppDarkRes(pResource->HasDarkRes());
 
     return true;
 }
