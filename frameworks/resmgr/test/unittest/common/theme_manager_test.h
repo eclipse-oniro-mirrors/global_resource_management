@@ -25,6 +25,7 @@ int ThemeManagerTestLoadThemeIconsResourceTest001(void);
 int ThemeManagerTestHasIconInThemeTest001(void);
 int ThemeManagerTestGetOtherIconsInfoTest001(void);
 int ThemeManagerTestGetThemeIconFromCacheTest001(void);
+int ThemeManagerTestIsUpdateByUserIdTest001(void);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
