@@ -140,6 +140,7 @@ void ThemePackManager::LoadThemeSkinResource(const std::string &bundleName, cons
 
 void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::string &moduleName, int32_t userId)
 {
+    UpdateUserId(userId);
     std::vector<std::string> rootDirs;
     std::vector<std::string> iconDirs;
     if (Utils::IsFileExist(themeFlagA)) {
@@ -434,6 +435,22 @@ RState ThemePackManager::GetThemeIconFromCache(
         return SUCCESS;
     }
     return NOT_FOUND;
+}
+
+bool ThemePackManager::IsUpdateByUserId(int32_t userId)
+{
+    AutoMutex mutex(this->lockUserId_);
+    return currentUserId_ != userId;
+}
+
+void ThemePackManager::UpdateUserId(int32_t userId)
+{
+    AutoMutex mutex(this->lockUserId_);
+    if (currentUserId_ != userId) {
+        RESMGR_HILOGI(RESMGR_TAG,
+            "update userId, currentUserId_= %{public}d, userId= %{public}d", currentUserId_, userId);
+        currentUserId_ = userId;
+    }
 }
 } // namespace Resource
 } // namespace Global
