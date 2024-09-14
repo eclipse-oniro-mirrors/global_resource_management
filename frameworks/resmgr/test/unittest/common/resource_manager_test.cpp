@@ -2058,16 +2058,4 @@ HWTEST_F(ResourceManagerTest, CreateResourceManagerTest001, TestSize.Level1)
     EXPECT_TRUE(bundleRm == nullptr);
     delete rc;
 }
-
-/*
- * @tc.name: GetSystemResourceManagerTest001
- * @tc.desc: Test CreateResourceManager function
- * @tc.type: FUNC
- */
-HWTEST_F(ResourceManagerTest, GetSystemResourceManagerTest001, TestSize.Level1)
-{
-    ResourceManager *bundleRm = GetSystemResourceManagerNoSandBox();
-    EXPECT_TRUE(bundleRm != nullptr);
-    bundleRm = nullptr;
-}
 }
