@@ -38,12 +38,14 @@ std::shared_ptr<HapResource> HapResourceManager::PutAndGetResource(const std::st
 {
     std::unique_lock<std::shared_mutex> lock(mutexRw_);
     auto iter = hapResourceMap_.find(path);
-    if (iter == hapResourceMap_.end() || !iter->second.lock()) {
-        hapResourceMap_[path] = pResource;
-        return pResource;
-    } else {
-        return iter->second.lock();
+    if (iter != hapResourceMap_.end()) {
+        auto res = iter->second.lock();
+        if (res) {
+            return res;
+        }
     }
+    hapResourceMap_[path] = pResource;
+    return pResource;
 }
 
 bool HapResourceManager::PutPatchResource(const std::string path, std::string patchPath)
