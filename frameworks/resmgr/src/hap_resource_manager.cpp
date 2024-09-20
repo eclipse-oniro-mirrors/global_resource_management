@@ -62,7 +62,7 @@ bool HapResourceManager::PutPatchResource(const std::string path, std::string pa
     return false;
 }
 
-std::shared_ptr<HapResource> HapResourceManager::getHapResource(const std::string path)
+std::shared_ptr<HapResource> HapResourceManager::GetHapResource(const std::string path)
 {
     std::shared_lock<std::shared_mutex> lock(mutexRw_);
     auto iter = hapResourceMap_.find(path);

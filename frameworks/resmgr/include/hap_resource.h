@@ -331,11 +331,11 @@ public:
     bool IsThemeSystemResEnable() const;
 
     /**
-     * update dark mode resconfig
+     * Determine whether there are dark resource
      *
-     * @param defaultConfig default config
+     * @return true if has dark resource, else false
      */
-    void UpdateDarkConfig(std::shared_ptr<ResConfigImpl> &defaultConfig);
+    bool HasDarkRes();
 private:
 
     void UpdateOverlayInfo(std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> &nameTypeId);
