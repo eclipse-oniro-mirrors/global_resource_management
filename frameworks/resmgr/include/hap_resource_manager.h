@@ -42,21 +42,23 @@ public:
      * @param hapResource  hapResource
      * @return th resource
      */
-    std::shared_ptr<HapResource> PutAndGetResource(const std::string path, std::shared_ptr<HapResource> hapResource);
+    std::shared_ptr<HapResource> PutAndGetResource(const std::string &path, std::shared_ptr<HapResource> hapResource);
 
     /**
      * Put patch resource
      *
+     * @param path the resources.index file path
+     * @param patchPath the patch path
      * @return Whether patch resource is put successfully
      */
-    bool PutPatchResource(const std::string path, std::string patchPath);
+    bool PutPatchResource(const std::string &path, const std::string &patchPath);
 
     /**
      * get resource from map
      *
      * @return the resource
      */
-    std::shared_ptr<HapResource> GetHapResource(const std::string path);
+    std::shared_ptr<HapResource> GetHapResource(const std::string &path);
 
 private:
     static std::recursive_mutex mutex_;
