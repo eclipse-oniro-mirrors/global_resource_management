@@ -419,10 +419,17 @@ bool ResourceManagerNapiUtils::GetHapResourceManager(const ResMgrDataContext* da
         RESMGR_HILOGE(RESMGR_JS_TAG, "GetHapResourceManager context == nullptr");
         return false;
     }
-    auto moduleContext = context->CreateModuleContext(resource->bundleName, resource->moduleName);
+    std::string bundleName(resource->bundleName);
+    if (bundleName.empty()) {
+        auto applicationInfo = context->GetApplicationInfo();
+        if (applicationInfo != nullptr) {
+            bundleName = applicationInfo->name;
+        }
+    }
+    auto moduleContext = context->CreateModuleContext(bundleName, resource->moduleName);
     if (moduleContext == nullptr) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "GetHapResourceManager moduleContext == nullptr, bundleName = %{public}s," \
-            "moduleName = %{public}s", resource->bundleName.c_str(), resource->moduleName.c_str());
+            "moduleName = %{public}s", bundleName.c_str(), resource->moduleName.c_str());
         return false;
     }
     resMgr = moduleContext->GetResourceManager();
