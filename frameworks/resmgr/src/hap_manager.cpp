@@ -29,7 +29,6 @@
 #include <unicode/utypes.h>
 #endif
 
-#include "auto_mutex.h"
 #include "hilog_wrapper.h"
 
 #include "hap_parser.h"
@@ -59,7 +58,12 @@ constexpr uint32_t PLURAL_CACHE_MAX_COUNT = 3;
 #if defined(__ARKUI_CROSS__)
 const std::string RAW_FILE_PATH = "resources/rawfile/";
 #endif
-Lock g_rawFileLock;
+
+using ReadLock = std::shared_lock<std::shared_mutex>;
+using WriteLock = std::unique_lock<std::shared_mutex>;
+
+std::mutex g_rawFileLock;
+
 HapManager::HapManager(std::shared_ptr<ResConfigImpl> resConfig, bool isSystem)
     : resConfig_(resConfig), isSystem_(isSystem)
 {
@@ -106,7 +110,7 @@ std::string HapManager::GetPluralRulesAndSelect(int quantity, bool isGetOverride
 {
     std::string defaultRet("other");
 #ifdef SUPPORT_GRAPHICS
-    AutoMutex mutex(this->lock_);
+    ReadLock lock(this->mutex_);
     std::shared_ptr<ResConfigImpl> config = getCompleteOverrideConfig(isGetOverrideResource);
     if (config == nullptr || config->GetResLocale() == nullptr ||
         config->GetResLocale()->GetLanguage() == nullptr) {
@@ -178,7 +182,7 @@ const std::shared_ptr<IdItem> HapManager::FindResourceByName(
 const std::shared_ptr<HapResource::ValueUnderQualifierDir> HapManager::FindQualifierValueByName(
     const char *name, const ResType resType, bool isGetOverrideResource, uint32_t density)
 {
-    AutoMutex mutex(this->lock_);
+    ReadLock lock(this->mutex_);
     std::vector<std::shared_ptr<HapResource::IdValues>> candidates = this->GetResourceListByName(name, resType);
     if (candidates.size() == 0) {
         return nullptr;
@@ -189,7 +193,7 @@ const std::shared_ptr<HapResource::ValueUnderQualifierDir> HapManager::FindQuali
 const std::shared_ptr<HapResource::ValueUnderQualifierDir> HapManager::FindQualifierValueById(uint32_t id,
     bool isGetOverrideResource, uint32_t density)
 {
-    AutoMutex mutex(this->lock_);
+    ReadLock lock(this->mutex_);
     std::vector<std::shared_ptr<HapResource::IdValues>> candidates = this->GetResourceList(id);
     if (candidates.size() == 0) {
         return nullptr;
@@ -304,6 +308,7 @@ RState HapManager::FindRawFile(const std::string &name, std::string &outValue)
 #else
     char seperator = '/';
 #endif
+    ReadLock lock(this->mutex_);
     for (auto iter = hapResources_.rbegin(); iter != hapResources_.rend(); iter++) {
         std::string indexPath = (*iter)->GetIndexPath();
         auto index = indexPath.rfind(seperator);
@@ -342,39 +347,39 @@ RState HapManager::FindRawFile(const std::string &name, std::string &outValue)
 
 RState HapManager::UpdateResConfig(ResConfig &resConfig)
 {
-    AutoMutex mutex(this->lock_);
+    WriteLock lock(this->mutex_);
     this->resConfig_->Copy(resConfig);
     return SUCCESS;
 }
 
 RState HapManager::UpdateOverrideResConfig(ResConfig &resConfig)
 {
-    AutoMutex mutex(this->lock_);
+    WriteLock lock(this->mutex_);
     this->overrideResConfig_->Copy(resConfig);
     return SUCCESS;
 }
 
 void HapManager::GetResConfig(ResConfig &resConfig)
 {
-    AutoMutex mutex(this->lock_);
+    ReadLock lock(this->mutex_);
     resConfig.Copy(*(this->resConfig_), true);
 }
 
 void HapManager::GetOverrideResConfig(ResConfig &resConfig)
 {
-    AutoMutex mutex(this->lock_);
+    ReadLock lock(this->mutex_);
     resConfig.Copy(*(this->overrideResConfig_));
 }
 
 bool HapManager::AddResource(const char *path, const uint32_t &selectedTypes)
 {
-    AutoMutex mutex(this->lock_);
+    WriteLock lock(this->mutex_);
     return this->AddResourcePath(path, selectedTypes);
 }
 
 bool HapManager::AddResource(const std::string &path, const std::vector<std::string> &overlayPaths)
 {
-    AutoMutex mutex(this->lock_);
+    WriteLock lock(this->mutex_);
     std::vector<std::string> targetOverlay = loadedHapPaths_[path];
     if (!targetOverlay.empty() && targetOverlay == overlayPaths) {
         RESMGR_HILOGI(RESMGR_TAG, "the overlay for %{public}s already been loaded", path.c_str());
@@ -395,6 +400,7 @@ bool HapManager::AddResource(const std::string &path, const std::vector<std::str
 std::string HapManager::GetValidAppPath()
 {
     std::string appPath;
+    ReadLock lock(this->mutex_);
     for (auto iter = hapResources_.rbegin(); iter != hapResources_.rend(); iter++) {
         const std::string tempPath = (*iter)->GetIndexPath();
         if ((*iter)->IsSystemResource() || (*iter)->IsOverlayResource()) {
@@ -497,6 +503,7 @@ bool HapManager::AddResourcePath(const char *path, const uint32_t &selectedTypes
 
 RState HapManager::ReloadAll()
 {
+    WriteLock lock(this->mutex_);
     if (hapResources_.size() == 0) {
         return SUCCESS;
     }
@@ -529,6 +536,7 @@ RState HapManager::ReloadAll()
 std::vector<std::string> HapManager::GetResourcePaths()
 {
     std::vector<std::string> result;
+    ReadLock lock(this->mutex_);
     for (auto iter = hapResources_.rbegin(); iter != hapResources_.rend(); iter++) {
         std::string indexPath = (*iter)->GetIndexPath();
         auto index = indexPath.rfind('/');
@@ -713,6 +721,7 @@ RState HapManager::GetMediaBase64DataFromIndex(const std::shared_ptr<HapResource
 
 int32_t HapManager::GetValidHapPath(std::string &hapPath)
 {
+    ReadLock lock(this->mutex_);
     for (auto iter = hapResources_.rbegin(); iter != hapResources_.rend(); iter++) {
         if ((*iter)->IsSystemResource() || (*iter)->IsOverlayResource()) {
             continue;
@@ -728,6 +737,7 @@ int32_t HapManager::GetValidHapPath(std::string &hapPath)
 
 int32_t HapManager::GetValidIndexPath(std::string &indexPath)
 {
+    ReadLock lock(this->mutex_);
     for (auto iter = hapResources_.rbegin(); iter != hapResources_.rend(); iter++) {
         const std::string tempPath = (*iter)->GetIndexPath();
         if (Utils::endWithTail(tempPath, "/systemres/resources.index")) {
@@ -742,6 +752,7 @@ int32_t HapManager::GetValidIndexPath(std::string &indexPath)
 RState HapManager::FindRawFileFromHap(const std::string &rawFileName, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue)
 {
+    ReadLock lock(this->mutex_);
     for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
         if ((*iter)->IsSystemResource() || (*iter)->IsOverlayResource()) {
             continue;
@@ -768,7 +779,7 @@ RState HapManager::FindRawFileFromHap(const std::string &rawFileName, size_t &le
 RState HapManager::FindRawFileDescriptorFromHap(const std::string &rawFileName,
     ResourceManager::RawFileDescriptor &descriptor)
 {
-    AutoMutex mutex(g_rawFileLock);
+    std::lock_guard<std::mutex> lock(g_rawFileLock);
     auto it = rawFileDescriptor_.find(rawFileName);
     if (it != rawFileDescriptor_.end()) {
         descriptor.fd = rawFileDescriptor_[rawFileName].fd;
@@ -786,6 +797,7 @@ RState HapManager::FindRawFileDescriptorFromHap(const std::string &rawFileName,
 RState HapManager::GetRawFd(const std::string &rawFileName, ResourceManager::RawFileDescriptor &descriptor)
 {
     RState state;
+    ReadLock lock(this->mutex_);
     for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
         if ((*iter)->IsSystemResource() || (*iter)->IsOverlayResource()) {
             continue;
@@ -890,7 +902,7 @@ RState HapManager::FindRawFileDescriptor(const std::string &name, ResourceManage
 
 RState HapManager::CloseRawFileDescriptor(const std::string &name)
 {
-    AutoMutex mutex(g_rawFileLock);
+    std::lock_guard<std::mutex> lock(g_rawFileLock);
     auto it = rawFileDescriptor_.find(name);
     if (it == rawFileDescriptor_.end()) {
         return ERROR_CODE_RES_PATH_INVALID;
@@ -909,7 +921,7 @@ RState HapManager::CloseRawFileDescriptor(const std::string &name)
 
 bool HapManager::RemoveResource(const std::string &path, const std::vector<std::string> &overlayPaths)
 {
-    AutoMutex mutex(this->lock_);
+    WriteLock lock(this->mutex_);
     RESMGR_HILOGI(RESMGR_TAG, "remove overlay for path, %{public}s", path.c_str());
     if (loadedHapPaths_.find(path) == loadedHapPaths_.end()) {
         return false;
@@ -962,7 +974,7 @@ void HapManager::AddSystemResource(const std::shared_ptr<HapManager> &systemHapM
         RESMGR_HILOGE(RESMGR_TAG, "add system resource failed, the added hapManager is not system");
         return;
     }
-    AutoMutex mutex(this->lock_);
+    WriteLock lock(this->mutex_);
     // add system resource to app resource vector
     const std::vector<std::shared_ptr<HapResource>> &systemResources = systemHapManager->hapResources_;
     for (size_t i = 0; i < systemResources.size(); i++) {
@@ -982,7 +994,7 @@ void HapManager::AddSystemResource(const std::shared_ptr<HapManager> &systemHapM
 
 uint32_t HapManager::GetResourceLimitKeys()
 {
-    AutoMutex mutex(this->lock_);
+    ReadLock lock(this->mutex_);
     uint32_t limitKeysValue = 0;
     for (size_t i = 0; i < hapResources_.size(); i++) {
         limitKeysValue |= hapResources_[i]->GetResourceLimitKeys();
@@ -1062,6 +1074,7 @@ RState HapManager::GetResId(const std::string &resTypeName, uint32_t &resId)
         RESMGR_HILOGE(RESMGR_TAG, "invalid resTypeName = %{public}s", resTypeName.c_str());
         return NOT_FOUND;
     }
+    ReadLock lock(this->mutex_);
     for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
         bool isSystemResource = (*iter)->IsSystemResource();
         bool isOverlayResource = (*iter)->IsOverlayResource();
@@ -1099,6 +1112,7 @@ void HapManager::GetLocales(std::vector<std::string> &outValue, bool includeSyst
         includeSystem = true;
     }
     std::set<std::string> result;
+    ReadLock lock(this->mutex_);
     for (size_t i = 0; i < hapResources_.size(); i++) {
         hapResources_[i]->GetLocales(result, includeSystem);
     }
@@ -1107,6 +1121,7 @@ void HapManager::GetLocales(std::vector<std::string> &outValue, bool includeSyst
 
 RState HapManager::IsRawDirFromHap(const std::string &pathName, bool &outValue)
 {
+    ReadLock lock(this->mutex_);
     for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
         if ((*iter)->IsSystemResource() || (*iter)->IsOverlayResource()) {
             continue;
@@ -1136,8 +1151,9 @@ RState HapManager::IsRawDirFromHap(const std::string &pathName, bool &outValue)
     return ERROR_CODE_RES_PATH_INVALID;
 }
 
-bool HapManager::IsThemeSystemResEnableHap() const
+bool HapManager::IsThemeSystemResEnableHap()
 {
+    ReadLock lock(this->mutex_);
     for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
         if ((*iter)->IsSystemResource() || (*iter)->IsOverlayResource()) {
             continue;
