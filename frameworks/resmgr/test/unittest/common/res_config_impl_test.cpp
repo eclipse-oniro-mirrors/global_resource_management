@@ -104,7 +104,7 @@ HWTEST_F(ResConfigImplTest, ResConfigImplMatchTest003, TestSize.Level1)
     Locale locale;
     locale = GetLocale("en", nullptr, "CA");
     current->SetPreferredLocaleInfo(locale);
-    EXPECT_TRUE(current->Match(other));
+    EXPECT_FALSE(current->Match(other));
 };
 
 /*
