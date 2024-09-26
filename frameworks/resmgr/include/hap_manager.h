@@ -19,7 +19,7 @@
 #include "hap_resource.h"
 #include "res_desc.h"
 #include "resource_manager.h"
-#include "lock.h"
+#include <shared_mutex>
 #include <set>
 
 #ifdef SUPPORT_GRAPHICS
@@ -373,7 +373,7 @@ public:
      *
      * @return true is enabled, else not.
      */
-    bool IsThemeSystemResEnableHap() const;
+    bool IsThemeSystemResEnableHap();
 
 private:
     void UpdateResConfigImpl(ResConfigImpl &resConfig);
@@ -423,7 +423,7 @@ private:
     std::vector<std::pair<std::string, icu::PluralRules *>> plurRulesCache_;
 #endif
 
-    Lock lock_;
+    std::shared_mutex mutex_;
 
     // indicate manager is system hap manager
     bool isSystem_;
