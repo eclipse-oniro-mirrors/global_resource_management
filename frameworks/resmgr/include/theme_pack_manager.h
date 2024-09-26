@@ -15,15 +15,16 @@
 #ifndef OHOS_THEME_PACK_MANAGER_H
 #define OHOS_THEME_PACK_MANAGER_H
 
-#include "res_config_impl.h"
+#include <mutex>
+#include <unordered_map>
+
 #include "hap_resource.h"
+#include "res_common.h"
+#include "res_config_impl.h"
 #include "res_desc.h"
 #include "resource_manager.h"
-#include "lock.h"
-#include "res_common.h"
-#include <unordered_map>
-#include "theme_pack_resource.h"
 #include "theme_pack_config.h"
+#include "theme_pack_resource.h"
 
 namespace OHOS {
 namespace Global {
@@ -176,11 +177,11 @@ private:
 
     std::vector<std::string> GetRootDir(const std::string &strCurrentDir);
     void UpdateUserId(int32_t userId);
-    Lock lockSkin_;
-    Lock lockIcon_;
-    Lock lockThemeId_;
-    Lock lockIconValue_;
-    Lock lockUserId_;
+    std::mutex lockSkin_;
+    std::mutex lockIcon_;
+    std::mutex lockThemeId_;
+    std::mutex lockIconValue_;
+    std::mutex lockUserId_;
     uint32_t themeId_{0};
     bool isFirstCreate = true;
     int32_t currentUserId_ = 100;

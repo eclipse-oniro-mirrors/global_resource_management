@@ -23,7 +23,6 @@
 #include <unicode/localebuilder.h>
 #include <unicode/utypes.h>
 #endif
-#include "auto_mutex.h"
 #include "locale_matcher.h"
 #include "res_config.h"
 #include "rstate.h"
@@ -36,7 +35,7 @@ namespace Resource {
 #ifdef SUPPORT_GRAPHICS
 Locale *ResLocale::defaultLocale_ = nullptr;
 #endif
-Lock ResLocale::lock_;
+std::mutex ResLocale::mutex_;
 
 ResLocale::ResLocale() : language_(nullptr), region_(nullptr), script_(nullptr)
 {
@@ -328,13 +327,13 @@ ResLocale *ResLocale::BuildFromParts(const char *language, const char *script, c
 #ifdef SUPPORT_GRAPHICS
 const Locale *ResLocale::GetDefault()
 {
-    AutoMutex mutex(ResLocale::lock_);
+    std::lock_guard<std::mutex> lock(ResLocale::mutex_);
     return ResLocale::defaultLocale_;
 }
 
 bool ResLocale::UpdateDefault(const Locale &localeInfo, bool needNotify)
 {
-    AutoMutex mutex(ResLocale::lock_);
+    std::lock_guard<std::mutex> lock(ResLocale::mutex_);
     UErrorCode errCode = U_ZERO_ERROR;
     Locale temp = icu::LocaleBuilder().setLocale(localeInfo).build(errCode);
     if (!U_SUCCESS(errCode)) {

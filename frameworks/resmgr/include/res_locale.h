@@ -16,13 +16,13 @@
 #ifndef OHOS_RESOURCE_MANAGER_RES_LOCALE_H
 #define OHOS_RESOURCE_MANAGER_RES_LOCALE_H
 
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
+#include <mutex>
 #ifdef SUPPORT_GRAPHICS
 #include <unicode/locid.h>
 #endif
 #include "rstate.h"
-#include "lock.h"
 
 #ifdef SUPPORT_GRAPHICS
 using icu::Locale;
@@ -124,7 +124,7 @@ private:
     static Locale *defaultLocale_;
 #endif
 
-    static Lock lock_;
+    static std::mutex mutex_;
 
     friend class LocaleMatcher;
 };

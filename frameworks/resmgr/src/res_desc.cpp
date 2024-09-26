@@ -313,25 +313,17 @@ std::string ResKey::ToString() const
     return ret;
 }
 
-ResDesc::ResDesc() : resHeader_(nullptr)
+ResDesc::ResDesc()
 {}
 
 ResDesc::~ResDesc()
 {
     RESMGR_HILOGD(RESMGR_TAG, "~ResDesc()");
-    if (resHeader_ != nullptr) {
-        delete (resHeader_);
-        resHeader_ = nullptr;
-    }
 }
 
 std::string ResDesc::ToString() const
 {
-    if (resHeader_ == nullptr) {
-        return "empty";
-    }
-    std::string ret = FormatString("version:%s, length:%u, keyCount:%u\n",
-        resHeader_->version_, resHeader_->length_, resHeader_->keyCount_);
+    std::string ret = FormatString("keyCount:%u\n", keys_.size());
     for (size_t i = 0; i < keys_.size(); ++i) {
         ret.append(keys_[i]->ToString());
         ret.append("\n");
