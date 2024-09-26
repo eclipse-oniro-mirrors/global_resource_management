@@ -33,7 +33,7 @@ std::shared_ptr<HapResourceManager> HapResourceManager::GetInstance()
     return instance_;
 }
 
-std::shared_ptr<HapResource> HapResourceManager::PutAndGetResource(const std::string path,
+std::shared_ptr<HapResource> HapResourceManager::PutAndGetResource(const std::string &path,
     std::shared_ptr<HapResource> pResource)
 {
     std::unique_lock<std::shared_mutex> lock(mutexRw_);
@@ -48,7 +48,7 @@ std::shared_ptr<HapResource> HapResourceManager::PutAndGetResource(const std::st
     return pResource;
 }
 
-bool HapResourceManager::PutPatchResource(const std::string path, std::string patchPath)
+bool HapResourceManager::PutPatchResource(const std::string &path, const std::string &patchPath)
 {
     std::unique_lock<std::shared_mutex> lock(mutexRw_);
     if (hapResourceMap_.find(path) != hapResourceMap_.end()) {
@@ -62,7 +62,7 @@ bool HapResourceManager::PutPatchResource(const std::string path, std::string pa
     return false;
 }
 
-std::shared_ptr<HapResource> HapResourceManager::GetHapResource(const std::string path)
+std::shared_ptr<HapResource> HapResourceManager::GetHapResource(const std::string &path)
 {
     std::shared_lock<std::shared_mutex> lock(mutexRw_);
     auto iter = hapResourceMap_.find(path);
