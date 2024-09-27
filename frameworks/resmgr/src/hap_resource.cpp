@@ -203,7 +203,7 @@ const std::shared_ptr<HapResource> HapResource::LoadFromHap(const char *path,
     int32_t out = HapParser::ParseResHex(
         reinterpret_cast<char *>(tmpBuf.get()), tmpLen, *resDesc, defaultConfig, selectedTypes);
     if (out != OK) {
-        RESMGR_HILOGE(RESMGR_TAG, "ParseResHex failed! retcode:%d", out);
+        RESMGR_HILOGE(RESMGR_TAG, "ParseResHex failed! retcode:%{public}d", out);
         return nullptr;
     }
 

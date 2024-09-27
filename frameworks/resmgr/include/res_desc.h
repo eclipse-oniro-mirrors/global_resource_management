@@ -219,8 +219,6 @@ public:
 
     std::string ToString() const;
 
-    ResHeader *resHeader_;
-
     std::vector<std::shared_ptr<ResKey>> keys_;
 
     std::string GetCurrentDeviceType();

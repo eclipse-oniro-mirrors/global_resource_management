@@ -14,7 +14,6 @@
  */
 #include "theme_pack_manager.h"
 
-#include "auto_mutex.h"
 #include <dirent.h>
 #include <cstdio>
 #include <cstdlib>
@@ -108,7 +107,7 @@ void ThemePackManager::ClearSkinResource()
 void ThemePackManager::LoadThemeSkinResource(const std::string &bundleName, const std::string &moduleName,
     const std::vector<std::string> &rootDirs, int32_t userId)
 {
-    AutoMutex mutex(this->lockSkin_);
+    std::lock_guard<std::mutex> lock(this->lockSkin_);
     for (size_t i = 0; i < skinResource_.size(); ++i) {
         auto pThemeResource = skinResource_[i];
         if (pThemeResource == nullptr) {
@@ -218,7 +217,7 @@ const std::string ThemePackManager::GetThemeResource(const std::pair<std::string
 std::vector<std::shared_ptr<ThemeResource::ThemeValue> > ThemePackManager::GetThemeResourceList(
     const std::pair<std::string, std::string> &bundInfo, const ResType &resType, const std::string &resName)
 {
-    AutoMutex mutex(this->lockSkin_);
+    std::lock_guard<std::mutex> lock(this->lockSkin_);
     std::vector<std::shared_ptr<ThemeResource::ThemeValue> > result;
     for (size_t i = 0; i < skinResource_.size(); ++i) {
         auto pThemeResource = skinResource_[i];
@@ -293,7 +292,7 @@ void ThemePackManager::ClearIconResource()
 void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, const std::string &moduleName,
     const std::vector<std::string> &rootDirs, int32_t userId)
 {
-    AutoMutex mutex(this->lockIcon_);
+    std::lock_guard<std::mutex> lock(this->lockIcon_);
     for (size_t i = 0; i < iconResource_.size(); ++i) {
         auto pThemeResource = iconResource_[i];
         if (pThemeResource == nullptr) {
@@ -322,7 +321,7 @@ void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, con
 const std::string ThemePackManager::FindThemeIconResource(const std::pair<std::string, std::string> &bundleInfo,
     const std::string &iconName, const std::string &abilityName)
 {
-    AutoMutex mutex(this->lockIcon_);
+    std::lock_guard<std::mutex> lock(this->lockIcon_);
     std::string result;
     for (size_t i = 0; i < iconResource_.size(); i++) {
         auto pThemeResource = iconResource_[i];
@@ -339,7 +338,7 @@ const std::string ThemePackManager::FindThemeIconResource(const std::pair<std::s
 
 bool ThemePackManager::UpdateThemeId(uint32_t newThemeId)
 {
-    AutoMutex mutex(this->lockThemeId_);
+    std::lock_guard<std::mutex> lock(this->lockThemeId_);
     if (newThemeId != 0 && newThemeId != themeId_) {
         RESMGR_HILOGI(RESMGR_TAG, "update theme, themeId_= %{public}d, newThemeId= %{public}d", themeId_, newThemeId);
         themeId_ = newThemeId;
@@ -359,7 +358,7 @@ bool ThemePackManager::IsFirstLoadResource()
 
 bool ThemePackManager::HasIconInTheme(const std::string &bundleName)
 {
-    AutoMutex mutex(this->lockIcon_);
+    std::lock_guard<std::mutex> lock(this->lockIcon_);
     bool result = false;
     for (size_t i = 0; i < iconResource_.size(); i++) {
         auto pThemeResource = iconResource_[i];
@@ -377,7 +376,7 @@ bool ThemePackManager::HasIconInTheme(const std::string &bundleName)
 RState ThemePackManager::GetOtherIconsInfo(const std::string &iconName,
     std::unique_ptr<uint8_t[]> &outValue, size_t &len, bool isGlobalMask)
 {
-    AutoMutex mutex(this->lockIconValue_);
+    std::lock_guard<std::mutex> lock(this->lockIconValue_);
     std::string iconPath;
     std::string iconTag;
     if (iconName.find("icon_mask") != std::string::npos && isGlobalMask) {
@@ -412,7 +411,7 @@ RState ThemePackManager::GetOtherIconsInfo(const std::string &iconName,
 RState ThemePackManager::GetThemeIconFromCache(
     const std::string &iconTag, std::unique_ptr<uint8_t[]> &outValue, size_t &len)
 {
-    AutoMutex mutex(this->lockIconValue_);
+    std::lock_guard<std::mutex> lock(this->lockIconValue_);
     if (iconMaskValues_.empty()) {
         return NOT_FOUND;
     }
@@ -439,13 +438,13 @@ RState ThemePackManager::GetThemeIconFromCache(
 
 bool ThemePackManager::IsUpdateByUserId(int32_t userId)
 {
-    AutoMutex mutex(this->lockUserId_);
+    std::lock_guard<std::mutex> lock(this->lockUserId_);
     return currentUserId_ != userId;
 }
 
 void ThemePackManager::UpdateUserId(int32_t userId)
 {
-    AutoMutex mutex(this->lockUserId_);
+    std::lock_guard<std::mutex> lock(this->lockUserId_);
     if (currentUserId_ != userId) {
         RESMGR_HILOGI(RESMGR_TAG,
             "update userId, currentUserId_= %{public}d, userId= %{public}d", currentUserId_, userId);

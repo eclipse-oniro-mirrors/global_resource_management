@@ -603,31 +603,24 @@ int32_t ParseKey(const char *buffer, uint32_t &offset, std::shared_ptr<ResKey> k
 
 
 int32_t HapParser::ParseResHex(const char *buffer, const size_t bufLen, ResDesc &resDesc,
-                               const std::shared_ptr<ResConfigImpl> defaultConfig, const uint32_t &selectedTypes)
+    const std::shared_ptr<ResConfigImpl> defaultConfig, const uint32_t &selectedTypes)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
 #endif
-    ResHeader *resHeader = new (std::nothrow) ResHeader();
-    if (resHeader == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "new ResHeader failed when ParseResHex");
-        return SYS_ERROR;
-    }
+    ResHeader resHeader;
     uint32_t offset = 0;
-    errno_t eret = memcpy_s(resHeader, sizeof(ResHeader), buffer + offset, RES_HEADER_LEN);
+    errno_t eret = memcpy_s(&resHeader, sizeof(ResHeader), buffer + offset, RES_HEADER_LEN);
     if (eret != OK) {
-        delete (resHeader);
         return SYS_ERROR;
     }
     offset += RES_HEADER_LEN;
-    if (resHeader->keyCount_ == 0 || resHeader->length_ == 0) {
-        delete (resHeader);
+    if (resHeader.keyCount_ == 0 || resHeader.length_ == 0) {
         return UNKNOWN_ERROR;
     }
 
-    resDesc.resHeader_ = resHeader;
     const std::string deviceType = resDesc.GetCurrentDeviceType();
-    for (uint32_t i = 0; i < resHeader->keyCount_; i++) {
+    for (uint32_t i = 0; i < resHeader.keyCount_; i++) {
         std::shared_ptr<ResKey> key = std::make_shared<ResKey>();
         if (key == nullptr) {
             RESMGR_HILOGE(RESMGR_TAG, "new ResKey failed when ParseResHex");

@@ -15,16 +15,17 @@
 #ifndef OHOS_THEME_PACK_RESOURCE_H
 #define OHOS_THEME_PACK_RESOURCE_H
 
-#include "res_config_impl.h"
+#include <mutex>
+#include <tuple>
+#include <unordered_map>
+
+#include "cJSON.h"
 #include "hap_resource.h"
+#include "res_common.h"
+#include "res_config_impl.h"
 #include "res_desc.h"
 #include "resource_manager.h"
-#include "lock.h"
-#include "res_common.h"
-#include <unordered_map>
 #include "theme_pack_config.h"
-#include <tuple>
-#include "cJSON.h"
 
 namespace OHOS {
 namespace Global {

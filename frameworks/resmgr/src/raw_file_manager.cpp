@@ -23,7 +23,6 @@
 #include <securec.h>
 #include <unistd.h>
 
-#include "auto_mutex.h"
 #include "raw_dir.h"
 #include "raw_file.h"
 #include "resource_manager.h"
@@ -38,9 +37,9 @@
 
 using namespace OHOS::Global::Resource;
 
-Lock g_rawDirLock;
-Lock g_rawFileLock;
-Lock g_rawFile64Lock;
+std::mutex g_rawDirMutex;
+std::mutex g_rawFileMutex;
+std::mutex g_rawFile64Mutex;
 struct NativeResourceManager {
     std::shared_ptr<ResourceManager> resManager = nullptr;
 };
@@ -139,7 +138,7 @@ RawDir *LoadRawDirFromHap(const NativeResourceManager *mgr, const std::string di
 
 RawDir *OH_ResourceManager_OpenRawDir(const NativeResourceManager *mgr, const char *dirName)
 {
-    AutoMutex mutex(g_rawDirLock);
+    std::lock_guard<std::mutex> lock(g_rawDirMutex);
     if (mgr == nullptr || dirName == nullptr) {
         return nullptr;
     }
@@ -208,7 +207,7 @@ RawFile *LoadRawFileFromHap(const NativeResourceManager *mgr, const char *fileNa
 
 RawFile *OH_ResourceManager_OpenRawFile(const NativeResourceManager *mgr, const char *fileName)
 {
-    AutoMutex mutex(g_rawFileLock);
+    std::lock_guard<std::mutex> lock(g_rawFileMutex);
     if (mgr == nullptr || fileName == nullptr) {
         return nullptr;
     }
@@ -256,7 +255,7 @@ const char *OH_ResourceManager_GetRawFileName(RawDir *rawDir, int index)
 
 void OH_ResourceManager_CloseRawDir(RawDir *rawDir)
 {
-    AutoMutex mutex(g_rawDirLock);
+    std::lock_guard<std::mutex> lock(g_rawDirMutex);
     if (rawDir != nullptr) {
         delete rawDir;
         rawDir = nullptr;
@@ -337,7 +336,7 @@ long OH_ResourceManager_GetRawFileRemainingLength(const RawFile *rawFile)
 
 void OH_ResourceManager_CloseRawFile(RawFile *rawFile)
 {
-    AutoMutex mutex(g_rawFileLock);
+    std::lock_guard<std::mutex> lock(g_rawFileMutex);
     if (rawFile != nullptr) {
         delete rawFile;
         rawFile = nullptr;
@@ -472,7 +471,7 @@ RawFile64 *LoadRawFileFromHap64(const NativeResourceManager *mgr, const char *fi
 
 RawFile64 *OH_ResourceManager_OpenRawFile64(const NativeResourceManager *mgr, const char *fileName)
 {
-    AutoMutex mutex(g_rawFile64Lock);
+    std::lock_guard<std::mutex> lock(g_rawFile64Mutex);
     if (mgr == nullptr || fileName == nullptr) {
         return nullptr;
     }
@@ -571,7 +570,7 @@ int64_t OH_ResourceManager_GetRawFileRemainingLength64(const RawFile64 *rawFile)
 
 void OH_ResourceManager_CloseRawFile64(RawFile64 *rawFile)
 {
-    AutoMutex mutex(g_rawFile64Lock);
+    std::lock_guard<std::mutex> lock(g_rawFile64Mutex);
     if (rawFile != nullptr) {
         delete rawFile;
         rawFile = nullptr;
