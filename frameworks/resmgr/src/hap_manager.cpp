@@ -400,7 +400,9 @@ bool HapManager::AddResource(const std::string &path, const std::vector<std::str
     }
     if (result.find(path) != result.end()) {
         hapResources_.push_back(result[path]);
-        this->resConfig_->SetAppDarkRes(result[path]->HasDarkRes());
+        if (result[path]->HasDarkRes()) {
+            this->resConfig_->SetAppDarkRes(true);
+        }
     }
     for (auto iter = overlayPaths.rbegin(); iter != overlayPaths.rend(); iter++) {
         if (result.find(*iter) != result.end()) {
@@ -513,8 +515,9 @@ bool HapManager::AddResourcePath(const char *path, const uint32_t &selectedTypes
     }
     this->loadedHapPaths_[sPath] = std::vector<std::string>();
     this->hapResources_.push_back(pResource);
-    this->resConfig_->SetAppDarkRes(pResource->HasDarkRes());
-
+    if (pResource->HasDarkRes()) {
+        this->resConfig_->SetAppDarkRes(true);
+    }
     return true;
 }
 
