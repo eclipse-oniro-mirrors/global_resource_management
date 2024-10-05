@@ -111,7 +111,7 @@ std::string HapManager::GetPluralRulesAndSelect(int quantity, bool isGetOverride
 {
     std::string defaultRet("other");
 #ifdef SUPPORT_GRAPHICS
-    ReadLock lock(this->mutex_);
+    WriteLock lock(this->mutex_);
     std::shared_ptr<ResConfigImpl> config = getCompleteOverrideConfig(isGetOverrideResource);
     if (config == nullptr || config->GetResLocale() == nullptr ||
         config->GetResLocale()->GetLanguage() == nullptr) {
