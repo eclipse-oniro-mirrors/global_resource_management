@@ -423,7 +423,10 @@ bool ResConfigImpl::Match(const std::shared_ptr<ResConfigImpl> other, bool isChe
     bool isPreferredLocaleMatch = false;
 #ifdef SUPPORT_GRAPHICS
     if (this->resPreferredLocale_ != nullptr) {
-        isPreferredLocaleMatch = LocaleMatcher::Match(this->resPreferredLocale_, other->GetResLocale());
+        isPreferredLocaleMatch = true;
+        if (!LocaleMatcher::Match(this->resPreferredLocale_, other->GetResLocale())) {
+            return false;
+        }
     }
 #endif
 
