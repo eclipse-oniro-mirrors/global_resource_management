@@ -14,6 +14,7 @@
  */
 
 #include "resource_manager_test.h"
+#include "system_resource_manager.h"
 
 #include "resource_manager_test_common.h"
 
@@ -62,6 +63,10 @@ void ResourceManagerTest::TearDown(void)
 {
     delete this->rm;
     delete this->rmc;
+    if (SystemResourceManager::resourceManager_) {
+        delete SystemResourceManager::resourceManager_;
+        SystemResourceManager::resourceManager_ = nullptr;
+    }
 }
 
 /*
