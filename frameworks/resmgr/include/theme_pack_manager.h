@@ -94,7 +94,7 @@ public:
      * @return the best resource or empty
      */
     const std::string FindThemeResource(const std::pair<std::string, std::string> &bundleInfo,
-        std::vector<std::shared_ptr<IdItem>> idItems, const ResConfigImpl &resConfig,
+        const std::vector<std::shared_ptr<IdItem>> &idItems, const ResConfigImpl &resConfig,
         bool isThemeSystemResEnable = false);
 
     /**
