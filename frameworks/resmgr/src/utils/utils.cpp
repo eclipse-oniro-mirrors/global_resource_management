@@ -478,11 +478,6 @@ void Utils::CanonicalizePath(const char *path, char *outPath, size_t len)
 #endif
 }
 
-bool Utils::IsPrefix(std::string_view prefix, std::string_view full)
-{
-    return prefix == full.substr(0, prefix.size());
-}
-
 RState Utils::GetFiles(const std::string &strCurrentDir, std::vector<std::string> &vFiles)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
