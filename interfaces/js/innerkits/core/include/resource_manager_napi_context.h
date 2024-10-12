@@ -37,8 +37,6 @@ public:
      */
     napi_value ContextGetResource(napi_env env, napi_callback_info info, const std::string &functionName,
         FunctionType functionType);
-private:
-    std::shared_ptr<ResourceManagerNapiBase> napiBase_;
 };
 } // namespace Resource
 } // namespace Global
