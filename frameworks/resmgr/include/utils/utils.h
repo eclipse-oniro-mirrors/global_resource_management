@@ -108,8 +108,6 @@ public:
 
     static void CanonicalizePath(const char *path, char *outPath, size_t len);
 
-    static bool IsPrefix(std::string_view prefix, std::string_view full);
-
     static RState GetFiles(const std::string &strCurrentDir, std::vector<std::string> &vFiles);
 private:
 
