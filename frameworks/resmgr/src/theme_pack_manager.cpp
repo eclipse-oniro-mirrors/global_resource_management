@@ -181,7 +181,7 @@ const std::string ThemePackManager::ReplaceUserIdInPath(const std::string &origi
 }
 
 const std::string ThemePackManager::FindThemeResource(const std::pair<std::string, std::string> &bundleInfo,
-    std::vector<std::shared_ptr<IdItem>> idItems, const ResConfigImpl &resConfig, bool isThemeSystemResEnable)
+    const std::vector<std::shared_ptr<IdItem>> &idItems, const ResConfigImpl &resConfig, bool isThemeSystemResEnable)
 {
     std::string result;
     for (size_t i = 0; i < idItems.size(); i++) {
