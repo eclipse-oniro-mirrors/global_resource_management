@@ -957,7 +957,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest022,
 
 /*
  * @tc.name: ResourceManagerGetStringFormatByNameTest023
- * @tc.desc: Test GetStringFormatByName with va_list function
+ * @tc.desc: Test GetStringFormatById function
  * @tc.type: FUNC
  */
 HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest023, TestSize.Level1)

@@ -109,7 +109,7 @@ ohos_shared_library("global_resmgr") {
     public_external_deps = [ "icu:shared_icuuc" ]
   }
 
-  stack_protector_ret = true
+  branch_protector_ret = "pac_ret"
   sanitize = {
     boundary_sanitize = true
     cfi = true
