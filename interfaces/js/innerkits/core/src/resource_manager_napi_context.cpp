@@ -19,7 +19,7 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
-ResourceManagerNapiContext::ResourceManagerNapiContext() : napiBase_(nullptr)
+ResourceManagerNapiContext::ResourceManagerNapiContext()
 {}
 
 ResourceManagerNapiContext::~ResourceManagerNapiContext()
@@ -28,12 +28,13 @@ ResourceManagerNapiContext::~ResourceManagerNapiContext()
 napi_value ResourceManagerNapiContext::ContextGetResource(napi_env env, napi_callback_info info,
     const std::string &methodName, FunctionType functionType)
 {
+    std::shared_ptr<ResourceManagerNapiBase> napiBase;
     if (functionType == FunctionType::SYNC) {
-        napiBase_ = std::make_shared<ResourceManagerNapiSyncImpl>();
+        napiBase = std::make_shared<ResourceManagerNapiSyncImpl>();
     } else {
-        napiBase_ = std::make_shared<ResourceManagerNapiAsyncImpl>();
+        napiBase = std::make_shared<ResourceManagerNapiAsyncImpl>();
     }
-    return napiBase_->GetResource(env, info, methodName);
+    return napiBase->GetResource(env, info, methodName);
 }
 } // namespace Resource
 } // namespace Global
