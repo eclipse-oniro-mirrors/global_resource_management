@@ -109,6 +109,12 @@ public:
      */
     void SetThemeId(uint32_t themeId);
 
+    /**
+     * Set resConfig themeIcon
+     * @param isIcon the resConfig themeIcon flag
+     */
+    void SetThemeIcon(bool isIcon);
+
 #ifdef SUPPORT_GRAPHICS
     const ResLocale *GetResPreferredLocale() const;
 
@@ -136,6 +142,8 @@ public:
     uint32_t GetMnc() const;
 
     uint32_t GetThemeId() const;
+
+    bool GetThemeIcon() const;
 
     DeviceType GetDeviceType() const;
 
@@ -264,6 +272,7 @@ private:
     bool isAppColorMode_;
     bool isAppDarkRes_;
     uint32_t themeId_;
+    bool isThemeIcon_;
 };
 } // namespace Resource
 } // namespace Global
