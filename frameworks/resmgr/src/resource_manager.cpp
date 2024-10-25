@@ -71,7 +71,7 @@ std::shared_ptr<ResourceManager> CreateResourceManagerDef(
     auto themePackManager = ThemePackManager::GetThemePackManager();
     if (themePackManager->IsFirstLoadResource() || themePackManager->UpdateThemeId(currentId)
         || themePackManager->IsUpdateByUserId(userId)) {
-        RESMGR_HILOGI(RESMGR_TAG, "CreateResourceManagerDef LoadThemeRes");
+        RESMGR_HILOGD(RESMGR_TAG, "CreateResourceManagerDef LoadThemeRes");
         themePackManager->LoadThemeRes(bundleName, moduleName, userId);
     }
     return resourceManagerImpl;

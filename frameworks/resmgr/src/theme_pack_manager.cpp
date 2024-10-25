@@ -391,7 +391,7 @@ RState ThemePackManager::GetOtherIconsInfo(const std::string &iconName,
     }
 
     if (iconPath.empty()) {
-        RESMGR_HILOGE(RESMGR_TAG, "no found, iconName = %{public}s", iconName.c_str());
+        RESMGR_HILOGD(RESMGR_TAG, "no found, iconTag = %{public}s", iconTag.c_str());
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
     }
 
