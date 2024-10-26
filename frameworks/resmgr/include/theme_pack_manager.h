@@ -156,6 +156,8 @@ public:
      * @return true if update theme by the user id, else not update
      */
     bool IsUpdateByUserId(int32_t userId);
+
+    void LoadThemeIconRes(const std::string &bundleName, const std::string &moduleName, int32_t userId);
 private:
     ThemePackManager();
     std::string themeMask;

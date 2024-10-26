@@ -49,6 +49,8 @@ public:
 
     virtual void SetThemeId(uint32_t themeId) = 0;
 
+    virtual void SetThemeIcon(bool isIcon) = 0;
+
 #ifdef SUPPORT_GRAPHICS
     virtual const Locale *GetLocaleInfo() const = 0;
 #endif
@@ -66,6 +68,8 @@ public:
     virtual uint32_t GetMnc() const = 0;
 
     virtual uint32_t GetThemeId() const = 0;
+
+    virtual bool GetThemeIcon() const = 0;
 
     virtual bool Copy(ResConfig &other, bool isRead = false) = 0;
 	

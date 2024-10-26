@@ -1150,8 +1150,13 @@ RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig, bool isUpdateT
 {
     auto themePackManager = ThemePackManager::GetThemePackManager();
     if (themePackManager->UpdateThemeId(resConfig.GetThemeId())) {
-        RESMGR_HILOGD(RESMGR_TAG, "The theme enabled");
-        themePackManager->LoadThemeRes(bundleInfo.first, bundleInfo.second, userId);
+        if (resConfig.GetThemeIcon()) {
+            RESMGR_HILOGD(RESMGR_TAG, "The themeIcon enabled");
+            themePackManager->LoadThemeIconRes(bundleInfo.first, bundleInfo.second, userId);
+        } else {
+            RESMGR_HILOGD(RESMGR_TAG, "The theme enabled");
+            themePackManager->LoadThemeRes(bundleInfo.first, bundleInfo.second, userId);
+        }
     }
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);

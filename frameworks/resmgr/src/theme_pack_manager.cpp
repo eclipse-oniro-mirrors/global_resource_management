@@ -157,6 +157,27 @@ void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::st
     return;
 }
 
+void ThemePackManager::LoadThemeIconRes(const std::string &bundleName, const std::string &moduleName, int32_t userId)
+{
+    UpdateUserId(userId);
+    std::vector<std::string> iconDirs;
+    if (Utils::IsFileExist(themeFlagA)) {
+        iconDirs = GetRootDir(themeIconsA);
+    } else if (Utils::IsFileExist(themeFlagB)) {
+        iconDirs = GetRootDir(themeIconsB);
+    } else {
+        if (Utils::IsFileExist(ReplaceUserIdInPath(absoluteThemeFlagA, userId))) {
+            iconDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeIconsA, userId));
+        } else if (Utils::IsFileExist(ReplaceUserIdInPath(absoluteThemeFlagB, userId))) {
+            iconDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeIconsB, userId));
+        } else {
+            RESMGR_HILOGE(RESMGR_TAG, "LoadThemesRes failed, userId = %{public}d, bundleName = %{public}s",
+                userId, bundleName.c_str());
+        }
+    }
+    LoadThemeIconsResource(bundleName, moduleName, iconDirs, userId);
+}
+
 void ThemePackManager::LoadSAThemeRes(const std::string &bundleName, const std::string &moduleName,
     int32_t userId, std::vector<std::string> &rootDirs, std::vector<std::string> &iconDirs)
 {
@@ -166,8 +187,10 @@ void ThemePackManager::LoadSAThemeRes(const std::string &bundleName, const std::
     } else if (Utils::IsFileExist(ReplaceUserIdInPath(absoluteThemeFlagB, userId))) {
         rootDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeSkinB, userId));
         iconDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeIconsB, userId));
+    } else {
+        RESMGR_HILOGE(RESMGR_TAG, "LoadThemesRes failed, userId = %{public}d, bundleName = %{public}s",
+            userId, bundleName.c_str());
     }
-    return;
 }
 
 const std::string ThemePackManager::ReplaceUserIdInPath(const std::string &originalPath, int32_t userId)
