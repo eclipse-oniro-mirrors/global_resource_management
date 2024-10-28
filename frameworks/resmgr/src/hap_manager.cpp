@@ -874,7 +874,10 @@ RState HapManager::GetRawFileList(const std::string &rawDirPath, std::vector<std
         }
         std::set<std::string> fileSet;
         RState hapState = HapParser::GetRawFileList(hapOrIndexPath, rawDirPath, fileSet);
-        RState hqfState = HapParser::GetRawFileList(temPatchPath, rawDirPath, fileSet);
+        RState hqfState = NOT_FOUND;
+        if (!temPatchPath.empty()) {
+            hqfState = HapParser::GetRawFileList(temPatchPath, rawDirPath, fileSet);
+        }
         for (auto it = fileSet.begin(); it != fileSet.end(); it++) {
             fileList.emplace_back(*it);
         }
