@@ -32,7 +32,8 @@ constexpr int SECOND_ELEMENT = 1;
 constexpr int THIRED_ELEMENT = 2;
 static std::shared_ptr<ThemePackManager> themeMgr = nullptr;
 static std::once_flag themeMgrFlag;
-const std::string sysResIdPreFix = "125";
+constexpr uint32_t SYSTEM_ID_BEGIN = 117440512; // 0x07000000
+constexpr uint32_t SYSTEM_ID_END = 134217727; // 0x07FFFFFF
 const std::string themeFlagA = "data/themes/a/app/flag";
 const std::string themeFlagB = "data/themes/b/app/flag";
 const std::string themeSkinA = "/data/themes/a/app/skin";
@@ -188,7 +189,7 @@ const std::string ThemePackManager::FindThemeResource(const std::pair<std::strin
         std::string resName = idItems[i]->GetItemResName();
         uint32_t id = idItems[i]->GetItemResId();
         ResType resType = idItems[i]->GetItemResType();
-        if (Utils::IsPrefix(sysResIdPreFix, std::to_string(id))) {
+        if (id >= SYSTEM_ID_BEGIN && id <= SYSTEM_ID_END) {
             if (resType == ResType::COLOR && !isThemeSystemResEnable) {
                 break;
             }
