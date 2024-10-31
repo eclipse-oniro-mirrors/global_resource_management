@@ -226,7 +226,7 @@ public:
          * @param isOverlay the overlay flag, default value is false.
          * @param isSystemResource the system flag, default value is false.
          */
-        ValueUnderQualifierDir(const std::shared_ptr<ResKey> resKey, std::shared_ptr<IdItem> idItem,
+        ValueUnderQualifierDir(const std::shared_ptr<ResKey> &resKey, const std::shared_ptr<IdItem> &idItem,
             const std::pair<std::string, std::string> &resPath, bool isOverlay = false, bool isSystemResource = false);
 
         ~ValueUnderQualifierDir();
