@@ -391,7 +391,8 @@ private:
         uint32_t density, std::shared_ptr<ResConfigImpl> currentResConfig);
 
     const std::shared_ptr<HapResource::ValueUnderQualifierDir> GetBestMatchResource(
-        std::vector<std::shared_ptr<HapResource::IdValues>> candidates, uint32_t density, bool isGetOverrideResource);
+        const std::vector<std::shared_ptr<HapResource::IdValues>> &candidates,
+        uint32_t density, bool isGetOverrideResource);
 
     bool AddResourcePath(const char *path, const uint32_t &selectedTypes = SELECT_ALL);
 
