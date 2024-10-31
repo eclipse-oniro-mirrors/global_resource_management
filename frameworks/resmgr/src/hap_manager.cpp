@@ -274,7 +274,7 @@ void HapManager::MatchBestResource(std::shared_ptr<ResConfigImpl> &bestResConfig
 }
 
 const std::shared_ptr<HapResource::ValueUnderQualifierDir> HapManager::GetBestMatchResource(
-    std::vector<std::shared_ptr<HapResource::IdValues>> candidates, uint32_t density, bool isGetOverrideResource)
+    const std::vector<std::shared_ptr<HapResource::IdValues>> &candidates, uint32_t density, bool isGetOverrideResource)
 {
     std::shared_ptr<ResConfigImpl> bestResConfig = nullptr;
     std::shared_ptr<ResConfigImpl> bestOverlayResConfig = nullptr;
@@ -286,7 +286,7 @@ const std::shared_ptr<HapResource::ValueUnderQualifierDir> HapManager::GetBestMa
     }
     // When there are multiple overlays, reverse the search to find the first match resource.
     for (auto iter = candidates.rbegin(); iter != candidates.rend(); iter++) {
-        const auto paths = (*iter)->GetLimitPathsConst();
+        const auto &paths = (*iter)->GetLimitPathsConst();
         bool isOverlayHapResource = paths[0]->IsOverlay();
         if (isOverlayHapResource) {
             MatchBestResource(bestOverlayResConfig, overlayResult, paths, density, currentResConfig);
