@@ -71,6 +71,13 @@ HapManager::HapManager(std::shared_ptr<ResConfigImpl> resConfig, bool isSystem)
     overrideResConfig_->SetColorMode(COLOR_MODE_NOT_SET);
 }
 
+HapManager::HapManager(std::shared_ptr<ResConfigImpl> resConfig, std::vector<std::shared_ptr<HapResource>> hapResources,
+    std::unordered_map<std::string, std::vector<std::string>> loadedHapPaths, bool isSystem)
+    : resConfig_(resConfig), hapResources_(hapResources), loadedHapPaths_(loadedHapPaths), isSystem_(isSystem)
+{
+    overrideResConfig_->SetColorMode(COLOR_MODE_NOT_SET);
+}
+
 bool HapManager::icuInitialized = HapManager::Init();
 
 bool HapManager::Init()
@@ -1218,6 +1225,16 @@ bool HapManager::IsThemeSystemResEnableHap()
         }
     }
     return false;
+}
+
+bool HapManager::IsSystem()
+{
+    return this->isSystem_;
+}
+
+std::unordered_map<std::string, std::vector<std::string>> HapManager::GetLoadedHapPaths()
+{
+    return this->loadedHapPaths_;
 }
 } // namespace Resource
 } // namespace Global

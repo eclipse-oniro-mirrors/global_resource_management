@@ -41,6 +41,16 @@ public:
     HapManager(std::shared_ptr<ResConfigImpl> resConfig, bool isSystem = false);
 
     /**
+     * The constructor of HapManager
+     * @param resConfig resource config
+     * @param hapResources hap resources
+     * @param loadedHapPaths loaded hap paths
+     * @param isSystem system flag, default value is false
+    */
+    HapManager(std::shared_ptr<ResConfigImpl> resConfig, std::vector<std::shared_ptr<HapResource>> hapResources,
+        std::unordered_map<std::string, std::vector<std::string>> loadedHapPaths, bool isSystem = false);
+
+    /**
      * The destructor of HapManager
      */
     ~HapManager();
@@ -321,6 +331,12 @@ public:
     std::vector<std::shared_ptr<HapResource>> GetHapResource();
 
     /**
+     * Get loaded hap path of manager
+     * @return loaded path map of manager
+     */
+    std::unordered_map<std::string, std::vector<std::string>> GetLoadedHapPaths();
+
+    /**
      * Add system resourc to app resource vector
      *
      * @param systemHapManager system manager
@@ -377,6 +393,12 @@ public:
      * @return true is enabled, else not.
      */
     bool IsThemeSystemResEnableHap();
+
+    /**
+     * Whether this is system hap manager
+     * @return true is system hap manager, else not.
+     */
+    bool IsSystem();
 
 private:
     void UpdateResConfigImpl(ResConfigImpl &resConfig);

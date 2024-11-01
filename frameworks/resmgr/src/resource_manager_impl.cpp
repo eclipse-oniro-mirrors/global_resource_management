@@ -84,7 +84,18 @@ bool ResourceManagerImpl::Init(std::shared_ptr<HapManager> hapManager)
         RESMGR_HILOGE(RESMGR_TAG, "ResourceManagerImpl::Init, hapManager is nullptr");
         return false;
     }
-    this->hapManager_ = hapManager;
+    auto resConfig = std::make_shared<ResConfigImpl>();
+    if (resConfig == nullptr) {
+        RESMGR_HILOGD(RESMGR_TAG, "new ResConfigImpl failed when ResourceManagerImpl::Init");
+        return false;
+    }
+    hapManager->GetResConfig(*resConfig);
+    hapManager_ = std::make_shared<HapManager>(resConfig, hapManager->GetHapResource(),
+        hapManager->GetLoadedHapPaths(), hapManager->IsSystem());
+    if (hapManager_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "new HapManager failed from hapManager");
+        return false;
+    }
     return true;
 }
 
