@@ -49,6 +49,7 @@ LogLevel g_logLevel = LOG_INFO;
 constexpr int HEX_ADECIMAL = 16;
 const std::string FOREGROUND = "foreground";
 const std::string BACKGROUND = "background";
+const std::regex FLOAT_REGEX = std::regex("(\\+|-)?\\d+(\\.\\d+)? *(px|vp|fp)?");
 
 void ResourceManagerImpl::AddSystemResource(ResourceManagerImpl *systemResourceManager)
 {
@@ -719,9 +720,8 @@ RState ResourceManagerImpl::RecalculateFloat(const std::string &unit, float &res
 
 RState ResourceManagerImpl::ParseFloat(const std::string &strValue, float &result, std::string &unit)
 {
-    std::regex reg("(\\+|-)?\\d+(\\.\\d+)? *(px|vp|fp)?");
     std::smatch floatMatch;
-    if (!regex_search(strValue, floatMatch, reg)) {
+    if (!regex_search(strValue, floatMatch, FLOAT_REGEX)) {
         RESMGR_HILOGD(RESMGR_TAG, "not valid float value %{public}s", strValue.c_str());
         return ERROR;
     }
