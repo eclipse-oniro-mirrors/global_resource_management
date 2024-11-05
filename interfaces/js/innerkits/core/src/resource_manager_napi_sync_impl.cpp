@@ -1020,6 +1020,10 @@ napi_value ResourceManagerNapiSyncImpl::AddResource(napi_env env, napi_callback_
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->path_ = ResourceManagerNapiUtils::GetResNameOrPath(env, argc, argv);
     auto resMgr = GetNativeResoruceManager(env, info);
+    if (resMgr == nullptr) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "resMgr is null, add overlay path = %{public}s", dataContext->path_.c_str());
+        return nullptr;
+    }
     if (!resMgr->AddAppOverlay(dataContext->path_)) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to add overlay path = %{public}s", dataContext->path_.c_str());
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_OVERLAY_RES_PATH_INVALID);
@@ -1038,8 +1042,12 @@ napi_value ResourceManagerNapiSyncImpl::RemoveResource(napi_env env, napi_callba
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->path_ = ResourceManagerNapiUtils::GetResNameOrPath(env, argc, argv);
     auto resMgr = GetNativeResoruceManager(env, info);
+    if (resMgr == nullptr) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "resMgr is null, overlay path = %{public}s", dataContext->path_.c_str());
+        return nullptr;
+    }
     if (!resMgr->RemoveAppOverlay(dataContext->path_)) {
-        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to add overlay path = %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to remove overlay path = %{public}s", dataContext->path_.c_str());
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_OVERLAY_RES_PATH_INVALID);
         return nullptr;
     }
