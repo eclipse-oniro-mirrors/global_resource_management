@@ -14,7 +14,7 @@
  */
 
 #include "utils/string_utils.h"
-
+#include "utils/utils.h"
 #include <cctype>
 #include <cstdarg>
 #include <cstdint>
@@ -159,10 +159,13 @@ bool parseArgs(const std::string &inputOutputValue, va_list args,
                 RESMGR_HILOGE(RESMGR_TAG, "index of placeholder is too large");
                 return false;
             }
-            if (std::stoul(placeholderIndex) == 0) {
+            unsigned long index;
+            if (!Utils::convertToUnsignedLong(placeholderIndex, index) || index < 1) {
+                RESMGR_HILOGE(RESMGR_TAG, "convert value error, placeholderIndex = %{public}s",
+                    placeholderIndex.c_str());
                 return false;
             }
-            paramIndex = std::stoul(placeholderIndex) - 1;
+            paramIndex = index - 1;
             paramsWithNum.push_back({paramIndex, placeholderType});
         } else {
             paramIndex = matchCount++;
@@ -173,23 +176,15 @@ bool parseArgs(const std::string &inputOutputValue, va_list args,
     return getJsParams(inputOutputValue, args, paramsWithOutNum, paramsWithNum, jsParams);
 }
 
-bool LocalizeNumber(std::string &inputOutputNum, const ResConfigImpl &resConfig,
-    const int32_t precision = INVALID_PRECISION)
+std::string GetLocalInfo(const ResLocale *resLocale)
 {
-#ifdef SUPPORT_GRAPHICS
-    const ResLocale *resLocale = resConfig.GetResLocale();
-    if (resLocale == nullptr) {
-        RESMGR_HILOGW(RESMGR_TAG, "LocalizeNumber resLocale is null");
-        return true;
-    }
-
     std::string localeInfo;
     const char *language = resLocale->GetLanguage();
     if (language != nullptr && strlen(language) > 0) {
         localeInfo.assign(language);
     } else {
-        RESMGR_HILOGW(RESMGR_TAG, "LocalizeNumber language is null");
-        return true;
+        RESMGR_HILOGW(RESMGR_TAG, "GetLocalInfo language is null");
+        return localeInfo;
     }
     std::string temp;
     const char *script = resLocale->GetScript();
@@ -202,7 +197,23 @@ bool LocalizeNumber(std::string &inputOutputNum, const ResConfigImpl &resConfig,
         temp.assign(region);
         localeInfo += "-" + temp;
     }
+    return localeInfo;
+}
 
+bool LocalizeNumber(std::string &inputOutputNum, const ResConfigImpl &resConfig,
+    const int32_t precision = INVALID_PRECISION)
+{
+#ifdef SUPPORT_GRAPHICS
+    const ResLocale *resLocale = resConfig.GetResLocale();
+    if (resLocale == nullptr) {
+        RESMGR_HILOGW(RESMGR_TAG, "LocalizeNumber resLocale is null");
+        return true;
+    }
+
+    std::string localeInfo = GetLocalInfo(resLocale);
+    if (localeInfo.empty()) {
+        return true;
+    }
     icu::Locale locale(localeInfo.c_str());
     if (locale.isBogus()) {
         return true;
@@ -214,9 +225,12 @@ bool LocalizeNumber(std::string &inputOutputNum, const ResConfigImpl &resConfig,
     if (precision != INVALID_PRECISION) {
         numberFormat = numberFormat.precision(icu::number::Precision::fixedFraction(precision));
     }
-    UErrorCode status = U_ZERO_ERROR;
-    double num = std::stod(inputOutputNum);
+    double num;
+    if (!Utils::convertToDouble(inputOutputNum, num)) {
+        return false;
+    }
     inputOutputNum.clear();
+    UErrorCode status = U_ZERO_ERROR;
     numberFormat.formatDouble(num, status).toString(status).toUTF8String(inputOutputNum);
     if (status == U_ZERO_ERROR) {
         RESMGR_HILOGE(RESMGR_TAG, "LocalizeNumber failed, status = %{public}d", status);
@@ -270,10 +284,11 @@ bool MatchPlaceholderIndex(std::string placeholderIndex, size_t &paramIndex, siz
             RESMGR_HILOGE(RESMGR_TAG, "index of placeholder is too large");
             return false;
         }
-        if (std::stoul(placeholderIndex) < 1) {
+        unsigned long index;
+        if (!Utils::convertToUnsignedLong(placeholderIndex, index) || index < 1) {
             return false;
         }
-        paramIndex = std::stoul(placeholderIndex) - 1;
+        paramIndex = index - 1;
     } else {
         paramIndex = matchCount++;
     }

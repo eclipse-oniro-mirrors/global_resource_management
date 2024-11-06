@@ -14,6 +14,9 @@
  */
 #include "utils/utils.h"
 
+#include <cstdlib>
+#include <cerrno>
+#include <climits>
 #include <fstream>
 #include <vector>
 #include <sys/stat.h>
@@ -36,6 +39,7 @@ namespace OHOS {
 namespace Global {
 namespace Resource {
 constexpr int ERROR_RESULT = -1;
+constexpr int CONVERT_BASE = 10;
 
 const std::set<std::string> Utils::tailSet {
     ".hap",
@@ -258,7 +262,7 @@ uint32_t Utils::EncodeScriptByResLocale(const ResLocale *locale)
 
 uint16_t Utils::EncodeRegion(const char *region)
 {
-    if (Utils::IsStrEmpty(region)) {
+    if (Utils::IsStrEmpty(region) || StrLen(region) < 1) {
         return NULL_REGION;
     }
     if (region[0] >= '0' && region[0] <= '9') {
@@ -279,7 +283,7 @@ uint16_t Utils::EncodeRegion(const char *region)
  */
 uint32_t Utils::EncodeScript(const char *script)
 {
-    if (Utils::IsStrEmpty(script)) {
+    if (Utils::IsStrEmpty(script) || StrLen(script) < ArrayLen::LEN_FOUR) {
         return NULL_SCRIPT;
     }
     return ((uint8_t)script[ArrayIndex::INDEX_ZERO] << BitOperatorNum::BIT_TWENTY_FOUR) |
@@ -505,6 +509,51 @@ RState Utils::GetFiles(const std::string &strCurrentDir, std::vector<std::string
     closedir(dir);
 #endif
     return SUCCESS;
+}
+
+bool Utils::IsValidValue(const char* end, const std::string& str)
+{
+    if (end == str.c_str() || errno == ERANGE || *end != '\0') {
+        RESMGR_HILOGE(RESMGR_TAG, "invalid value = %{public}s, errno = %{public}d", str.c_str(), errno);
+        return false;
+    }
+    return true;
+}
+
+bool Utils::convertToInteger(const std::string& str, int& outValue)
+{
+    char* end;
+    errno = 0;
+    long value = std::strtol(str.c_str(), &end, CONVERT_BASE);
+    if (!IsValidValue(end, str)) {
+        return false;
+    }
+    outValue = static_cast<int>(value);
+    return true;
+}
+
+bool Utils::convertToUnsignedLong(const std::string& str, unsigned long& outValue)
+{
+    char* end;
+    errno = 0;
+    unsigned long value = std::strtoul(str.c_str(), &end, CONVERT_BASE);
+    if (!IsValidValue(end, str)) {
+        return false;
+    }
+    outValue = value;
+    return true;
+}
+
+bool Utils::convertToDouble(const std::string& str, double& outValue)
+{
+    char* end;
+    errno = 0;
+    double value = std::strtod(str.c_str(), &end);
+    if (!IsValidValue(end, str)) {
+        return false;
+    }
+    outValue = value;
+    return true;
 }
 } // namespace Resource
 } // namespace Global
