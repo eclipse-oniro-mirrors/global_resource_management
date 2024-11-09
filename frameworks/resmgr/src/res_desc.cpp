@@ -224,7 +224,7 @@ bool IdItem::HaveParent() const
     return (values_.size() % 2 == 1); // Taking the remainder of 2 to determine the existence of a parent node
 }
 
-bool IdItem::IsRef(const std::string &value, ResType &resType, int &id)
+bool IdItem::IsRef(const std::string &value, ResType &resType, uint32_t &id)
 {
     const char *it = value.c_str();
     const char *st = it;
@@ -240,11 +240,11 @@ bool IdItem::IsRef(const std::string &value, ResType &resType, int &id)
     typeStr.assign(it + 1, index - 1);
     idStr.assign(it + index + 1, value.size() - index);
 
-    int idd = atoi(idStr.c_str());
-    if (idd <= 0) {
+    unsigned long tmpId;
+    if (!Utils::convertToUnsignedLong(idStr, tmpId)) {
         return false;
     }
-
+    uint32_t idd = static_cast<uint32_t>(tmpId);
     for (auto iit = resTypeStrList.begin(); iit != resTypeStrList.end(); ++iit) {
         auto tValue = iit->second;
         auto type = iit->first;

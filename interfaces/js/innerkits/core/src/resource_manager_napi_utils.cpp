@@ -110,7 +110,7 @@ std::string ResourceManagerNapiUtils::GetResNameOrPath(napi_env env, size_t argc
     return buf.data();
 }
 
-int ResourceManagerNapiUtils::GetResId(napi_env env, size_t argc, napi_value *argv)
+uint32_t ResourceManagerNapiUtils::GetResId(napi_env env, size_t argc, napi_value *argv)
 {
     if (argc == 0 || argv == nullptr) {
         return 0;
@@ -126,14 +126,14 @@ int ResourceManagerNapiUtils::GetResId(napi_env env, size_t argc, napi_value *ar
         RESMGR_HILOGE(RESMGR_JS_TAG, "Invalid param, not number");
         return 0;
     }
-    int resId = 0;
-    status = napi_get_value_int32(env, argv[ARRAY_SUBCRIPTOR_ZERO], &resId);
+    int64_t resId = 0;
+    status = napi_get_value_int64(env, argv[ARRAY_SUBCRIPTOR_ZERO], &resId);
     if (status != napi_ok) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get id number");
         return 0;
     }
 
-    return resId;
+    return static_cast<uint32_t>(resId);
 }
 
 std::string ResourceManagerNapiUtils::FindErrMsg(int32_t errCode)
@@ -358,13 +358,13 @@ bool ResourceManagerNapiUtils::GetResourceObjectId(napi_env env,
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resource id number");
         return false;
     }
-    int32_t resId = 0;
-    status = napi_get_value_int32(env, id, &resId);
+    int64_t resId = 0;
+    status = napi_get_value_int64(env, id, &resId);
     if (status != napi_ok) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resource id value");
         return false;
     }
-    resourcePtr->id = resId;
+    resourcePtr->id = static_cast<uint32_t>(resId);
     return true;
 }
 
@@ -392,7 +392,7 @@ int32_t ResourceManagerNapiUtils::GetResourceObject(napi_env env,
 }
 
 bool ResourceManagerNapiUtils::GetHapResourceManager(const ResMgrDataContext* dataContext,
-    std::shared_ptr<ResourceManager> &resMgr, int32_t &resId)
+    std::shared_ptr<ResourceManager> &resMgr, uint32_t &resId)
 {
     std::shared_ptr<ResourceManager::Resource> resource = dataContext->resource_;
     // In fa module, resource is null.

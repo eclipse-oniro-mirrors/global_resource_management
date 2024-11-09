@@ -406,7 +406,7 @@ napi_value ResourceManagerNapiAsyncImpl::ProcessNoParam(napi_env env, napi_callb
 auto getStringFunc = [](napi_env env, void* data) {
     ResMgrDataContext *dataContext = static_cast<ResMgrDataContext*>(data);
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
 
     bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext, resMgr, resId);
     if (!ret) {
@@ -466,7 +466,7 @@ napi_value ResourceManagerNapiAsyncImpl::GetStringByName(napi_env env, napi_call
 auto getStringArrayFunc = [](napi_env env, void* data) {
     ResMgrDataContext *dataContext = static_cast<ResMgrDataContext*>(data);
     RState state;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     if (dataContext->resId_ != 0 || dataContext->resource_ != nullptr) {
         bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext, resMgr, resId);
@@ -521,7 +521,7 @@ napi_value ResourceManagerNapiAsyncImpl::GetStringArrayByName(napi_env env, napi
 auto getMediaFunc = [](napi_env env, void *data) {
     ResMgrDataContext *dataContext = static_cast<ResMgrDataContext*>(data);
     std::string path;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext, resMgr, resId);
     if (!ret) {
@@ -565,7 +565,7 @@ auto getMediaBase64Func = [](napi_env env, void *data) {
     std::string path;
     RState state;
     if (dataContext->resId_ != 0 || dataContext->resource_ != nullptr) {
-        int32_t resId = 0;
+        uint32_t resId = 0;
         std::shared_ptr<ResourceManager> resMgr = nullptr;
         bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext, resMgr, resId);
         if (!ret) {
@@ -629,7 +629,7 @@ auto getPluralCapFunc = [](napi_env env, void *data) {
     ResMgrDataContext *dataContext = static_cast<ResMgrDataContext*>(data);
     RState state;
     if (dataContext->resId_ != 0 || dataContext->resource_ != nullptr) {
-        int32_t resId = 0;
+        uint32_t resId = 0;
         std::shared_ptr<ResourceManager> resMgr = nullptr;
         bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext, resMgr, resId);
         if (!ret) {
@@ -813,7 +813,7 @@ napi_value ResourceManagerNapiAsyncImpl::GetRawFileList(napi_env env, napi_callb
 auto getColorFunc = [](napi_env env, void* data) {
     ResMgrDataContext *dataContext = static_cast<ResMgrDataContext*>(data);
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
 
     if (!ResourceManagerNapiUtils::GetHapResourceManager(dataContext, resMgr, resId)) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to GetHapResourceManager in getColorFunc");

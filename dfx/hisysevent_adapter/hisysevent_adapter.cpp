@@ -33,7 +33,7 @@ void ReportInitResourceManagerFail(const std::string& bundleName, const std::str
     }
 }
 
-void ReportGetResourceByIdFail(int32_t resId, const std::string& result, const std::string& errMsg)
+void ReportGetResourceByIdFail(uint32_t resId, const std::string& result, const std::string& errMsg)
 {
     int ret = HiSysEventWrite(HiSysEventNameSpace::Domain::GLOBAL_RESMGR, "GET_RES_BY_ID_FAILED",
         HiSysEventNameSpace::EventType::BEHAVIOR,
@@ -42,7 +42,7 @@ void ReportGetResourceByIdFail(int32_t resId, const std::string& result, const s
         "ERROR_MSG", errMsg);
     if (ret != 0) {
         RESMGR_HILOGE(RESMGR_TAG,
-            "HiSysEventWrite failed! ret %{public}d, resId %{public}d, result %{public}s, errMsg %{public}s.",
+            "HiSysEventWrite failed! ret %{public}d, resId %{public}u, result %{public}s, errMsg %{public}s.",
             ret, resId, result.c_str(), errMsg.c_str());
     }
 }
