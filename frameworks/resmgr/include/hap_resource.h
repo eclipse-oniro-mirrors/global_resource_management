@@ -15,6 +15,7 @@
 #ifndef RESOURCE_MANAGER_HAPRESOURCE_H
 #define RESOURCE_MANAGER_HAPRESOURCE_H
 
+#include <filesystem>
 #include <map>
 #include <string>
 #include <time.h>
@@ -171,6 +172,26 @@ public:
      * Get the resource information
      */
     const std::vector<std::string> GetQualifiers() const;
+
+    /**
+     * Get resource update time.
+     *
+     * @return ressource update time.
+     */
+    inline time_t GetLastModTime()
+    {
+        return lastModTime_;
+    }
+
+    /**
+     * Set resource time.
+     *
+     * @param lastModTime resource last mod time
+     */
+    inline void SetLastModTime(time_t lastModTime)
+    {
+        lastModTime_ = lastModTime;
+    }
 
     /**
      * Describe limitpath and value under the path

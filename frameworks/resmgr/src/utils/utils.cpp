@@ -555,6 +555,13 @@ bool Utils::convertToDouble(const std::string& str, double& outValue)
     outValue = value;
     return true;
 }
+
+time_t Utils::ConvertTime(std::filesystem::file_time_type fileTime)
+{
+    auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(fileTime -
+        std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
+    return std::chrono::system_clock::to_time_t(sctp);
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
