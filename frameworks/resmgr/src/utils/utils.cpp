@@ -20,6 +20,8 @@
 #include <fstream>
 #include <vector>
 #include <sys/stat.h>
+#include <cstdio>
+#include <fcntl.h>
 #include "hilog_wrapper.h"
 #ifdef __LINUX__
 #include <cstring>
@@ -40,7 +42,10 @@ namespace Global {
 namespace Resource {
 constexpr int ERROR_RESULT = -1;
 constexpr int CONVERT_BASE = 10;
-
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+constexpr uint32_t RES_FD_DOMAIN = 0xD001E00;
+const uint32_t RES_FD_TAG = fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, RES_FD_DOMAIN);
+#endif
 const std::set<std::string> Utils::tailSet {
     ".hap",
     ".hsp",
@@ -555,6 +560,26 @@ bool Utils::convertToDouble(const std::string& str, double& outValue)
     outValue = value;
     return true;
 }
+
+int Utils::Open(const char* filename, int flag)
+{
+    int fd = open(filename, flag);
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    if (fd > 0) {
+        fdsan_exchange_owner_tag(fd, 0, RES_FD_TAG);
+    }
+#endif
+    return fd;
+};
+
+int Utils::Close(int fd)
+{
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    return fdsan_close_with_tag(fd, RES_FD_TAG);
+#else
+    return close(fd);
+#endif
+};
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
