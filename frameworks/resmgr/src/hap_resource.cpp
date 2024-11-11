@@ -455,7 +455,7 @@ const std::vector<std::string> HapResource::GetQualifiers() const
 uint32_t HapResource::GetResourceLimitKeys() const
 {
     uint32_t limitKeyValue = 0;
-    std::vector<bool> keyTypes(KeyType::KEY_TYPE_MAX - 1, false);
+    std::vector<bool> keyTypes(KeyType::KEY_TYPE_MAX, false);
     for (auto iter = idValuesMap_.begin(); iter != idValuesMap_.end(); iter++) {
         if (iter->second == nullptr) {
             continue;
