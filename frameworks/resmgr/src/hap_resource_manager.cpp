@@ -15,7 +15,6 @@
 
 #include "hap_resource_manager.h"
 #include "hilog_wrapper.h"
-#include "utils/utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -41,8 +40,7 @@ std::shared_ptr<HapResource> HapResourceManager::PutAndGetResource(const std::st
     auto iter = hapResourceMap_.find(path);
     if (iter != hapResourceMap_.end()) {
         auto res = iter->second.lock();
-        auto fileTime = std::filesystem::last_write_time(path);
-        if (res && res->GetLastModTime() == Utils::ConvertTime(fileTime)) {
+        if (res) {
             return res;
         }
     }

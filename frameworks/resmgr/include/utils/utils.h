@@ -16,7 +16,6 @@
 #define OHOS_RESOURCE_MANAGER_UTILS_H
 #include <cstddef>
 #include <cstdint>
-#include <filesystem>
 #include "res_locale.h"
 #include "rstate.h"
 #include <dirent.h>
@@ -116,8 +115,6 @@ public:
     static bool convertToUnsignedLong(const std::string& str, unsigned long& outValue);
 
     static bool convertToDouble(const std::string& str, double& outValue);
-
-    static time_t ConvertTime(std::filesystem::file_time_type fileTime);
 private:
     static bool IsValidValue(const char* end, const std::string& str);
     static uint16_t EncodeLanguageOrRegion(const char *str, char base);
