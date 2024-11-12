@@ -79,11 +79,9 @@ const std::shared_ptr<HapResource> HapResource::Load(const char *path,
     std::shared_ptr<ResConfigImpl> &defaultConfig, bool isSystem, bool isOverlay, const uint32_t &selectedTypes)
 {
     std::shared_ptr<HapResource> pResource;
-    auto fileTime = std::filesystem::last_write_time(path);
-    time_t fileTimeT = Utils::ConvertTime(fileTime);
     if (selectedTypes == SELECT_ALL) {
         pResource = HapResourceManager::GetInstance()->GetHapResource(path);
-        if (pResource && pResource->GetLastModTime() == fileTimeT) {
+        if (pResource) {
             return pResource;
         }
     }
@@ -94,7 +92,6 @@ const std::shared_ptr<HapResource> HapResource::Load(const char *path,
     }
     if (pResource != nullptr && selectedTypes == SELECT_ALL) {
         pResource = HapResourceManager::GetInstance()->PutAndGetResource(path, pResource);
-        pResource->SetLastModTime(fileTimeT);
     }
     return pResource;
 }
