@@ -26,7 +26,7 @@ struct ResMgrDataContext {
     napi_async_work work_;
 
     std::string bundleName_;
-    int32_t resId_;
+    uint32_t resId_;
     int32_t param_;
 
     std::string path_;

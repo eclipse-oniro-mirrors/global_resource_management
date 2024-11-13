@@ -427,7 +427,7 @@ RState ResourceManagerImpl::GetPluralString(const std::shared_ptr<HapResource::V
 
 RState ResourceManagerImpl::ResolveReference(const std::string value, std::string &outValue)
 {
-    int id;
+    uint32_t id;
     ResType resType;
     bool isRef = true;
     int count = 0;
@@ -517,7 +517,7 @@ RState ResourceManagerImpl::ResolveParentReference(const std::shared_ptr<IdItem>
         }
         if (haveParent) {
             // get parent
-            int id;
+            uint32_t id;
             ResType resType;
             bool isRef = IdItem::IsRef(currItem->values_[0], resType, id);
             if (!isRef) {
@@ -797,7 +797,7 @@ RState ResourceManagerImpl::GetInteger(const std::shared_ptr<IdItem> idItem, int
 RState ResourceManagerImpl::ProcessReference(const std::string value,
     std::vector<std::shared_ptr<IdItem>> &idItems)
 {
-    int id;
+    uint32_t id;
     ResType resType;
     bool isRef = true;
     int count = 0;

@@ -85,7 +85,7 @@ public:
      * @param id      when return true, set id. as sample : 16777225
      * @return        true: value is ref
      */
-    static bool IsRef(const std::string &value, ResType &resType, int &id);
+    static bool IsRef(const std::string &value, ResType &resType, uint32_t &id);
 
     std::string ToString() const;
 

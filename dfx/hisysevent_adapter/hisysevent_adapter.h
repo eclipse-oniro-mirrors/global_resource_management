@@ -23,7 +23,7 @@ namespace Global {
 namespace Resource {
 void ReportInitResourceManagerFail(const std::string& bundleName, const std::string& errMsg);
 
-void ReportGetResourceByIdFail(int32_t resId, const std::string& result, const std::string& errMsg);
+void ReportGetResourceByIdFail(uint32_t resId, const std::string& result, const std::string& errMsg);
 
 void ReportGetResourceByNameFail(const std::string& resName, const std::string& result, const std::string& errMsg);
 
