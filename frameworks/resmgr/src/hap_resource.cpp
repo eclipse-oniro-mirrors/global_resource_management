@@ -19,6 +19,7 @@
 #include <climits>
 #include <cstdlib>
 #include <fstream>
+#include <sys/stat.h>
 #include "utils/utils.h"
 #include <set>
 #ifdef __WINNT__
@@ -79,9 +80,11 @@ const std::shared_ptr<HapResource> HapResource::Load(const char *path,
     std::shared_ptr<ResConfigImpl> &defaultConfig, bool isSystem, bool isOverlay, const uint32_t &selectedTypes)
 {
     std::shared_ptr<HapResource> pResource;
+    struct stat fileStat {};
+    int ret = stat(path, &fileStat);
     if (selectedTypes == SELECT_ALL) {
         pResource = HapResourceManager::GetInstance()->GetHapResource(path);
-        if (pResource) {
+        if (pResource && ret == 0 && fileStat.st_mtime == pResource->GetLastModTime()) {
             return pResource;
         }
     }
@@ -91,6 +94,7 @@ const std::shared_ptr<HapResource> HapResource::Load(const char *path,
         pResource = LoadFromIndex(path, defaultConfig, isSystem, isOverlay, selectedTypes);
     }
     if (pResource != nullptr && selectedTypes == SELECT_ALL) {
+        pResource->SetLastModTime(fileStat.st_mtime);
         pResource = HapResourceManager::GetInstance()->PutAndGetResource(path, pResource);
     }
     return pResource;
