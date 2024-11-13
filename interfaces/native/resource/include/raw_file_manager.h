@@ -32,6 +32,8 @@
  *
  * You can use the resource manager to open raw files for subsequent operations, such as seeking and reading.
  *
+ * @syscap SystemCapability.Global.ResourceManager
+ * @library librawfile.z.so
  * @since 8
  * @version 1.0
  */
