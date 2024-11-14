@@ -40,7 +40,7 @@ std::shared_ptr<HapResource> HapResourceManager::PutAndGetResource(const std::st
     auto iter = hapResourceMap_.find(path);
     if (iter != hapResourceMap_.end()) {
         auto res = iter->second.lock();
-        if (res) {
+        if (res && res->GetLastModTime() == pResource->GetLastModTime()) {
             return res;
         }
     }

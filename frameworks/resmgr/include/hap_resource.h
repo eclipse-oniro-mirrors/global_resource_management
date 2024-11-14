@@ -173,6 +173,26 @@ public:
     const std::vector<std::string> GetQualifiers() const;
 
     /**
+     * Get resource last mod time.
+     *
+     * @return the resource last mod time.
+     */
+    inline time_t GetLastModTime()
+    {
+        return lastModTime_;
+    }
+
+    /**
+     * Set resource last mod time.
+     *
+     * @param lastModTime resource last mod time
+    */
+    inline void SetLastModTime(time_t lastModTime)
+    {
+        lastModTime_ = lastModTime;
+    }
+
+    /**
      * Describe limitpath and value under the path
      */
     class ValueUnderQualifierDir {
