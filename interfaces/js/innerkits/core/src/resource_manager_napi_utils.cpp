@@ -128,7 +128,7 @@ uint32_t ResourceManagerNapiUtils::GetResId(napi_env env, size_t argc, napi_valu
     }
     int64_t resId = 0;
     status = napi_get_value_int64(env, argv[ARRAY_SUBCRIPTOR_ZERO], &resId);
-    if (status != napi_ok) {
+    if (status != napi_ok || resId < 0 || resId > UINT32_MAX) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get id number");
         return 0;
     }
@@ -360,7 +360,11 @@ bool ResourceManagerNapiUtils::GetResourceObjectId(napi_env env,
     }
     int64_t resId = 0;
     status = napi_get_value_int64(env, id, &resId);
-    if (status != napi_ok) {
+    if (resId == -1) {
+        resourcePtr->id = 0;
+        return true;
+    }
+    if (status != napi_ok || resId < 0 || resId > UINT32_MAX) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resource id value");
         return false;
     }
