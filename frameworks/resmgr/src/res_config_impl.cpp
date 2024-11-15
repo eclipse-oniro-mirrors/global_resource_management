@@ -68,10 +68,15 @@ RState ResConfigImpl::SetPreferredLocaleInfo(Locale &preferredLocaleInfo)
     const char *script = preferredLocaleInfo.getScript();
     const char *region = preferredLocaleInfo.getCountry();
     if (Utils::IsStrEmpty(language)) {
-        delete this->resPreferredLocale_;
-        delete this->preferredLocaleInfo_;
-        this->resPreferredLocale_ = nullptr;
-        this->preferredLocaleInfo_ = nullptr;
+        if (this->resPreferredLocale_ != nullptr) {
+            delete this->resPreferredLocale_;
+            this->resPreferredLocale_ = nullptr;
+        }
+
+        if (this->preferredLocaleInfo_ != nullptr) {
+            delete this->preferredLocaleInfo_;
+            this->preferredLocaleInfo_ = nullptr;
+        }
         return SUCCESS;
     }
     RState state = BuildResLocale(language, script, region, &this->resPreferredLocale_);
@@ -101,7 +106,10 @@ RState ResConfigImpl::BuildResLocale(const char *language, const char *script,
             return NOT_ENOUGH_MEM;
         }
     }
-    delete *resLocale;
+    if (*resLocale != nullptr) {
+        delete *resLocale;
+        *resLocale = nullptr;
+    }
     *resLocale = temp;
     return state;
 }
@@ -114,7 +122,10 @@ RState ResConfigImpl::BuildLocaleInfo(const ResLocale *resLocale, Locale **local
     if (!U_SUCCESS(errCode)) {
         return NOT_ENOUGH_MEM;
     }
-    delete *localeInfo;
+    if (*localeInfo != nullptr) {
+        delete *localeInfo;
+        *localeInfo = nullptr;
+    }
     *localeInfo = new Locale(temp);
     return SUCCESS;
 }

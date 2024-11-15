@@ -450,6 +450,10 @@ int HapResource::GetIdByName(const char *name, const ResType resType) const
 const std::vector<std::string> HapResource::GetQualifiers() const
 {
     std::vector<std::string> result;
+    if (resDesc_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "resDesc_ is null! GetQualifiers failed");
+        return result;
+    }
     for (size_t i = 0; i < resDesc_->keys_.size(); i++) {
         result.push_back(resDesc_->keys_[i]->ToString());
     }
@@ -493,6 +497,10 @@ uint32_t HapResource::GetLimitPathsKeys(const std::vector<std::shared_ptr<ValueU
 
 void HapResource::GetLocales(std::set<std::string> &outValue, bool includeSystem)
 {
+    if (resDesc_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "resDesc_ is null! GetLocales failed");
+        return;
+    }
     if ((!includeSystem && isSystem_) || (!isSystem_ && isOverlay_)) {
         return;
     }

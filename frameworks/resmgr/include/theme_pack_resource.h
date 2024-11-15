@@ -166,6 +166,7 @@ private:
     std::vector<std::tuple<ResType, std::string, std::shared_ptr<ThemeValue>> > themeValueVec_;
     std::vector<std::pair<ThemeKey, std::string> > iconValues_;
     void ParseJson(const std::string &bundleName, const std::string &moduleName, const std::string &jsonPath);
+    void ReleaseJson(char* jsonData, FILE* pf);
     void ParseIcon(const std::string &bundleName, const std::string &moduleName, const std::string &iconPath);
     void InitThemeRes(std::pair<std::string, std::string> bundleInfo, cJSON *root,
         std::shared_ptr<ThemeConfig> themeConfig, const std::string &resTypeStr);
