@@ -241,7 +241,7 @@ bool IdItem::IsRef(const std::string &value, ResType &resType, uint32_t &id)
     idStr.assign(it + index + 1, value.size() - index);
 
     unsigned long tmpId;
-    if (!Utils::convertToUnsignedLong(idStr, tmpId)) {
+    if (!Utils::convertToUnsignedLong(idStr, tmpId) || tmpId > UINT32_MAX) {
         return false;
     }
     uint32_t idd = static_cast<uint32_t>(tmpId);
