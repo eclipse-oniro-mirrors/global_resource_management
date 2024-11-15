@@ -32,6 +32,8 @@
  *
  * For example, you can use the functions to traverse and close a raw file directory, and reset its index.
  *
+ * @syscap SystemCapability.Global.ResourceManager
+ * @library librawfile.z.so
  * @since 8
  * @version 1.0
  */
