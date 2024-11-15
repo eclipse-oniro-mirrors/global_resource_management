@@ -48,6 +48,7 @@ typedef struct ResHeader {
 class IdItem {
 public:
     static const uint32_t HEADER_LEN = 12;
+    static const uint32_t SIZE_LEN = 2;
 
     /**
      * Whether the resType is array or not

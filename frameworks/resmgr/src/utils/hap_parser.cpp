@@ -60,6 +60,13 @@ static const std::unordered_map<ResType, uint32_t> TYPE_MAP {
     {SYMBOL, SELECT_SYMBOL}
 };
 
+struct SelectOptions {
+    bool match = true;
+    std::shared_ptr<ResConfigImpl> defaultConfig;
+    std::string deviceType;
+    uint32_t selectedTypes = SELECT_ALL;
+};
+
 int32_t LocateFile(unzFile &uf, const char *fileName)
 {
     if (unzLocateFile2(uf, fileName, 1)) { // try to locate file inside zip, 1 = case sensitive
@@ -386,18 +393,28 @@ RState HapParser::GetRawFileListUnCompressed(const std::string &indexPath, const
  *
  * @param buffer
  * @param offset
+ * @param bufLen
  * @param id
  * @param includeTemi dose length include '\0'
  * @return OK or ERROR
  */
-int32_t ParseString(const char *buffer, uint32_t &offset, std::string &id, bool includeTemi = true)
+int32_t ParseString(const char *buffer, uint32_t &offset, const size_t &bufLen, std::string &id,
+    bool includeTemi = true)
 {
     uint16_t strLen;
-    errno_t eret = memcpy_s(&strLen, sizeof(strLen), buffer + offset, 2);
+    if (offset + IdItem::SIZE_LEN > bufLen) {
+        RESMGR_HILOGE(RESMGR_TAG, "ParseString length failed, the offset will be out of bounds");
+        return SYS_ERROR;
+    }
+    errno_t eret = memcpy_s(&strLen, sizeof(strLen), buffer + offset, IdItem::SIZE_LEN);
     if (eret != OK || (includeTemi && strLen == 0)) {
         return SYS_ERROR;
     }
-    offset += 2; // Offset value plus 2
+    offset += IdItem::SIZE_LEN; // Offset value plus 2
+    if (offset + (includeTemi ? (strLen - 1) : strLen) > bufLen) {
+        RESMGR_HILOGE(RESMGR_TAG, "ParseString value failed, the offset will be out of bounds");
+        return SYS_ERROR;
+    }
     std::string tmp = std::string(const_cast<char *>(buffer) + offset, includeTemi ? (strLen - 1) : strLen);
     offset += includeTemi ? strLen : (strLen + 1);
     id = tmp;
@@ -408,22 +425,27 @@ int32_t ParseString(const char *buffer, uint32_t &offset, std::string &id, bool 
  *
  * @param buffer
  * @param offset
+ * @param bufLen
  * @param values
  * @return
  */
-int32_t ParseStringArray(const char *buffer, uint32_t &offset, std::vector<std::string> &values)
+int32_t ParseStringArray(const char *buffer, uint32_t &offset, const size_t &bufLen, std::vector<std::string> &values)
 {
     uint16_t arrLen;
-    errno_t eret = memcpy_s(&arrLen, sizeof(arrLen), buffer + offset, 2);
+    if (offset + IdItem::SIZE_LEN > bufLen) {
+        RESMGR_HILOGE(RESMGR_TAG, "ParseStringArray failed, the offset will be out of bounds");
+        return SYS_ERROR;
+    }
+    errno_t eret = memcpy_s(&arrLen, sizeof(arrLen), buffer + offset, IdItem::SIZE_LEN);
     if (eret != OK) {
         return SYS_ERROR;
     }
-    offset += 2; // Offset value plus 2
+    offset += IdItem::SIZE_LEN; // Offset value plus 2
     // next arrLen bytes are several strings. then after, is one '\0'
     uint32_t startOffset = offset;
     std::string value;
     while (true) {
-        int32_t ret = ParseString(buffer, offset, value, false);
+        int32_t ret = ParseString(buffer, offset, bufLen, value, false);
         if (ret != OK) {
             return ret;
         }
@@ -452,8 +474,13 @@ uint32_t ConvertType(ResType type)
     return it->second;
 }
 
-int32_t ParseIdItem(const char *buffer, uint32_t &offset, std::shared_ptr<IdItem> idItem, const uint32_t &selectedTypes)
+int32_t ParseIdItem(const char *buffer, uint32_t &offset, const size_t &bufLen, std::shared_ptr<IdItem> idItem,
+    const uint32_t &selectedTypes)
 {
+    if (offset + IdItem::HEADER_LEN > bufLen) {
+        RESMGR_HILOGE(RESMGR_TAG, "Parse IdItemHeader failed, the offset will be out of bounds");
+        return SYS_ERROR;
+    }
     errno_t eret = memcpy_s(idItem.get(), sizeof(IdItem), buffer + offset, IdItem::HEADER_LEN);
     if (eret != OK) {
         return SYS_ERROR;
@@ -465,26 +492,31 @@ int32_t ParseIdItem(const char *buffer, uint32_t &offset, std::shared_ptr<IdItem
 
     idItem->JudgeArray();
     if (idItem->isArray_) {
-        int32_t ret = ParseStringArray(buffer, offset, idItem->values_);
+        int32_t ret = ParseStringArray(buffer, offset, bufLen, idItem->values_);
         if (ret != OK) {
             return ret;
         }
     } else {
-        int32_t ret = ParseString(buffer, offset, idItem->value_);
+        int32_t ret = ParseString(buffer, offset, bufLen, idItem->value_);
         if (ret != OK) {
             return ret;
         }
         idItem->valueLen_ = idItem->value_.size();
     }
-    int32_t ret = ParseString(buffer, offset, idItem->name_);
+    int32_t ret = ParseString(buffer, offset, bufLen, idItem->name_);
     if (ret != OK) {
         return ret;
     }
     return OK;
 }
 
-int32_t ParseId(const char *buffer, uint32_t &offset, std::shared_ptr<ResId> id, const uint32_t &selectedTypes)
+int32_t ParseId(const char *buffer, uint32_t &offset, const size_t &bufLen, std::shared_ptr<ResId> id,
+    const uint32_t &selectedTypes)
 {
+    if (offset + ResId::RESID_HEADER_LEN > bufLen) {
+        RESMGR_HILOGE(RESMGR_TAG, "Parse ResIdHeader failed, the offset will be out of bounds");
+        return SYS_ERROR;
+    }
     errno_t eret = memcpy_s(id.get(), sizeof(ResId), buffer + offset, ResId::RESID_HEADER_LEN);
     if (eret != OK) {
         return SYS_ERROR;
@@ -500,6 +532,10 @@ int32_t ParseId(const char *buffer, uint32_t &offset, std::shared_ptr<ResId> id,
             RESMGR_HILOGE(RESMGR_TAG, "new IdParam failed when ParseId");
             return SYS_ERROR;
         }
+        if (offset + ResId::IDPARAM_HEADER_LEN > bufLen) {
+            RESMGR_HILOGE(RESMGR_TAG, "Parse IdParam failed, the offset will be out of bounds");
+            return SYS_ERROR;
+        }
         errno_t eret = memcpy_s(ip.get(), sizeof(IdParam), buffer + offset, ResId::IDPARAM_HEADER_LEN);
         if (eret != OK) {
             return SYS_ERROR;
@@ -511,7 +547,7 @@ int32_t ParseId(const char *buffer, uint32_t &offset, std::shared_ptr<ResId> id,
             return SYS_ERROR;
         }
         uint32_t ipOffset = ip->offset_;
-        int32_t ret = ParseIdItem(buffer, ipOffset, idItem, selectedTypes);
+        int32_t ret = ParseIdItem(buffer, ipOffset, bufLen, idItem, selectedTypes);
         if (ret != OK) {
             return ret;
         }
@@ -539,9 +575,41 @@ bool IsLocaleMatch(const std::shared_ptr<ResConfigImpl> defaultConfig,
     return false;
 }
 
-int32_t ParseKey(const char *buffer, uint32_t &offset, std::shared_ptr<ResKey> key, bool &match,
-    const std::shared_ptr<ResConfigImpl> defaultConfig, const std::string &deviceType, const uint32_t &selectedTypes)
+int32_t ParseKeyParam(const char *buffer, uint32_t &offset, const size_t &bufLen,
+    SelectOptions *options, std::shared_ptr<KeyParam> &kp)
 {
+    kp = std::make_shared<KeyParam>();
+    if (kp == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "ParseKeyParam new KeyParam failed");
+        return SYS_ERROR;
+    }
+    if (offset + ResKey::KEYPARAM_HEADER_LEN > bufLen) {
+        RESMGR_HILOGE(RESMGR_TAG, "ParseKeyParam failed, the offset will be out of bounds");
+        return SYS_ERROR;
+    }
+    errno_t eret = memcpy_s(kp.get(), sizeof(KeyParam), buffer + offset, ResKey::KEYPARAM_HEADER_LEN);
+    if (eret != OK) {
+        return SYS_ERROR;
+    }
+    offset += ResKey::KEYPARAM_HEADER_LEN;
+    kp->InitStr();
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    auto resDeviceType = kp->GetDeviceTypeStr();
+    if (options->deviceType != DEVICE_DEFAULT && resDeviceType != NOT_DEVICE_TYPE &&
+        resDeviceType != options->deviceType) {
+        options->match = false;
+    }
+#endif
+    return OK;
+}
+
+int32_t ParseKey(const char *buffer, uint32_t &offset, const size_t &bufLen, std::shared_ptr<ResKey> key,
+    SelectOptions *options)
+{
+    if (offset + ResKey::RESKEY_HEADER_LEN > bufLen) {
+        RESMGR_HILOGE(RESMGR_TAG, "Parse ResKeyHeader failed, the offset will be out of bounds");
+        return SYS_ERROR;
+    }
     errno_t eret = memcpy_s(key.get(), sizeof(ResKey), buffer + offset, ResKey::RESKEY_HEADER_LEN);
     if (eret != OK) {
         return SYS_ERROR;
@@ -552,30 +620,20 @@ int32_t ParseKey(const char *buffer, uint32_t &offset, std::shared_ptr<ResKey> k
         return -1;
     }
     for (uint32_t i = 0; i < key->keyParamsCount_; ++i) {
-        std::shared_ptr<KeyParam> kp = std::make_shared<KeyParam>();
+        std::shared_ptr<KeyParam> kp;
+        if (ParseKeyParam(buffer, offset, bufLen, options, kp) != OK) {
+            return SYS_ERROR;
+        }
         if (kp == nullptr) {
-            RESMGR_HILOGE(RESMGR_TAG, "new KeyParam failed when ParseKey");
             return SYS_ERROR;
         }
-        errno_t eret = memcpy_s(kp.get(), sizeof(KeyParam), buffer + offset, ResKey::KEYPARAM_HEADER_LEN);
-        if (eret != OK) {
-            return SYS_ERROR;
-        }
-        offset += ResKey::KEYPARAM_HEADER_LEN;
-        kp->InitStr();
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-        auto resDeviceType = kp->GetDeviceTypeStr();
-        if (deviceType != DEVICE_DEFAULT && resDeviceType != NOT_DEVICE_TYPE && resDeviceType != deviceType) {
-            match = false;
-        }
-#endif
         key->keyParams_.push_back(kp);
     }
 
     key->resConfig_ = HapParser::CreateResConfigFromKeyParams(key->keyParams_);
-    if (match == false ||
-        (selectedTypes != SELECT_ALL && defaultConfig && !defaultConfig->Match(key->resConfig_, false))) {
-        match = false;
+    if (!options->match || (options->selectedTypes != SELECT_ALL && options->defaultConfig &&
+                            !options->defaultConfig->Match(key->resConfig_, false))) {
+        options->match = false;
         return OK;
     }
 
@@ -585,7 +643,7 @@ int32_t ParseKey(const char *buffer, uint32_t &offset, std::shared_ptr<ResKey> k
         RESMGR_HILOGE(RESMGR_TAG, "new ResId failed when ParseKey");
         return SYS_ERROR;
     }
-    int32_t ret = ParseId(buffer, idOffset, id, selectedTypes);
+    int32_t ret = ParseId(buffer, idOffset, bufLen, id, options->selectedTypes);
     if (ret != OK) {
         return ret;
     }
@@ -606,6 +664,10 @@ int32_t HapParser::ParseResHex(const char *buffer, const size_t bufLen, ResDesc 
         return SYS_ERROR;
     }
     uint32_t offset = 0;
+    if (offset + RES_HEADER_LEN > bufLen) {
+        RESMGR_HILOGE(RESMGR_TAG, "Parse ResHeader failed, the offset will be out of bounds");
+        return SYS_ERROR;
+    }
     errno_t eret = memcpy_s(resHeader, sizeof(ResHeader), buffer + offset, RES_HEADER_LEN);
     if (eret != OK) {
         delete (resHeader);
@@ -625,12 +687,12 @@ int32_t HapParser::ParseResHex(const char *buffer, const size_t bufLen, ResDesc 
             RESMGR_HILOGE(RESMGR_TAG, "new ResKey failed when ParseResHex");
             return SYS_ERROR;
         }
-        bool match = true;
-        int32_t ret = ParseKey(buffer, offset, key, match, defaultConfig, deviceType, selectedTypes);
+        SelectOptions selectOptions{true, defaultConfig, deviceType, selectedTypes};
+        int32_t ret = ParseKey(buffer, offset, bufLen, key, &selectOptions);
         if (ret != OK) {
             return ret;
         }
-        if (match) {
+        if (selectOptions.match) {
             resDesc.keys_.push_back(key);
         }
     }
