@@ -184,7 +184,7 @@ RawFile *LoadRawFileFromHap(const NativeResourceManager *mgr, const char *fileNa
     size_t len;
     std::unique_ptr<uint8_t[]> tmpBuf;
     RState state = mgr->resManager->GetRawFileFromHap(fileName, len, tmpBuf);
-    if (state != SUCCESS) {
+    if (state != SUCCESS || tmpBuf == nullptr) {
         RESMGR_HILOGD(RESMGR_RAWFILE_TAG, "failed to get %{public}s rawfile", fileName);
         return nullptr;
     }
@@ -200,6 +200,11 @@ RawFile *LoadRawFileFromHap(const NativeResourceManager *mgr, const char *fileNa
         return nullptr;
     }
     result->pf = fdopen(zipFd, "r");
+    if (result->pf == nullptr) {
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed open fd = %{public}d", zipFd);
+        close(zipFd);
+        return nullptr;
+    }
     result->length = static_cast<long>(len);
     result->resMgr = mgr;
     return result.release();
