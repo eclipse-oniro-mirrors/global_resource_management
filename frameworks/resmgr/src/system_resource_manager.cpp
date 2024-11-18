@@ -135,13 +135,14 @@ bool SystemResourceManager::LoadSystemResource(ResourceManagerImpl *impl, bool i
 void SystemResourceManager::ReleaseSystemResourceManager()
 {
     if (resourceManager_ != nullptr) {
+        RESMGR_HILOGI(RESMGR_TAG, "SystemResourceManager has been released");
+        return;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (resourceManager_ != nullptr) {
         delete resourceManager_;
-<<<<<<< HEAD
         resourceManager_ = nullptr;
-=======
-        resourceManager_ = nullptr
->>>>>>> 98b9ccc0a47c4460a8c5c729081bbddaa4df8d72
-        RESMGR_HILOGE(RESMGR_TAG, "ReleaseSystemResourceManager success");
+        RESMGR_HILOGI(RESMGR_TAG, "ReleaseSystemResourceManager success");
     }
 }
 } // namespace Resource
