@@ -136,7 +136,11 @@ void SystemResourceManager::ReleaseSystemResourceManager()
 {
     if (resourceManager_ != nullptr) {
         delete resourceManager_;
+<<<<<<< HEAD
         resourceManager_ = nullptr;
+=======
+        resourceManager_ = nullptr
+>>>>>>> 98b9ccc0a47c4460a8c5c729081bbddaa4df8d72
         RESMGR_HILOGE(RESMGR_TAG, "ReleaseSystemResourceManager success");
     }
 }
