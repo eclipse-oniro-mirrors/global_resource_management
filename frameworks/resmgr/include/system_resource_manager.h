@@ -42,6 +42,11 @@ public:
      */
     static ResourceManagerImpl *GetSystemResourceManagerNoSandBox();
 
+    /**
+     * Release system resource manager.
+     */
+    static void ReleaseSystemResourceManager();
+
 private:
     static std::mutex mutex_;
 
