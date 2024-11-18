@@ -119,6 +119,11 @@ ResourceManager *GetSystemResourceManagerNoSandBox()
     return SystemResourceManager::GetSystemResourceManagerNoSandBox();
 }
 
+void ReleaseSystemResourceManager()
+{
+    return SystemResourceManager::ReleaseSystemResourceManager();
+}
+
 ResourceManager::~ResourceManager()
 {}
 } // namespace Resource

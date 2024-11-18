@@ -131,6 +131,15 @@ bool SystemResourceManager::LoadSystemResource(ResourceManagerImpl *impl, bool i
     }
     return false;
 }
+
+void SystemResourceManager::ReleaseSystemResourceManager()
+{
+    if (resourceManager_ != nullptr) {
+        delete resourceManager_;
+        resourceManager_ = nullptr;
+        RESMGR_HILOGE(RESMGR_TAG, "ReleaseSystemResourceManager success");
+    }
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
