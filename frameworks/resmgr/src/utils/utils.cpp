@@ -22,6 +22,7 @@
 #include <sys/stat.h>
 #include <cstdio>
 #include <fcntl.h>
+#include <unistd.h>
 #include "hilog_wrapper.h"
 #ifdef __LINUX__
 #include <cstring>
