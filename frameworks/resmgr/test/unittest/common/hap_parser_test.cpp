@@ -19,6 +19,7 @@
 
 #include "test_common.h"
 #include "utils/errors.h"
+#include "utils/utils.h"
 #include "utils/string_utils.h"
 
 #include "hap_parser.h"
@@ -353,7 +354,7 @@ HWTEST_F(HapParserTest, ReadRawFileDescriptorTest002, TestSize.Level1)
     RState state = HapParser::ReadRawFileDescriptor(hapPath.c_str(), "", "test_rawfile.txt", descriptor);
     EXPECT_EQ(state, SUCCESS);
     if (descriptor.fd > 0) {
-        close(descriptor.fd);
+        Utils::Close(descriptor.fd);
     }
 }
 
@@ -395,7 +396,7 @@ HWTEST_F(HapParserTest, ReadRawFileDescriptorTest005, TestSize.Level1)
     RState state = HapParser::ReadRawFileDescriptor(hapPath.c_str(), hapPath.c_str(), "test_rawfile.txt", descriptor);
     EXPECT_EQ(state, SUCCESS);
     if (descriptor.fd > 0) {
-        close(descriptor.fd);
+        Utils::Close(descriptor.fd);
     }
 }
 

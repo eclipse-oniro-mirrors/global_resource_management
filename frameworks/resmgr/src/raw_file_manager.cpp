@@ -29,6 +29,7 @@
 #include "resource_manager_addon.h"
 #include "resource_manager_impl.h"
 #include "hilog_wrapper.h"
+#include "utils/utils.h"
 
 #ifdef __WINNT__
 #include <shlwapi.h>
@@ -194,17 +195,12 @@ RawFile *LoadRawFileFromHap(const NativeResourceManager *mgr, const char *fileNa
         RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed get file buffer");
         return nullptr;
     }
-    int zipFd = open(hapPath.c_str(), O_RDONLY);
-    if (zipFd < 0) {
+    FILE* zipFile = fopen(hapPath.c_str(), "r");
+    if (!zipFile) {
         RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed open file %{public}s", hapPath.c_str());
         return nullptr;
     }
-    result->pf = fdopen(zipFd, "r");
-    if (result->pf == nullptr) {
-        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed open fd = %{public}d", zipFd);
-        close(zipFd);
-        return nullptr;
-    }
+    result->pf = zipFile;
     result->length = static_cast<long>(len);
     result->resMgr = mgr;
     return result.release();
@@ -394,7 +390,7 @@ bool OH_ResourceManager_GetRawFileDescriptorData(const RawFile *rawFile, RawFile
         RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to realpath the rawFile path");
     }
 #endif
-    int fd = open(paths, O_RDONLY);
+    int fd = Utils::Open(paths, O_RDONLY);
     if (fd > 0) {
         descriptor->fd = fd;
         descriptor->length = static_cast<long>(rawFile->length);
@@ -413,7 +409,7 @@ bool OH_ResourceManager_ReleaseRawFileDescriptor(const RawFileDescriptor &descri
 bool OH_ResourceManager_ReleaseRawFileDescriptorData(const RawFileDescriptor *descriptor)
 {
     if (descriptor->fd > 0) {
-        return close(descriptor->fd) == 0;
+        return Utils::Close(descriptor->fd) == 0;
     }
     return true;
 }
@@ -461,7 +457,7 @@ RawFile64 *LoadRawFileFromHap64(const NativeResourceManager *mgr, const char *fi
     result->pf = fdopen(resMgrDescriptor.fd, "rb");
     if (result->pf == nullptr) {
         if (resMgrDescriptor.fd > 0) {
-            close(resMgrDescriptor.fd);
+            Utils::Close(resMgrDescriptor.fd);
             resMgrDescriptor.fd = 0;
         }
         RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to open %{public}s rawfile descriptor", fileName);
@@ -623,7 +619,7 @@ bool OH_ResourceManager_GetRawFileDescriptor64(const RawFile64 *rawFile, RawFile
         RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to realpath the rawFile path");
     }
 #endif
-    int fd = open(paths, O_RDONLY);
+    int fd = Utils::Open(paths, O_RDONLY);
     if (fd > 0) {
         descriptor->fd = fd;
         descriptor->length = rawFile->raw->length;
@@ -637,7 +633,7 @@ bool OH_ResourceManager_GetRawFileDescriptor64(const RawFile64 *rawFile, RawFile
 bool OH_ResourceManager_ReleaseRawFileDescriptor64(const RawFileDescriptor64 *descriptor)
 {
     if (descriptor->fd > 0) {
-        return close(descriptor->fd) == 0;
+        return Utils::Close(descriptor->fd) == 0;
     }
     return true;
 }

@@ -365,7 +365,7 @@ RState HapParser::ReadRawFileDescriptor(const char *hapPath, const char *patchPa
         RESMGR_HILOGE(RESMGR_TAG, "failed to get rawFileDescriptor rawfilePath, %{public}s", rawfilePath.c_str());
         return NOT_FOUND;
     }
-    int zipFd = open(outPath, O_RDONLY);
+    int zipFd = Utils::Open(outPath, O_RDONLY);
     if (zipFd < 0) {
         RESMGR_HILOGE(RESMGR_TAG, "failed open file %{public}s", outPath);
         return NOT_FOUND;
