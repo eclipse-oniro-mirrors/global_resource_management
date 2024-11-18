@@ -167,11 +167,13 @@ void PsueManager::ToAccent(wstring &ws) const
 
 std::string PsueManager::ToWstring(std::wstring &dest, const std::string &src)
 {
-    std::string result = setlocale(LC_CTYPE, "");
+    char* result = setlocale(LC_CTYPE, "");
+    if (result == nullptr) {
+        return "set locale fail";
+    }
     size_t destSize = mbstowcs(NULL, src.c_str(), 0);
     if (destSize == size_t(-1)) {
-        cout << result << endl;
-        return "get widechar size fail ";
+        return "get widechar size fail";
     }
     vector<wchar_t> buf(destSize + 1);
     if (mbstowcs(&buf[0], src.c_str(), src.size()) == static_cast<size_t>(-1)) {

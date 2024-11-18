@@ -73,6 +73,9 @@ std::string FormatString(const char *fmt, va_list args)
         va_copy(tmpArgs, args);
         int nLength = vsnprintf(nullptr, 0, fmt, tmpArgs); // compute buffer size
         va_end(tmpArgs);
+        if (nLength < 0) {
+            return strResult;
+        }
         std::vector<char> vBuffer(nLength + 1, '\0');
         int nWritten = vsnprintf_s(&vBuffer[0], nLength + 1, nLength, fmt, args);
         if (nWritten > 0) {
@@ -231,11 +234,12 @@ bool LocalizeNumber(std::string &inputOutputNum, const ResConfigImpl &resConfig,
     }
     inputOutputNum.clear();
     UErrorCode status = U_ZERO_ERROR;
-    numberFormat.formatDouble(num, status).toString(status).toUTF8String(inputOutputNum);
-    if (status == U_ZERO_ERROR) {
-        RESMGR_HILOGE(RESMGR_TAG, "LocalizeNumber failed, status = %{public}d", status);
+    icu_72::UnicodeString formattedNum = numberFormat.formatDouble(num, status).toString(status);
+    if (U_FAILURE(status)) {
+        RESMGR_HILOGE(RESMGR_TAG, "LocalizeNumber formatDouble failed, status = %{public}d", status);
         return false;
     }
+    formattedNum.toUTF8String(inputOutputNum);
     return true;
 #else
     return true;

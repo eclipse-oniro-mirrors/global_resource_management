@@ -54,7 +54,7 @@ public:
         std::string moduleName;
 
         /** the resource id in hap */
-        int32_t id;
+        uint32_t id;
     };
 
     enum class NapiValueType {

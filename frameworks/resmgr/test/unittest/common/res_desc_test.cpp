@@ -66,7 +66,7 @@ void ResDescTest::TearDown()
 HWTEST_F(ResDescTest, ResDescFuncTest001, TestSize.Level1)
 {
     std::string str;
-    int id;
+    uint32_t id;
     ResType resType;
     str.assign("abc");
     EXPECT_TRUE(!IdItem::IsRef(str, resType, id));

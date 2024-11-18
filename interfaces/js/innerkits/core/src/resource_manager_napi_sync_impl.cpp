@@ -309,7 +309,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessStrResource(napi_env env, napi_callb
     std::unique_ptr<ResMgrDataContext> &dataContext)
 {
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in GetStringSync");
@@ -357,7 +357,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessSymbolResource(napi_env env, napi_ca
     std::unique_ptr<ResMgrDataContext> &dataContext)
 {
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in GetSymbol");
@@ -399,7 +399,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessColorResource(napi_env env, napi_cal
     std::unique_ptr<ResMgrDataContext> &dataContext)
 {
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in ProcessColorResource");
@@ -442,7 +442,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessNumResource(napi_env env, napi_callb
     std::unique_ptr<ResMgrDataContext> &dataContext)
 {
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to ResourceManagerNapiUtils::GetHapResourceManager in GetNumber");
@@ -484,7 +484,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessBoolResource(napi_env env, napi_call
     std::unique_ptr<ResMgrDataContext> &dataContext)
 {
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret2 = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret2) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in GetBoolean");
@@ -525,7 +525,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcesstMediaContentBase64Resource(napi_env
     std::unique_ptr<ResMgrDataContext> &dataContext)
 {
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret2 = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret2) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in GetMediaContentBase64Sync");
@@ -570,7 +570,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessMediaContentResource(napi_env env, n
     std::unique_ptr<ResMgrDataContext> &dataContext)
 {
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret2 = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret2) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in GetMediaContentSync");
@@ -616,7 +616,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessPluralStringValueResource(napi_env e
     std::unique_ptr<ResMgrDataContext> &dataContext)
 {
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret2 = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret2) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in GetPluralStringValueSync");
@@ -669,7 +669,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessStringArrayValueResource(napi_env en
     std::unique_ptr<ResMgrDataContext> &dataContext)
 {
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret2 = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret2) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in GetStringArrayValueSync");
@@ -729,7 +729,7 @@ napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptor(napi_env env, napi
     }
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     if (!ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId)) {
         dataContext->SetErrorMsg("Failed to get GetHapResourceManager in GetDrawableDescriptor", true);
         return nullptr;

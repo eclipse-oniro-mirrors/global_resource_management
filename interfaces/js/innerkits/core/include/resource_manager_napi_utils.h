@@ -58,7 +58,7 @@ public:
 
     static std::string GetResNameOrPath(napi_env env, size_t argc, napi_value *argv);
 
-    static int GetResId(napi_env env, size_t argc, napi_value *argv);
+    static uint32_t GetResId(napi_env env, size_t argc, napi_value *argv);
 
     static void NapiThrow(napi_env env, int32_t errCode);
 
@@ -66,7 +66,7 @@ public:
         napi_value &value);
 
     static bool GetHapResourceManager(const ResMgrDataContext* dataContext,
-        std::shared_ptr<ResourceManager> &resMgr, int32_t &resId);
+        std::shared_ptr<ResourceManager> &resMgr, uint32_t &resId);
 
     static RState GetIncludeSystem(napi_env env, napi_value value, bool &includeSystem);
 

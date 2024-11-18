@@ -48,6 +48,7 @@ typedef struct ResHeader {
 class IdItem {
 public:
     static const uint32_t HEADER_LEN = 12;
+    static const uint32_t SIZE_LEN = 2;
 
     /**
      * Whether the resType is array or not
@@ -84,7 +85,7 @@ public:
      * @param id      when return true, set id. as sample : 16777225
      * @return        true: value is ref
      */
-    static bool IsRef(const std::string &value, ResType &resType, int &id);
+    static bool IsRef(const std::string &value, ResType &resType, uint32_t &id);
 
     std::string ToString() const;
 

@@ -605,6 +605,10 @@ std::string GetFilePathFromHap(std::shared_ptr<AbilityBase::Extractor> &extracto
     const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd, const ResType resType)
 {
     std::string filePath;
+    if (qd == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetFilePathFromHap qd is null");
+        return filePath;
+    }
     const std::shared_ptr<IdItem> idItem = qd->GetIdItem();
     if (idItem == nullptr || idItem->resType_ != resType) {
         std::string hapPath = qd->GetIndexPath();

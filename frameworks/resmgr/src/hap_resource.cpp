@@ -19,6 +19,7 @@
 #include <climits>
 #include <cstdlib>
 #include <fstream>
+#include <sys/stat.h>
 #include "utils/utils.h"
 #include <set>
 #ifdef __WINNT__
@@ -79,9 +80,11 @@ const std::shared_ptr<HapResource> HapResource::Load(const char *path,
     std::shared_ptr<ResConfigImpl> &defaultConfig, bool isSystem, bool isOverlay, const uint32_t &selectedTypes)
 {
     std::shared_ptr<HapResource> pResource;
+    struct stat fileStat {};
+    int ret = stat(path, &fileStat);
     if (selectedTypes == SELECT_ALL) {
         pResource = HapResourceManager::GetInstance()->GetHapResource(path);
-        if (pResource) {
+        if (pResource && ret == 0 && fileStat.st_mtime == pResource->GetLastModTime()) {
             return pResource;
         }
     }
@@ -91,6 +94,7 @@ const std::shared_ptr<HapResource> HapResource::Load(const char *path,
         pResource = LoadFromIndex(path, defaultConfig, isSystem, isOverlay, selectedTypes);
     }
     if (pResource != nullptr && selectedTypes == SELECT_ALL) {
+        pResource->SetLastModTime(fileStat.st_mtime);
         pResource = HapResourceManager::GetInstance()->PutAndGetResource(path, pResource);
     }
     return pResource;
@@ -446,6 +450,10 @@ int HapResource::GetIdByName(const char *name, const ResType resType) const
 const std::vector<std::string> HapResource::GetQualifiers() const
 {
     std::vector<std::string> result;
+    if (resDesc_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "resDesc_ is null! GetQualifiers failed");
+        return result;
+    }
     for (size_t i = 0; i < resDesc_->keys_.size(); i++) {
         result.push_back(resDesc_->keys_[i]->ToString());
     }
@@ -455,7 +463,7 @@ const std::vector<std::string> HapResource::GetQualifiers() const
 uint32_t HapResource::GetResourceLimitKeys() const
 {
     uint32_t limitKeyValue = 0;
-    std::vector<bool> keyTypes(KeyType::KEY_TYPE_MAX - 1, false);
+    std::vector<bool> keyTypes(KeyType::KEY_TYPE_MAX, false);
     for (auto iter = idValuesMap_.begin(); iter != idValuesMap_.end(); iter++) {
         if (iter->second == nullptr) {
             continue;
@@ -489,6 +497,10 @@ uint32_t HapResource::GetLimitPathsKeys(const std::vector<std::shared_ptr<ValueU
 
 void HapResource::GetLocales(std::set<std::string> &outValue, bool includeSystem)
 {
+    if (resDesc_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "resDesc_ is null! GetLocales failed");
+        return;
+    }
     if ((!includeSystem && isSystem_) || (!isSystem_ && isOverlay_)) {
         return;
     }

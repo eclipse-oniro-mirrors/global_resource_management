@@ -33,6 +33,9 @@ void ThemeConfig::SetThemeColorMode(ColorMode colorMode)
 
 bool ThemeConfig::Match(const std::shared_ptr<ThemeConfig> &themeConfig, const ResConfigImpl &resConfig)
 {
+    if (themeConfig == nullptr) {
+        return false;
+    }
     ColorMode colorMode = resConfig.GetColorMode();
     Direction direction = resConfig.GetDirection();
     ColorMode themeColorMode_ = themeConfig->GetThemeColorMode();

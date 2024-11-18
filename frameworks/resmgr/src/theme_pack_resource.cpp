@@ -139,6 +139,19 @@ void ThemeResource::InitThemeRes(std::pair<std::string, std::string> bundleInfo,
     return;
 }
 
+void ThemeResource::ReleaseJson(char* jsonData, FILE* pf)
+{
+    if (jsonData != nullptr) {
+        free(jsonData);
+        jsonData = nullptr;
+    }
+
+    if (pf != nullptr) {
+        fclose(pf);
+        pf = nullptr;
+    }
+}
+
 void ThemeResource::ParseJson(const std::string &bundleName, const std::string &moduleName,
     const std::string &jsonPath)
 {
@@ -164,18 +177,26 @@ void ThemeResource::ParseJson(const std::string &bundleName, const std::string &
     jsonData[len] = '\0';
     auto themeConfig = GetThemeConfig(jsonPath);
     cJSON *jsonValue = cJSON_Parse(jsonData);
+    if (jsonValue == nullptr) {
+        ReleaseJson(jsonData, pf);
+        RESMGR_HILOGE(RESMGR_TAG, "parse json fail");
+        return;
+    }
     std::pair<std::string, std::string> bundleInfo(bundleName, moduleName);
     cJSON *floatRoot = cJSON_GetObjectItem(jsonValue, "float");
+    if (floatRoot == nullptr) {
+        ReleaseJson(jsonData, pf);
+        cJSON_Delete(jsonValue);
+        RESMGR_HILOGE(RESMGR_TAG, "get float fail");
+        return;
+    }
     InitThemeRes(bundleInfo, floatRoot, themeConfig, "float");
 
     cJSON *colorRoot = cJSON_GetObjectItem(jsonValue, "color");
-    InitThemeRes(bundleInfo, colorRoot, themeConfig, "color");
-    free(jsonData);
-    jsonData = nullptr;
-    if (pf != nullptr) {
-        fclose(pf);
-        pf = nullptr;
+    if (colorRoot != nullptr) {
+        InitThemeRes(bundleInfo, colorRoot, themeConfig, "color");
     }
+    ReleaseJson(jsonData, pf);
     cJSON_Delete(jsonValue);
     return;
 }
