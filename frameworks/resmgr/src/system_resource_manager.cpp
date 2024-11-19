@@ -134,7 +134,7 @@ bool SystemResourceManager::LoadSystemResource(ResourceManagerImpl *impl, bool i
 
 void SystemResourceManager::ReleaseSystemResourceManager()
 {
-    if (resourceManager_ != nullptr) {
+    if (resourceManager_ == nullptr) {
         RESMGR_HILOGI(RESMGR_TAG, "SystemResourceManager has been released");
         return;
     }

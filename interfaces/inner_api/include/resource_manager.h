@@ -280,7 +280,8 @@ EXPORT_FUNC std::shared_ptr<ResourceManager> CreateResourceManager(const std::st
     ResConfig &resConfig, int32_t appType = 0, int32_t userId = 100);
 
 /**
- * Release system resource manager.
+ * Release system resource manager. This object may be held by multiple objects, and once released, the
+ * ResourceManagers of all holders are released. When using this interface, pay attention to the impact on all holders.
  */
 EXPORT_FUNC void ReleaseSystemResourceManager();
 } // namespace Resource
