@@ -555,7 +555,6 @@ bool Utils::convertToDouble(const std::string& str, double& outValue)
     outValue = value;
     return true;
 }
-};
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
