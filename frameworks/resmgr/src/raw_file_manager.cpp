@@ -29,7 +29,6 @@
 #include "resource_manager_addon.h"
 #include "resource_manager_impl.h"
 #include "hilog_wrapper.h"
-#include "utils/utils.h"
 
 #ifdef __WINNT__
 #include <shlwapi.h>
@@ -390,7 +389,7 @@ bool OH_ResourceManager_GetRawFileDescriptorData(const RawFile *rawFile, RawFile
         RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to realpath the rawFile path");
     }
 #endif
-    int fd = Utils::Open(paths, O_RDONLY);
+    int fd = open(paths, O_RDONLY);
     if (fd > 0) {
         descriptor->fd = fd;
         descriptor->length = static_cast<long>(rawFile->length);
@@ -409,7 +408,7 @@ bool OH_ResourceManager_ReleaseRawFileDescriptor(const RawFileDescriptor &descri
 bool OH_ResourceManager_ReleaseRawFileDescriptorData(const RawFileDescriptor *descriptor)
 {
     if (descriptor->fd > 0) {
-        return Utils::Close(descriptor->fd) == 0;
+        return close(descriptor->fd) == 0;
     }
     return true;
 }
@@ -457,7 +456,7 @@ RawFile64 *LoadRawFileFromHap64(const NativeResourceManager *mgr, const char *fi
     result->pf = fdopen(resMgrDescriptor.fd, "rb");
     if (result->pf == nullptr) {
         if (resMgrDescriptor.fd > 0) {
-            Utils::Close(resMgrDescriptor.fd);
+            close(resMgrDescriptor.fd);
             resMgrDescriptor.fd = 0;
         }
         RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to open %{public}s rawfile descriptor", fileName);
@@ -619,7 +618,7 @@ bool OH_ResourceManager_GetRawFileDescriptor64(const RawFile64 *rawFile, RawFile
         RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to realpath the rawFile path");
     }
 #endif
-    int fd = Utils::Open(paths, O_RDONLY);
+    int fd = open(paths, O_RDONLY);
     if (fd > 0) {
         descriptor->fd = fd;
         descriptor->length = rawFile->raw->length;
@@ -633,7 +632,7 @@ bool OH_ResourceManager_GetRawFileDescriptor64(const RawFile64 *rawFile, RawFile
 bool OH_ResourceManager_ReleaseRawFileDescriptor64(const RawFileDescriptor64 *descriptor)
 {
     if (descriptor->fd > 0) {
-        return Utils::Close(descriptor->fd) == 0;
+        return close(descriptor->fd) == 0;
     }
     return true;
 }

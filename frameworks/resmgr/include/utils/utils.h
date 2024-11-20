@@ -116,9 +116,6 @@ public:
 
     static bool convertToDouble(const std::string& str, double& outValue);
 
-    static int Open(const char* filename, int flag);
-
-    static int Close(int fd);
 private:
     static bool IsValidValue(const char* end, const std::string& str);
     static uint16_t EncodeLanguageOrRegion(const char *str, char base);
