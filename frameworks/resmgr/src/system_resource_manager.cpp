@@ -131,6 +131,20 @@ bool SystemResourceManager::LoadSystemResource(ResourceManagerImpl *impl, bool i
     }
     return false;
 }
+
+void SystemResourceManager::ReleaseSystemResourceManager()
+{
+    if (resourceManager_ == nullptr) {
+        RESMGR_HILOGI(RESMGR_TAG, "SystemResourceManager has been released");
+        return;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (resourceManager_ != nullptr) {
+        delete resourceManager_;
+        resourceManager_ = nullptr;
+        RESMGR_HILOGI(RESMGR_TAG, "ReleaseSystemResourceManager success");
+    }
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
