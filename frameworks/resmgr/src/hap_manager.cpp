@@ -955,16 +955,16 @@ RState HapManager::FindRawFileDescriptor(const std::string &name, ResourceManage
     }
     char outPath[PATH_MAX + 1] = {0};
     Utils::CanonicalizePath(paths.c_str(), outPath, PATH_MAX);
-    int fd = Utils::Open(outPath, O_RDONLY);
+    int fd = open(outPath, O_RDONLY);
     if (fd > 0) {
         long length = lseek(fd, 0, SEEK_END);
         if (length == -1) {
-            Utils::Close(fd);
+            close(fd);
             return ERROR_CODE_RES_PATH_INVALID;
         }
         long begin = lseek(fd, 0, SEEK_SET);
         if (begin == -1) {
-            Utils::Close(fd);
+            close(fd);
             return ERROR_CODE_RES_PATH_INVALID;
         }
         descriptor.fd = fd;
@@ -984,7 +984,7 @@ RState HapManager::CloseRawFileDescriptor(const std::string &name)
     }
     int fd = rawFileDescriptor_[name].fd;
     if (fd > 0) {
-        int result = Utils::Close(fd);
+        int result = close(fd);
         if (result == -1) {
             return ERROR_CODE_RES_PATH_INVALID;
         }
