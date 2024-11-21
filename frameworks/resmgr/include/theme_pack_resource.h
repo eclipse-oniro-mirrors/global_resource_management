@@ -172,6 +172,8 @@ private:
         std::shared_ptr<ThemeConfig> themeConfig, const std::string &resTypeStr);
     const std::string GetThemeAppIconByAbilityName(const std::pair<std::string, std::string> &bundleInfo,
         const std::string &name, const std::string &abilityName = "");
+    static void AddIconValue(const std::string &bundleName, const std::string &moduleName,
+        const std::string &iconName, const std::string &path, const std::string &abilityName = "");
     static ThemeResource *themeRes;
 };
 } // namespace Resource
