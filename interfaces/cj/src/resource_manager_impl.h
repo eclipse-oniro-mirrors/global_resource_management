@@ -103,7 +103,7 @@ public:
     int32_t GetSymbolByName(const char *name, uint32_t &outValue) override;
 
     bool GetHapResourceManager(Global::Resource::ResourceManager::Resource resource,
-        std::shared_ptr<Global::Resource::ResourceManager> &resMgr, int32_t &resId);
+        std::shared_ptr<Global::Resource::ResourceManager> &resMgr, uint32_t &resId);
 private:
     std::shared_ptr<Global::Resource::ResourceManager> resMgr_;
     bool isSystem_ = false;

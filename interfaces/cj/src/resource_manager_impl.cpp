@@ -385,7 +385,7 @@ int32_t ResourceManagerImpl::GetDrawableDescriptorByName(const char *name, int64
 }
 
 bool ResourceManagerImpl::GetHapResourceManager(Global::Resource::ResourceManager::Resource resource,
-    std::shared_ptr<Global::Resource::ResourceManager> &resMgr, int32_t &resId)
+    std::shared_ptr<Global::Resource::ResourceManager> &resMgr, uint32_t &resId)
 {
     resId = resource.id;
     if (isSystem_) {
