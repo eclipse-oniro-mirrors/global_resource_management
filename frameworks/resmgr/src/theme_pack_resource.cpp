@@ -343,6 +343,13 @@ std::string GetIconsBundleName(const std::string& iconPath)
     return iconPath.substr(pos + 1);
 }
 
+void ThemeResource::AddIconValue(const std::string &bundleName, const std::string &moduleName,
+    const std::string &iconName, const std::string &path, const std::string &abilityName)
+{
+    ThemeKey themeKey = ThemeKey(bundleName, moduleName, ResType::MEDIA, iconName, abilityName);
+    themeRes->iconValues_.emplace_back(std::make_pair(themeKey, path));
+}
+
 const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeIconResource(const std::string& iconPath)
 {
     if (iconPath.empty()) {
@@ -365,28 +372,24 @@ const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeIconResource(const 
                 continue;
             }
             std::string dynamicBundle = path.substr(iconPath.length() + 1, pos3 - iconPath.length() - 1);
-            ThemeKey themeKey = ThemeKey(bundleName, dynamicBundle, ResType::MEDIA, iconName);
-            themeRes->iconValues_.emplace_back(std::make_pair(themeKey, path));
+            AddIconValue(bundleName, dynamicBundle, iconName, path);
             continue;
         }
 
         auto pos3 = path.find('/', iconPath.length() + 1);
         if (pos3 == std::string::npos || pos3 < iconPath.length() + 1) {
-            ThemeKey themeKey = ThemeKey(bundleName, "", ResType::MEDIA, iconName);
-            themeRes->iconValues_.emplace_back(std::make_pair(themeKey, path));
+            AddIconValue(bundleName, "", iconName, path);
             continue;
         }
 
         auto pos4 = path.find('/', pos3 + 1);
         if (pos4 == std::string::npos || pos4 < pos3 + 1 || pos4 != pos2) {
-            ThemeKey themeKey = ThemeKey(bundleName, "", ResType::MEDIA, iconName);
-            themeRes->iconValues_.emplace_back(std::make_pair(themeKey, path));
+            AddIconValue(bundleName, "", iconName, path);
             continue;
         }
 
         std::string abilityName = path.substr(pos3 + 1, pos4 - pos3 - 1);
-        ThemeKey themeKey = ThemeKey(bundleName, "", ResType::MEDIA, iconName, abilityName);
-        themeRes->iconValues_.emplace_back(std::make_pair(themeKey, path));
+        AddIconValue(bundleName, "", iconName, path, abilityName);
     }
     return themeResource;
 }
