@@ -38,7 +38,7 @@ extern "C" {
         char* moduleName;
 
         /** the resource id in hap */
-        int32_t id;
+        uint32_t id;
     };
 
     struct RetDataU32 {

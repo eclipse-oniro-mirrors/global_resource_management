@@ -196,7 +196,7 @@ RetDataCString CJ_GetPluralStringValueByResource(int64_t id, CResource resource,
     OHOS::Global::Resource::ResourceManager::Resource res = { .bundleName = std::string(resource.bundleName),
         .moduleName = std::string(resource.moduleName), .id = resource.id };
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {
         LOGE("ResourceManager CJ_GetPluralStringValueByResource failed at GetHapResourceManager");
         ret.code = RState::ERROR_CODE_RES_NOT_FOUND_BY_ID;
@@ -258,7 +258,7 @@ RetDataCArrString CJ_GetStringArrayValueByResource(int64_t id, CResource resourc
     OHOS::Global::Resource::ResourceManager::Resource res = { .bundleName = std::string(resource.bundleName),
         .moduleName = std::string(resource.moduleName), .id = resource.id };
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {
         LOGE("ResourceManager CJ_GetStringArrayValueByResource failed at GetHapResourceManager");
         ret.code = RState::ERROR_CODE_RES_NOT_FOUND_BY_ID;
@@ -321,7 +321,7 @@ RetDataCString CJ_GetStringByResource(int64_t id, CResource resource)
     OHOS::Global::Resource::ResourceManager::Resource res = { .bundleName = std::string(resource.bundleName),
         .moduleName = std::string(resource.moduleName), .id = resource.id };
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {
         LOGE("ResourceManager CJ_GetStringByResource failed at GetHapResourceManager");
         ret.code = RState::ERROR_CODE_RES_NOT_FOUND_BY_ID;
@@ -388,7 +388,7 @@ int32_t CJ_GetColorByResource(int64_t id, CResource resource, uint32_t &data)
     OHOS::Global::Resource::ResourceManager::Resource res = { .bundleName = std::string(resource.bundleName),
         .moduleName = std::string(resource.moduleName), .id = resource.id };
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {
         LOGE("ResourceManager CJ_GetColorByResource failed at GetHapResourceManager");
         return RState::ERROR_CODE_RES_NOT_FOUND_BY_ID;
@@ -418,7 +418,7 @@ int32_t CJ_GetBooleanByResource(int64_t id, CResource resource, bool &data)
     OHOS::Global::Resource::ResourceManager::Resource res = { .bundleName = std::string(resource.bundleName),
         .moduleName = std::string(resource.moduleName), .id = resource.id };
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {
         LOGE("ResourceManager CJ_GetBooleanByResource failed at GetHapResourceManager");
         return RState::ERROR_CODE_RES_NOT_FOUND_BY_ID;
@@ -465,7 +465,7 @@ int32_t CJ_GetNumberByResource(int64_t id, CResource resource, RetGetNumber &dat
     OHOS::Global::Resource::ResourceManager::Resource res = { .bundleName = std::string(resource.bundleName),
         .moduleName = std::string(resource.moduleName), .id = resource.id };
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {
         LOGE("ResourceManager CJ_GetNumberByResource failed at GetHapResourceManager");
         return RState::ERROR_CODE_RES_NOT_FOUND_BY_ID;
@@ -570,7 +570,7 @@ RetDataCArrUI8 CJ_GetMediaContentByResource(int64_t id, CResource resource, uint
     OHOS::Global::Resource::ResourceManager::Resource res = { .bundleName = std::string(resource.bundleName),
         .moduleName = std::string(resource.moduleName), .id = resource.id };
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {
         LOGE("ResourceManager CJ_GetMediaContentByResource failed at GetHapResourceManager");
         ret.code = RState::ERROR_CODE_RES_NOT_FOUND_BY_ID;
@@ -616,7 +616,7 @@ RetDataCString CJ_GetMediaContentBase64ByResource(int64_t id, CResource resource
     OHOS::Global::Resource::ResourceManager::Resource res = { .bundleName = std::string(resource.bundleName),
         .moduleName = std::string(resource.moduleName), .id = resource.id };
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {
         LOGE("ResourceManager CJ_GetMediaContentBase64ByResource failed at GetHapResourceManager");
         ret.code = RState::ERROR_CODE_RES_NOT_FOUND_BY_ID;
@@ -677,7 +677,7 @@ RetDataI64 CJ_GetDrawableDescriptorByResource(int64_t id, CResource resource, ui
     OHOS::Global::Resource::ResourceManager::Resource res = { .bundleName = std::string(resource.bundleName),
         .moduleName = std::string(resource.moduleName), .id = resource.id };
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {
         LOGE("ResourceManager CJ_GetDrawableDescriptorByResource failed at GetHapResourceManager");
         ret.code = RState::ERROR_CODE_RES_NOT_FOUND_BY_ID;
@@ -759,7 +759,7 @@ RetDataU32 CJ_GetSymbolByResource(int64_t id, CResource resource)
     OHOS::Global::Resource::ResourceManager::Resource res = { .bundleName = std::string(resource.bundleName),
         .moduleName = std::string(resource.moduleName), .id = resource.id };
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     if (!instance->GetHapResourceManager(res, resMgr, resId)) {
         LOGE("ResourceManager CJ_GetSymbolByResource failed at GetHapResourceManager");
         ret.code = RState::ERROR_CODE_RES_NOT_FOUND_BY_ID;
