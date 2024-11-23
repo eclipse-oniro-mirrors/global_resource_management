@@ -463,13 +463,13 @@ RState ThemePackManager::GetThemeIconFromCache(
 bool ThemePackManager::IsUpdateByUserId(int32_t userId)
 {
     std::lock_guard<std::mutex> lock(this->lockUserId_);
-    return currentUserId_ != userId;
+    return userId != 0 && currentUserId_ != userId;
 }
 
 void ThemePackManager::UpdateUserId(int32_t userId)
 {
     std::lock_guard<std::mutex> lock(this->lockUserId_);
-    if (currentUserId_ != userId) {
+    if (userId != 0 && currentUserId_ != userId) {
         RESMGR_HILOGI(RESMGR_TAG,
             "update userId, currentUserId_= %{public}d, userId= %{public}d", currentUserId_, userId);
         currentUserId_ = userId;
