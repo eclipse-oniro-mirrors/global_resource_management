@@ -139,7 +139,7 @@ RawDir *LoadRawDirFromHap(const NativeResourceManager *mgr, const std::string di
 RawDir *OH_ResourceManager_OpenRawDir(const NativeResourceManager *mgr, const char *dirName)
 {
     std::lock_guard<std::mutex> lock(g_rawDirMutex);
-    if (mgr == nullptr || dirName == nullptr) {
+    if (mgr == nullptr || dirName == nullptr || mgr->resManager == nullptr) {
         return nullptr;
     }
     std::string hapPath;
@@ -208,7 +208,7 @@ RawFile *LoadRawFileFromHap(const NativeResourceManager *mgr, const char *fileNa
 RawFile *OH_ResourceManager_OpenRawFile(const NativeResourceManager *mgr, const char *fileName)
 {
     std::lock_guard<std::mutex> lock(g_rawFileMutex);
-    if (mgr == nullptr || fileName == nullptr) {
+    if (mgr == nullptr || fileName == nullptr || mgr->resManager == nullptr) {
         return nullptr;
     }
 
@@ -272,8 +272,8 @@ int OH_ResourceManager_ReadRawFile(const RawFile *rawFile, void *buf, size_t len
         if (length > len) {
             length = len;
         }
-        int ret = memcpy_s(buf, length, rawFile->buffer + rawFile->actualOffset->offset, length);
-        if (ret != 0) {
+        errno_t ret = memcpy_s(buf, length, rawFile->buffer + rawFile->actualOffset->offset, length);
+        if (ret != EOK) {
             RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to copy to buf");
             return 0;
         }
@@ -376,7 +376,7 @@ bool OH_ResourceManager_GetRawFileDescriptorData(const RawFile *rawFile, RawFile
     if (rawFile == nullptr || rawFile->actualOffset == nullptr) {
         return false;
     }
-    if (rawFile->resMgr != nullptr) {
+    if (rawFile->resMgr->resManager != nullptr) {
         return GetRawFileDescriptorFromHap(rawFile, *descriptor);
     }
     char paths[PATH_MAX] = {0};
@@ -472,7 +472,7 @@ RawFile64 *LoadRawFileFromHap64(const NativeResourceManager *mgr, const char *fi
 RawFile64 *OH_ResourceManager_OpenRawFile64(const NativeResourceManager *mgr, const char *fileName)
 {
     std::lock_guard<std::mutex> lock(g_rawFile64Mutex);
-    if (mgr == nullptr || fileName == nullptr) {
+    if (mgr == nullptr || fileName == nullptr || mgr->resManager == nullptr) {
         return nullptr;
     }
 
@@ -605,7 +605,7 @@ bool OH_ResourceManager_GetRawFileDescriptor64(const RawFile64 *rawFile, RawFile
     if (rawFile == nullptr || rawFile->raw == nullptr) {
         return false;
     }
-    if (rawFile->raw->resMgr != nullptr) {
+    if (rawFile->raw->resMgr->resManager != nullptr) {
         return GetRawFileDescriptorFromHap64(rawFile, descriptor);
     }
     char paths[PATH_MAX] = {0};
@@ -640,7 +640,7 @@ bool OH_ResourceManager_ReleaseRawFileDescriptor64(const RawFileDescriptor64 *de
 bool OH_ResourceManager_IsRawDir(const NativeResourceManager *mgr, const char *path)
 {
     bool result = false;
-    if (mgr == nullptr || path == nullptr) {
+    if (mgr == nullptr || path == nullptr || mgr->resManager == nullptr) {
         return result;
     }
     RState state = mgr->resManager->IsRawDirFromHap(path, result);

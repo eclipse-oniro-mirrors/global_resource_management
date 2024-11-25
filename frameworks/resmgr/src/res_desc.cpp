@@ -149,7 +149,7 @@ const std::string KeyParam::ConvertToStr() const
         char tmp[4];
         char tmp2[5];
         errno_t eret = memcpy_s(tmp, sizeof(tmp), &value_, 4);
-        if (eret != OK) {
+        if (eret != EOK) {
             RESMGR_HILOGE(RESMGR_TAG, "memcpy_s error : %d", eret);
         }
         int j = 0;

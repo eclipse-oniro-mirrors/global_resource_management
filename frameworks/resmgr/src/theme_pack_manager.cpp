@@ -422,7 +422,7 @@ RState ThemePackManager::GetOtherIconsInfo(const std::string &iconName,
     if (outValue != nullptr && len != 0) {
         auto tmpInfo = std::make_unique<uint8_t[]>(len);
         errno_t ret = memcpy_s(tmpInfo.get(), len, outValue.get(), len);
-        if (ret != 0) {
+        if (ret != EOK) {
             RESMGR_HILOGE(RESMGR_TAG, "save fail, iconName = %{public}s, ret = %{public}d", iconName.c_str(), ret);
             return SUCCESS;
         }
@@ -449,7 +449,7 @@ RState ThemePackManager::GetThemeIconFromCache(
         auto iconInfo = std::make_unique<uint8_t[]>(length);
         auto tmpInfo = std::get<SECOND_ELEMENT>(iconValue).get();
         errno_t ret = memcpy_s(iconInfo.get(), length, tmpInfo, length);
-        if (ret != 0) {
+        if (ret != EOK) {
             RESMGR_HILOGE(RESMGR_TAG, "get icon info fail, ret = %{public}d", ret);
             continue;
         }
