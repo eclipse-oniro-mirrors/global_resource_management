@@ -443,6 +443,9 @@ bool HapManager::RemoveAppOverlay(const std::string &overlayPath)
 
 HapManager::~HapManager()
 {
+    WriteLock lock(this->mutex_);
+    hapResources_.clear();
+    loadedHapPaths_.clear();
 #ifdef SUPPORT_GRAPHICS
     auto iter = plurRulesCache_.begin();
     for (; iter != plurRulesCache_.end(); iter++) {
