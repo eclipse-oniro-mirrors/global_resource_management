@@ -183,7 +183,7 @@ private:
     Lock lockUserId_;
     uint32_t themeId_{0};
     bool isFirstCreate = true;
-    int32_t currentUserId_ = 100;
+    int32_t currentUserId_ = 0;
 };
 } // namespace Resource
 } // namespace Global
