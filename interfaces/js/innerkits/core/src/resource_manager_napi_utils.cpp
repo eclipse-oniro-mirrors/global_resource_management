@@ -204,9 +204,9 @@ napi_value ResourceManagerNapiUtils::CreateJsUint8Array(napi_env env, ResMgrData
     }
 
     uint8_t *tempData = context.mediaData.release();
-    errno_t ret = memcpy_s(data, context.len_, tempData, context.len_);
+    int ret = memcpy_s(data, context.len_, tempData, context.len_);
     delete[] tempData;
-    if (ret != EOK) {
+    if (ret != 0) {
         context.SetErrorMsg("Failed to copy media to buffer");
         return result;
     }
