@@ -625,7 +625,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     }
 
     (void)memset_s(ch, size, 0x00, size);
-    if (memcpy_s(ch, size, data, size) != EOK) {
+    if (memcpy_s(ch, size, data, size) != 0) {
         free(ch);
         ch = nullptr;
         return 0;
