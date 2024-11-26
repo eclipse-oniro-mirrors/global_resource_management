@@ -272,8 +272,8 @@ int OH_ResourceManager_ReadRawFile(const RawFile *rawFile, void *buf, size_t len
         if (length > len) {
             length = len;
         }
-        errno_t ret = memcpy_s(buf, length, rawFile->buffer + rawFile->actualOffset->offset, length);
-        if (ret != OK) {
+        int ret = memcpy_s(buf, length, rawFile->buffer + rawFile->actualOffset->offset, length);
+        if (ret != 0) {
             RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to copy to buf");
             return 0;
         }
