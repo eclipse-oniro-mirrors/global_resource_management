@@ -433,7 +433,7 @@ int32_t ParseString(const char *buffer, uint32_t &offset, const size_t &bufLen, 
         return SYS_ERROR;
     }
     errno_t eret = memcpy_s(&strLen, sizeof(strLen), buffer + offset, IdItem::SIZE_LEN);
-    if (eret != EOK || (includeTemi && strLen == 0)) {
+    if (eret != OK || (includeTemi && strLen == 0)) {
         return SYS_ERROR;
     }
     offset += IdItem::SIZE_LEN; // Offset value plus 2
@@ -463,7 +463,7 @@ int32_t ParseStringArray(const char *buffer, uint32_t &offset, const size_t &buf
         return SYS_ERROR;
     }
     errno_t eret = memcpy_s(&arrLen, sizeof(arrLen), buffer + offset, IdItem::SIZE_LEN);
-    if (eret != EOK) {
+    if (eret != OK) {
         return SYS_ERROR;
     }
     offset += IdItem::SIZE_LEN; // Offset value plus 2
@@ -508,7 +508,7 @@ int32_t ParseIdItem(const char *buffer, uint32_t &offset, const size_t &bufLen, 
         return SYS_ERROR;
     }
     errno_t eret = memcpy_s(idItem.get(), sizeof(IdItem), buffer + offset, IdItem::HEADER_LEN);
-    if (eret != EOK) {
+    if (eret != OK) {
         return SYS_ERROR;
     }
     if (selectedTypes != SELECT_ALL && (selectedTypes & ConvertType(idItem->resType_)) == 0) {
@@ -544,7 +544,7 @@ int32_t ParseId(const char *buffer, uint32_t &offset, const size_t &bufLen, std:
         return SYS_ERROR;
     }
     errno_t eret = memcpy_s(id.get(), sizeof(ResId), buffer + offset, ResId::RESID_HEADER_LEN);
-    if (eret != EOK) {
+    if (eret != OK) {
         return SYS_ERROR;
     }
     offset += ResId::RESID_HEADER_LEN;
@@ -563,7 +563,7 @@ int32_t ParseId(const char *buffer, uint32_t &offset, const size_t &bufLen, std:
             return SYS_ERROR;
         }
         errno_t eret = memcpy_s(ip.get(), sizeof(IdParam), buffer + offset, ResId::IDPARAM_HEADER_LEN);
-        if (eret != EOK) {
+        if (eret != OK) {
             return SYS_ERROR;
         }
         offset += ResId::IDPARAM_HEADER_LEN;
@@ -597,7 +597,7 @@ int32_t ParseKeyParam(const char *buffer, uint32_t &offset, const size_t &bufLen
         return SYS_ERROR;
     }
     errno_t eret = memcpy_s(kp.get(), sizeof(KeyParam), buffer + offset, ResKey::KEYPARAM_HEADER_LEN);
-    if (eret != EOK) {
+    if (eret != OK) {
         return SYS_ERROR;
     }
     offset += ResKey::KEYPARAM_HEADER_LEN;
@@ -620,7 +620,7 @@ int32_t ParseKey(const char *buffer, uint32_t &offset, const size_t &bufLen, std
         return SYS_ERROR;
     }
     errno_t eret = memcpy_s(key.get(), sizeof(ResKey), buffer + offset, ResKey::RESKEY_HEADER_LEN);
-    if (eret != EOK) {
+    if (eret != OK) {
         return SYS_ERROR;
     }
     offset += ResKey::RESKEY_HEADER_LEN;
@@ -673,7 +673,7 @@ int32_t HapParser::ParseResHex(const char *buffer, const size_t bufLen, ResDesc 
         return SYS_ERROR;
     }
     errno_t eret = memcpy_s(&resHeader, sizeof(ResHeader), buffer + offset, RES_HEADER_LEN);
-    if (eret != EOK) {
+    if (eret != OK) {
         return SYS_ERROR;
     }
     offset += RES_HEADER_LEN;
