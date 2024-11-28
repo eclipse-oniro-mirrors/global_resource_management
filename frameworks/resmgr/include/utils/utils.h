@@ -109,8 +109,14 @@ public:
     static void CanonicalizePath(const char *path, char *outPath, size_t len);
 
     static RState GetFiles(const std::string &strCurrentDir, std::vector<std::string> &vFiles);
-private:
 
+    static bool convertToInteger(const std::string& str, int& outValue);
+
+    static bool convertToUnsignedLong(const std::string& str, unsigned long& outValue);
+
+    static bool convertToDouble(const std::string& str, double& outValue);
+private:
+    static bool IsValidValue(const char* end, const std::string& str);
     static uint16_t EncodeLanguageOrRegion(const char *str, char base);
 
     static bool StrCompare(const char *left, const char *right, size_t len, bool isCaseSensitive);

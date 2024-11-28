@@ -772,11 +772,15 @@ RState ResourceManagerImpl::GetInteger(const std::shared_ptr<IdItem> idItem, int
     }
     std::string temp;
     RState state = ResolveReference(idItem->value_, temp);
-    if (state == SUCCESS) {
-        outValue = stoi(temp);
+    if (state != SUCCESS) {
+        return state;
+    }
+    int intValue;
+    if (Utils::convertToInteger(temp, intValue)) {
+        outValue = intValue;
         return SUCCESS;
     }
-    return state;
+    return ERROR;
 }
 
 RState ResourceManagerImpl::ProcessReference(const std::string value,
@@ -957,7 +961,11 @@ RState ResourceManagerImpl::GetIntArray(const std::shared_ptr<IdItem> idItem, st
             RESMGR_HILOGD(RESMGR_TAG, "ResolveReference failed, value:%{public}s", idItem->values_[i].c_str());
             return ERROR;
         }
-        outValue.push_back(stoi(resolvedValue));
+        int intValue;
+        if (!Utils::convertToInteger(resolvedValue, intValue)) {
+            return ERROR;
+        }
+        outValue.push_back(intValue);
     }
     return SUCCESS;
 }
