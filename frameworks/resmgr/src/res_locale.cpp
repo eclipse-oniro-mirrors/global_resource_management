@@ -379,6 +379,7 @@ Locale *BuildFromString(const char *str, char sep, RState &rState)
             return nullptr;
         }
         Locale *retLocal = new Locale(temp);
+        delete resLocale;
         return retLocal;
     }
     return nullptr;

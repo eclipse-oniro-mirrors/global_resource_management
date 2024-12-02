@@ -666,6 +666,7 @@ int32_t HapParser::ParseResHex(const char *buffer, const size_t bufLen, ResDesc 
     uint32_t offset = 0;
     if (offset + RES_HEADER_LEN > bufLen) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse ResHeader failed, the offset will be out of bounds");
+        delete (resHeader);
         return SYS_ERROR;
     }
     errno_t eret = memcpy_s(resHeader, sizeof(ResHeader), buffer + offset, RES_HEADER_LEN);
