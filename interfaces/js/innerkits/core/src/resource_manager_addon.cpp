@@ -201,7 +201,7 @@ bool ResourceManagerAddon::Init(napi_env env)
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to create reference at init");
         return false;
     }
-    napi_add_env_cleanup_hook(env, [](void *data) { g_constructor = nullptr; }, nullptr);
+    napi_add_env_cleanup_hook(env, [](void *data) { g_constructor = nullptr; }, g_constructor);
     return true;
 }
 
