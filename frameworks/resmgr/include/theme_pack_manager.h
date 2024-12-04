@@ -187,6 +187,7 @@ private:
     void ClearIconResource();
     void ReleaseSkinResource(int32_t userId);
     void ReleaseIconResource(int32_t userId);
+    const std::string GetMaskString(const std::string &path);
     std::vector<std::shared_ptr<ThemeResource>> skinResource_;
     std::vector<std::shared_ptr<ThemeResource>> iconResource_;
     std::unordered_map<int32_t, int32_t> useCountMap_;
@@ -215,6 +216,7 @@ private:
     uint32_t themeId_{0};
     bool isFirstCreate = true;
     int32_t currentUserId_ = 0;
+    bool isLogFlag_ = false;
 };
 } // namespace Resource
 } // namespace Global

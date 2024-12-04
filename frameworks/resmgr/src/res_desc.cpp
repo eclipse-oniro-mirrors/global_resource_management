@@ -148,9 +148,10 @@ const std::string KeyParam::ConvertToStr() const
     if ((type_ == KeyType::LANGUAGES) || (type_ == KeyType::REGION) || (type_ == KeyType::SCRIPT)) {
         char tmp[4];
         char tmp2[5];
-        errno_t eret = memcpy_s(tmp, sizeof(tmp), &value_, 4);
+        errno_t eret = memcpy_s(tmp, sizeof(tmp), &value_, sizeof(value_));
         if (eret != OK) {
             RESMGR_HILOGE(RESMGR_TAG, "memcpy_s error : %d", eret);
+            return std::string();
         }
         int j = 0;
         // 4 means langauges/region/script key value max length

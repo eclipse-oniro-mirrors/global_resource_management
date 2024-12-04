@@ -38,6 +38,10 @@ namespace OHOS::HiviewDFX {
     #define RESMGR_HILOGI(tag, fmt, ...) HILOG_IMPL(LOG_CORE, LOG_INFO, 0xD001E00, tag, fmt, ##__VA_ARGS__)
     #define RESMGR_HILOGD(tag, fmt, ...) HILOG_IMPL(LOG_CORE, LOG_DEBUG, 0xD001E00, tag, fmt, ##__VA_ARGS__)
     #define RESMGR_HILOGF(tag, fmt, ...) HILOG_IMPL(LOG_CORE, LOG_FATAL, 0xD001E00, tag, fmt, ##__VA_ARGS__)
+    #define RESMGR_HILOGI_BY_FLAG(flag, tag, fmt, ...)                              \
+        if (flag) {                                                                 \
+            HILOG_IMPL(LOG_CORE, LOG_INFO, 0xD001E00, tag, fmt, ##__VA_ARGS__);     \
+        }
 }
 
 namespace OHOS {
@@ -55,6 +59,7 @@ extern LogLevel g_logLevel;
 #define RESMGR_HILOGI(tag, fmt, ...)
 #define RESMGR_HILOGD(tag, fmt, ...)
 #define RESMGR_HILOGF(tag, fmt, ...)
+#define RESMGR_HILOGI_BY_FLAG(flag, tag, fmt, ...)
 
 #endif  // CONFIG_HILOG
 
