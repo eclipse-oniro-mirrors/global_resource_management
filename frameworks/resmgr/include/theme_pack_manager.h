@@ -163,6 +163,7 @@ private:
     std::string themeMask;
     void ClearSkinResource();
     void ClearIconResource();
+    const std::string GetMaskString(const std::string &path);
     std::vector<std::shared_ptr<ThemeResource>> skinResource_;
     std::vector<std::shared_ptr<ThemeResource>> iconResource_;
     std::vector<std::tuple<std::string, std::unique_ptr<uint8_t[]>, size_t>> iconMaskValues_;
@@ -187,6 +188,7 @@ private:
     uint32_t themeId_{0};
     bool isFirstCreate = true;
     int32_t currentUserId_ = 0;
+    bool isLogFlag_ = false;
 };
 } // namespace Resource
 } // namespace Global
