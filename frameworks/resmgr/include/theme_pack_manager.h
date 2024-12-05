@@ -81,9 +81,10 @@ public:
      * @param resType the resoucre type
      * @param resName the resource name
      * @param resConfig the resource config
+     * @param userId the user id
      */
     const std::string GetThemeResource(const std::pair<std::string, std::string> &bundleInfo,
-        const ResType &resType, const std::string &resName, const ResConfigImpl &resConfig);
+        const ResType &resType, const std::string &resName, const ResConfigImpl &resConfig, int32_t userId);
 
     /**
      * Find the best theme resource related to bundlename, modulename, idItems and resConfig.
@@ -91,10 +92,12 @@ public:
      * @param bundleInfo which contains bundlename, modulename
      * @param idItems which used to process the reference resource
      * @param resConfig the resource config
+     * @param userId the user id
+     * @param isThemeSystemResEnable true is theme system res enable
      * @return the best resource or empty
      */
     const std::string FindThemeResource(const std::pair<std::string, std::string> &bundleInfo,
-        const std::vector<std::shared_ptr<IdItem>> &idItems, const ResConfigImpl &resConfig,
+        const std::vector<std::shared_ptr<IdItem>> &idItems, const ResConfigImpl &resConfig, int32_t userId,
         bool isThemeSystemResEnable = false);
 
     /**
@@ -102,11 +105,12 @@ public:
      *
      * @param bundleInfo which contains bundlename, modulename
      * @param iconName the icon resource name
+     * @param userId the user id
      * @param abilityName the hap abilityName
      * @return the best resource or empty
      */
     const std::string FindThemeIconResource(const std::pair<std::string, std::string> &bundleInfo,
-        const std::string &iconName, const std::string &abilityName = "");
+        const std::string &iconName, int32_t userId, const std::string &abilityName = "");
 
     inline const std::string GetMask() const
     {
@@ -123,9 +127,10 @@ public:
      * Whether an icon exists in the theme
      *
      * @param bundleName the hap bundleName
+     * @param userId the user id
      * @return true if icon exists, else no exists
      */
-    bool HasIconInTheme(const std::string &bundleName);
+    bool HasIconInTheme(const std::string &bundleName, int32_t userId);
 
     /**
      * Get icons info in other icons by icon name
@@ -134,10 +139,11 @@ public:
      * @param outValue the obtain resource wirte to
      * @param len the data len wirte to
      * @param isGlobalMask true if the global mask, else other icons
+     * @param userId the user id
      * @return SUCCESS if the theme icon get success, else failed
      */
     RState GetOtherIconsInfo(const std::string &iconName,
-        std::unique_ptr<uint8_t[]> &outValue, size_t &len, bool isGlobalMask);
+        std::unique_ptr<uint8_t[]> &outValue, size_t &len, bool isGlobalMask, int32_t userId);
 
     /**
      * Get the theme icon from cache
@@ -158,33 +164,55 @@ public:
     bool IsUpdateByUserId(int32_t userId);
 
     void LoadThemeIconRes(const std::string &bundleName, const std::string &moduleName, int32_t userId);
+
+    /**
+     * set flag of resource manager
+     *
+     * @param userId the current user id
+     */
+    void SetFlagByUserId(int32_t userId);
+
+    /**
+     * check flag of resource manager
+     *
+     * @param userId the current user id
+     */
+    void CheckFlagByUserId(int32_t userId);
 private:
     ThemePackManager();
     std::string themeMask;
+    void ChangeSkinResourceStatus(int32_t userId);
+    void ChangeIconResourceStatus(int32_t userId);
     void ClearSkinResource();
     void ClearIconResource();
+    void ReleaseSkinResource(int32_t userId);
+    void ReleaseIconResource(int32_t userId);
     const std::string GetMaskString(const std::string &path);
     std::vector<std::shared_ptr<ThemeResource>> skinResource_;
     std::vector<std::shared_ptr<ThemeResource>> iconResource_;
+    std::unordered_map<int32_t, int32_t> useCountMap_;
     std::vector<std::tuple<std::string, std::unique_ptr<uint8_t[]>, size_t>> iconMaskValues_;
     std::vector<std::shared_ptr<ThemeResource::ThemeValue> > GetThemeResourceList(
-        const std::pair<std::string, std::string> &bundInfo, const ResType &resType, const std::string &resName);
+        const std::pair<std::string, std::string> &bundInfo, const ResType &resType, const std::string &resName,
+        int32_t userId);
 
     const std::shared_ptr<ThemeResource::ThemeQualifierValue> GetThemeQualifierValue(
         const std::pair<std::string, std::string> &bundInfo, const ResType &resType,
-        const std::string &resName, const ResConfigImpl &resConfig);
+        const std::string &resName, const ResConfigImpl &resConfig, int32_t userId);
 
     const std::shared_ptr<ThemeResource::ThemeQualifierValue> GetBestMatchThemeResource(
         const std::vector<std::shared_ptr<ThemeResource::ThemeValue> > &candidates,
         const ResConfigImpl &resConfig);
 
     std::vector<std::string> GetRootDir(const std::string &strCurrentDir);
+    bool IsSameResourceByUserId(const std::string &path, int32_t userId);
     void UpdateUserId(int32_t userId);
     std::mutex lockSkin_;
     std::mutex lockIcon_;
     std::mutex lockThemeId_;
     std::mutex lockIconValue_;
     std::mutex lockUserId_;
+    std::mutex lockUseCount_;
     uint32_t themeId_{0};
     bool isFirstCreate = true;
     int32_t currentUserId_ = 0;
