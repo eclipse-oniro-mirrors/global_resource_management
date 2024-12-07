@@ -52,6 +52,7 @@ ThemePackManager::ThemePackManager()
 
 ThemePackManager::~ThemePackManager()
 {
+    RESMGR_HILOGI_BY_FLAG(isLogFlag_, RESMGR_TAG, "~ThemePackManager");
     skinResource_.clear();
     iconResource_.clear();
     iconMaskValues_.clear();
@@ -321,7 +322,7 @@ void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, con
         }
     }
     ClearIconResource();
-    RESMGR_HILOGI_BY_FLAG(isLogFlag_, RESMGR_TAG, "load img end, size is %{public}u", iconResource_.size());
+    RESMGR_HILOGI_BY_FLAG(isLogFlag_, RESMGR_TAG, "load img end, size is %{public}zu", iconResource_.size());
 }
 
 const std::string ThemePackManager::FindThemeIconResource(const std::pair<std::string, std::string> &bundleInfo,
