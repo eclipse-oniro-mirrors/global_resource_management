@@ -2108,4 +2108,17 @@ HWTEST_F(ResourceManagerTest, AddPatchResourcePathTest001, TestSize.Level1)
     EXPECT_TRUE(rm->AddPatchResource(path.c_str(), "testPatch"));
     EXPECT_FALSE(rm->AddPatchResource("not_exit_path", "testPatch"));
 }
+
+/*
+ * @tc.name: ReleaseSystemResourceManagerTest001
+ * @tc.desc: Test ReleaseSystemResourceManager function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ReleaseSystemResourceManagerTest001, TestSize.Level1)
+{
+    ResourceManager *bundleRm = GetSystemResourceManagerNoSandBox();
+    EXPECT_TRUE(bundleRm != nullptr);
+    ReleaseSystemResourceManager();
+    bundleRm = nullptr;
+}
 }
