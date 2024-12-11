@@ -75,6 +75,7 @@ bool ResourceManagerImpl::Init(bool isSystem)
         RESMGR_HILOGE(RESMGR_TAG, "new HapManager failed when ResourceManagerImpl::Init");
         return false;
     }
+    isSystemResMgr_ = isSystem;
     return true;
 }
 
@@ -1088,6 +1089,17 @@ bool ResourceManagerImpl::AddResource(const char *path, const uint32_t &selected
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
+#endif
+
+#if defined(__ARKUI_CROSS__)
+    if (!isSystemResMgr_ && std::string(path).find("/systemres/resources.index") != std::string::npos) {
+        ResourceManager* systemResourceManager = GetSystemResourceManager();
+        if (systemResourceManager != nullptr) {
+            systemResourceManager->AddResource(path);
+            AddSystemResource(systemResourceManager);
+            return true;
+        }
+    }
 #endif
     return this->hapManager_->AddResource(path, selectedTypes);
 }
