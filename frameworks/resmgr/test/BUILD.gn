@@ -56,7 +56,6 @@ ohos_unittest("resmgr_test") {
     "../:global_resmgr",
     "//third_party/cJSON:cjson",
     "//third_party/googletest:gtest_main",
-    "//third_party/zlib:libz",
   ]
 
   if (resource_management_support_icu) {
@@ -71,6 +70,7 @@ ohos_unittest("resmgr_test") {
   external_deps = [
     "ability_base:extractortool",
     "hilog:libhilog",
+    "zlib:libz",
   ]
 
   resource_config_file = "../../../test/resource/ohos_test.xml"
