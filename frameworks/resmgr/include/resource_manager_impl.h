@@ -814,6 +814,8 @@ private:
     const std::string FONT_SIZE_PIXEL = "fp";
 
     bool isOverrideResMgr_ = false;
+
+    bool isSystemResMgr_ = false;
 };
 } // namespace Resource
 } // namespace Global
