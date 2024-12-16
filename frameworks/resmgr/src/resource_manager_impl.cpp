@@ -1101,7 +1101,7 @@ bool ResourceManagerImpl::AddResource(const char *path, const uint32_t &selected
 
 #if defined(__ARKUI_CROSS__)
     if (!isSystemResMgr_ && std::string(path).find("/systemres/resources.index") != std::string::npos) {
-        ResourceManager* systemResourceManager = GetSystemResourceManager();
+        ResourceManagerImpl* systemResourceManager = SystemResourceManager::GetSystemResourceManager();
         if (systemResourceManager != nullptr) {
             systemResourceManager->AddResource(path);
             AddSystemResource(systemResourceManager);
