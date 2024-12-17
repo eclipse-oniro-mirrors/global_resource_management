@@ -88,10 +88,12 @@ bool SystemResourceManager::CreateSystemResourceManager(bool isSandbox)
             delete impl;
             return false;
         }
+#if !defined(__ARKUI_CROSS__)
         if (!LoadSystemResource(impl, isSandbox)) {
             delete impl;
             return false;
         }
+#endif
         resourceManager_ = impl;
     }
     return true;
