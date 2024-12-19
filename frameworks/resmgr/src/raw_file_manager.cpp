@@ -354,6 +354,9 @@ long OH_ResourceManager_GetRawFileOffset(const RawFile *rawFile)
 static bool GetRawFileDescriptorFromHap(const RawFile *rawFile, RawFileDescriptor &descriptor)
 {
     ResourceManager::RawFileDescriptor resMgrDescriptor;
+    if (rawFile->resMgr->resManager == nullptr) {
+        return false;
+    }
     RState state = rawFile->resMgr->resManager->
         GetRawFdNdkFromHap(rawFile->filePath, resMgrDescriptor);
     if (state != SUCCESS) {
@@ -376,7 +379,7 @@ bool OH_ResourceManager_GetRawFileDescriptorData(const RawFile *rawFile, RawFile
     if (rawFile == nullptr || rawFile->actualOffset == nullptr) {
         return false;
     }
-    if (rawFile->resMgr != nullptr && rawFile->resMgr->resManager != nullptr) {
+    if (rawFile->resMgr != nullptr) {
         return GetRawFileDescriptorFromHap(rawFile, *descriptor);
     }
     char paths[PATH_MAX] = {0};
@@ -588,6 +591,9 @@ int64_t OH_ResourceManager_GetRawFileOffset64(const RawFile64 *rawFile)
 static bool GetRawFileDescriptorFromHap64(const RawFile64 *rawFile, RawFileDescriptor64 *descriptor)
 {
     ResourceManager::RawFileDescriptor resMgrDescriptor;
+    if (rawFile->raw->resMgr->resManager == nullptr) {
+        return false;
+    }
     RState state = rawFile->raw->resMgr->resManager->
         GetRawFdNdkFromHap(rawFile->raw->filePath, resMgrDescriptor);
     if (state != SUCCESS) {
@@ -605,7 +611,7 @@ bool OH_ResourceManager_GetRawFileDescriptor64(const RawFile64 *rawFile, RawFile
     if (rawFile == nullptr || rawFile->raw == nullptr) {
         return false;
     }
-    if (rawFile->raw->resMgr != nullptr && rawFile->raw->resMgr->resManager != nullptr) {
+    if (rawFile->raw->resMgr != nullptr) {
         return GetRawFileDescriptorFromHap64(rawFile, descriptor);
     }
     char paths[PATH_MAX] = {0};
