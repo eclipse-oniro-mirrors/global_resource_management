@@ -862,8 +862,7 @@ std::string HapParser::ToFolderPath(const std::vector<std::shared_ptr<KeyParam>>
     }
     // mcc-mnc-language_script_region-direction-deviceType-colorMode-inputDevice-screenDensity
     Determiner determiner;
-    for (size_t i = 0; i < keyParams.size(); ++i) {
-        std::shared_ptr<KeyParam> keyParam = keyParams[i];
+    for (const auto &keyParam : keyParams) {
         switch (keyParam->type_) {
             case KeyType::LANGUAGES:
                 determiner.language = keyParam->GetStr();
