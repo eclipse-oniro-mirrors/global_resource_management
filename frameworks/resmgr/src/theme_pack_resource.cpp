@@ -184,13 +184,9 @@ void ThemeResource::ParseJson(const std::string &bundleName, const std::string &
     }
     std::pair<std::string, std::string> bundleInfo(bundleName, moduleName);
     cJSON *floatRoot = cJSON_GetObjectItem(jsonValue, "float");
-    if (floatRoot == nullptr) {
-        ReleaseJson(jsonData, pf);
-        cJSON_Delete(jsonValue);
-        RESMGR_HILOGE(RESMGR_TAG, "get float fail");
-        return;
+    if (floatRoot != nullptr) {
+        InitThemeRes(bundleInfo, floatRoot, themeConfig, "float");
     }
-    InitThemeRes(bundleInfo, floatRoot, themeConfig, "float");
 
     cJSON *colorRoot = cJSON_GetObjectItem(jsonValue, "color");
     if (colorRoot != nullptr) {
