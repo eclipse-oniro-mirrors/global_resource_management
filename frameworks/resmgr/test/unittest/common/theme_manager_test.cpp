@@ -93,7 +93,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest001, TestSiz
 }
 
 /*
- * @tc.name: ThemeManagerTestLoadThemeSkinResourceTest003
+ * @tc.name: ThemeManagerTestLoadThemeSkinResourceTest002
  * @tc.desc: Test AddResource function, file case.
  * @tc.type: FUNC
  */
@@ -114,6 +114,220 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest002, TestSiz
     tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId);
     rm->GetColorById(id, outValue);
     ASSERT_EQ(4294967295, outValue); // base_only theme value is #ffffff(4294967295)
+}
+
+/*
+ * @tc.name: ThemeManagerTestLoadThemeSkinResourceTest003
+ * @tc.desc: Test GetThemeDataById function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest003, TestSize.Level1)
+{
+   // success cases
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId("ohos_device_theme", ResType::THEME);
+    std::map<std::string, ResourceManager::ResData> outValue;
+    rm->GetThemeDataById(id, outValue);
+    ASSERT_EQ(ResType::STRING, outValue["width1"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["width2"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["height1"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["height2"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["textColor1"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["textColor2"].resType);
+    ASSERT_EQ(ResType::PATTERN, outValue["button_pattern"].resType);
+    ASSERT_EQ(ResType::THEME, outValue["ohosTheme"].resType);
+    ASSERT_EQ(ResType::PATTERN, outValue["text_pattern"].resType);
+    ASSERT_EQ(ResType::PATTERN, outValue["list_pattern"].resType);
+    ASSERT_EQ("100fp", outValue["width1"].value);
+    ASSERT_EQ("100fp", outValue["width2"].value);
+    ASSERT_EQ("100vp", outValue["height1"].value);
+    ASSERT_EQ("100vp", outValue["height2"].value);
+    ASSERT_EQ("#000000FF", outValue["textColor1"].value);
+    ASSERT_EQ("#000000FF", outValue["textColor2"].value);
+    ASSERT_EQ("16777333", outValue["button_pattern"].value);
+    ASSERT_EQ("16777328", outValue["ohosTheme"].value);
+    ASSERT_EQ("16777332", outValue["text_pattern"].value);
+    ASSERT_EQ("16777331", outValue["list_pattern"].value);
+
+    std::vector<std::string> rootDirs;
+    std::string rootDir = "/data/test/theme/skin/ohos.global.test.all";
+    rootDirs.emplace_back(rootDir);
+    int32_t userId = 100; // userId is 100
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId);
+    rm->GetThemeDataById(id, outValue);
+    ASSERT_EQ(ResType::STRING, outValue["width1"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["width2"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["height1"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["height2"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["textColor1"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["textColor2"].resType);
+    ASSERT_EQ("1000fp", outValue["width1"].value);
+    ASSERT_EQ("100fp", outValue["width2"].value);
+    ASSERT_EQ("1000vp", outValue["height1"].value);
+    ASSERT_EQ("100vp", outValue["height2"].value);
+    ASSERT_EQ("#000000AA", outValue["textColor1"].value);
+    ASSERT_EQ("#000000FF", outValue["textColor2"].value);
+    ASSERT_EQ("16777333", outValue["button_pattern"].value);
+    ASSERT_EQ("16777328", outValue["ohosTheme"].value);
+    ASSERT_EQ("16777332", outValue["text_pattern"].value);
+    ASSERT_EQ("16777331", outValue["list_pattern"].value);
+}
+
+/*
+ * @tc.name: ThemeManagerTestLoadThemeSkinResourceTest004
+ * @tc.desc: Test GetThemeDataByName function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest004, TestSize.Level1)
+{
+   // success cases
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    std::map<std::string, ResourceManager::ResData> outValue;
+    rm->GetThemeDataByName("ohos_device_theme", outValue);
+    ASSERT_EQ(ResType::STRING, outValue["width1"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["width2"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["height1"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["height2"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["textColor1"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["textColor2"].resType);
+    ASSERT_EQ(ResType::PATTERN, outValue["button_pattern"].resType);
+    ASSERT_EQ(ResType::THEME, outValue["ohosTheme"].resType);
+    ASSERT_EQ(ResType::PATTERN, outValue["text_pattern"].resType);
+    ASSERT_EQ(ResType::PATTERN, outValue["list_pattern"].resType);
+    ASSERT_EQ("100fp", outValue["width1"].value);
+    ASSERT_EQ("100fp", outValue["width2"].value);
+    ASSERT_EQ("100vp", outValue["height1"].value);
+    ASSERT_EQ("100vp", outValue["height2"].value);
+    ASSERT_EQ("#000000FF", outValue["textColor1"].value);
+    ASSERT_EQ("#000000FF", outValue["textColor2"].value);
+    ASSERT_EQ("16777333", outValue["button_pattern"].value);
+    ASSERT_EQ("16777328", outValue["ohosTheme"].value);
+    ASSERT_EQ("16777332", outValue["text_pattern"].value);
+    ASSERT_EQ("16777331", outValue["list_pattern"].value);
+
+    std::vector<std::string> rootDirs;
+    std::string rootDir = "/data/test/theme/skin/ohos.global.test.all";
+    rootDirs.emplace_back(rootDir);
+    int32_t userId = 100; // userId is 100
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId);
+    rm->GetThemeDataByName("ohos_device_theme", outValue);
+    ASSERT_EQ(ResType::STRING, outValue["width1"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["width2"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["height1"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["height2"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["textColor1"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["textColor2"].resType);
+    ASSERT_EQ("1000fp", outValue["width1"].value);
+    ASSERT_EQ("100fp", outValue["width2"].value);
+    ASSERT_EQ("1000vp", outValue["height1"].value);
+    ASSERT_EQ("100vp", outValue["height2"].value);
+    ASSERT_EQ("#000000AA", outValue["textColor1"].value);
+    ASSERT_EQ("#000000FF", outValue["textColor2"].value);
+    ASSERT_EQ("16777333", outValue["button_pattern"].value);
+    ASSERT_EQ("16777328", outValue["ohosTheme"].value);
+    ASSERT_EQ("16777332", outValue["text_pattern"].value);
+    ASSERT_EQ("16777331", outValue["list_pattern"].value);
+}
+
+/*
+ * @tc.name: ThemeManagerTestLoadThemeSkinResourceTest005
+ * @tc.desc: Test GetPatternDataByName function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest005, TestSize.Level1)
+{
+   // success cases
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    std::map<std::string, ResourceManager::ResData> outValue;
+    rm->GetPatternDataByName("ohos_button_pattern", outValue);
+    ASSERT_EQ(ResType::STRING, outValue["width"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["height"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["bgColor"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["fgColor"].resType);
+    ASSERT_EQ(ResType::PATTERN, outValue["fontPattern"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["marginColor"].resType);
+    ASSERT_EQ(ResType::PATTERN, outValue["baseFontPattern"].resType);
+    ASSERT_EQ("10vp", outValue["width"].value);
+    ASSERT_EQ("66vp", outValue["height"].value);
+    ASSERT_EQ("#FF0000BB", outValue["bgColor"].value);
+    ASSERT_EQ("#FF0000CC", outValue["fgColor"].value);
+    ASSERT_EQ("16777334", outValue["fontPattern"].value);
+    ASSERT_EQ("#FF00AA00", outValue["marginColor"].value);
+    ASSERT_EQ("16777335", outValue["baseFontPattern"].value);
+
+    std::vector<std::string> rootDirs;
+    std::string rootDir = "/data/test/theme/skin/ohos.global.test.all";
+    rootDirs.emplace_back(rootDir);
+    int32_t userId = 100; // userId is 100
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId);
+    rm->GetPatternDataByName("ohos_button_pattern", outValue);
+    ASSERT_EQ(ResType::STRING, outValue["width"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["height"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["bgColor"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["fgColor"].resType);
+    ASSERT_EQ(ResType::PATTERN, outValue["fontPattern"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["marginColor"].resType);
+    ASSERT_EQ(ResType::PATTERN, outValue["baseFontPattern"].resType);
+    ASSERT_EQ("10vp", outValue["width"].value);
+    ASSERT_EQ("666vp", outValue["height"].value);
+    ASSERT_EQ("#FF0000BB", outValue["bgColor"].value);
+    ASSERT_EQ("#FF0000CC", outValue["fgColor"].value);
+    ASSERT_EQ("16777334", outValue["fontPattern"].value);
+    ASSERT_EQ("#FF00AA00", outValue["marginColor"].value);
+    ASSERT_EQ("16777335", outValue["baseFontPattern"].value);
+}
+
+/*
+ * @tc.name: ThemeManagerTestLoadThemeSkinResourceTest006
+ * @tc.desc: Test GetPatternDataById function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest006, TestSize.Level1)
+{
+   // success cases
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId("ohos_button_pattern", ResType::PATTERN);
+    std::map<std::string, ResourceManager::ResData> outValue;
+    rm->GetPatternDataById(id, outValue);
+    ASSERT_EQ(ResType::STRING, outValue["width"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["height"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["bgColor"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["fgColor"].resType);
+    ASSERT_EQ(ResType::PATTERN, outValue["fontPattern"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["marginColor"].resType);
+    ASSERT_EQ(ResType::PATTERN, outValue["baseFontPattern"].resType);
+    ASSERT_EQ("10vp", outValue["width"].value);
+    ASSERT_EQ("66vp", outValue["height"].value);
+    ASSERT_EQ("#FF0000BB", outValue["bgColor"].value);
+    ASSERT_EQ("#FF0000CC", outValue["fgColor"].value);
+    ASSERT_EQ("16777334", outValue["fontPattern"].value);
+    ASSERT_EQ("#FF00AA00", outValue["marginColor"].value);
+    ASSERT_EQ("16777335", outValue["baseFontPattern"].value);
+
+    std::vector<std::string> rootDirs;
+    std::string rootDir = "/data/test/theme/skin/ohos.global.test.all";
+    rootDirs.emplace_back(rootDir);
+    int32_t userId = 100; // userId is 100
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId);
+    rm->GetPatternDataById(id, outValue);
+    ASSERT_EQ(ResType::STRING, outValue["width"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["height"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["bgColor"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["fgColor"].resType);
+    ASSERT_EQ(ResType::PATTERN, outValue["fontPattern"].resType);
+    ASSERT_EQ(ResType::STRING, outValue["marginColor"].resType);
+    ASSERT_EQ(ResType::PATTERN, outValue["baseFontPattern"].resType);
+    ASSERT_EQ("10vp", outValue["width"].value);
+    ASSERT_EQ("666vp", outValue["height"].value);
+    ASSERT_EQ("#FF0000BB", outValue["bgColor"].value);
+    ASSERT_EQ("#FF0000CC", outValue["fgColor"].value);
+    ASSERT_EQ("16777334", outValue["fontPattern"].value);
+    ASSERT_EQ("#FF00AA00", outValue["marginColor"].value);
+    ASSERT_EQ("16777335", outValue["baseFontPattern"].value);
 }
 
 /*

@@ -1,0 +1,38 @@
+{
+    "theme": [
+      {
+        "name":"ohos_device_theme",
+        "parent": "ohos_base_theme",
+        "value":[
+          {
+            "name":"button_pattern",
+            "value":"$pattern:ohos_phone_button_pattern"
+          },
+          {
+            "name":"width1",
+            "value":"$float:float1"
+          },
+          {
+            "name":"width2",
+            "value":"100fp"
+          },
+          {
+            "name":"height1",
+            "value":"$float:float2"
+          },
+          {
+            "name":"height2",
+            "value":"100vp"
+          },
+          {
+            "name":"textColor1",
+            "value":"$color:color1"
+          },
+          {
+            "name":"textColor2",
+            "value":"#000000FF"
+          }
+        ]
+      }
+    ]
+  }

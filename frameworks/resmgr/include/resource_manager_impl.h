@@ -733,6 +733,38 @@ public:
      */
     virtual RState GetStringFormatByName(std::string &outValue, const char *name, va_list args);
 
+    /**
+     * Get the THEME resource by resource name
+     * @param name the resource name
+     * @param outValue the resource write to
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetThemeDataByName(const char *name, std::map<std::string, ResData> &outValue);
+
+    /**
+     * Get the THEME resource by resource id
+     * @param id the resource id
+     * @param outValue the resource write to
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetThemeDataById(uint32_t id, std::map<std::string, ResData> &outValue);
+
+    /**
+     * Get the PATTERN resource by resource id
+     * @param id the resource id
+     * @param outValue the resource write to
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetPatternDataById(uint32_t id, std::map<std::string, ResData> &outValue);
+
+    /**
+     * Get the PATTERN resource by resource name
+     * @param name the resource name
+     * @param outValue the resource write to
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetPatternDataByName(const char *name, std::map<std::string, ResData> &outValue);
+
 private:
     RState GetString(const std::shared_ptr<IdItem> idItem, std::string &outValue);
 
@@ -796,6 +828,17 @@ private:
     RState GetThemeValues(const std::string &value, std::string &outValue);
 
     RState UpdateFakeLocaleFlag(ResConfig &resConfig);
+
+    RState GetThemeData(const std::shared_ptr<IdItem> idItem, std::map<std::string, ResData> &outValue);
+
+    RState ResolveResData(const std::shared_ptr<IdItem> idItem, std::map<std::string, ResData> &outValue);
+
+    RState ResolveDataReference(const std::string key, const std::string value,
+        std::map<std::string, ResData> &outValue);
+
+    RState GetPatternData(const std::shared_ptr<IdItem> idItem, std::map<std::string, ResData> &outValue);
+
+    RState ProcessItem(std::shared_ptr<IdItem> idItem, std::map<std::string, ResData> &outValue);
 
     std::shared_ptr<HapManager> GetHapManager();
 

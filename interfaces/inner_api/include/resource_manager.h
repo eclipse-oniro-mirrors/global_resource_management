@@ -57,6 +57,14 @@ public:
         uint32_t id;
     };
 
+    struct ResData {
+        /** the resource type */
+        ResType resType;
+
+        /** the resource value */
+        std::string value;
+    };
+
     enum class NapiValueType {
         NAPI_NUMBER = 0,
         NAPI_STRING = 1
@@ -244,6 +252,14 @@ public:
         std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams) = 0;
     
     virtual bool AddPatchResource(const char *path, const char *patchPath) = 0;
+
+    virtual RState GetThemeDataByName(const char *name, std::map<std::string, ResData> &outValue) = 0;
+
+    virtual RState GetThemeDataById(uint32_t id, std::map<std::string, ResData> &outValue) = 0;
+
+    virtual RState GetPatternDataById(uint32_t id, std::map<std::string, ResData> &outValue) = 0;
+
+    virtual RState GetPatternDataByName(const char *name, std::map<std::string, ResData> &outValue) = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();

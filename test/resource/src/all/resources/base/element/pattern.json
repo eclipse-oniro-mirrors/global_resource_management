@@ -44,6 +44,106 @@
           "value":"222vp"
         }
       ]
+    },
+    {
+      "name": "base_button_pattern",
+      "value": [
+        {
+          "name": "bgColor",
+          "value": "#FF00AABB"
+        },
+        {
+          "name": "fgColor",
+          "value": "#FF00AACC"
+        },
+        {
+          "name": "marginColor",
+          "value": "#FF00AA00"
+        },
+        {
+          "name": "baseFontPattern",
+          "value": "$pattern:base_font_pattern"
+        }
+      ]
+    },
+    {
+      "name": "ohos_button_pattern",
+      "parent": "base_button_pattern",
+      "value": [
+        {
+          "name":"width",
+          "value":"10vp"
+        },
+        {
+          "name":"height",
+          "value":"$float:button_height"
+        },
+        {
+          "name": "bgColor",
+          "value": "#FF0000BB"
+        },
+        {
+          "name": "fgColor",
+          "value": "#FF0000CC"
+        },
+        {
+          "name": "fontPattern",
+          "value": "$pattern:ohos_font_pattern"
+        }
+      ]
+    },
+    {
+      "name": "base_list_pattern",
+      "value": [
+        {
+          "name": "bgColor",
+          "value": "#FF1100BB"
+        },
+        {
+          "name": "fgColor",
+          "value": "#FF1100CC"
+        }
+      ]
+    },
+    {
+      "name": "ohos_text_pattern",
+      "value": [
+        {
+          "name": "bgColor",
+          "value": "#FF2200BB"
+        },
+        {
+          "name": "fgColor",
+          "value": "#FF2200CC"
+        }
+      ]
+    },
+    {
+      "name": "ohos_font_pattern",
+      "value": [
+        {
+          "name": "bgColor",
+          "value": "#FF3300BB"
+        },
+        {
+          "name": "fgColor",
+          "value": "#FF3300CC"
+        }
+      ]
+    },
+    {
+      "name": "base_font_pattern",
+      "value": [
+        {
+          "name": "bgColor",
+          "value": "#FF3300BB"
+        },
+        {
+          "name": "fgColor",
+          "value": "#FF3300CC"
+        }
+      ]
     }
+
   ]
 }

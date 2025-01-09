@@ -59,6 +59,10 @@
     {
       "name": "base_only",
       "value": "#00000000"
+    },
+    {
+      "name": "color1",
+      "value": "#000000FF"
     }
   ]
 }

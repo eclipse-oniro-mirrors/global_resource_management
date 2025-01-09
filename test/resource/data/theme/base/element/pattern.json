@@ -7,6 +7,10 @@
     {
         "name": "normal_background_color",
         "value": "#00000000"
+    },
+    {
+      "name": "color1",
+      "value": "#000000AA"
     }
   ],
   "float": [
@@ -17,6 +21,18 @@
     {
         "name": "card_margin_start",
         "value": "48vp"
+    },
+    {
+        "name": "float1",
+        "value": "1000fp"
+    },
+    {
+        "name": "float2",
+        "value": "1000vp"
+    },
+    {
+        "name": "button_height",
+        "value": "666vp"
     }
   ]
 }
