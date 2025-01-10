@@ -81,6 +81,11 @@ public:
 
     virtual void GetResConfig(ResConfig &resConfig) = 0;
 
+    virtual RState GetResConfigById(uint32_t resId, ResConfig &resConfig, uint32_t density = 0) = 0;
+
+    virtual RState GetResConfigByName(const std::string &name, const ResType type,
+        ResConfig &resConfig, uint32_t density = 0) = 0;
+
     virtual RState GetStringById(uint32_t id, std::string &outValue) = 0;
 
     virtual RState GetStringByName(const char *name, std::string &outValue) = 0;

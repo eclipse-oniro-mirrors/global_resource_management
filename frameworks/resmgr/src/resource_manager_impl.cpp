@@ -1215,6 +1215,26 @@ void ResourceManagerImpl::GetResConfig(ResConfig &resConfig)
     this->hapManager_->GetResConfig(resConfig);
 }
 
+RState GetResConfigById(uint32_t resId, ResConfig &resConfig, uint32_t density)
+{
+    if (!IsDensityValid(density)) {
+        RESMGR_HILOGD(RESMGR_TAG, "density invalid");
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+
+    return this->hapManager_->GetResConfigById(resId, resConfig, isOverrideResMgr_, density);
+}
+
+RState GetResConfigByName(const string &name, const ResType type, ResConfig &resConfig, uint32_t density)
+{
+    if (!IsDensityValid(density)) {
+        RESMGR_HILOGD(RESMGR_TAG, "density invalid");
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+    
+    return this->hapManager_->GetResConfigByName(name, type, resConfig, isOverrideResMgr_, density);
+}
+
 void ResourceManagerImpl::GetOverrideResConfig(ResConfig &resConfig)
 {
     this->hapManager_->GetOverrideResConfig(resConfig);

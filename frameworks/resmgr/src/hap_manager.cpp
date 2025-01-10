@@ -373,6 +373,26 @@ void HapManager::GetResConfig(ResConfig &resConfig)
     resConfig.Copy(*(this->resConfig_), true);
 }
 
+RState GetResConfigById(uint32_t resId, ResConfig &resConfig, bool isGetOverrideResource, uint32_t density)
+{
+    auto qualifierValue = FindQualifierValueById(resId, isGetOverrideResource, density);
+    if (qualifierValue == nullptr) {
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+    resConfig.Copy(*(qualifierValue.GetResConfig()), true);
+    return SUCCESS;
+}
+
+RState GetResConfigByName(const string &name, const ResType type, ResConfig &resConfig, bool isGetOverrideResource, uint32_t density)
+{
+    auto qualifierValue = FindQualifierValueByName(name, type, isGetOverrideResource, density);
+    if (qualifierValue == nullptr) {
+        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
+    }
+    resConfig.Copy(*(qualifierValue.GetResConfig()), true);
+    return SUCCESS;
+}
+
 void HapManager::GetOverrideResConfig(ResConfig &resConfig)
 {
     ReadLock lock(this->mutex_);
