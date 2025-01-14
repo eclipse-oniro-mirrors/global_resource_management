@@ -87,7 +87,7 @@ public:
      * @param path the resource path
      * @return true if add resource path success, else false
      */
-    bool AddResource(const char *path, const uint32_t &selectedTypes);
+    bool AddResource(const char *path, const uint32_t &selectedTypes, bool forceReload = false);
 
     bool AddPatchResource(const char *path, const char *patchPath);
 
@@ -419,7 +419,11 @@ private:
         const std::vector<std::shared_ptr<HapResource::IdValues>> &candidates,
         uint32_t density, bool isGetOverrideResource);
 
-    bool AddResourcePath(const char *path, const uint32_t &selectedTypes = SELECT_ALL);
+    bool AddResourcePath(const char *path, const uint32_t &selectedTypes = SELECT_ALL, bool forceReload = false);
+
+#if defined(__ARKUI_CROSS__)
+    void RemoveHapResource(const std::string &path);
+#endif
 
     bool AddPatchResourcePath(const char *path, const char *patchPath);
 

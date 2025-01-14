@@ -71,6 +71,17 @@ std::shared_ptr<HapResource> HapResourceManager::GetHapResource(const std::strin
     }
     return nullptr;
 }
+
+#if defined(__ARKUI_CROSS__)
+void HapResourceManager::RemoveHapResource(const std::string &path)
+{
+    std::unique_lock<std::shared_mutex> lock(mutexRw_);
+    auto iter = hapResourceMap_.find(path);
+    if (iter != hapResourceMap_.end()) {
+        hapResourceMap_.erase(iter);
+    }
+}
+#endif
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
