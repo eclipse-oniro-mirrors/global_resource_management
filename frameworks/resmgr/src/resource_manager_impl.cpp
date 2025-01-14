@@ -587,7 +587,8 @@ RState ResourceManagerImpl::GetThemeFloat(const std::shared_ptr<IdItem> idItem, 
     std::vector<std::shared_ptr<IdItem>> idItems;
     idItems.emplace_back(idItem);
     ProcessReference(idItem->value_, idItems);
-    std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig);
+    std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(
+        bundleInfo, idItems, resConfig, userId);
     if (result.empty()) {
         return NOT_FOUND;
     }
@@ -603,7 +604,8 @@ RState ResourceManagerImpl::GetThemeFloat(const std::shared_ptr<IdItem> idItem, 
     std::vector<std::shared_ptr<IdItem>> idItems;
     idItems.emplace_back(idItem);
     ProcessReference(idItem->value_, idItems);
-    std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig);
+    std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(
+        bundleInfo, idItems, resConfig, userId);
     if (result.empty()) {
         return NOT_FOUND;
     }
@@ -1225,7 +1227,8 @@ RState ResourceManagerImpl::GetThemeMedia(const std::shared_ptr<IdItem> idItem, 
     GetResConfig(resConfig);
     std::vector<std::shared_ptr<IdItem>> idItems;
     idItems.emplace_back(idItem);
-    std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig);
+    std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(
+        bundleInfo, idItems, resConfig, userId);
     outValue = Utils::LoadResourceFile(result, len);
     return result.empty() ? ERROR_CODE_RES_ID_NOT_FOUND : SUCCESS;
 }
@@ -1283,7 +1286,8 @@ RState ResourceManagerImpl::GetThemeMediaBase64(const std::shared_ptr<IdItem> id
     GetResConfig(resConfig);
     std::vector<std::shared_ptr<IdItem>> idItems;
     idItems.emplace_back(idItem);
-    std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig);
+    std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(
+        bundleInfo, idItems, resConfig, userId);
     if (result.empty()) {
         return NOT_FOUND;
     }
@@ -1407,7 +1411,8 @@ RState ResourceManagerImpl::GetThemeIcon(const std::shared_ptr<IdItem> idItem, s
     std::unique_ptr<uint8_t[]> &outValue, uint32_t density)
 {
     std::string iconName = idItem->GetItemResName();
-    std::string result = ThemePackManager::GetThemePackManager()->FindThemeIconResource(bundleInfo, iconName);
+    std::string result = ThemePackManager::GetThemePackManager()->FindThemeIconResource(
+        bundleInfo, iconName, userId);
     if (result.empty()) {
         RESMGR_HILOGD(RESMGR_TAG,
             "GetThemeIcon FAILED bundlename = %{public}s, modulename = %{public}s, iconName = %{public}s",
@@ -1647,7 +1652,7 @@ RState ResourceManagerImpl::GetThemeIconInfo(const std::string &iconName, size_t
     std::unique_ptr<uint8_t[]> &outValue, const std::string &abilityName)
 {
     std::string result = ThemePackManager::GetThemePackManager()->FindThemeIconResource(
-        bundleInfo, iconName, abilityName);
+        bundleInfo, iconName, userId, abilityName);
     if (result.empty()) {
         RESMGR_HILOGD(RESMGR_TAG, "GetThemeIconInfo FAILED bundlename = %{public}s,", result.c_str());
         return ERROR_CODE_RES_ID_NOT_FOUND;
@@ -1685,7 +1690,7 @@ std::string ResourceManagerImpl::GetThemeMask()
 
 bool ResourceManagerImpl::HasIconInTheme(const std::string &bundleName)
 {
-    return ThemePackManager::GetThemePackManager()->HasIconInTheme(bundleName);
+    return ThemePackManager::GetThemePackManager()->HasIconInTheme(bundleName, userId);
 }
 
 RState ResourceManagerImpl::GetOtherIconsInfo(const std::string &iconName,
@@ -1701,7 +1706,7 @@ RState ResourceManagerImpl::GetOtherIconsInfo(const std::string &iconName,
     if (result == SUCCESS) {
         return SUCCESS;
     }
-    return ThemePackManager::GetThemePackManager()->GetOtherIconsInfo(iconName, outValue, len, isGlobalMask);
+    return ThemePackManager::GetThemePackManager()->GetOtherIconsInfo(iconName, outValue, len, isGlobalMask, userId);
 }
 
 RState ResourceManagerImpl::IsRawDirFromHap(const std::string &pathName, bool &outValue)

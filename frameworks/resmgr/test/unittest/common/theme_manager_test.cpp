@@ -202,7 +202,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestGetThemeIconFromCacheTest001, TestSiz
     size_t len;
     RState state = tm->GetThemeIconFromCache("other_icons_background", outValue, len);
     EXPECT_EQ(state, NOT_FOUND);
-    state = tm->GetOtherIconsInfo("background", outValue, len, false);
+    state = tm->GetOtherIconsInfo("background", outValue, len, false, userId);
     EXPECT_EQ(state, SUCCESS);
     state = tm->GetThemeIconFromCache("other_icons_background", outValue, len);
     EXPECT_EQ(state, SUCCESS);

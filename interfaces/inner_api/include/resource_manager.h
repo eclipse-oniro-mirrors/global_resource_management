@@ -33,7 +33,7 @@ class ResourceManager {
 public:
     std::pair<std::string, std::string> bundleInfo;
 
-    int32_t userId = 100;
+    int32_t userId = 0;
 
     typedef struct {
         /** the raw file fd */
