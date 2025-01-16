@@ -234,7 +234,7 @@ bool LocalizeNumber(std::string &inputOutputNum, const ResConfigImpl &resConfig,
     }
     inputOutputNum.clear();
     UErrorCode status = U_ZERO_ERROR;
-    icu_72::UnicodeString formattedNum = numberFormat.formatDouble(num, status).toString(status);
+    icu::UnicodeString formattedNum = numberFormat.formatDouble(num, status).toString(status);
     if (U_FAILURE(status)) {
         RESMGR_HILOGE(RESMGR_TAG, "LocalizeNumber formatDouble failed, status = %{public}d", status);
         return false;
