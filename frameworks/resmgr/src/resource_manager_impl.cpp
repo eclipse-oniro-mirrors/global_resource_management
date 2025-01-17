@@ -1225,7 +1225,8 @@ RState ResourceManagerImpl::GetResConfigById(uint32_t resId, ResConfig &resConfi
     return this->hapManager_->GetResConfigById(resId, resConfig, isOverrideResMgr_, density);
 }
 
-RState ResourceManagerImpl::GetResConfigByName(const std::string &name, const ResType type, ResConfig &resConfig, uint32_t density)
+RState ResourceManagerImpl::GetResConfigByName(const std::string &name, const ResType type,
+    ResConfig &resConfig, uint32_t density)
 {
     if (!IsDensityValid(density)) {
         RESMGR_HILOGD(RESMGR_TAG, "density invalid");
