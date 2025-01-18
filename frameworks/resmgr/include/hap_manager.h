@@ -79,6 +79,7 @@ public:
      * Get resConfig by id
      * @param resId the resource Id
      * @param resConfig the resource config
+     * @param isGetOverrideResource override resource flag
      * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
      * @return SUCCESS if config exist, else NOT_FOUND
      */
@@ -90,6 +91,7 @@ public:
      * @param name the resource name
      * @param type the resource type
      * @param resConfig the resource config
+     * @param isGetOverrideResource override resource flag
      * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
      * @return SUCCESS if config exist, else NOT_FOUND
      */
