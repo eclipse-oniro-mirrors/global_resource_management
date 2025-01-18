@@ -371,6 +371,412 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigTest002, TestSize.Level
 }
 
 /*
+ * @tc.name: ResourceManagerGetResConfigByIdTest001
+ * @tc.desc: Test GetResConfigById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigByIdTest001, TestSize.Level1)
+{
+    // success cases
+    RState state;
+    {
+        ResConfigImpl appResCfg;
+        appResCfg.SetLocaleInfo("en", nullptr, "US");
+        appResCfg.SetColorMode(DARK);
+        state = rm->UpdateResConfig(appResCfg);
+        EXPECT_EQ(SUCCESS, state);
+    }
+    rm->AddResource(FormatFullPath(g_hapPath).c_str());
+
+    int id = rmc->GetResId("mccmnc_str", ResType::STRING);
+    ResConfigImpl resCfg;
+    state = rm->GetResConfigById(id, resCfg);
+    EXPECT_EQ(SUCCESS, state);
+#ifdef SUPPORT_GRAPHICS
+    EXPECT_EQ("en", std::string(resCfg.GetLocaleInfo()->getLanguage()));
+    EXPECT_EQ("US", std::string(resCfg.GetLocaleInfo()->getCountry()));
+#endif
+    EXPECT_EQ(DARK, resCfg.GetColorMode());
+}
+
+/*
+ * @tc.name: ResourceManagerGetResConfigByIdTest002
+ * @tc.desc: Test GetResConfigById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigByIdTest002, TestSize.Level1)
+{
+    // success cases
+    RState state;
+    {
+        ResConfigImpl appResCfg;
+        appResCfg.SetLocaleInfo("zh", nullptr, "CN");
+        appResCfg.SetScreenDensityDpi(SCREEN_DENSITY_XXLDPI);
+        state = rm->UpdateResConfig(appResCfg);
+        EXPECT_EQ(SUCCESS, state);
+    }
+
+    rm->AddResource(FormatFullPath(g_hapPath).c_str());
+
+    int id = rmc->GetResId("icon", ResType::MEDIA);
+    ResConfigImpl resCfg;
+    state = rm->GetResConfigById(id, resCfg, SCREEN_DENSITY_XXLDPI);
+    EXPECT_EQ(SUCCESS, state);
+#ifdef SUPPORT_GRAPHICS
+    EXPECT_EQ("zh", std::string(resCfg.GetLocaleInfo()->getLanguage()));
+    EXPECT_EQ("CN", std::string(resCfg.GetLocaleInfo()->getCountry()));
+#endif
+    EXPECT_EQ(SCREEN_DENSITY_XXLDPI, resCfg.GetScreenDensityDpi());
+}
+
+/*
+ * @tc.name: ResourceManagerGetResConfigByIdTest003
+ * @tc.desc: Test GetResConfigById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigByIdTest003, TestSize.Level1)
+{
+    // success cases
+    RState state;
+    {
+        ResConfigImpl appResCfg;
+        appResCfg.SetLocaleInfo("en", nullptr, "US");
+        appResCfg.SetScreenDensityDpi(SCREEN_DENSITY_XXLDPI);
+        appResCfg.SetColorMode(COLOR_MODE_NOT_SET);
+        state = rm->UpdateResConfig(appResCfg);
+        EXPECT_EQ(SUCCESS, state);
+    }
+    rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+
+    int id = rmc->GetResId("mccmnc_str", ResType::STRING);
+    ResConfigImpl resCfg;
+    state = rm->GetResConfigById(id, resCfg, SCREEN_DENSITY_XXLDPI);
+    EXPECT_EQ(SUCCESS, state);
+#ifdef SUPPORT_GRAPHICS
+    EXPECT_EQ("en", std::string(resCfg.GetLocaleInfo()->getLanguage()));
+    EXPECT_EQ("US", std::string(resCfg.GetLocaleInfo()->getCountry()));
+#endif
+    EXPECT_EQ(SCREEN_DENSITY_XXLDPI, resCfg.GetScreenDensityDpi());
+}
+
+/*
+ * @tc.name: ResourceManagerGetResConfigByIdTest004
+ * @tc.desc: Test GetResConfigById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigByIdTest004, TestSize.Level1)
+{
+    // success cases
+    RState state;
+    {
+        ResConfigImpl appResCfg;
+        appResCfg.SetLocaleInfo("en", nullptr, nullptr);
+        appResCfg.SetScreenDensityDpi(SCREEN_DENSITY_LDPI);
+        state = rm->UpdateResConfig(appResCfg);
+        EXPECT_EQ(SUCCESS, state);
+    }
+    rm->AddResource(FormatFullPath(g_hapPath).c_str());
+
+    int id = rmc->GetResId("mccmnc_str", ResType::STRING);
+    ResConfigImpl resCfg;
+    state = rm->GetResConfigById(id, resCfg, SCREEN_DENSITY_LDPI);
+    EXPECT_EQ(SUCCESS, state);
+#ifdef SUPPORT_GRAPHICS
+    EXPECT_EQ("en", std::string(resCfg.GetLocaleInfo()->getLanguage()));
+#endif
+    EXPECT_EQ(SCREEN_DENSITY_NOT_SET, resCfg.GetScreenDensityDpi());
+}
+
+/*
+ * @tc.name: ResourceManagerGetResConfigByIdTest005
+ * @tc.desc: Test GetResConfigById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigByIdTest005, TestSize.Level1)
+{
+    // error cases
+    ResConfigImpl resCfg;
+    int id = rmc->GetResId(g_nonExistName, ResType::STRING);
+    RState state = rm->GetResConfigById(id, resCfg);
+    EXPECT_EQ(ERROR_CODE_RES_NOT_FOUND_BY_ID, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetResConfigByIdTest006
+ * @tc.desc: Test GetResConfigById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigByIdTest006, TestSize.Level1)
+{
+    // success cases
+    std::shared_ptr<ResConfigImpl> rc = std::make_shared<ResConfigImpl>();
+    rc->SetLocaleInfo("zh-CN");
+    std::shared_ptr<ResourceManager> manager = rm->GetOverrideResourceManager(rc);
+    EXPECT_TRUE(manager != nullptr);
+    bool addRet = manager->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(addRet);
+
+    ResourceManagerTestCommon *overrideRmc = new ResourceManagerTestCommon(manager);
+    ResConfigImpl resCfg;
+    int id = overrideRmc->GetResId("child", ResType::PATTERN);
+    RState state = manager->GetResConfigById(id, resCfg);
+    EXPECT_EQ(SUCCESS, state);
+    EXPECT_EQ(DIRECTION_NOT_SET, resCfg.GetDirection());
+    EXPECT_EQ(SCREEN_DENSITY_NOT_SET, resCfg.GetScreenDensity());
+    EXPECT_EQ(DEVICE_NOT_SET, resCfg.GetDeviceType());
+    delete overrideRmc;
+}
+
+/*
+ * @tc.name: ResourceManagerGetResConfigByIdTest007
+ * @tc.desc: Test GetResConfigById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigByIdTest007, TestSize.Level1)
+{
+    // error cases
+    std::shared_ptr<ResConfigImpl> rc = std::make_shared<ResConfigImpl>();
+    rc->SetLocaleInfo("zh-CN");
+    std::shared_ptr<ResourceManager> manager = rm->GetOverrideResourceManager(rc);
+    EXPECT_TRUE(manager != nullptr);
+    bool addRet = manager->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(addRet);
+
+    ResourceManagerTestCommon *overrideRmc = new ResourceManagerTestCommon(manager);
+    ResConfigImpl resCfg;
+    int id = overrideRmc->GetResId(g_nonExistName, ResType::STRING);
+    RState state = manager->GetResConfigById(id, resCfg);
+    EXPECT_EQ(ERROR_CODE_RES_NOT_FOUND_BY_ID, state);
+    delete overrideRmc;
+}
+
+/*
+ * @tc.name: ResourceManagerGetResConfigByIdTest008
+ * @tc.desc: Test GetResConfigById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigByIdTest008, TestSize.Level1)
+{
+    // success cases
+    RState state;
+    {
+        ResConfigImpl appResCfg;
+        appResCfg.SetLocaleInfo("en", nullptr, nullptr);
+        appResCfg.SetScreenDensityDpi(SCREEN_DENSITY_LDPI);
+        state = rm->UpdateResConfig(appResCfg);
+        EXPECT_EQ(SUCCESS, state);
+    }
+
+    rm->AddResource(FormatFullPath(g_hapPath).c_str());
+
+    int id = rmc->GetResId("app_name", ResType::STRING);
+    ResConfigImpl resCfg;
+    state = rm->GetResConfigById(id, resCfg);
+    EXPECT_EQ(SUCCESS, state);
+    EXPECT_EQ(DIRECTION_NOT_SET, resCfg.GetDirection());
+    EXPECT_EQ(SCREEN_DENSITY_NOT_SET, resCfg.GetScreenDensity());
+    EXPECT_EQ(DEVICE_NOT_SET, resCfg.GetDeviceType());
+}
+
+/*
+ * @tc.name: ResourceManagerGetResConfigByNameTest001
+ * @tc.desc: Test GetResConfigByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigByNameTest001, TestSize.Level1)
+{
+    // success cases
+    RState state;
+    {
+        ResConfigImpl appResCfg;
+        appResCfg.SetLocaleInfo("en", nullptr, "US");
+        appResCfg.SetColorMode(DARK);
+        state = rm->UpdateResConfig(appResCfg);
+        EXPECT_EQ(SUCCESS, state);
+    }
+    rm->AddResource(FormatFullPath(g_hapPath).c_str());
+
+    ResConfigImpl resCfg;
+    state = rm->GetResConfigByName("mccmnc_str", ResType::STRING, resCfg);
+    EXPECT_EQ(SUCCESS, state);
+#ifdef SUPPORT_GRAPHICS
+    EXPECT_EQ("en", std::string(resCfg.GetLocaleInfo()->getLanguage()));
+    EXPECT_EQ("US", std::string(resCfg.GetLocaleInfo()->getCountry()));
+#endif
+    EXPECT_EQ(DARK, resCfg.GetColorMode());
+}
+
+/*
+ * @tc.name: ResourceManagerGetResConfigByNameTest002
+ * @tc.desc: Test GetResConfigByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigByNameTest002, TestSize.Level1)
+{
+    // success cases
+    RState state;
+    {
+        ResConfigImpl appResCfg;
+        appResCfg.SetLocaleInfo("zh", nullptr, "CN");
+        appResCfg.SetScreenDensityDpi(SCREEN_DENSITY_XXLDPI);
+        state = rm->UpdateResConfig(appResCfg);
+        EXPECT_EQ(SUCCESS, state);
+    }
+    rm->AddResource(FormatFullPath(g_hapPath).c_str());
+
+    ResConfigImpl resCfg;
+    state = rm->GetResConfigByName("icon", ResType::MEDIA, resCfg, SCREEN_DENSITY_XXLDPI);
+    EXPECT_EQ(SUCCESS, state);
+#ifdef SUPPORT_GRAPHICS
+    EXPECT_EQ("zh", std::string(resCfg.GetLocaleInfo()->getLanguage()));
+    EXPECT_EQ("CN", std::string(resCfg.GetLocaleInfo()->getCountry()));
+#endif
+    EXPECT_EQ(SCREEN_DENSITY_XXLDPI, resCfg.GetScreenDensityDpi());
+}
+
+/*
+ * @tc.name: ResourceManagerGetResConfigByNameTest003
+ * @tc.desc: Test GetResConfigByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigByNameTest003, TestSize.Level1)
+{
+    // success cases
+    RState state;
+    {
+        ResConfigImpl appResCfg;
+        appResCfg.SetLocaleInfo("en", nullptr, "US");
+        appResCfg.SetScreenDensityDpi(SCREEN_DENSITY_XXLDPI);
+        appResCfg.SetColorMode(COLOR_MODE_NOT_SET);
+        state = rm->UpdateResConfig(appResCfg);
+        EXPECT_EQ(SUCCESS, state);
+    }
+    rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+
+    ResConfigImpl resCfg;
+    state = rm->GetResConfigByName("mccmnc_str", ResType::STRING, resCfg, SCREEN_DENSITY_XXLDPI);
+    EXPECT_EQ(SUCCESS, state);
+#ifdef SUPPORT_GRAPHICS
+    EXPECT_EQ("en", std::string(resCfg.GetLocaleInfo()->getLanguage()));
+    EXPECT_EQ("US", std::string(resCfg.GetLocaleInfo()->getCountry()));
+#endif
+    EXPECT_EQ(SCREEN_DENSITY_XXLDPI, resCfg.GetScreenDensityDpi());
+}
+
+/*
+ * @tc.name: ResourceManagerGetResConfigByNameTest004
+ * @tc.desc: Test GetResConfigByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigByNameTest004, TestSize.Level1)
+{
+    // success cases
+    RState state;
+    {
+        ResConfigImpl appResCfg;
+        appResCfg.SetLocaleInfo("en", nullptr, nullptr);
+        appResCfg.SetScreenDensityDpi(SCREEN_DENSITY_LDPI);
+        state = rm->UpdateResConfig(appResCfg);
+        EXPECT_EQ(SUCCESS, state);
+    }
+    rm->AddResource(FormatFullPath(g_hapPath).c_str());
+
+    ResConfigImpl resCfg;
+    state = rm->GetResConfigByName("mccmnc_str", ResType::STRING, resCfg, SCREEN_DENSITY_LDPI);
+    EXPECT_EQ(SUCCESS, state);
+#ifdef SUPPORT_GRAPHICS
+    EXPECT_EQ("en", std::string(resCfg.GetLocaleInfo()->getLanguage()));
+#endif
+    EXPECT_EQ(SCREEN_DENSITY_NOT_SET, resCfg.GetScreenDensityDpi());
+}
+
+/*
+ * @tc.name: ResourceManagerGetResConfigByNameTest005
+ * @tc.desc: Test GetResConfigByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigByNameTest005, TestSize.Level1)
+{
+    // error cases
+    ResConfigImpl resCfg;
+    RState state = rm->GetResConfigByName(g_nonExistName, ResType::STRING, resCfg);
+    EXPECT_EQ(ERROR_CODE_RES_NOT_FOUND_BY_NAME, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetResConfigByNameTest006
+ * @tc.desc: Test GetResConfigByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigByNameTest006, TestSize.Level1)
+{
+    // success cases
+    std::shared_ptr<ResConfigImpl> rc = std::make_shared<ResConfigImpl>();
+    rc->SetLocaleInfo("zh-CN");
+    std::shared_ptr<ResourceManager> manager = rm->GetOverrideResourceManager(rc);
+    EXPECT_TRUE(manager != nullptr);
+    bool addRet = manager->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(addRet);
+
+    ResourceManagerTestCommon *overrideRmc = new ResourceManagerTestCommon(manager);
+    ResConfigImpl resCfg;
+    RState state = manager->GetResConfigByName("child", ResType::PATTERN, resCfg);
+    EXPECT_EQ(SUCCESS, state);
+    EXPECT_EQ(DIRECTION_NOT_SET, resCfg.GetDirection());
+    EXPECT_EQ(SCREEN_DENSITY_NOT_SET, resCfg.GetScreenDensity());
+    EXPECT_EQ(DEVICE_NOT_SET, resCfg.GetDeviceType());
+    delete overrideRmc;
+}
+
+/*
+ * @tc.name: ResourceManagerGetResConfigByNameTest007
+ * @tc.desc: Test GetResConfigByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigByNameTest007, TestSize.Level1)
+{
+    // error cases
+    std::shared_ptr<ResConfigImpl> rc = std::make_shared<ResConfigImpl>();
+    rc->SetLocaleInfo("zh-CN");
+    std::shared_ptr<ResourceManager> manager = rm->GetOverrideResourceManager(rc);
+    EXPECT_TRUE(manager != nullptr);
+    bool addRet = manager->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(addRet);
+
+    ResourceManagerTestCommon *overrideRmc = new ResourceManagerTestCommon(manager);
+    ResConfigImpl resCfg;
+    RState state = manager->GetResConfigByName(g_nonExistName, ResType::STRING, resCfg);
+    EXPECT_EQ(ERROR_CODE_RES_NOT_FOUND_BY_NAME, state);
+    delete overrideRmc;
+}
+
+/*
+ * @tc.name: ResourceManagerGetResConfigByNameTest008
+ * @tc.desc: Test GetResConfigByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigByNameTest008, TestSize.Level1)
+{
+    // success cases
+    RState state;
+    {
+        ResConfigImpl appResCfg;
+        appResCfg.SetLocaleInfo("en", nullptr, nullptr);
+        appResCfg.SetScreenDensityDpi(SCREEN_DENSITY_LDPI);
+        state = rm->UpdateResConfig(appResCfg);
+        EXPECT_EQ(SUCCESS, state);
+    }
+    rm->AddResource(FormatFullPath(g_hapPath).c_str());
+
+    ResConfigImpl resCfg;
+    state = rm->GetResConfigByName("app_name", ResType::STRING, resCfg);
+    EXPECT_EQ(SUCCESS, state);
+    EXPECT_EQ(DIRECTION_NOT_SET, resCfg.GetDirection());
+    EXPECT_EQ(SCREEN_DENSITY_NOT_SET, resCfg.GetScreenDensity());
+    EXPECT_EQ(DEVICE_NOT_SET, resCfg.GetDeviceType());
+}
+
+/*
  * @tc.name: ResourceManagerGetPatternByIdTest001
  * @tc.desc: Test GetPatternById function, file case.
  * @tc.type: FUNC

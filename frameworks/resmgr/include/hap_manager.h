@@ -76,6 +76,29 @@ public:
     void GetResConfig(ResConfig &resConfig);
 
     /**
+     * Get resConfig by id
+     * @param resId the resource Id
+     * @param resConfig the resource config
+     * @param isGetOverrideResource override resource flag
+     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
+     * @return SUCCESS if config exist, else NOT_FOUND
+     */
+    RState GetResConfigById(uint32_t resId, ResConfig &resConfig,
+        bool isGetOverrideResource = false, uint32_t density = 0);
+
+    /**
+     * Get resConfig by name
+     * @param name the resource name
+     * @param type the resource type
+     * @param resConfig the resource config
+     * @param isGetOverrideResource override resource flag
+     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
+     * @return SUCCESS if config exist, else NOT_FOUND
+     */
+    RState GetResConfigByName(const std::string &name, const ResType type, ResConfig &resConfig,
+        bool isGetOverrideResource = false, uint32_t density = 0);
+
+    /**
      * Get the override resConfig
      * @param resConfig the override resource config
      * @return SUCCESS if the override resConfig updated success, else ERROR

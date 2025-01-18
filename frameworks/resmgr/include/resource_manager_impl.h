@@ -110,6 +110,26 @@ public:
     virtual void GetResConfig(ResConfig &resConfig);
 
     /**
+     * Get resConfig by id
+     * @param resId the resource Id
+     * @param resConfig the resource config
+     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
+     * @return SUCCESS if config exist, else NOT_FOUND
+     */
+    virtual RState GetResConfigById(uint32_t resId, ResConfig &resConfig, uint32_t density = 0);
+
+    /**
+     * Get resConfig by name
+     * @param name the resource name
+     * @param type the resource type
+     * @param resConfig the resource config
+     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
+     * @return SUCCESS if config exist, else NOT_FOUND
+     */
+    virtual RState GetResConfigByName(const std::string &name, const ResType type,
+        ResConfig &resConfig, uint32_t density = 0);
+
+    /**
      * Get string resource by Id
      * @param id the resource Id
      * @param outValue the string resource write to
