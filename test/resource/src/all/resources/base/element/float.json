@@ -127,6 +127,18 @@
     {
       "name":"float_ref",
       "value":"$float:aboutPage_minHeight"
+    },
+    {
+      "name":"float1",
+      "value":"100fp"
+    },
+    {
+      "name":"float2",
+      "value":"100vp"
+    },
+    {
+      "name":"button_height",
+      "value":"66vp"
     }
   ]
 }

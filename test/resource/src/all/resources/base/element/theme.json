@@ -54,6 +54,56 @@
                     "value":"true"
                 }
             ]
+        },
+        {
+            "name":"base_theme",
+            "value":[
+                {
+                    "name":"button_pattern",
+                    "value":"$pattern:base_button_pattern"
+                },
+                {
+                    "name":"list_pattern",
+                    "value":"$pattern:base_list_pattern"
+                }
+            ]
+        },
+        {
+            "name":"ohos_base_theme",
+            "parent": "base_theme",
+            "value":[
+                {
+                    "name":"button_pattern",
+                    "value":"$pattern:ohos_button_pattern"
+                },
+                {
+                    "name":"text_pattern",
+                    "value":"$pattern:ohos_text_pattern"
+                },
+                {
+                    "name":"ohosTheme",
+                    "value":"$theme:ohos_theme"
+                }
+            ]
+        },
+        {
+            "name":"ohos_device_theme",
+            "parent": "ohos_base_theme",
+            "value":[
+                {
+                    "name":"button_pattern",
+                    "value":"$pattern:ohos_button_pattern"
+                }
+            ]
+        },
+        {
+            "name":"ohos_theme",
+            "value":[
+                {
+                    "name":"ohos_theme_float",
+                    "value":"100vp"
+                }
+            ]
         }
     ]
 }

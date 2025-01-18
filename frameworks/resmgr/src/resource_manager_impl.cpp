@@ -288,6 +288,20 @@ RState ResourceManagerImpl::GetPatternById(uint32_t id, std::map<std::string, st
     return state;
 }
 
+RState ResourceManagerImpl::GetPatternDataById(uint32_t id, std::map<std::string, ResData> &outValue)
+{
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
+    if (idItem == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetPatternDataById error id = %{public}d", id);
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
+    RState state = GetPatternData(idItem, outValue);
+    if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+    return state;
+}
+
 RState ResourceManagerImpl::GetPatternByName(const char *name, std::map<std::string, std::string> &outValue)
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::PATTERN, isOverrideResMgr_);
@@ -296,6 +310,20 @@ RState ResourceManagerImpl::GetPatternByName(const char *name, std::map<std::str
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     RState state = GetPattern(idItem, outValue);
+    if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
+        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
+    }
+    return state;
+}
+
+RState ResourceManagerImpl::GetPatternDataByName(const char *name, std::map<std::string, ResData> &outValue)
+{
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::PATTERN, isOverrideResMgr_);
+    if (idItem == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetPatternDataByName error name = %{public}s", name);
+        return ERROR_CODE_RES_NAME_NOT_FOUND;
+    }
+    RState state = GetPatternData(idItem, outValue);
     if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
     }
@@ -312,6 +340,18 @@ RState ResourceManagerImpl::GetPattern(const std::shared_ptr<IdItem> idItem, std
         return NOT_FOUND;
     }
     return ResolveParentReference(idItem, outValue);
+}
+
+RState ResourceManagerImpl::GetPatternData(const std::shared_ptr<IdItem> idItem,
+    std::map<std::string, ResData> &outValue)
+{
+    //type invalid
+    if (idItem->resType_ != ResType::PATTERN) {
+        RESMGR_HILOGE(RESMGR_TAG,
+            "actual resType = %{public}d, expect resType = %{public}d", idItem->resType_, ResType::PATTERN);
+        return NOT_FOUND;
+    }
+    return ResolveResData(idItem, outValue);
 }
 
 RState ResourceManagerImpl::GetPluralStringById(uint32_t id, int quantity, std::string &outValue)
@@ -467,6 +507,48 @@ RState ResourceManagerImpl::ResolveReference(const std::string value, std::strin
     return SUCCESS;
 }
 
+RState ResourceManagerImpl::ResolveDataReference(const std::string key, const std::string value,
+    std::map<std::string, ResData> &outValue)
+{
+    uint32_t id;
+    ResType resType;
+    bool isRef = true;
+    int count = 0;
+    std::string refStr(value);
+    while (isRef) {
+        isRef = IdItem::IsRef(refStr, resType, id);
+        if (!isRef) {
+            outValue[key] = { .resType = ResType::STRING, .value = refStr };
+            return SUCCESS;
+        }
+
+        if (IdItem::IsArrayOfType(resType)) {
+            // can't be array
+            outValue[key] = { .resType = resType, .value = std::to_string(id) };
+            return SUCCESS;
+        }
+        const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
+        if (idItem == nullptr) {
+            RESMGR_HILOGE(RESMGR_TAG, "ref %s id not found", refStr.c_str());
+            return ERROR;
+        }
+        // unless compile bug
+        if (resType != idItem->resType_) {
+            RESMGR_HILOGE(RESMGR_TAG,
+                "impossible. ref %s type mismatch, found type: %d", refStr.c_str(), idItem->resType_);
+            return ERROR;
+        }
+
+        refStr = idItem->value_;
+
+        if (++count > MAX_DEPTH_REF_SEARCH) {
+            RESMGR_HILOGE(RESMGR_TAG, "ref %s has re-ref too much", value.c_str());
+            return ERROR_CODE_RES_REF_TOO_MUCH;
+        }
+    }
+    return SUCCESS;
+}
+
 RState ResourceManagerImpl::GetThemeValues(const std::string &value, std::string &outValue)
 {
     ResConfigImpl resConfig;
@@ -535,6 +617,81 @@ RState ResourceManagerImpl::ResolveParentReference(const std::shared_ptr<IdItem>
 
         if (++count > MAX_DEPTH_REF_SEARCH) {
             RESMGR_HILOGE(RESMGR_TAG, " %u has too many parents", idItem->id_);
+            return ERROR;
+        }
+    } while (haveParent);
+
+    return SUCCESS;
+}
+
+RState ResourceManagerImpl::ProcessItem(std::shared_ptr<IdItem> idItem,
+    std::map<std::string, ResData> &outValue)
+{
+    size_t startIdx = idItem->HaveParent() ? 1 : 0;
+    // add currItem values into map when key is absent
+    // this make sure child covers parent
+    size_t loop = idItem->values_.size() / 2;
+    for (size_t i = 0; i < loop; ++i) {
+        std::string key(idItem->values_[startIdx + i * 2]); // 2 means key appear in pairs
+        std::string value(idItem->values_[startIdx + i * 2 + 1]); // 2 means value appear in pairs
+        auto iter = outValue.find(key);
+        if (iter != outValue.end()) {
+            continue;
+        }
+        std::string resolvedValue;
+        if (GetThemeValues(value, resolvedValue) == SUCCESS) {
+            outValue[key] = { .resType = ResType::STRING, .value = resolvedValue };
+            continue;
+        }
+        RState rrRet = ResolveDataReference(key, value, outValue);
+        if (rrRet != SUCCESS) {
+            RESMGR_HILOGD(RESMGR_TAG, "ResolveReference failed, value:%{public}s", value.c_str());
+            return ERROR;
+        }
+    }
+    return SUCCESS;
+}
+
+RState ResourceManagerImpl::ResolveResData(const std::shared_ptr<IdItem> idItem,
+    std::map<std::string, ResData> &outValue)
+{
+    // only pattern and theme
+    // ref always at idx 0
+    // child will cover parent
+    outValue.clear();
+
+    bool haveParent = false;
+    int count = 0;
+    std::shared_ptr<IdItem> currItem = idItem;
+    do {
+        RState ret = ProcessItem(currItem, outValue);
+        if (ret != SUCCESS) {
+            outValue.clear();
+            return ret;
+        }
+        haveParent = currItem->HaveParent();
+        if (haveParent) {
+            // get parent
+            uint32_t id;
+            ResType resType;
+            bool isRef = IdItem::IsRef(currItem->values_[0], resType, id);
+            if (!isRef) {
+                RESMGR_HILOGE(RESMGR_TAG,
+                    "something wrong, pls check HaveParent(). idItem: %{public}s", idItem->ToString().c_str());
+                outValue.clear();
+                return ERROR;
+            }
+            currItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
+            if (currItem == nullptr) {
+                RESMGR_HILOGE(RESMGR_TAG, "ref %s id not found", idItem->values_[0].c_str());
+                outValue.clear();
+                return ERROR;
+            }
+        }
+
+        if (++count > MAX_DEPTH_REF_SEARCH) {
+            RESMGR_HILOGE(RESMGR_TAG, " %u has too many parents", idItem->id_);
+            outValue.clear();
             return ERROR;
         }
     } while (haveParent);
@@ -998,6 +1155,20 @@ RState ResourceManagerImpl::GetThemeById(uint32_t id, std::map<std::string, std:
     return state;
 }
 
+RState ResourceManagerImpl::GetThemeDataById(uint32_t id, std::map<std::string, ResData> &outValue)
+{
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
+    if (idItem == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetThemeDataById error id = %{public}d", id);
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
+    RState state = GetThemeData(idItem, outValue);
+    if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+    return state;
+}
+
 RState ResourceManagerImpl::GetThemeByName(const char *name, std::map<std::string, std::string> &outValue)
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::THEME, isOverrideResMgr_);
@@ -1006,6 +1177,20 @@ RState ResourceManagerImpl::GetThemeByName(const char *name, std::map<std::strin
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     RState state = GetTheme(idItem, outValue);
+    if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
+        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
+    }
+    return state;
+}
+
+RState ResourceManagerImpl::GetThemeDataByName(const char *name, std::map<std::string, ResData> &outValue)
+{
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::THEME, isOverrideResMgr_);
+    if (idItem == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetThemeDataByName error name = %{public}s", name);
+        return ERROR_CODE_RES_NAME_NOT_FOUND;
+    }
+    RState state = GetThemeData(idItem, outValue);
     if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
     }
@@ -1021,6 +1206,17 @@ RState ResourceManagerImpl::GetTheme(const std::shared_ptr<IdItem> idItem, std::
         return NOT_FOUND;
     }
     return ResolveParentReference(idItem, outValue);
+}
+
+RState ResourceManagerImpl::GetThemeData(const std::shared_ptr<IdItem> idItem, std::map<std::string, ResData> &outValue)
+{
+    //type invalid
+    if (idItem->resType_ != ResType::THEME) {
+        RESMGR_HILOGE(RESMGR_TAG,
+            "actual resType = %{public}d, expect resType = %{public}d", idItem->resType_, ResType::THEME);
+        return NOT_FOUND;
+    }
+    return ResolveResData(idItem, outValue);
 }
 
 RState ResourceManagerImpl::GetProfileById(uint32_t id, std::string &outValue)

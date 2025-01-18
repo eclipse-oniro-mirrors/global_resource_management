@@ -435,5 +435,49 @@
 			"type":	"profile",
 			"name":	"test_profile",
 			"id":	"0x0100006C"
+		}, {
+			"type":	"theme",
+			"name":	"base_theme",
+			"id":	"0x0100006D"
+		}, {
+			"type":	"theme",
+			"name":	"ohos_base_theme",
+			"id":	"0x0100006E"
+		}, {
+			"type":	"theme",
+			"name":	"ohos_device_theme",
+			"id":	"0x0100006F"
+		}, {
+			"type":	"theme",
+			"name":	"ohos_theme",
+			"id":	"0x01000070"
+		}, {
+			"type":	"pattern",
+			"name":	"base_button_pattern",
+			"id":	"0x01000071"
+		}, {
+			"type":	"pattern",
+			"name":	"ohos_button_pattern",
+			"id":	"0x01000072"
+		}, {
+			"type":	"pattern",
+			"name":	"base_list_pattern",
+			"id":	"0x01000073"
+		}, {
+			"type":	"pattern",
+			"name":	"ohos_text_pattern",
+			"id":	"0x01000074"
+		}, {
+			"type":	"pattern",
+			"name":	"ohos_phone_button_pattern",
+			"id":	"0x01000075"
+		}, {
+			"type":	"pattern",
+			"name":	"ohos_font_pattern",
+			"id":	"0x01000076"
+		}, {
+			"type":	"pattern",
+			"name":	"base_font_pattern",
+			"id":	"0x01000077"
 		}]
 }

@@ -1,0 +1,22 @@
+{
+    "pattern":[
+      {
+        "name":"ohos_phone_button_pattern",
+        "parent": "ohos_button_pattern",
+        "value":[
+          {
+            "name":"width",
+            "value":"100vp"
+          },
+          {
+            "name": "bgColor",
+            "value": "#FF0033BB"
+          },
+          {
+            "name": "fgColor",
+            "value": "#FF0033CC"
+          }
+        ]
+      }
+    ]
+  }
