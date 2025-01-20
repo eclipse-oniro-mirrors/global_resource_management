@@ -450,7 +450,7 @@ RawFile64 *LoadRawFileFromHap64(const NativeResourceManager *mgr, const char *fi
     ResourceManager::RawFileDescriptor resMgrDescriptor;
     RState state = mgr->resManager->GetRawFdNdkFromHap(fileName, resMgrDescriptor);
     if (state != SUCCESS) {
-        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to get %{public}s rawfile descriptor", fileName);
+        RESMGR_HILOGD(RESMGR_RAWFILE_TAG, "failed to get %{public}s rawfile descriptor", fileName);
         return nullptr;
     }
     auto result = std::make_unique<Raw>(fileName);
@@ -646,7 +646,7 @@ bool OH_ResourceManager_IsRawDir(const NativeResourceManager *mgr, const char *p
     }
     RState state = mgr->resManager->IsRawDirFromHap(path, result);
     if (state != SUCCESS) {
-        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to determine whether the path is a directory");
+        RESMGR_HILOGD(RESMGR_RAWFILE_TAG, "failed to determine whether the path is a directory");
         return result;
     }
     return result;
