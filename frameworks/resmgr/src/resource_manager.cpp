@@ -69,6 +69,7 @@ std::shared_ptr<ResourceManager> CreateResourceManagerDef(
     resourceManagerImpl->userId = userId;
     uint32_t currentId = resConfig.GetThemeId();
     auto themePackManager = ThemePackManager::GetThemePackManager();
+    themePackManager->SetFlagByUserId(userId);
     if (themePackManager->IsFirstLoadResource() || themePackManager->UpdateThemeId(currentId)
         || themePackManager->IsUpdateByUserId(userId)) {
         RESMGR_HILOGI(RESMGR_TAG, "CreateResourceManagerDef LoadThemeRes");
@@ -120,7 +121,9 @@ ResourceManager *GetSystemResourceManagerNoSandBox()
 }
 
 ResourceManager::~ResourceManager()
-{}
+{
+    ThemePackManager::GetThemePackManager()->CheckFlagByUserId(userId);
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
