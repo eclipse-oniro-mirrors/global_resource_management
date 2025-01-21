@@ -955,7 +955,7 @@ RState HapParser::IsRawDirFromHap(const char *hapPath, const std::string &pathNa
     } else if (extractor->IsDirExist(rawPath)) {
         outValue = true;
     } else {
-        RESMGR_HILOGE(RESMGR_TAG, "the rawfile file %{public}s is not exist in %{public}s", rawPath.c_str(), hapPath);
+        RESMGR_HILOGD(RESMGR_TAG, "the rawfile file %{public}s is not exist in %{public}s", rawPath.c_str(), hapPath);
         return ERROR_CODE_RES_PATH_INVALID;
     }
 #endif
