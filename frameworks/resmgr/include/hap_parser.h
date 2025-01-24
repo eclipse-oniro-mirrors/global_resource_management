@@ -33,6 +33,20 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
+
+struct ParserContext {
+    const char *buffer{nullptr};
+    const size_t bufLen{0};
+    ResDesc &resDesc;
+    uint32_t limitKeyValue{0};
+    std::set<std::string> locales;
+    const std::shared_ptr<ResConfigImpl> defaultConfig{nullptr};
+    const uint32_t &selectedTypes{SELECT_ALL};
+    std::string deviceType;
+    bool isSystem{false};
+    bool isUpdate{false};
+};
+
 class HapParser {
 public:
     /**
@@ -139,8 +153,7 @@ public:
      * @param defaultConfig the default config
      * @return OK if the resource hex parse success, else SYS_ERROR
      */
-    static int32_t ParseResHex(const char *buffer, const size_t bufLen, ResDesc &resDesc,
-        const std::shared_ptr<ResConfigImpl> defaultConfig = nullptr, const uint32_t &selectedTypes = SELECT_ALL);
+    static int32_t ParseResHex(ParserContext &context);
 
     /**
      * Create resource config from KeyParams

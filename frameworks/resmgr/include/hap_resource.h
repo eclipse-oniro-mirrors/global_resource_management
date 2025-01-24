@@ -22,6 +22,7 @@
 #include <set>
 #include "res_desc.h"
 #include "res_config_impl.h"
+#include <shared_mutex>
 
 namespace OHOS {
 namespace Global {
@@ -170,7 +171,7 @@ public:
     /**
      * Get the resource information
      */
-    const std::vector<std::string> GetQualifiers() const;
+    const std::vector<std::string> GetQualifiers();
 
     /**
      * Get resource last mod time.
@@ -303,7 +304,7 @@ public:
      * @param id the resource id
      * @return the resource value related to id
      */
-    const std::shared_ptr<IdValues> GetIdValues(const uint32_t id) const;
+    const std::shared_ptr<IdValues> GetIdValues(const uint32_t id);
 
     /**
      * Get the resource value by resource name
@@ -311,7 +312,7 @@ public:
      * @param resType the resource type
      * @return the resource value related to resource name
      */
-    const std::shared_ptr<IdValues> GetIdValuesByName(const std::string name, const ResType resType) const;
+    const std::shared_ptr<IdValues> GetIdValuesByName(const std::string name, const ResType resType);
 
     /**
      * Get the resource id by resource name
@@ -319,7 +320,9 @@ public:
      * @param resType the resource type
      * @return the resource id related to resource name
      */
-    int GetIdByName(const char *name, const ResType resType) const;
+    int GetIdByName(const char *name, const ResType resType);
+
+    RState UpdateResConfig(const std::shared_ptr<ResConfigImpl> &defaultConfig);
 
     size_t IdSize() const
     {
@@ -331,9 +334,9 @@ public:
      *
      * @return the resource limit keys
      */
-    uint32_t GetResourceLimitKeys() const;
+    uint32_t GetResourceLimitKeys();
 
-    std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> BuildNameTypeIdMapping() const;
+    std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> BuildNameTypeIdMapping();
 
     /**
      * Get locale list
@@ -360,11 +363,6 @@ private:
 
     void UpdateOverlayInfo(std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> &nameTypeId);
 
-    uint32_t GetLimitPathsKeys(const std::vector<std::shared_ptr<ValueUnderQualifierDir>> &limitPaths,
-        std::vector<bool> &keyTypes) const;
-
-    void GetKeyParamsLocales(const std::vector<std::shared_ptr<KeyParam>> keyParams, std::set<std::string> &outValue);
-
     // must call Init() after constructor
     bool Init(std::shared_ptr<ResConfigImpl> &defaultConfig);
 
@@ -377,6 +375,21 @@ private:
     void IsAppDarkRes(const std::shared_ptr<HapResource::ValueUnderQualifierDir> &limitPath,
         std::shared_ptr<ResConfigImpl> &defaultConfig);
 
+    inline void SetLimitKeysValue(uint32_t limitKeyValue)
+    {
+        limitKeyValue_ = limitKeyValue;
+    }
+
+    inline void SetLocales(const std::set<std::string> &locales)
+    {
+        locales_ = locales;
+    }
+
+    inline void SetSelectedType(uint32_t type)
+    {
+        selectedTypes_ = type;
+    }
+    
     // resources.index file path
     const std::string indexPath_;
 
@@ -386,8 +399,14 @@ private:
     // last mod time of hap file
     time_t lastModTime_;
 
+    uint32_t selectedTypes_{SELECT_ALL};
+    
     // resource information stored in resDesc_
     std::shared_ptr<ResDesc> resDesc_;
+
+    std::shared_mutex mutex_;
+
+    std::set<std::shared_ptr<ResConfigImpl>> loadedConfig_;
 
     std::map<uint32_t, std::shared_ptr<IdValues>> idValuesMap_;
 
@@ -412,6 +431,10 @@ private:
 
     // judge the resource is adapt dark mode or not.
     bool hasDarkRes_ = false;
+
+    uint32_t limitKeyValue_ = 0;
+
+    std::set<std::string> locales_;
 };
 } // namespace Resource
 } // namespace Global

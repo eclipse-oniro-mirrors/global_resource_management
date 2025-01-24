@@ -433,6 +433,37 @@ bool ResConfigImpl::Copy(ResConfig &other, bool isRead)
     return true;
 }
 
+bool ResConfigImpl::MatchLocal(ResConfig &other) const
+{
+    auto localeInfo = other.GetPreferredLocaleInfo();
+    if (!localeInfo) {
+        localeInfo = other.GetLocaleInfo();
+    }
+    if (!localeInfo) {
+        return true;
+    }
+    if (localeInfo && !resLocale_) {
+        return false;
+    }
+    ResLocale resLocal;
+    resLocal.CopyFromLocaleInfo(localeInfo);
+
+    bool isPreferredLocaleMatch = false;
+#ifdef SUPPORT_GRAPHICS
+    if (this->resPreferredLocale_ != nullptr) {
+        isPreferredLocaleMatch = true;
+        if (!LocaleMatcher::Match(this->resPreferredLocale_, &resLocal)) {
+            return false;
+        }
+    }
+#endif
+
+    if (!isPreferredLocaleMatch && !(LocaleMatcher::Match(this->resLocale_, &resLocal))) {
+        return false;
+    }
+    return true;
+}
+
 bool ResConfigImpl::Match(const std::shared_ptr<ResConfigImpl> other, bool isCheckDarkAdaptation) const
 {
     if (other == nullptr) {

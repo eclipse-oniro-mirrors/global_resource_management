@@ -122,7 +122,13 @@ int ParseIndexCost(const std::string &pstr, char *buf, const size_t& bufLen)
             free(buf);
             return -1;
         }
-        int32_t out = HapParser::ParseResHex((char *)buf, bufLen, *resDesc, nullptr);
+        ParserContext context = {
+        .buffer = reinterpret_cast<char *>(buf),
+        .bufLen = bufLen,
+        .resDesc = *resDesc,
+        .defaultConfig = nullptr,
+        };
+        int32_t out = HapParser::ParseResHex(context);
         if (out != OK) {
             free(buf);
             RESMGR_HILOGE(RESMGR_TAG, "ParseResHex failed! retcode:%d", out);

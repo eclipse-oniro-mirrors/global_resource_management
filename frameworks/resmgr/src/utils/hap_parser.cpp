@@ -60,13 +60,6 @@ static const std::unordered_map<ResType, uint32_t> TYPE_MAP {
     {SYMBOL, SELECT_SYMBOL}
 };
 
-struct SelectOptions {
-    bool match = true;
-    std::shared_ptr<ResConfigImpl> defaultConfig;
-    std::string deviceType;
-    uint32_t selectedTypes = SELECT_ALL;
-};
-
 int32_t LocateFile(unzFile &uf, const char *fileName)
 {
     if (unzLocateFile2(uf, fileName, 1)) { // try to locate file inside zip, 1 = case sensitive
@@ -415,6 +408,7 @@ RState HapParser::GetRawFileListUnCompressed(const std::string &indexPath, const
     HapParser::GetPath(rawDirPath, rawFilePath);
     return Utils::GetFiles(rawFilePath, fileList);
 }
+
 /**
  *
  * @param buffer
@@ -584,19 +578,18 @@ int32_t ParseId(const char *buffer, uint32_t &offset, const size_t &bufLen, std:
     return OK;
 }
 
-int32_t ParseKeyParam(const char *buffer, uint32_t &offset, const size_t &bufLen,
-    SelectOptions *options, std::shared_ptr<KeyParam> &kp)
+int32_t ParseKeyParam(ParserContext &context, uint32_t &offset, bool &match, std::shared_ptr<KeyParam> &kp)
 {
     kp = std::make_shared<KeyParam>();
     if (kp == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "ParseKeyParam new KeyParam failed");
         return SYS_ERROR;
     }
-    if (offset + ResKey::KEYPARAM_HEADER_LEN > bufLen) {
+    if (offset + ResKey::KEYPARAM_HEADER_LEN > context.bufLen) {
         RESMGR_HILOGE(RESMGR_TAG, "ParseKeyParam failed, the offset will be out of bounds");
         return SYS_ERROR;
     }
-    errno_t eret = memcpy_s(kp.get(), sizeof(KeyParam), buffer + offset, ResKey::KEYPARAM_HEADER_LEN);
+    errno_t eret = memcpy_s(kp.get(), sizeof(KeyParam), context.buffer + offset, ResKey::KEYPARAM_HEADER_LEN);
     if (eret != OK) {
         return SYS_ERROR;
     }
@@ -604,22 +597,75 @@ int32_t ParseKeyParam(const char *buffer, uint32_t &offset, const size_t &bufLen
     kp->InitStr();
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     auto resDeviceType = kp->GetDeviceTypeStr();
-    if (options->deviceType != DEVICE_DEFAULT && resDeviceType != NOT_DEVICE_TYPE &&
-        resDeviceType != options->deviceType) {
-        options->match = false;
+    if (context.deviceType != DEVICE_DEFAULT && resDeviceType != NOT_DEVICE_TYPE &&
+        resDeviceType != context.deviceType) {
+        match = false;
     }
 #endif
     return OK;
 }
 
-int32_t ParseKey(const char *buffer, uint32_t &offset, const size_t &bufLen, std::shared_ptr<ResKey> key,
-    SelectOptions *options)
+void GetLimitKeyValue(uint32_t &limitKeyValue, KeyType type, std::vector<bool> &keyTypes)
 {
-    if (offset + ResKey::RESKEY_HEADER_LEN > bufLen) {
+    const uint32_t limitKeysBase = 0x00000001;
+    uint32_t typeValue = static_cast<uint32_t>(type);
+    if (type < KeyType::KEY_TYPE_MAX && !keyTypes[typeValue]) {
+        keyTypes[typeValue] = true;
+        limitKeyValue |= limitKeysBase << typeValue;
+    }
+}
+
+void GetKeyParamsLocales(std::shared_ptr<KeyParam> kp, std::string &locale, bool &isLocale)
+{
+    KeyType keyType = kp->type_;
+    if (keyType == KeyType::MCC || keyType == KeyType::MNC) {
+        return;
+    }
+    if (keyType == KeyType::LANGUAGES) {
+        locale = kp->GetStr();
+        isLocale = true;
+        return;
+    }
+    if (keyType == KeyType::SCRIPT) {
+        locale.append("-");
+        locale.append(kp->GetStr());
+        return;
+    }
+    if (keyType == KeyType::REGION) {
+        locale.append("-");
+        locale.append(kp->GetStr());
+    }
+}
+
+bool SkipParseItem(ParserContext &context, const std::shared_ptr<ResKey> &key, bool &match)
+{
+    if (!match || (context.selectedTypes != SELECT_ALL && context.defaultConfig &&
+                      !context.defaultConfig->Match(key->resConfig_, false))) {
+        return true;
+    }
+
+    if (context.isSystem) {
+        return false;
+    }
+    if (key->keyParams_.empty()) {
+        return context.isUpdate;
+    }
+
+    if (context.defaultConfig && context.defaultConfig->MatchLocal(*key->resConfig_)) {
+        return false;
+    }
+
+    return true;
+}
+
+int32_t ParseKey(ParserContext &context, uint32_t &offset, std::shared_ptr<ResKey> key,
+    bool &match, std::vector<bool> &keyTypes)
+{
+    if (offset + ResKey::RESKEY_HEADER_LEN > context.bufLen) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse ResKeyHeader failed, the offset will be out of bounds");
         return SYS_ERROR;
     }
-    errno_t eret = memcpy_s(key.get(), sizeof(ResKey), buffer + offset, ResKey::RESKEY_HEADER_LEN);
+    errno_t eret = memcpy_s(key.get(), sizeof(ResKey), context.buffer + offset, ResKey::RESKEY_HEADER_LEN);
     if (eret != OK) {
         return SYS_ERROR;
     }
@@ -628,20 +674,26 @@ int32_t ParseKey(const char *buffer, uint32_t &offset, const size_t &bufLen, std
         || key->tag_[ArrayIndex::INDEX_TWO] != 'Y' || key->tag_[ArrayIndex::INDEX_THREE] != 'S') {
         return -1;
     }
+    std::string locale;
+    bool isLocale = false;
     for (uint32_t i = 0; i < key->keyParamsCount_; ++i) {
         std::shared_ptr<KeyParam> kp;
-        if (ParseKeyParam(buffer, offset, bufLen, options, kp) != OK) {
+        if (ParseKeyParam(context, offset, match, kp) != OK) {
             return SYS_ERROR;
         }
         if (kp == nullptr) {
             return SYS_ERROR;
         }
+        GetLimitKeyValue(context.limitKeyValue, kp->type_, keyTypes);
+        GetKeyParamsLocales(kp, locale, isLocale);
         key->keyParams_.push_back(kp);
     }
+    if (isLocale) {
+        context.locales.emplace(locale);
+    }
     key->resConfig_ = HapParser::CreateResConfigFromKeyParams(key->keyParams_);
-    if (!options->match || (options->selectedTypes != SELECT_ALL && options->defaultConfig &&
-                            !options->defaultConfig->Match(key->resConfig_, false))) {
-        options->match = false;
+    if (SkipParseItem(context, key, match)) {
+        match = false;
         return OK;
     }
 
@@ -651,7 +703,7 @@ int32_t ParseKey(const char *buffer, uint32_t &offset, const size_t &bufLen, std
         RESMGR_HILOGE(RESMGR_TAG, "new ResId failed when ParseKey");
         return SYS_ERROR;
     }
-    int32_t ret = ParseId(buffer, idOffset, bufLen, id, options->selectedTypes);
+    int32_t ret = ParseId(context.buffer, idOffset, context.bufLen, id, context.selectedTypes);
     if (ret != OK) {
         return ret;
     }
@@ -659,20 +711,18 @@ int32_t ParseKey(const char *buffer, uint32_t &offset, const size_t &bufLen, std
     return OK;
 }
 
-
-int32_t HapParser::ParseResHex(const char *buffer, const size_t bufLen, ResDesc &resDesc,
-    const std::shared_ptr<ResConfigImpl> defaultConfig, const uint32_t &selectedTypes)
+int32_t HapParser::ParseResHex(ParserContext &context)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
 #endif
     ResHeader resHeader;
     uint32_t offset = 0;
-    if (offset + RES_HEADER_LEN > bufLen) {
+    if (offset + RES_HEADER_LEN > context.bufLen) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse ResHeader failed, the offset will be out of bounds");
         return SYS_ERROR;
     }
-    errno_t eret = memcpy_s(&resHeader, sizeof(ResHeader), buffer + offset, RES_HEADER_LEN);
+    errno_t eret = memcpy_s(&resHeader, sizeof(ResHeader), context.buffer + offset, RES_HEADER_LEN);
     if (eret != OK) {
         return SYS_ERROR;
     }
@@ -680,21 +730,21 @@ int32_t HapParser::ParseResHex(const char *buffer, const size_t bufLen, ResDesc 
     if (resHeader.keyCount_ == 0 || resHeader.length_ == 0) {
         return UNKNOWN_ERROR;
     }
-
-    const std::string deviceType = resDesc.GetCurrentDeviceType();
+    context.deviceType = context.resDesc.GetCurrentDeviceType();
+    std::vector<bool> keyTypes(KeyType::KEY_TYPE_MAX, false);
     for (uint32_t i = 0; i < resHeader.keyCount_; i++) {
         std::shared_ptr<ResKey> key = std::make_shared<ResKey>();
         if (key == nullptr) {
             RESMGR_HILOGE(RESMGR_TAG, "new ResKey failed when ParseResHex");
             return SYS_ERROR;
         }
-        SelectOptions selectOptions{true, defaultConfig, deviceType, selectedTypes};
-        int32_t ret = ParseKey(buffer, offset, bufLen, key, &selectOptions);
+        bool match = true;
+        int32_t ret = ParseKey(context, offset, key, match, keyTypes);
         if (ret != OK) {
             return ret;
         }
-        if (selectOptions.match) {
-            resDesc.keys_.push_back(key);
+        if (match) {
+            context.resDesc.keys_.push_back(key);
         }
     }
     return OK;

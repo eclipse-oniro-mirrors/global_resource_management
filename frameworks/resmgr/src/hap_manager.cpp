@@ -356,14 +356,32 @@ RState HapManager::FindRawFile(const std::string &name, std::string &outValue)
 RState HapManager::UpdateResConfig(ResConfig &resConfig)
 {
     WriteLock lock(this->mutex_);
+    bool needUpdate = !this->resConfig_->MatchLocal(resConfig);
     this->resConfig_->Copy(resConfig);
+    if (needUpdate) {
+        for (auto &resource : hapResources_) {
+            RState state = resource->UpdateResConfig(this->resConfig_);
+            if (state != SUCCESS) {
+                return state;
+            }
+        }
+    }
     return SUCCESS;
 }
 
 RState HapManager::UpdateOverrideResConfig(ResConfig &resConfig)
 {
     WriteLock lock(this->mutex_);
+    bool needUpdate = !this->overrideResConfig_->MatchLocal(resConfig);
     this->overrideResConfig_->Copy(resConfig);
+    if (needUpdate) {
+        for (auto &resource : hapResources_) {
+            RState state = resource->UpdateResConfig(this->overrideResConfig_);
+            if (state != SUCCESS) {
+                return state;
+            }
+        }
+    }
     return SUCCESS;
 }
 

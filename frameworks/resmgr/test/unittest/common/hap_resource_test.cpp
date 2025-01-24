@@ -70,7 +70,7 @@ void TestGetIdValuesByName(const std::shared_ptr<HapResource> pResource)
     auto idValues = pResource->GetIdValuesByName(name, ResType::STRING);
     auto cost = CurrentTimeUsec() - start;
     // 3 compare with the size of LimitPaths
-    EXPECT_EQ(static_cast<size_t>(3), idValues->GetLimitPathsConst().size());
+    EXPECT_EQ(static_cast<size_t>(1), idValues->GetLimitPathsConst().size());
     RESMGR_HILOGD(RESMGR_TAG, "GetIdValues by name cost: %ld us.", cost);
     PrintIdValues(idValues);
     {
@@ -78,18 +78,6 @@ void TestGetIdValuesByName(const std::shared_ptr<HapResource> pResource)
         EXPECT_TRUE(limitPath->GetFolder() == "default");
         EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
         EXPECT_TRUE(limitPath->GetIdItem()->value_ == "About");
-    }
-    {
-        auto limitPath = idValues->GetLimitPathsConst()[1];
-        EXPECT_TRUE(limitPath->GetFolder() == "en_US");
-        EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
-        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "App Name");
-    }
-    {
-        auto limitPath = idValues->GetLimitPathsConst()[2];
-        EXPECT_TRUE(limitPath->GetFolder() == "zh_CN");
-        EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
-        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "应用名称");
     }
 }
 
@@ -116,7 +104,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest001, TestSize.Level0)
     start = CurrentTimeUsec();
     auto idValues = pResource->GetIdValues(id);
     cost = CurrentTimeUsec() - start;
-    EXPECT_EQ(static_cast<size_t>(3), idValues->GetLimitPathsConst().size());
+    EXPECT_EQ(static_cast<size_t>(1), idValues->GetLimitPathsConst().size());
     RESMGR_HILOGD(RESMGR_TAG, "GetIdValues by id cost: %ld us.", cost);
     PrintIdValues(idValues);
     {
@@ -124,18 +112,6 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest001, TestSize.Level0)
         EXPECT_TRUE(limitPath->GetFolder() == "default");
         EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
         EXPECT_TRUE(limitPath->GetIdItem()->value_ == "About");
-    }
-    {
-        auto limitPath = idValues->GetLimitPathsConst()[1];
-        EXPECT_TRUE(limitPath->GetFolder() == "en_US");
-        EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
-        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "App Name");
-    }
-    {
-        auto limitPath = idValues->GetLimitPathsConst()[2];
-        EXPECT_TRUE(limitPath->GetFolder() == "zh_CN");
-        EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
-        EXPECT_TRUE(limitPath->GetIdItem()->value_ == "应用名称");
     }
     TestGetIdValuesByName(pResource);
 }
@@ -147,7 +123,8 @@ void GetIdValuesByNameFuncTest002(const std::shared_ptr<HapResource> pResource, 
     auto start = CurrentTimeUsec();
     auto idValues = pResource->GetIdValuesByName(name, ResType::STRING);
     auto cost = CurrentTimeUsec() - start;
-    EXPECT_EQ(static_cast<size_t>(3), idValues->GetLimitPathsConst().size()); // 3 means the number of candidates
+    size_t expectSize = 2;
+    EXPECT_EQ(expectSize, idValues->GetLimitPathsConst().size());
     RESMGR_HILOGD(RESMGR_TAG, "GetIdValues by name cost: %ld us.", cost);
     PrintIdValues(idValues);
 
@@ -192,7 +169,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest002, TestSize.Level1)
     start = CurrentTimeUsec();
     auto idValues = pResource->GetIdValues(id);
     cost = CurrentTimeUsec() - start;
-    EXPECT_EQ(static_cast<size_t>(3), idValues->GetLimitPathsConst().size());
+    EXPECT_EQ(static_cast<size_t>(2), idValues->GetLimitPathsConst().size());
     RESMGR_HILOGD(RESMGR_TAG, "GetIdValues by id cost: %ld us.", cost);
     PrintIdValues(idValues);
 
@@ -272,7 +249,14 @@ ResDesc *LoadFromHap(const char *hapPath, const std::shared_ptr<ResConfigImpl> d
     RESMGR_HILOGD(RESMGR_TAG, "extract success, bufLen:%zu", bufLen);
 
     ResDesc *resDesc = new ResDesc();
-    out = HapParser::ParseResHex(reinterpret_cast<char *>(buf.get()), bufLen, *resDesc, defaultConfig, selectedTypes);
+    ParserContext context = {
+        .buffer = reinterpret_cast<char *>(buf.get()),
+        .bufLen = bufLen,
+        .resDesc = *resDesc,
+        .defaultConfig = defaultConfig,
+        .selectedTypes = selectedTypes,
+    };
+    out = HapParser::ParseResHex(context);
     if (out != OK) {
         delete (resDesc);
         RESMGR_HILOGE(RESMGR_TAG, "ParseResHex failed! retcode:%d", out);
