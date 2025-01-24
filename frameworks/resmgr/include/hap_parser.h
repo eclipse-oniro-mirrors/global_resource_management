@@ -43,7 +43,7 @@ struct ParserContext {
     const std::shared_ptr<ResConfigImpl> defaultConfig{nullptr};
     const uint32_t &selectedTypes{SELECT_ALL};
     std::string deviceType;
-    bool isSystem{false};
+    bool loadAll{false};
     bool isUpdate{false};
 };
 

@@ -435,6 +435,7 @@ bool ResConfigImpl::Copy(ResConfig &other, bool isRead)
 
 bool ResConfigImpl::MatchLocal(ResConfig &other) const
 {
+#ifdef SUPPORT_GRAPHICS
     auto localeInfo = other.GetPreferredLocaleInfo();
     if (!localeInfo) {
         localeInfo = other.GetLocaleInfo();
@@ -449,18 +450,17 @@ bool ResConfigImpl::MatchLocal(ResConfig &other) const
     resLocal.CopyFromLocaleInfo(localeInfo);
 
     bool isPreferredLocaleMatch = false;
-#ifdef SUPPORT_GRAPHICS
     if (this->resPreferredLocale_ != nullptr) {
         isPreferredLocaleMatch = true;
         if (!LocaleMatcher::Match(this->resPreferredLocale_, &resLocal)) {
             return false;
         }
     }
-#endif
 
     if (!isPreferredLocaleMatch && !(LocaleMatcher::Match(this->resLocale_, &resLocal))) {
         return false;
     }
+#endif
     return true;
 }
 

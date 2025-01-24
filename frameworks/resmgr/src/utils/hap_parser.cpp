@@ -644,10 +644,10 @@ bool SkipParseItem(ParserContext &context, const std::shared_ptr<ResKey> &key, b
         return true;
     }
 
-    if (context.isSystem) {
+    if (context.loadAll) {
         return false;
     }
-    if (key->keyParams_.empty()) {
+    if (!key->resConfig_->GetLocaleInfo()) {
         return context.isUpdate;
     }
 

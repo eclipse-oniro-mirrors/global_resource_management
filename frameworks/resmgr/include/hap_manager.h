@@ -423,6 +423,11 @@ public:
      */
     bool IsSystem();
 
+    inline void SetOverride(bool isOverride)
+    {
+        isOverride_ = isOverride;
+    }
+
 private:
     void UpdateResConfigImpl(ResConfigImpl &resConfig);
 
@@ -478,6 +483,8 @@ private:
 
     // indicate manager is system hap manager
     bool isSystem_;
+
+    bool isOverride_;
 };
 } // namespace Resource
 } // namespace Global

@@ -438,9 +438,9 @@ bool HapManager::AddResource(const std::string &path, const std::vector<std::str
         RESMGR_HILOGI(RESMGR_TAG, "the overlay for %{public}s already been loaded", path.c_str());
         return true;
     }
-
+    std::shared_ptr<ResConfigImpl> config = getCompleteOverrideConfig(isOverride_);
     std::unordered_map<std::string, std::shared_ptr<HapResource>> result = HapResource::LoadOverlays(path, overlayPaths,
-        resConfig_, isSystem_);
+        config, isSystem_);
     if (result.size() == 0) {
         return false;
     }
@@ -557,8 +557,8 @@ bool HapManager::AddResourcePath(const char *path, const uint32_t &selectedTypes
     if (it != loadedHapPaths_.end()) {
         return false;
     }
-
-    std::shared_ptr<HapResource> pResource = HapResource::Load(path, resConfig_, isSystem_, false, selectedTypes);
+    std::shared_ptr<ResConfigImpl> config = getCompleteOverrideConfig(isOverride_);
+    std::shared_ptr<HapResource> pResource = HapResource::Load(path, config, isSystem_, false, selectedTypes);
     if (pResource == nullptr) {
         return false;
     }

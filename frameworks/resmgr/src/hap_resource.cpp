@@ -25,6 +25,7 @@
 #ifdef __WINNT__
 #include <shlwapi.h>
 #include <windows.h>
+#undef GetLocaleInfo
 #endif
 
 #ifdef __LINUX__
@@ -88,6 +89,7 @@ const std::shared_ptr<HapResource> HapResource::Load(const char *path,
     if (selectedTypes == SELECT_ALL) {
         pResource = HapResourceManager::GetInstance()->GetHapResource(path);
         if (pResource && ret == 0 && fileStat.st_mtime == pResource->GetLastModTime()) {
+            pResource->UpdateResConfig(defaultConfig);
             return pResource;
         }
     }
@@ -100,8 +102,12 @@ const std::shared_ptr<HapResource> HapResource::Load(const char *path,
         pResource->SetLastModTime(fileStat.st_mtime);
         pResource = HapResourceManager::GetInstance()->PutAndGetResource(path, pResource);
     }
+    if (pResource) {
+        pResource->UpdateResConfig(defaultConfig);
+    }
     return pResource;
 }
+
 bool GetIndexDataFromIndex(const char *path, std::unique_ptr<uint8_t[]> &buf, size_t &len)
 {
     char outPath[PATH_MAX + 1] = {0};
@@ -150,7 +156,7 @@ const std::shared_ptr<HapResource> HapResource::LoadFromIndex(const char *path,
         .resDesc = *resDesc,
         .defaultConfig = defaultConfig,
         .selectedTypes = selectedTypes,
-        .isSystem = isSystem,
+        .loadAll = isSystem || isOverlay,
     };
     int32_t out = HapParser::ParseResHex(context);
     if (out != OK) {
@@ -229,7 +235,7 @@ const std::shared_ptr<HapResource> HapResource::LoadFromHap(const char *path,
         .resDesc = *resDesc,
         .defaultConfig = defaultConfig,
         .selectedTypes = selectedTypes,
-        .isSystem = isSystem,
+        .loadAll = isSystem || isOverlay,
     };
     int32_t out = HapParser::ParseResHex(context);
     if (out != OK) {
@@ -428,6 +434,13 @@ bool HapResource::InitIdList(std::shared_ptr<ResConfigImpl> &defaultConfig)
             return false;
         }
     }
+#ifdef SUPPORT_GRAPHICS
+    if (defaultConfig && (defaultConfig->GetPreferredLocaleInfo() || defaultConfig->GetLocaleInfo())) {
+        std::shared_ptr<ResConfigImpl> currentConfig = std::make_shared<ResConfigImpl>();
+        currentConfig->Copy(*defaultConfig);
+        loadedConfig_.insert(currentConfig);
+    }
+#endif
     return true;
 };
 
@@ -544,11 +557,16 @@ bool HapResource::HasDarkRes()
     return hasDarkRes_;
 }
 
-RState HapResource::UpdateResConfig(const std::shared_ptr<ResConfigImpl> &defaultConfig)
+RState HapResource::UpdateResConfig(std::shared_ptr<ResConfigImpl> &defaultConfig)
 {
-    if (isSystem_ || !defaultConfig) {
+    if (isSystem_ || isOverlay_ || !defaultConfig) {
         return SUCCESS;
     }
+#ifdef SUPPORT_GRAPHICS
+    if (!defaultConfig->GetPreferredLocaleInfo() && !defaultConfig->GetLocaleInfo()) {
+        return SUCCESS;
+    }
+#endif
     WriteLock lock(mutex_);
     for (auto &config : loadedConfig_) {
         if (defaultConfig->MatchLocal(*config)) {
@@ -581,12 +599,9 @@ RState HapResource::UpdateResConfig(const std::shared_ptr<ResConfigImpl> &defaul
     if (HapParser::ParseResHex(context) != OK) {
         return HAP_INIT_FAILED;
     };
-    std::shared_ptr<ResConfigImpl> currentConfig = std::make_shared<ResConfigImpl>();
-    currentConfig->Copy(*defaultConfig);
-    if (!InitIdList(currentConfig)) {
+    if (!InitIdList(defaultConfig)) {
         return HAP_INIT_FAILED;
     }
-    loadedConfig_.insert(currentConfig);
     return SUCCESS;
 }
 } // namespace Resource

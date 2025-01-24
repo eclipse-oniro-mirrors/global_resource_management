@@ -76,6 +76,7 @@ bool ResourceManagerImpl::Init(bool isSystem)
         RESMGR_HILOGE(RESMGR_TAG, "new HapManager failed when ResourceManagerImpl::Init");
         return false;
     }
+    hapManager_->SetOverride(isOverrideResMgr_);
     isSystemResMgr_ = isSystem;
     return true;
 }
@@ -98,6 +99,7 @@ bool ResourceManagerImpl::Init(std::shared_ptr<HapManager> hapManager)
         RESMGR_HILOGE(RESMGR_TAG, "new HapManager failed from hapManager");
         return false;
     }
+    hapManager_->SetOverride(isOverrideResMgr_);
     return true;
 }
 
