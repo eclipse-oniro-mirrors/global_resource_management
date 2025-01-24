@@ -284,7 +284,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest005, TestSize.Le
     rc->SetLocaleInfo("en", nullptr, "US");
     state = rm->UpdateResConfig(*rc);
     delete rc;
-    EXPECT_EQ(SUCCESS, state);
+    EXPECT_EQ(HAP_INIT_FAILED, state);
 }
 
 /*

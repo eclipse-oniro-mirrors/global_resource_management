@@ -218,6 +218,7 @@ public:
      */
     bool GetAppDarkRes() const;
 
+    bool MatchLocal(ResConfig& other) const;
 private:
     bool IsMoreSpecificThan(const std::shared_ptr<ResConfigImpl> other, uint32_t density = 0) const;
 

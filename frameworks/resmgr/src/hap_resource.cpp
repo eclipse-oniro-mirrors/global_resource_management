@@ -41,6 +41,9 @@
 #include "hilog_wrapper.h"
 #include "utils/errors.h"
 
+using ReadLock = std::shared_lock<std::shared_mutex>;
+using WriteLock = std::unique_lock<std::shared_mutex>;
+
 namespace OHOS {
 namespace Global {
 namespace Resource {
@@ -99,48 +102,61 @@ const std::shared_ptr<HapResource> HapResource::Load(const char *path,
     }
     return pResource;
 }
-
-const std::shared_ptr<HapResource> HapResource::LoadFromIndex(const char *path,
-    std::shared_ptr<ResConfigImpl> &defaultConfig, bool isSystem, bool isOverlay, const uint32_t &selectedTypes)
+bool GetIndexDataFromIndex(const char *path, std::unique_ptr<uint8_t[]> &buf, size_t &len)
 {
     char outPath[PATH_MAX + 1] = {0};
     Utils::CanonicalizePath(path, outPath, PATH_MAX);
     std::ifstream inFile(outPath, std::ios::binary | std::ios::in);
     if (!inFile.good()) {
-        return nullptr;
+        return false;
     }
     inFile.seekg(0, std::ios::end);
     int bufLen = inFile.tellg();
     if (bufLen <= 0) {
         RESMGR_HILOGE(RESMGR_TAG, "file size is zero");
         inFile.close();
-        return nullptr;
+        return false;
     }
-    void *buf = malloc(bufLen);
+    len = bufLen;
+    buf = std::make_unique<uint8_t[]>(bufLen);
     if (buf == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "Error allocating memory");
         inFile.close();
-        return nullptr;
+        return false;
     }
     inFile.seekg(0, std::ios::beg);
-    inFile.read(static_cast<char *>(buf), bufLen);
+    inFile.read(reinterpret_cast<char*>(buf.get()), bufLen);
     inFile.close();
-
     RESMGR_HILOGD(RESMGR_TAG, "extract success, bufLen:%d", bufLen);
+    return true;
+}
 
+const std::shared_ptr<HapResource> HapResource::LoadFromIndex(const char *path,
+    std::shared_ptr<ResConfigImpl> &defaultConfig, bool isSystem, bool isOverlay, const uint32_t &selectedTypes)
+{
+    std::unique_ptr<uint8_t[]> buf;
+    size_t bufLen;
+    if (!GetIndexDataFromIndex(path, buf, bufLen)) {
+        return nullptr;
+    }
     std::shared_ptr<ResDesc> resDesc = std::make_shared<ResDesc>();
     if (resDesc == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "new ResDesc failed when LoadFromIndex");
-        free(buf);
         return nullptr;
     }
-    int32_t out = HapParser::ParseResHex(static_cast<char *>(buf), bufLen, *resDesc, defaultConfig, selectedTypes);
+    ParserContext context = {
+        .buffer = reinterpret_cast<char *>(buf.get()),
+        .bufLen = bufLen,
+        .resDesc = *resDesc,
+        .defaultConfig = defaultConfig,
+        .selectedTypes = selectedTypes,
+        .isSystem = isSystem,
+    };
+    int32_t out = HapParser::ParseResHex(context);
     if (out != OK) {
-        free(buf);
         RESMGR_HILOGE(RESMGR_TAG, "ParseResHex failed! retcode:%d", out);
         return nullptr;
     }
-    free(buf);
 
     std::shared_ptr<HapResource> pResource = std::make_shared<HapResource>(std::string(path),
         0, resDesc, isSystem, isOverlay);
@@ -151,6 +167,9 @@ const std::shared_ptr<HapResource> HapResource::LoadFromIndex(const char *path,
     if (!pResource->Init(defaultConfig)) {
         return nullptr;
     }
+    pResource->SetLimitKeysValue(context.limitKeyValue);
+    pResource->SetLocales(context.locales);
+    pResource->SetSelectedType(context.selectedTypes);
     return pResource;
 }
 
@@ -165,7 +184,7 @@ std::string GetIndexFilePath(std::shared_ptr<AbilityBase::Extractor> &extractor)
 }
 #endif
 
-bool GetIndexData(const char *path, std::unique_ptr<uint8_t[]> &tmpBuf, size_t &len)
+bool GetIndexDataFromHap(const char *path, std::unique_ptr<uint8_t[]> &tmpBuf, size_t &len)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
@@ -192,9 +211,9 @@ bool GetIndexData(const char *path, std::unique_ptr<uint8_t[]> &tmpBuf, size_t &
 const std::shared_ptr<HapResource> HapResource::LoadFromHap(const char *path,
     std::shared_ptr<ResConfigImpl> &defaultConfig, bool isSystem, bool isOverlay, const uint32_t &selectedTypes)
 {
-    std::unique_ptr<uint8_t[]> tmpBuf;
-    size_t tmpLen = 0;
-    bool ret = GetIndexData(path, tmpBuf, tmpLen);
+    std::unique_ptr<uint8_t[]> buf;
+    size_t bufLen = 0;
+    bool ret = GetIndexDataFromHap(path, buf, bufLen);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_TAG, "read Index from file failed path, %{public}s", path);
         return nullptr;
@@ -204,8 +223,15 @@ const std::shared_ptr<HapResource> HapResource::LoadFromHap(const char *path,
         RESMGR_HILOGE(RESMGR_TAG, "new ResDesc failed when LoadFromHap");
         return nullptr;
     }
-    int32_t out = HapParser::ParseResHex(
-        reinterpret_cast<char *>(tmpBuf.get()), tmpLen, *resDesc, defaultConfig, selectedTypes);
+    ParserContext context = {
+        .buffer = reinterpret_cast<char *>(buf.get()),
+        .bufLen = bufLen,
+        .resDesc = *resDesc,
+        .defaultConfig = defaultConfig,
+        .selectedTypes = selectedTypes,
+        .isSystem = isSystem,
+    };
+    int32_t out = HapParser::ParseResHex(context);
     if (out != OK) {
         RESMGR_HILOGE(RESMGR_TAG, "ParseResHex failed! retcode:%{public}d", out);
         return nullptr;
@@ -219,6 +245,9 @@ const std::shared_ptr<HapResource> HapResource::LoadFromHap(const char *path,
     if (!pResource->Init(defaultConfig)) {
         return nullptr;
     }
+    pResource->SetLimitKeysValue(context.limitKeyValue);
+    pResource->SetLocales(context.locales);
+    pResource->SetSelectedType(context.selectedTypes);
     return pResource;
 }
 
@@ -264,8 +293,9 @@ const std::unordered_map<std::string, std::shared_ptr<HapResource>> HapResource:
     return std::unordered_map<std::string, std::shared_ptr<HapResource>>();
 }
 
-std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> HapResource::BuildNameTypeIdMapping() const
+std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> HapResource::BuildNameTypeIdMapping()
 {
+    ReadLock lock(mutex_);
     std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> result;
     for (auto iter = idValuesMap_.begin(); iter != idValuesMap_.end(); iter++) {
         const std::vector<std::shared_ptr<ValueUnderQualifierDir>> &limitPaths = iter->second->GetLimitPathsConst();
@@ -279,6 +309,7 @@ std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> HapResour
 
 void HapResource::UpdateOverlayInfo(std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> &nameTypeId)
 {
+    WriteLock lock(mutex_);
     std::map<uint32_t, std::shared_ptr<IdValues>> newIdValuesMap;
     for (auto iter = idValuesMap_.begin(); iter != idValuesMap_.end(); iter++) {
         const std::vector<std::shared_ptr<ValueUnderQualifierDir>> &limitPaths = iter->second->GetLimitPathsConst();
@@ -335,6 +366,7 @@ bool HapResource::Init(std::shared_ptr<ResConfigImpl> &defaultConfig)
         auto mptr = std::make_shared<std::map<std::string, std::shared_ptr<IdValues>>>();
         idValuesNameMap_.push_back(mptr);
     }
+    WriteLock lock(mutex_);
     return InitIdList(defaultConfig);
 }
 
@@ -382,6 +414,9 @@ bool HapResource::InitMap(const std::shared_ptr<ResKey> &resKey, const std::pair
 
 bool HapResource::InitIdList(std::shared_ptr<ResConfigImpl> &defaultConfig)
 {
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
+#endif
     if (resDesc_ == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "resDesc_ is null ! InitIdList failed");
         return false;
@@ -396,8 +431,9 @@ bool HapResource::InitIdList(std::shared_ptr<ResConfigImpl> &defaultConfig)
     return true;
 };
 
-const std::shared_ptr<HapResource::IdValues> HapResource::GetIdValues(const uint32_t id) const
+const std::shared_ptr<HapResource::IdValues> HapResource::GetIdValues(const uint32_t id)
 {
+    ReadLock lock(mutex_);
     if (idValuesMap_.empty()) {
         RESMGR_HILOGE(RESMGR_TAG, "idValuesMap_ is empty");
         return nullptr;
@@ -412,8 +448,9 @@ const std::shared_ptr<HapResource::IdValues> HapResource::GetIdValues(const uint
 }
 
 const std::shared_ptr<HapResource::IdValues> HapResource::GetIdValuesByName(
-    const std::string name, const ResType resType) const
+    const std::string name, const ResType resType)
 {
+    ReadLock lock(mutex_);
     const auto map = idValuesNameMap_[resType];
     std::map<std::string, std::shared_ptr<IdValues>>::const_iterator iter = map->find(name);
     if (iter == map->end()) {
@@ -423,8 +460,9 @@ const std::shared_ptr<HapResource::IdValues> HapResource::GetIdValuesByName(
     return iter->second;
 }
 
-int HapResource::GetIdByName(const char *name, const ResType resType) const
+int HapResource::GetIdByName(const char *name, const ResType resType)
 {
+    ReadLock lock(mutex_);
     if (name == nullptr) {
         return -1;
     }
@@ -447,8 +485,9 @@ int HapResource::GetIdByName(const char *name, const ResType resType) const
     return ids->GetLimitPathsConst()[0]->GetIdItem()->id_;
 }
 
-const std::vector<std::string> HapResource::GetQualifiers() const
+const std::vector<std::string> HapResource::GetQualifiers()
 {
+    ReadLock lock(mutex_);
     std::vector<std::string> result;
     if (resDesc_ == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "resDesc_ is null! GetQualifiers failed");
@@ -460,43 +499,15 @@ const std::vector<std::string> HapResource::GetQualifiers() const
     return result;
 }
 
-uint32_t HapResource::GetResourceLimitKeys() const
+uint32_t HapResource::GetResourceLimitKeys()
 {
-    uint32_t limitKeyValue = 0;
-    std::vector<bool> keyTypes(KeyType::KEY_TYPE_MAX, false);
-    for (auto iter = idValuesMap_.begin(); iter != idValuesMap_.end(); iter++) {
-        if (iter->second == nullptr) {
-            continue;
-        }
-        const std::vector<std::shared_ptr<ValueUnderQualifierDir>> &limitPaths = iter->second->GetLimitPathsConst();
-        if (limitPaths.size() <= 0) {
-            continue;
-        }
-        limitKeyValue |= GetLimitPathsKeys(limitPaths, keyTypes);
-    }
-    return limitKeyValue;
-}
-
-uint32_t HapResource::GetLimitPathsKeys(const std::vector<std::shared_ptr<ValueUnderQualifierDir>> &limitPaths,
-    std::vector<bool> &keyTypes) const
-{
-    uint32_t limitKeyValue = 0;
-    const uint32_t limitKeysBase = 0x00000001;
-    for_each(limitPaths.begin(), limitPaths.end(), [&](auto &item) {
-        const std::vector<std::shared_ptr<KeyParam>> &keyParams = item->keyParams_;
-        for_each(keyParams.begin(), keyParams.end(), [&](auto &keyParam) {
-            uint32_t typeValue = static_cast<uint32_t>(keyParam->type_);
-            if (keyParam->type_ < KeyType::KEY_TYPE_MAX && !keyTypes[typeValue]) {
-                keyTypes[typeValue] = true;
-                limitKeyValue |= limitKeysBase << typeValue;
-            }
-        });
-    });
-    return limitKeyValue;
+    ReadLock lock(mutex_);
+    return limitKeyValue_;
 }
 
 void HapResource::GetLocales(std::set<std::string> &outValue, bool includeSystem)
 {
+    ReadLock lock(mutex_);
     if (resDesc_ == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "resDesc_ is null! GetLocales failed");
         return;
@@ -504,42 +515,9 @@ void HapResource::GetLocales(std::set<std::string> &outValue, bool includeSystem
     if ((!includeSystem && isSystem_) || (!isSystem_ && isOverlay_)) {
         return;
     }
-    for (size_t i = 0; i < resDesc_->keys_.size(); i++) {
-        GetKeyParamsLocales(resDesc_->keys_[i]->keyParams_, outValue);
-    }
+    outValue.insert(locales_.begin(), locales_.end());
 }
 
-void HapResource::GetKeyParamsLocales(const std::vector<std::shared_ptr<KeyParam>> keyParams,
-    std::set<std::string> &outValue)
-{
-    std::string locale;
-    bool isLocale = false;
-    for (size_t i = 0; i < keyParams.size(); i++) {
-        KeyType keyType = keyParams[i]->type_;
-        if (keyType == KeyType::MCC || keyType == KeyType::MNC) {
-            continue;
-        }
-        if (keyType == KeyType::LANGUAGES) {
-            locale = keyParams[i]->GetStr();
-            isLocale = true;
-            continue;
-        }
-        if (keyType == KeyType::SCRIPT) {
-            locale.append("-");
-            locale.append(keyParams[i]->GetStr());
-            continue;
-        }
-        if (keyType == KeyType::REGION) {
-            locale.append("-");
-            locale.append(keyParams[i]->GetStr());
-            break;
-        }
-        break;
-    }
-    if (isLocale) {
-        outValue.emplace(locale);
-    }
-}
 bool HapResource::IsThemeSystemResEnable() const
 {
     return this->isThemeSystemResEnable_;
@@ -564,6 +542,52 @@ void HapResource::IsAppDarkRes(const std::shared_ptr<HapResource::ValueUnderQual
 bool HapResource::HasDarkRes()
 {
     return hasDarkRes_;
+}
+
+RState HapResource::UpdateResConfig(const std::shared_ptr<ResConfigImpl> &defaultConfig)
+{
+    if (isSystem_ || !defaultConfig) {
+        return SUCCESS;
+    }
+    WriteLock lock(mutex_);
+    for (auto &config : loadedConfig_) {
+        if (defaultConfig->MatchLocal(*config)) {
+            return SUCCESS;
+        }
+    }
+
+    resDesc_ = std::make_shared<ResDesc>();
+    std::unique_ptr<uint8_t[]> buf;
+    size_t bufLen = 0;
+    bool ret = false;
+    const char* rawIndexPath = indexPath_.c_str();
+    if (Utils::ContainsTail(rawIndexPath, Utils::tailSet)) {
+        ret = GetIndexDataFromHap(rawIndexPath, buf, bufLen);
+    } else {
+        ret = GetIndexDataFromIndex(rawIndexPath, buf, bufLen);
+    }
+    if (!ret) {
+        RESMGR_HILOGE(RESMGR_TAG, "read Index from file failed path, %{public}s", rawIndexPath);
+        return HAP_INIT_FAILED;
+    }
+    ParserContext context = {
+        .buffer = reinterpret_cast<char *>(buf.get()),
+        .bufLen = bufLen,
+        .resDesc = *resDesc_,
+        .defaultConfig = defaultConfig,
+        .selectedTypes = selectedTypes_,
+        .isUpdate = true,
+    };
+    if (HapParser::ParseResHex(context) != OK) {
+        return HAP_INIT_FAILED;
+    };
+    std::shared_ptr<ResConfigImpl> currentConfig = std::make_shared<ResConfigImpl>();
+    currentConfig->Copy(*defaultConfig);
+    if (!InitIdList(currentConfig)) {
+        return HAP_INIT_FAILED;
+    }
+    loadedConfig_.insert(currentConfig);
+    return SUCCESS;
 }
 } // namespace Resource
 } // namespace Global

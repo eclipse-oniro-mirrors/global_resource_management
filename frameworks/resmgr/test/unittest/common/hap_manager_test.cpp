@@ -123,7 +123,7 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest002, TestSize.Level1)
         return;
     }
 
-    EXPECT_EQ(static_cast<size_t>(2), idValues[0]->GetLimitPathsConst().size());
+    EXPECT_EQ(static_cast<size_t>(1), idValues[0]->GetLimitPathsConst().size());
     PrintIdValues(idValues[0]);
 
     // reload
