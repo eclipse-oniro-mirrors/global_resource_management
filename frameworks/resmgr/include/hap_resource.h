@@ -322,7 +322,7 @@ public:
      */
     int GetIdByName(const char *name, const ResType resType);
 
-    RState UpdateResConfig(const std::shared_ptr<ResConfigImpl> &defaultConfig);
+    RState UpdateResConfig(std::shared_ptr<ResConfigImpl> &defaultConfig);
 
     size_t IdSize() const
     {
