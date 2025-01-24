@@ -55,7 +55,6 @@ ThemePackManager::~ThemePackManager()
     skinResource_.clear();
     iconResource_.clear();
     iconMaskValues_.clear();
-    useCountMap_.clear();
 }
 
 std::shared_ptr<ThemePackManager> ThemePackManager::GetThemePackManager()
@@ -524,50 +523,6 @@ void ThemePackManager::ChangeIconResourceStatus(int32_t userId)
             pThemeResource->SetNewResource(false);
         }
     }
-}
-
-void ThemePackManager::SetFlagByUserId(int32_t userId)
-{
-    std::lock_guard<std::mutex> lock(this->lockUseCount_);
-    auto iter = useCountMap_.find(userId);
-    if (iter != useCountMap_.end()) {
-        useCountMap_[userId] = iter->second + 1;
-        return;
-    }
-    useCountMap_[userId] = 1;
-}
-
-void ThemePackManager::CheckFlagByUserId(int32_t userId)
-{
-    std::lock_guard<std::mutex> lock(this->lockUseCount_);
-    auto iter = useCountMap_.find(userId);
-    if (iter == useCountMap_.end()) {
-        return;
-    }
-    if (iter->second > 1) {
-        useCountMap_[userId] = iter->second - 1;
-        return;
-    }
-    useCountMap_.erase(userId);
-    ReleaseSkinResource(userId);
-    ReleaseIconResource(userId);
-    if (useCountMap_.empty() || !IsUpdateByUserId(userId)) {
-        UpdateUserId(-1); // reset user id
-    }
-}
-
-void ThemePackManager::ReleaseSkinResource(int32_t userId)
-{
-    std::lock_guard<std::mutex> lock(this->lockSkin_);
-    ChangeSkinResourceStatus(userId);
-    ClearSkinResource();
-}
-
-void ThemePackManager::ReleaseIconResource(int32_t userId)
-{
-    std::lock_guard<std::mutex> lock(this->lockIcon_);
-    ChangeIconResourceStatus(userId);
-    ClearIconResource();
 }
 
 const std::string ThemePackManager::GetMaskString(const std::string &path)

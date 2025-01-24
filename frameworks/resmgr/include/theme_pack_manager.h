@@ -165,19 +165,6 @@ public:
 
     void LoadThemeIconRes(const std::string &bundleName, const std::string &moduleName, int32_t userId);
 
-    /**
-     * set flag of resource manager
-     *
-     * @param userId the current user id
-     */
-    void SetFlagByUserId(int32_t userId);
-
-    /**
-     * check flag of resource manager
-     *
-     * @param userId the current user id
-     */
-    void CheckFlagByUserId(int32_t userId);
 private:
     ThemePackManager();
     std::string themeMask;
@@ -185,12 +172,9 @@ private:
     void ChangeIconResourceStatus(int32_t userId);
     void ClearSkinResource();
     void ClearIconResource();
-    void ReleaseSkinResource(int32_t userId);
-    void ReleaseIconResource(int32_t userId);
     const std::string GetMaskString(const std::string &path);
     std::vector<std::shared_ptr<ThemeResource>> skinResource_;
     std::vector<std::shared_ptr<ThemeResource>> iconResource_;
-    std::unordered_map<int32_t, int32_t> useCountMap_;
     std::vector<std::tuple<std::string, std::unique_ptr<uint8_t[]>, size_t>> iconMaskValues_;
     std::vector<std::shared_ptr<ThemeResource::ThemeValue> > GetThemeResourceList(
         const std::pair<std::string, std::string> &bundInfo, const ResType &resType, const std::string &resName,
@@ -212,7 +196,6 @@ private:
     std::mutex lockThemeId_;
     std::mutex lockIconValue_;
     std::mutex lockUserId_;
-    std::mutex lockUseCount_;
     uint32_t themeId_{0};
     bool isFirstCreate = true;
     int32_t currentUserId_ = 0;
