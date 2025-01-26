@@ -129,11 +129,11 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest003, TestSiz
     int id = rmc->GetResId("ohos_device_theme", ResType::THEME);
     std::map<std::string, ResourceManager::ResData> outValue;
     rm->GetThemeDataById(id, outValue);
-    ASSERT_EQ(ResType::STRING, outValue["width1"].resType);
+    ASSERT_EQ(ResType::FLOAT, outValue["width1"].resType);
     ASSERT_EQ(ResType::STRING, outValue["width2"].resType);
-    ASSERT_EQ(ResType::STRING, outValue["height1"].resType);
+    ASSERT_EQ(ResType::FLOAT, outValue["height1"].resType);
     ASSERT_EQ(ResType::STRING, outValue["height2"].resType);
-    ASSERT_EQ(ResType::STRING, outValue["textColor1"].resType);
+    ASSERT_EQ(ResType::COLOR, outValue["textColor1"].resType);
     ASSERT_EQ(ResType::STRING, outValue["textColor2"].resType);
     ASSERT_EQ(ResType::PATTERN, outValue["button_pattern"].resType);
     ASSERT_EQ(ResType::THEME, outValue["ohosTheme"].resType);
@@ -156,11 +156,11 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest003, TestSiz
     int32_t userId = 100; // userId is 100
     tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId);
     rm->GetThemeDataById(id, outValue);
-    ASSERT_EQ(ResType::STRING, outValue["width1"].resType);
+    ASSERT_EQ(ResType::FLOAT, outValue["width1"].resType);
     ASSERT_EQ(ResType::STRING, outValue["width2"].resType);
-    ASSERT_EQ(ResType::STRING, outValue["height1"].resType);
+    ASSERT_EQ(ResType::FLOAT, outValue["height1"].resType);
     ASSERT_EQ(ResType::STRING, outValue["height2"].resType);
-    ASSERT_EQ(ResType::STRING, outValue["textColor1"].resType);
+    ASSERT_EQ(ResType::COLOR, outValue["textColor1"].resType);
     ASSERT_EQ(ResType::STRING, outValue["textColor2"].resType);
     ASSERT_EQ("1000fp", outValue["width1"].value);
     ASSERT_EQ("100fp", outValue["width2"].value);
@@ -186,11 +186,11 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest004, TestSiz
     ASSERT_TRUE(ret);
     std::map<std::string, ResourceManager::ResData> outValue;
     rm->GetThemeDataByName("ohos_device_theme", outValue);
-    ASSERT_EQ(ResType::STRING, outValue["width1"].resType);
+    ASSERT_EQ(ResType::FLOAT, outValue["width1"].resType);
     ASSERT_EQ(ResType::STRING, outValue["width2"].resType);
-    ASSERT_EQ(ResType::STRING, outValue["height1"].resType);
+    ASSERT_EQ(ResType::FLOAT, outValue["height1"].resType);
     ASSERT_EQ(ResType::STRING, outValue["height2"].resType);
-    ASSERT_EQ(ResType::STRING, outValue["textColor1"].resType);
+    ASSERT_EQ(ResType::COLOR, outValue["textColor1"].resType);
     ASSERT_EQ(ResType::STRING, outValue["textColor2"].resType);
     ASSERT_EQ(ResType::PATTERN, outValue["button_pattern"].resType);
     ASSERT_EQ(ResType::THEME, outValue["ohosTheme"].resType);
@@ -213,11 +213,11 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest004, TestSiz
     int32_t userId = 100; // userId is 100
     tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId);
     rm->GetThemeDataByName("ohos_device_theme", outValue);
-    ASSERT_EQ(ResType::STRING, outValue["width1"].resType);
+    ASSERT_EQ(ResType::FLOAT, outValue["width1"].resType);
     ASSERT_EQ(ResType::STRING, outValue["width2"].resType);
-    ASSERT_EQ(ResType::STRING, outValue["height1"].resType);
+    ASSERT_EQ(ResType::FLOAT, outValue["height1"].resType);
     ASSERT_EQ(ResType::STRING, outValue["height2"].resType);
-    ASSERT_EQ(ResType::STRING, outValue["textColor1"].resType);
+    ASSERT_EQ(ResType::COLOR, outValue["textColor1"].resType);
     ASSERT_EQ(ResType::STRING, outValue["textColor2"].resType);
     ASSERT_EQ("1000fp", outValue["width1"].value);
     ASSERT_EQ("100fp", outValue["width2"].value);
@@ -244,7 +244,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest005, TestSiz
     std::map<std::string, ResourceManager::ResData> outValue;
     rm->GetPatternDataByName("ohos_button_pattern", outValue);
     ASSERT_EQ(ResType::STRING, outValue["width"].resType);
-    ASSERT_EQ(ResType::STRING, outValue["height"].resType);
+    ASSERT_EQ(ResType::FLOAT, outValue["height"].resType);
     ASSERT_EQ(ResType::STRING, outValue["bgColor"].resType);
     ASSERT_EQ(ResType::STRING, outValue["fgColor"].resType);
     ASSERT_EQ(ResType::PATTERN, outValue["fontPattern"].resType);
@@ -265,7 +265,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest005, TestSiz
     tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId);
     rm->GetPatternDataByName("ohos_button_pattern", outValue);
     ASSERT_EQ(ResType::STRING, outValue["width"].resType);
-    ASSERT_EQ(ResType::STRING, outValue["height"].resType);
+    ASSERT_EQ(ResType::FLOAT, outValue["height"].resType);
     ASSERT_EQ(ResType::STRING, outValue["bgColor"].resType);
     ASSERT_EQ(ResType::STRING, outValue["fgColor"].resType);
     ASSERT_EQ(ResType::PATTERN, outValue["fontPattern"].resType);
@@ -294,7 +294,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest006, TestSiz
     std::map<std::string, ResourceManager::ResData> outValue;
     rm->GetPatternDataById(id, outValue);
     ASSERT_EQ(ResType::STRING, outValue["width"].resType);
-    ASSERT_EQ(ResType::STRING, outValue["height"].resType);
+    ASSERT_EQ(ResType::FLOAT, outValue["height"].resType);
     ASSERT_EQ(ResType::STRING, outValue["bgColor"].resType);
     ASSERT_EQ(ResType::STRING, outValue["fgColor"].resType);
     ASSERT_EQ(ResType::PATTERN, outValue["fontPattern"].resType);
@@ -315,7 +315,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest006, TestSiz
     tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId);
     rm->GetPatternDataById(id, outValue);
     ASSERT_EQ(ResType::STRING, outValue["width"].resType);
-    ASSERT_EQ(ResType::STRING, outValue["height"].resType);
+    ASSERT_EQ(ResType::FLOAT, outValue["height"].resType);
     ASSERT_EQ(ResType::STRING, outValue["bgColor"].resType);
     ASSERT_EQ(ResType::STRING, outValue["fgColor"].resType);
     ASSERT_EQ(ResType::PATTERN, outValue["fontPattern"].resType);

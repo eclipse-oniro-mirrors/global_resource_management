@@ -477,7 +477,7 @@ RState ResourceManagerImpl::ResolveReference(const std::string value, std::strin
     std::string refStr(value);
     while (isRef) {
         isRef = IdItem::IsRef(refStr, resType, id);
-        if (!isRef) {
+        if (!isRef || resType == ResType::PLURALS) {
             outValue = refStr;
             return SUCCESS;
         }
@@ -513,14 +513,18 @@ RState ResourceManagerImpl::ResolveDataReference(const std::string key, const st
     std::map<std::string, ResData> &outValue)
 {
     uint32_t id;
-    ResType resType;
+    ResType resType = ResType::MAX_RES_TYPE;
     bool isRef = true;
     int count = 0;
     std::string refStr(value);
     while (isRef) {
+        ResType realType = resType;
         isRef = IdItem::IsRef(refStr, resType, id);
         if (!isRef) {
-            outValue[key] = { .resType = ResType::STRING, .value = refStr };
+            if (realType == ResType::MAX_RES_TYPE) {
+                realType = ResType::STRING;
+            }
+            outValue[key] = { .resType = realType, .value = refStr };
             return SUCCESS;
         }
 
@@ -641,8 +645,11 @@ RState ResourceManagerImpl::ProcessItem(std::shared_ptr<IdItem> idItem,
             continue;
         }
         std::string resolvedValue;
-        if (GetThemeValues(value, resolvedValue) == SUCCESS) {
-            outValue[key] = { .resType = ResType::STRING, .value = resolvedValue };
+        ResType resType = ResType::STRING;
+        uint32_t id;
+        bool isRef = IdItem::IsRef(value, resType, id);
+        if (isRef && GetThemeValues(value, resolvedValue) == SUCCESS) {
+            outValue[key] = { .resType = resType, .value = resolvedValue };
             continue;
         }
         RState rrRet = ResolveDataReference(key, value, outValue);
@@ -966,7 +973,7 @@ RState ResourceManagerImpl::ProcessReference(const std::string value,
     std::string refStr(value);
     while (isRef) {
         isRef = IdItem::IsRef(refStr, resType, id);
-        if (!isRef) {
+        if (!isRef || resType == ResType::PLURALS) {
             return SUCCESS;
         }
 
