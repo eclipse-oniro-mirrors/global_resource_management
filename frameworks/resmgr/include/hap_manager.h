@@ -484,7 +484,7 @@ private:
     // indicate manager is system hap manager
     bool isSystem_;
 
-    bool isOverride_;
+    bool isOverride_{ false };
 };
 } // namespace Resource
 } // namespace Global
