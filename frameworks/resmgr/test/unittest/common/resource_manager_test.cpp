@@ -16,6 +16,8 @@
 #include "resource_manager_test.h"
 #include "system_resource_manager.h"
 
+#include <fcntl.h>
+#include "res_config.h"
 #include "resource_manager_test_common.h"
 
 using namespace OHOS::Global::Resource;
@@ -2526,5 +2528,62 @@ HWTEST_F(ResourceManagerTest, ReleaseSystemResourceManagerTest001, TestSize.Leve
     EXPECT_TRUE(bundleRm != nullptr);
     ReleaseSystemResourceManager();
     bundleRm = nullptr;
+}
+
+/*
+ * @tc.name: CloseRawFileDescriptorTest001
+ * @tc.desc: Test CloseRawFileDescriptor function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, CloseRawFileDescriptorTest001, TestSize.Level1)
+{
+    rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    string name = "test_rawfile.txt";
+    OHOS::Global::Resource::ResourceManager::RawFileDescriptor descriptor;
+    RState state = rm->GetRawFileDescriptor(name, descriptor);
+    EXPECT_EQ(SUCCESS, state);
+    state = rm->CloseRawFileDescriptor(name);
+    EXPECT_EQ(SUCCESS, state);
+}
+
+/*
+ * @tc.name: CloseRawFileDescriptorTest002
+ * @tc.desc: Test CloseRawFileDescriptor function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, CloseRawFileDescriptorTest002, TestSize.Level1)
+{
+    rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    string name = "test_rawfile.txt";
+    OHOS::Global::Resource::ResourceManager::RawFileDescriptor descriptor;
+    RState state = rm->GetRawFileDescriptor(name, descriptor);
+    EXPECT_EQ(SUCCESS, state);
+
+    close(descriptor.fd);
+
+    state = rm->CloseRawFileDescriptor(name);
+    EXPECT_EQ(ERROR_CODE_RES_PATH_INVALID, state);
+}
+
+/*
+ * @tc.name: CloseRawFileDescriptorTest003
+ * @tc.desc: Test CloseRawFileDescriptor function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, CloseRawFileDescriptorTest003, TestSize.Level1)
+{
+    rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    string name = "test_rawfile.txt";
+    OHOS::Global::Resource::ResourceManager::RawFileDescriptor descriptor;
+    RState state = rm->GetRawFileDescriptor(name, descriptor);
+    EXPECT_EQ(SUCCESS, state);
+
+    close(descriptor.fd);
+    int fd = open(name.c_str(), O_RDONLY);
+
+    state = rm->CloseRawFileDescriptor(name);
+    EXPECT_EQ(ERROR_CODE_RES_PATH_INVALID, state);
+
+    close(fd);
 }
 }

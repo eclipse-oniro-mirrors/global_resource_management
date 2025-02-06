@@ -1021,16 +1021,25 @@ RState HapManager::CloseRawFileDescriptor(const std::string &name)
     if (it == rawFileDescriptor_.end()) {
         return ERROR_CODE_RES_PATH_INVALID;
     }
+
     int fd = rawFileDescriptor_[name].fd;
-    if (fd > 0) {
-        int result = close(fd);
-        if (result == -1) {
-            return ERROR_CODE_RES_PATH_INVALID;
-        }
+    if (fd <= 0) {
+        return ERROR_CODE_RES_PATH_INVALID;
+    }
+
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    if (fdsan_get_owner_tag(fd) != 0) {
         rawFileDescriptor_.erase(name);
         return SUCCESS;
     }
-    return ERROR_CODE_RES_PATH_INVALID;
+#endif
+
+    if (close(fd) == -1) {
+        return ERROR_CODE_RES_PATH_INVALID;
+    }
+
+    rawFileDescriptor_.erase(name);
+    return SUCCESS;
 }
 
 bool HapManager::RemoveResource(const std::string &path, const std::vector<std::string> &overlayPaths)
