@@ -126,6 +126,9 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest003, TestSiz
    // success cases
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     ASSERT_TRUE(ret);
+    std::vector<std::string> rootDirs;
+    int32_t userId = 100; // userId is 100
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId);
     int id = rmc->GetResId("ohos_device_theme", ResType::THEME);
     std::map<std::string, ResourceManager::ResData> outValue;
     rm->GetThemeDataById(id, outValue);
@@ -150,10 +153,8 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest003, TestSiz
     ASSERT_EQ("16777332", outValue["text_pattern"].value);
     ASSERT_EQ("16777331", outValue["list_pattern"].value);
 
-    std::vector<std::string> rootDirs;
     std::string rootDir = "/data/test/theme/skin/ohos.global.test.all";
     rootDirs.emplace_back(rootDir);
-    int32_t userId = 100; // userId is 100
     tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId);
     rm->GetThemeDataById(id, outValue);
     ASSERT_EQ(ResType::FLOAT, outValue["width1"].resType);
@@ -184,6 +185,9 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest004, TestSiz
    // success cases
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     ASSERT_TRUE(ret);
+    std::vector<std::string> rootDirs;
+    int32_t userId = 100; // userId is 100
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId);
     std::map<std::string, ResourceManager::ResData> outValue;
     rm->GetThemeDataByName("ohos_device_theme", outValue);
     ASSERT_EQ(ResType::FLOAT, outValue["width1"].resType);
@@ -207,10 +211,8 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest004, TestSiz
     ASSERT_EQ("16777332", outValue["text_pattern"].value);
     ASSERT_EQ("16777331", outValue["list_pattern"].value);
 
-    std::vector<std::string> rootDirs;
     std::string rootDir = "/data/test/theme/skin/ohos.global.test.all";
     rootDirs.emplace_back(rootDir);
-    int32_t userId = 100; // userId is 100
     tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId);
     rm->GetThemeDataByName("ohos_device_theme", outValue);
     ASSERT_EQ(ResType::FLOAT, outValue["width1"].resType);
@@ -241,6 +243,9 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest005, TestSiz
    // success cases
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     ASSERT_TRUE(ret);
+    std::vector<std::string> rootDirs;
+    int32_t userId = 100; // userId is 100
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId);
     std::map<std::string, ResourceManager::ResData> outValue;
     rm->GetPatternDataByName("ohos_button_pattern", outValue);
     ASSERT_EQ(ResType::STRING, outValue["width"].resType);
@@ -258,10 +263,8 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest005, TestSiz
     ASSERT_EQ("#FF00AA00", outValue["marginColor"].value);
     ASSERT_EQ("16777335", outValue["baseFontPattern"].value);
 
-    std::vector<std::string> rootDirs;
     std::string rootDir = "/data/test/theme/skin/ohos.global.test.all";
     rootDirs.emplace_back(rootDir);
-    int32_t userId = 100; // userId is 100
     tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId);
     rm->GetPatternDataByName("ohos_button_pattern", outValue);
     ASSERT_EQ(ResType::STRING, outValue["width"].resType);
@@ -290,6 +293,9 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest006, TestSiz
    // success cases
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     ASSERT_TRUE(ret);
+    std::vector<std::string> rootDirs;
+    int32_t userId = 100; // userId is 100
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId);
     int id = rmc->GetResId("ohos_button_pattern", ResType::PATTERN);
     std::map<std::string, ResourceManager::ResData> outValue;
     rm->GetPatternDataById(id, outValue);
@@ -308,10 +314,8 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest006, TestSiz
     ASSERT_EQ("#FF00AA00", outValue["marginColor"].value);
     ASSERT_EQ("16777335", outValue["baseFontPattern"].value);
 
-    std::vector<std::string> rootDirs;
     std::string rootDir = "/data/test/theme/skin/ohos.global.test.all";
     rootDirs.emplace_back(rootDir);
-    int32_t userId = 100; // userId is 100
     tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId);
     rm->GetPatternDataById(id, outValue);
     ASSERT_EQ(ResType::STRING, outValue["width"].resType);
@@ -402,6 +406,93 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeIconsResourceTest003, TestSi
     state = rm->GetThemeIcons(resId, foregroundInfo, backgroundInfo, 0, "ohos.global.test.all.EntryAbility");
     EXPECT_EQ(state, SUCCESS);
     tm->LoadThemeIconsResource("ohos.global.test.all", "entry", {}, userId);
+}
+
+/*
+ * @tc.name: ThemeManagerTestLoadThemeIconsResourceTest004
+ * @tc.desc: Test FindThemeIconResource function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeIconsResourceTest004, TestSize.Level1)
+{
+    std::vector<std::string> rootDirs;
+    std::string rootDir = "/data/test/theme/theme1/icons/ohos.global.test1";
+    rootDirs.emplace_back(rootDir);
+    int32_t userId = 100; // userId is 100
+    tm->LoadThemeIconsResource("ohos.global.test1", "entry", rootDirs, userId);
+    std::pair<std::string, std::string> bundleInfo;
+    bundleInfo.first = "ohos.global.test1";
+    std::string iconName("foreground");
+    std::string iconPath = tm->FindThemeIconResource(bundleInfo, iconName, userId);
+    EXPECT_EQ(iconPath, "/data/test/theme/theme1/icons/ohos.global.test1/entry/foreground.png");
+    iconName = "background";
+    iconPath = tm->FindThemeIconResource(bundleInfo, iconName, userId);
+    EXPECT_EQ(iconPath, "/data/test/theme/theme1/icons/ohos.global.test1/entry/background.png");
+}
+
+/*
+ * @tc.name: ThemeManagerTestLoadThemeIconsResourceTest005
+ * @tc.desc: Test FindThemeIconResource function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeIconsResourceTest005, TestSize.Level1)
+{
+    std::vector<std::string> rootDirs;
+    std::string rootDir = "/data/test/theme/theme1/icons/ohos.global.test1";
+    rootDirs.emplace_back(rootDir);
+    int32_t userId = 100; // userId is 100
+    tm->LoadThemeIconsResource("ohos.global.test1", "entry", rootDirs, userId);
+    std::pair<std::string, std::string> bundleInfo;
+    bundleInfo.first = "ohos.global.test1";
+    std::string iconName("foreground");
+    std::string iconPath = tm->FindThemeIconResource(bundleInfo, iconName, userId);
+    EXPECT_EQ(iconPath, "/data/test/theme/theme1/icons/ohos.global.test1/entry/foreground.png");
+    iconName = "background";
+    iconPath = tm->FindThemeIconResource(bundleInfo, iconName, userId);
+    EXPECT_EQ(iconPath, "/data/test/theme/theme1/icons/ohos.global.test1/entry/background.png");
+
+    rootDirs.clear();
+    rootDirs.emplace_back("/data/test/theme/theme2/icons/ohos.global.test2");
+    tm->LoadThemeIconsResource("ohos.global.test2", "entry", rootDirs, userId);
+    bundleInfo.first = "ohos.global.test2";
+    iconName = "foreground";
+    iconPath = tm->FindThemeIconResource(bundleInfo, iconName, userId);
+    EXPECT_EQ(iconPath, "/data/test/theme/theme2/icons/ohos.global.test2/entry/foreground.png");
+    iconName = "background";
+    iconPath = tm->FindThemeIconResource(bundleInfo, iconName, userId);
+    EXPECT_EQ(iconPath, "/data/test/theme/theme2/icons/ohos.global.test2/entry/background.png");
+}
+
+/*
+ * @tc.name: ThemeManagerTestLoadThemeIconsResourceTest006
+ * @tc.desc: Test FindThemeIconResource function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeIconsResourceTest006, TestSize.Level1)
+{
+    std::vector<std::string> rootDirs;
+    std::string rootDir = "/data/test/theme/theme1/icons/ohos.global.test1";
+    rootDirs.emplace_back(rootDir);
+    int32_t userId = 100; // userId is 100
+    tm->LoadThemeIconsResource("ohos.global.test1", "entry", rootDirs, userId);
+    std::pair<std::string, std::string> bundleInfo;
+    bundleInfo.first = "ohos.global.test1";
+    std::string iconName("foreground");
+    std::string iconPath = tm->FindThemeIconResource(bundleInfo, iconName, userId);
+    EXPECT_EQ(iconPath, "/data/test/theme/theme1/icons/ohos.global.test1/entry/foreground.png");
+    iconName = "background";
+    iconPath = tm->FindThemeIconResource(bundleInfo, iconName, userId);
+    EXPECT_EQ(iconPath, "/data/test/theme/theme1/icons/ohos.global.test1/entry/background.png");
+
+    rootDirs.clear();
+    rootDirs.emplace_back("/data/test/theme/theme2/icons/ohos.global.test2");
+    tm->LoadThemeIconsResource("ohos.global.test2", "entry", rootDirs, userId);
+    iconName = "foreground";
+    iconPath = tm->FindThemeIconResource(bundleInfo, iconName, userId);
+    EXPECT_EQ(iconPath, "");
+    iconName = "background";
+    iconPath = tm->FindThemeIconResource(bundleInfo, iconName, userId);
+    EXPECT_EQ(iconPath, "");
 }
 
 /*

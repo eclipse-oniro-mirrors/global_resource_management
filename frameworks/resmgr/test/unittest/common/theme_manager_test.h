@@ -22,6 +22,11 @@ namespace Resource {
 int ThemeManagerTestLoadThemeSkinResourceTest001(void);
 int ThemeManagerTestLoadThemeSkinResourceTest002(void);
 int ThemeManagerTestLoadThemeIconsResourceTest001(void);
+int ThemeManagerTestLoadThemeIconsResourceTest002(void);
+int ThemeManagerTestLoadThemeIconsResourceTest003(void);
+int ThemeManagerTestLoadThemeIconsResourceTest004(void);
+int ThemeManagerTestLoadThemeIconsResourceTest005(void);
+int ThemeManagerTestLoadThemeIconsResourceTest006(void);
 int ThemeManagerTestHasIconInThemeTest001(void);
 int ThemeManagerTestGetOtherIconsInfoTest001(void);
 int ThemeManagerTestGetThemeIconFromCacheTest001(void);
