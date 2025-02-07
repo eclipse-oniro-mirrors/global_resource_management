@@ -1919,6 +1919,9 @@ RState ResourceManagerImpl::GetThemeIcons(uint32_t resId, std::pair<std::unique_
     RState foreState = GetThemeIconInfo(FOREGROUND, foregroundInfo.second, foregroundInfo.first, abilityName);
     RState backState = GetThemeIconInfo(BACKGROUND, backgroundInfo.second, backgroundInfo.first, abilityName);
     if (foreState == SUCCESS && backState == SUCCESS) {
+        RESMGR_HILOGW(RESMGR_TAG,
+            "GetThemeIcons bundleName = %{public}s, abilityName = %{public}s, fLen = %{public}zu, bLen = %{public}zu",
+            bundleInfo.first.c_str(), abilityName.c_str(), foregroundInfo.second, backgroundInfo.second);
         return SUCCESS;
     }
     return ERROR_CODE_RES_ID_NOT_FOUND;
