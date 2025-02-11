@@ -50,17 +50,10 @@ namespace Global {
 namespace Resource {
 HapResource::ValueUnderQualifierDir::ValueUnderQualifierDir(const std::shared_ptr<ResKey> &resKey,
     const std::shared_ptr<IdItem> &idItem, const std::pair<std::string, std::string> &resPath, bool isOverlay,
-    bool systemResource)
-{
-    keyParams_ = resKey->keyParams_;
-    folder_ = HapParser::ToFolderPath(keyParams_);
-    idItem_ = idItem;
-    isOverlay_ = isOverlay;
-    isSystemResource_ = systemResource;
-    resConfig_ = resKey->resConfig_;
-    indexPath_ = resPath.first;
-    resourcePath_ = resPath.second;
-}
+    bool systemResource) : keyParams_(resKey->keyParams_), folder_(HapParser::ToFolderPath(keyParams_)),
+    resConfig_(resKey->resConfig_), idItem_(idItem), indexPath_(resPath.first), resourcePath_(resPath.second),
+    isOverlay_(isOverlay), isSystemResource_(systemResource)
+{}
 
 HapResource::ValueUnderQualifierDir::~ValueUnderQualifierDir()
 {}
