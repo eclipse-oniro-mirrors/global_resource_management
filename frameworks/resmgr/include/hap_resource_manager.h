@@ -60,6 +60,15 @@ public:
      */
     std::shared_ptr<HapResource> GetHapResource(const std::string &path);
 
+#if defined(__ARKUI_CROSS__)
+    /**
+     * remove resource from map
+     *
+     * @param path the resources.index file path
+     */
+    void RemoveHapResource(const std::string &path);
+#endif
+
 private:
     static std::recursive_mutex mutex_;
     static std::shared_ptr<HapResourceManager> instance_;

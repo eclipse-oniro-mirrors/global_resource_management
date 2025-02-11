@@ -58,9 +58,11 @@ public:
     /**
      * Add resource path to hap paths
      * @param path the resource path
+     * @param forceReload is reload resource
      * @return true if add resource path success, else false
      */
-    virtual bool AddResource(const char *path, const uint32_t &selectedTypes = SELECT_ALL);
+    virtual bool AddResource(const char *path, const uint32_t &selectedTypes = SELECT_ALL,
+        bool forceReload = false);
 
     virtual bool AddPatchResource(const char *path, const char *patchPath);
 
