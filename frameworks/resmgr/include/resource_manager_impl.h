@@ -823,8 +823,6 @@ private:
 
     bool IsDensityValid(uint32_t density);
 
-    bool IsFileExist(const std::string& path);
-
     RState GetThemeColor(const std::shared_ptr<IdItem> idItem, uint32_t &outValue);
 
     RState GetThemeFloat(const std::shared_ptr<IdItem> idItem, float &outValue);

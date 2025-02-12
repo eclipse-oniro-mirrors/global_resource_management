@@ -1625,16 +1625,6 @@ RState ResourceManagerImpl::IsLoadHap(std::string &hapPath)
     return NOT_FOUND;
 }
 
-bool ResourceManagerImpl::IsFileExist(const std::string& path)
-{
-    std::fstream inputFile;
-    inputFile.open(path, std::ios::in);
-    if (inputFile) {
-        return true;
-    }
-    return false;
-}
-
 RState ResourceManagerImpl::GetRawFileList(const std::string &rawDirPath, std::vector<std::string>& rawfileList)
 {
     return hapManager_->GetRawFileList(rawDirPath, rawfileList);
