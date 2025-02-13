@@ -479,5 +479,9 @@
 			"type":	"pattern",
 			"name":	"base_font_pattern",
 			"id":	"0x01000077"
-		}]
+		}, {
+			"type":	"symbol",
+			"name":	"test_symbol",
+			"id":	"0x01000078"
+ 		}]
 }
