@@ -347,6 +347,7 @@ RState HapManager::FindRawFile(const std::string &name, std::string &outValue)
         inputFile.open(realPath, std::ios::in);
         if (inputFile) {
             outValue = realPath;
+            inputFile.close();
             return SUCCESS;
         }
     }
