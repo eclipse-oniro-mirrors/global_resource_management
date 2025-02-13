@@ -23,7 +23,6 @@ int HapParserFuncTest001(void);
 int HapParserFuncTest002(void);
 int HapParserFuncTest003(void);
 int HapParserFuncTest004(void);
-int HapParserFuncTest005(void);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

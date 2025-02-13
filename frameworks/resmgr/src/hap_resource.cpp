@@ -50,9 +50,8 @@ namespace Global {
 namespace Resource {
 HapResource::ValueUnderQualifierDir::ValueUnderQualifierDir(const std::shared_ptr<ResKey> &resKey,
     const std::shared_ptr<IdItem> &idItem, const std::pair<std::string, std::string> &resPath, bool isOverlay,
-    bool systemResource) : keyParams_(resKey->keyParams_), folder_(HapParser::ToFolderPath(keyParams_)),
-    resConfig_(resKey->resConfig_), idItem_(idItem), indexPath_(resPath.first), resourcePath_(resPath.second),
-    isOverlay_(isOverlay), isSystemResource_(systemResource)
+    bool systemResource) : resConfig_(resKey->resConfig_), idItem_(idItem), indexPath_(resPath.first),
+    resourcePath_(resPath.second), isOverlay_(isOverlay), isSystemResource_(systemResource)
 {}
 
 HapResource::ValueUnderQualifierDir::~ValueUnderQualifierDir()
@@ -538,8 +537,8 @@ void HapResource::IsAppDarkRes(const std::shared_ptr<HapResource::ValueUnderQual
     if (isSystem_ || isOverlay_ || defaultConfig->GetAppDarkRes()) {
         return;
     }
-    std::string folder = limitPath->GetFolder();
-    if (folder.find("dark") != std::string::npos) {
+
+    if (limitPath->GetResConfig()->GetColorMode() == ColorMode::DARK) {
         defaultConfig->SetAppDarkRes(true);
         hasDarkRes_ = true;
     }

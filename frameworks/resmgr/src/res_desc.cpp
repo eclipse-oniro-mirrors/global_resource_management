@@ -306,10 +306,8 @@ ResKey::~ResKey()
 
 std::string ResKey::ToString() const
 {
-    std::string ret = FormatString("offset:%u, keyParamsCount:%u, keyParams:", offset_, keyParamsCount_);
-    for (uint32_t i = 0; i < keyParamsCount_; ++i) {
-        ret.append(keyParams_[i]->ToString());
-    }
+    std::string ret = FormatString("offset:%u, keyParamsCount:%u, folder path:", offset_, keyParamsCount_);
+    ret.append(resConfig_->ToString());
     ret.append("\nid: ");
     ret.append(resId_->ToString());
     return ret;
