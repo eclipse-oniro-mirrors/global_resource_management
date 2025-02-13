@@ -81,13 +81,13 @@ void TestGetIdValuesByName(const std::shared_ptr<HapResource> pResource)
     }
     {
         auto limitPath = idValues->GetLimitPathsConst()[1];
-        EXPECT_TRUE(limitPath->GetFolder() == "en_US");
+        EXPECT_TRUE(limitPath->GetResConfig()->ToString() == "en_Latn_US");
         EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
         EXPECT_TRUE(limitPath->GetIdItem()->value_ == "App Name");
     }
     {
         auto limitPath = idValues->GetLimitPathsConst()[2];
-        EXPECT_TRUE(limitPath->GetFolder() == "zh_CN");
+        EXPECT_TRUE(limitPath->GetResConfig()->ToString() == "zh_Hans_CN");
         EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
         EXPECT_TRUE(limitPath->GetIdItem()->value_ == "应用名称");
     }
@@ -127,13 +127,13 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest001, TestSize.Level0)
     }
     {
         auto limitPath = idValues->GetLimitPathsConst()[1];
-        EXPECT_TRUE(limitPath->GetFolder() == "en_US");
+        EXPECT_TRUE(limitPath->GetResConfig()->ToString() == "en_Latn_US");
         EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
         EXPECT_TRUE(limitPath->GetIdItem()->value_ == "App Name");
     }
     {
         auto limitPath = idValues->GetLimitPathsConst()[2];
-        EXPECT_TRUE(limitPath->GetFolder() == "zh_CN");
+        EXPECT_TRUE(limitPath->GetResConfig()->ToString() == "zh_Hans_CN");
         EXPECT_TRUE(limitPath->GetIdItem()->name_ == "app_name");
         EXPECT_TRUE(limitPath->GetIdItem()->value_ == "应用名称");
     }

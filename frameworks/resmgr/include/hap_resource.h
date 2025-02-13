@@ -188,6 +188,7 @@ public:
         ~ValueUnderQualifierDir();
 
     private:
+        std::vector<std::shared_ptr<KeyParam>> keyParams_;
 
         /**
          * resConfig_ is to describe Qualifiers Sub-directory

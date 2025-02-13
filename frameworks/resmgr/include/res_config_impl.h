@@ -210,8 +210,6 @@ public:
      */
     bool GetAppDarkRes() const;
 
-    bool MatchLocal(ResConfig& other) const;
-
     std::string ToString() const;
 
     std::string GetDeviceTypeStr() const;

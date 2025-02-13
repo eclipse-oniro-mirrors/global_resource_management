@@ -411,6 +411,121 @@ bool ResConfigImpl::Copy(ResConfig &other, bool isRead)
     return true;
 }
 
+void PathAppend(std::string &path, const std::string &append, const std::string &connector)
+{
+    if (!append.size()) {
+        return;
+    }
+    if (path.size() > 0) {
+        path.append(connector);
+    }
+    path.append(append);
+}
+
+std::string ResConfigImpl::ToString() const
+{
+    /*
+     * folder path struct: mcc_mnc-language_script_region-direction-deviceType-colorMode-inputDevice-screenDensity
+     * default is base
+     */
+    std::string path = "";
+    std::string underScore = "_";
+    std::string hyphen = "-";
+
+    if (mcc_ != MCC_UNDEFINED) {
+        PathAppend(path, "mcc" + std::to_string(mcc_), hyphen);
+        if (mnc_ != MNC_UNDEFINED) {
+            PathAppend(path, "mnc" + std::to_string(mnc_), underScore);
+        }
+    }
+
+    if (resLocale_ != nullptr) {
+        PathAppend(path, std::string(resLocale_->GetLanguage()), hyphen);
+        PathAppend(path, std::string(resLocale_->GetScript()), underScore);
+        PathAppend(path, std::string(resLocale_->GetRegion()), underScore);
+    }
+
+    if (direction_ != Direction::DIRECTION_NOT_SET) {
+        PathAppend(path, std::string((direction_ == Direction::DIRECTION_VERTICAL) ? VERTICAL : HORIZONTAL), hyphen);
+    }
+
+    PathAppend(path, GetDeviceTypeStr(), hyphen);
+
+    if (colorMode_ != ColorMode::COLOR_MODE_NOT_SET) {
+        PathAppend(path, std::string((colorMode_ == ColorMode::DARK) ? DARK_STR : LIGHT_STR), hyphen);
+    }
+
+    if (inputDevice_ != InputDevice::INPUTDEVICE_NOT_SET) {
+        PathAppend(path, std::string(POINTING_DEVICE_STR), hyphen);
+    }
+
+    PathAppend(path, GetScreenDensityStr(), hyphen);
+
+    if (path.size() == 0) {
+        path = "base";
+    }
+    return path;
+}
+
+std::string ResConfigImpl::GetDeviceTypeStr() const
+{
+    std::string deviceType;
+    switch (deviceType_) {
+        case DeviceType::DEVICE_PHONE:
+            deviceType = std::string(PHONE_STR);
+            break;
+        case DeviceType::DEVICE_TABLET:
+            deviceType = std::string(TABLET_STR);
+            break;
+        case DeviceType::DEVICE_CAR:
+            deviceType = std::string(CAR_STR);
+            break;
+        case DeviceType::DEVICE_PAD:
+            deviceType = std::string(PAD_STR);
+            break;
+        case DeviceType::DEVICE_TV:
+            deviceType = std::string(TV_STR);
+            break;
+        case DeviceType::DEVICE_WEARABLE:
+            deviceType = std::string(WEARABLE_STR);
+            break;
+        case DeviceType::DEVICE_TWOINONE:
+            deviceType = std::string(TWOINONE_STR);
+            break;
+        default:
+            break;
+    }
+    return deviceType;
+}
+
+std::string ResConfigImpl::GetScreenDensityStr() const
+{
+    std::string screenDensity;
+    switch (screenDensityDpi_) {
+        case ScreenDensity::SCREEN_DENSITY_SDPI:
+            screenDensity = std::string(RE_120_STR);
+            break;
+        case ScreenDensity::SCREEN_DENSITY_MDPI:
+            screenDensity = std::string(RE_160_STR);
+            break;
+        case ScreenDensity::SCREEN_DENSITY_LDPI:
+            screenDensity = std::string(RE_240_STR);
+            break;
+        case ScreenDensity::SCREEN_DENSITY_XLDPI:
+            screenDensity = std::string(RE_320_STR);
+            break;
+        case ScreenDensity::SCREEN_DENSITY_XXLDPI:
+            screenDensity = std::string(RE_480_STR);
+            break;
+        case ScreenDensity::SCREEN_DENSITY_XXXLDPI:
+            screenDensity = std::string(RE_640_STR);
+            break;
+        default:
+            break;
+    }
+    return screenDensity;
+}
+
 bool ResConfigImpl::Match(const std::shared_ptr<ResConfigImpl> other, bool isCheckDarkAdaptation) const
 {
     if (other == nullptr) {

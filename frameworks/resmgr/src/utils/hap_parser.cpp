@@ -571,7 +571,7 @@ bool IsLocaleMatch(const std::shared_ptr<ResConfigImpl> defaultConfig,
     if (LocaleMatcher::Match(defaultConfig->GetResLocale(), config->GetResLocale())) {
         return true;
     }
-    RESMGR_HILOGD(RESMGR_TAG, "mismatch, do not parse %s", HapParser::ToFolderPath(keyParams).c_str());
+    RESMGR_HILOGD(RESMGR_TAG, "mismatch, do not parse %s", config->ToString().c_str());
     return false;
 }
 
@@ -619,7 +619,6 @@ int32_t ParseKey(const char *buffer, uint32_t &offset, const size_t &bufLen, std
         || key->tag_[ArrayIndex::INDEX_TWO] != 'Y' || key->tag_[ArrayIndex::INDEX_THREE] != 'S') {
         return -1;
     }
-    std::vector<std::shared_ptr<KeyParam>> keyParams;
     for (uint32_t i = 0; i < key->keyParamsCount_; ++i) {
         std::shared_ptr<KeyParam> kp;
         if (ParseKeyParam(buffer, offset, bufLen, options, kp) != OK) {
