@@ -54,10 +54,10 @@ ResConfigImpl::ResConfigImpl()
     preferredLocaleInfo_(nullptr),
     localeInfo_(nullptr),
 #endif
+    themeId_(0),
     isCompletedScript_(false),
     isAppColorMode_(false),
-    isAppDarkRes_(false),
-    themeId_(0)
+    isAppDarkRes_(false)
 {}
 
 #ifdef SUPPORT_GRAPHICS

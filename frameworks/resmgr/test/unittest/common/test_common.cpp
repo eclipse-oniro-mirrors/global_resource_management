@@ -46,7 +46,8 @@ void PrintIdValues(const std::shared_ptr<HapResource::IdValues> &idValues)
     }
     for (size_t i = 0; i < idValues->GetLimitPathsConst().size(); ++i) {
         auto limitPath = idValues->GetLimitPathsConst()[i];
-        RESMGR_HILOGD(RESMGR_TAG, "%zu: folder is: %s, value: %s", i, limitPath->GetFolder().c_str(),
+        RESMGR_HILOGD(RESMGR_TAG, "%zu: folder is: %s, value: %s", i,
+            limitPath->GetResConfig()->ToString().c_str(),
             limitPath->GetIdItem()->ToString().c_str());
     }
 }

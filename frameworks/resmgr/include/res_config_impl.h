@@ -210,6 +210,13 @@ public:
      */
     bool GetAppDarkRes() const;
 
+    bool MatchLocal(ResConfig& other) const;
+
+    std::string ToString() const;
+
+    std::string GetDeviceTypeStr() const;
+
+    std::string GetScreenDensityStr() const;
 private:
     bool IsMoreSpecificThan(const std::shared_ptr<ResConfigImpl> other, uint32_t density = 0) const;
 
@@ -260,10 +267,10 @@ private:
     Locale *preferredLocaleInfo_;
     Locale *localeInfo_;
 #endif
+    uint32_t themeId_;
     bool isCompletedScript_;
     bool isAppColorMode_;
     bool isAppDarkRes_;
-    uint32_t themeId_;
 };
 } // namespace Resource
 } // namespace Global

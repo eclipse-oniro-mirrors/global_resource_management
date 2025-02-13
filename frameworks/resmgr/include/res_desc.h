@@ -200,9 +200,6 @@ public:
     // count of qualifiers
     uint32_t keyParamsCount_;
 
-    // the qualifiers
-    std::vector<std::shared_ptr<KeyParam>> keyParams_;
-
     // the resource ID data
     std::shared_ptr<ResId> resId_;
 

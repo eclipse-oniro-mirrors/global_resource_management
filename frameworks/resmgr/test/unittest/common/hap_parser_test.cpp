@@ -148,53 +148,10 @@ HWTEST_F(HapParserTest, HapParserFuncTest003, TestSize.Level1)
 
 /*
  * @tc.name: HapParserFuncTest004
- * @tc.desc: Test ToFolderPath
- * @tc.type: FUNC
- */
-HWTEST_F(HapParserTest, HapParserFuncTest004, TestSize.Level1)
-{
-    std::vector<std::shared_ptr<KeyParam>> keyParams;
-    auto kp1 = std::make_shared<KeyParam>();
-    kp1->type_ = LANGUAGES;
-    kp1->value_ = 31336;
-    kp1->InitStr();
-    keyParams.push_back(kp1);
-    auto kp2 = std::make_shared<KeyParam>();
-    kp2->type_ = REGION;
-    kp2->value_ = 17230;
-    kp2->InitStr();
-    keyParams.push_back(kp2);
-    auto kp3 = std::make_shared<KeyParam>();
-    kp3->type_ = SCREEN_DENSITY;
-    kp3->value_ = SCREEN_DENSITY_SDPI;
-    kp3->InitStr();
-    keyParams.push_back(kp3);
-    auto kp4 = std::make_shared<KeyParam>();
-    kp4->type_ = DEVICETYPE;
-    kp4->value_ = DEVICE_CAR;
-    kp4->InitStr();
-    keyParams.push_back(kp4);
-    auto kp5 = std::make_shared<KeyParam>();
-    kp5->type_ = DIRECTION;
-    kp5->value_ = DIRECTION_VERTICAL;
-    kp5->InitStr();
-    keyParams.push_back(kp5);
-    auto kp6 = std::make_shared<KeyParam>();
-    kp6->type_ = COLORMODE;
-    kp6->value_ = DARK;
-    kp6->InitStr();
-    keyParams.push_back(kp6);
-    std::string folder = HapParser::ToFolderPath(keyParams);
-    ASSERT_EQ("zh_CN-vertical-car-dark-sdpi", folder);
-    keyParams.clear();
-}
-
-/*
- * @tc.name: HapParserFuncTest005
  * @tc.desc: Test GetColorMode
  * @tc.type: FUNC
  */
-HWTEST_F(HapParserTest, HapParserFuncTest005, TestSize.Level1)
+HWTEST_F(HapParserTest, HapParserFuncTest004, TestSize.Level1)
 {
     ASSERT_EQ(DARK, HapParser::GetColorMode(DARK));
     ASSERT_EQ(LIGHT, HapParser::GetColorMode(LIGHT));
