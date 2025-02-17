@@ -213,13 +213,13 @@ public:
 
         friend class HapResource;
 
-        bool isOverlay_;
-
-        bool isSystemResource_;
-
         std::string indexPath_;
 
         std::string resourcePath_;
+
+        bool isOverlay_;
+
+        bool isSystemResource_;
     };
 
     /**
