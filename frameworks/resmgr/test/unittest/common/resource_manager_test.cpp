@@ -2265,6 +2265,68 @@ HWTEST_F(ResourceManagerTest, ResourceManagerSameNameTest001, TestSize.Level1)
 }
 
 /*
+ * @tc.name: ResourceManagerGetSymbolByIdTest001
+ * @tc.desc: Test GetSymbolById function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetSymbolByIdTest001, TestSize.Level1)
+{
+    rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    uint32_t id = rmc->GetResId("test_symbol", ResType::SYMBOL);
+    uint32_t outValue;
+    RState state = rm->GetSymbolById(id, outValue);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(983040, outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetSymbolByIdTest002
+ * @tc.desc: Test GetSymbolById function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetSymbolByIdTest002, TestSize.Level1)
+{
+    rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    uint32_t id = rmc->GetResId("app_name", ResType::STRING);
+    uint32_t outValue;
+    RState state = rm->GetSymbolById(id, outValue);
+    EXPECT_TRUE(state == ERROR_CODE_RES_NOT_FOUND_BY_ID);
+
+    id = 1992503;
+    state = rm->GetSymbolById(id, outValue);
+    EXPECT_TRUE(state == ERROR_CODE_RES_ID_NOT_FOUND);
+}
+
+/*
+ * @tc.name: ResourceManagerGetSymbolByNameTest001
+ * @tc.desc: Test GetSymbolByName function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetSymbolByNameTest001, TestSize.Level1)
+{
+    rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    std::string name("test_symbol");
+    uint32_t outValue;
+    RState state = rm->GetSymbolByName(name.c_str(), outValue);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(983040, outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetSymbolByNameTest002
+ * @tc.desc: Test GetSymbolByName function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetSymbolByNameTest002, TestSize.Level1)
+{
+    rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    std::string name("test_symbol_tmp");
+    uint32_t outValue;
+    RState state = rm->GetSymbolByName(name.c_str(), outValue);
+    EXPECT_TRUE(state == ERROR_CODE_RES_NAME_NOT_FOUND);
+}
+
+/*
  * test get raw file path interface
  * @tc.name: RawFileTest001
  * @tc.desc: Test GetRawFilePathByName, file case.
