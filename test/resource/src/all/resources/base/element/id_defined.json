@@ -483,5 +483,9 @@
 			"type":	"symbol",
 			"name":	"test_symbol",
 			"id":	"0x01000078"
- 		}]
+ 		}, {
+			"type":	"plural",
+			"name":	"eat_apple2",
+			"id":	"0x01000079"
+		}]
 }

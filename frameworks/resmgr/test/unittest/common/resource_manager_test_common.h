@@ -66,6 +66,12 @@ public:
 
     void TestFormatPluralStringByName(const std::string name, double quantity, const char *cmp);
 
+    RState TestGetFormatPluralStringById(std::string outValue, const int id,
+        ResourceManager::Quantity quantity, ...);
+
+    RState TestGetFormatPluralStringByName(std::string outValue, const char *name,
+        ResourceManager::Quantity quantity, ...);
+
     void TestGetRawFilePathByName(const std::string &name, const std::string &cmp);
 
     void AddResource(const char *language, const char *script, const char *region);

@@ -28,6 +28,7 @@ struct ResMgrDataContext {
     std::string bundleName_;
     uint32_t resId_;
     int32_t param_;
+    ResourceManager::Quantity quantity_;
 
     std::string path_;
     std::string resName_;

@@ -114,7 +114,7 @@ bool HapManager::Init()
     return true;
 }
 
-std::string HapManager::GetPluralRulesAndSelect(int quantity, bool isGetOverrideResource)
+std::string HapManager::GetPluralRulesAndSelect(ResourceManager::Quantity quantity, bool isGetOverrideResource)
 {
     std::string defaultRet("other");
 #ifdef SUPPORT_GRAPHICS
@@ -160,7 +160,8 @@ std::string HapManager::GetPluralRulesAndSelect(int quantity, bool isGetOverride
         plurRulesCache_.push_back(plPair);
     }
     std::string converted;
-    icu::UnicodeString us = pluralRules->select(quantity);
+    icu::UnicodeString us = quantity.isInteger ? pluralRules->select(quantity.intValue) :
+        pluralRules->select(quantity.doubleValue);
     us.toUTF8String(converted);
     return converted;
 #else

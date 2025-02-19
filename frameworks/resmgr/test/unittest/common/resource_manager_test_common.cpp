@@ -186,6 +186,28 @@ void ResourceManagerTestCommon::TestFormatPluralStringByName(const std::string n
     ASSERT_EQ(std::string(cmp), outValue);
 }
 
+RState ResourceManagerTestCommon::TestGetFormatPluralStringById(std::string outValue, const int id,
+    ResourceManager::Quantity quantity, ...)
+{
+    RState state;
+    va_list args;
+    va_start(args, quantity);
+    state = rm->GetFormatPluralStringById(outValue, id, quantity, args);
+    return state;
+    va_end(args);
+}
+
+RState ResourceManagerTestCommon::TestGetFormatPluralStringByName(std::string outValue, const char *name,
+    ResourceManager::Quantity quantity, ...)
+{
+    RState state;
+    va_list args;
+    va_start(args, quantity);
+    state = rm->GetFormatPluralStringByName(outValue, name, quantity, args);
+    return state;
+    va_end(args);
+}
+
 void ResourceManagerTestCommon::TestGetRawFilePathByName(const std::string &name, const std::string &cmp)
 {
     std::string outValue;

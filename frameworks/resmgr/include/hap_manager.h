@@ -201,7 +201,7 @@ public:
      * @param quantity the language quantity
      * @return the language pluralRule related to quantity
      */
-    std::string GetPluralRulesAndSelect(int quantity, bool isGetOverrideResource = false);
+    std::string GetPluralRulesAndSelect(ResourceManager::Quantity quantity, bool isGetOverrideResource = false);
 
     /**
      * Get resource paths vector
