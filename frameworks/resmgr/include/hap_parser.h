@@ -164,13 +164,6 @@ public:
         const std::vector<std::shared_ptr<KeyParam>> &keyParams);
 
     /**
-     * To resource folder path
-     * @param keyParams the keyParams contain type and value
-     * @return the resources folder path
-     */
-    static std::string ToFolderPath(const std::vector<std::shared_ptr<KeyParam>> &keyParams);
-
-    /**
      * Get screen density
      * @param value the type of screen density
      * @return the screen density related to the value
@@ -259,7 +252,6 @@ private:
         uint32_t mnc = MNC_UNDEFINED;
     };
 
-    static std::string BuildFolderPath(Determiner *determiner);
     static std::shared_ptr<ResConfigImpl> BuildResConfig(ResConfigKey *configKey);
 };
 } // namespace Resource
