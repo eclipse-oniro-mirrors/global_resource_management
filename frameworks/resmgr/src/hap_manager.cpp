@@ -1055,7 +1055,8 @@ RState HapManager::CloseRawFileDescriptor(const std::string &name)
 
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     if (fdsan_get_owner_tag(fd) != 0) {
-        return ERROR_CODE_RES_PATH_INVALID;
+        rawFileDescriptor_.erase(name);
+        return SUCCESS;
     }
 #endif
 
