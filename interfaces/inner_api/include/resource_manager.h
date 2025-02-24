@@ -83,7 +83,8 @@ public:
      *     only add resource of current language, which means it will be further faster.
      * @return true if init success, else false
      */
-    virtual bool AddResource(const char *path, const uint32_t &selectedTypes = SELECT_ALL) = 0;
+    virtual bool AddResource(const char *path, const uint32_t &selectedTypes = SELECT_ALL,
+        bool forceReload = false) = 0;
 
     virtual RState UpdateResConfig(ResConfig &resConfig, bool isUpdateTheme = false) = 0;
 

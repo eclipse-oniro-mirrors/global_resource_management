@@ -51,7 +51,7 @@ ThemePackManager::ThemePackManager()
 
 ThemePackManager::~ThemePackManager()
 {
-    RESMGR_HILOGI_BY_FLAG(isLogFlag_, RESMGR_TAG, "~ThemePackManager");
+    RESMGR_HILOGW_BY_FLAG(isLogFlag_, RESMGR_TAG, "~ThemePackManager");
     skinResource_.clear();
     iconResource_.clear();
     iconMaskValues_.clear();
@@ -330,14 +330,14 @@ void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, con
             RESMGR_HILOGE(RESMGR_TAG, "invalid dir = %{public}s in LoadThemeIconsResource", dir.c_str());
             continue;
         }
-        RESMGR_HILOGI_BY_FLAG(isLogFlag_, RESMGR_TAG, "load img, %{public}s", GetMaskString(dir).c_str());
+        RESMGR_HILOGW_BY_FLAG(isLogFlag_, RESMGR_TAG, "load img, %{public}s", GetMaskString(dir).c_str());
         auto pThemeResource = ThemeResource::LoadThemeIconResource(dir);
         if (pThemeResource != nullptr) {
             this->iconResource_.emplace_back(pThemeResource);
         }
     }
     ClearIconResource();
-    RESMGR_HILOGI_BY_FLAG(isLogFlag_, RESMGR_TAG, "load img end, size is %{public}zu", iconResource_.size());
+    RESMGR_HILOGW_BY_FLAG(isLogFlag_, RESMGR_TAG, "load img end, size is %{public}zu", iconResource_.size());
 }
 
 const std::string ThemePackManager::FindThemeIconResource(const std::pair<std::string, std::string> &bundleInfo,
@@ -355,7 +355,7 @@ const std::string ThemePackManager::FindThemeIconResource(const std::pair<std::s
         }
         result = pThemeResource->GetThemeAppIcon(bundleInfo, iconName, abilityName);
         if (!result.empty()) {
-            RESMGR_HILOGI_BY_FLAG(isLogFlag_, RESMGR_TAG, "find img, %{public}s", GetMaskString(result).c_str());
+            RESMGR_HILOGW_BY_FLAG(isLogFlag_, RESMGR_TAG, "find img, %{public}s", GetMaskString(result).c_str());
             break;
         }
     }
@@ -366,7 +366,7 @@ bool ThemePackManager::UpdateThemeId(uint32_t newThemeId)
 {
     std::lock_guard<std::mutex> lock(this->lockThemeId_);
     if (newThemeId != 0 && newThemeId != themeId_) {
-        RESMGR_HILOGI(RESMGR_TAG, "update theme, themeId_= %{public}d, newThemeId= %{public}d", themeId_, newThemeId);
+        RESMGR_HILOGW(RESMGR_TAG, "update theme, themeId_= %{public}d, newThemeId= %{public}d", themeId_, newThemeId);
         themeId_ = newThemeId;
         return true;
     }
@@ -475,7 +475,7 @@ void ThemePackManager::UpdateUserId(int32_t userId)
 {
     std::lock_guard<std::mutex> lock(this->lockUserId_);
     if (userId != 0 && currentUserId_ != userId) {
-        RESMGR_HILOGI(RESMGR_TAG,
+        RESMGR_HILOGW(RESMGR_TAG,
             "update userId, currentUserId_= %{public}d, userId= %{public}d", currentUserId_, userId);
         currentUserId_ = userId;
     }

@@ -81,16 +81,19 @@ std::unique_ptr<uint8_t[]> Utils::LoadResourceFile(const std::string &path, size
     int length = mediaStream.tellg();
     if (length == ERROR_RESULT) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get the file length");
+        mediaStream.close();
         return nullptr;
     } else {
         len = static_cast<size_t>(length);
     }
     std::unique_ptr<uint8_t[]> tempData = std::make_unique<uint8_t[]>(len);
     if (tempData == nullptr) {
+        mediaStream.close();
         return nullptr;
     }
     mediaStream.seekg(0, std::ios::beg);
     mediaStream.read(reinterpret_cast<char *>(tempData.get()), len);
+    mediaStream.close();
     return tempData;
 }
 

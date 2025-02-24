@@ -347,6 +347,7 @@ RState HapManager::FindRawFile(const std::string &name, std::string &outValue)
         inputFile.open(realPath, std::ios::in);
         if (inputFile) {
             outValue = realPath;
+            inputFile.close();
             return SUCCESS;
         }
     }
@@ -418,10 +419,10 @@ void HapManager::GetOverrideResConfig(ResConfig &resConfig)
     resConfig.Copy(*(this->overrideResConfig_));
 }
 
-bool HapManager::AddResource(const char *path, const uint32_t &selectedTypes)
+bool HapManager::AddResource(const char *path, const uint32_t &selectedTypes, bool forceReload)
 {
     WriteLock lock(this->mutex_);
-    return this->AddResourcePath(path, selectedTypes);
+    return this->AddResourcePath(path, selectedTypes, forceReload);
 }
 
 bool HapManager::AddPatchResource(const char *path, const char *patchPath)
@@ -550,9 +551,15 @@ std::vector<std::shared_ptr<HapResource::IdValues>> HapManager::GetResourceListB
     return result;
 }
 
-bool HapManager::AddResourcePath(const char *path, const uint32_t &selectedTypes)
+bool HapManager::AddResourcePath(const char *path, const uint32_t &selectedTypes, bool forceReload)
 {
     std::string sPath(path);
+#if defined(__ARKUI_CROSS__)
+    if (forceReload) {
+        HapResourceManager::GetInstance()->RemoveHapResource(sPath);
+        RemoveHapResource(sPath);
+    }
+#endif
     auto it = loadedHapPaths_.find(sPath);
     if (it != loadedHapPaths_.end()) {
         return false;
@@ -569,6 +576,25 @@ bool HapManager::AddResourcePath(const char *path, const uint32_t &selectedTypes
     }
     return true;
 }
+
+#if defined(__ARKUI_CROSS__)
+void HapManager::RemoveHapResource(const std::string &path)
+{
+    for (auto iter = hapResources_.begin(); iter != hapResources_.end();) {
+        if ((*iter)->GetIndexPath() == path) {
+            iter = hapResources_.erase(iter);
+            break;
+        } else {
+            ++iter;
+        }
+    }
+
+    auto it = loadedHapPaths_.find(path);
+    if (it != loadedHapPaths_.end()) {
+        loadedHapPaths_.erase(it);
+    }
+}
+#endif
 
 bool HapManager::AddPatchResourcePath(const char *path, const char *patchPath)
 {

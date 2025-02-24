@@ -21,11 +21,25 @@ namespace Global {
 namespace Resource {
 int ThemeManagerTestLoadThemeSkinResourceTest001(void);
 int ThemeManagerTestLoadThemeSkinResourceTest002(void);
+int ThemeManagerTestChangeSkinResourceStatusTest001(void);
 int ThemeManagerTestLoadThemeIconsResourceTest001(void);
+int ThemeManagerTestLoadThemeIconsResourceTest002(void);
+int ThemeManagerTestLoadThemeIconsResourceTest003(void);
+int ThemeManagerTestLoadThemeIconsResourceTest004(void);
+int ThemeManagerTestLoadThemeIconsResourceTest005(void);
+int ThemeManagerTestLoadThemeIconsResourceTest006(void);
+int ThemeManagerTestLoadThemeIconsResourceTest007(void);
+int ThemeManagerTestLoadThemeIconsResourceTest008(void);
+int ThemeManagerTestChangeIconResourceStatusTest001(void);
 int ThemeManagerTestHasIconInThemeTest001(void);
 int ThemeManagerTestGetOtherIconsInfoTest001(void);
+int ThemeManagerTestGetOtherIconsInfoTest002(void);
+int ThemeManagerTestGetOtherIconsInfoTest003(void);
 int ThemeManagerTestGetThemeIconFromCacheTest001(void);
+int ThemeManagerTestGetThemeIconFromCacheTest002(void);
 int ThemeManagerTestIsUpdateByUserIdTest001(void);
+int ThemeManagerTestIsSameResourceByUserIdTest001(void);
+int ThemeManagerTestGetMaskStringTest001(void);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

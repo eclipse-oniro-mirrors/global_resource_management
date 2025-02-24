@@ -1228,6 +1228,10 @@ napi_value ResourceManagerNapiSyncImpl::GetConfigurationSync(napi_env env, napi_
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
+    if (dataContext->addon_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get addon in GetConfigurationSync");
+        return nullptr;
+    }
     return ResourceManagerNapiUtils::CreateJsConfig(env, *dataContext);
 }
 
@@ -1235,6 +1239,10 @@ napi_value ResourceManagerNapiSyncImpl::GetDeviceCapabilitySync(napi_env env, na
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
+    if (dataContext->addon_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get addon in GetDeviceCapabilitySync");
+        return nullptr;
+    }
     return ResourceManagerNapiUtils::CreateJsDeviceCap(env, *dataContext);
 }
 
@@ -1243,6 +1251,10 @@ napi_value ResourceManagerNapiSyncImpl::GetLocales(napi_env env, napi_callback_i
     GET_PARAMS(env, info, PARAMS_NUM_TWO);
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
+    if (dataContext->addon_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get addon in GetLocales");
+        return nullptr;
+    }
 
     // includeSystem optional parameters
     if (ResourceManagerNapiUtils::GetIncludeSystem(env, argv[ARRAY_SUBCRIPTOR_ZERO],

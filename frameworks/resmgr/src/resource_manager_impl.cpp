@@ -1311,7 +1311,7 @@ void ResourceManagerImpl::ProcessPsuedoTranslate(std::string &outValue)
 ResourceManagerImpl::~ResourceManagerImpl()
 {}
 
-bool ResourceManagerImpl::AddResource(const char *path, const uint32_t &selectedTypes)
+bool ResourceManagerImpl::AddResource(const char *path, const uint32_t &selectedTypes, bool forceReload)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
@@ -1327,7 +1327,7 @@ bool ResourceManagerImpl::AddResource(const char *path, const uint32_t &selected
         }
     }
 #endif
-    return this->hapManager_->AddResource(path, selectedTypes);
+    return this->hapManager_->AddResource(path, selectedTypes, forceReload);
 }
 
 bool ResourceManagerImpl::AddPatchResource(const char *path, const char *patchPath)
@@ -1625,16 +1625,6 @@ RState ResourceManagerImpl::IsLoadHap(std::string &hapPath)
     return NOT_FOUND;
 }
 
-bool ResourceManagerImpl::IsFileExist(const std::string& path)
-{
-    std::fstream inputFile;
-    inputFile.open(path, std::ios::in);
-    if (inputFile) {
-        return true;
-    }
-    return false;
-}
-
 RState ResourceManagerImpl::GetRawFileList(const std::string &rawDirPath, std::vector<std::string>& rawfileList)
 {
     return hapManager_->GetRawFileList(rawDirPath, rawfileList);
@@ -1919,6 +1909,9 @@ RState ResourceManagerImpl::GetThemeIcons(uint32_t resId, std::pair<std::unique_
     RState foreState = GetThemeIconInfo(FOREGROUND, foregroundInfo.second, foregroundInfo.first, abilityName);
     RState backState = GetThemeIconInfo(BACKGROUND, backgroundInfo.second, backgroundInfo.first, abilityName);
     if (foreState == SUCCESS && backState == SUCCESS) {
+        RESMGR_HILOGW(RESMGR_TAG,
+            "GetThemeIcons bundleName = %{public}s, abilityName = %{public}s, fLen = %{public}zu, bLen = %{public}zu",
+            bundleInfo.first.c_str(), abilityName.c_str(), foregroundInfo.second, backgroundInfo.second);
         return SUCCESS;
     }
     return ERROR_CODE_RES_ID_NOT_FOUND;

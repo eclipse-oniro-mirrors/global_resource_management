@@ -676,6 +676,7 @@ int32_t ParseKey(ParserContext &context, uint32_t &offset, std::shared_ptr<ResKe
     }
     std::string locale;
     bool isLocale = false;
+    std::vector<std::shared_ptr<KeyParam>> keyParams;
     for (uint32_t i = 0; i < key->keyParamsCount_; ++i) {
         std::shared_ptr<KeyParam> kp;
         if (ParseKeyParam(context, offset, match, kp) != OK) {
@@ -686,12 +687,12 @@ int32_t ParseKey(ParserContext &context, uint32_t &offset, std::shared_ptr<ResKe
         }
         GetLimitKeyValue(context.limitKeyValue, kp->type_, keyTypes);
         GetKeyParamsLocales(kp, locale, isLocale);
-        key->keyParams_.push_back(kp);
+        keyParams.push_back(kp);
     }
     if (isLocale) {
         context.locales.emplace(locale);
     }
-    key->resConfig_ = HapParser::CreateResConfigFromKeyParams(key->keyParams_);
+    key->resConfig_ = HapParser::CreateResConfigFromKeyParams(keyParams);
     if (SkipParseItem(context, key, match)) {
         match = false;
         return OK;
@@ -893,96 +894,6 @@ ScreenDensity HapParser::GetScreenDensity(uint32_t value)
         screenDensity = SCREEN_DENSITY_XXXLDPI;
     }
     return screenDensity;
-}
-
-void PathAppend(std::string &path, const std::string &append, const std::string &connector)
-{
-    if (append.size() > 0) {
-        if (path.size() > 0) {
-            path.append(connector);
-        }
-        path.append(append);
-    }
-}
-
-std::string HapParser::ToFolderPath(const std::vector<std::shared_ptr<KeyParam>> &keyParams)
-{
-    if (keyParams.size() == 0) {
-        return std::string("default");
-    }
-    // mcc-mnc-language_script_region-direction-deviceType-colorMode-inputDevice-screenDensity
-    Determiner determiner;
-    for (const auto &keyParam : keyParams) {
-        switch (keyParam->type_) {
-            case KeyType::LANGUAGES:
-                determiner.language = keyParam->GetStr();
-                break;
-            case KeyType::SCRIPT:
-                determiner.script = keyParam->GetStr();
-                break;
-            case KeyType::REGION:
-                determiner.region = keyParam->GetStr();
-                break;
-            case KeyType::DIRECTION:
-                determiner.direction = keyParam->GetStr();
-                break;
-            case KeyType::DEVICETYPE:
-                determiner.deviceType = keyParam->GetStr();
-                break;
-            case KeyType::COLORMODE:
-                determiner.colorMode = keyParam->GetStr();
-                break;
-            case KeyType::INPUTDEVICE:
-                determiner.inputDevice = keyParam->GetStr();
-                break;
-            case KeyType::MCC:
-                determiner.mcc = keyParam->GetStr();
-                break;
-            case KeyType::MNC:
-                determiner.mnc = keyParam->GetStr();
-                break;
-            case KeyType::SCREEN_DENSITY:
-                determiner.screenDensity = keyParam->GetStr();
-                break;
-            default:
-                break;
-        }
-    }
-
-    return BuildFolderPath(&determiner);
-}
-
-std::string HapParser::BuildFolderPath(Determiner *determiner)
-{
-    std::string path;
-    if (determiner == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "determiner is null");
-        return path;
-    }
-    std::string connecter1("_");
-    std::string connecter2("-");
-    if (determiner->mcc.size() > 0) {
-        path.append(determiner->mcc);
-        if (determiner->mnc.size() > 0) {
-            PathAppend(path, determiner->mnc, connecter1);
-        }
-        if (determiner->language.size() > 0) {
-            PathAppend(path, determiner->language, connecter2);
-        }
-    } else {
-        if (determiner->language.size() > 0) {
-            path.append(determiner->language);
-        }
-    }
-    PathAppend(path, determiner->script, connecter1);
-    PathAppend(path, determiner->region, connecter1);
-    PathAppend(path, determiner->direction, connecter2);
-    PathAppend(path, determiner->deviceType, connecter2);
-    PathAppend(path, determiner->colorMode, connecter2);
-    PathAppend(path, determiner->inputDevice, connecter2);
-    PathAppend(path, determiner->screenDensity, connecter2);
-
-    return path;
 }
 
 RState HapParser::IsRawDirFromHap(const char *hapPath, const std::string &pathName, bool &outValue)
