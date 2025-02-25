@@ -300,7 +300,6 @@ void ResourceManagerImpl::GetDeviceCapability(DeviceCapability &deviceCapability
     deviceCapability.deviceType = static_cast<int32_t>(cfg->GetDeviceType());
     LOGI("ResourceManagerImpl::GetDeviceCapability ok screenDensity %{public}" PRId32,
         deviceCapability.screenDensity);
-    LOGI("ResourceManagerImpl::GetDeviceCapability ok deviceType %{public}" PRId32, deviceCapability.deviceType);
 }
 
 int32_t ResourceManagerImpl::GetMediaDataByName(const char *name, size_t &len, std::unique_ptr<uint8_t[]> &outValue,
