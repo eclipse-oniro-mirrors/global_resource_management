@@ -143,16 +143,6 @@ public:
      */
     class ValueUnderQualifierDir {
     public:
-        inline const std::vector<std::shared_ptr<KeyParam>> GetKeyParams() const
-        {
-            return keyParams_;
-        }
-
-        inline const std::string GetFolder() const
-        {
-            return folder_;
-        }
-
         inline const std::shared_ptr<IdItem> GetIdItem() const
         {
             return idItem_;
@@ -198,14 +188,12 @@ public:
         ~ValueUnderQualifierDir();
 
     private:
-
-        /*
-         * keyParams_, folder_, resConfig_ are 3 different ways to describe Qualifiers Sub-directory
-         */
         std::vector<std::shared_ptr<KeyParam>> keyParams_;
-        // the qualifier path name
-        std::string folder_;
-        // this resConfig_ point to the ResKey resConfig_ and resConfig_ will be unified free in ResKey destruct.
+
+        /**
+         * resConfig_ is to describe Qualifiers Sub-directory
+         * it point to the ResKey resConfig_ and resConfig_ will be unified free in ResKey destruct.
+         */
         std::shared_ptr<ResConfigImpl> resConfig_;
 
         // the value
