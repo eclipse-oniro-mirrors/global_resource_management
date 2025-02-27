@@ -563,7 +563,7 @@ RState ResourceManagerImpl::GetThemeValues(const std::string &value, std::string
     if (ProcessReference(value, idItems) != SUCCESS) {
         return NOT_FOUND;
     }
-    outValue = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig,
+    outValue = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig, userId,
         hapManager_->IsThemeSystemResEnableHap());
     return outValue.empty() ? NOT_FOUND : SUCCESS;
 }
@@ -1013,7 +1013,7 @@ RState ResourceManagerImpl::GetThemeColor(const std::shared_ptr<IdItem> idItem, 
     idItems.emplace_back(idItem);
     RState state = ProcessReference(idItem->value_, idItems);
     std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig,
-        hapManager_->IsThemeSystemResEnableHap());
+        userId, hapManager_->IsThemeSystemResEnableHap());
     if (result.empty()) {
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
