@@ -16,6 +16,7 @@
 #define OHOS_RESOURCE_MANAGER_RESOURCEMANAGERIMPL_H
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 #include "hap_manager.h"
@@ -54,6 +55,13 @@ public:
      * @param systemResourceManager the system resource manager.
      */
     void AddSystemResource(ResourceManagerImpl *systemResourceManager);
+
+    /**
+     * Add system resource to hap resource vector.
+     *
+     * @param systemResourceManager the system resource manager.
+     */
+    void AddSystemResource(const std::shared_ptr<ResourceManagerImpl> &systemResourceManager);
 
     /**
      * Add resource path to hap paths
@@ -863,6 +871,8 @@ private:
     std::shared_ptr<HapManager> GetHapManager();
 
     std::shared_ptr<HapManager> hapManager_;
+    
+    std::shared_ptr<ResourceManagerImpl> systemResourceManager_{nullptr};
 
     float fontRatio_ = 0.0f;
 
