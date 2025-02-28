@@ -721,7 +721,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest017, 
     average = total / 1000.0;
     g_logLevel = LOG_DEBUG;
     RESMGR_HILOGD(RESMGR_TAG, "avg cost 017: %f us", average);
-    EXPECT_LT(average, 110);
+    EXPECT_LT(average, 100);
 };
 
 /*
@@ -747,7 +747,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest018, 
     average = total / 1000.0;
     g_logLevel = LOG_DEBUG;
     RESMGR_HILOGD(RESMGR_TAG, "avg cost 018: %f us", average);
-    EXPECT_LT(average, 110);
+    EXPECT_LT(average, 100);
 };
 
 /*
