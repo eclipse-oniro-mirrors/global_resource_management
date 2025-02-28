@@ -41,6 +41,8 @@ const std::string SystemResourceManager::SYSTEM_RESOURCE_EXT_NO_SAND_BOX_HAP_PAT
 
 ResourceManagerImpl *SystemResourceManager::resourceManager_ = nullptr;
 
+std::weak_ptr<ResourceManagerImpl> SystemResourceManager::weakResourceManager_;
+
 std::mutex SystemResourceManager::mutex_;
 
 SystemResourceManager::SystemResourceManager()
@@ -146,6 +148,37 @@ void SystemResourceManager::ReleaseSystemResourceManager()
         resourceManager_ = nullptr;
         RESMGR_HILOGI(RESMGR_TAG, "ReleaseSystemResourceManager success");
     }
+}
+
+bool SystemResourceManager::AddSystemResource(ResourceManagerImpl *appResMgr)
+{
+    if (!appResMgr) {
+        return false;
+    }
+
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (resourceManager_) {
+        appResMgr->AddSystemResource(resourceManager_);
+        return true;
+    }
+    std::shared_ptr<ResourceManagerImpl> sysResMgr = weakResourceManager_.lock();
+    if (!sysResMgr) {
+        sysResMgr = std::make_shared<ResourceManagerImpl>();
+        if (!sysResMgr) {
+            return false;
+        }
+        if (!sysResMgr->Init(true)) {
+            return false;
+        }
+#if !defined(__ARKUI_CROSS__)
+        if (!LoadSystemResource(sysResMgr.get(), false) && !LoadSystemResource(sysResMgr.get(), true)) {
+            return false;
+        }
+#endif
+        weakResourceManager_ = sysResMgr;
+    }
+    appResMgr->AddSystemResource(sysResMgr);
+    return true;
 }
 } // namespace Resource
 } // namespace Global

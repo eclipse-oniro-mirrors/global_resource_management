@@ -58,6 +58,14 @@ void ResourceManagerImpl::AddSystemResource(ResourceManagerImpl *systemResourceM
     }
 }
 
+void ResourceManagerImpl::AddSystemResource(const std::shared_ptr<ResourceManagerImpl> &systemResourceManager)
+{
+    if (systemResourceManager != nullptr) {
+        this->systemResourceManager_ = systemResourceManager;
+        this->hapManager_->AddSystemResource(systemResourceManager->hapManager_);
+    }
+}
+
 ResourceManagerImpl::ResourceManagerImpl(bool isOverrideResMgr) : hapManager_(nullptr),
     isOverrideResMgr_(isOverrideResMgr)
 {

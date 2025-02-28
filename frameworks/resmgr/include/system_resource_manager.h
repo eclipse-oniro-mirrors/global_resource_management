@@ -15,6 +15,7 @@
 #ifndef OHOS_RESOURCE_MANAGER_SYSTEMRESOURCEMANAGER_H
 #define OHOS_RESOURCE_MANAGER_SYSTEMRESOURCEMANAGER_H
 
+#include <memory>
 #include "resource_manager_impl.h"
 
 namespace OHOS {
@@ -47,10 +48,19 @@ public:
      */
     static void ReleaseSystemResourceManager();
 
+    /**
+     * Add system resource to hap resource vector.
+     *
+     * @param resourceManager the hap resource manager.
+     */
+    static bool AddSystemResource(ResourceManagerImpl *resourceManager);
+
 private:
     static std::mutex mutex_;
 
     static ResourceManagerImpl *resourceManager_;
+
+    static std::weak_ptr<ResourceManagerImpl> weakResourceManager_;
 
     static const std::string SYSTEM_RESOURCE_PATH;
 
