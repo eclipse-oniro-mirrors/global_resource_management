@@ -1217,7 +1217,7 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetLocalesTest003, TestSize.Leve
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     EXPECT_TRUE(ret);
     std::vector<std::string> outValue;
-    rm->GetLocales(outValue, true);
+    rm->GetLocales(outValue, false);
     EXPECT_EQ(static_cast<size_t>(4), outValue.size());
 }
 
