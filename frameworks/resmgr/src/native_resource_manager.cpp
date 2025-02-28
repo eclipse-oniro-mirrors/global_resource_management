@@ -713,3 +713,91 @@ ResourceManager_ErrorCode OH_ResourceManager_GetStringByName(const NativeResourc
     }
     return copyString(resultValue, tempResultValue, "GetStringByName");
 }
+
+ResourceManager_ErrorCode OH_ResourceManager_GetIntPluralString(const NativeResourceManager *mgr,
+    uint32_t resId, uint32_t num, char **resultValue, ...)
+{
+    if (mgr == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
+        return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+    std::string tempResultValue;
+
+    va_list args;
+    va_start(args, resultValue);
+    ResourceManager::Quantity quantity = { true, num, 0.0 };
+    RState state = mgr->resManager->GetFormatPluralStringById(tempResultValue, resId, quantity, args);
+    va_end(args);
+    ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
+    if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
+        RESMGR_HILOGE(RESMGR_NATIVE_TAG,
+            "failed get plural string id = %{public}d, errorCode = %{public}d", resId, errorCode);
+        return errorCode;
+    }
+    return copyString(resultValue, tempResultValue, "GetIntPluralString");
+}
+
+ResourceManager_ErrorCode OH_ResourceManager_GetDoublePluralString(const NativeResourceManager *mgr,
+    uint32_t resId, double num, char **resultValue, ...)
+{
+    if (mgr == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
+        return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+    std::string tempResultValue;
+    
+    va_list args;
+    va_start(args, resultValue);
+    ResourceManager::Quantity quantity = { false, 0, num };
+    RState state = mgr->resManager->GetFormatPluralStringById(tempResultValue, resId, quantity, args);
+    va_end(args);
+    ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
+    if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
+        RESMGR_HILOGE(RESMGR_NATIVE_TAG,
+            "failed get plural string id = %{public}d, errorCode = %{public}d", resId, errorCode);
+        return errorCode;
+    }
+    return copyString(resultValue, tempResultValue, "GetDoublePluralString");
+}
+
+ResourceManager_ErrorCode OH_ResourceManager_GetIntPluralStringByName(const NativeResourceManager *mgr,
+    const char *resName, uint32_t num, char **resultValue, ...)
+{
+    if (mgr == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
+        return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+    std::string tempResultValue;
+
+    va_list args;
+    va_start(args, resultValue);
+    ResourceManager::Quantity quantity = { true, num, 0.0 };
+    RState state = mgr->resManager->GetFormatPluralStringByName(tempResultValue, resName, quantity, args);
+    va_end(args);
+    ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
+    if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
+        RESMGR_HILOGE(RESMGR_NATIVE_TAG,
+            "failed get plural string name = %{public}s, errorCode = %{public}d", resName, errorCode);
+        return errorCode;
+    }
+    return copyString(resultValue, tempResultValue, "GetIntPluralStringByName");
+}
+
+ResourceManager_ErrorCode OH_ResourceManager_GetDoublePluralStringByName(const NativeResourceManager *mgr,
+    const char *resName, double num, char **resultValue, ...)
+{
+    if (mgr == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
+        return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+    std::string tempResultValue;
+
+    va_list args;
+    va_start(args, resultValue);
+    ResourceManager::Quantity quantity = { false, 0, num };
+    RState state = mgr->resManager->GetFormatPluralStringByName(tempResultValue, resName, quantity, args);
+    va_end(args);
+    ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
+    if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
+        RESMGR_HILOGE(RESMGR_NATIVE_TAG,
+            "failed get plural string name = %{public}s, errorCode = %{public}d", resName, errorCode);
+        return errorCode;
+    }
+    return copyString(resultValue, tempResultValue, "GetDoublePluralStringByName");
+}

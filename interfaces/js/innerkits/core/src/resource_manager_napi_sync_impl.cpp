@@ -102,7 +102,15 @@ std::unordered_map<std::string, std::function<napi_value(napi_env&, napi_callbac
     {"GetOverrideConfiguration", [](napi_env& env, napi_callback_info& info) -> napi_value {
         return ResourceManagerNapiSyncImpl::GetOverrideConfiguration(env, info);}},
     {"UpdateOverrideConfiguration", [](napi_env& env, napi_callback_info& info) -> napi_value {
-        return ResourceManagerNapiSyncImpl::UpdateOverrideConfiguration(env, info);}}
+        return ResourceManagerNapiSyncImpl::UpdateOverrideConfiguration(env, info);}},
+    {"GetIntPluralStringValueSync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetIntPluralStringValueSync(env, info);}},
+    {"GetDoublePluralStringValueSync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetDoublePluralStringValueSync(env, info);}},
+    {"GetIntPluralStringByNameSync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetIntPluralStringByNameSync(env, info);}},
+    {"GetDoublePluralStringByNameSync", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetDoublePluralStringByNameSync(env, info);}},
 };
 
 napi_value ResourceManagerNapiSyncImpl::GetResource(napi_env env, napi_callback_info info,
@@ -1059,7 +1067,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessPluralStrResourceByName(napi_env env
 {
     if (!InitNapiParameters(env, info, dataContext->jsParams_)) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "GetPluralStringByNameSync formatting error");
-        return ERROR_CODE_RES_ID_FORMAT_ERROR;
+        return ERROR_CODE_RES_NAME_FORMAT_ERROR;
     }
     RState state = dataContext->addon_->GetResMgr()->GetFormatPluralStringByName(dataContext->value_,
         dataContext->resName_.c_str(), dataContext->param_, dataContext->jsParams_);
@@ -1355,6 +1363,209 @@ napi_value ResourceManagerNapiSyncImpl::UpdateOverrideConfiguration(napi_env env
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
     }
     return nullptr;
+}
+
+bool ResourceManagerNapiSyncImpl::InitOptionalParameters(napi_env env, napi_callback_info info, uint32_t startIndex,
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
+{
+    size_t size = startIndex;
+    napi_get_cb_info(env, info, &size, nullptr, nullptr, nullptr);
+    // one parameter: resId or resource or Name
+    if (size <= startIndex) {
+        return true;
+    }
+    napi_value paramArray[size];
+    napi_get_cb_info(env, info, &size, paramArray, nullptr, nullptr);
+
+    for (size_t i = startIndex; i < size; ++i) {
+        if (!InitParamsFromParamArray(env, paramArray[i], jsParams)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+int32_t ResourceManagerNapiSyncImpl::ProcessPluralStringResource(napi_env env, napi_callback_info info,
+    std::unique_ptr<ResMgrDataContext> &dataContext)
+{
+    std::shared_ptr<ResourceManager> resMgr = nullptr;
+    uint32_t resId = 0;
+    bool ret2 = ResourceManagerNapiUtils::GetHapResourceManager(dataContext.get(), resMgr, resId);
+    if (!ret2) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in GetHapResourceManager");
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+    uint32_t startIndex = 2;
+    if (!InitOptionalParameters(env, info, startIndex, dataContext->jsParams_)) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "InitOptionalParameters formatting error");
+        return ERROR_CODE_RES_ID_FORMAT_ERROR;
+    }
+    RState state = resMgr->GetFormatPluralStringById(dataContext->value_, resId, dataContext->quantity_,
+        dataContext->jsParams_);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to GetFormatPluralStringById state", true, state);
+        return state;
+    }
+    return SUCCESS;
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetIntPluralStringValueSync(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+
+    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
+
+    int32_t state = ResourceManagerNapiSyncImpl::InitIdResourceAddon(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to init para in GetIntPluralStringValueSync", true);
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    if (ResourceManagerNapiUtils::GetType(env, argv[ARRAY_SUBCRIPTOR_ONE]) != napi_number) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Parameter type is not napi_number in GetIntPluralStringValueSync");
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+    double num =  0;
+    napi_get_value_double(env, argv[ARRAY_SUBCRIPTOR_ONE], &num);
+    if (num > INT_MAX) {
+        num = INT_MAX;
+    } else if (num < INT_MIN) {
+        num = INT_MIN;
+    }
+    dataContext->quantity_ = { true, num, 0.0 };
+    
+    state = ProcessPluralStringResource(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to process plural string resource in GetIntPluralStringValueSync", true);
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    return ResourceManagerNapiUtils::CreateJsString(env, *dataContext);
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetDoublePluralStringValueSync(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+
+    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
+
+    int32_t state = ResourceManagerNapiSyncImpl::InitIdResourceAddon(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to init para in GetDoublePluralStringValueSync", true);
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    if (ResourceManagerNapiUtils::GetType(env, argv[ARRAY_SUBCRIPTOR_ONE]) != napi_number) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Parameter type is not napi_number in GetDoublePluralStringValueSync");
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+    double num =  0;
+    napi_get_value_double(env, argv[ARRAY_SUBCRIPTOR_ONE], &num);
+    dataContext->quantity_ = { false, 0, num };
+
+    state = ProcessPluralStringResource(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to process plural string resource in GetDoublePluralStringValueSync", true);
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    return ResourceManagerNapiUtils::CreateJsString(env, *dataContext);
+}
+
+int32_t ResourceManagerNapiSyncImpl::ProcessPluralStringResourceByName(napi_env env, napi_callback_info info,
+    std::unique_ptr<ResMgrDataContext> &dataContext)
+{
+    uint32_t startIndex = 2;
+    if (!InitOptionalParameters(env, info, startIndex, dataContext->jsParams_)) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "InitOptionalParameters formatting error");
+        return ERROR_CODE_RES_NAME_FORMAT_ERROR;
+    }
+    RState state = dataContext->addon_->GetResMgr()->GetFormatPluralStringByName(dataContext->value_,
+        dataContext->resName_.c_str(), dataContext->quantity_, dataContext->jsParams_);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("GetFormatPluralStringByName failed state", false);
+        return state;
+    }
+    return SUCCESS;
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetIntPluralStringByNameSync(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+    if (!ResourceManagerNapiUtils::IsNapiString(env, info)) {
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to init para in GetIntPluralStringByNameSync", false);
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    if (ResourceManagerNapiUtils::GetType(env, argv[ARRAY_SUBCRIPTOR_ONE]) != napi_number) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Parameter type is not napi_number in GetIntPluralStringByNameSync");
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+    double num =  0;
+    napi_get_value_double(env, argv[ARRAY_SUBCRIPTOR_ONE], &num);
+    if (num > INT_MAX) {
+        num = INT_MAX;
+    } else if (num < INT_MIN) {
+        num = INT_MIN;
+    }
+    dataContext->quantity_ = { true, num, 0.0 };
+
+    state = ProcessPluralStringResourceByName(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to process plural string in GetIntPluralStringByNameSync", false);
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    return ResourceManagerNapiUtils::CreateJsString(env, *dataContext);
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetDoublePluralStringByNameSync(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+    if (!ResourceManagerNapiUtils::IsNapiString(env, info)) {
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to init para in GetDoublePluralStringByNameSync", false);
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    if (ResourceManagerNapiUtils::GetType(env, argv[ARRAY_SUBCRIPTOR_ONE]) != napi_number) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Parameter type is not napi_number in GetDoublePluralStringByNameSync");
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+    double num = 0.0;
+    napi_get_value_double(env, argv[ARRAY_SUBCRIPTOR_ONE], &num);
+    dataContext->quantity_ = { false, 0, num };
+
+    state = ProcessPluralStringResourceByName(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to process plural string in GetDoublePluralStringByNameSync", false);
+        ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    return ResourceManagerNapiUtils::CreateJsString(env, *dataContext);
 }
 } // namespace Resource
 } // namespace Global

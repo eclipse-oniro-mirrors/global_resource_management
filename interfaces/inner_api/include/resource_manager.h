@@ -65,6 +65,17 @@ public:
         std::string value;
     };
 
+    struct Quantity {
+        /** the indication of whether quantity is an integer. */
+        bool isInteger = false;
+
+        /** the integer representation of the quantity value. */
+        int intValue = 0;
+
+        /** the double representation of the quantity value. */
+        double doubleValue = 0.0;
+    };
+
     enum class NapiValueType {
         NAPI_NUMBER = 0,
         NAPI_STRING = 1
@@ -266,6 +277,18 @@ public:
     virtual RState GetPatternDataById(uint32_t id, std::map<std::string, ResData> &outValue) = 0;
 
     virtual RState GetPatternDataByName(const char *name, std::map<std::string, ResData> &outValue) = 0;
+
+    virtual RState GetFormatPluralStringById(std::string &outValue, uint32_t id, Quantity quantity,
+        va_list args) = 0;
+
+    virtual RState GetFormatPluralStringById(std::string &outValue, uint32_t id, Quantity quantity,
+        std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams) = 0;
+
+    virtual RState GetFormatPluralStringByName(std::string &outValue, const char *name, Quantity quantity,
+        va_list args) = 0;
+
+    virtual RState GetFormatPluralStringByName(std::string &outValue, const char *name, Quantity quantity,
+        std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams) = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager();

@@ -594,7 +594,7 @@ public:
     /**
      * Get the plural format string by resource name
      * @param outValue the resource write to
-     * @param id the resource id
+     * @param name the resource name
      * @param quantity the language quantity
      * @param jsParams the formatting string resource js parameters, the tuple first parameter represents the type,
      *     napi_number is denoted by NAPI_NUMBER, napi_string is denoted by NAPI_STRING,
@@ -795,6 +795,54 @@ public:
      */
     virtual RState GetPatternDataByName(const char *name, std::map<std::string, ResData> &outValue);
 
+    /**
+     * Get the plural format string by resource id
+     * @param outValue the resource write to
+     * @param id the resource id
+     * @param quantity the language quantity
+     * @param args the variable argument list
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetFormatPluralStringById(std::string &outValue, uint32_t id, Quantity quantity,
+        va_list args);
+
+    /**
+     * Get the plural format string by resource id
+     * @param outValue the resource write to
+     * @param id the resource id
+     * @param quantity the language quantity
+     * @param jsParams the formatting string resource js parameters, the tuple first parameter represents the type,
+     *     napi_number is denoted by NAPI_NUMBER, napi_string is denoted by NAPI_STRING,
+     *     the tuple second parameter represents the value
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetFormatPluralStringById(std::string &outValue, uint32_t id, Quantity quantity,
+        std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams);
+
+    /**
+     * Get the plural format string by resource name
+     * @param outValue the resource write to
+     * @param name the resource name
+     * @param quantity the language quantity
+     * @param args the variable argument list
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetFormatPluralStringByName(std::string &outValue, const char *name, Quantity quantity,
+        va_list args);
+
+    /**
+     * Get the plural format string by resource name
+     * @param outValue the resource write to
+     * @param name the resource name
+     * @param quantity the language quantity
+     * @param jsParams the formatting string resource js parameters, the tuple first parameter represents the type,
+     *     napi_number is denoted by NAPI_NUMBER, napi_string is denoted by NAPI_STRING,
+     *     the tuple second parameter represents the value
+     * @return SUCCESS if resource exist, else NOT_FOUND
+     */
+    virtual RState GetFormatPluralStringByName(std::string &outValue, const char *name, Quantity quantity,
+        std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams);
+
 private:
     RState GetString(const std::shared_ptr<IdItem> idItem, std::string &outValue);
 
@@ -804,7 +852,7 @@ private:
 
     RState GetTheme(const std::shared_ptr<IdItem> idItem, std::map<std::string, std::string> &outValue);
 
-    RState GetPluralString(const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd, int quantity,
+    RState GetPluralString(const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd, Quantity quantity,
         std::string &outValue);
 
     RState ResolveReference(const std::string value, std::string &outValue);

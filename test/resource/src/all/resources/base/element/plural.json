@@ -25,6 +25,19 @@
           "value":"$string:res_two"
         }
       ]
+    },
+    {
+      "name":"eat_apple2",
+      "value":[
+        {
+          "quantity":"one",
+          "value":"%d apple, %f, %s, %.2f"
+        },
+        {
+          "quantity":"other",
+          "value":"%d apples, %f, %s, %.2f"
+        }
+      ]
     }
   ]
 }

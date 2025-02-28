@@ -368,14 +368,16 @@ RState ResourceManagerImpl::GetPluralStringById(uint32_t id, int quantity, std::
 {
     const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd = hapManager_->FindQualifierValueById(id,
         isOverrideResMgr_);
-    return GetPluralString(vuqd, quantity, outValue);
+    Quantity intQuantity = { true, quantity, 0.0 };
+    return GetPluralString(vuqd, intQuantity, outValue);
 }
 
 RState ResourceManagerImpl::GetPluralStringByName(const char *name, int quantity, std::string &outValue)
 {
     const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd =
         hapManager_->FindQualifierValueByName(name, ResType::PLURALS, isOverrideResMgr_);
-    return GetPluralString(vuqd, quantity, outValue);
+        Quantity intQuantity = { true, quantity, 0.0 };
+    return GetPluralString(vuqd, intQuantity, outValue);
 }
 
 RState ResourceManagerImpl::GetPluralStringByIdFormat(std::string &outValue, uint32_t id, int quantity, ...)
@@ -387,7 +389,8 @@ RState ResourceManagerImpl::GetPluralStringByIdFormat(std::string &outValue, uin
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     std::string temp;
-    RState rState = GetPluralString(vuqd, quantity, temp);
+    Quantity intQuantity = { true, quantity, 0.0 };
+    RState rState = GetPluralString(vuqd, intQuantity, temp);
     if (rState == ERROR_CODE_RES_REF_TOO_MUCH) {
         return rState;
     }
@@ -412,7 +415,8 @@ RState ResourceManagerImpl::GetPluralStringByNameFormat(std::string &outValue, c
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     std::string temp;
-    RState rState = GetPluralString(vuqd, quantity, temp);
+    Quantity intQuantity = { true, quantity, 0.0 };
+    RState rState = GetPluralString(vuqd, intQuantity, temp);
     if (rState == ERROR_CODE_RES_REF_TOO_MUCH) {
         return rState;
     }
@@ -429,7 +433,7 @@ RState ResourceManagerImpl::GetPluralStringByNameFormat(std::string &outValue, c
 }
 
 RState ResourceManagerImpl::GetPluralString(const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd,
-    int quantity, std::string &outValue)
+    Quantity quantity, std::string &outValue)
 {
     // not found or type invalid
     if (vuqd == nullptr) {
@@ -1818,6 +1822,83 @@ RState ResourceManagerImpl::GetStringFormatByName(const char *name, std::string 
 RState ResourceManagerImpl::GetFormatPluralStringById(std::string &outValue, uint32_t id, int quantity,
     std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
 {
+    Quantity intqQantity = { true, quantity, 0.0 };
+    return GetFormatPluralStringById(outValue, id, intqQantity, jsParams);
+}
+
+RState ResourceManagerImpl::GetFormatPluralStringByName(std::string &outValue, const char *name, int quantity,
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
+{
+    Quantity intQuantity = { true, quantity, 0.0 };
+    return GetFormatPluralStringByName(outValue, name, intQuantity, jsParams);
+}
+
+RState ResourceManagerImpl::GetFormatPluralStringById(std::string &outValue, uint32_t id, Quantity quantity,
+    va_list args)
+{
+    const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd = hapManager_->FindQualifierValueById(id,
+        isOverrideResMgr_);
+    if (vuqd == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetFormatPluralStringById error id = %{public}d", id);
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
+    RState rState = GetPluralString(vuqd, quantity, outValue);
+    if (rState == ERROR_CODE_RES_REF_TOO_MUCH) {
+        RESMGR_HILOGE(RESMGR_TAG, "find too much ref by plural id = %{public}d", id);
+        return rState;
+    }
+    if (rState != SUCCESS) {
+        RESMGR_HILOGE(RESMGR_TAG, "plural res not found, id = %{public}d", id);
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
+    if (parseArgs(outValue, args, params)) {
+        ResConfigImpl resConfig;
+        GetResConfig(resConfig);
+        if (!ReplacePlaceholderWithParams(outValue, resConfig, params)) {
+            RESMGR_HILOGE(RESMGR_TAG, "format plural string error, id = %{public}d", id);
+            return ERROR_CODE_RES_ID_FORMAT_ERROR;
+        }
+        return SUCCESS;
+    }
+    return ERROR_CODE_INVALID_INPUT_PARAMETER;
+}
+
+RState ResourceManagerImpl::GetFormatPluralStringByName(std::string &outValue, const char *name, Quantity quantity,
+    va_list args)
+{
+    const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd =
+        hapManager_->FindQualifierValueByName(name, ResType::PLURALS, isOverrideResMgr_);
+    if (vuqd == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetFormatPluralStringByName error name = %{public}s", name);
+        return ERROR_CODE_RES_NAME_NOT_FOUND;
+    }
+    RState rState = GetPluralString(vuqd, quantity, outValue);
+    if (rState == ERROR_CODE_RES_REF_TOO_MUCH) {
+        RESMGR_HILOGE(RESMGR_TAG, "find too much ref by plural name = %{public}s", name);
+        return rState;
+    }
+    if (rState != SUCCESS) {
+        RESMGR_HILOGE(RESMGR_TAG, "plural res not found, name = %{public}s", name);
+        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
+    }
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
+    if (parseArgs(outValue, args, params)) {
+        ResConfigImpl resConfig;
+        GetResConfig(resConfig);
+        if (!ReplacePlaceholderWithParams(outValue, resConfig, params)) {
+            RESMGR_HILOGE(RESMGR_TAG, "format plural string error, name = %{public}s", name);
+            return ERROR_CODE_RES_NAME_FORMAT_ERROR;
+        }
+        return SUCCESS;
+    }
+    return ERROR_CODE_INVALID_INPUT_PARAMETER;
+}
+
+RState ResourceManagerImpl::GetFormatPluralStringById(std::string &outValue, uint32_t id, Quantity quantity,
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
+{
     const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd = hapManager_->FindQualifierValueById(id,
         isOverrideResMgr_);
     if (vuqd == nullptr) {
@@ -1837,12 +1918,12 @@ RState ResourceManagerImpl::GetFormatPluralStringById(std::string &outValue, uin
     GetResConfig(resConfig);
     if (!ReplacePlaceholderWithParams(outValue, resConfig, jsParams)) {
         RESMGR_HILOGE(RESMGR_TAG, "format plural string error, id = %{public}d", id);
-        return ERROR_CODE_RES_NAME_FORMAT_ERROR;
+        return ERROR_CODE_RES_ID_FORMAT_ERROR;
     }
     return SUCCESS;
 }
 
-RState ResourceManagerImpl::GetFormatPluralStringByName(std::string &outValue, const char *name, int quantity,
+RState ResourceManagerImpl::GetFormatPluralStringByName(std::string &outValue, const char *name, Quantity quantity,
     std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
 {
     const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd =

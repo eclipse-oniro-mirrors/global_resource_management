@@ -1371,6 +1371,121 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByIdTest
 }
 
 /*
+ * @tc.name: ResourceManagerGetFormatPluralStringByIdTest006
+ * @tc.desc: Test GetFormatPluralStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByIdTest006, TestSize.Level1)
+{
+    rmc->AddResource("en", nullptr, "US");
+    RState state;
+    ResourceManager::Quantity quantity = { true, 1, 0.0 };
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
+    params.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_NUMBER, "1"));
+    params.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_NUMBER, "1.1"));
+    params.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_STRING, "aaa"));
+    params.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_NUMBER, "2.123456"));
+    int id = rmc->GetResId("eat_apple2", ResType::PLURALS);
+    state = rm->GetFormatPluralStringById(outValue, id, quantity, params);
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_EQ("1 apple, 1.1, aaa, 2.12", outValue);
+
+    rmc->TestGetFormatPluralStringById(outValue, id, quantity, 1, 1.1, "aaa");
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_EQ("1 apple, 1.1, aaa, 2.12", outValue);
+
+    quantity = { false, 0, 2.1 };
+    state = rm->GetFormatPluralStringById(outValue, id, quantity, params);
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_EQ("1 apples, 1.1, aaa, 2.12", outValue);
+
+    state = rmc->TestGetFormatPluralStringById(outValue, id, quantity, 1, 1.1, "aaa");
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_EQ("1 apples, 1.1, aaa, 2.12", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetFormatPluralStringByIdTest007
+ * @tc.desc: Test GetFormatPluralStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByIdTest007, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    int id = rmc->GetResId("eat_apple", ResType::PLURALS);
+    ASSERT_TRUE(id > 0);
+    RState state;
+    std::string outValue;
+    ResourceManager::Quantity quantity = { true, 1, 0.0 };
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
+    params.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_STRING, "1"));
+    state = rm->GetFormatPluralStringById(outValue, id, quantity, params);
+    EXPECT_EQ(state, ERROR_CODE_RES_NAME_FORMAT_ERROR);
+}
+
+/*
+ * @tc.name: ResourceManagerGetFormatPluralStringByIdTest008
+ * @tc.desc: Test GetFormatPluralStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByIdTest008, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    ResourceManager::Quantity quantity = { true, 1, 0.0 };
+    int id = rmc->GetResId("app_name", ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    RState state;
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
+    state = rm->GetFormatPluralStringById(outValue, id, quantity, params);
+    EXPECT_EQ(state, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+
+    state = rmc->TestGetFormatPluralStringById(outValue, id, quantity);
+    EXPECT_EQ(state, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+}
+
+/*
+ * @tc.name: ResourceManagerGetFormatPluralStringByIdTest009
+ * @tc.desc: Test GetFormatPluralStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByIdTest009, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    ResourceManager::Quantity quantity = { true, 1, 0.0 };
+    int id = rmc->GetResId("eat_apple1", ResType::PLURALS);
+    RState state;
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
+    state = rm->GetFormatPluralStringById(outValue, id, quantity, params);
+    EXPECT_EQ(state, ERROR_CODE_RES_REF_TOO_MUCH);
+
+    state = rmc->TestGetFormatPluralStringById(outValue, id, quantity);
+    EXPECT_EQ(state, ERROR_CODE_RES_REF_TOO_MUCH);
+}
+
+/*
+ * @tc.name: ResourceManagerGetFormatPluralStringByIdTest010
+ * @tc.desc: Test GetFormatPluralStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByIdTest010, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    ResourceManager::Quantity quantity = { true, 1, 0.0 };
+    int id = 0;
+    RState state;
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
+    state = rm->GetFormatPluralStringById(outValue, id, quantity, params);
+    EXPECT_EQ(state, ERROR_CODE_RES_ID_NOT_FOUND);
+
+    state = rmc->TestGetFormatPluralStringById(outValue, id, quantity);
+    EXPECT_EQ(state, ERROR_CODE_RES_ID_NOT_FOUND);
+}
+
+/*
  * @tc.name: ResourceManagerGetPluralStringByNameFormatTest001
  * @tc.desc: Test GetPluralStringByNameFormat function, file case.
  * @tc.type: FUNC
@@ -1490,6 +1605,96 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByNameTe
     jsParams.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_STRING, "1"));
     state = rm->GetFormatPluralStringByName(outValue, "eat_apple", quantity, jsParams);
     EXPECT_EQ(state, ERROR_CODE_RES_NAME_FORMAT_ERROR);
+}
+
+/*
+ * @tc.name: ResourceManagerGetFormatPluralStringByNameTest005
+ * @tc.desc: Test GetFormatPluralStringByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByNameTest005, TestSize.Level1)
+{
+    rmc->AddResource("en", nullptr, "US");
+    RState state;
+    ResourceManager::Quantity quantity = { true, 1, 0.0 };
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
+    params.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_NUMBER, "1"));
+    params.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_NUMBER, "1.1"));
+    params.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_STRING, "aaa"));
+    params.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_NUMBER, "2.123456"));
+    const char* name = "eat_apple2";
+    state = rm->GetFormatPluralStringByName(outValue, name, quantity, params);
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_EQ("1 apple, 1.1, aaa, 2.12", outValue);
+
+    state = rmc->TestGetFormatPluralStringByName(outValue, name, quantity, 1, 1.1, "aaa");
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_EQ("1 apple, 1.1, aaa, 2.12", outValue);
+
+    quantity = { false, 0, 2.1 };
+    state = rm->GetFormatPluralStringByName(outValue, name, quantity, params);
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_EQ("1 apples, 1.1, aaa, 2.12", outValue);
+
+    state = rmc->TestGetFormatPluralStringByName(outValue, name, quantity, 1, 1.1, "aaa");
+    ASSERT_EQ(SUCCESS, state);
+    EXPECT_EQ("1 apples, 1.1, aaa, 2.12", outValue);
+}
+
+ /*
+ * @tc.name: ResourceManagerGetFormatPluralStringByNameTest006
+ * @tc.desc: Test GetFormatPluralStringByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByNameTest006, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    ResourceManager::Quantity quantity = { true, 1, 0.0 };
+    RState state;
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
+    params.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_STRING, "1"));
+    state = rm->GetFormatPluralStringByName(outValue, "eat_apple", quantity, params);
+    EXPECT_EQ(state, ERROR_CODE_RES_NAME_FORMAT_ERROR);
+}
+
+/*
+ * @tc.name: ResourceManagerGetFormatPluralStringByNameTest007
+ * @tc.desc: Test GetFormatPluralStringByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByNameTest007, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    ResourceManager::Quantity quantity = { true, 1, 0.0 };
+    RState state;
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
+    state = rm->GetFormatPluralStringByName(outValue, "no_exist_plural", quantity, params);
+    EXPECT_EQ(state, ERROR_CODE_RES_NAME_NOT_FOUND);
+
+    state = rmc->TestGetFormatPluralStringByName(outValue, "no_exist_plural", quantity);
+    EXPECT_EQ(state, ERROR_CODE_RES_NAME_NOT_FOUND);
+}
+
+/*
+ * @tc.name: ResourceManagerGetFormatPluralStringByNameTest008
+ * @tc.desc: Test GetFormatPluralStringByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByNameTest008, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    ResourceManager::Quantity quantity = { true, 1, 0.0 };
+    RState state;
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
+    state = rm->GetFormatPluralStringByName(outValue, "eat_apple1", quantity, params);
+    EXPECT_EQ(state, ERROR_CODE_RES_REF_TOO_MUCH);
+
+    state = rmc->TestGetFormatPluralStringByName(outValue, "eat_apple1", quantity);
+    EXPECT_EQ(state, ERROR_CODE_RES_REF_TOO_MUCH);
 }
 
 /*
