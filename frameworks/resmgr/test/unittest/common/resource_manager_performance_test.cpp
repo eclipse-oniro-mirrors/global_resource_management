@@ -60,13 +60,15 @@ public:
 
 int ResourceManagerPerformanceTest::GetResId(std::string name, ResType resType) const
 {
-    auto idv = ((ResourceManagerImpl *)rm)->hapManager_->GetResourceListByName(name.c_str(), resType);
-    if (idv.size() == 0) {
+    auto idValues = ((ResourceManagerImpl *)rm)->hapManager_->GetResourceListByName(name.c_str(), resType);
+    if (idValues.size() == 0) {
         return -1;
     }
 
-    if (idv[0]->GetLimitPathsConst().size() > 0) {
-        return idv[0]->GetLimitPathsConst()[0]->GetIdItem()->id_;
+    for (auto &idValue : idValues) {
+        if (idValue->GetLimitPathsConst().size() > 0 && !idValue->GetLimitPathsConst()[0]->IsSystemResource()) {
+            return idValue->GetLimitPathsConst()[0]->GetIdItem()->id_;
+        }
     }
     return OBJ_NOT_FOUND;
 }
