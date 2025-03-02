@@ -63,7 +63,8 @@
             "zlib",
             "bounds_checking_function",
             "icu",
-            "cJSON"
+            "cJSON",
+            "runtime_core"
           ]
       },
         "build": {
@@ -76,7 +77,8 @@
               "//base/global/resource_management/frameworks/resmgr:win_resmgr",
               "//base/global/resource_management/frameworks/resmgr:linux_resmgr",
               "//base/global/resource_management/frameworks/resmgr:mac_resmgr",
-              "//base/global/resource_management/frameworks/resmgr:ohresmgr"
+              "//base/global/resource_management/frameworks/resmgr:ohresmgr",
+              "//base/global/resource_management/ani:ani_package_res"
             ],
             "inner_kits": [
               {
@@ -144,6 +146,15 @@
                   ]
                 },
                 "name": "//base/global/resource_management/frameworks/resmgr:librawfile"
+              },
+              {
+                "header": {
+                  "header_base": "//base/global/resource_management/ani/include",
+                  "header_files": [
+                    "resmgr_enum.h"
+                  ]
+                },
+                "name": "//base/global/resource_management/ani:ani_package_res"
               }
             ],
             "test": [
