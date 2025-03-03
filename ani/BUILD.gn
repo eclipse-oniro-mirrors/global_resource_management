@@ -1,0 +1,60 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/components/ets_frontend/ets2abc_config.gni")
+import("//build/ohos.gni")
+
+ohos_shared_library("resmgr") {
+  include_dirs = [
+    "./include",
+    "../dfx/hisysevent_adapter",
+    "../interfaces/inner_api/include",
+    "../interfaces/js/innerkits/core/include",
+    "../frameworks/resmgr/include",
+  ]
+  sources = [
+    "../interfaces/js/innerkits/core/src/resource_manager_addon.cpp",
+    "../interfaces/js/innerkits/core/src/resource_manager_napi_async_impl.cpp",
+    "../interfaces/js/innerkits/core/src/resource_manager_napi_context.cpp",
+    "../interfaces/js/innerkits/core/src/resource_manager_napi_sync_impl.cpp",
+    "../interfaces/js/innerkits/core/src/resource_manager_napi_utils.cpp",
+    "./native/resmgr_ani.cpp",
+    "./native/resmgr_enum.cpp",
+  ]
+  deps = []
+  external_deps = [
+    "ability_base:configuration",
+    "ace_engine:drawable_descriptor",
+    "bundle_framework:appexecfwk_base",
+    "cJSON:cjson",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "napi:ace_napi",
+    "runtime_core:ani",
+  ]
+  subsystem_name = "global"
+  part_name = "resource_management"
+}
+
+generate_static_abc("resmgr_abc") {
+  dst_file = "$target_out_dir/resmgr_ani.abc"
+  arktsconfig = "./arktsconfig.json"
+  out_puts = [ "$target_out_dir/resmgr" ]
+}
+
+group("ani_package_res") {
+  deps = [
+    ":resmgr",
+    ":resmgr_abc",
+  ]
+}
