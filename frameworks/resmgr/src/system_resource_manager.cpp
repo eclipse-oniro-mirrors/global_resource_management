@@ -16,6 +16,7 @@
 #include "system_resource_manager.h"
 
 #include "hilog_wrapper.h"
+#include "resource_manager.h"
 #include "utils/utils.h"
 
 namespace OHOS {
@@ -54,11 +55,7 @@ SystemResourceManager::~SystemResourceManager()
 ResourceManagerImpl *SystemResourceManager::GetSystemResourceManager()
 {
     // SystemAbility is not forked from appspawn, so SystemAbility should load sandbox system resource.
-    bool isCreated = CreateSystemResourceManager(true);
-    if (!isCreated) {
-        return nullptr;
-    }
-    return resourceManager_;
+    return CreateSystemResourceManager(true);
 }
 
 ResourceManagerImpl *SystemResourceManager::GetSystemResourceManagerNoSandBox()
@@ -66,39 +63,33 @@ ResourceManagerImpl *SystemResourceManager::GetSystemResourceManagerNoSandBox()
     RESMGR_HILOGI(RESMGR_TAG, "GetSystemResourceManagerNoSandBox");
     // appspawn can only add no sandbox system resource path, so all app that forked from appspawn have
     // one global resourceManager.
-    bool isCreated = CreateSystemResourceManager(false);
-    if (!isCreated) {
-        RESMGR_HILOGW(RESMGR_TAG, "CreateSystemResourceManager failed when GetSystemResourceManagerNoSandBox");
-        return nullptr;
-    }
-    return resourceManager_;
+    return CreateSystemResourceManager(false);
 }
 
-bool SystemResourceManager::CreateSystemResourceManager(bool isSandbox)
+ResourceManagerImpl *SystemResourceManager::CreateSystemResourceManager(bool isSandbox)
 {
-    if (resourceManager_ != nullptr) {
-        return true;
-    }
     std::lock_guard<std::mutex> lock(mutex_);
     if (resourceManager_ == nullptr) {
         ResourceManagerImpl *impl = new (std::nothrow) ResourceManagerImpl;
         if (impl == nullptr) {
             RESMGR_HILOGE(RESMGR_TAG, "new ResourceManagerImpl failed when CreateSystemResourceManager");
-            return false;
+            return nullptr;
         }
         if (!impl->Init(true)) {
             delete impl;
-            return false;
+            return nullptr;
         }
-#if !defined(__ARKUI_CROSS__)
-        if (!LoadSystemResource(impl, isSandbox)) {
+        std::shared_ptr<ResourceManagerImpl> sysResMgr = weakResourceManager_.lock();
+        if (!sysResMgr) {
+            sysResMgr = CreateSystemResourceManager();
+        }
+        if (!impl->AddSystemResource(sysResMgr)) {
             delete impl;
-            return false;
+            return nullptr;
         }
-#endif
         resourceManager_ = impl;
     }
-    return true;
+    return resourceManager_;
 }
 
 bool SystemResourceManager::LoadSystemResource(ResourceManagerImpl *impl, bool isSandbox)
@@ -138,15 +129,13 @@ bool SystemResourceManager::LoadSystemResource(ResourceManagerImpl *impl, bool i
 
 void SystemResourceManager::ReleaseSystemResourceManager()
 {
-    if (resourceManager_ == nullptr) {
-        RESMGR_HILOGI(RESMGR_TAG, "SystemResourceManager has been released");
-        return;
-    }
     std::lock_guard<std::mutex> lock(mutex_);
     if (resourceManager_ != nullptr) {
         delete resourceManager_;
         resourceManager_ = nullptr;
         RESMGR_HILOGI(RESMGR_TAG, "ReleaseSystemResourceManager success");
+    } else {
+        RESMGR_HILOGI(RESMGR_TAG, "SystemResourceManager has been released");
     }
 }
 
@@ -157,28 +146,30 @@ bool SystemResourceManager::AddSystemResource(ResourceManagerImpl *appResMgr)
     }
 
     std::lock_guard<std::mutex> lock(mutex_);
-    if (resourceManager_) {
-        appResMgr->AddSystemResource(resourceManager_);
-        return true;
-    }
     std::shared_ptr<ResourceManagerImpl> sysResMgr = weakResourceManager_.lock();
     if (!sysResMgr) {
-        sysResMgr = std::make_shared<ResourceManagerImpl>();
-        if (!sysResMgr) {
-            return false;
-        }
-        if (!sysResMgr->Init(true)) {
-            return false;
-        }
-#if !defined(__ARKUI_CROSS__)
-        if (!LoadSystemResource(sysResMgr.get(), false) && !LoadSystemResource(sysResMgr.get(), true)) {
-            return false;
-        }
-#endif
-        weakResourceManager_ = sysResMgr;
+        sysResMgr = CreateSystemResourceManager();
     }
     appResMgr->AddSystemResource(sysResMgr);
     return true;
+}
+
+std::shared_ptr<ResourceManagerImpl> SystemResourceManager::CreateSystemResourceManager()
+{
+    std::shared_ptr<ResourceManagerImpl> sysResMgr = std::make_shared<ResourceManagerImpl>();
+    if (!sysResMgr) {
+        return nullptr;
+    }
+    if (!sysResMgr->Init(true)) {
+        return nullptr;
+    }
+#if !defined(__ARKUI_CROSS__)
+    if (!LoadSystemResource(sysResMgr.get(), false) && !LoadSystemResource(sysResMgr.get(), true)) {
+        return nullptr;
+    }
+#endif
+    weakResourceManager_ = sysResMgr;
+    return sysResMgr;
 }
 } // namespace Resource
 } // namespace Global

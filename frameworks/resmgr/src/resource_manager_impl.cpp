@@ -58,12 +58,14 @@ void ResourceManagerImpl::AddSystemResource(ResourceManagerImpl *systemResourceM
     }
 }
 
-void ResourceManagerImpl::AddSystemResource(const std::shared_ptr<ResourceManagerImpl> &systemResourceManager)
+bool ResourceManagerImpl::AddSystemResource(const std::shared_ptr<ResourceManagerImpl> &systemResourceManager)
 {
     if (systemResourceManager != nullptr) {
         this->systemResourceManager_ = systemResourceManager;
         this->hapManager_->AddSystemResource(systemResourceManager->hapManager_);
+        return true;
     }
+    return false;
 }
 
 ResourceManagerImpl::ResourceManagerImpl(bool isOverrideResMgr) : hapManager_(nullptr),
@@ -567,10 +569,9 @@ RState ResourceManagerImpl::ResolveDataReference(const std::string key, const st
     return SUCCESS;
 }
 
-RState ResourceManagerImpl::GetThemeValues(const std::string &value, std::string &outValue)
+RState ResourceManagerImpl::GetThemeValues(const std::string &value, std::string &outValue,
+    const ResConfigImpl &resConfig)
 {
-    ResConfigImpl resConfig;
-    GetResConfig(resConfig);
     std::vector<std::shared_ptr<IdItem>> idItems;
     if (ProcessReference(value, idItems) != SUCCESS) {
         return NOT_FOUND;
@@ -591,6 +592,8 @@ RState ResourceManagerImpl::ResolveParentReference(const std::shared_ptr<IdItem>
     bool haveParent = false;
     int count = 0;
     std::shared_ptr<IdItem> currItem = idItem;
+    ResConfigImpl resConfig;
+    GetResConfig(resConfig);
     do {
         haveParent = currItem->HaveParent();
         size_t startIdx = haveParent ? 1 : 0;
@@ -600,17 +603,15 @@ RState ResourceManagerImpl::ResolveParentReference(const std::shared_ptr<IdItem>
         for (size_t i = 0; i < loop; ++i) {
             std::string key(currItem->values_[startIdx + i * 2]); // 2 means key appear in pairs
             std::string value(currItem->values_[startIdx + i * 2 + 1]); // 2 means value appear in pairs
-            auto iter = outValue.find(key);
-            if (iter != outValue.end()) {
+            if (outValue.find(key) != outValue.end()) {
                 continue;
             }
             std::string resolvedValue;
-            if (GetThemeValues(value, resolvedValue) == SUCCESS) {
+            if (GetThemeValues(value, resolvedValue, resConfig) == SUCCESS) {
                 outValue[key] = resolvedValue;
                 continue;
             }
-            RState rrRet = ResolveReference(value, resolvedValue);
-            if (rrRet != SUCCESS) {
+            if (ResolveReference(value, resolvedValue) != SUCCESS) {
                 RESMGR_HILOGD(RESMGR_TAG, "ResolveReference failed, value:%{public}s", value.c_str());
                 return ERROR;
             }
@@ -620,8 +621,7 @@ RState ResourceManagerImpl::ResolveParentReference(const std::shared_ptr<IdItem>
             // get parent
             uint32_t id;
             ResType resType;
-            bool isRef = IdItem::IsRef(currItem->values_[0], resType, id);
-            if (!isRef) {
+            if (!IdItem::IsRef(currItem->values_[0], resType, id)) {
                 RESMGR_HILOGE(RESMGR_TAG,
                     "something wrong, pls check HaveParent(). idItem: %{public}s", idItem->ToString().c_str());
                 return ERROR;
@@ -638,7 +638,6 @@ RState ResourceManagerImpl::ResolveParentReference(const std::shared_ptr<IdItem>
             return ERROR;
         }
     } while (haveParent);
-
     return SUCCESS;
 }
 
@@ -649,6 +648,8 @@ RState ResourceManagerImpl::ProcessItem(std::shared_ptr<IdItem> idItem,
     // add currItem values into map when key is absent
     // this make sure child covers parent
     size_t loop = idItem->values_.size() / 2;
+    ResConfigImpl resConfig;
+    GetResConfig(resConfig);
     for (size_t i = 0; i < loop; ++i) {
         std::string key(idItem->values_[startIdx + i * 2]); // 2 means key appear in pairs
         std::string value(idItem->values_[startIdx + i * 2 + 1]); // 2 means value appear in pairs
@@ -660,7 +661,7 @@ RState ResourceManagerImpl::ProcessItem(std::shared_ptr<IdItem> idItem,
         ResType resType = ResType::STRING;
         uint32_t id;
         bool isRef = IdItem::IsRef(value, resType, id);
-        if (isRef && GetThemeValues(value, resolvedValue) == SUCCESS) {
+        if (isRef && GetThemeValues(value, resolvedValue, resConfig) == SUCCESS) {
             outValue[key] = { .resType = resType, .value = resolvedValue };
             continue;
         }

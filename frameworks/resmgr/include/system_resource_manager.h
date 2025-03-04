@@ -78,7 +78,8 @@ private:
 
     static bool LoadSystemResource(ResourceManagerImpl *impl, bool isSandbox = true);
 
-    static bool CreateSystemResourceManager(bool isSandbox = true);
+    static ResourceManagerImpl *CreateSystemResourceManager(bool isSandbox);
+    static std::shared_ptr<ResourceManagerImpl> CreateSystemResourceManager();
 };
 } // namespace Resource
 } // namespace Global
