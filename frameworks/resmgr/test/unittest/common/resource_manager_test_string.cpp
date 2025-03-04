@@ -1367,7 +1367,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByIdTest
     std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams;
     jsParams.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_STRING, "1"));
     state = rm->GetFormatPluralStringById(outValue, id, quantity, jsParams);
-    EXPECT_EQ(state, ERROR_CODE_RES_NAME_FORMAT_ERROR);
+    EXPECT_EQ(state, ERROR_CODE_RES_ID_FORMAT_ERROR);
 }
 
 /*
@@ -1421,7 +1421,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetFormatPluralStringByIdTest
     std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
     params.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_STRING, "1"));
     state = rm->GetFormatPluralStringById(outValue, id, quantity, params);
-    EXPECT_EQ(state, ERROR_CODE_RES_NAME_FORMAT_ERROR);
+    EXPECT_EQ(state, ERROR_CODE_RES_ID_FORMAT_ERROR);
 }
 
 /*
