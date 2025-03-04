@@ -22,7 +22,7 @@ export class BusinessError<T = void> {
 }
 type AsyncCallback<T, E = void> = (err: BusinessError<E>, data: T) => void;
 
-namespace resourceManager {
+export namespace resourceManager {
     export enum Direction {
         DIRECTION_VERTICAL = 0,
         DIRECTION_HORIZONTAL = 1
@@ -97,6 +97,7 @@ namespace resourceManager {
         bundleName: string = "";
         moduleName: string = "";
         id: number = 0;
+        params?: Array<Object | undefined> | undefined;
         type?: number | undefined;
     }
 

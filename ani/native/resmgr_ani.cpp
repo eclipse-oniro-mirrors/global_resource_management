@@ -13,14 +13,66 @@
  * limitations under the License.
  */
 
-#include <ani.h>
-#include <array>
-#include <iostream>
-
+#include "resmgr_ani.h"
 #include "resource_manager_data_context.h"
 #include "resource_manager_impl.h"
 
-std::string AniStrToString(ani_env* env, ani_ref aniStr)
+using namespace OHOS;
+using namespace Global;
+using namespace Resource;
+
+static std::shared_ptr<ResourceManager> sysResMgr = nullptr;
+static std::mutex sysMgrMutex;
+
+ResMgrAddon::ResMgrAddon(
+    const std::string& bundleName, const std::shared_ptr<ResourceManager>& resMgr,
+    const std::shared_ptr<AbilityRuntime::Context>& context, bool isSystem)
+    : bundleName_(bundleName), resMgr_(resMgr), context_(context), isSystem_(isSystem)
+{
+    napiContext_ = std::make_shared<ResourceManagerNapiContext>();
+}
+
+ResMgrAddon::ResMgrAddon(const std::shared_ptr<ResourceManager>& resMgr, bool isSystem)
+    : resMgr_(resMgr), isSystem_(isSystem)
+{
+    napiContext_ = std::make_shared<ResourceManagerNapiContext>();
+}
+
+ani_object ResMgrAddon::CreateResMgr(
+    ani_env* env, const std::string& bundleName, const std::shared_ptr<ResourceManager>& resMgr,
+    std::shared_ptr<AbilityRuntime::Context> context)
+{
+    std::shared_ptr<ResMgrAddon> addon = std::make_shared<ResMgrAddon>(bundleName, resMgr, context);
+    return WrapResourceManager(env, addon);
+}
+
+ani_object ResMgrAddon::WrapResourceManager(ani_env* env, std::shared_ptr<ResMgrAddon> &addon)
+{
+    ani_object nativeResMgr = {};
+    static const char *className = "Lresmgr/resmgr_ani/resourceManager/ResourceManagerInner;";
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        std::cerr << "Not found '" << className << "'" << std::endl;
+        return nativeResMgr;
+    }
+
+    ani_method ctor;
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
+        std::cerr << "get ctor Failed'" << className << "'" << std::endl;
+        return nativeResMgr;
+    }
+
+    auto addonPtr = std::make_unique<std::shared_ptr<ResMgrAddon>>(addon);
+    if (ANI_OK != env->Object_New(cls, ctor, &nativeResMgr, reinterpret_cast<ani_long>(addonPtr.get()))) {
+        std::cerr << "Create Object Failed'" << className << "'" << std::endl;
+        return nativeResMgr;
+    }
+
+    addonPtr.release();
+    return nativeResMgr;
+}
+
+std::string ResMgrAddon::AniStrToString(ani_env* env, ani_ref aniStr)
 {
     ani_string str = reinterpret_cast<ani_string>(aniStr);
     if (str == nullptr) {
@@ -40,19 +92,19 @@ std::string AniStrToString(ani_env* env, ani_ref aniStr)
     return std::string(buffer.data(), nameSize);
 }
 
-static OHOS::Global::Resource::ResourceManagerImpl* unwrapAddon(ani_env* env, ani_object object)
+static ResourceManagerImpl* unwrapAddon(ani_env* env, ani_object object)
 {
     ani_long ptr;
     if (ANI_OK != env->Object_GetFieldByName_Long(object, "nativeResMgr", &ptr)) {
         return nullptr;
     }
-    return reinterpret_cast<OHOS::Global::Resource::ResourceManagerImpl*>(ptr);
+    return reinterpret_cast<ResourceManagerImpl*>(ptr);
 }
 
-void InitIdResourceAddon(ani_env* env, ani_object object,
-    std::unique_ptr<OHOS::Global::Resource::ResMgrDataContext>& dataContext, const ani_object resource)
+static void InitIdResourceAddon(ani_env* env, ani_object object,
+    std::unique_ptr<ResMgrDataContext>& dataContext, const ani_object resource)
 {
-    auto resourcePtr = std::make_shared<OHOS::Global::Resource::ResourceManager::Resource>();
+    auto resourcePtr = std::make_shared<ResourceManager::Resource>();
     if (resource == nullptr) {
         return;
     }
@@ -61,12 +113,12 @@ void InitIdResourceAddon(ani_env* env, ani_object object,
     if ((status = env->Object_GetPropertyByName_Ref(resource, "bundleName", &bundleName)) != ANI_OK) {
         return;
     }
-    resourcePtr->bundleName = AniStrToString(env, bundleName);
+    resourcePtr->bundleName = ResMgrAddon::AniStrToString(env, bundleName);
     ani_ref moduleName;
     if ((status = env->Object_GetPropertyByName_Ref(resource, "moduleName", &moduleName)) != ANI_OK) {
         return;
     }
-    resourcePtr->moduleName = AniStrToString(env, moduleName);
+    resourcePtr->moduleName = ResMgrAddon::AniStrToString(env, moduleName);
     ani_double id;
     if ((status = env->Object_GetPropertyByName_Double(resource, "id", &id)) != ANI_OK) {
         return;
@@ -75,10 +127,10 @@ void InitIdResourceAddon(ani_env* env, ani_object object,
     dataContext->resource_ = resourcePtr;
 }
 
-static ani_string getStringSync0([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object, ani_double resId)
+ani_string ResMgrAddon::getStringSync0([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object,
+    ani_double resId)
 {
-    std::unique_ptr<OHOS::Global::Resource::ResMgrDataContext> dataContext =
-        std::make_unique<OHOS::Global::Resource::ResMgrDataContext>();
+    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     auto resMgr = unwrapAddon(env, object);
     dataContext->resId_ = resId;
     ani_string ret;
@@ -87,9 +139,8 @@ static ani_string getStringSync0([[maybe_unused]] ani_env* env, [[maybe_unused]]
         env->String_NewUTF8(str.c_str(), str.size(), &ret);
         return ret;
     }
-    OHOS::Global::Resource::RState state =
-        resMgr->GetStringFormatById(resId, dataContext->value_, dataContext->jsParams_);
-    if (state != OHOS::Global::Resource::RState::SUCCESS) {
+    RState state = resMgr->GetStringFormatById(resId, dataContext->value_, dataContext->jsParams_);
+    if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to GetStringSync state", true, state);
         env->String_NewUTF8(str.c_str(), str.size(), &ret);
         return ret;
@@ -99,10 +150,10 @@ static ani_string getStringSync0([[maybe_unused]] ani_env* env, [[maybe_unused]]
     return ret;
 }
 
-static ani_string getStringSync2([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object, ani_object resource)
+ani_string ResMgrAddon::getStringSync2([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object,
+    ani_object resource)
 {
-    std::unique_ptr<OHOS::Global::Resource::ResMgrDataContext> dataContext =
-        std::make_unique<OHOS::Global::Resource::ResMgrDataContext>();
+    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     InitIdResourceAddon(env, object, dataContext, resource);
     ani_string ret;
     std::string str = "";
@@ -111,9 +162,8 @@ static ani_string getStringSync2([[maybe_unused]] ani_env* env, [[maybe_unused]]
         env->String_NewUTF8(str.c_str(), str.size(), &ret);
         return ret;
     }
-    OHOS::Global::Resource::RState state =
-        resMgr->GetStringFormatById(dataContext->resource_->id, dataContext->value_, dataContext->jsParams_);
-    if (state != OHOS::Global::Resource::RState::SUCCESS) {
+    RState state = resMgr->GetStringFormatById(dataContext->resource_->id, dataContext->value_, dataContext->jsParams_);
+    if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to GetStringSync state", true, state);
         env->String_NewUTF8(str.c_str(), str.size(), &ret);
         return ret;
@@ -123,74 +173,72 @@ static ani_string getStringSync2([[maybe_unused]] ani_env* env, [[maybe_unused]]
     return ret;
 }
 
-static ani_double getNumber0([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object, ani_double resId)
+ani_double ResMgrAddon::getNumber0([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object, ani_double resId)
 {
-    std::unique_ptr<OHOS::Global::Resource::ResMgrDataContext> dataContext =
-        std::make_unique<OHOS::Global::Resource::ResMgrDataContext>();
+    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     auto resMgr = unwrapAddon(env, object);
     dataContext->resId_ = resId;
-    OHOS::Global::Resource::RState state = resMgr->GetIntegerById(resId, dataContext->iValue_);
-    if (state != OHOS::Global::Resource::RState::SUCCESS) {
+    RState state = resMgr->GetIntegerById(resId, dataContext->iValue_);
+    if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to getNumber0 state", true, state);
         return -1;
     }
     return dataContext->iValue_;
 }
 
-static ani_double getNumber1([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object, ani_object resource)
+ani_double ResMgrAddon::getNumber1([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object,
+    ani_object resource)
 {
-    std::unique_ptr<OHOS::Global::Resource::ResMgrDataContext> dataContext =
-        std::make_unique<OHOS::Global::Resource::ResMgrDataContext>();
+    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     InitIdResourceAddon(env, object, dataContext, resource);
     auto resMgr = unwrapAddon(env, object);
-    OHOS::Global::Resource::RState state = resMgr->GetIntegerById(dataContext->resource_->id, dataContext->iValue_);
-    if (state != OHOS::Global::Resource::RState::SUCCESS) {
+    RState state = resMgr->GetIntegerById(dataContext->resource_->id, dataContext->iValue_);
+    if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to getNumber1 state", true, state);
         return -1;
     }
     return dataContext->iValue_;
 }
 
-static ani_double getColorSync0([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object, ani_double resId)
+ani_double ResMgrAddon::getColorSync0([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object,
+    ani_double resId)
 {
-    std::unique_ptr<OHOS::Global::Resource::ResMgrDataContext> dataContext =
-        std::make_unique<OHOS::Global::Resource::ResMgrDataContext>();
+    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     auto resMgr = unwrapAddon(env, object);
     dataContext->resId_ = resId;
-    OHOS::Global::Resource::RState state = resMgr->GetColorById(resId, dataContext->colorValue_);
-    if (state != OHOS::Global::Resource::RState::SUCCESS) {
+    RState state = resMgr->GetColorById(resId, dataContext->colorValue_);
+    if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to getColorSync0 state", true, state);
         return -1;
     }
     return dataContext->colorValue_;
 }
 
-static ani_double getColorSync1([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object, ani_object resource)
+ani_double ResMgrAddon::getColorSync1([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object,
+    ani_object resource)
 {
-    std::unique_ptr<OHOS::Global::Resource::ResMgrDataContext> dataContext =
-        std::make_unique<OHOS::Global::Resource::ResMgrDataContext>();
+    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     InitIdResourceAddon(env, object, dataContext, resource);
     auto resMgr = unwrapAddon(env, object);
-    OHOS::Global::Resource::RState state = resMgr->GetColorById(dataContext->resource_->id, dataContext->colorValue_);
-    if (state != OHOS::Global::Resource::RState::SUCCESS) {
+    RState state = resMgr->GetColorById(dataContext->resource_->id, dataContext->colorValue_);
+    if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to getColorSync1 state", true, state);
         return -1;
     }
     return dataContext->colorValue_;
 }
 
-static ani_string getPluralStringValueSync0([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object,
-    ani_double resId, ani_double num)
+ani_string ResMgrAddon::getPluralStringValueSync0([[maybe_unused]] ani_env* env, [[maybe_unused]]
+    ani_object object, ani_double resId, ani_double num)
 {
-    std::unique_ptr<OHOS::Global::Resource::ResMgrDataContext> dataContext =
-        std::make_unique<OHOS::Global::Resource::ResMgrDataContext>();
+    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     auto resMgr = unwrapAddon(env, object);
     dataContext->resId_ = resId;
     dataContext->param_ = num;
-    OHOS::Global::Resource::RState state =
-        resMgr->GetFormatPluralStringById(dataContext->value_, resId, dataContext->param_, dataContext->jsParams_);
+    RState state = resMgr->GetFormatPluralStringById(dataContext->value_,
+        resId, dataContext->param_, dataContext->jsParams_);
     ani_string ret;
-    if (state != OHOS::Global::Resource::RState::SUCCESS) {
+    if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to getPluralStringValueSync0 state", true, state);
         std::string str = "Failed";
         env->String_NewUTF8(str.c_str(), str.size(), &ret);
@@ -201,18 +249,17 @@ static ani_string getPluralStringValueSync0([[maybe_unused]] ani_env* env, [[may
     return ret;
 }
 
-static ani_string getPluralStringValueSync1([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object,
-    ani_object resource, ani_double num)
+ani_string ResMgrAddon::getPluralStringValueSync1([[maybe_unused]] ani_env* env, [[maybe_unused]]
+    ani_object object, ani_object resource, ani_double num)
 {
-    std::unique_ptr<OHOS::Global::Resource::ResMgrDataContext> dataContext =
-        std::make_unique<OHOS::Global::Resource::ResMgrDataContext>();
+    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     InitIdResourceAddon(env, object, dataContext, resource);
     dataContext->param_ = num;
     auto resMgr = unwrapAddon(env, object);
-    OHOS::Global::Resource::RState state = resMgr->GetFormatPluralStringById(
-        dataContext->value_, dataContext->resource_->id, dataContext->param_, dataContext->jsParams_);
+    RState state = resMgr->GetFormatPluralStringById(dataContext->value_,
+        dataContext->resource_->id, dataContext->param_, dataContext->jsParams_);
     ani_string ret;
-    if (state != OHOS::Global::Resource::RState::SUCCESS) {
+    if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to getPluralStringValueSync1 state", true, state);
         std::string str = "Failed";
         env->String_NewUTF8(str.c_str(), str.size(), &ret);
@@ -223,9 +270,9 @@ static ani_string getPluralStringValueSync1([[maybe_unused]] ani_env* env, [[may
     return ret;
 }
 
-static ani_object create([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_class clazz)
+ani_object ResMgrAddon::create([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_class clazz)
 {
-    auto nativeResMgr = new OHOS::Global::Resource::ResourceManagerImpl();
+    auto nativeResMgr = new ResourceManagerImpl();
     nativeResMgr->Init();
     static const char* className = "Lresmgr/resmgr_ani/resourceManager/ResourceManagerInner;";
     ani_class cls;
@@ -247,7 +294,7 @@ static ani_object create([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_cla
     return resmgr_object;
 }
 
-static ani_status BindContext(ani_env* env)
+ani_status ResMgrAddon::BindContext(ani_env* env)
 {
     static const char* className = "Lresmgr/resmgr_ani/resourceManager/ResourceManagerInner;";
     ani_class cls;
@@ -285,7 +332,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm* vm, uint32_t* result)
         return (ani_status)ANI_ERROR;
     }
 
-    auto status = BindContext(env);
+    auto status = ResMgrAddon::BindContext(env);
     if (status != ANI_OK) {
         return status;
     }

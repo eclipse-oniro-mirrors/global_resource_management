@@ -78,7 +78,8 @@
               "//base/global/resource_management/frameworks/resmgr:linux_resmgr",
               "//base/global/resource_management/frameworks/resmgr:mac_resmgr",
               "//base/global/resource_management/frameworks/resmgr:ohresmgr",
-              "//base/global/resource_management/ani:ani_package_res"
+              "//base/global/resource_management/ani:resmgr",
+              "//base/global/resource_management/ani/arkts:resmgr_abc"
             ],
             "inner_kits": [
               {
@@ -151,10 +152,11 @@
                 "header": {
                   "header_base": "//base/global/resource_management/ani/include",
                   "header_files": [
+                    "resmgr_ani.h",
                     "resmgr_enum.h"
                   ]
                 },
-                "name": "//base/global/resource_management/ani:ani_package_res"
+                "name": "//base/global/resource_management/ani:resmgr"
               }
             ],
             "test": [

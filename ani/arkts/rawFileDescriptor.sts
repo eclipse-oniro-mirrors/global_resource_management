@@ -18,3 +18,9 @@ export interface RawFileDescriptor {
     offset: number;
     length: number;
 }
+
+export class RawFileDescriptorInner implements RawFileDescriptor {
+    fd: number = 0;
+    offset: number = 0;
+    length: number = 0;
+}
