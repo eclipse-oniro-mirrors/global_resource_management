@@ -21,6 +21,7 @@
 #include <vector>
 #include "hap_manager.h"
 #include "resource_manager.h"
+#include "res_config_impl.h"
 #include "utils/psue_manager.h"
 #include "theme_pack_manager.h"
 
@@ -60,8 +61,9 @@ public:
      * Add system resource to hap resource vector.
      *
      * @param systemResourceManager the system resource manager.
+     * @return true if AddSystemResource success, else false
      */
-    void AddSystemResource(const std::shared_ptr<ResourceManagerImpl> &systemResourceManager);
+    bool AddSystemResource(const std::shared_ptr<ResourceManagerImpl> &systemResourceManager);
 
     /**
      * Add resource path to hap paths
@@ -901,7 +903,7 @@ private:
     RState GetThemeIconInfo(const std::string &iconName, size_t &len, std::unique_ptr<uint8_t[]> &outValue,
         const std::string &abilityName = "");
 
-    RState GetThemeValues(const std::string &value, std::string &outValue);
+    RState GetThemeValues(const std::string &value, std::string &outValue, const ResConfigImpl &resConfig);
 
     RState UpdateFakeLocaleFlag(ResConfig &resConfig);
 

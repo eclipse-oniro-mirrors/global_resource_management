@@ -542,9 +542,13 @@ std::vector<std::shared_ptr<HapResource::IdValues>> HapManager::GetResourceListB
 {
     std::vector<std::shared_ptr<HapResource::IdValues>> result;
     // all match will return
+    if (name == nullptr) {
+        return result;
+    }
+    std::string key(name);
     for (size_t i = 0; i < hapResources_.size(); ++i) {
         std::shared_ptr<HapResource> pResource = hapResources_[i];
-        const std::shared_ptr<HapResource::IdValues> out = pResource->GetIdValuesByName(std::string(name), resType);
+        const std::shared_ptr<HapResource::IdValues> out = pResource->GetIdValuesByName(key, resType);
         if (out != nullptr) {
             result.emplace_back(out);
         }
