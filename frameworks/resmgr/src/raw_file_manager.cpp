@@ -592,7 +592,7 @@ int64_t OH_ResourceManager_GetRawFileOffset64(const RawFile64 *rawFile)
 static bool GetRawFileDescriptorFromHap64(const RawFile64 *rawFile, RawFileDescriptor64 *descriptor)
 {
     ResourceManager::RawFileDescriptor resMgrDescriptor;
-    if (rawFile->resMgr->resManager == nullptr) {
+    if (rawFile->raw->resMgr->resManager == nullptr) {
         return false;
     }
     RState state = rawFile->raw->resMgr->resManager->
