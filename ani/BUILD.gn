@@ -11,10 +11,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/config/components/ets_frontend/ets2abc_config.gni")
 import("//build/ohos.gni")
 
+config("resmgr_config") {
+  include_dirs = [
+    "./include",
+    "../dfx/hisysevent_adapter",
+    "../interfaces/inner_api/include",
+    "../interfaces/js/innerkits/core/include",
+    "../frameworks/resmgr/include",
+  ]
+}
+
 ohos_shared_library("resmgr") {
+  public_configs = [ ":resmgr_config" ]
   include_dirs = [
     "./include",
     "../dfx/hisysevent_adapter",
@@ -23,6 +33,18 @@ ohos_shared_library("resmgr") {
     "../frameworks/resmgr/include",
   ]
   sources = [
+    "../dfx/hisysevent_adapter/hisysevent_adapter.cpp",
+    "../frameworks/resmgr/src/hap_manager.cpp",
+    "../frameworks/resmgr/src/hap_resource.cpp",
+    "../frameworks/resmgr/src/hap_resource_manager.cpp",
+    "../frameworks/resmgr/src/locale_matcher.cpp",
+    "../frameworks/resmgr/src/res_config_impl.cpp",
+    "../frameworks/resmgr/src/res_desc.cpp",
+    "../frameworks/resmgr/src/res_locale.cpp",
+    "../frameworks/resmgr/src/resource_manager_impl.cpp",
+    "../frameworks/resmgr/src/utils/hap_parser.cpp",
+    "../frameworks/resmgr/src/utils/psue_manager.cpp",
+    "../frameworks/resmgr/src/utils/utils.cpp",
     "../interfaces/js/innerkits/core/src/resource_manager_addon.cpp",
     "../interfaces/js/innerkits/core/src/resource_manager_napi_async_impl.cpp",
     "../interfaces/js/innerkits/core/src/resource_manager_napi_context.cpp",
@@ -31,30 +53,33 @@ ohos_shared_library("resmgr") {
     "./native/resmgr_ani.cpp",
     "./native/resmgr_enum.cpp",
   ]
+
+  sources += [
+    "../frameworks/resmgr/src/resource_manager.cpp",
+    "../frameworks/resmgr/src/resource_manager_ext_mgr.cpp",
+    "../frameworks/resmgr/src/system_resource_manager.cpp",
+    "../frameworks/resmgr/src/theme_pack_config.cpp",
+    "../frameworks/resmgr/src/theme_pack_manager.cpp",
+    "../frameworks/resmgr/src/theme_pack_resource.cpp",
+    "../frameworks/resmgr/src/utils/string_utils.cpp",
+  ]
+
   deps = []
   external_deps = [
     "ability_base:configuration",
+    "ability_base:extractortool",
     "ace_engine:drawable_descriptor",
     "bundle_framework:appexecfwk_base",
     "cJSON:cjson",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
+    "icu:shared_icui18n",
+    "init:libbegetutil",
     "napi:ace_napi",
     "runtime_core:ani",
+    "zlib:libz",
   ]
   subsystem_name = "global"
   part_name = "resource_management"
-}
-
-generate_static_abc("resmgr_abc") {
-  dst_file = "$target_out_dir/resmgr_ani.abc"
-  arktsconfig = "./arktsconfig.json"
-  out_puts = [ "$target_out_dir/resmgr" ]
-}
-
-group("ani_package_res") {
-  deps = [
-    ":resmgr",
-    ":resmgr_abc",
-  ]
 }

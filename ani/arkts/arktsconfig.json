@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "package": "resmgr",
-    "baseUrl": "./arkts",
+    "baseUrl": ".",
     "outDir": "build/out",
     "paths": {
       "std": [
@@ -13,6 +13,6 @@
     }
   },
   "include": [
-    "./arkts/*.sts"
+    "./*.sts"
   ]
 }
