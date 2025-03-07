@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "resmgr_enum.h"
+#include "resourceManager_enum.h"
 
 namespace OHOS {
 namespace Global {

@@ -35,12 +35,15 @@ public:
     ResMgrAddon(const std::shared_ptr<ResourceManager>& resMgr, bool isSystem = false);
     static ani_object CreateResMgr(ani_env* env, const std::string& bundleName,
         const std::shared_ptr<ResourceManager>& resMgr, std::shared_ptr<AbilityRuntime::Context> context);
-    static std::string AniStrToString(ani_env* env, ani_ref aniStr);
     static ani_object getSystemResourceManager([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object);
     static ani_string getStringSync0([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object,
         ani_double resId);
+    static ani_string getStringSync1([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
+        ani_double resId, ani_object args);
     static ani_string getStringSync2([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object,
         ani_object resource);
+    static ani_string getStringSync3([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
+        ani_object resource, ani_object args);
     static ani_double getNumber0([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object,
         ani_double resId);
     static ani_double getNumber1([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object,
