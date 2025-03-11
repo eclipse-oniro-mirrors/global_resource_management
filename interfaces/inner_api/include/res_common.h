@@ -119,7 +119,7 @@ static const uint32_t SELECT_PATTERN = 0x0800;
 static const uint32_t SELECT_SYMBOL = 0x1000;
 static const uint32_t SELECT_ALL = 0xFFFFFFFF;
 
-enum DeviceType {
+enum DeviceType : int32_t {
     DEVICE_NOT_SET  = -1,
     DEVICE_PHONE    = 0,
     DEVICE_TABLET   = 1,
