@@ -443,6 +443,10 @@ bool ResourceManagerNapiUtils::GetHapResourceManager(const ResMgrDataContext* da
 napi_value ResourceManagerNapiUtils::CreateJsDeviceCap(napi_env env, ResMgrDataContext& context)
 {
     std::unique_ptr<ResConfig> cfg(CreateResConfig());
+    if (!cfg) {
+        context.SetErrorMsg("Failed to create ResConfig object.");
+        return nullptr;
+    }
     context.addon_->GetResMgr()->GetResConfig(*cfg);
 
     napi_value result;
@@ -509,6 +513,10 @@ std::string ResourceManagerNapiUtils::GetLocale(std::unique_ptr<ResConfig> &cfg)
 napi_value ResourceManagerNapiUtils::CreateJsConfig(napi_env env, ResMgrDataContext& context)
 {
     std::unique_ptr<ResConfig> cfg(CreateResConfig());
+    if (!cfg) {
+        context.SetErrorMsg("Failed to create ResConfig object.");
+        return nullptr;
+    }
     context.addon_->GetResMgr()->GetResConfig(*cfg);
     return CreateConfig(env, context, cfg);
 }
@@ -516,6 +524,10 @@ napi_value ResourceManagerNapiUtils::CreateJsConfig(napi_env env, ResMgrDataCont
 napi_value ResourceManagerNapiUtils::CreateOverrideJsConfig(napi_env env, ResMgrDataContext& context)
 {
     std::unique_ptr<ResConfig> cfg(CreateResConfig());
+    if (!cfg) {
+        context.SetErrorMsg("Failed to create ResConfig object.");
+        return nullptr;
+    }
     context.addon_->GetResMgr()->GetOverrideResConfig(*cfg);
     return CreateConfig(env, context, cfg);
 }
