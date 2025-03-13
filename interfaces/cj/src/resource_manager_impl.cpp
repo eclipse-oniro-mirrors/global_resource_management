@@ -280,6 +280,10 @@ void ResourceManagerImpl::GetConfiguration(Configuration &configuration)
 {
     LOGI("ResourceManagerImpl::GetConfiguration start");
     std::unique_ptr<ResConfig> cfg(CreateResConfig());
+    if (!cfg) {
+        LOGE("Failed to create ResConfig object.");
+        return;
+    }
     resMgr_->GetResConfig(*cfg);
     configuration.direction = static_cast<int32_t>(cfg->GetDirection());
     LOGI("ResourceManagerImpl::GetConfiguration ok %{public}" PRId32, configuration.direction);
@@ -295,6 +299,10 @@ void ResourceManagerImpl::GetConfiguration(Configuration &configuration)
 void ResourceManagerImpl::GetDeviceCapability(DeviceCapability &deviceCapability)
 {
     std::unique_ptr<ResConfig> cfg(CreateResConfig());
+    if (!cfg) {
+        LOGE("Failed to create ResConfig object.");
+        return;
+    }
     resMgr_->GetResConfig(*cfg);
     deviceCapability.screenDensity = static_cast<int32_t>(cfg->ConvertDensity(cfg->GetScreenDensity()));
     deviceCapability.deviceType = static_cast<int32_t>(cfg->GetDeviceType());
@@ -329,7 +337,7 @@ int32_t ResourceManagerImpl::GetMediaDataById(uint32_t id, size_t &len, std::uni
 int32_t ResourceManagerImpl::GetMediaContentBase64ById(uint32_t id, std::string &outValue, uint32_t density)
 {
     RState state = resMgr_->GetMediaBase64DataById(id, outValue, density);
-        if (state != RState::SUCCESS) {
+    if (state != RState::SUCCESS) {
         LOGE("ResourceManagerImpl::GetMediaDataById failed %{public}" PRIu32, state);
     } else {
         LOGI("ResourceManagerImpl::GetMediaDataById success");
@@ -340,7 +348,7 @@ int32_t ResourceManagerImpl::GetMediaContentBase64ById(uint32_t id, std::string 
 int32_t ResourceManagerImpl::GetMediaContentBase64ByName(const char *name, std::string &outValue, uint32_t density)
 {
     RState state = resMgr_->GetMediaBase64DataByName(name, outValue, density);
-        if (state != RState::SUCCESS) {
+    if (state != RState::SUCCESS) {
         LOGE("ResourceManagerImpl::GetMediaDataById failed %{public}" PRIu32, state);
     } else {
         LOGI("ResourceManagerImpl::GetMediaDataById success");
