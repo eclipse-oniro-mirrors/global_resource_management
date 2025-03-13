@@ -16,13 +16,15 @@
 import { RawFileDescriptor as _RawFileDescriptor } from 'global.rawFileDescriptor';
 import { Resource as _Resource } from 'global.resource';
 
-export class BusinessError<T = void> {
+class BusinessError<T = void> {
     code: number;
     data: T;
 }
 type AsyncCallback<T, E = void> = (err: BusinessError<E>, data: T) => void;
 
 export default namespace resourceManager {
+    loadLibrary("resourceManager_ani.z");
+
     export enum Direction {
         DIRECTION_VERTICAL = 0,
         DIRECTION_HORIZONTAL = 1

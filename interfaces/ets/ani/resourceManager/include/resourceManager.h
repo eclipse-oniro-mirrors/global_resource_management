@@ -60,6 +60,10 @@ public:
         ani_object resource, ani_double num);
     static ani_object create([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_class clazz);
     static ani_status BindContext(ani_env* env);
+    inline std::shared_ptr<ResourceManager> GetResMgr()
+    {
+        return resMgr_;
+    }
 private:
     static ani_object WrapResourceManager(ani_env* env, std::shared_ptr<ResMgrAddon> &addon);
 
