@@ -1134,4 +1134,871 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest032, 
     RESMGR_HILOGD(RESMGR_TAG, "avg cost 032: %f us", average);
     EXPECT_LT(average, 100);
 };
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest033
+ * @tc.desc: Test GetResConfigById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest033, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    unsigned long long total = 0;
+    double average = 0;
+    int id = GetResId("app_name", ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    ResConfigImpl rci;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetResConfigById(id, rci);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 033: %f us", average);
+    EXPECT_LT(average, 100);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest034
+ * @tc.desc: Test GetResConfigByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest034, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    unsigned long long total = 0;
+    double average = 0;
+    ResConfigImpl rci;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetResConfigByName("app_name", ResType::STRING, rci);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 034: %f us", average);
+    EXPECT_LT(average, 100);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest035
+ * @tc.desc: Test GetRawFilePathByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest035, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    unsigned long long total = 0;
+    double average = 0;
+    std::string outValue;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetRawFilePathByName("test_rawfile.txt", outValue);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 035: %f us", average);
+    EXPECT_LT(average, 100);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest036
+ * @tc.desc: Test GetRawFileDescriptor & CloseRawFileDescriptor
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest036, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    unsigned long long total = 0;
+    double average = 0;
+    ResourceManager::RawFileDescriptor descriptor;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetRawFileDescriptor("test_rawfile.txt", descriptor);
+        rm->CloseRawFileDescriptor("test_rawfile.txt");
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 036: %f us", average);
+    EXPECT_LT(average, 200);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest037
+ * @tc.desc: Test GetMediaDataById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest037, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    unsigned long long total = 0;
+    double average = 0;
+    int id = GetResId("icon", ResType::MEDIA);
+    ASSERT_TRUE(id > 0);
+    size_t len;
+    std::unique_ptr<uint8_t[]> outValue;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetMediaDataById(id, len, outValue);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 037: %f us", average);
+    EXPECT_LT(average, 100);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest038
+ * @tc.desc: Test GetMediaDataByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest038, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    unsigned long long total = 0;
+    double average = 0;
+    size_t len;
+    std::unique_ptr<uint8_t[]> outValue;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetMediaDataByName("icon", len, outValue);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 038: %f us", average);
+    EXPECT_LT(average, 100);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest039
+ * @tc.desc: Test GetMediaBase64DataById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest039, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    unsigned long long total = 0;
+    double average = 0;
+    int id = GetResId("icon", ResType::MEDIA);
+    ASSERT_TRUE(id > 0);
+    std::string outValue;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetMediaBase64DataById(id, outValue);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 039: %f us", average);
+    EXPECT_LT(average, 100);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest040
+ * @tc.desc: Test GetMediaBase64DataByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest040, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    unsigned long long total = 0;
+    double average = 0;
+    std::string outValue;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetMediaBase64DataByName("icon", outValue);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 040: %f us", average);
+    EXPECT_LT(average, 100);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest041
+ * @tc.desc: Test GetProfileDataById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest041, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    unsigned long long total = 0;
+    double average = 0;
+    int id = GetResId("test_profile", ResType::PROF);
+    EXPECT_TRUE(id > 0);
+    size_t len;
+    std::unique_ptr<uint8_t[]> outValue;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetProfileDataById(id, len, outValue);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 041: %f us", average);
+    EXPECT_LT(average, 260);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest042
+ * @tc.desc: Test GetProfileDataByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest042, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    unsigned long long total = 0;
+    double average = 0;
+    size_t len;
+    std::unique_ptr<uint8_t[]> outValue;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetProfileDataByName("test_profile", len, outValue);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 042: %f us", average);
+    EXPECT_LT(average, 260);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest043
+ * @tc.desc: Test GetRawFileFromHap
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest043, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    unsigned long long total = 0;
+    double average = 0;
+    size_t len;
+    std::unique_ptr<uint8_t[]> outValue;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetRawFileFromHap("test_rawfile.txt", len, outValue);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 043: %f us", average);
+    EXPECT_LT(average, 150);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest044
+ * @tc.desc: Test GetRawFileDescriptorFromHap
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest044, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    unsigned long long total = 0;
+    double average = 0;
+    ResourceManager::RawFileDescriptor descriptor;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetRawFileDescriptorFromHap("test_rawfile.txt", descriptor);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 044: %f us", average);
+    EXPECT_LT(average, 100);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest045
+ * @tc.desc: Test IsLoadHap
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest045, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    unsigned long long total = 0;
+    double average = 0;
+    std::string hapPath(FormatFullPath(g_hapPath));
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->IsLoadHap(hapPath);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 045: %f us", average);
+    EXPECT_LT(average, 100);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest046
+ * @tc.desc: Test GetRawFileList
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest046, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    unsigned long long total = 0;
+    double average = 0;
+    std::vector<std::string> rawfileList;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetRawFileList("/", rawfileList);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 046: %f us", average);
+    EXPECT_LT(average, 250);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest047
+ * @tc.desc: Test GetDrawableInfoById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest047, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    unsigned long long total = 0;
+    double average = 0;
+    int id = GetResId("icon", ResType::MEDIA);
+    ASSERT_TRUE(id > 0);
+    std::string type;
+    size_t len;
+    std::unique_ptr<uint8_t[]> outValue;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetDrawableInfoById(id, type, len, outValue);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 047: %f us", average);
+    EXPECT_LT(average, 100);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest048
+ * @tc.desc: Test GetDrawableInfoByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest048, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    unsigned long long total = 0;
+    double average = 0;
+    std::string type;
+    size_t len;
+    std::unique_ptr<uint8_t[]> outValue;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetDrawableInfoByName(std::string("icon").c_str(), type, len, outValue);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 048: %f us", average);
+    EXPECT_LT(average, 100);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest049
+ * @tc.desc: Test GetResourceLimitKeys
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest049, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    unsigned long long total = 0;
+    double average = 0;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetResourceLimitKeys();
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 049: %f us", average);
+    EXPECT_LT(average, 100);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest050
+ * @tc.desc: Test GetRawFdNdkFromHap
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest050, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    unsigned long long total = 0;
+    double average = 0;
+    ResourceManager::RawFileDescriptor descriptor;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetRawFdNdkFromHap("test_rawfile.txt", descriptor);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 050: %f us", average);
+    EXPECT_LT(average, 200);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest051
+ * @tc.desc: Test GetResId
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest051, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    unsigned long long total = 0;
+    double average = 0;
+    uint32_t resId;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetResId("app.string.app_name", resId);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 051: %f us", average);
+    EXPECT_LT(average, 320);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest052
+ * @tc.desc: Test GetLocales
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest052, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    unsigned long long total = 0;
+    double average = 0;
+    std::vector<std::string> outValue;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetLocales(outValue);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 052: %f us", average);
+    EXPECT_LT(average, 100);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest053
+ * @tc.desc: Test GetSymbolById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest053, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    int id = GetResId("test_symbol", ResType::SYMBOL);
+    ASSERT_TRUE(id > 0);
+    unsigned long long total = 0;
+    double average = 0;
+    uint32_t outValue;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetSymbolById(id, outValue);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 053: %f us", average);
+    EXPECT_LT(average, 100);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest054
+ * @tc.desc: Test GetSymbolByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest054, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    unsigned long long total = 0;
+    double average = 0;
+    uint32_t outValue;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetSymbolByName(std::string("test_symbol").c_str(), outValue);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 054: %f us", average);
+    EXPECT_LT(average, 100);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest055
+ * @tc.desc: Test IsRawDirFromHap
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest055, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    unsigned long long total = 0;
+    double average = 0;
+    bool outValue;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->IsRawDirFromHap("test_rawfile.txt", outValue);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 055: %f us", average);
+    EXPECT_LT(average, 350);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest056
+ * @tc.desc: Test GetStringFormatById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest056, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    int id = GetResId("test_string2", ResType::STRING);
+    ASSERT_TRUE(id > 0);
+
+    unsigned long long total = 0;
+    double average = 0;
+    std::string outValue;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetStringFormatById(outValue, id, 1.00001, "你好");
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 056: %f us", average);
+    EXPECT_LT(average, 100);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest057
+ * @tc.desc: Test GetStringFormatByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest057, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    unsigned long long total = 0;
+    double average = 0;
+    std::string outValue;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetStringFormatByName(outValue, std::string("test_string2").c_str(), 1.0001, "你好");
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 057: %f us", average);
+    EXPECT_LT(average, 100);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest058
+ * @tc.desc: Test GetFormatPluralStringById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest058, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    int id = GetResId("eat_apple", ResType::PLURALS);
+    ASSERT_TRUE(id > 0);
+
+    unsigned long long total = 0;
+    double average = 0;
+    double quantity = 1;
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
+    params.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_NUMBER, std::to_string(quantity)));
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetFormatPluralStringById(outValue, id, quantity, params);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 058: %f us", average);
+    EXPECT_LT(average, 200);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest059
+ * @tc.desc: Test GetFormatPluralStringByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest059, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    unsigned long long total = 0;
+    double average = 0;
+    double quantity = 1;
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
+    params.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_NUMBER, std::to_string(quantity)));
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetFormatPluralStringByName(outValue, std::string("eat_apple").c_str(), quantity, params);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 059: %f us", average);
+    EXPECT_LT(average, 200);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest060
+ * @tc.desc: Test GetThemeDataByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest060, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    unsigned long long total = 0;
+    double average = 0;
+    std::map<std::string, ResourceManager::ResData> outValue;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetThemeDataByName("ohos_device_theme", outValue);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 060: %f us", average);
+    EXPECT_LT(average, 150);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest061
+ * @tc.desc: Test GetThemeDataById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest061, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    int id = GetResId("ohos_device_theme", ResType::THEME);
+    ASSERT_TRUE(id > 0);
+    unsigned long long total = 0;
+    double average = 0;
+    std::map<std::string, ResourceManager::ResData> outValue;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetThemeDataById(id, outValue);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 061: %f us", average);
+    EXPECT_LT(average, 150);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest062
+ * @tc.desc: Test GetPatternDataByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest062, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    unsigned long long total = 0;
+    double average = 0;
+    std::map<std::string, ResourceManager::ResData> outValue;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetPatternDataByName("ohos_button_pattern", outValue);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 062: %f us", average);
+    EXPECT_LT(average, 100);
+};
+
+/*
+ * @tc.name: ResourceManagerPerformanceFuncTest063
+ * @tc.desc: Test GetPatternDataById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest063, TestSize.Level1)
+{
+    if (rm == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    EXPECT_TRUE(ret);
+    int id = GetResId("ohos_button_pattern", ResType::PATTERN);
+    ASSERT_TRUE(id > 0);
+    unsigned long long total = 0;
+    double average = 0;
+    std::map<std::string, ResourceManager::ResData> outValue;
+    for (int k = 0; k < 1000; ++k) {
+        auto t1 = std::chrono::high_resolution_clock::now();
+        rm->GetPatternDataById(id, outValue);
+        auto t2 = std::chrono::high_resolution_clock::now();
+        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    }
+    average = total / 1000.0;
+    g_logLevel = LOG_DEBUG;
+    RESMGR_HILOGD(RESMGR_TAG, "avg cost 063: %f us", average);
+    EXPECT_LT(average, 100);
+};
 }
