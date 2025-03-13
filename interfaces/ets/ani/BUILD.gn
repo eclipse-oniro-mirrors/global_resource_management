@@ -11,10 +11,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/config/components/ets_frontend/ets2abc_config.gni")
+import("//build/ohos.gni")
 
-generate_static_abc("resmgr_abc") {
-  dst_file = "$target_out_dir/resmgr_ani.abc"
-  arktsconfig = "./arktsconfig.json"
-  out_puts = [ "$target_out_dir/resmgr" ]
+group("ani_package_resmgr") {
+  deps = [
+    "./resourceManager:rawFileDescriptor_etc",
+    "./resourceManager:resourceManager_ani",
+    "./resourceManager:resourceManager_etc",
+    "./resourceManager:resource_etc",
+  ]
 }

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-import { RawFileDescriptor as _RawFileDescriptor } from './rawFileDescriptor';
-import { Resource as _Resource } from './resource';
+import { RawFileDescriptor as _RawFileDescriptor } from 'global.rawFileDescriptor';
+import { Resource as _Resource } from 'global.resource';
 
 export class BusinessError<T = void> {
     code: number;
@@ -22,7 +22,7 @@ export class BusinessError<T = void> {
 }
 type AsyncCallback<T, E = void> = (err: BusinessError<E>, data: T) => void;
 
-export namespace resourceManager {
+export default namespace resourceManager {
     export enum Direction {
         DIRECTION_VERTICAL = 0,
         DIRECTION_HORIZONTAL = 1
@@ -75,7 +75,9 @@ export namespace resourceManager {
         getStringValue(resource: Resource): Promise<string>;
 
         getStringSync(resId: number): string;
+        getStringSync(resId: number, args: Array<string | number>): string;
         getStringSync(resource: Resource): string;
+        getStringSync(resource: Resource, args: Array<string | number>): string;
 
         getNumber(resId: number): number;
         getNumber(resource: Resource): number;
@@ -83,8 +85,13 @@ export namespace resourceManager {
         getStringValue(resId: number, callback: AsyncCallback<string, void>): void;
         getStringValue(resId: number): Promise<string>;
 
+        getRawFileContent(path: string, callback: AsyncCallback<Uint8Array, void>): void;
+        getRawFileContent(path: string): Promise<Uint8Array>;
+
         getColorSync(resId: number): number;
         getColorSync(resource: Resource): number;
+
+        getRawFileContentSync(path: string): Uint8Array;
 
         getPluralStringValueSync(resId: number, num: number): string;
         getPluralStringValueSync(resource: Resource, num: number): string;
@@ -93,16 +100,8 @@ export namespace resourceManager {
     export type RawFileDescriptor = _RawFileDescriptor;
     export type Resource = _Resource;
 
-    export class ResourceInner implements Resource {
-        bundleName: string = "";
-        moduleName: string = "";
-        id: number = 0;
-        params?: Array<Object | undefined> | undefined;
-        type?: number | undefined;
-    }
-
     export class ResourceManagerInner implements ResourceManager {
-        static { loadLibrary("resmgr.z"); }
+        static { loadLibrary("resourceManager_ani.z"); }
 
         private nativeResMgr: long = 0;
 
@@ -114,16 +113,20 @@ export namespace resourceManager {
     
         native static create(): ResourceManagerInner;
         native getStringSync(resId: number): string
+        native getStringSync(resId: number, args: Array<string | number>): string
         native getStringSync(resource: Resource): string
+        native getStringSync(resource: Resource, args: Array<string | number>): string
         native getNumber(resId: number): number 
         native getNumber(resource: Resource): number 
         native getColorSync(resId: number): number 
         native getColorSync(resource: Resource): number 
+        native getRawFileContentSync(path: string): Uint8Array;
         native getPluralStringValueSync(resId: number, num: number): string 
         native getPluralStringValueSync(resource: Resource, num: number): string
 
         getString(resId: number, callback: AsyncCallback<string, void>): void {
-            let p1 = launch this.getStringSync(resId);
+            let p1 = taskpool.execute(():undefined => {new ResourceManagerInner(this.nativeResMgr).getStringSync(resId);
+                return undefined})
             p1.then((e: NullishType) => {
                 let content = e as string;
                 let r: BusinessError = { code: 0, data: undefined };
@@ -135,7 +138,8 @@ export namespace resourceManager {
 
         getString(resId: number): Promise<string> {
             let p = new Promise<string>((resolve: (v: string) => void, reject: (error: Object) => void) => {
-                let p1 = launch this.getStringSync(resId);
+                let p1 = taskpool.execute(():undefined => {
+                    new ResourceManagerInner(this.nativeResMgr).getStringSync(resId); return undefined})
                 p1.then((e: NullishType) => {
                     let content = e as string;
                     resolve(content);
@@ -147,7 +151,8 @@ export namespace resourceManager {
         }
 
         getStringValue(resId: number, callback: AsyncCallback<string, void>): void {
-            let p1 = launch this.getStringSync(resId);
+            let p1 = taskpool.execute(():undefined => {
+                new ResourceManagerInner(this.nativeResMgr).getStringSync(resId); return undefined})
             p1.then((e: NullishType) => {
                 let content = e as string;
                 let r: BusinessError = { code: 0, data: undefined };
@@ -159,7 +164,8 @@ export namespace resourceManager {
 
         getStringValue(resId: number): Promise<string> {
             let p = new Promise<string>((resolve: (v: string) => void, reject: (error: Object) => void) => {
-                let p1 = launch this.getStringSync(resId);
+                let p1 = taskpool.execute(():undefined => {
+                    new ResourceManagerInner(this.nativeResMgr).getStringSync(resId); return undefined})
                 p1.then((e: NullishType) => {
                     let content = e as string;
                     resolve(content);
@@ -171,7 +177,8 @@ export namespace resourceManager {
         }
 
         getStringValue(resource: Resource, callback: AsyncCallback<string, void>): void {
-            let p1 = launch this.getStringSync(resource);
+            let p1 = taskpool.execute(():undefined => {
+                new ResourceManagerInner(this.nativeResMgr).getStringSync(resource); return undefined})
             p1.then((e: NullishType) => {
                 let content = e as string;
                 let r: BusinessError = { code: 0, data: undefined };
@@ -183,7 +190,8 @@ export namespace resourceManager {
 
         getStringValue(resource: Resource): Promise<string> {
             let p = new Promise<string>((resolve: (v: string) => void, reject: (error: Object) => void) => {
-                let p1 = launch this.getStringSync(resource);
+                let p1 = taskpool.execute(():undefined => {
+                    new ResourceManagerInner(this.nativeResMgr).getStringSync(resource); return undefined})
                 p1.then((e: NullishType) => {
                     let content = e as string;
                     resolve(content);
@@ -193,5 +201,33 @@ export namespace resourceManager {
             });
             return p;
         }
+
+        getRawFileContent(path: string, callback: AsyncCallback<Uint8Array, void>): void {
+            let p1 = taskpool.execute(():undefined => {
+                new ResourceManagerInner(this.nativeResMgr).getRawFileContentSync(path); return undefined})
+            p1.then((e: NullishType) => {
+                let content = e as Uint8Array;
+                let r: BusinessError = { code: 0, data: undefined };
+                callback(r, content)
+            }, (err: Object): void => {
+                console.log("getRawFileContent callback");
+            });
+        }
+        
+        getRawFileContent(path: string): Promise<Uint8Array> {
+            let p = new Promise<Uint8Array>((resolve: (v: Uint8Array) => void, reject: (error: Object) => void) => {
+                let p1 = taskpool.execute(():undefined => {
+                    new ResourceManagerInner(this.nativeResMgr).getRawFileContentSync(path); return undefined})
+                p1.then((e: NullishType) => {
+                    let content = e as Uint8Array;
+                    resolve(content);
+                }, (err: Object): void => {
+                    console.log("getRawFileContent promise");
+                });
+            });
+            return p;
+        }
     }
+
+    export native function getSystemResourceManager(): ResourceManager;
 }
