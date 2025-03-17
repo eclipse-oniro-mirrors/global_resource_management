@@ -15,6 +15,7 @@
 #ifndef OHOS_RESOURCE_MANAGER_SYSTEMRESOURCEMANAGER_H
 #define OHOS_RESOURCE_MANAGER_SYSTEMRESOURCEMANAGER_H
 
+#include <memory>
 #include "resource_manager_impl.h"
 
 namespace OHOS {
@@ -42,10 +43,19 @@ public:
      */
     static ResourceManagerImpl *GetSystemResourceManagerNoSandBox();
 
+    /**
+     * Add system resource to hap resource vector.
+     *
+     * @param resourceManager the hap resource manager.
+     */
+    static bool AddSystemResource(ResourceManagerImpl *resourceManager);
+
 private:
     static std::mutex mutex_;
 
     static ResourceManagerImpl *resourceManager_;
+
+    static std::weak_ptr<ResourceManagerImpl> weakResourceManager_;
 
     static const std::string SYSTEM_RESOURCE_PATH;
 
@@ -63,7 +73,9 @@ private:
 
     static bool LoadSystemResource(ResourceManagerImpl *impl, bool isSandbox = true);
 
-    static bool CreateSystemResourceManager(bool isSandbox = true);
+    static ResourceManagerImpl *CreateSystemResourceManager(bool isSandbox);
+
+    static std::shared_ptr<ResourceManagerImpl> CreateSystemResourceManager();
 };
 } // namespace Resource
 } // namespace Global

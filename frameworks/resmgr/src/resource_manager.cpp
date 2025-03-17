@@ -42,10 +42,7 @@ ResourceManager *CreateResourceManager()
         delete (impl);
         return nullptr;
     }
-    ResourceManagerImpl *systemResourceManager = SystemResourceManager::GetSystemResourceManager();
-    if (systemResourceManager != nullptr) {
-        impl->AddSystemResource(systemResourceManager);
-    }
+    SystemResourceManager::AddSystemResource(impl);
     return impl;
 }
 
