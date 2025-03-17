@@ -251,6 +251,8 @@ EXPORT_FUNC ResourceManager *CreateResourceManager();
  * after the sandbox mount.
  *
  * @return pointer of system resource manager
+ * @deprecated since 14
+ * @useinstead CreateResourceManager
  */
 EXPORT_FUNC ResourceManager *GetSystemResourceManager();
 
@@ -259,6 +261,8 @@ EXPORT_FUNC ResourceManager *GetSystemResourceManager();
  * before the sandbox mount, for example appspawn.
  *
  * @return pointer of system resource manager
+ * @deprecated since 14
+ * @useinstead CreateResourceManager
  */
 EXPORT_FUNC ResourceManager *GetSystemResourceManagerNoSandBox();
 

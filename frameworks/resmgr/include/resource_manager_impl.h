@@ -16,10 +16,12 @@
 #define OHOS_RESOURCE_MANAGER_RESOURCEMANAGERIMPL_H
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 #include "hap_manager.h"
 #include "resource_manager.h"
+#include "res_config_impl.h"
 #include "utils/psue_manager.h"
 #include "theme_pack_manager.h"
 
@@ -54,6 +56,14 @@ public:
      * @param systemResourceManager the system resource manager.
      */
     void AddSystemResource(ResourceManagerImpl *systemResourceManager);
+
+    /**
+     * Add system resource to hap resource vector.
+     *
+     * @param systemResourceManager the system resource manager.
+     * @return true if AddSystemResource success, else false
+     */
+    bool AddSystemResource(const std::shared_ptr<ResourceManagerImpl> &systemResourceManager);
 
     /**
      * Add resource path to hap paths
@@ -791,13 +801,15 @@ private:
     RState GetThemeIconInfo(const std::string &iconName, size_t &len, std::unique_ptr<uint8_t[]> &outValue,
         const std::string &abilityName = "");
 
-    RState GetThemeValues(const std::string &value, std::string &outValue);
+    RState GetThemeValues(const std::string &value, std::string &outValue, const ResConfigImpl &resConfig);
 
     RState UpdateFakeLocaleFlag(ResConfig &resConfig);
 
     std::shared_ptr<HapManager> GetHapManager();
 
     std::shared_ptr<HapManager> hapManager_;
+    
+    std::shared_ptr<ResourceManagerImpl> systemResourceManager_{nullptr};
 
     float fontRatio_ = 0.0f;
 
