@@ -171,46 +171,11 @@ ani_string ResMgrAddon::getStringSync0([[maybe_unused]] ani_env* env, [[maybe_un
     return ret;
 }
 
-ani_int getArrayLength(ani_env* env, ani_object args)
-{
-    ani_class cls;
-    if (ANI_OK != env->FindClass("Lescompat/Array;", &cls)) {
-        std::cerr << "Not found 'Lescompat/Array'" << std::endl;
-        return -1;
-    }
-
-    ani_method getlength;
-    if (ANI_OK != env->Class_FindGetter(cls, "length", &getlength)) {
-        std::cerr << "Find Method Fail" << std::endl;
-        return -1;
-    }
-
-    ani_int length;
-    if (ANI_OK != env->Object_CallMethod_Int(args, getlength, &length)) {
-        std::cerr << "Object_CallMethod_Int Fail" << std::endl;
-        return -1;
-    }
-
-    return length;
-}
-
 ArrayElement getArrayElement(ani_env* env, ani_object args, int index)
 {
-    ani_class cls;
-    if (ANI_OK != env->FindClass("Lescompat/Array;", &cls)) {
-        std::cerr << "Not found 'Lescompat/Array'" << std::endl;
-        return ArrayElement{ArrayElement::ElementType::NUMBER, 0};
-    }
-
-    ani_method get;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_get", nullptr, &get)) {
-        std::cerr << "Find Method Fail" << std::endl;
-        return ArrayElement{ArrayElement::ElementType::NUMBER, 0};
-    }
-
     ani_ref value;
-    if (ANI_OK != env->Object_CallMethod_Ref(args, get, &value, index)) {
-        std::cerr << "Object_CallMethod_Ref Fail" << std::endl;
+    if (ANI_OK != env->Object_CallMethodByName_Ref(args, "$_get", "I:Lstd/core/Object;", &value, index)) {
+        std::cerr << "Object_CallMethodByName_Ref Failed" << std::endl;
         return ArrayElement{ArrayElement::ElementType::NUMBER, 0};
     }
 
@@ -239,8 +204,14 @@ ani_string ResMgrAddon::getStringSync1([[maybe_unused]] ani_env *env, [[maybe_un
     std::string str = "";
     env->String_NewUTF8(str.c_str(), str.size(), &ret);
 
-    ani_int length = getArrayLength(env, args);
-    if (length == -1) return ret;
+    ani_double length;
+    if (ANI_OK != env->Object_GetPropertyByName_Double(args, "length", &length)) {
+        std::cerr << "Object_GetPropertyByName_Double length Failed" << std::endl;
+        return ret;
+    }
+    if (length == -1) {
+        return ret;
+    }
 
     for (int i = 0; i < length; ++i) {
         auto param = getArrayElement(env, args, i);
@@ -303,8 +274,14 @@ ani_string ResMgrAddon::getStringSync3([[maybe_unused]] ani_env *env, [[maybe_un
     std::string str = "";
     env->String_NewUTF8(str.c_str(), str.size(), &ret);
 
-    ani_int length = getArrayLength(env, args);
-    if (length == -1) return ret;
+    ani_double length;
+    if (ANI_OK != env->Object_GetPropertyByName_Double(args, "length", &length)) {
+        std::cerr << "Object_GetPropertyByName_Double length Failed" << std::endl;
+        return ret;
+    }
+    if (length == -1) {
+        return ret;
+    }
 
     for (int i = 0; i < length; ++i) {
         auto param = getArrayElement(env, args, i);
