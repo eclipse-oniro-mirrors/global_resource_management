@@ -72,34 +72,28 @@ ani_object ResMgrAddon::WrapResourceManager(ani_env* env, std::shared_ptr<ResMgr
         return nativeResMgr;
     }
 
-    auto addonPtr = std::make_unique<std::shared_ptr<ResMgrAddon>>(addon);
-    if (ANI_OK != env->Object_New(cls, ctor, &nativeResMgr, reinterpret_cast<ani_long>(addonPtr.get()))) {
+    if (ANI_OK != env->Object_New(cls, ctor, &nativeResMgr, reinterpret_cast<ani_long>(addon->GetResMgr().get()))) {
         std::cerr << "Create Object Failed'" << className << "'" << std::endl;
         return nativeResMgr;
     }
-
-    addonPtr.release();
     return nativeResMgr;
 }
 
-static std::string AniStrToString(ani_env* env, ani_ref aniStr)
+static std::string AniStrToString(ani_env *env, ani_ref aniStr)
 {
-    ani_string str = reinterpret_cast<ani_string>(aniStr);
-    if (str == nullptr) {
-        return "";
-    }
-    ani_status status = ANI_ERROR;
-    ani_size substrSize = -1;
-    if ((status = env->String_GetUTF8Size(str, &substrSize)) != ANI_OK) {
-        return "";
-    }
-    std::vector<char> buffer(substrSize + 1);
-    ani_size nameSize;
-    if ((status = env->String_GetUTF8SubString(str, 0U, substrSize, buffer.data(), buffer.size(), &nameSize)) !=
-        ANI_OK) {
-        return "";
-    }
-    return std::string(buffer.data(), nameSize);
+    ani_string ani_str = static_cast<ani_string>(aniStr);
+    ani_size strSize;
+    env->String_GetUTF8Size(ani_str, &strSize);
+   
+    std::vector<char> buffer(strSize + 1);
+    char* utf8Buffer = buffer.data();
+
+    ani_size bytes_written = 0;
+    env->String_GetUTF8(ani_str, utf8Buffer, strSize + 1, &bytes_written);
+
+    utf8Buffer[bytes_written] = '\0';
+    std::string content = std::string(utf8Buffer);
+    return content;
 }
 
 static ResourceManagerImpl* unwrapAddon(ani_env* env, ani_object object)
@@ -177,46 +171,11 @@ ani_string ResMgrAddon::getStringSync0([[maybe_unused]] ani_env* env, [[maybe_un
     return ret;
 }
 
-ani_int getArrayLength(ani_env* env, ani_object args)
-{
-    ani_class cls;
-    if (ANI_OK != env->FindClass("Lescompat/Array;", &cls)) {
-        std::cerr << "Not found 'Lescompat/Array'" << std::endl;
-        return -1;
-    }
-
-    ani_method getlength;
-    if (ANI_OK != env->Class_FindGetter(cls, "length", &getlength)) {
-        std::cerr << "Find Method Fail" << std::endl;
-        return -1;
-    }
-
-    ani_int length;
-    if (ANI_OK != env->Object_CallMethod_Int(args, getlength, &length)) {
-        std::cerr << "Object_CallMethod_Int Fail" << std::endl;
-        return -1;
-    }
-
-    return length;
-}
-
 ArrayElement getArrayElement(ani_env* env, ani_object args, int index)
 {
-    ani_class cls;
-    if (ANI_OK != env->FindClass("Lescompat/Array;", &cls)) {
-        std::cerr << "Not found 'Lescompat/Array'" << std::endl;
-        return ArrayElement{ArrayElement::ElementType::NUMBER, 0};
-    }
-
-    ani_method get;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_get", nullptr, &get)) {
-        std::cerr << "Find Method Fail" << std::endl;
-        return ArrayElement{ArrayElement::ElementType::NUMBER, 0};
-    }
-
     ani_ref value;
-    if (ANI_OK != env->Object_CallMethod_Ref(args, get, &value, index)) {
-        std::cerr << "Object_CallMethod_Ref Fail" << std::endl;
+    if (ANI_OK != env->Object_CallMethodByName_Ref(args, "$_get", "I:Lstd/core/Object;", &value, index)) {
+        std::cerr << "Object_CallMethodByName_Ref Failed" << std::endl;
         return ArrayElement{ArrayElement::ElementType::NUMBER, 0};
     }
 
@@ -224,16 +183,13 @@ ArrayElement getArrayElement(ani_env* env, ani_object args, int index)
     env->FindClass("Lstd/core/String;", &stringClass);
 
     ani_boolean isString;
-    env->Object_InstanceOf(reinterpret_cast<ani_object>(value), stringClass, &isString);
+    env->Object_InstanceOf(static_cast<ani_object>(value), stringClass, &isString);
 
     if (isString) {
         return ArrayElement{ArrayElement::ElementType::STRING, AniStrToString(env, value)};
     } else {
         ani_double param;
-        if (ANI_OK != env->Object_CallMethod_Double(args, get, &param, index)) {
-            std::cerr << "Object_CallMethod_Double Fail" << std::endl;
-            return ArrayElement{ArrayElement::ElementType::NUMBER, 0};
-        }
+        env->Object_CallMethodByName_Double(static_cast<ani_object>(value), "unboxed", ":D", &param);
         return ArrayElement{ArrayElement::ElementType::NUMBER, param};
     }
 }
@@ -248,8 +204,14 @@ ani_string ResMgrAddon::getStringSync1([[maybe_unused]] ani_env *env, [[maybe_un
     std::string str = "";
     env->String_NewUTF8(str.c_str(), str.size(), &ret);
 
-    ani_int length = getArrayLength(env, args);
-    if (length == -1) return ret;
+    ani_double length;
+    if (ANI_OK != env->Object_GetPropertyByName_Double(args, "length", &length)) {
+        std::cerr << "Object_GetPropertyByName_Double length Failed" << std::endl;
+        return ret;
+    }
+    if (length == -1) {
+        return ret;
+    }
 
     for (int i = 0; i < length; ++i) {
         auto param = getArrayElement(env, args, i);
@@ -312,8 +274,14 @@ ani_string ResMgrAddon::getStringSync3([[maybe_unused]] ani_env *env, [[maybe_un
     std::string str = "";
     env->String_NewUTF8(str.c_str(), str.size(), &ret);
 
-    ani_int length = getArrayLength(env, args);
-    if (length == -1) return ret;
+    ani_double length;
+    if (ANI_OK != env->Object_GetPropertyByName_Double(args, "length", &length)) {
+        std::cerr << "Object_GetPropertyByName_Double length Failed" << std::endl;
+        return ret;
+    }
+    if (length == -1) {
+        return ret;
+    }
 
     for (int i = 0; i < length; ++i) {
         auto param = getArrayElement(env, args, i);
@@ -464,7 +432,7 @@ ani_object createUint8Array(ani_env* env, ani_object buffer)
     return ret;
 }
 
-bool copyDataToArrayBuffer(ani_env* env, ani_object buffer, uint8_t* data)
+bool copyDataToArrayBuffer(ani_env* env, ani_object buffer, uint8_t* data, ani_ref &arrayBuffer)
 {
     static const char *className = "Lescompat/ArrayBuffer;";
     ani_class cls;
@@ -479,7 +447,7 @@ bool copyDataToArrayBuffer(ani_env* env, ani_object buffer, uint8_t* data)
         return false;
     }
 
-    if (ANI_OK != env->Object_CallMethod_Ref(buffer, from, reinterpret_cast<ani_ref*>(&buffer), &data)) {
+    if (ANI_OK != env->Object_CallMethod_Ref(buffer, from, &arrayBuffer, &data)) {
         std::cerr << "Object_CallMethod_Long Fail" << std::endl;
         return false;
     }
@@ -510,12 +478,13 @@ ani_object ResMgrAddon::getRawFileContentSync([[maybe_unused]] ani_env* env, [[m
         return createEmptyUint8Array(env);
     }
 
-    if (!copyDataToArrayBuffer(env, buffer, data)) {
+    ani_ref arrayBuffer;
+    if (!copyDataToArrayBuffer(env, buffer, data, arrayBuffer)) {
         delete[] data;
         return createEmptyUint8Array(env);
     }
 
-    ani_object obj = createUint8Array(env, buffer);
+    ani_object obj = createUint8Array(env, static_cast<ani_object>(arrayBuffer));
     delete[] data;
     return obj;
 }
