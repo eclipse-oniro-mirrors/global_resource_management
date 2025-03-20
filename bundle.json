@@ -144,6 +144,13 @@
                   ]
                 },
                 "name": "//base/global/resource_management/frameworks/resmgr:librawfile"
+              },
+              {
+                "header": {
+                  "header_base": "//base/global/resource_management/interfaces/cj/src",
+                  "header_files": []
+                },
+                "name": "//base/global/resource_management/interfaces/cj:cj_resource_manager_ffi"
               }
             ],
             "test": [
