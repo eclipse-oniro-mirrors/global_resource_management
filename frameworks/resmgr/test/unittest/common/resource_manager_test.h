@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -140,6 +140,8 @@ int GetSystemResourceManagerTest001(void);
 int CloseRawFileDescriptorTest001(void);
 int CloseRawFileDescriptorTest002(void);
 int CloseRawFileDescriptorTest003(void);
+int AddSystemResourceTest001(void);
+int AddSystemResourceTest002(void);
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

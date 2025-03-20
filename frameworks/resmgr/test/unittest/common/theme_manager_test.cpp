@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -795,6 +795,32 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestIsSameResourceByUserIdTest001, TestSi
     userId = 101;
     result = tm->IsSameResourceByUserId(path, userId);
     EXPECT_TRUE(result == false);
+}
+
+/*
+ * @tc.name: ThemeManagerTestIsSameResourceByUserIdTest002
+ * @tc.desc: Test IsSameResourceByUserId function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestIsSameResourceByUserIdTest002, TestSize.Level1)
+{
+    std::string path("/data/service/el1/public/themes/100");
+    int32_t userId = 100;
+    bool result = tm->IsSameResourceByUserId(path, userId);
+    EXPECT_TRUE(result);
+}
+
+/*
+ * @tc.name: ThemeManagerTestIsSameResourceByUserIdTest003
+ * @tc.desc: Test IsSameResourceByUserId function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestIsSameResourceByUserIdTest003, TestSize.Level1)
+{
+    std::string path("/data/service/el1/public/themes/abc/");
+    int32_t userId = 100;
+    bool result = tm->IsSameResourceByUserId(path, userId);
+    EXPECT_TRUE(result);
 }
 
 /*

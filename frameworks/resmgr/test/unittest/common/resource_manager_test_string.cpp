@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -143,6 +143,21 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByIdTest005, TestSiz
     bool ret = ((ResourceManagerImpl*)rm)->AddResource(FormatFullPath(g_resFilePath).c_str(), overlayPaths);
     ASSERT_TRUE(ret);
     rmc->TestStringById("ohos_lab_answer_call", "overlay接听电话");
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByIdTest006
+ * @tc.desc: Test GetStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByIdTest006, TestSize.Level1)
+{
+    rmc->AddHapResource("zh", nullptr, "CN");
+    int id = rmc->GetResId("icon1", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    std::string outValue;
+    RState state = rm->GetStringById(id, outValue);
+    EXPECT_EQ(state, ERROR_CODE_RES_NOT_FOUND_BY_ID);
 }
 
 /*
@@ -1066,6 +1081,21 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringArrayByIdTest002, Te
     std::vector<std::string> outValue;
     state = rm->GetStringArrayById(NON_EXIST_ID, outValue);
     ASSERT_EQ(ERROR_CODE_RES_ID_NOT_FOUND, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringArrayByIdTest003
+ * @tc.desc: Test GetStringArrayById function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringArrayByIdTest003, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    int id = rmc->GetResId("app_name", ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::vector<std::string> outValue;
+    RState state = rm->GetStringArrayById(id, outValue);
+    ASSERT_EQ(ERROR_CODE_RES_NOT_FOUND_BY_ID, state);
 }
 
 /*

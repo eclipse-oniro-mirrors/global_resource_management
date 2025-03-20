@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -581,6 +581,21 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigByIdTest008, TestSize.L
 }
 
 /*
+ * @tc.name: ResourceManagerGetResConfigByIdTest009
+ * @tc.desc: Test GetResConfigById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigByIdTest009, TestSize.Level1)
+{
+    rm->AddResource(FormatFullPath(g_hapPath).c_str());
+
+    int id = rmc->GetResId("app_name", ResType::STRING);
+    ResConfigImpl resCfg;
+    RState state = rm->GetResConfigById(id, resCfg, 1000);
+    EXPECT_EQ(ERROR_CODE_INVALID_INPUT_PARAMETER, state);
+}
+
+/*
  * @tc.name: ResourceManagerGetResConfigByNameTest001
  * @tc.desc: Test GetResConfigByName function
  * @tc.type: FUNC
@@ -779,6 +794,33 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigByNameTest008, TestSize
 }
 
 /*
+ * @tc.name: ResourceManagerGetResConfigByNameTest009
+ * @tc.desc: Test GetResConfigByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigByNameTest009, TestSize.Level1)
+{
+    rm->AddResource(FormatFullPath(g_hapPath).c_str());
+
+    ResConfigImpl resCfg;
+    RState state = rm->GetResConfigByName("app_name", ResType::STRING, resCfg, 1000);
+    EXPECT_EQ(ERROR_CODE_INVALID_INPUT_PARAMETER, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetResourcePathsTest001
+ * @tc.desc: Test GetResourcePaths function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResourcePathsTest001, TestSize.Level1)
+{
+    rm->AddResource(FormatFullPath(g_hapPath).c_str());
+
+    std::vector<std::string> resourcePaths = ((ResourceManagerImpl *)rm)->GetResourcePaths();
+    EXPECT_TRUE(resourcePaths.size() > 0);
+}
+
+/*
  * @tc.name: ResourceManagerGetPatternByIdTest001
  * @tc.desc: Test GetPatternById function, file case.
  * @tc.type: FUNC
@@ -848,6 +890,21 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPatternByIdTest004, TestSize.Lev
 }
 
 /*
+ * @tc.name: ResourceManagerGetPatternByIdTest005
+ * @tc.desc: Test GetPatternById function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetPatternByIdTest005, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, nullptr);
+    int id = rmc->GetResId("app_name", ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::map<std::string, std::string> outValue;
+    RState state = rm->GetPatternById(id, outValue);
+    ASSERT_EQ(ERROR_CODE_RES_NOT_FOUND_BY_ID, state);
+}
+
+/*
  * @tc.name: ResourceManagerGetPatternByNameTest001
  * @tc.desc: Test GetPatternByName function, file case.
  * @tc.type: FUNC
@@ -913,6 +970,49 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetPatternByNameTest004, TestSize.L
 }
 
 /*
+ * @tc.name: ResourceManagerGetPatternDataByIdTest001
+ * @tc.desc: Test GetPatternDataById function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetPatternDataByIdTest001, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, nullptr);
+
+    std::map<std::string, ResourceManager::ResData> outValue;
+    RState state = rm->GetPatternDataById(NON_EXIST_ID, outValue);
+    ASSERT_EQ(ERROR_CODE_RES_ID_NOT_FOUND, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetPatternDataByIdTest002
+ * @tc.desc: Test GetPatternDataById function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetPatternDataByIdTest002, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, nullptr);
+    int id = rmc->GetResId("app_name", ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::map<std::string, ResourceManager::ResData> outValue;
+    RState state = rm->GetPatternDataById(id, outValue);
+    ASSERT_EQ(ERROR_CODE_RES_NOT_FOUND_BY_ID, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetPatternDataByNameTest001
+ * @tc.desc: Test GetPatternDataByName function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetPatternDataByNameTest001, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, nullptr);
+
+    std::map<std::string, ResourceManager::ResData> outValue;
+    RState state = rm->GetPatternDataByName(g_nonExistName, outValue);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_NOT_FOUND, state);
+}
+
+/*
  * @tc.name: ResourceManagerGetThemeByIdTest001
  * @tc.desc: Test GetThemeById
  * @tc.type: FUNC
@@ -937,6 +1037,53 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetThemeByIdTest002, TestSize.Level
     RState state;
     state = rm->GetThemeById(NON_EXIST_ID, outValue);
     ASSERT_EQ(ERROR_CODE_RES_ID_NOT_FOUND, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetThemeByIdTest003
+ * @tc.desc: Test GetThemeById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetThemeByIdTest003, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    int id = rmc->GetResId("app_name", ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::map<std::string, std::string> outValue;
+    RState state;
+    state = rm->GetThemeById(id, outValue);
+    ASSERT_EQ(ERROR_CODE_RES_NOT_FOUND_BY_ID, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetThemeDataByIdTest001
+ * @tc.desc: Test GetThemeDataById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetThemeDataByIdTest001, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    std::map<std::string, ResourceManager::ResData> outValue;
+    RState state;
+    state = rm->GetThemeDataById(NON_EXIST_ID, outValue);
+    ASSERT_EQ(ERROR_CODE_RES_ID_NOT_FOUND, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetThemeDataByIdTest002
+ * @tc.desc: Test GetThemeDataById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetThemeDataByIdTest002, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    int id = rmc->GetResId("app_name", ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::map<std::string, ResourceManager::ResData> outValue;
+    RState state;
+    state = rm->GetThemeDataById(id, outValue);
+    ASSERT_EQ(ERROR_CODE_RES_NOT_FOUND_BY_ID, state);
 }
 
 /*
@@ -967,6 +1114,34 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetThemeByNameTest002, TestSize.Lev
 }
 
 /*
+ * @tc.name: ResourceManagerGetThemeDataByNameTest001
+ * @tc.desc: Test GetThemeDataByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetThemeDataByNameTest001, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    std::map<std::string, ResourceManager::ResData> outValue;
+    RState state;
+    state = rm->GetThemeDataByName(g_nonExistName, outValue);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_NOT_FOUND, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetThemeDataTest001
+ * @tc.desc: Test GetThemeData
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetThemeDataTest001, TestSize.Level1)
+{
+    std::map<std::string, ResourceManager::ResData> outValue;
+    std::shared_ptr<IdItem> idItem = std::make_shared<IdItem>();
+    RState state = ((ResourceManagerImpl *)rm)->GetThemeData(idItem, outValue);
+    ASSERT_EQ(NOT_FOUND, state);
+}
+
+/*
  * @tc.name: ResourceManagerGetBooleanByIdTest001
  * @tc.desc: Test GetBooleanById
  * @tc.type: FUNC
@@ -991,6 +1166,22 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByIdTest002, TestSize.Lev
     RState state;
     state = rm->GetBooleanById(NON_EXIST_ID, outValue);
     ASSERT_EQ(ERROR_CODE_RES_ID_NOT_FOUND, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetBooleanByIdTest002
+ * @tc.desc: Test GetBooleanById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByIdTest003, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    int id = rmc->GetResId("app_name", ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    bool outValue = true;
+    RState state;
+    state = rm->GetBooleanById(id, outValue);
+    ASSERT_EQ(ERROR_CODE_RES_NOT_FOUND_BY_ID, state);
 }
 
 /*
@@ -1048,6 +1239,22 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByIdTest002, TestSize.Lev
 }
 
 /*
+ * @tc.name: ResourceManagerGetIntegerByIdTest003
+ * @tc.desc: Test GetIntegerById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByIdTest003, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    int id = rmc->GetResId("app_name", ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    int outValue;
+    RState state;
+    state = rm->GetIntegerById(id, outValue);
+    ASSERT_EQ(ERROR_CODE_RES_NOT_FOUND_BY_ID, state);
+}
+
+/*
  * @tc.name: ResourceManagerGetIntegerByNameTest001
  * @tc.desc: Test GetIntegerByName
  * @tc.type: FUNC
@@ -1099,6 +1306,85 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetFloatByIdTest002, TestSize.Level
     RState state;
     state = rm->GetFloatById(NON_EXIST_ID, outValue);
     ASSERT_EQ(ERROR_CODE_RES_ID_NOT_FOUND, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetFloatByIdTest003
+ * @tc.desc: Test GetFloatById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetFloatByIdTest003, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    int id = rmc->GetResId("app_name", ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    float outValue;
+    RState state;
+    state = rm->GetFloatById(id, outValue);
+    ASSERT_EQ(ERROR_CODE_RES_NOT_FOUND_BY_ID, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetFloatByIdTest004
+ * @tc.desc: Test GetFloatById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetFloatByIdTest004, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    float outValue;
+    std::string unit;
+    RState state;
+    state = rm->GetFloatById(NON_EXIST_ID, outValue, unit);
+    ASSERT_EQ(ERROR_CODE_RES_ID_NOT_FOUND, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetFloatByIdTest005
+ * @tc.desc: Test GetFloatById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetFloatByIdTest005, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    int id = rmc->GetResId("app_name", ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    float outValue;
+    std::string unit;
+    RState state;
+    state = rm->GetFloatById(id, outValue, unit);
+    ASSERT_EQ(ERROR_CODE_RES_NOT_FOUND_BY_ID, state);
+}
+
+/*
+ * @tc.name: ResourceManagerRecalculateFloatTest001
+ * @tc.desc: Test RecalculateFloat
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerRecalculateFloatTest001, TestSize.Level1)
+{
+    rmc->AddColorModeResource(DEVICE_PHONE, LIGHT, 3.25);
+    float outValue = 20.0;
+    std::string unit = "vp";
+    RState state = ((ResourceManagerImpl *)rm)->RecalculateFloat(unit, outValue);
+    ASSERT_EQ(SUCCESS, state);
+    ASSERT_EQ(outValue, 20.0 * 3.25f);
+}
+
+/*
+ * @tc.name: ResourceManagerRecalculateFloatTest002
+ * @tc.desc: Test RecalculateFloat
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerRecalculateFloatTest002, TestSize.Level1)
+{
+    rmc->AddColorModeResource(DEVICE_PHONE, LIGHT, 3.25);
+    float outValue = 20.0;
+    std::string unit = "fp";
+    RState state = ((ResourceManagerImpl *)rm)->RecalculateFloat(unit, outValue);
+    ASSERT_EQ(SUCCESS, state);
+    ASSERT_EQ(outValue, 20.0 * 3.25f);
 }
 
 /*
@@ -1219,6 +1505,22 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByIdTest002, TestSize.Level
     RState state;
     state = rm->GetColorById(NON_EXIST_ID, outValue);
     ASSERT_EQ(ERROR_CODE_RES_ID_NOT_FOUND, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetColorByIdTest003
+ * @tc.desc: Test GetColorById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetColorByIdTest003, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    int id = rmc->GetResId("app_name", ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    uint32_t outValue;
+    RState state;
+    state = rm->GetColorById(id, outValue);
+    ASSERT_EQ(ERROR_CODE_RES_NOT_FOUND_BY_ID, state);
 }
 
 /*
@@ -2647,5 +2949,100 @@ HWTEST_F(ResourceManagerTest, CloseRawFileDescriptorTest003, TestSize.Level1)
     EXPECT_EQ(ERROR_CODE_RES_PATH_INVALID, state);
 
     close(fd);
+}
+
+/*
+ * @tc.name: AddSystemResourceTest001
+ * @tc.desc: Test AddSystemResource function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, AddSystemResourceTest001, TestSize.Level1)
+{
+    std::shared_ptr<ResourceManagerImpl> sysMgr = nullptr;
+    bool result = ((ResourceManagerImpl *)rm)->AddSystemResource(sysMgr);
+    EXPECT_FALSE(result);
+}
+
+/*
+ * @tc.name: AddSystemResourceTest002
+ * @tc.desc: Test AddSystemResource function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, AddSystemResourceTest002, TestSize.Level1)
+{
+    ResourceManagerImpl* sysMgr = SystemResourceManager::GetSystemResourceManager();
+    ((ResourceManagerImpl *)rm)->AddSystemResource(sysMgr);
+    uint32_t outValue;
+    RState state = rm->GetColorById(125831026, outValue);
+    EXPECT_EQ(state, SUCCESS);
+    SystemResourceManager::ReleaseSystemResourceManager();
+}
+
+/*
+ * @tc.name: GetMediaBase64DataByNameTest001
+ * @tc.desc: Test GetMediaBase64DataByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, GetMediaBase64DataByNameTest001, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaBase64DataByName("app_name", outValue);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_NOT_FOUND, state);
+}
+
+/*
+ * @tc.name: GetProfileDataByIdTest001
+ * @tc.desc: Test GetProfileDataById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, GetProfileDataByIdTest001, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    size_t len;
+    std::unique_ptr<uint8_t[]> outValue;
+    RState state = rm->GetProfileDataById(NON_EXIST_ID, len, outValue);
+    ASSERT_EQ(ERROR_CODE_RES_NOT_FOUND_BY_ID, state);
+}
+
+/*
+ * @tc.name: GetDrawableInfoByIdTest001
+ * @tc.desc: Test GetDrawableInfoById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, GetDrawableInfoByIdTest001, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    std::tuple<std::string, size_t, std::string> drawableInfo;
+    std::unique_ptr<uint8_t[]> outValue;
+    RState state = rm->GetDrawableInfoById(NON_EXIST_ID, drawableInfo, outValue, 0, 1000);
+    ASSERT_EQ(ERROR_CODE_INVALID_INPUT_PARAMETER, state);
+}
+
+/*
+ * @tc.name: GetDrawableInfoByNameTest001
+ * @tc.desc: Test GetDrawableInfoByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, GetDrawableInfoByNameTest001, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    std::tuple<std::string, size_t, std::string> drawableInfo;
+    std::unique_ptr<uint8_t[]> outValue;
+    RState state = rm->GetDrawableInfoByName("app_name", drawableInfo, outValue, 0, 1000);
+    ASSERT_EQ(ERROR_CODE_INVALID_INPUT_PARAMETER, state);
+}
+
+/*
+ * @tc.name: ResourceManagerInitTest001
+ * @tc.desc: Test Init function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerInitTest001, TestSize.Level1)
+{
+    std::shared_ptr<HapManager> hapManager = nullptr;
+    bool result = ((ResourceManagerImpl *)rm)->Init(hapManager);
+    EXPECT_FALSE(result);
 }
 }

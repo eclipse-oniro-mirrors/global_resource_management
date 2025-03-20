@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -60,4 +60,15 @@ HWTEST_F(PsueManagerTest, TestConvertFunc001, TestSize.Level1)
     EXPECT_EQ(psueManager->Convert("abc {test} %dabc", outValue), "");
 }
 
-}  // namespace
+/*
+ * @tc.name: TestGetExtendRatio001
+ * @tc.desc: Test GetExtendRatio function
+ * @tc.type: FUNC
+ */
+HWTEST_F(PsueManagerTest, TestGetExtendRatio001, TestSize.Level1)
+{
+    int32_t len = 1000;
+    float result = psueManager->GetExtendRatio(len);
+    EXPECT_EQ(0.3f, result);
+}
+}  // namespace
