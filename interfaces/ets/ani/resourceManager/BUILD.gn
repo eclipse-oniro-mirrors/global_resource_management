@@ -55,7 +55,10 @@ generate_static_abc("resourceManager") {
 
 generate_static_abc("resource") {
   base_url = "./ets"
-  files = [ "./ets/global/resource.ets" ]
+  files = [
+    "./ets/global/resource.ets",
+    "./ets/global/resourceInner.ets",
+  ]
   is_boot_abc = "True"
   device_dst_file = "system/framework/resource.abc"
 }
@@ -89,4 +92,11 @@ ohos_prebuilt_etc("rawFileDescriptor_etc") {
   part_name = "resource_management"
   subsystem_name = "global"
   deps = [ ":rawFileDescriptor" ]
+}
+
+ohos_copy("copy_resourceManager_ets") {
+  sources = [ "./ets/global/resourceInner.ets" ]
+  outputs = [ "$ohos_ets_inner_path/global/resourceInner.ets" ]
+  subsystem_name = "global"
+  part_name = "resource_management"
 }

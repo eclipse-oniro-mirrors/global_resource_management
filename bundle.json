@@ -156,6 +156,9 @@
                   ]
                 },
                 "name": "//base/global/resource_management/interfaces/ets/ani/resourceManager:resourceManager_ani"
+              },
+              {
+                "name": "//base/global/resource_management/interfaces/ets/ani/resourceManager:copy_resourceManager_ets"
               }
             ],
             "test": [
