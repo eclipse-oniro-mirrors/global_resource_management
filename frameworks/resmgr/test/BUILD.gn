@@ -38,6 +38,7 @@ ohos_unittest("resmgr_test") {
     "unittest/common/test_common.cpp",
     "unittest/common/theme_config_test.cpp",
     "unittest/common/theme_manager_test.cpp",
+    "unittest/common/theme_resource_test.cpp",
     "unittest/utils/psue_manaer_test.cpp",
     "unittest/utils/utils_test.cpp",
   ]
