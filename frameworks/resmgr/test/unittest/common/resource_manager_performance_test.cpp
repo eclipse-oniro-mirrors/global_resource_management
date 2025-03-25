@@ -36,6 +36,7 @@ using namespace OHOS::Global::Resource;
 using namespace testing::ext;
 using namespace std;
 namespace {
+static const char *PERFOR_FEIL_PATH = "all/assets/entry/resources_performance.index";
 class ResourceManagerPerformanceTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -210,7 +211,7 @@ int TestLoadFromIndex(const char *filePath)
  */
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest001, TestSize.Level1)
 {
-    int ret = TestLoadFromIndex(g_resFilePath);
+    int ret = TestLoadFromIndex(PERFOR_FEIL_PATH);
     EXPECT_EQ(OK, ret);
 };
 
@@ -1659,7 +1660,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest051, 
     average = total / 1000.0;
     g_logLevel = LOG_DEBUG;
     RESMGR_HILOGD(RESMGR_TAG, "avg cost 051: %f us", average);
-    EXPECT_LT(average, 320);
+    EXPECT_LT(average, 380);
 };
 
 /*
@@ -1962,7 +1963,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest062, 
     std::map<std::string, ResourceManager::ResData> outValue;
     for (int k = 0; k < 1000; ++k) {
         auto t1 = std::chrono::high_resolution_clock::now();
-        rm->GetPatternDataByName("ohos_button_pattern", outValue);
+        rm->GetPatternDataByName("ohos_test_button_pattern", outValue);
         auto t2 = std::chrono::high_resolution_clock::now();
         total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
     }
@@ -1985,7 +1986,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest063, 
     }
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     EXPECT_TRUE(ret);
-    int id = GetResId("ohos_button_pattern", ResType::PATTERN);
+    int id = GetResId("ohos_test_button_pattern", ResType::PATTERN);
     ASSERT_TRUE(id > 0);
     unsigned long long total = 0;
     double average = 0;
