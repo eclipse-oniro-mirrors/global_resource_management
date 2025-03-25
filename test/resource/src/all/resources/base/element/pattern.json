@@ -67,7 +67,7 @@
       ]
     },
     {
-      "name": "ohos_button_pattern",
+      "name": "ohos_test_button_pattern",
       "parent": "base_button_pattern",
       "value": [
         {
