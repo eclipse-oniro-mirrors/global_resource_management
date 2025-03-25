@@ -366,28 +366,6 @@ ani_double ResMgrAddon::getColorSync1([[maybe_unused]] ani_env* env, [[maybe_unu
     return dataContext->colorValue_;
 }
 
-ani_object createArrayBuffer(ani_env* env, ani_int length)
-{
-    ani_object buffer = {};
-    static const char *className = "Lescompat/ArrayBuffer;";
-    ani_class cls;
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        std::cerr << "Not found '" << className << "'" << std::endl;
-        return buffer;
-    }
-
-    ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
-        std::cerr << "get ctor Failed'" << className << "'" << std::endl;
-        return buffer;
-    }
-
-    if (ANI_OK != env->Object_New(cls, ctor, &buffer, length)) {
-        std::cerr << "Create Object Failed'" << className << "'" << std::endl;
-    }
-    return buffer;
-}
-
 ani_object createEmptyUint8Array(ani_env* env)
 {
     ani_object ret = {};
@@ -399,18 +377,18 @@ ani_object createEmptyUint8Array(ani_env* env)
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":V", &ctor)) {
         std::cerr << "get ctor Failed'" << className << "'" << std::endl;
         return ret;
     }
 
-    if (ANI_OK != env->Object_New(cls, ctor, &ret, 0)) {
+    if (ANI_OK != env->Object_New(cls, ctor, &ret)) {
         std::cerr << "Create Object Failed'" << className << "'" << std::endl;
     }
     return ret;
 }
 
-ani_object createUint8Array(ani_env* env, ani_object buffer)
+ani_object createUint8Array(ani_env* env, ani_array data)
 {
     ani_object ret = {};
     static const char *className = "Lescompat/Uint8Array;";
@@ -421,37 +399,15 @@ ani_object createUint8Array(ani_env* env, ani_object buffer)
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "[I:V", &ctor)) {
         std::cerr << "get ctor Failed'" << className << "'" << std::endl;
         return ret;
     }
 
-    if (ANI_OK != env->Object_New(cls, ctor, &ret, buffer)) {
+    if (ANI_OK != env->Object_New(cls, ctor, &ret, data)) {
         std::cerr << "Create Object Failed'" << className << "'" << std::endl;
     }
     return ret;
-}
-
-bool copyDataToArrayBuffer(ani_env* env, ani_object buffer, uint8_t* data, ani_ref &arrayBuffer)
-{
-    static const char *className = "Lescompat/ArrayBuffer;";
-    ani_class cls;
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        std::cerr << "Not found '" << className << "'" << std::endl;
-        return false;
-    }
-
-    ani_method from;
-    if (ANI_OK != env->Class_FindMethod(cls, "from", nullptr, &from)) {
-        std::cerr << "Find Method Fail" << "'" << std::endl;
-        return false;
-    }
-
-    if (ANI_OK != env->Object_CallMethod_Ref(buffer, from, &arrayBuffer, &data)) {
-        std::cerr << "Object_CallMethod_Long Fail" << std::endl;
-        return false;
-    }
-    return true;
 }
 
 ani_object ResMgrAddon::getRawFileContentSync([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object,
@@ -467,24 +423,31 @@ ani_object ResMgrAddon::getRawFileContentSync([[maybe_unused]] ani_env* env, [[m
         return createEmptyUint8Array(env);
     }
 
-    uint8_t* data = new uint8_t[dataContext->len_];
+    size_t length = dataContext->len_;
+    uint8_t* data = new uint8_t[length];
     uint8_t *tempData = dataContext->mediaData.release();
-    std::copy(tempData, tempData + dataContext->len_, data);
+    std::copy(tempData, tempData + length, data);
     delete[] tempData;
 
-    ani_object buffer = createArrayBuffer(env, dataContext->len_);
-    if (!buffer) {
+    ani_array_int datas;
+    if (env->Array_New_Int(length, &datas) != ANI_OK) {
+        std::cerr << "Array_New_Int Fail" << std::endl;
         delete[] data;
         return createEmptyUint8Array(env);
     }
 
-    ani_ref arrayBuffer;
-    if (!copyDataToArrayBuffer(env, buffer, data, arrayBuffer)) {
+    int* intData = new int[length];
+    for (size_t i = 0; i < length; ++i) {
+        intData[i] = static_cast<int>(data[i]);
+    }
+
+    if (env->Array_SetRegion_Int(datas, 0, length, intData) != ANI_OK) {
+        std::cerr << "Array_SetRegion_Int Fail" << std::endl;
         delete[] data;
         return createEmptyUint8Array(env);
     }
 
-    ani_object obj = createUint8Array(env, static_cast<ani_object>(arrayBuffer));
+    ani_object obj = createUint8Array(env, datas);
     delete[] data;
     return obj;
 }
@@ -544,7 +507,7 @@ ani_object ResMgrAddon::create([[maybe_unused]] ani_env* env, [[maybe_unused]] a
     }
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "J:V", &ctor)) {
-        std::cerr << "Not found '" << "ctor" << "'" << std::endl;
+        std::cerr << "get ctor Failed'" << className << "'" << std::endl;
         ani_object nullobj = nullptr;
         return nullobj;
     }
