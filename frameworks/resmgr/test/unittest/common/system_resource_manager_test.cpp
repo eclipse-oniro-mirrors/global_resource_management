@@ -49,6 +49,12 @@ TEST_F(SystemResourceManagerTest, CreateSystemResourceTest)
     EXPECT_EQ(SystemResourceManager::weakResourceManager_.use_count(), 0);
 }
 
+TEST_F(SystemResourceManagerTest, CreateSystemResourceTest002)
+{
+    std::shared_ptr<SystemResourceManager> sysResMgr = std::make_shared<SystemResourceManager>();
+    EXPECT_TRUE(sysResMgr != nullptr);
+}
+
 TEST_F(SystemResourceManagerTest, GetSystemResourceManagerNoSandBoxTest)
 {
     {
@@ -113,5 +119,12 @@ TEST_F(SystemResourceManagerTest, SystemResourceCreateAfterGet)
     EXPECT_EQ(weakResource.use_count(), refCountTwo);
     SystemResourceManager::ReleaseSystemResourceManager();
     EXPECT_EQ(weakResource.use_count(), 0);
+}
+
+TEST_F(SystemResourceManagerTest, AddSystemResourceTest)
+{
+    ResourceManagerImpl *appResMgr = nullptr;
+    bool result = SystemResourceManager::AddSystemResource(appResMgr);
+    EXPECT_FALSE(result);
 }
 }  // namespace

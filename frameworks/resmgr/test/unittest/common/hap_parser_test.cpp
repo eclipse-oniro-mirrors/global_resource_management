@@ -437,4 +437,97 @@ HWTEST_F(HapParserTest, IsRawDirUnCompressedTest002, TestSize.Level1)
     EXPECT_EQ(state, ERROR_CODE_RES_PATH_INVALID);
     EXPECT_FALSE(outValue);
 }
+
+/*
+ * @tc.name: IsRawDirUnCompressedTest003
+ * @tc.desc: Test IsRawDirUnCompressed
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, IsRawDirUnCompressedTest003, TestSize.Level1)
+{
+    std::string pathName = "/data/test/all/assets/entry/resources/base/media";
+    bool outValue;
+    RState state = HapParser::IsRawDirUnCompressed(pathName, outValue);
+    EXPECT_EQ(state, SUCCESS);
+    EXPECT_TRUE(outValue);
+}
+
+/*
+ * @tc.name: ParseModuleNameTest001
+ * @tc.desc: Test ParseModuleName
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, ParseModuleNameTest001, TestSize.Level1)
+{
+    std::shared_ptr<OHOS::AbilityBase::Extractor> extractor = nullptr;
+    std::string result = HapParser::ParseModuleName(extractor);
+    EXPECT_EQ(result, std::string());
+}
+
+/*
+ * @tc.name: ParseModuleNameTest002
+ * @tc.desc: Test ParseModuleName
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, ParseModuleNameTest002, TestSize.Level1)
+{
+    std::shared_ptr<OHOS::AbilityBase::Extractor> extractor = std::make_shared<OHOS::AbilityBase::Extractor>("");
+    std::string result = HapParser::ParseModuleName(extractor);
+    EXPECT_EQ(result, std::string());
+}
+
+/*
+ * @tc.name: GetRawFileListTest001
+ * @tc.desc: Test GetRawFileList
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, GetRawFileListTest001, TestSize.Level1)
+{
+    std::string hapPath = "";
+    std::string rawDirPath = "";
+    std::set<std::string> fileSet;
+    RState state = HapParser::GetRawFileList(hapPath, rawDirPath, fileSet);
+    EXPECT_EQ(state, NOT_FOUND);
+}
+
+/*
+ * @tc.name: ParseResHex001
+ * @tc.desc: Test ParseResHex
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, ParseResHex001, TestSize.Level1)
+{
+    ResDesc *resDesc = new ResDesc();
+    ParserContext context = {
+        .resDesc = *resDesc,
+    };
+    int32_t state = HapParser::ParseResHex(context);
+    EXPECT_EQ(state, SYS_ERROR);
+    delete (resDesc);
+}
+
+/*
+ * @tc.name: BuildResConfig001
+ * @tc.desc: Test BuildResConfig
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, BuildResConfig001, TestSize.Level1)
+{
+    HapParser::ResConfigKey *configKey = nullptr;
+    std::shared_ptr<ResConfigImpl> resConfig = HapParser::BuildResConfig(configKey);
+    EXPECT_EQ(resConfig, nullptr);
+}
+
+/*
+ * @tc.name: BuildResConfig002
+ * @tc.desc: Test BuildResConfig
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, BuildResConfig002, TestSize.Level1)
+{
+    HapParser::ResConfigKey configKey;
+    configKey.language = std::string("abc").c_str();
+    std::shared_ptr<ResConfigImpl> resConfig = HapParser::BuildResConfig(&configKey);
+    EXPECT_TRUE(resConfig != nullptr);
+}
 }
