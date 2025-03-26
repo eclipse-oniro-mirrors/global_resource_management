@@ -498,6 +498,7 @@ HWTEST_F(HapParserTest, GetRawFileListTest001, TestSize.Level1)
 HWTEST_F(HapParserTest, ParseResHex001, TestSize.Level1)
 {
     ResDesc *resDesc = new ResDesc();
+    ASSERT_TRUE(resDesc != nullptr);
     ParserContext context = {
         .resDesc = *resDesc,
     };
