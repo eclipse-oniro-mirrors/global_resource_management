@@ -36,6 +36,7 @@ using namespace OHOS::Global::Resource;
 using namespace testing::ext;
 using namespace std;
 namespace {
+static const char *PERFOR_FEIL_PATH = "all/assets/entry/resources_performance.index";
 class ResourceManagerPerformanceTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -210,7 +211,7 @@ int TestLoadFromIndex(const char *filePath)
  */
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest001, TestSize.Level1)
 {
-    int ret = TestLoadFromIndex(g_resFilePath);
+    int ret = TestLoadFromIndex(PERFOR_FEIL_PATH);
     EXPECT_EQ(OK, ret);
 };
 

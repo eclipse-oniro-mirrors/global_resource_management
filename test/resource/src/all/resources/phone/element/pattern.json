@@ -2,7 +2,7 @@
     "pattern":[
       {
         "name":"ohos_phone_button_pattern",
-        "parent": "ohos_button_pattern",
+        "parent": "ohos_test_button_pattern",
         "value":[
           {
             "name":"width",

@@ -457,7 +457,7 @@
 			"id":	"0x01000071"
 		}, {
 			"type":	"pattern",
-			"name":	"ohos_button_pattern",
+			"name":	"ohos_test_button_pattern",
 			"id":	"0x01000072"
 		}, {
 			"type":	"pattern",
