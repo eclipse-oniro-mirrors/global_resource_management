@@ -354,11 +354,10 @@ long OH_ResourceManager_GetRawFileOffset(const RawFile *rawFile)
 static bool GetRawFileDescriptorFromHap(const RawFile *rawFile, RawFileDescriptor &descriptor)
 {
     ResourceManager::RawFileDescriptor resMgrDescriptor;
-    if (rawFile->resMgr->resManager == nullptr) {
+    if (rawFile->resMgr->resManager == nullptr || rawFile->filePath == "") {
         return false;
     }
-    RState state = rawFile->resMgr->resManager->
-        GetRawFdNdkFromHap(rawFile->filePath, resMgrDescriptor);
+    RState state = rawFile->resMgr->resManager->GetRawFdNdkFromHap(rawFile->filePath, resMgrDescriptor);
     if (state != SUCCESS) {
         RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "GetRawFileDescriptorFromHap failed");
         return false;
