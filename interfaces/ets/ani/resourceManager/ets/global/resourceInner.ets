@@ -12,11 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Resource } from 'global.resource';
 
-export interface Resource {
-    bundleName: string;
-    moduleName: string;
-    id: number;
-    params?: Array<Object | undefined>;
-    type?: number;
+export class ResourceInner implements Resource {
+    bundleName: string = "";
+    moduleName: string = "";
+    id: number = 0;
+    params?: Array<Object | undefined> | undefined;
+    type?: number | undefined = 0;
 }
