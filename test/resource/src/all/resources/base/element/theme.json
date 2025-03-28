@@ -74,7 +74,7 @@
             "value":[
                 {
                     "name":"button_pattern",
-                    "value":"$pattern:ohos_button_pattern"
+                    "value":"$pattern:ohos_test_button_pattern"
                 },
                 {
                     "name":"text_pattern",
@@ -92,7 +92,7 @@
             "value":[
                 {
                     "name":"button_pattern",
-                    "value":"$pattern:ohos_button_pattern"
+                    "value":"$pattern:ohos_test_button_pattern"
                 }
             ]
         },

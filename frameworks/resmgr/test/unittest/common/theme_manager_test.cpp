@@ -275,7 +275,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest005, TestSiz
     int32_t userId = 100; // userId is 100
     tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId);
     std::map<std::string, ResourceManager::ResData> outValue;
-    rm->GetPatternDataByName("ohos_button_pattern", outValue);
+    rm->GetPatternDataByName("ohos_test_button_pattern", outValue);
     ASSERT_EQ(ResType::STRING, outValue["width"].resType);
     ASSERT_EQ(ResType::FLOAT, outValue["height"].resType);
     ASSERT_EQ(ResType::STRING, outValue["bgColor"].resType);
@@ -294,7 +294,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest005, TestSiz
     std::string rootDir = "/data/test/theme/skin/ohos.global.test.all";
     rootDirs.emplace_back(rootDir);
     tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId);
-    rm->GetPatternDataByName("ohos_button_pattern", outValue);
+    rm->GetPatternDataByName("ohos_test_button_pattern", outValue);
     ASSERT_EQ(ResType::STRING, outValue["width"].resType);
     ASSERT_EQ(ResType::FLOAT, outValue["height"].resType);
     ASSERT_EQ(ResType::STRING, outValue["bgColor"].resType);
@@ -324,7 +324,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest006, TestSiz
     std::vector<std::string> rootDirs;
     int32_t userId = 100; // userId is 100
     tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId);
-    int id = rmc->GetResId("ohos_button_pattern", ResType::PATTERN);
+    int id = rmc->GetResId("ohos_test_button_pattern", ResType::PATTERN);
     std::map<std::string, ResourceManager::ResData> outValue;
     rm->GetPatternDataById(id, outValue);
     ASSERT_EQ(ResType::STRING, outValue["width"].resType);
