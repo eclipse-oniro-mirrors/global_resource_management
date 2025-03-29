@@ -63,7 +63,8 @@
             "zlib",
             "bounds_checking_function",
             "icu",
-            "cJSON"
+            "cJSON",
+            "runtime_core"
           ]
       },
         "build": {
@@ -76,7 +77,8 @@
               "//base/global/resource_management/frameworks/resmgr:win_resmgr",
               "//base/global/resource_management/frameworks/resmgr:linux_resmgr",
               "//base/global/resource_management/frameworks/resmgr:mac_resmgr",
-              "//base/global/resource_management/frameworks/resmgr:ohresmgr"
+              "//base/global/resource_management/frameworks/resmgr:ohresmgr",
+              "//base/global/resource_management/interfaces/ets/ani:ani_package_resmgr"
             ],
             "inner_kits": [
               {
@@ -144,6 +146,19 @@
                   ]
                 },
                 "name": "//base/global/resource_management/frameworks/resmgr:librawfile"
+              },
+              {
+                "header": {
+                  "header_base": "//base/global/resource_management/interfaces/ets/ani/resourceManager/include",
+                  "header_files": [
+                    "resourceManager.h",
+                    "resourceManager_enum.h"
+                  ]
+                },
+                "name": "//base/global/resource_management/interfaces/ets/ani/resourceManager:resourceManager_ani"
+              },
+              {
+                "name": "//base/global/resource_management/interfaces/ets/ani/resourceManager:copy_resourceManager_ets"
               }
             ],
             "test": [
