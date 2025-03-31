@@ -191,6 +191,9 @@ private:
 
     static int32_t ProcessPluralStringResourceByName(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
+
+    static RState GetParamsFromArgv(napi_env env, napi_callback_info info,
+        std::unique_ptr<ResMgrDataContext> &dataContext);
 };
 } // namespace Resource
 } // namespace Global
