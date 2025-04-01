@@ -343,7 +343,9 @@ napi_value ResourceManagerNapiSyncImpl::GetStringSync(napi_env env, napi_callbac
     GET_PARAMS(env, info, PARAMS_NUM_TWO);
 
     auto dataContext = std::make_unique<ResMgrDataContext>();
-
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     int32_t state = InitIdResourceAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in GetStringSync", true);
@@ -385,7 +387,9 @@ napi_value ResourceManagerNapiSyncImpl::GetSymbol(napi_env env, napi_callback_in
     GET_PARAMS(env, info, PARAMS_NUM_TWO);
 
     auto dataContext = std::make_unique<ResMgrDataContext>();
-
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     int32_t state = InitIdResourceAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in GetSymbol", true);
@@ -428,7 +432,9 @@ napi_value ResourceManagerNapiSyncImpl::GetColorSync(napi_env env, napi_callback
     GET_PARAMS(env, info, PARAMS_NUM_TWO);
 
     auto dataContext = std::make_unique<ResMgrDataContext>();
-
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     int32_t state = InitIdResourceAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in GetColorSync", true);
@@ -470,7 +476,9 @@ napi_value ResourceManagerNapiSyncImpl::GetNumber(napi_env env, napi_callback_in
     GET_PARAMS(env, info, PARAMS_NUM_TWO);
 
     auto dataContext = std::make_unique<ResMgrDataContext>();
-
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     int32_t state = InitIdResourceAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in GetNumber", true);
@@ -714,24 +722,37 @@ napi_value ResourceManagerNapiSyncImpl::GetStringArrayValueSync(napi_env env, na
     return ResourceManagerNapiUtils::CreateJsArray(env, *dataContext);
 }
 
+RState ResourceManagerNapiSyncImpl::GetParamsFromArgv(napi_env env, napi_callback_info info,
+    std::unique_ptr<ResMgrDataContext> &dataContext)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_THREE);
+    // density optional parameters
+    if (ResourceManagerNapiUtils::GetDataType(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+
+    // data type optional parameters
+    if (ResourceManagerNapiUtils::GetDataType(env, argv[ARRAY_SUBCRIPTOR_TWO], dataContext->iconType_) != SUCCESS) {
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
+    return SUCCESS;
+}
+
 napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptor(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, PARAMS_NUM_THREE);
     auto dataContext = std::make_unique<ResMgrDataContext>();
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     int32_t ret = ResourceManagerNapiSyncImpl::InitIdResourceAddon(env, info, dataContext);
     if (ret != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in GetDrawableDescriptor", true);
         ResourceManagerNapiUtils::NapiThrow(env, ret);
         return nullptr;
     }
-    // density optional parameters
-    if (ResourceManagerNapiUtils::GetDataType(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
-        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
-        return nullptr;
-    }
 
-    // data type optional parameters
-    if (ResourceManagerNapiUtils::GetDataType(env, argv[ARRAY_SUBCRIPTOR_TWO], dataContext->iconType_) != SUCCESS) {
+    if (GetParamsFromArgv(env, info, dataContext) != SUCCESS) {
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
@@ -804,7 +825,9 @@ napi_value ResourceManagerNapiSyncImpl::GetStringByNameSync(napi_env env, napi_c
     GET_PARAMS(env, info, PARAMS_NUM_TWO);
 
     auto dataContext = std::make_unique<ResMgrDataContext>();
-
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in GetStringByNameSync", false);
@@ -838,7 +861,9 @@ napi_value ResourceManagerNapiSyncImpl::GetSymbolByName(napi_env env, napi_callb
     GET_PARAMS(env, info, PARAMS_NUM_TWO);
 
     auto dataContext = std::make_unique<ResMgrDataContext>();
-
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in GetSymbolByName", false);
@@ -874,7 +899,9 @@ napi_value ResourceManagerNapiSyncImpl::GetColorByNameSync(napi_env env, napi_ca
     GET_PARAMS(env, info, PARAMS_NUM_TWO);
 
     auto dataContext = std::make_unique<ResMgrDataContext>();
-
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in GetColorByNameSync", false);
@@ -910,7 +937,9 @@ napi_value ResourceManagerNapiSyncImpl::GetNumberByName(napi_env env, napi_callb
     GET_PARAMS(env, info, PARAMS_NUM_TWO);
 
     auto dataContext = std::make_unique<ResMgrDataContext>();
-
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in GetNumberByName", false);
@@ -933,7 +962,9 @@ napi_value ResourceManagerNapiSyncImpl::GetBooleanByName(napi_env env, napi_call
     GET_PARAMS(env, info, PARAMS_NUM_TWO);
 
     auto dataContext = std::make_unique<ResMgrDataContext>();
-
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     int32_t ret = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (ret != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in GetBooleanByName", false);
@@ -960,16 +991,15 @@ napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptorByName(napi_env env
         return nullptr;
     }
     auto dataContext = std::make_unique<ResMgrDataContext>();
-    // density optional parameters
-    if (ResourceManagerNapiUtils::GetDataType(env, argv[ARRAY_SUBCRIPTOR_ONE], dataContext->density_) != SUCCESS) {
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
+
+    if (GetParamsFromArgv(env, info, dataContext) != SUCCESS) {
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
-    // icon type optional parameters
-    if (ResourceManagerNapiUtils::GetDataType(env, argv[ARRAY_SUBCRIPTOR_TWO], dataContext->iconType_) != SUCCESS) {
-        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
-        return nullptr;
-    }
+
     dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
     if (dataContext->addon_ == nullptr) {
         return nullptr;
@@ -1026,6 +1056,9 @@ napi_value ResourceManagerNapiSyncImpl::AddResource(napi_env env, napi_callback_
         return nullptr;
     }
     auto dataContext = std::make_unique<ResMgrDataContext>();
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     dataContext->path_ = ResourceManagerNapiUtils::GetResNameOrPath(env, argc, argv);
     auto resMgr = GetNativeResoruceManager(env, info);
     if (resMgr == nullptr) {
@@ -1048,6 +1081,9 @@ napi_value ResourceManagerNapiSyncImpl::RemoveResource(napi_env env, napi_callba
         return nullptr;
     }
     auto dataContext = std::make_unique<ResMgrDataContext>();
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     dataContext->path_ = ResourceManagerNapiUtils::GetResNameOrPath(env, argc, argv);
     auto resMgr = GetNativeResoruceManager(env, info);
     if (resMgr == nullptr) {
@@ -1086,6 +1122,9 @@ napi_value ResourceManagerNapiSyncImpl::GetPluralStringByNameSync(napi_env env, 
         return nullptr;
     }
     auto dataContext = std::make_unique<ResMgrDataContext>();
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in GetPluralStringByNameSync", false);
@@ -1130,6 +1169,9 @@ napi_value ResourceManagerNapiSyncImpl::GetMediaBase64ByNameSync(napi_env env, n
         return nullptr;
     }
     auto dataContext = std::make_unique<ResMgrDataContext>();
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in GetMediaBase64ByNameSync", false);
@@ -1173,6 +1215,9 @@ napi_value ResourceManagerNapiSyncImpl::GetMediaByNameSync(napi_env env, napi_ca
         return nullptr;
     }
     auto dataContext = std::make_unique<ResMgrDataContext>();
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in GetMediaByNameSync", false);
@@ -1216,6 +1261,9 @@ napi_value ResourceManagerNapiSyncImpl::GetStringArrayByNameSync(napi_env env, n
         return nullptr;
     }
     auto dataContext = std::make_unique<ResMgrDataContext>();
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in GetStringArrayByNameSync", false);
@@ -1235,6 +1283,9 @@ napi_value ResourceManagerNapiSyncImpl::GetStringArrayByNameSync(napi_env env, n
 napi_value ResourceManagerNapiSyncImpl::GetConfigurationSync(napi_env env, napi_callback_info info)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
     if (dataContext->addon_ == nullptr) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get addon in GetConfigurationSync");
@@ -1246,6 +1297,9 @@ napi_value ResourceManagerNapiSyncImpl::GetConfigurationSync(napi_env env, napi_
 napi_value ResourceManagerNapiSyncImpl::GetDeviceCapabilitySync(napi_env env, napi_callback_info info)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
     if (dataContext->addon_ == nullptr) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get addon in GetDeviceCapabilitySync");
@@ -1258,6 +1312,9 @@ napi_value ResourceManagerNapiSyncImpl::GetLocales(napi_env env, napi_callback_i
 {
     GET_PARAMS(env, info, PARAMS_NUM_TWO);
     auto dataContext = std::make_unique<ResMgrDataContext>();
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
     if (dataContext->addon_ == nullptr) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get addon in GetLocales");
@@ -1278,7 +1335,9 @@ napi_value ResourceManagerNapiSyncImpl::IsRawDir(napi_env env, napi_callback_inf
 {
     GET_PARAMS(env, info, PARAMS_NUM_TWO);
     auto dataContext = std::make_unique<ResMgrDataContext>();
-
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     int32_t ret = InitPathAddon(env, info, dataContext);
     if (ret != RState::SUCCESS) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to init para in IsRawDir by %{public}s", dataContext->path_.c_str());
@@ -1300,6 +1359,9 @@ napi_value ResourceManagerNapiSyncImpl::IsRawDir(napi_env env, napi_callback_inf
 napi_value ResourceManagerNapiSyncImpl::GetOverrideResourceManager(napi_env env, napi_callback_info info)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     int32_t state = getAddonAndConfig(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to get param in GetOverrideResourceManager", false);
@@ -1338,6 +1400,9 @@ RState ResourceManagerNapiSyncImpl::getAddonAndConfig(napi_env env, napi_callbac
 napi_value ResourceManagerNapiSyncImpl::GetOverrideConfiguration(napi_env env, napi_callback_info info)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
     if (dataContext->addon_ == nullptr) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "GetOverrideConfiguration failed to get addon");
@@ -1349,6 +1414,9 @@ napi_value ResourceManagerNapiSyncImpl::GetOverrideConfiguration(napi_env env, n
 napi_value ResourceManagerNapiSyncImpl::UpdateOverrideConfiguration(napi_env env, napi_callback_info info)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     int32_t state = getAddonAndConfig(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to get param in GetOverrideResourceManager", false);
@@ -1371,11 +1439,14 @@ bool ResourceManagerNapiSyncImpl::InitOptionalParameters(napi_env env, napi_call
     size_t size = startIndex;
     napi_get_cb_info(env, info, &size, nullptr, nullptr, nullptr);
     // one parameter: resId or resource or Name
-    if (size <= startIndex) {
+    if (size <= startIndex || size > SIZE_MAX) {
         return true;
     }
     napi_value paramArray[size];
     napi_get_cb_info(env, info, &size, paramArray, nullptr, nullptr);
+    if (size > SIZE_MAX) {
+        return true;
+    }
 
     for (size_t i = startIndex; i < size; ++i) {
         if (!InitParamsFromParamArray(env, paramArray[i], jsParams)) {
@@ -1503,6 +1574,9 @@ napi_value ResourceManagerNapiSyncImpl::GetIntPluralStringByNameSync(napi_env en
         return nullptr;
     }
     auto dataContext = std::make_unique<ResMgrDataContext>();
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in GetIntPluralStringByNameSync", false);
@@ -1542,6 +1616,9 @@ napi_value ResourceManagerNapiSyncImpl::GetDoublePluralStringByNameSync(napi_env
         return nullptr;
     }
     auto dataContext = std::make_unique<ResMgrDataContext>();
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
     int32_t state = ResourceManagerNapiSyncImpl::InitNameAddon(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in GetDoublePluralStringByNameSync", false);
