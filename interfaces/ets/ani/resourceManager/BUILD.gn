@@ -1,0 +1,102 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/components/ets_frontend/ets2abc_config.gni")
+import("//build/ohos.gni")
+
+config("resourceManager_config") {
+  include_dirs = [
+    "./include",
+    "../../../js/innerkits/core/include",
+  ]
+}
+
+ohos_shared_library("resourceManager_ani") {
+  public_configs = [ ":resourceManager_config" ]
+  include_dirs = [ "./include" ]
+  sources = [
+    "./src/resourceManager.cpp",
+    "./src/resourceManager_enum.cpp",
+  ]
+
+  deps = [
+    "../../../../frameworks/resmgr:global_resmgr",
+    "../../../js/innerkits/core:resmgr_napi_core",
+  ]
+  external_deps = [
+    "ability_base:configuration",
+    "bundle_framework:appexecfwk_base",
+    "cJSON:cjson",
+    "napi:ace_napi",
+    "runtime_core:ani",
+    "runtime_core:libarkruntime",
+  ]
+
+  part_name = "resource_management"
+  subsystem_name = "global"
+}
+
+generate_static_abc("resourceManager") {
+  base_url = "./ets"
+  files = [ "./ets/@ohos.resourceManager.ets" ]
+  is_boot_abc = "True"
+  device_dst_file = "system/framework/resourceManager.abc"
+}
+
+generate_static_abc("resource") {
+  base_url = "./ets"
+  files = [
+    "./ets/global/resource.ets",
+    "./ets/global/resourceInner.ets",
+  ]
+  is_boot_abc = "True"
+  device_dst_file = "system/framework/resource.abc"
+}
+
+generate_static_abc("rawFileDescriptor") {
+  base_url = "./ets"
+  files = [ "./ets/global/rawFileDescriptor.ets" ]
+  is_boot_abc = "True"
+  device_dst_file = "system/framework/rawFileDescriptor.abc"
+}
+
+ohos_prebuilt_etc("resourceManager_etc") {
+  source = "$target_out_dir/resourceManager.abc"
+  module_install_dir = "framework"
+  part_name = "resource_management"
+  subsystem_name = "global"
+  deps = [ ":resourceManager" ]
+}
+
+ohos_prebuilt_etc("resource_etc") {
+  source = "$target_out_dir/resource.abc"
+  module_install_dir = "framework"
+  part_name = "resource_management"
+  subsystem_name = "global"
+  deps = [ ":resource" ]
+}
+
+ohos_prebuilt_etc("rawFileDescriptor_etc") {
+  source = "$target_out_dir/rawFileDescriptor.abc"
+  module_install_dir = "framework"
+  part_name = "resource_management"
+  subsystem_name = "global"
+  deps = [ ":rawFileDescriptor" ]
+}
+
+ohos_copy("copy_resourceManager_ets") {
+  sources = [ "./ets/global/resourceInner.ets" ]
+  outputs = [ "$ohos_ets_inner_path/global/resourceInner.ets" ]
+  subsystem_name = "global"
+  part_name = "resource_management"
+}
