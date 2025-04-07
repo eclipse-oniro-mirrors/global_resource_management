@@ -1251,13 +1251,14 @@ RState HapManager::GetResId(const std::string &resTypeName, uint32_t &resId)
             candidates.emplace_back(data.second);
         }
         resId = GetRealResId(resType, candidates);
-        if (resId == 0) {
-            RESMGR_HILOGE(RESMGR_TAG,
-                "GetResId name = %{public}s, resType = %{public}s", resName.c_str(), resType.c_str());
-            return NOT_FOUND;
+        if (resId != 0) {
+            return SUCCESS;
         }
     }
-    return SUCCESS;
+    if (resId == 0) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetResId name:%{public}s, resType:%{public}s", resName.c_str(), resType.c_str());
+    }
+    return NOT_FOUND;
 }
 
 void HapManager::GetLocales(std::vector<std::string> &outValue, bool includeSystem)
