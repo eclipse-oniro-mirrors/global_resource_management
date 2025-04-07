@@ -3045,4 +3045,32 @@ HWTEST_F(ResourceManagerTest, ResourceManagerInitTest001, TestSize.Level1)
     bool result = ((ResourceManagerImpl *)rm)->Init(hapManager);
     EXPECT_FALSE(result);
 }
+
+/*
+ * @tc.name: ResourceManagerGetResIdTest001
+ * @tc.desc: Test GetResId function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResIdTest001, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    uint32_t resId;
+    RState state = rm->GetResId("sys.string.ohos_id_text_font_family_regular", resId);
+    ASSERT_EQ(state, SUCCESS);
+    ASSERT_EQ(resId, 125829694);
+}
+
+/*
+ * @tc.name: ResourceManagerGetResIdTest002
+ * @tc.desc: Test GetResId function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResIdTest002, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    uint32_t resId;
+    RState state = rm->GetResId("app.string.app_name", resId);
+    ASSERT_EQ(state, SUCCESS);
+    ASSERT_EQ(resId, 16777216);
+}
 }
