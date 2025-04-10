@@ -57,14 +57,15 @@ HWTEST_F(ThemeResourceTest, ThemeResourceInitThemeResTest001, TestSize.Level1)
 HWTEST_F(ThemeResourceTest, ThemeResourceInitThemeResTest002, TestSize.Level1)
 {
     std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>("");
-    EXPECT_TRUE(themeResource != nullptr);
+    ASSERT_TRUE(themeResource != nullptr);
     std::pair<std::string, std::string> bundleInfo;
     cJSON *root = cJSON_CreateObject();
-    cJSON *array = cJSON_CreateArray();
+    ASSERT_TRUE(root != nullptr);
     cJSON *item = cJSON_CreateObject();
-    cJSON_AddStringToObject(item, "name1", "bbbbb");
-    cJSON_AddItemToArray(array, item);
-    cJSON_AddItemToObject(root, "color", array);
+    ASSERT_TRUE(item != nullptr);
+    cJSON_AddItemToObject(item, "name1", cJSON_CreateString("aaaaa"));
+    cJSON_AddItemToObject(root, "color", item);
+    root->type = cJSON_Array;
     std::shared_ptr<ThemeConfig> themeConfig = std::make_shared<ThemeConfig>();
     std::string resTypeStr = "color";
     themeResource->InitThemeRes(bundleInfo, root, themeConfig, resTypeStr);
@@ -80,16 +81,37 @@ HWTEST_F(ThemeResourceTest, ThemeResourceInitThemeResTest002, TestSize.Level1)
 HWTEST_F(ThemeResourceTest, ThemeResourceInitThemeResTest003, TestSize.Level1)
 {
     std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>("");
-    EXPECT_TRUE(themeResource != nullptr);
+    ASSERT_TRUE(themeResource != nullptr);
     std::pair<std::string, std::string> bundleInfo;
     cJSON *root = cJSON_CreateObject();
-    cJSON *array = cJSON_CreateArray();
+    ASSERT_TRUE(root != nullptr);
     cJSON *item = cJSON_CreateObject();
-    cJSON_AddStringToObject(item, "value1", "bbbbb");
-    cJSON_AddItemToArray(array, item);
-    cJSON_AddItemToObject(root, "color", array);
+    ASSERT_TRUE(item != nullptr);
+    cJSON_AddItemToObject(item, "name", cJSON_CreateString("aaaaa"));
+    cJSON_AddItemToObject(item, "value1", cJSON_CreateString("bbbbb"));
+    cJSON_AddItemToObject(root, "color", item);
+    root->type = cJSON_Array;
     std::shared_ptr<ThemeConfig> themeConfig = std::make_shared<ThemeConfig>();
     std::string resTypeStr = "color";
+    themeResource->InitThemeRes(bundleInfo, root, themeConfig, resTypeStr);
+    cJSON_Delete(root);
+    EXPECT_TRUE(themeResource->themeValueVec_.size() == 0);
+}
+
+/*
+ * @tc.name: ThemeResourceInitThemeResTest004
+ * @tc.desc: Test InitThemeRes function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeResourceTest, ThemeResourceInitThemeResTest004, TestSize.Level1)
+{
+    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>("");
+    ASSERT_TRUE(themeResource != nullptr);
+    std::pair<std::string, std::string> bundleInfo;
+    cJSON *root = cJSON_CreateObject();
+    ASSERT_TRUE(root != nullptr);
+    std::shared_ptr<ThemeConfig> themeConfig = std::make_shared<ThemeConfig>();
+    std::string resTypeStr = "string";
     themeResource->InitThemeRes(bundleInfo, root, themeConfig, resTypeStr);
     cJSON_Delete(root);
     EXPECT_TRUE(themeResource->themeValueVec_.size() == 0);
@@ -286,9 +308,9 @@ HWTEST_F(ThemeResourceTest, ThemeResourceLoadThemeIconResourceTest003, TestSize.
  */
 HWTEST_F(ThemeResourceTest, ThemeResourceGetThemeAppIconByAbilityNameTest001, TestSize.Level1)
 {
-    std::string iconPath("/data/test/theme/icons/dynamic_icons/ohos.global.test.all/");
+    std::string iconPath("/data/test/theme/icons/dynamic_icons");
     std::shared_ptr<ThemeResource> themeResource = ThemeResource::LoadThemeIconResource(iconPath);
-    EXPECT_TRUE(themeResource != nullptr);
+    ASSERT_TRUE(themeResource != nullptr);
     std::pair<std::string, std::string> bundleInfo;
     bundleInfo.first = "ohos.global.test";
     bundleInfo.second = "entry";
@@ -305,9 +327,9 @@ HWTEST_F(ThemeResourceTest, ThemeResourceGetThemeAppIconByAbilityNameTest001, Te
  */
 HWTEST_F(ThemeResourceTest, ThemeResourceGetThemeAppIconByAbilityNameTest002, TestSize.Level1)
 {
-    std::string iconPath("/data/test/theme/icons/ohos.global.test.all/entry/");
+    std::string iconPath("/data/test/theme/icons/ohos.global.test.all");
     std::shared_ptr<ThemeResource> themeResource = ThemeResource::LoadThemeIconResource(iconPath);
-    EXPECT_TRUE(themeResource != nullptr);
+    ASSERT_TRUE(themeResource != nullptr);
     std::pair<std::string, std::string> bundleInfo;
     bundleInfo.first = "ohos.global.test";
     bundleInfo.second = "entry";
@@ -324,11 +346,23 @@ HWTEST_F(ThemeResourceTest, ThemeResourceGetThemeAppIconByAbilityNameTest002, Te
  */
 HWTEST_F(ThemeResourceTest, ThemeResourceHasIconInThemeTest001, TestSize.Level1)
 {
-    std::string iconPath("/data/test/theme/icons/dynamic_icons/ohos.global.test.all/");
+    std::string iconPath("/data/test/theme/icons/dynamic_icons");
     std::shared_ptr<ThemeResource> themeResource = ThemeResource::LoadThemeIconResource(iconPath);
-    EXPECT_TRUE(themeResource != nullptr);
+    ASSERT_TRUE(themeResource != nullptr);
     std::string bundleName = "ohos.global.test.all";
     bool result = themeResource->HasIconInTheme(bundleName);
     EXPECT_FALSE(result);
+}
+
+/*
+ * @tc.name: ThemeResourceLoadThemeResourceTest001
+ * @tc.desc: Test LoadThemeResource function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeResourceTest, ThemeResourceLoadThemeResourceTest001, TestSize.Level1)
+{
+    std::string rootDir = "";
+    std::shared_ptr<ThemeResource> themeResource = ThemeResource::LoadThemeResource(rootDir);
+    EXPECT_TRUE(themeResource == nullptr);
 }
 }
