@@ -24,10 +24,7 @@ config("resourceManager_config") {
 ohos_shared_library("resourceManager_ani") {
   public_configs = [ ":resourceManager_config" ]
   include_dirs = [ "./include" ]
-  sources = [
-    "./src/resourceManager.cpp",
-    "./src/resourceManager_enum.cpp",
-  ]
+  sources = [ "./src/resourceManager.cpp" ]
 
   deps = [
     "../../../../frameworks/resmgr:global_resmgr",
