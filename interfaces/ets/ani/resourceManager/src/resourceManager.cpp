@@ -171,7 +171,7 @@ ani_string ResMgrAddon::getStringSync0([[maybe_unused]] ani_env* env, [[maybe_un
     return ret;
 }
 
-ArrayElement getArrayElement(ani_env* env, ani_object args, int index)
+static ArrayElement getArrayElement(ani_env* env, ani_object args, int index)
 {
     ani_ref value;
     if (ANI_OK != env->Object_CallMethodByName_Ref(args, "$_get", "I:Lstd/core/Object;", &value, index)) {
@@ -315,6 +315,10 @@ ani_double ResMgrAddon::getNumber0([[maybe_unused]] ani_env* env, [[maybe_unused
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     auto resMgr = unwrapAddon(env, object);
+    if (resMgr == nullptr) {
+        return -1;
+    }
+
     dataContext->resId_ = resId;
     RState state = resMgr->GetIntegerById(resId, dataContext->iValue_);
     if (state != RState::SUCCESS) {
@@ -330,6 +334,10 @@ ani_double ResMgrAddon::getNumber1([[maybe_unused]] ani_env* env, [[maybe_unused
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     InitIdResourceAddon(env, object, dataContext, resource);
     auto resMgr = unwrapAddon(env, object);
+    if (resMgr == nullptr) {
+        return -1;
+    }
+
     RState state = resMgr->GetIntegerById(dataContext->resource_->id, dataContext->iValue_);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to getNumber1 state", true, state);
@@ -343,6 +351,10 @@ ani_double ResMgrAddon::getColorSync0([[maybe_unused]] ani_env* env, [[maybe_unu
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     auto resMgr = unwrapAddon(env, object);
+    if (resMgr == nullptr) {
+        return -1;
+    }
+
     dataContext->resId_ = resId;
     RState state = resMgr->GetColorById(resId, dataContext->colorValue_);
     if (state != RState::SUCCESS) {
@@ -358,6 +370,10 @@ ani_double ResMgrAddon::getColorSync1([[maybe_unused]] ani_env* env, [[maybe_unu
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     InitIdResourceAddon(env, object, dataContext, resource);
     auto resMgr = unwrapAddon(env, object);
+    if (resMgr == nullptr) {
+        return -1;
+    }
+
     RState state = resMgr->GetColorById(dataContext->resource_->id, dataContext->colorValue_);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to getColorSync1 state", true, state);
@@ -366,29 +382,7 @@ ani_double ResMgrAddon::getColorSync1([[maybe_unused]] ani_env* env, [[maybe_unu
     return dataContext->colorValue_;
 }
 
-ani_object createEmptyUint8Array(ani_env* env)
-{
-    ani_object ret = {};
-    static const char *className = "Lescompat/Uint8Array;";
-    ani_class cls;
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        std::cerr << "Not found '" << className << "'" << std::endl;
-        return ret;
-    }
-
-    ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":V", &ctor)) {
-        std::cerr << "get ctor Failed'" << className << "'" << std::endl;
-        return ret;
-    }
-
-    if (ANI_OK != env->Object_New(cls, ctor, &ret)) {
-        std::cerr << "Create Object Failed'" << className << "'" << std::endl;
-    }
-    return ret;
-}
-
-ani_object createUint8Array(ani_env* env, ani_array data)
+static ani_object createUint8Array(ani_env* env, ani_array data)
 {
     ani_object ret = {};
     static const char *className = "Lescompat/Uint8Array;";
@@ -415,12 +409,15 @@ ani_object ResMgrAddon::getRawFileContentSync([[maybe_unused]] ani_env* env, [[m
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     auto resMgr = unwrapAddon(env, object);
+    if (resMgr == nullptr) {
+        return nullptr;
+    }
     dataContext->path_ = AniStrToString(env, path);
 
     RState state = resMgr->GetRawFileFromHap(dataContext->path_, dataContext->len_, dataContext->mediaData);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to getRawFileContentSync state", true, state);
-        return createEmptyUint8Array(env);
+        return nullptr;
     }
 
     size_t length = dataContext->len_;
@@ -433,18 +430,18 @@ ani_object ResMgrAddon::getRawFileContentSync([[maybe_unused]] ani_env* env, [[m
     if (env->Array_New_Int(length, &datas) != ANI_OK) {
         std::cerr << "Array_New_Int Fail" << std::endl;
         delete[] data;
-        return createEmptyUint8Array(env);
+        return nullptr;
     }
 
-    int* intData = new int[length];
+    std::vector<int> intData(length);
     for (size_t i = 0; i < length; ++i) {
         intData[i] = static_cast<int>(data[i]);
     }
 
-    if (env->Array_SetRegion_Int(datas, 0, length, intData) != ANI_OK) {
+    if (env->Array_SetRegion_Int(datas, 0, length, intData.data()) != ANI_OK) {
         std::cerr << "Array_SetRegion_Int Fail" << std::endl;
         delete[] data;
-        return createEmptyUint8Array(env);
+        return nullptr;
     }
 
     ani_object obj = createUint8Array(env, datas);
@@ -457,8 +454,12 @@ ani_string ResMgrAddon::getPluralStringValueSync0([[maybe_unused]] ani_env* env,
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     auto resMgr = unwrapAddon(env, object);
+    if (resMgr == nullptr) {
+        return nullptr;
+    }
     dataContext->resId_ = resId;
     dataContext->param_ = num;
+
     RState state = resMgr->GetFormatPluralStringById(dataContext->value_,
         resId, dataContext->param_, dataContext->jsParams_);
     ani_string ret;
@@ -480,6 +481,10 @@ ani_string ResMgrAddon::getPluralStringValueSync1([[maybe_unused]] ani_env* env,
     InitIdResourceAddon(env, object, dataContext, resource);
     dataContext->param_ = num;
     auto resMgr = unwrapAddon(env, object);
+    if (resMgr == nullptr) {
+        return nullptr;
+    }
+
     RState state = resMgr->GetFormatPluralStringById(dataContext->value_,
         dataContext->resource_->id, dataContext->param_, dataContext->jsParams_);
     ani_string ret;
@@ -496,24 +501,26 @@ ani_string ResMgrAddon::getPluralStringValueSync1([[maybe_unused]] ani_env* env,
 
 ani_object ResMgrAddon::create([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_class clazz)
 {
-    auto nativeResMgr = new ResourceManagerImpl();
-    nativeResMgr->Init();
     static const char* className = "L@ohos/resourceManager/resourceManager/ResourceManagerInner;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         std::cerr << "Not found '" << className << "'" << std::endl;
-        ani_object nullobj = nullptr;
-        return nullobj;
+        return nullptr;
     }
+
     ani_method ctor;
     if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "J:V", &ctor)) {
         std::cerr << "get ctor Failed'" << className << "'" << std::endl;
-        ani_object nullobj = nullptr;
-        return nullobj;
+        return nullptr;
     }
+
+    auto nativeResMgr = new ResourceManagerImpl();
+    nativeResMgr->Init();
     ani_object resmgr_object;
     if (ANI_OK != env->Object_New(cls, ctor, &resmgr_object, reinterpret_cast<ani_long>(nativeResMgr))) {
         std::cerr << "New ResMgr Fail" << std::endl;
+        delete nativeResMgr;
+        return nullptr;
     }
     return resmgr_object;
 }
