@@ -24,6 +24,7 @@
 #include "utils/date_utils.h"
 #include "utils/errors.h"
 #include "utils/string_utils.h"
+#include "hap_resource_manager.h"
 
 #define private public
 
@@ -290,5 +291,37 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest004, TestSize.Level1)
     // 4. load select string type res
     resDesc = LoadFromHap(FormatFullPath("all.hap").c_str(), nullptr, SELECT_STRING);
     ASSERT_TRUE(resDesc != nullptr);
+}
+
+/*
+ * @tc.name: HapResourcePutAndGetResourceTest001
+ * @tc.desc: Test HapResourceManager::PutAndGetResource function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapResourceTest, HapResourcePutAndGetResourceTest001, TestSize.Level1)
+{
+    std::shared_ptr<HapResource> pResource1 = std::make_shared<HapResource>("test1", 1000, nullptr, false, false);
+    ASSERT_TRUE(pResource1 != nullptr);
+    std::shared_ptr<HapResource> pResource2 =
+        HapResourceManager::GetInstance()->PutAndGetResource("test1", pResource1);
+    EXPECT_EQ(pResource2, pResource1);
+    std::shared_ptr<HapResource> pResource3 = std::make_shared<HapResource>("test1", 1000, nullptr, false, false);
+    ASSERT_TRUE(pResource3 != nullptr);
+    std::shared_ptr<HapResource> pResource4 =
+        HapResourceManager::GetInstance()->PutAndGetResource("test1", pResource3);
+    EXPECT_EQ(pResource4, pResource1);
+}
+
+/*
+ * @tc.name: HapResourcePutPatchResourceTest001
+ * @tc.desc: Test HapResourceManager::PutPatchResource function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapResourceTest, HapResourcePutPatchResourceTest001, TestSize.Level1)
+{
+    std::string path = "test";
+    std::string patchPath = "testPatch";
+    bool result = HapResourceManager::GetInstance()->PutPatchResource(path, patchPath);
+    ASSERT_FALSE(result);
 }
 }
