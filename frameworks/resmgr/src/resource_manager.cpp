@@ -31,7 +31,7 @@ static std::mutex resMgrExtLock;
 static std::shared_ptr<ResourceManagerExtMgr> resMgrExtMgr = std::make_shared<ResourceManagerExtMgr>();
 #endif
 
-ResourceManager *CreateResourceManager()
+ResourceManager *CreateResourceManager(bool includeSystemRes)
 {
     ResourceManagerImpl *impl = new (std::nothrow) ResourceManagerImpl;
     if (impl == nullptr) {
@@ -42,7 +42,9 @@ ResourceManager *CreateResourceManager()
         delete (impl);
         return nullptr;
     }
-    SystemResourceManager::AddSystemResource(impl);
+    if (includeSystemRes) {
+        SystemResourceManager::AddSystemResource(impl);
+    }
     return impl;
 }
 
