@@ -291,7 +291,7 @@ public:
         std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams) = 0;
 };
 
-EXPORT_FUNC ResourceManager *CreateResourceManager();
+EXPORT_FUNC ResourceManager *CreateResourceManager(bool includeSystemRes = true);
 
 /**
  * Get system resource manager, the added system resource is sandbox path. This method should call
