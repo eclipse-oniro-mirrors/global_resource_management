@@ -38,7 +38,7 @@ ResourceManagerImpl::ResourceManagerImpl(OHOS::AbilityRuntime::Context* context)
     }
     resMgr_ = context->GetResourceManager();
     context_ = std::shared_ptr<OHOS::AbilityRuntime::Context>(context);
-    bundleName_ = context->GetBundleName();
+    bundleName_ = context_->GetBundleName();
     isSystem_ = false;
     LOGI("ResourceManagerImpl::ResourceManagerImpl success");
 }
