@@ -1170,6 +1170,7 @@ std::unordered_map<std::string, ResType> ResTypeMap {
     {"media", MEDIA},
     {"profile", PROF},
     {"pattern", PATTERN},
+    {"symbol", SYMBOL},
 };
 
 bool IsPrefix(std::string_view prefix, std::string_view full)
