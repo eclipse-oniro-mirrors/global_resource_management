@@ -12,9 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { RawFileDescriptor } from 'global.rawFileDescriptor';
 
-export interface RawFileDescriptor {
-    fd: number;
-    offset: number;
-    length: number;
+export class RawFileDescriptorInner implements RawFileDescriptor {
+    fd: number = 0;
+    offset: number = 0;
+    length: number = 0;
 }

@@ -28,6 +28,9 @@
 #undef RESMGR_RAWFILE_TAG
 #define RESMGR_RAWFILE_TAG "ResourceManagerRawFile"
 
+#undef RESMGR_ANI_TAG
+#define RESMGR_ANI_TAG "ResourceManagerAni"
+
 #ifdef CONFIG_HILOG
 
 #include "hilog/log.h"
