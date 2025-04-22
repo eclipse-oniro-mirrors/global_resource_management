@@ -17,6 +17,8 @@
 
 #include "hilog/log_cpp.h"
 #include "securec.h"
+#include "utils/string_utils.h"
+
 namespace OHOS {
 namespace Global {
 namespace Resource {
@@ -25,7 +27,7 @@ constexpr int PARAMS_NUM_TWO = 2;
 
 const std::unordered_map<int32_t, std::string> ResourceManagerNapiUtils::ErrorCodeToMsg {
     {ERROR_CODE_INVALID_INPUT_PARAMETER, "Invalid input parameter"},
-    {ERROR_CODE_RES_ID_NOT_FOUND, "Invalid resource ID"},
+    {ERROR_CODE_RES_ID_NOT_FOUND, "Invalid resource ID: %lu"},
     {ERROR_CODE_RES_NAME_NOT_FOUND, "Invalid resource name"},
     {ERROR_CODE_RES_NOT_FOUND_BY_ID, "No matching resource is found based on the resource ID"},
     {ERROR_CODE_RES_NOT_FOUND_BY_NAME, "No matching resource is found based on the resource name"},
@@ -143,13 +145,16 @@ std::string ResourceManagerNapiUtils::FindErrMsg(int32_t errCode)
     return errMsg;
 }
 
-void ResourceManagerNapiUtils::NapiThrow(napi_env env, int32_t errCode)
+void ResourceManagerNapiUtils::NapiThrow(napi_env env, int32_t errCode, ...)
 {
     napi_value code = nullptr;
     napi_create_string_latin1(env, std::to_string(errCode).c_str(), NAPI_AUTO_LENGTH, &code);
 
     napi_value message = nullptr;
-    std::string errMsg = FindErrMsg(errCode);
+    va_list args;
+    va_start(args, errCode);
+    std::string errMsg = FormatString(FindErrMsg(errCode).c_str(), args);
+    va_end(args);
     napi_create_string_latin1(env, errMsg.c_str(), NAPI_AUTO_LENGTH, &message);
     if (errMsg != "") {
         napi_value error = nullptr;

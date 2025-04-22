@@ -332,7 +332,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessStrResource(napi_env env, napi_callb
     RState state = resMgr->GetStringFormatById(resId, dataContext->value_, dataContext->jsParams_);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("GetStringSync failed state", true);
-        ResourceManagerNapiUtils::NapiThrow(env, state);
+        ResourceManagerNapiUtils::NapiThrow(env, state, dataContext->resId_);
         return state;
     }
     return SUCCESS;
@@ -356,7 +356,7 @@ napi_value ResourceManagerNapiSyncImpl::GetStringSync(napi_env env, napi_callbac
     state = ProcessStrResource(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to process string in GetStringSync", true);
-        ResourceManagerNapiUtils::NapiThrow(env, state);
+        ResourceManagerNapiUtils::NapiThrow(env, state, dataContext->resId_);
         return nullptr;
     }
 
@@ -377,7 +377,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessSymbolResource(napi_env env, napi_ca
     RState state = resMgr->GetSymbolById(resId, dataContext->symbolValue_);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("GetSymbol failed state", true);
-        ResourceManagerNapiUtils::NapiThrow(env, state);
+        ResourceManagerNapiUtils::NapiThrow(env, state, dataContext->resId_);
     }
     return state;
 }
@@ -400,7 +400,7 @@ napi_value ResourceManagerNapiSyncImpl::GetSymbol(napi_env env, napi_callback_in
     state = ProcessSymbolResource(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to process symbol in GetSymbol", true);
-        ResourceManagerNapiUtils::NapiThrow(env, state);
+        ResourceManagerNapiUtils::NapiThrow(env, state, dataContext->resId_);
         return nullptr;
     }
 
@@ -421,7 +421,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessColorResource(napi_env env, napi_cal
     RState state = resMgr->GetColorById(resId, dataContext->colorValue_);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("GetColor failed state", true);
-        ResourceManagerNapiUtils::NapiThrow(env, state);
+        ResourceManagerNapiUtils::NapiThrow(env, state, dataContext->resId_);
         return state;
     }
     return SUCCESS;
@@ -445,7 +445,7 @@ napi_value ResourceManagerNapiSyncImpl::GetColorSync(napi_env env, napi_callback
     state = ProcessColorResource(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to process string in GetColorSync", true);
-        ResourceManagerNapiUtils::NapiThrow(env, state);
+        ResourceManagerNapiUtils::NapiThrow(env, state, dataContext->resId_);
         return nullptr;
     }
 
@@ -489,7 +489,7 @@ napi_value ResourceManagerNapiSyncImpl::GetNumber(napi_env env, napi_callback_in
     state = ProcessNumResource(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to process string in GetNumber", true);
-        ResourceManagerNapiUtils::NapiThrow(env, state);
+        ResourceManagerNapiUtils::NapiThrow(env, state, dataContext->resId_);
         return nullptr;
     }
 
@@ -530,7 +530,7 @@ napi_value ResourceManagerNapiSyncImpl::GetBoolean(napi_env env, napi_callback_i
     state = ProcessBoolResource(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to process bool resource in GetBoolean", true);
-        ResourceManagerNapiUtils::NapiThrow(env, state);
+        ResourceManagerNapiUtils::NapiThrow(env, state, dataContext->resId_);
         return nullptr;
     }
 
@@ -575,7 +575,7 @@ napi_value ResourceManagerNapiSyncImpl::GetMediaContentBase64Sync(napi_env env, 
     state = ProcesstMediaContentBase64Resource(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to process media base64 resource in GetMediaContentBase64Sync", true);
-        ResourceManagerNapiUtils::NapiThrow(env, state);
+        ResourceManagerNapiUtils::NapiThrow(env, state, dataContext->resId_);
         return nullptr;
     }
 
@@ -621,7 +621,7 @@ napi_value ResourceManagerNapiSyncImpl::GetMediaContentSync(napi_env env, napi_c
     state = ProcessMediaContentResource(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to process media resource in GetMediaContentSync", true);
-        ResourceManagerNapiUtils::NapiThrow(env, state);
+        ResourceManagerNapiUtils::NapiThrow(env, state, dataContext->resId_);
         return nullptr;
     }
 
@@ -674,7 +674,7 @@ napi_value ResourceManagerNapiSyncImpl::GetPluralStringValueSync(napi_env env, n
     state = ProcessPluralStringValueResource(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to process plural string resource in GetPluralStringValueSync", true);
-        ResourceManagerNapiUtils::NapiThrow(env, state);
+        ResourceManagerNapiUtils::NapiThrow(env, state, dataContext->resId_);
         return nullptr;
     }
 
@@ -715,7 +715,7 @@ napi_value ResourceManagerNapiSyncImpl::GetStringArrayValueSync(napi_env env, na
     state = ProcessStringArrayValueResource(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to process string array resource in GetStringArrayValueSync", true);
-        ResourceManagerNapiUtils::NapiThrow(env, state);
+        ResourceManagerNapiUtils::NapiThrow(env, state, dataContext->resId_);
         return nullptr;
     }
 
@@ -780,7 +780,7 @@ napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptor(napi_env env, napi
         state, drawableType, dataContext->density_);
     if (state != SUCCESS) {
         dataContext->SetErrorMsg("Failed to Create drawableDescriptor", true);
-        ResourceManagerNapiUtils::NapiThrow(env, state);
+        ResourceManagerNapiUtils::NapiThrow(env, state, resId);
         return nullptr;
     }
     return Ace::Napi::JsDrawableDescriptor::ToNapi(env, drawableDescriptor.release(), drawableType);
@@ -1510,7 +1510,7 @@ napi_value ResourceManagerNapiSyncImpl::GetIntPluralStringValueSync(napi_env env
     state = ProcessPluralStringResource(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to process plural string resource in GetIntPluralStringValueSync", true);
-        ResourceManagerNapiUtils::NapiThrow(env, state);
+        ResourceManagerNapiUtils::NapiThrow(env, state, dataContext->resId_);
         return nullptr;
     }
 
@@ -1542,7 +1542,7 @@ napi_value ResourceManagerNapiSyncImpl::GetDoublePluralStringValueSync(napi_env 
     state = ProcessPluralStringResource(env, info, dataContext);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to process plural string resource in GetDoublePluralStringValueSync", true);
-        ResourceManagerNapiUtils::NapiThrow(env, state);
+        ResourceManagerNapiUtils::NapiThrow(env, state, dataContext->resId_);
         return nullptr;
     }
 
