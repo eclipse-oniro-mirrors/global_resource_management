@@ -13,11 +13,9 @@
  * limitations under the License.
  */
 
-import { BusinessError } from '@ohos.base'
+import { AsyncCallback, BusinessError } from '@ohos.base';
 import { RawFileDescriptor as _RawFileDescriptor } from 'global.rawFileDescriptor';
 import { Resource as _Resource } from 'global.resource';
-
-type AsyncCallback<T, E = void> = (err: BusinessError<E> | null, data: T) => void;
 
 export default namespace resourceManager {
     loadLibrary("resourceManager_ani.z");
@@ -127,7 +125,7 @@ export default namespace resourceManager {
                 return this.getStringSync(resId);
             })
             p1.then((content: NullishType) => {
-                callback(null, content as string);
+                callback(new BusinessError(), content as string);
             }).catch((err: BusinessError): void => {
                 callback(err, "");
             });
@@ -150,7 +148,7 @@ export default namespace resourceManager {
                 return this.getStringSync(resId);
             })
             p1.then((content: NullishType) => {
-                callback(null, content as string);
+                callback(new BusinessError(), content as string);
             }).catch((err: BusinessError): void => {
                 callback(err, "");
             });
@@ -173,7 +171,7 @@ export default namespace resourceManager {
                 return this.getStringSync(resource);
             })
             p1.then((content: NullishType) => {
-                callback(null, content as string);
+                callback(new BusinessError(), content as string);
             }).catch((err: BusinessError): void => {
                 callback(err, "");
             });
@@ -196,7 +194,7 @@ export default namespace resourceManager {
                 return this.getRawFileContentSync(path);
             })
             p1.then((content: NullishType) => {
-                callback(null, content as Uint8Array);
+                callback(new BusinessError(), content as Uint8Array);
             }, (err: BusinessError): void => {
                 callback(err, new Uint8Array());
             });
