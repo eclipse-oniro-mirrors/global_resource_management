@@ -96,29 +96,6 @@ static std::string AniStrToString(ani_env *env, ani_ref aniStr)
     return result;
 }
 
-static ani_object createUint8Array(ani_env* env, ani_array data)
-{
-    ani_object ret = {};
-    static const char *className = "Lescompat/Uint8Array;";
-    ani_class cls;
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", className);
-        return nullptr;
-    }
-
-    ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "[D:V", &ctor)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find method '<ctor>' failed");
-        return nullptr;
-    }
-
-    if (ANI_OK != env->Object_New(cls, ctor, &ret, data)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "New object '%{public}s' failed", className);
-        return nullptr;
-    }
-    return ret;
-}
-
 static ani_object CreateAniUint8Array(ani_env* env, ResMgrDataContext &context)
 {
     size_t length = context.len_;
@@ -127,27 +104,40 @@ static ani_object CreateAniUint8Array(ani_env* env, ResMgrDataContext &context)
     std::copy(tempData, tempData + length, data);
     delete[] tempData;
 
-    ani_array_int datas;
-    if (ANI_OK != env->Array_New_Int(length, &datas)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Array_New_Int Fail");
-        delete[] data;
+    static const char *className = "Lescompat/Uint8Array;";
+    ani_class cls;
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", className);
         return nullptr;
     }
 
-    std::vector<int> intData(length);
-    for (size_t i = 0; i < length; ++i) {
-        intData[i] = static_cast<int>(data[i]);
-    }
-
-    if (ANI_OK != env->Array_SetRegion_Int(datas, 0, length, intData.data())) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Array_SetRegion_Int Fail");
-        delete[] data;
+    ani_method ctor;
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find method '<ctor>' failed");
         return nullptr;
     }
 
-    ani_object obj = createUint8Array(env, datas);
+    ani_object ret = {};
+    if (ANI_OK != env->Object_New(cls, ctor, &ret, length)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "New object '%{public}s' failed", className);
+        return nullptr;
+    }
+
+    ani_method set;
+    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "II:V", &set)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find method '$_set' failed");
+        return nullptr;
+    }
+
+    for (size_t i = 0; i < length; i++) {
+        if (ANI_OK != env->Object_CallMethod_Void(ret, set, i, data[i])) {
+            RESMGR_HILOGE(RESMGR_ANI_TAG, "Call method '$_set' failed");
+            return nullptr;
+        }
+    }
+
     delete[] data;
-    return obj;
+    return ret;
 }
 
 static std::shared_ptr<ResMgrAddon> UnwrapAddon(ani_env* env, ani_object object)
