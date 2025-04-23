@@ -22,57 +22,60 @@
 
 #include "foundation/ability/ability_runtime/interfaces/kits/native/appkit/ability_runtime/context/context.h"
 #include "resource_manager.h"
-#include "resource_manager_napi_context.h"
 
 namespace OHOS {
 namespace Global {
 namespace Resource {
 class ResMgrAddon {
 public:
-    ResMgrAddon(const std::string& bundleName,
-        const std::shared_ptr<ResourceManager>& resMgr,
+    ResMgrAddon(const std::string& bundleName, const std::shared_ptr<ResourceManager>& resMgr,
         const std::shared_ptr<OHOS::AbilityRuntime::Context>& context, bool isSystem = false);
     ResMgrAddon(const std::shared_ptr<ResourceManager>& resMgr, bool isSystem = false);
     static ani_object CreateResMgr(ani_env* env, const std::string& bundleName,
         const std::shared_ptr<ResourceManager>& resMgr, std::shared_ptr<AbilityRuntime::Context> context);
-    static ani_object getSystemResourceManager([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object);
-    static ani_string getStringSync0([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object,
-        ani_double resId);
-    static ani_string getStringSync1([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
-        ani_double resId, ani_object args);
-    static ani_string getStringSync2([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object,
-        ani_object resource);
-    static ani_string getStringSync3([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object,
-        ani_object resource, ani_object args);
-    static ani_double getNumber0([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object,
-        ani_double resId);
-    static ani_double getNumber1([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object,
-        ani_object resource);
-    static ani_double getColorSync0([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object,
-        ani_double resId);
-    static ani_double getColorSync1([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object,
-        ani_object resource);
-    static ani_object getRawFileContentSync([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object,
-        ani_string path);
-    static ani_string getPluralStringValueSync0([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object,
-        ani_double resId, ani_double num);
-    static ani_string getPluralStringValueSync1([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_object object,
-        ani_object resource, ani_double num);
-    static ani_object create([[maybe_unused]] ani_env* env, [[maybe_unused]] ani_class clazz);
+    static ani_object getSystemResourceManager(ani_env* env);
+
+    static ani_string getStringSyncById(ani_env* env, ani_object object, ani_double resId);
+    static ani_string getFormatStringSyncById(ani_env *env, ani_object object, ani_double resId, ani_object args);
+    static ani_string getStringSync(ani_env* env, ani_object object, ani_object resource);
+    static ani_string getFormatStringSync(ani_env *env, ani_object object, ani_object resource, ani_object args);
+    static ani_double getNumberById(ani_env* env, ani_object object, ani_double resId);
+    static ani_double getNumber(ani_env* env, ani_object object, ani_object resource);
+    static ani_double getColorSyncById(ani_env* env, ani_object object, ani_double resId);
+    static ani_double getColorSync(ani_env* env, ani_object object, ani_object resource);
+    static ani_object getRawFileContentSync(ani_env* env, ani_object object, ani_string path);
+    static ani_string getPluralStringValueSyncById(ani_env* env, ani_object object, ani_double resId, ani_double num);
+    static ani_string getPluralStringValueSync(ani_env* env, ani_object object, ani_object resource, ani_double num);
     static ani_status BindContext(ani_env* env);
+
     inline std::shared_ptr<ResourceManager> GetResMgr()
     {
         return resMgr_;
     }
+
+    inline std::shared_ptr<AbilityRuntime::Context> GetContext()
+    {
+        return context_;
+    }
+
+    inline bool IsSystem()
+    {
+        return isSystem_;
+    }
+
+    bool isOverrideAddon()
+    {
+        return isOverrideAddon_;
+    }
+
 private:
     static ani_object WrapResourceManager(ani_env* env, std::shared_ptr<ResMgrAddon> &addon);
 
     std::string bundleName_;
     std::shared_ptr<ResourceManager> resMgr_;
     std::shared_ptr<AbilityRuntime::Context> context_;
-    [[maybe_unused]] bool isSystem_;
-    std::shared_ptr<ResourceManagerNapiContext> napiContext_;
-    [[maybe_unused]] bool isOverrideAddon_ = false;
+    bool isSystem_;
+    bool isOverrideAddon_ = false;
 };
 } // namespace Resource
 } // namespace Global

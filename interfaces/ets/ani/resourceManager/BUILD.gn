@@ -17,29 +17,28 @@ import("//build/ohos.gni")
 config("resourceManager_config") {
   include_dirs = [
     "./include",
-    "../../../js/innerkits/core/include",
+    "../../../../frameworks/resmgr/include",
   ]
 }
 
 ohos_shared_library("resourceManager_ani") {
   public_configs = [ ":resourceManager_config" ]
-  include_dirs = [ "./include" ]
+  include_dirs = [
+    "./include",
+    "../../../../frameworks/resmgr/include",
+  ]
   sources = [
     "./src/resourceManager.cpp",
-    "./src/resourceManager_enum.cpp",
+    "./src/resource_manager_ani_utils.cpp",
   ]
-
-  deps = [
-    "../../../../frameworks/resmgr:global_resmgr",
-    "../../../js/innerkits/core:resmgr_napi_core",
-  ]
+  defines = [ "CONFIG_HILOG" ]
   external_deps = [
     "ability_base:configuration",
+    "ace_engine:drawable_descriptor",
     "bundle_framework:appexecfwk_base",
     "cJSON:cjson",
-    "napi:ace_napi",
+    "hilog:libhilog",
     "runtime_core:ani",
-    "runtime_core:libarkruntime",
   ]
 
   part_name = "resource_management"
@@ -68,6 +67,7 @@ generate_static_abc("rawFileDescriptor") {
   files = [ "./ets/global/rawFileDescriptor.ets" ]
   is_boot_abc = "True"
   device_dst_file = "system/framework/rawFileDescriptor.abc"
+  dependencies = [ ":copy_rawFileDescriptorInner_ets" ]
 }
 
 ohos_prebuilt_etc("resourceManager_etc") {
@@ -97,6 +97,13 @@ ohos_prebuilt_etc("rawFileDescriptor_etc") {
 ohos_copy("copy_resourceManager_ets") {
   sources = [ "./ets/global/resourceInner.ets" ]
   outputs = [ "$ohos_ets_inner_path/global/resourceInner.ets" ]
+  subsystem_name = "global"
+  part_name = "resource_management"
+}
+
+ohos_copy("copy_rawFileDescriptorInner_ets") {
+  sources = [ "./ets/global/rawFileDescriptorInner.ets" ]
+  outputs = [ "$ohos_ets_inner_path/global/rawFileDescriptorInner.ets" ]
   subsystem_name = "global"
   part_name = "resource_management"
 }

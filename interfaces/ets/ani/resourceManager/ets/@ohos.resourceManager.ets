@@ -13,14 +13,9 @@
  * limitations under the License.
  */
 
+import { AsyncCallback, BusinessError } from '@ohos.base';
 import { RawFileDescriptor as _RawFileDescriptor } from 'global.rawFileDescriptor';
 import { Resource as _Resource } from 'global.resource';
-
-class BusinessError<T = void> {
-    code: number;
-    data: T;
-}
-type AsyncCallback<T, E = void> = (err: BusinessError<E>, data: T) => void;
 
 export default namespace resourceManager {
     loadLibrary("resourceManager_ani.z");
@@ -77,9 +72,9 @@ export default namespace resourceManager {
         getStringValue(resource: Resource): Promise<string>;
 
         getStringSync(resId: number): string;
-        getStringSync(resId: number, args: Array<string | number>): string;
+        getStringSync(resId: number, ...args: (string | number)[]): string;
         getStringSync(resource: Resource): string;
-        getStringSync(resource: Resource, args: Array<string | number>): string;
+        getStringSync(resource: Resource, ...args: (string | number)[]): string;
 
         getNumber(resId: number): number;
         getNumber(resource: Resource): number;
@@ -112,130 +107,109 @@ export default namespace resourceManager {
                 this.nativeResMgr = context;
             }
         }
-    
-        native static create(): ResourceManagerInner;
-        native getStringSync(resId: number): string
-        native getStringSync(resId: number, args: Array<string | number>): string
-        native getStringSync(resource: Resource): string
-        native getStringSync(resource: Resource, args: Array<string | number>): string
-        native getNumber(resId: number): number 
-        native getNumber(resource: Resource): number 
-        native getColorSync(resId: number): number 
-        native getColorSync(resource: Resource): number 
+
+        native getStringSync(resId: number): string;
+        native getStringSync(resId: number, ...args: (string | number)[]): string;
+        native getStringSync(resource: Resource): string;
+        native getStringSync(resource: Resource, ...args: (string | number)[]): string;
+        native getNumber(resId: number): number;
+        native getNumber(resource: Resource): number;
+        native getColorSync(resId: number): number;
+        native getColorSync(resource: Resource): number;
         native getRawFileContentSync(path: string): Uint8Array;
-        native getPluralStringValueSync(resId: number, num: number): string 
-        native getPluralStringValueSync(resource: Resource, num: number): string
+        native getPluralStringValueSync(resId: number, num: number): string;
+        native getPluralStringValueSync(resource: Resource, num: number): string;
 
         getString(resId: number, callback: AsyncCallback<string, void>): void {
             let p1 = taskpool.execute((): string => {
                 return this.getStringSync(resId);
             })
-            p1.then((e: NullishType) => {
-                let content = e as string;
-                let r: BusinessError = { code: 0, data: undefined };
-                callback(r, content)
-            }, (err: Object): void => {
-                console.log("getString callback");
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as string);
+            }).catch((err: BusinessError): void => {
+                callback(err, "");
             });
         }
 
         getString(resId: number): Promise<string> {
-            let p = new Promise<string>((resolve: (v: string) => void, reject: (error: Object) => void) => {
-                let p1 = taskpool.execute((): string => {
+            return new Promise<string>((resolve, reject) => {
+                taskpool.execute((): string => {
                     return this.getStringSync(resId);
-                })
-                p1.then((e: NullishType) => {
-                    let content = e as string;
-                    resolve(content);
-                }, (err: Object): void => {
-                    console.log("getString promise");
+                }).then((content: NullishType) => {
+                    resolve(content as string);
+                }, (err: BusinessError): void => {
+                    reject(err);
                 });
             });
-            return p;
         }
 
         getStringValue(resId: number, callback: AsyncCallback<string, void>): void {
             let p1 = taskpool.execute((): string => {
                 return this.getStringSync(resId);
             })
-            p1.then((e: NullishType) => {
-                let content = e as string;
-                let r: BusinessError = { code: 0, data: undefined };
-                callback(r, content)
-            }, (err: Object): void => {
-                console.log("getStringValue callback");
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as string);
+            }).catch((err: BusinessError): void => {
+                callback(err, "");
             });
         }
 
         getStringValue(resId: number): Promise<string> {
-            let p = new Promise<string>((resolve: (v: string) => void, reject: (error: Object) => void) => {
-                let p1 = taskpool.execute((): string => {
+            return new Promise<string>((resolve, reject) => {
+                taskpool.execute((): string => {
                     return this.getStringSync(resId);
-                })
-                p1.then((e: NullishType) => {
-                    let content = e as string;
-                    resolve(content);
-                }, (err: Object): void => {
-                    console.log("getStringValue promise");
+                }).then((content: NullishType) => {
+                    resolve(content as string);
+                }, (err: BusinessError): void => {
+                    reject(err);
                 });
             });
-            return p;
         }
 
         getStringValue(resource: Resource, callback: AsyncCallback<string, void>): void {
             let p1 = taskpool.execute((): string => {
                 return this.getStringSync(resource);
             })
-            p1.then((e: NullishType) => {
-                let content = e as string;
-                let r: BusinessError = { code: 0, data: undefined };
-                callback(r, content)
-            }, (err: Object): void => {
-                console.log("getStringValue resource callback");
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as string);
+            }).catch((err: BusinessError): void => {
+                callback(err, "");
             });
         }
 
         getStringValue(resource: Resource): Promise<string> {
-            let p = new Promise<string>((resolve: (v: string) => void, reject: (error: Object) => void) => {
-                let p1 = taskpool.execute((): string => {
+            return new Promise<string>((resolve, reject) => {
+                taskpool.execute((): string => {
                     return this.getStringSync(resource);
-                })
-                p1.then((e: NullishType) => {
-                    let content = e as string;
-                    resolve(content);
-                }, (err: Object): void => {
-                    console.log("getStringValue resource promise");
+                }).then((content: NullishType) => {
+                    resolve(content as string);
+                }, (err: BusinessError): void => {
+                    reject(err);
                 });
             });
-            return p;
         }
 
         getRawFileContent(path: string, callback: AsyncCallback<Uint8Array, void>): void {
             let p1 = taskpool.execute((): Uint8Array => {
                 return this.getRawFileContentSync(path);
             })
-            p1.then((e: NullishType) => {
-                let content = e as Uint8Array;
-                let r: BusinessError = { code: 0, data: undefined };
-                callback(r, content)
-            }, (err: Object): void => {
-                console.log("getRawFileContent callback");
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as Uint8Array);
+            }, (err: BusinessError): void => {
+                callback(err, new Uint8Array());
             });
         }
 
         getRawFileContent(path: string): Promise<Uint8Array> {
-            let p = new Promise<Uint8Array>((resolve: (v: Uint8Array) => void, reject: (error: Object) => void) => {
-                let p1 = taskpool.execute((): Uint8Array => {
+            return new Promise<Uint8Array>((resolve, reject) => {
+                taskpool.execute((): Uint8Array => {
                     return this.getRawFileContentSync(path);
-                })
-                p1.then((e: NullishType) => {
-                    let content = e as Uint8Array;
-                    resolve(content);
-                }, (err: Object): void => {
-                    console.log("getRawFileContent promise");
+                }).then((content: NullishType) => {
+                    resolve(content as Uint8Array);
+                }, (err: BusinessError): void => {
+                    reject(err);
                 });
             });
-            return p;
         }
     }
 
