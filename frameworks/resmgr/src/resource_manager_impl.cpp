@@ -81,6 +81,9 @@ bool ResourceManagerImpl::Init(bool isSystem)
         RESMGR_HILOGE(RESMGR_TAG, "new ResConfigImpl failed when ResourceManagerImpl::Init");
         return false;
     }
+    if (isSystem) {
+        resConfig->SetDeviceType(ResConfigImpl::ParseDeviceTypeStr(ResConfigImpl::GetCurrentDeviceType()));
+    }
     hapManager_ = std::make_shared<HapManager>(resConfig, isSystem);
     if (hapManager_ == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "new HapManager failed when ResourceManagerImpl::Init");
