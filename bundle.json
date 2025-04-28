@@ -151,6 +151,8 @@
                 "header": {
                   "header_base": "//base/global/resource_management/interfaces/ets/ani/resourceManager/include",
                   "header_files": [
+                    "resource_manager_ani_utils.h",
+                    "resource_manager_data_context.h",
                     "resourceManager.h"
                   ]
                 },

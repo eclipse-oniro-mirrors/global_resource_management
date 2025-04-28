@@ -16,6 +16,7 @@
 import { AsyncCallback, BusinessError } from '@ohos.base';
 import { RawFileDescriptor as _RawFileDescriptor } from 'global.rawFileDescriptor';
 import { Resource as _Resource } from 'global.resource';
+import { RawFileDescriptorInner } from 'global.rawFileDescriptorInner';
 
 export default namespace resourceManager {
     loadLibrary("resourceManager_ani.z");
@@ -65,33 +66,144 @@ export default namespace resourceManager {
     }
 
     export interface ResourceManager {
-        getString(resId: number, callback: AsyncCallback<string, void>): void;
-        getString(resId: number): Promise<string>;
-
         getStringValue(resource: Resource, callback: AsyncCallback<string, void>): void;
         getStringValue(resource: Resource): Promise<string>;
+
+        getStringArrayValue(resource: Resource, callback: AsyncCallback<Array<string>, void>): void;
+        getStringArrayValue(resource: Resource): Promise<Array<string>>;
+
+        getMediaContent(resource: Resource, callback: AsyncCallback<Uint8Array, void>): void;
+        getMediaContent(resource: Resource, density: number, callback: AsyncCallback<Uint8Array, void>): void;
+        getMediaContent(resource: Resource): Promise<Uint8Array>;
+        getMediaContent(resource: Resource, density: number): Promise<Uint8Array>;
+
+        getMediaContentBase64(resource: Resource, callback: AsyncCallback<string, void>): void;
+        getMediaContentBase64(resource: Resource, density: number, callback: AsyncCallback<string, void>): void;
+        getMediaContentBase64(resource: Resource): Promise<string>;
+        getMediaContentBase64(resource: Resource, density: number): Promise<string>;
+
+        getDeviceCapability(callback: AsyncCallback<DeviceCapability, void>): void;
+        getDeviceCapability(): Promise<DeviceCapability>;
+
+        getConfiguration(callback: AsyncCallback<Configuration, void>): void;
+        getConfiguration(): Promise<Configuration>;
+
+        getStringByName(resName: string, callback: AsyncCallback<string, void>): void;
+        getStringByName(resName: string): Promise<string>;
+
+        getStringArrayByName(resName: string, callback: AsyncCallback<Array<string>, void>): void;
+        getStringArrayByName(resName: string): Promise<Array<string>>;
+
+        getMediaByName(resName: string, callback: AsyncCallback<Uint8Array, void>): void;
+        getMediaByName(resName: string, density: number, callback: AsyncCallback<Uint8Array, void>): void;
+        getMediaByName(resName: string): Promise<Uint8Array>;
+        getMediaByName(resName: string, density: number): Promise<Uint8Array>;
+
+        getMediaBase64ByName(resName: string, callback: AsyncCallback<string, void>): void;
+        getMediaBase64ByName(resName: string, density: number, callback: AsyncCallback<string, void>): void;
+        getMediaBase64ByName(resName: string): Promise<string>;
+        getMediaBase64ByName(resName: string, density: number): Promise<string>;
 
         getStringSync(resId: number): string;
         getStringSync(resId: number, ...args: (string | number)[]): string;
         getStringSync(resource: Resource): string;
         getStringSync(resource: Resource, ...args: (string | number)[]): string;
 
+        getStringByNameSync(resName: string): string;
+        getStringByNameSync(resName: string, ...args: (string | number)[]): string;
+
+        getBoolean(resId: number): boolean;
+        getBoolean(resource: Resource): boolean;
+        getBooleanByName(resName: string): boolean;
+
         getNumber(resId: number): number;
         getNumber(resource: Resource): number;
+        getNumberByName(resName: string): number;
 
         getStringValue(resId: number, callback: AsyncCallback<string, void>): void;
         getStringValue(resId: number): Promise<string>;
 
+        getStringArrayValue(resId: number, callback: AsyncCallback<Array<string>, void>): void;
+        getStringArrayValue(resId: number): Promise<Array<string>>;
+
+        getIntPluralStringValueSync(resId: number, num: number, ...args: (string | number)[]): string;
+        getIntPluralStringValueSync(resource: Resource, num: number, ...args: (string | number)[]): string;
+        getIntPluralStringByNameSync(resName: string, num: number, ...args: (string | number)[]): string;
+
+        getDoublePluralStringValueSync(resId: number, num: number, ...args: (string | number)[]): string;
+        getDoublePluralStringValueSync(resource: Resource, num: number, ...args: (string | number)[]): string;
+        getDoublePluralStringByNameSync(resName: string, num: number, ...args: (string | number)[]): string;
+
+        getMediaContent(resId: number, callback: AsyncCallback<Uint8Array, void>): void;
+        getMediaContent(resId: number, density: number, callback: AsyncCallback<Uint8Array, void>): void;
+        getMediaContent(resId: number): Promise<Uint8Array>;
+        getMediaContent(resId: number, density: number): Promise<Uint8Array>;
+
+        getMediaContentBase64(resId: number, callback: AsyncCallback<string, void>): void;
+        getMediaContentBase64(resId: number, density: number, callback: AsyncCallback<string, void>): void;
+        getMediaContentBase64(resId: number): Promise<string>;
+        getMediaContentBase64(resId: number, density: number): Promise<string>;
+
         getRawFileContent(path: string, callback: AsyncCallback<Uint8Array, void>): void;
         getRawFileContent(path: string): Promise<Uint8Array>;
 
+        getRawFd(path: string, callback: AsyncCallback<RawFileDescriptor, void>): void;
+        getRawFd(path: string): Promise<RawFileDescriptor>;
+
+        closeRawFd(path: string, callback: AsyncCallback<void, void>): void;
+        closeRawFd(path: string): Promise<void>;
+
+        getRawFileList(path: string, callback: AsyncCallback<Array<string>, void>): void;
+        getRawFileList(path: string): Promise<Array<string>>;
+
+        getColor(resId: number, callback: AsyncCallback<number, void>): void;
+        getColor(resId: number): Promise<number>;
+        getColor(resource: Resource, callback: AsyncCallback<number, void>): void;
+        getColor(resource: Resource): Promise<number>;
+
+        getColorByName(resName: string, callback: AsyncCallback<number, void>): void;
+        getColorByName(resName: string): Promise<number>;
+
         getColorSync(resId: number): number;
         getColorSync(resource: Resource): number;
+        getColorByNameSync(resName: string) : number;
 
+        addResource(path: string) : void;
+        removeResource(path: string) : void;
+
+        getRawFdSync(path: string): RawFileDescriptor;
+        closeRawFdSync(path: string): void;
+
+        getRawFileListSync(path: string): Array<string>;
         getRawFileContentSync(path: string): Uint8Array;
 
-        getPluralStringValueSync(resId: number, num: number): string;
-        getPluralStringValueSync(resource: Resource, num: number): string;
+        getMediaContentSync(resId: number, density?: number): Uint8Array;
+        getMediaContentSync(resource: Resource, density?: number): Uint8Array;
+
+        getMediaContentBase64Sync(resId: number, density?: number): string;
+        getMediaContentBase64Sync(resource: Resource, density?: number): string;
+
+        getStringArrayValueSync(resId: number): Array<string>;
+        getStringArrayValueSync(resource: Resource): Array<string>;
+        
+        getMediaByNameSync(resName: string, density?: number): Uint8Array;
+        getMediaBase64ByNameSync(resName: string, density?: number): string;
+
+        getStringArrayByNameSync(resName: string): Array<string>;
+
+        getConfigurationSync(): Configuration;
+        getDeviceCapabilitySync(): DeviceCapability;
+        getLocales(includeSystem?: boolean): Array<string>;
+
+        getSymbol(resId: number) : number;
+        getSymbol(resource: Resource) : number;
+        getSymbolByName(resName: string) : number;
+
+        isRawDir(path: string): boolean;
+
+        getOverrideResourceManager(configuration?: Configuration): ResourceManager;
+        getOverrideConfiguration(): Configuration;
+        updateOverrideConfiguration(configuration: Configuration): void;
     }
 
     export type RawFileDescriptor = _RawFileDescriptor;
@@ -112,36 +224,64 @@ export default namespace resourceManager {
         native getStringSync(resId: number, ...args: (string | number)[]): string;
         native getStringSync(resource: Resource): string;
         native getStringSync(resource: Resource, ...args: (string | number)[]): string;
+
+        native getStringByNameSync(resName: string): string;
+        native getStringByNameSync(resName: string, ...args: (string | number)[]): string;
+
+        native getBoolean(resId: number): boolean;
+        native getBoolean(resource: Resource): boolean;
+        native getBooleanByName(resName: string): boolean;
+
         native getNumber(resId: number): number;
         native getNumber(resource: Resource): number;
+        native getNumberByName(resName: string): number;
+
+        native getIntPluralStringValueSync(resId: number, num: number, ...args: (string | number)[]): string;
+        native getIntPluralStringValueSync(resource: Resource, num: number, ...args: (string | number)[]): string;
+        native getIntPluralStringByNameSync(resName: string, num: number, ...args: (string | number)[]): string;
+
+        native getDoublePluralStringValueSync(resId: number, num: number, ...args: (string | number)[]): string;
+        native getDoublePluralStringValueSync(resource: Resource, num: number, ...args: (string | number)[]): string;
+        native getDoublePluralStringByNameSync(resName: string, num: number, ...args: (string | number)[]): string;
+
         native getColorSync(resId: number): number;
         native getColorSync(resource: Resource): number;
+        native getColorByNameSync(resName: string) : number;
+
+        native addResource(path: string) : void;
+        native removeResource(path: string) : void;
+
+        native getRawFdSync(path: string): RawFileDescriptor;
+        native closeRawFdSync(path: string): void;
+        native isRawDir(path: string): boolean;
+
+        native getRawFileListSync(path: string): Array<string>;
         native getRawFileContentSync(path: string): Uint8Array;
-        native getPluralStringValueSync(resId: number, num: number): string;
-        native getPluralStringValueSync(resource: Resource, num: number): string;
 
-        getString(resId: number, callback: AsyncCallback<string, void>): void {
-            let p1 = taskpool.execute((): string => {
-                return this.getStringSync(resId);
-            })
-            p1.then((content: NullishType) => {
-                callback(new BusinessError(), content as string);
-            }).catch((err: BusinessError): void => {
-                callback(err, "");
-            });
-        }
+        native getMediaContentSync(resId: number, density?: number): Uint8Array;
+        native getMediaContentSync(resource: Resource, density?: number): Uint8Array;
 
-        getString(resId: number): Promise<string> {
-            return new Promise<string>((resolve, reject) => {
-                taskpool.execute((): string => {
-                    return this.getStringSync(resId);
-                }).then((content: NullishType) => {
-                    resolve(content as string);
-                }, (err: BusinessError): void => {
-                    reject(err);
-                });
-            });
-        }
+        native getMediaContentBase64Sync(resId: number, density?: number): string;
+        native getMediaContentBase64Sync(resource: Resource, density?: number): string;
+
+        native getStringArrayValueSync(resId: number): Array<string>;
+        native getStringArrayValueSync(resource: Resource): Array<string>;
+        native getStringArrayByNameSync(resName: string): Array<string>;
+
+        native getMediaByNameSync(resName: string, density?: number): Uint8Array;
+        native getMediaBase64ByNameSync(resName: string, density?: number): string;
+
+        native getConfigurationSync(): Configuration;
+        native getDeviceCapabilitySync(): DeviceCapability;
+        native getLocales(includeSystem?: boolean): Array<string>;
+
+        native getSymbol(resId: number) : number;
+        native getSymbol(resource: Resource) : number;
+        native getSymbolByName(resName: string) : number;
+
+        native getOverrideResourceManager(configuration?: Configuration): ResourceManager;
+        native getOverrideConfiguration(): Configuration;
+        native updateOverrideConfiguration(configuration: Configuration): void;
 
         getStringValue(resId: number, callback: AsyncCallback<string, void>): void {
             let p1 = taskpool.execute((): string => {
@@ -189,6 +329,420 @@ export default namespace resourceManager {
             });
         }
 
+        getStringArrayValue(resource: Resource, callback: AsyncCallback<Array<string>, void>): void {
+            let p1 = taskpool.execute((): Array<string> => {
+                return this.getStringArrayValueSync(resource);
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as Array<string>);
+            }).catch((err: BusinessError): void => {
+                callback(err, new Array<string>);
+            });
+        }
+
+        getStringArrayValue(resource: Resource): Promise<Array<string>> {
+            return new Promise<Array<string>>((resolve, reject) => {
+                taskpool.execute((): Array<string> => {
+                    return this.getStringArrayValueSync(resource);
+                }).then((content: NullishType) => {
+                    resolve(content as Array<string>);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getStringArrayValue(resId: number, callback: AsyncCallback<Array<string>, void>): void {
+            let p1 = taskpool.execute((): Array<string> => {
+                return this.getStringArrayValueSync(resId);
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as Array<string>);
+            }).catch((err: BusinessError): void => {
+                callback(err, new Array<string>);
+            });
+        }
+
+        getStringArrayValue(resId: number): Promise<Array<string>> {
+            return new Promise<Array<string>>((resolve, reject) => {
+                taskpool.execute((): Array<string> => {
+                    return this.getStringArrayValueSync(resId);
+                }).then((content: NullishType) => {
+                    resolve(content as Array<string>);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getMediaContent(resource: Resource, callback: AsyncCallback<Uint8Array, void>): void {
+            let p1 = taskpool.execute((): Uint8Array => {
+                return this.getMediaContentSync(resource);
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as Uint8Array);
+            }).catch((err: BusinessError): void => {
+                callback(err, new Uint8Array());
+            });
+        }
+
+        getMediaContent(resource: Resource): Promise<Uint8Array> {
+            return new Promise<Uint8Array>((resolve, reject) => {
+                taskpool.execute((): Uint8Array => {
+                    return this.getMediaContentSync(resource);
+                }).then((content: NullishType) => {
+                    resolve(content as Uint8Array);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getMediaContent(resource: Resource, density: number, callback: AsyncCallback<Uint8Array, void>): void {
+            let p1 = taskpool.execute((): Uint8Array => {
+                return this.getMediaContentSync(resource, density);
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as Uint8Array);
+            }).catch((err: BusinessError): void => {
+                callback(err, new Uint8Array());
+            });
+        }
+
+        getMediaContent(resource: Resource, density: number): Promise<Uint8Array> {
+            return new Promise<Uint8Array>((resolve, reject) => {
+                taskpool.execute((): Uint8Array => {
+                    return this.getMediaContentSync(resource, density);
+                }).then((content: NullishType) => {
+                    resolve(content as Uint8Array);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getMediaContentBase64(resource: Resource, callback: AsyncCallback<string, void>): void {
+            let p1 = taskpool.execute((): string => {
+                return this.getMediaContentBase64Sync(resource);
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as string);
+            }).catch((err: BusinessError): void => {
+                callback(err, "");
+            });
+        }
+
+        getMediaContentBase64(resource: Resource): Promise<string> {
+            return new Promise<string>((resolve, reject) => {
+                taskpool.execute((): string => {
+                    return this.getMediaContentBase64Sync(resource);
+                }).then((content: NullishType) => {
+                    resolve(content as string);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getMediaContentBase64(resource: Resource, density: number, callback: AsyncCallback<string, void>): void {
+            let p1 = taskpool.execute((): string => {
+                return this.getMediaContentBase64Sync(resource, density);
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as string);
+            }).catch((err: BusinessError): void => {
+                callback(err, "");
+            });
+        }
+
+        getMediaContentBase64(resource: Resource, density: number): Promise<string> {
+            return new Promise<string>((resolve, reject) => {
+                taskpool.execute((): string => {
+                    return this.getMediaContentBase64Sync(resource, density);
+                }).then((content: NullishType) => {
+                    resolve(content as string);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getDeviceCapability(callback: AsyncCallback<DeviceCapability, void>): void {
+            let p1 = taskpool.execute((): DeviceCapability => {
+                return this.getDeviceCapabilitySync();
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as DeviceCapability);
+            }).catch((err: BusinessError): void => {
+                callback(err, new DeviceCapability());
+            });
+        }
+
+        getDeviceCapability(): Promise<DeviceCapability> {
+            return new Promise<DeviceCapability>((resolve, reject) => {
+                taskpool.execute((): DeviceCapability => {
+                    return this.getDeviceCapabilitySync();
+                }).then((content: NullishType) => {
+                    resolve(content as DeviceCapability);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getConfiguration(callback: AsyncCallback<Configuration, void>): void {
+            let p1 = taskpool.execute((): Configuration => {
+                return this.getConfigurationSync();
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as Configuration);
+            }).catch((err: BusinessError): void => {
+                callback(err, new Configuration());
+            });
+        }
+
+        getConfiguration(): Promise<Configuration> {
+            return new Promise<Configuration>((resolve, reject) => {
+                taskpool.execute((): Configuration => {
+                    return this.getConfigurationSync();
+                }).then((content: NullishType) => {
+                    resolve(content as Configuration);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getStringByName(resName: string, callback: AsyncCallback<string, void>): void {
+            let p1 = taskpool.execute((): string => {
+                return this.getStringByNameSync(resName);
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as string);
+            }).catch((err: BusinessError): void => {
+                callback(err, "");
+            });
+        }
+
+        getStringByName(resName: string): Promise<string> {
+            return new Promise<string>((resolve, reject) => {
+                taskpool.execute((): string => {
+                    return this.getStringByNameSync(resName);
+                }).then((content: NullishType) => {
+                    resolve(content as string);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getStringArrayByName(resName: string, callback: AsyncCallback<Array<string>, void>): void {
+            let p1 = taskpool.execute((): Array<string> => {
+                return this.getStringArrayByNameSync(resName);
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as Array<string>);
+            }).catch((err: BusinessError): void => {
+                callback(err, new Array<string>);
+            });
+        }
+
+        getStringArrayByName(resName: string): Promise<Array<string>> {
+            return new Promise<Array<string>>((resolve, reject) => {
+                taskpool.execute((): Array<string> => {
+                    return this.getStringArrayByNameSync(resName);
+                }).then((content: NullishType) => {
+                    resolve(content as Array<string>);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getMediaByName(resName: string, callback: AsyncCallback<Uint8Array, void>): void {
+            let p1 = taskpool.execute((): Uint8Array => {
+                return this.getMediaByNameSync(resName);
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as Uint8Array);
+            }).catch((err: BusinessError): void => {
+                callback(err, new Uint8Array());
+            });
+        }
+
+        getMediaByName(resName: string): Promise<Uint8Array> {
+            return new Promise<Uint8Array>((resolve, reject) => {
+                taskpool.execute((): Uint8Array => {
+                    return this.getMediaByNameSync(resName);
+                }).then((content: NullishType) => {
+                    resolve(content as Uint8Array);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getMediaByName(resName: string, density: number, callback: AsyncCallback<Uint8Array, void>): void {
+            let p1 = taskpool.execute((): Uint8Array => {
+                return this.getMediaByNameSync(resName, density);
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as Uint8Array);
+            }).catch((err: BusinessError): void => {
+                callback(err, new Uint8Array());
+            });
+        }
+
+        getMediaByName(resName: string, density: number): Promise<Uint8Array> {
+            return new Promise<Uint8Array>((resolve, reject) => {
+                taskpool.execute((): Uint8Array => {
+                    return this.getMediaByNameSync(resName, density);
+                }).then((content: NullishType) => {
+                    resolve(content as Uint8Array);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getMediaBase64ByName(resName: string, callback: AsyncCallback<string, void>): void {
+            let p1 = taskpool.execute((): string => {
+                return this.getMediaBase64ByNameSync(resName);
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as string);
+            }).catch((err: BusinessError): void => {
+                callback(err, "");
+            });
+        }
+
+        getMediaBase64ByName(resName: string): Promise<string> {
+            return new Promise<string>((resolve, reject) => {
+                taskpool.execute((): string => {
+                    return this.getMediaBase64ByNameSync(resName);
+                }).then((content: NullishType) => {
+                    resolve(content as string);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getMediaBase64ByName(resName: string, density: number, callback: AsyncCallback<string, void>): void {
+            let p1 = taskpool.execute((): string => {
+                return this.getMediaBase64ByNameSync(resName, density);
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as string);
+            }).catch((err: BusinessError): void => {
+                callback(err, "");
+            });
+        }
+
+        getMediaBase64ByName(resName: string, density: number): Promise<string> {
+            return new Promise<string>((resolve, reject) => {
+                taskpool.execute((): string => {
+                    return this.getMediaBase64ByNameSync(resName, density);
+                }).then((content: NullishType) => {
+                    resolve(content as string);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getMediaContent(resId: number, callback: AsyncCallback<Uint8Array, void>): void {
+            let p1 = taskpool.execute((): Uint8Array => {
+                return this.getMediaContentSync(resId);
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as Uint8Array);
+            }).catch((err: BusinessError): void => {
+                callback(err, new Uint8Array());
+            });
+        }
+
+        getMediaContent(resId: number): Promise<Uint8Array> {
+            return new Promise<Uint8Array>((resolve, reject) => {
+                taskpool.execute((): Uint8Array => {
+                    return this.getMediaContentSync(resId);
+                }).then((content: NullishType) => {
+                    resolve(content as Uint8Array);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getMediaContent(resId: number, density: number, callback: AsyncCallback<Uint8Array, void>): void {
+            let p1 = taskpool.execute((): Uint8Array => {
+                return this.getMediaContentSync(resId, density);
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as Uint8Array);
+            }).catch((err: BusinessError): void => {
+                callback(err, new Uint8Array());
+            });
+        }
+
+        getMediaContent(resId: number, density: number): Promise<Uint8Array> {
+            return new Promise<Uint8Array>((resolve, reject) => {
+                taskpool.execute((): Uint8Array => {
+                    return this.getMediaContentSync(resId, density);
+                }).then((content: NullishType) => {
+                    resolve(content as Uint8Array);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getMediaContentBase64(resId: number, callback: AsyncCallback<string, void>): void {
+            let p1 = taskpool.execute((): string => {
+                return this.getMediaContentBase64Sync(resId);
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as string);
+            }).catch((err: BusinessError): void => {
+                callback(err, "");
+            });
+        }
+
+        getMediaContentBase64(resId: number): Promise<string> {
+            return new Promise<string>((resolve, reject) => {
+                taskpool.execute((): string => {
+                    return this.getMediaContentBase64Sync(resId);
+                }).then((content: NullishType) => {
+                    resolve(content as string);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getMediaContentBase64(resId: number, density: number, callback: AsyncCallback<string, void>): void {
+            let p1 = taskpool.execute((): string => {
+                return this.getMediaContentBase64Sync(resId, density);
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as string);
+            }).catch((err: BusinessError): void => {
+                callback(err, "");
+            });
+        }
+
+        getMediaContentBase64(resId: number, density: number): Promise<string> {
+            return new Promise<string>((resolve, reject) => {
+                taskpool.execute((): string => {
+                    return this.getMediaContentBase64Sync(resId, density);
+                }).then((content: NullishType) => {
+                    resolve(content as string);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
         getRawFileContent(path: string, callback: AsyncCallback<Uint8Array, void>): void {
             let p1 = taskpool.execute((): Uint8Array => {
                 return this.getRawFileContentSync(path);
@@ -206,6 +760,144 @@ export default namespace resourceManager {
                     return this.getRawFileContentSync(path);
                 }).then((content: NullishType) => {
                     resolve(content as Uint8Array);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getRawFd(path: string, callback: AsyncCallback<RawFileDescriptor, void>): void {
+            let p1 = taskpool.execute((): RawFileDescriptor => {
+                return this.getRawFdSync(path);
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as RawFileDescriptor);
+            }, (err: BusinessError): void => {
+                callback(err, new RawFileDescriptorInner());
+            });
+        }
+
+        getRawFd(path: string): Promise<RawFileDescriptor> {
+            return new Promise<RawFileDescriptor>((resolve, reject) => {
+                taskpool.execute((): RawFileDescriptor => {
+                    return this.getRawFdSync(path);
+                }).then((content: NullishType) => {
+                    resolve(content as RawFileDescriptor);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        closeRawFd(path: string, callback: AsyncCallback<void, void>): void {
+            let p1 = taskpool.execute((): void => {
+                return this.closeRawFdSync(path);
+            })
+            p1.then(() => {
+                callback(new BusinessError(), undefined);
+            }, (err: BusinessError): void => {
+                callback(err, undefined);
+            });
+        }
+
+        closeRawFd(path: string): Promise<void> {
+            return new Promise<void>((resolve, reject) => {
+                taskpool.execute((): void => {
+                    return this.closeRawFdSync(path);
+                }).then(() => {
+                    resolve(undefined);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getRawFileList(path: string, callback: AsyncCallback<Array<string>, void>): void {
+            let p1 = taskpool.execute((): Array<string> => {
+                return this.getRawFileListSync(path);
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as Array<string>);
+            }, (err: BusinessError): void => {
+                callback(err, new Array<string>);
+            });
+        }
+
+        getRawFileList(path: string): Promise<Array<string>> {
+            return new Promise<Array<string>>((resolve, reject) => {
+                taskpool.execute((): Array<string> => {
+                    return this.getRawFileListSync(path);
+                }).then((content: NullishType) => {
+                    resolve(content as Array<string>);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getColor(resId: number, callback: AsyncCallback<number, void>): void {
+            let p1 = taskpool.execute((): number => {
+                return this.getColorSync(resId);
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as number);
+            }).catch((err: BusinessError): void => {
+                callback(err, -1);
+            });
+        }
+
+        getColor(resId: number): Promise<number> {
+            return new Promise<number>((resolve, reject) => {
+                taskpool.execute((): number => {
+                    return this.getColorSync(resId);
+                }).then((content: NullishType) => {
+                    resolve(content as number);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getColor(resource: Resource, callback: AsyncCallback<number, void>): void {
+            let p1 = taskpool.execute((): number => {
+                return this.getColorSync(resource);
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as number);
+            }).catch((err: BusinessError): void => {
+                callback(err, -1);
+            });
+        }
+
+        getColor(resource: Resource): Promise<number> {
+            return new Promise<number>((resolve, reject) => {
+                taskpool.execute((): number => {
+                    return this.getColorSync(resource);
+                }).then((content: NullishType) => {
+                    resolve(content as number);
+                }, (err: BusinessError): void => {
+                    reject(err);
+                });
+            });
+        }
+
+        getColorByName(resName: string, callback: AsyncCallback<number, void>): void {
+            let p1 = taskpool.execute((): number => {
+                return this.getColorByNameSync(resName);
+            })
+            p1.then((content: NullishType) => {
+                callback(new BusinessError(), content as number);
+            }).catch((err: BusinessError): void => {
+                callback(err, -1);
+            });
+        }
+
+        getColorByName(resName: string): Promise<number> {
+            return new Promise<number>((resolve, reject) => {
+                taskpool.execute((): number => {
+                    return this.getColorByNameSync(resName);
+                }).then((content: NullishType) => {
+                    resolve(content as number);
                 }, (err: BusinessError): void => {
                     reject(err);
                 });
