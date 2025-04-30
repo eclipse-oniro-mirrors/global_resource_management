@@ -26,6 +26,15 @@ using namespace Resource;
 
 constexpr ani_double ABNORMAL_NUMBER_RETURN_VALUE = -1;
 
+enum ScreenDensityIndex {
+    SCREEN_DENSITY_ONE = 0,
+    SCREEN_DENSITY_TWO = 1,
+    SCREEN_DENSITY_THREE = 2,
+    SCREEN_DENSITY_FOUR = 3,
+    SCREEN_DENSITY_FIVE = 4,
+    SCREEN_DENSITY_SIX = 5,
+};
+
 struct ArrayElement {
     enum class ElementType { NUMBER, STRING } type;
     std::variant<double, std::string> value;
@@ -1394,12 +1403,12 @@ ani_object ResMgrAddon::GetStringArrayByNameSync(ani_env* env, ani_object object
 static int GetScreenDensityIndex(ScreenDensity value)
 {
     switch (value) {
-        case ScreenDensity::SCREEN_DENSITY_SDPI: return 0;
-        case ScreenDensity::SCREEN_DENSITY_MDPI: return 1;
-        case ScreenDensity::SCREEN_DENSITY_LDPI: return 2;
-        case ScreenDensity::SCREEN_DENSITY_XLDPI: return 3;
-        case ScreenDensity::SCREEN_DENSITY_XXLDPI: return 4;
-        case ScreenDensity::SCREEN_DENSITY_XXXLDPI: return 5;
+        case ScreenDensity::SCREEN_DENSITY_SDPI: return static_cast<int>(ScreenDensityIndex::SCREEN_DENSITY_ONE);
+        case ScreenDensity::SCREEN_DENSITY_MDPI: return static_cast<int>(ScreenDensityIndex::SCREEN_DENSITY_TWO);
+        case ScreenDensity::SCREEN_DENSITY_LDPI: return static_cast<int>(ScreenDensityIndex::SCREEN_DENSITY_THREE);
+        case ScreenDensity::SCREEN_DENSITY_XLDPI: return static_cast<int>(ScreenDensityIndex::SCREEN_DENSITY_FOUR);
+        case ScreenDensity::SCREEN_DENSITY_XXLDPI: return static_cast<int>(ScreenDensityIndex::SCREEN_DENSITY_FIVE);
+        case ScreenDensity::SCREEN_DENSITY_XXXLDPI: return static_cast<int>(ScreenDensityIndex::SCREEN_DENSITY_SIX);
         default: return -1;
     }
 }
