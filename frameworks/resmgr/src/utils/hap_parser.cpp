@@ -578,7 +578,7 @@ int32_t ParseId(const char *buffer, uint32_t &offset, const size_t &bufLen, std:
     return OK;
 }
 
-int32_t ParseKeyParam(ParserContext &context, uint32_t &offset, bool &match, std::shared_ptr<KeyParam> &kp)
+int32_t ParseKeyParam(ParserContext &context, uint32_t &offset, bool &match, std::shared_ptr<KeyParam> kp)
 {
     kp = std::make_shared<KeyParam>();
     if (kp == nullptr) {
