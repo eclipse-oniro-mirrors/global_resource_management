@@ -62,7 +62,7 @@ public:
      * @return pResource if create pResource success, else nullptr
      */
     static const std::shared_ptr<HapResource> LoadFromHap(
-        const char *path, std::shared_ptr<ResConfigImpl> &defaultConfig,
+        const char *path, std::shared_ptr<ResConfigImpl> defaultConfig,
         bool isSystem = false, bool isOverlay = false, const uint32_t &selectedTypes = SELECT_ALL);
 
     /**
@@ -78,7 +78,7 @@ public:
      * @return pResource if create pResource success, else nullptr
      */
     static const std::shared_ptr<HapResource> Load(
-        const char* path, std::shared_ptr<ResConfigImpl> &defaultConfig,
+        const char* path, std::shared_ptr<ResConfigImpl> defaultConfig,
         bool isSystem = false, bool isOverlay = false, const uint32_t &selectedTypes = SELECT_ALL);
 
     /**
@@ -91,7 +91,7 @@ public:
      */
     static const std::unordered_map<std::string, std::shared_ptr<HapResource>> LoadOverlays(
         const std::string &path, const std::vector<std::string> &overlayPath,
-        std::shared_ptr<ResConfigImpl> &defaultConfig, bool isSystem = false);
+        std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem = false);
 
     /**
      * The destructor of HapResource
@@ -237,7 +237,7 @@ public:
          * @param isOverlay the overlay flag, default value is false.
          * @param isSystemResource the system flag, default value is false.
          */
-        ValueUnderQualifierDir(const std::shared_ptr<ResKey> &resKey, const std::shared_ptr<IdItem> &idItem,
+        ValueUnderQualifierDir(const std::shared_ptr<ResKey> resKey, const std::shared_ptr<IdItem> idItem,
             const std::pair<std::string, std::string> &resPath, bool isOverlay = false, bool isSystemResource = false);
 
         ~ValueUnderQualifierDir();
@@ -351,13 +351,13 @@ private:
     void UpdateOverlayInfo(std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> &nameTypeId);
 
     // must call Init() after constructor
-    bool Init(std::shared_ptr<ResConfigImpl> &defaultConfig);
+    bool Init(std::shared_ptr<ResConfigImpl> defaultConfig);
 
-    bool InitMap(const std::shared_ptr<ResKey> &resKey, const std::pair<std::string, std::string> &resPath,
-        std::shared_ptr<ResConfigImpl> &defaultConfig);
+    bool InitMap(const std::shared_ptr<ResKey> resKey, const std::pair<std::string, std::string> &resPath,
+        std::shared_ptr<ResConfigImpl> defaultConfig);
 
     // step of Init(), called in Init()
-    bool InitIdList(std::shared_ptr<ResConfigImpl> &defaultConfig);
+    bool InitIdList(std::shared_ptr<ResConfigImpl> defaultConfig);
 
     void IsAppDarkRes(const std::shared_ptr<HapResource::ValueUnderQualifierDir> &limitPath,
         std::shared_ptr<ResConfigImpl> &defaultConfig);
