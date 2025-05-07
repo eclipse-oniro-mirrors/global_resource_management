@@ -667,7 +667,6 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetMediaDataByIdFromHapTest0041,
     auto rc = CreateResConfig();
     if (rc == nullptr) {
         EXPECT_TRUE(false);
-        return;
     }
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -705,7 +704,6 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetMediaDataByNameFromHapTest004
     auto rc = CreateResConfig();
     if (rc == nullptr) {
         EXPECT_TRUE(false);
-        return;
     }
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -741,7 +739,6 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetMediaBase64DataByIdFromHapTes
     auto rc = CreateResConfig();
     if (rc == nullptr) {
         EXPECT_TRUE(false);
-        return;
     }
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -775,7 +772,6 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetMediaBase64DataByNameFromHapT
     auto rc = CreateResConfig();
     if (rc == nullptr) {
         EXPECT_TRUE(false);
-        return;
     }
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -899,7 +895,6 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerOverlayTest001, TestSize.Level1)
     auto rc = CreateResConfig();
     if (rc == nullptr) {
         EXPECT_TRUE(false);
-        return;
     }
     rc->SetLocaleInfo("en", nullptr, "US");
     rm->UpdateResConfig(*rc);
