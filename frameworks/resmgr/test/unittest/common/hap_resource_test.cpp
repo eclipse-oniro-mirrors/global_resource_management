@@ -98,7 +98,6 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest001, TestSize.Level0)
 
     if (pResource == nullptr) {
         EXPECT_TRUE(false);
-        return;
     }
 
     int id = pResource->GetIdByName("app_name", ResType::STRING);
@@ -163,7 +162,6 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest002, TestSize.Level1)
 
     if (pResource == nullptr) {
         EXPECT_TRUE(false);
-        return;
     }
 
     int id = pResource->GetIdByName("app_name", ResType::STRING);
@@ -206,7 +204,6 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest003, TestSize.Level1)
 
     if (pResource == nullptr) {
         EXPECT_TRUE(false);
-        return;
     }
 
     auto idv = pResource->GetIdValuesByName(std::string("integer_ref"), ResType::INTEGER);
