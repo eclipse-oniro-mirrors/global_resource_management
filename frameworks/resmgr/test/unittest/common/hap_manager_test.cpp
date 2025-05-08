@@ -182,9 +182,7 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest003, TestSize.Level1)
 
     idValues = hapManager->GetResourceList(NON_EXIST_ID);
     if (idValues.size() == 0) {
-        delete hapManager;
         EXPECT_TRUE(true);
-        return;
     }
     delete hapManager;
 }
@@ -218,9 +216,7 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest004, TestSize.Level1)
 
     idValues = hapManager->GetResourceList(NON_EXIST_ID);
     if (idValues.size() == 0) {
-        delete hapManager;
         EXPECT_TRUE(true);
-        return;
     }
     delete hapManager;
 }
