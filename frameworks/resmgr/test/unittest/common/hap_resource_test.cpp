@@ -97,7 +97,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest001, TestSize.Level0)
     RESMGR_HILOGD(RESMGR_TAG, "load cost: %ld us.", cost);
 
     if (pResource == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
 
     int id = pResource->GetIdByName("app_name", ResType::STRING);
@@ -161,7 +161,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest002, TestSize.Level1)
     RESMGR_HILOGD(RESMGR_TAG, "load cost: %ld us.", cost);
 
     if (pResource == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
 
     int id = pResource->GetIdByName("app_name", ResType::STRING);
@@ -203,7 +203,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest003, TestSize.Level1)
     RESMGR_HILOGD(RESMGR_TAG, "load cost: %ld us.", cost);
 
     if (pResource == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
 
     auto idv = pResource->GetIdValuesByName(std::string("integer_ref"), ResType::INTEGER);

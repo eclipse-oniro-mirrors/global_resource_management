@@ -219,7 +219,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameTest004, TestS
 {
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("zh", nullptr, "CN");
     rc->SetDirection(DIRECTION_VERTICAL);
@@ -1737,7 +1737,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDeviceType(DEVICE_TV);
@@ -1764,7 +1764,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("zh", nullptr, nullptr);
     rc->SetDeviceType(DEVICE_TV);
@@ -1791,7 +1791,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetMcc(460);
@@ -1822,7 +1822,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetMcc(460);
@@ -1852,7 +1852,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetMcc(460);
@@ -1882,7 +1882,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetMcc(460);
@@ -1912,7 +1912,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("zh", nullptr, nullptr);
     rc->SetMcc(460);
@@ -1941,7 +1941,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDeviceType(DEVICE_PHONE);
@@ -1968,7 +1968,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetColorMode(LIGHT);
@@ -1994,7 +1994,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetMcc(460);
@@ -2023,7 +2023,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetMcc(460);
@@ -2051,7 +2051,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDeviceType(DEVICE_TV);
@@ -2078,7 +2078,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDeviceType(DEVICE_TV);
@@ -2105,7 +2105,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetMcc(460);
@@ -2134,7 +2134,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetMcc(460);
@@ -2163,7 +2163,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDeviceType(DEVICE_TV);
@@ -2190,7 +2190,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDeviceType(DEVICE_TV);
@@ -2217,7 +2217,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetMcc(460);
@@ -2246,7 +2246,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetMcc(460);
@@ -2275,7 +2275,7 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetMcc(460);
