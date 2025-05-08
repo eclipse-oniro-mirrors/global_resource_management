@@ -597,8 +597,10 @@ int32_t ParseKeyParam(ParserContext &context, uint32_t &offset, bool &match, std
     kp->InitStr();
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     auto resDeviceType = kp->GetDeviceTypeStr();
-    if (context.deviceType != DEVICE_DEFAULT && resDeviceType != NOT_DEVICE_TYPE &&
-        resDeviceType != context.deviceType) {
+    if (resDeviceType == NOT_DEVICE_TYPE || context.deviceType == DEVICE_DEFAULT) {
+        return OK;
+    }
+    if (resDeviceType != context.deviceType) {
         match = false;
     }
 #endif
@@ -732,6 +734,10 @@ int32_t HapParser::ParseResHex(ParserContext &context)
         return UNKNOWN_ERROR;
     }
     context.deviceType = context.resDesc.GetCurrentDeviceType();
+    if ((context.deviceType == std::string(TABLET_STR) || context.deviceType == std::string(TWOINONE_STR)) &&
+        !context.defaultConfig->GetDeviceTypeStr().empty()) {
+        context.deviceType = context.defaultConfig->GetDeviceTypeStr();
+    }
     std::vector<bool> keyTypes(KeyType::KEY_TYPE_MAX, false);
     for (uint32_t i = 0; i < resHeader.keyCount_; i++) {
         std::shared_ptr<ResKey> key = std::make_shared<ResKey>();
