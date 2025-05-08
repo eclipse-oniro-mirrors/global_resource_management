@@ -26,7 +26,6 @@
 
 #include "hilog_wrapper.h"
 #include "locale_matcher.h"
-#include "res_common.h"
 #if defined(__WINNT__)
 #include <cstring>
 #else
