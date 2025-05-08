@@ -226,11 +226,11 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest002, 
     double average = 0;
     auto tmpRm = CreateResourceManager();
     if (tmpRm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     ResConfig *rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
         delete tmpRm;
     }
     rc->SetLocaleInfo("en", nullptr, "US");
@@ -257,13 +257,13 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest002, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest003, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
     ResConfig *rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, "US");
     rc->SetDeviceType(DeviceType::DEVICE_CAR);
@@ -289,7 +289,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest003, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest004, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -325,7 +325,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest004, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest005, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -354,7 +354,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest005, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest006, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -383,7 +383,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest006, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest007, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -419,7 +419,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest007, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest008, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -448,7 +448,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest008, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest009, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -476,7 +476,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest009, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest010, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -501,7 +501,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest010, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest011, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -536,7 +536,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest011, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest012, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -565,7 +565,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest012, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest013, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -597,7 +597,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest013, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest014, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -626,7 +626,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest014, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest015, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -658,7 +658,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest015, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest016, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -687,7 +687,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest016, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest017, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -715,7 +715,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest017, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest018, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -740,7 +740,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest018, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest019, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -768,7 +768,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest019, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest020, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -793,7 +793,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest020, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest021, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -821,7 +821,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest021, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest022, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -846,7 +846,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest022, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest023, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -874,7 +874,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest023, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest024, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -899,7 +899,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest024, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest025, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -927,7 +927,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest025, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest026, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -952,7 +952,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest026, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest027, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -980,7 +980,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest027, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest028, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -1005,7 +1005,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest028, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest029, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -1033,7 +1033,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest029, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest030, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -1058,7 +1058,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest030, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest031, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -1086,7 +1086,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest031, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest032, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -1111,7 +1111,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest032, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest033, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -1138,7 +1138,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest033, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest034, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -1163,7 +1163,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest034, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest035, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     EXPECT_TRUE(ret);
@@ -1190,7 +1190,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest035, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest036, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     EXPECT_TRUE(ret);
@@ -1218,7 +1218,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest036, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest037, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -1246,7 +1246,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest037, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest038, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -1272,7 +1272,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest038, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest039, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -1299,7 +1299,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest039, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest040, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -1324,7 +1324,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest040, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest041, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -1352,7 +1352,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest041, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest042, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -1378,7 +1378,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest042, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest043, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     EXPECT_TRUE(ret);
@@ -1406,7 +1406,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest043, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest044, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     EXPECT_TRUE(ret);
@@ -1433,7 +1433,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest044, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest045, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     EXPECT_TRUE(ret);
@@ -1460,7 +1460,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest045, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest046, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     EXPECT_TRUE(ret);
@@ -1487,7 +1487,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest046, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest047, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -1516,7 +1516,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest047, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest048, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -1543,7 +1543,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest048, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest049, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -1567,7 +1567,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest049, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest050, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     EXPECT_TRUE(ret);
@@ -1594,7 +1594,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest050, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest051, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -1619,7 +1619,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest051, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest052, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -1644,7 +1644,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest052, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest053, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     int id = GetResId("test_symbol", ResType::SYMBOL);
     ASSERT_TRUE(id > 0);
@@ -1671,7 +1671,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest053, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest054, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -1696,7 +1696,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest054, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest055, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     EXPECT_TRUE(ret);
@@ -1723,7 +1723,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest055, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest056, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     int id = GetResId("test_string2", ResType::STRING);
     ASSERT_TRUE(id > 0);
@@ -1751,7 +1751,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest056, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest057, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -1776,7 +1776,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest057, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest058, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     int id = GetResId("eat_apple", ResType::PLURALS);
     ASSERT_TRUE(id > 0);
@@ -1807,7 +1807,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest058, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest059, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     unsigned long long total = 0;
     double average = 0;
@@ -1835,7 +1835,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest059, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest060, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     EXPECT_TRUE(ret);
@@ -1862,7 +1862,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest060, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest061, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     EXPECT_TRUE(ret);
@@ -1891,7 +1891,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest061, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest062, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     EXPECT_TRUE(ret);
@@ -1918,7 +1918,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest062, 
 HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest063, TestSize.Level1)
 {
     if (rm == nullptr) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
     }
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     EXPECT_TRUE(ret);
