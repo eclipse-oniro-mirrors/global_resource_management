@@ -15,6 +15,7 @@
 
 #include "hap_parser.h"
 
+#include <algorithm>
 #include <cstdlib>
 #include <string>
 #include <fcntl.h>
@@ -606,7 +607,9 @@ int32_t ParseKeyParam(ParserContext &context, uint32_t &offset, bool &match, std
     if (resDeviceType == NOT_DEVICE_TYPE || context.deviceType == DEVICE_DEFAULT) {
         return OK;
     }
-    if (resDeviceType != context.deviceType) {
+    if ((context.deviceTypes.empty() && resDeviceType != context.deviceType) ||
+        (!context.deviceTypes.empty() && find(context.deviceTypes.begin(), context.deviceTypes.end(), resDeviceType) ==
+         context.deviceTypes.end())) {
         match = false;
     }
 #endif
@@ -740,9 +743,8 @@ int32_t HapParser::ParseResHex(ParserContext &context)
         return UNKNOWN_ERROR;
     }
     context.deviceType = context.resDesc.GetCurrentDeviceType();
-    if ((context.deviceType == std::string(TABLET_STR) || context.deviceType == std::string(TWOINONE_STR)) &&
-        !context.defaultConfig->GetDeviceTypeStr().empty()) {
-        context.deviceType = context.defaultConfig->GetDeviceTypeStr();
+    if (context.deviceType == std::string(TABLET_STR) || context.deviceType == std::string(TWOINONE_STR)) {
+        context.deviceTypes = context.resDesc.GetAppSupportDeviceTypes();
     }
     std::vector<bool> keyTypes(KeyType::KEY_TYPE_MAX, false);
     for (uint32_t i = 0; i < resHeader.keyCount_; i++) {

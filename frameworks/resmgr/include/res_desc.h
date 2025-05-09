@@ -220,6 +220,8 @@ public:
     std::vector<std::shared_ptr<ResKey>> keys_;
 
     std::string GetCurrentDeviceType();
+
+    std::vector<std::string> GetAppSupportDeviceTypes();
 };
 } // namespace Resource
 } // namespace Global
