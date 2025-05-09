@@ -506,6 +506,12 @@ int32_t ParseIdItem(const char *buffer, uint32_t &offset, const size_t &bufLen, 
     if (eret != OK) {
         return SYS_ERROR;
     }
+    if (idItem->resType_ >= ResType::MAX_RES_TYPE) {
+        RESMGR_HILOGE(RESMGR_TAG, "Parse idItem failed, the resType: %{public}u is out of bounds",
+            static_cast<uint32_t>(idItem->resType_));
+        return SYS_ERROR;
+    }
+
     if (selectedTypes != SELECT_ALL && (selectedTypes & ConvertType(idItem->resType_)) == 0) {
         return OK;
     }

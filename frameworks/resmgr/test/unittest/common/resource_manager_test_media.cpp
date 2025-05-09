@@ -122,8 +122,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest004, TestSize.
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_TV);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -158,8 +157,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest005, TestSize.
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -194,8 +192,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest006, TestSize.
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -230,8 +227,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest007, TestSize.
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -266,8 +262,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest008, TestSize.
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -350,8 +345,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest011, TestSize.
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_TABLET);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -386,8 +380,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest012, TestSize.
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_TABLET);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -422,8 +415,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest013, TestSize.
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_TABLET);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -458,8 +450,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest014, TestSize.
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_TABLET);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -494,8 +485,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest015, TestSize.
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_TABLET);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -530,8 +520,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest016, TestSize.
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_TABLET);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -566,8 +555,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest017, TestSize.
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("zh", nullptr, "CN");
     rc->SetMcc(460);
@@ -605,8 +593,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest018, TestSize.
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("zh", nullptr, "CN");
     rc->SetMcc(460);
@@ -644,8 +631,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest019, TestSize.
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("zh", nullptr, "CN");
     rc->SetMcc(460);
@@ -683,8 +669,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest020, TestSize.
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("zh", nullptr, "CN");
     rc->SetMcc(460);
@@ -722,8 +707,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest021, TestSize.
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("zh", nullptr, "CN");
     rc->SetMcc(460);
@@ -761,8 +745,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest022, TestSize.
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("zh", nullptr, "CN");
     rc->SetMcc(460);
@@ -811,8 +794,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetDrawableInfoByIdTest001, Te
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_TABLET);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -889,8 +871,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest004, TestSiz
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -923,8 +904,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest005, TestSiz
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -957,8 +937,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest006, TestSiz
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -991,8 +970,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest007, TestSiz
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -1025,8 +1003,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest008, TestSiz
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_PHONE);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -1104,8 +1081,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest011, TestSiz
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_TABLET);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -1138,8 +1114,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest012, TestSiz
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_TABLET);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -1172,8 +1147,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest013, TestSiz
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_TABLET);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -1206,8 +1180,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest014, TestSiz
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_TABLET);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -1240,8 +1213,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest015, TestSiz
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_TABLET);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -1274,8 +1246,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest016, TestSiz
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_TABLET);
     rc->SetColorMode(COLOR_MODE_NOT_SET);
@@ -1308,8 +1279,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest017, TestSiz
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetMcc(460);
     rc->SetMnc(101);
@@ -1345,8 +1315,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest018, TestSiz
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetMcc(460);
     rc->SetMnc(101);
@@ -1382,8 +1351,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest019, TestSiz
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetMcc(460);
     rc->SetMnc(101);
@@ -1419,8 +1387,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest020, TestSiz
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetMcc(460);
     rc->SetMnc(101);
@@ -1456,8 +1423,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest021, TestSiz
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetMcc(460);
     rc->SetMnc(101);
@@ -1493,8 +1459,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest022, TestSiz
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetMcc(460);
     rc->SetMnc(101);
@@ -1525,8 +1490,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetDrawableInfoByNameTest001, 
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetDeviceType(DEVICE_TABLET);
     rc->SetColorMode(COLOR_MODE_NOT_SET);

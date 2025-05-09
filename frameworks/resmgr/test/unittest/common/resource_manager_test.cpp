@@ -165,8 +165,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest001, TestSize.Le
     RState state;
     ResConfig *rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, "US");
     rc->SetDeviceType(DeviceType::DEVICE_CAR);
@@ -186,8 +185,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest002, TestSize.Le
     RState state;
     ResConfig *rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     state = rm->UpdateResConfig(*rc);
     delete rc;
@@ -205,8 +203,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest003, TestSize.Le
     RState state;
     ResConfig *rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo(nullptr, nullptr, "US");
     state = rm->UpdateResConfig(*rc);
@@ -227,17 +224,15 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest004, TestSize.Le
     RState state;
     ResConfig *rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     state = rm->UpdateResConfig(*rc);
     EXPECT_EQ(SUCCESS, state);
     ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
     if (!ret) {
-        EXPECT_TRUE(false);
+        ASSERT_TRUE(false);
         delete rc;
-        return;
     }
     // update to another language, will trigger reload
     // before reload:
@@ -280,8 +275,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest005, TestSize.Le
     RState state;
     ResConfig *rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, "US");
     state = rm->UpdateResConfig(*rc);
@@ -347,8 +341,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetResConfigTest002, TestSize.Level
     {
         ResConfig *rc = CreateResConfig();
         if (rc == nullptr) {
-            EXPECT_TRUE(false);
-            return;
+            ASSERT_TRUE(false);
         }
         rc->SetLocaleInfo("en", nullptr, "US");
 #ifdef SUPPORT_GRAPHICS
@@ -1787,8 +1780,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest001,
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDirection(DIRECTION_NOT_SET);
@@ -1819,8 +1811,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest002,
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDirection(DIRECTION_NOT_SET);
@@ -1851,8 +1842,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest003,
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("zh", nullptr, "CN");
     rc->SetDirection(DIRECTION_NOT_SET);
@@ -1883,8 +1873,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByIdForInputDeviceTest004,
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, "US");
     rc->SetDirection(DIRECTION_NOT_SET);
@@ -1915,8 +1904,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest00
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDirection(DIRECTION_NOT_SET);
@@ -1945,8 +1933,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest00
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDirection(DIRECTION_NOT_SET);
@@ -1975,8 +1962,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest00
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("zh", nullptr, "CN");
     rc->SetDirection(DIRECTION_NOT_SET);
@@ -2005,8 +1991,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest00
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, "US");
     rc->SetDirection(DIRECTION_NOT_SET);
@@ -2035,8 +2020,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest00
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("zh", nullptr, "CN");
     rc->SetDirection(DIRECTION_NOT_SET);
@@ -2064,8 +2048,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetStringByNameForInputDeviceTest00
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("zh", nullptr, "CN");
     rc->SetDirection(DIRECTION_NOT_SET);
@@ -2094,8 +2077,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDirection(DIRECTION_NOT_SET);
@@ -2124,8 +2106,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDirection(DIRECTION_NOT_SET);
@@ -2154,8 +2135,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("zh", nullptr, "CN");
     rc->SetDirection(DIRECTION_NOT_SET);
@@ -2184,8 +2164,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetIntegerByNameForInputDeviceTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, "US");
     rc->SetDirection(DIRECTION_NOT_SET);
@@ -2214,8 +2193,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByNameForInputDeviceTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDirection(DIRECTION_NOT_SET);
@@ -2244,8 +2222,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetBooleanByNameForInputDeviceTest0
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDirection(DIRECTION_NOT_SET);
@@ -2277,8 +2254,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest001
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDirection(DIRECTION_NOT_SET);
@@ -2310,8 +2286,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest002
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, nullptr);
     rc->SetDirection(DIRECTION_NOT_SET);
@@ -2343,8 +2318,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest003
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("zh", nullptr, "CN");
     rc->SetDirection(DIRECTION_NOT_SET);
@@ -2376,8 +2350,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetMediaByNameForInputDeviceTest004
 
     auto rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, "US");
     rc->SetDirection(DIRECTION_NOT_SET);
@@ -2404,8 +2377,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerResolveReferenceTest001, TestSize.L
 {
     ResConfig *rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, "US");
     rm->UpdateResConfig(*rc);
@@ -2465,8 +2437,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerResolveReferenceTest002, TestSize.L
 {
     ResConfig *rc = CreateResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, "US");
     rm->UpdateResConfig(*rc);
@@ -2653,8 +2624,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerCreateDefaultResConfigTest001, Test
 {
     ResConfig *rc = CreateDefaultResConfig();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     EXPECT_EQ(rc->GetColorMode(), COLOR_MODE_NOT_SET);
     delete(rc);
@@ -2669,8 +2639,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetOverrideResourceManager001, Test
 {
     std::shared_ptr<ResConfigImpl> rc = std::make_shared<ResConfigImpl>();
     if (rc == nullptr) {
-        EXPECT_TRUE(false);
-        return;
+        ASSERT_TRUE(false);
     }
     std::shared_ptr<ResourceManager> manager = rm->GetOverrideResourceManager(rc);
     EXPECT_TRUE(manager != nullptr);
