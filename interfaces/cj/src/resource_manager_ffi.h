@@ -48,6 +48,7 @@ extern "C" {
 
     FFI_EXPORT int64_t CJ_GetResourceManagerStageMode(OHOS::AbilityRuntime::Context* context);
     FFI_EXPORT RetDataI64 CJ_GetSystemResMgr();
+    FFI_EXPORT RetDataI64 FfiGetOverrideResMgr(int64_t id, OHOS::Resource::ConfigurationEx cfg);
     FFI_EXPORT int32_t CJ_CloseRawFd(int64_t id, const char* path);
     FFI_EXPORT int32_t CJ_GetRawFd(int64_t id, const char* rawFileName,
         OHOS::Global::Resource::ResourceManager::RawFileDescriptor &descriptor);
@@ -72,6 +73,9 @@ extern "C" {
     FFI_EXPORT int32_t CJ_GetNumberByResource(int64_t id, CResource resource, RetGetNumber &data);
     FFI_EXPORT int32_t CJ_GetNumberByName(int64_t id, const char* name, RetGetNumber &data);
     FFI_EXPORT int32_t CJ_GetConfiguration(int64_t id, OHOS::Resource::Configuration &cfg);
+    FFI_EXPORT int32_t FfiResMgrGetConfiguration(int64_t id, OHOS::Resource::ConfigurationEx* cfg);
+    FFI_EXPORT int32_t FfiResMgrGetOverrideConfiguration(int64_t id, OHOS::Resource::ConfigurationEx* cfg);
+    FFI_EXPORT void FfiResMgrFreeConfiguration(OHOS::Resource::ConfigurationEx* cfg);
     FFI_EXPORT int32_t CJ_GetDeviceCapability(int64_t id, OHOS::Resource::DeviceCapability &deviceCapability);
     FFI_EXPORT RetDataCArrUI8 CJ_GetMediaByName(int64_t id, const char* resName, uint32_t density);
     FFI_EXPORT RetDataCArrUI8 CJ_GetMediaContent(int64_t id, uint32_t resId, uint32_t density);

@@ -29,6 +29,17 @@ struct DeviceCapability {
     int32_t screenDensity;
     int32_t deviceType;
 };
+
+struct ConfigurationEx {
+    int32_t direction;
+    int32_t deviceType;
+    int32_t screenDensity;
+    int32_t colorMode;
+    uint32_t mcc;
+    uint32_t mnc;
+    char* locale;
+};
+
 class IResourceManager {
 public:
     virtual int32_t CloseRawFd(const std::string &name) = 0;
@@ -45,6 +56,8 @@ public:
     virtual int32_t GetFloatById(uint32_t id, float &outValue) = 0;
     virtual int32_t GetFloatByName(const char *name, float &outValue) = 0;
     virtual void GetConfiguration(Configuration &cfg) = 0;
+    virtual void GetConfiguration(ConfigurationEx *configuration) = 0;
+    virtual void GetOverrideConfiguration(ConfigurationEx *configuration) = 0;
     virtual void GetDeviceCapability(DeviceCapability &deviceCapability) = 0;
     virtual int32_t GetMediaDataByName(const char *name, size_t &len, std::unique_ptr<uint8_t[]> &outValue,
         uint32_t density) = 0;
@@ -65,6 +78,8 @@ public:
     virtual void GetLocales(bool includeSystem, std::vector<std::string> &outValue) = 0;
     virtual int32_t GetSymbolById(uint32_t id, uint32_t &outValue) = 0;
     virtual int32_t GetSymbolByName(const char *name, uint32_t &outValue) = 0;
+    virtual std::shared_ptr<Global::Resource::ResourceManager> GetOverrideResMgr(ConfigurationEx &configuration,
+        int32_t &errCode) = 0;
 };
 } // namespace Resource
 } // namespace OHOS
