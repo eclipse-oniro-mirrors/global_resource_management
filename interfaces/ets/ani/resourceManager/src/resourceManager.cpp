@@ -689,20 +689,15 @@ ani_double ResMgrAddon::GetNumberByName(ani_env* env, ani_object object, ani_str
     dataContext->addon_ = UnwrapAddon(env, object);
     dataContext->resName_ = AniStrToString(env, static_cast<ani_ref>(resName));
 
-    std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
-    bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
-    if (!ret) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getNumberByName");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
-        return ABNORMAL_NUMBER_RETURN_VALUE;
-    }
-
-    RState state = resMgr->GetFloatByName(dataContext->resName_.c_str(), dataContext->fValue_);
+    auto resMgr = dataContext->addon_->GetResMgr();
+    RState state = resMgr->GetIntegerByName(dataContext->resName_.c_str(), dataContext->iValue_);
     if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to process number in getNumberByName", false);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return ABNORMAL_NUMBER_RETURN_VALUE;
+        state = resMgr->GetFloatByName(dataContext->resName_.c_str(), dataContext->fValue_);
+        if (state != RState::SUCCESS) {
+            dataContext->SetErrorMsg("Failed to process number in getNumberByName", false);
+            ResourceManagerAniUtils::AniThrow(env, state);
+            return ABNORMAL_NUMBER_RETURN_VALUE;
+        }
     }
 
     ani_double aniValue;
@@ -1022,33 +1017,6 @@ void ResMgrAddon::RemoveResource(ani_env* env, ani_object object, ani_string pat
     }
 }
 
-static void SetNumberMember(ani_env *env, ani_object obj, const std::string name, const ani_int value)
-{
-    static const char *className = "Lstd/core/Int;";
-    ani_class cls;
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", className);
-        return;
-    }
-
-    ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find method '<ctor>' failed");
-        return;
-    }
-
-    ani_object intObj;
-    if (ANI_OK != env->Object_New(cls, ctor, &intObj, value)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "New object '%{public}s' failed", className);
-        return;
-    }
-
-    if (ANI_OK != env->Object_SetPropertyByName_Ref(obj, name.c_str(), intObj)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Set property '%{public}s' failed", name.c_str());
-        return;
-    }
-}
-
 ani_object ResMgrAddon::GetRawFdSync(ani_env* env, ani_object object, ani_string path)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
@@ -1082,9 +1050,17 @@ ani_object ResMgrAddon::GetRawFdSync(ani_env* env, ani_object object, ani_string
         return nullptr;
     }
 
-    SetNumberMember(env, obj, "fd", dataContext->descriptor_.fd);
-    SetNumberMember(env, obj, "offset", dataContext->descriptor_.offset);
-    SetNumberMember(env, obj, "length", dataContext->descriptor_.length);
+    if (ANI_OK != env->Object_SetPropertyByName_Double(obj, "fd", dataContext->descriptor_.fd)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Set property 'fd' failed");
+    }
+
+    if (ANI_OK != env->Object_SetPropertyByName_Double(obj, "offset", dataContext->descriptor_.offset)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Set property 'offset' failed");
+    }
+
+    if (ANI_OK != env->Object_SetPropertyByName_Double(obj, "length", dataContext->descriptor_.length)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Set property 'length' failed");
+    }
     return obj;
 }
 
