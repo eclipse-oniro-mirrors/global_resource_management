@@ -604,12 +604,14 @@ int32_t ParseKeyParam(ParserContext &context, uint32_t &offset, bool &match, std
     kp->InitStr();
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     auto resDeviceType = kp->GetDeviceTypeStr();
-    if (resDeviceType == NOT_DEVICE_TYPE || context.deviceType == DEVICE_DEFAULT) {
+    if (resDeviceType == NOT_DEVICE_TYPE ||
+        context.deviceType == DEVICE_DEFAULT ||
+        resDeviceType == context.deviceType) {
         return OK;
     }
-    if ((context.deviceTypes.empty() && resDeviceType != context.deviceType) ||
-        (!context.deviceTypes.empty() && find(context.deviceTypes.begin(), context.deviceTypes.end(), resDeviceType) ==
-         context.deviceTypes.end())) {
+    
+    if (!context.deviceTypes.empty() &&
+        find(context.deviceTypes.begin(), context.deviceTypes.end(), resDeviceType) == context.deviceTypes.end()) {
         match = false;
     }
 #endif
