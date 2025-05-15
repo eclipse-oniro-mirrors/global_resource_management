@@ -163,7 +163,7 @@ std::shared_ptr<ResourceManagerImpl> SystemResourceManager::CreateSystemResource
     if (!sysResMgr->Init(true)) {
         return nullptr;
     }
-#if !defined(__ARKUI_CROSS__)
+#if !defined(__ARKUI_CROSS__) && !defined(__IDE_PREVIEW__)
     if (!LoadSystemResource(sysResMgr.get(), false) && !LoadSystemResource(sysResMgr.get(), true)) {
         return nullptr;
     }

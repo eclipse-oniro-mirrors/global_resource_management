@@ -16,7 +16,11 @@
 #ifndef RESOURCE_MANAGER_ADDON_H
 #define RESOURCE_MANAGER_ADDON_H
 
+#if !defined(__IDE_PREVIEW__)
 #include "foundation/ability/ability_runtime/interfaces/kits/native/appkit/ability_runtime/context/context.h"
+#else
+#include "context.h"
+#endif
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "resource_manager.h"
@@ -24,7 +28,7 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
-class ResourceManagerAddon {
+class EXPORT_FUNC ResourceManagerAddon {
 #define GET_PARAMS(env, info, num)    \
     size_t argc = num;                \
     napi_value argv[num] = {nullptr}; \

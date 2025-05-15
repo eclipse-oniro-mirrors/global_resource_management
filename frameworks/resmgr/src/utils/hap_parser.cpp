@@ -401,7 +401,12 @@ RState HapParser::GetRawFileList(const std::string &hapPath, const std::string &
 RState HapParser::GetRawFileListUnCompressed(const std::string &indexPath, const std::string &rawDirPath,
     std::vector<std::string>& fileList)
 {
-    auto pos = indexPath.rfind('/');
+#ifdef __WINNT__
+    char seperator = '\\';
+#else
+    char seperator = '/';
+#endif
+    auto pos = indexPath.rfind(seperator);
     if (pos == std::string::npos) {
         return ERROR_CODE_RES_PATH_INVALID;
     }

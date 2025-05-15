@@ -63,7 +63,8 @@
             "zlib",
             "bounds_checking_function",
             "icu",
-            "cJSON"
+            "cJSON",
+            "graphic_2d"
           ]
       },
         "build": {
@@ -76,7 +77,8 @@
               "//base/global/resource_management/frameworks/resmgr:win_resmgr",
               "//base/global/resource_management/frameworks/resmgr:linux_resmgr",
               "//base/global/resource_management/frameworks/resmgr:mac_resmgr",
-              "//base/global/resource_management/frameworks/resmgr:ohresmgr"
+              "//base/global/resource_management/frameworks/resmgr:ohresmgr",
+              "//base/global/resource_management/interfaces/js/innerkits/core:resmgr_napi_core_preview"
             ],
             "inner_kits": [
               {
@@ -99,6 +101,15 @@
                   ]
                 },
                 "name": "//base/global/resource_management/interfaces/js/innerkits/core:resmgr_napi_core"
+              },
+              {
+                "header": {
+                  "header_base": "//base/global/resource_management/interfaces/js/innerkits/core/include/",
+                  "header_files": [
+                    "resource_manager_addon.h"
+                  ]
+                },
+                "name": "//base/global/resource_management/interfaces/js/innerkits/core:resmgr_napi_core_preview"
               },
               {
                 "header": {
