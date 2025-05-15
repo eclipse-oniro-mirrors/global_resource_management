@@ -48,8 +48,8 @@ using WriteLock = std::unique_lock<std::shared_mutex>;
 namespace OHOS {
 namespace Global {
 namespace Resource {
-HapResource::ValueUnderQualifierDir::ValueUnderQualifierDir(const std::shared_ptr<ResKey> &resKey,
-    const std::shared_ptr<IdItem> &idItem, const std::pair<std::string, std::string> &resPath, bool isOverlay,
+HapResource::ValueUnderQualifierDir::ValueUnderQualifierDir(const std::shared_ptr<ResKey> resKey,
+    const std::shared_ptr<IdItem> idItem, const std::pair<std::string, std::string> &resPath, bool isOverlay,
     bool systemResource) : resConfig_(resKey->resConfig_), idItem_(idItem), indexPath_(resPath.first),
     resourcePath_(resPath.second), isOverlay_(isOverlay), isSystemResource_(systemResource)
 {}
@@ -73,7 +73,7 @@ HapResource::~HapResource()
 }
 
 const std::shared_ptr<HapResource> HapResource::Load(const char *path,
-    std::shared_ptr<ResConfigImpl> &defaultConfig, bool isSystem, bool isOverlay, const uint32_t &selectedTypes)
+    std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem, bool isOverlay, const uint32_t &selectedTypes)
 {
     std::shared_ptr<HapResource> pResource;
     struct stat fileStat {};
@@ -207,7 +207,7 @@ bool GetIndexDataFromHap(const char *path, std::unique_ptr<uint8_t[]> &tmpBuf, s
 }
 
 const std::shared_ptr<HapResource> HapResource::LoadFromHap(const char *path,
-    std::shared_ptr<ResConfigImpl> &defaultConfig, bool isSystem, bool isOverlay, const uint32_t &selectedTypes)
+    std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem, bool isOverlay, const uint32_t &selectedTypes)
 {
     std::unique_ptr<uint8_t[]> buf;
     size_t bufLen = 0;
@@ -250,7 +250,7 @@ const std::shared_ptr<HapResource> HapResource::LoadFromHap(const char *path,
 }
 
 const std::unordered_map<std::string, std::shared_ptr<HapResource>> HapResource::LoadOverlays(const std::string &path,
-    const std::vector<std::string> &overlayPaths, std::shared_ptr<ResConfigImpl> &defaultConfig, bool isSystem)
+    const std::vector<std::string> &overlayPaths, std::shared_ptr<ResConfigImpl> defaultConfig, bool isSystem)
 {
     std::unordered_map<std::string, std::shared_ptr<HapResource>> result;
     do {
@@ -332,7 +332,7 @@ void HapResource::UpdateOverlayInfo(std::unordered_map<std::string, std::unorder
     idValuesMap_.swap(newIdValuesMap);
 }
 
-bool HapResource::Init(std::shared_ptr<ResConfigImpl> &defaultConfig)
+bool HapResource::Init(std::shared_ptr<ResConfigImpl> defaultConfig)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
@@ -368,8 +368,8 @@ bool HapResource::Init(std::shared_ptr<ResConfigImpl> &defaultConfig)
     return InitIdList(defaultConfig);
 }
 
-bool HapResource::InitMap(const std::shared_ptr<ResKey> &resKey, const std::pair<std::string, std::string> &resPath,
-    std::shared_ptr<ResConfigImpl> &defaultConfig)
+bool HapResource::InitMap(const std::shared_ptr<ResKey> resKey, const std::pair<std::string, std::string> &resPath,
+    std::shared_ptr<ResConfigImpl> defaultConfig)
 {
     for (size_t j = 0; j < resKey->resId_->idParams_.size(); ++j) {
         std::shared_ptr<IdParam> idParam = resKey->resId_->idParams_[j];
@@ -410,7 +410,7 @@ bool HapResource::InitMap(const std::shared_ptr<ResKey> &resKey, const std::pair
     return true;
 }
 
-bool HapResource::InitIdList(std::shared_ptr<ResConfigImpl> &defaultConfig)
+bool HapResource::InitIdList(std::shared_ptr<ResConfigImpl> defaultConfig)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
