@@ -516,7 +516,7 @@ RState Utils::GetFiles(const std::string &strCurrentDir, std::vector<std::string
         RESMGR_HILOGE(RESMGR_TAG, "invalid path, %{public}s", strCurrentDir.c_str());
         return ERROR_CODE_RES_PATH_INVALID;
     }
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
+#if !defined(__WINNT__)
     DIR *dir;
     struct dirent *pDir;
     if ((dir = opendir(strCurrentDir.c_str())) == nullptr) {
