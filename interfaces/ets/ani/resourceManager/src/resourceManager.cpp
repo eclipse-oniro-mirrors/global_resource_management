@@ -99,7 +99,7 @@ static std::string AniStrToString(ani_env *env, ani_ref aniStr)
 static ani_object CreateAniUint8Array(ani_env* env, ResMgrDataContext &context)
 {
     size_t length = context.len_;
-    std::unique_ptr<uint8_t[]> data(new uint8_t[length]);
+    auto data = std::make_unique<uint8_t[]>(length);
     std::unique_ptr<uint8_t[]> tempData = std::move(context.mediaData);
     std::copy(tempData.get(), tempData.get() + length, data.get());
 
