@@ -56,7 +56,7 @@ namespace Resource {
 #ifdef SUPPORT_GRAPHICS
 constexpr uint32_t PLURAL_CACHE_MAX_COUNT = 3;
 #endif
-#if defined(__ARKUI_CROSS__)
+#if defined(__ARKUI_CROSS__) || defined(__WINNT__) || defined(__IDE_PREVIEW__)
 const std::string RAW_FILE_PATH = "resources/rawfile/";
 #endif
 
@@ -856,7 +856,7 @@ int32_t HapManager::GetValidIndexPath(std::string &indexPath)
     ReadLock lock(this->mutex_);
     for (auto iter = hapResources_.rbegin(); iter != hapResources_.rend(); iter++) {
         const std::string tempPath = (*iter)->GetIndexPath();
-        if (Utils::endWithTail(tempPath, "/systemres/resources.index")) {
+        if (Utils::IsSystemPath(tempPath)) {
             continue;
         }
         indexPath = tempPath;
@@ -1289,7 +1289,7 @@ RState HapManager::IsRawDirFromHap(const std::string &pathName, bool &outValue)
                 continue;
             }
         } else { // if file path is uncompressed
-#if !defined(__ARKUI_CROSS__)
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
             RState state = HapParser::IsRawDirUnCompressed(pathName, outValue);
             if (state != SUCCESS) {
                 continue;

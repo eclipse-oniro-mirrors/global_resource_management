@@ -13,15 +13,16 @@
  * limitations under the License.
  */
 
+#if !defined(__IDE_PREVIEW__)
 #include "resource_manager_addon.h"
-
 #include "ability.h"
 #include "foundation/ability/ability_runtime/interfaces/kits/native/appkit/ability_runtime/context/context.h"
-#include "hilog/log.h"
 #include "hisysevent_adapter.h"
 #include "hitrace_meter.h"
 #include "js_runtime_utils.h"
+#endif
 
+#include "hilog/log.h"
 #include "napi/native_api.h"
 #include "napi/native_common.h"
 #include "res_common.h"
@@ -30,6 +31,7 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
+#if !defined(__IDE_PREVIEW__)
 #define GET_PARAMS(env, info, num)    \
     size_t argc = num;                \
     napi_value argv[num] = {nullptr}; \
@@ -195,6 +197,7 @@ static napi_value GetResourceManager(napi_env env, napi_callback_info info)
     napi_value result = getResult(env, asyncContext, bundleName, abilityRuntimeContext);
     return result;
 }
+#endif
 
 static napi_value GetSystemResourceManager(napi_env env, napi_callback_info info)
 {
@@ -268,14 +271,22 @@ static napi_value InitColorModeObject(napi_env env)
 static napi_value ResMgrInit(napi_env env, napi_value exports)
 {
     std::string traceVal = "GetResourceManager";
+#if !defined(__IDE_PREVIEW__)
     StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
     napi_property_descriptor creatorProp[] = {
         DECLARE_NAPI_FUNCTION("getResourceManager", GetResourceManager),
         DECLARE_NAPI_FUNCTION("getSystemResourceManager", GetSystemResourceManager),
     };
+#else
+    napi_property_descriptor creatorProp[] = {
+        DECLARE_NAPI_FUNCTION("getSystemResourceManager", GetSystemResourceManager),
+    };
+#endif
     napi_status status = napi_define_properties(env, exports, sizeof(creatorProp) / sizeof(creatorProp[0]),
         creatorProp);
+#if !defined(__IDE_PREVIEW__)
     FinishTrace(HITRACE_TAG_GLOBAL_RESMGR);
+#endif
     if (status != napi_ok) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to set getResourceManager at init");
         return nullptr;

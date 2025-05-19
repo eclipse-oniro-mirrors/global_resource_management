@@ -14,7 +14,15 @@
 import("//build/ohos.gni")
 import("../../../../resmgr.gni")
 
-config("resmgr_napi_core_public_config") {
+resmgr_napi_core_source = [
+    "src/resource_manager_addon.cpp",
+    "src/resource_manager_napi_async_impl.cpp",
+    "src/resource_manager_napi_context.cpp",
+    "src/resource_manager_napi_sync_impl.cpp",
+    "src/resource_manager_napi_utils.cpp",
+]
+
+config("resmgr_napi_core_public_config_all") {
   include_dirs = [
     "include",
     "../../../../dfx/hisysevent_adapter",
@@ -22,21 +30,27 @@ config("resmgr_napi_core_public_config") {
   ]
 }
 
+config("resmgr_napi_core_public_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "include",
+    "../../../../frameworks/resmgr/include",
+  ]
+}
+
 ohos_shared_library("resmgr_napi_core") {
-  sources = [
+  sources = resmgr_napi_core_source
+
+  sources += [
     "../../../../dfx/hisysevent_adapter/hisysevent_adapter.cpp",
-    "src/resource_manager_addon.cpp",
-    "src/resource_manager_napi_async_impl.cpp",
-    "src/resource_manager_napi_context.cpp",
-    "src/resource_manager_napi_sync_impl.cpp",
-    "src/resource_manager_napi_utils.cpp",
   ]
 
   defines = [ "CONFIG_HILOG" ]
 
   version_script = "libresmgr_napi_core.versionscript"
 
-  public_configs = [ ":resmgr_napi_core_public_config" ]
+  public_configs = [ ":resmgr_napi_core_public_config_all" ]
 
   deps = [ "../../../../frameworks/resmgr:global_resmgr" ]
 
@@ -66,5 +80,51 @@ ohos_shared_library("resmgr_napi_core") {
   }
   subsystem_name = "global"
   innerapi_tags = [ "platformsdk" ]
+  part_name = "resource_management"
+}
+
+ohos_shared_library("resmgr_napi_core_preview") {
+  if (is_mingw || is_mac || is_linux) {
+    defines = [
+      "__IDE_PREVIEW__",
+    ]
+    cflags = [
+      "-std=c++17",
+      "-Wno-ignored-attributes",
+    ]
+
+    sources = resmgr_napi_core_source
+
+    public_configs = [
+      ":resmgr_napi_core_public_config",
+      "${ability_runtime_path}/frameworks/simulator/common:ability_simulator_common_config",
+    ]
+
+    if (resource_management_support_icu) {
+      defines += [ "SUPPORT_GRAPHICS" ]
+    }
+
+    if (is_mingw) {
+      defines += [
+        "__WINNT__",
+        "__EXPORT_MGR__",
+      ]
+      deps = [ "../../../../frameworks/resmgr:global_resmgr_win" ]
+    } else if (is_mac) {
+      deps = [ "../../../../frameworks/resmgr:global_resmgr_mac" ]
+    } else if (is_linux) {
+      defines += [ "__LINUX__" ]
+      deps = [ "../../../../frameworks/resmgr:global_resmgr_linux" ]
+    }
+
+    external_deps = [
+      "graphic_2d:librender_service_client",
+      "ace_engine:drawable_descriptor",
+      "bounds_checking_function:libsec_shared",
+      "hilog:libhilog",
+      "napi:ace_napi",
+    ]
+  }
+  subsystem_name = "global"
   part_name = "resource_management"
 }
