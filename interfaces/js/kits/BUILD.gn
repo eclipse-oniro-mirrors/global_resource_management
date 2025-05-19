@@ -14,6 +14,15 @@
 import("//build/ohos.gni")
 import("../../../resmgr.gni")
 
+config("resourcemanager_preview_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "../../../frameworks/resmgr/include",
+    "../../inner_api/include",
+  ]
+}
+
 ohos_shared_library("resourcemanager") {
   include_dirs = [
     "../../../dfx/hisysevent_adapter",
@@ -54,6 +63,41 @@ ohos_shared_library("resourcemanager") {
   part_name = "resource_management"
 }
 
+ohos_shared_library("resourcemanager_preview") {
+  if (is_mingw || is_mac || is_linux) {
+    output_name = "resourcemanager"
+    defines = [
+      "__IDE_PREVIEW__",
+    ]
+
+    if (is_mingw) {
+      defines += [
+        "__WINNT__",
+        "__EXPORT_MGR__",
+      ]
+    } else if (is_linux) {
+      defines += [ "__LINUX__" ]
+    }
+
+    public_configs = [ ":resourcemanager_preview_config" ]
+
+    sources = [
+      "src/resource_manager_napi.cpp",
+    ]
+
+    defines += [ "CONFIG_HILOG" ]
+
+    deps = [ "../innerkits/core:resmgr_napi_core_preview" ]
+
+    external_deps = [
+      "hilog:libhilog",
+      "napi:ace_napi",
+    ]
+  }
+  subsystem_name = "global"
+  part_name = "resource_management"
+}
+
 ohos_shared_library("sendableresourcemanager") {
   include_dirs = [ "../../inner_api/include" ]
 
@@ -76,6 +120,24 @@ ohos_shared_library("sendableresourcemanager") {
     ubsan = true
   }
   relative_install_dir = "module"
+  subsystem_name = "global"
+  part_name = "resource_management"
+}
+
+ohos_shared_library("sendableresourcemanager_preview") {
+  if (is_mingw || is_mac || is_linux) {
+    output_name = "sendableresourcemanager"
+    include_dirs = [ "../../inner_api/include" ]
+
+    sources = [ "src/sendable_resource_manager_napi.cpp" ]
+
+    defines = [ "CONFIG_HILOG" ]
+
+    external_deps = [
+      "hilog:libhilog",
+      "napi:ace_napi",
+    ]
+  }
   subsystem_name = "global"
   part_name = "resource_management"
 }

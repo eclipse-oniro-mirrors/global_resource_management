@@ -110,12 +110,15 @@ public:
 
     static RState GetFiles(const std::string &strCurrentDir, std::vector<std::string> &vFiles);
 
+    static RState GetFilesForWin(const std::string &strCurrentDir, std::vector<std::string> &vFiles);
+
     static bool convertToInteger(const std::string& str, int& outValue);
 
     static bool convertToUnsignedLong(const std::string& str, unsigned long& outValue);
 
     static bool convertToDouble(const std::string& str, double& outValue);
 
+    static bool IsSystemPath(const std::string& path);
 private:
     static bool IsValidValue(const char* end, const std::string& str);
     static uint16_t EncodeLanguageOrRegion(const char *str, char base);

@@ -32,6 +32,7 @@
 #ifdef __WINNT__
 #include <shlwapi.h>
 #include <windows.h>
+#include <io.h>
 #undef ERROR
 #endif
 
@@ -485,15 +486,37 @@ void Utils::CanonicalizePath(const char *path, char *outPath, size_t len)
 #endif
 }
 
+RState Utils::GetFilesForWin(const std::string &strCurrentDir, std::vector<std::string> &vFiles)
+{
+#if defined(__WINNT__) && defined(__IDE_PREVIEW__)
+    struct _finddata_t findData;
+    std::string findPath = strCurrentDir + "\\*.*";
+    intptr_t handle = _findfirst(findPath.c_str(), &findData);
+    if (handle == ERROR_RESULT) {
+        RESMGR_HILOGE(RESMGR_TAG, "invalid path, %{public}s", strCurrentDir.c_str());
+        return ERROR_CODE_RES_PATH_INVALID;
+    }
+
+    do {
+        if (strcmp(findData.name, ".") == 0 || strcmp(findData.name, "..") == 0) {
+            continue;
+        }
+        vFiles.emplace_back(findData.name);
+    } while (_findnext(handle, &findData) == 0);
+    _findclose(handle);
+#endif
+    return SUCCESS;
+}
+
 RState Utils::GetFiles(const std::string &strCurrentDir, std::vector<std::string> &vFiles)
 {
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
     char outPath[PATH_MAX + 1] = {0};
     Utils::CanonicalizePath(strCurrentDir.c_str(), outPath, PATH_MAX);
     if (outPath[0] == '\0') {
         RESMGR_HILOGE(RESMGR_TAG, "invalid path, %{public}s", strCurrentDir.c_str());
         return ERROR_CODE_RES_PATH_INVALID;
     }
+#if !defined(__WINNT__)
     DIR *dir;
     struct dirent *pDir;
     if ((dir = opendir(strCurrentDir.c_str())) == nullptr) {
@@ -510,6 +533,8 @@ RState Utils::GetFiles(const std::string &strCurrentDir, std::vector<std::string
         vFiles.emplace_back(pDir->d_name);
     }
     closedir(dir);
+#else
+    return GetFilesForWin(strCurrentDir, vFiles);
 #endif
     return SUCCESS;
 }
@@ -557,6 +582,13 @@ bool Utils::convertToDouble(const std::string& str, double& outValue)
     }
     outValue = value;
     return true;
+}
+
+bool Utils::IsSystemPath(const std::string& path)
+{
+    return Utils::endWithTail(path, "/systemres/resources.index")
+        || Utils::endWithTail(path, "\\resources\\resources.index")
+        || Utils::endWithTail(path, "/resources/resources.index");
 }
 } // namespace Resource
 } // namespace Global

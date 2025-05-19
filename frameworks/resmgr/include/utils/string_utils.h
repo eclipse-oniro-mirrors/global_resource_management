@@ -28,8 +28,8 @@ namespace Global {
 namespace Resource {
 std::string FormatString(const char *fmt, ...);
 
-std::string FormatString(const char *fmt, va_list args);
-    
+EXPORT_FUNC std::string FormatString(const char *fmt, va_list args);
+
 bool parseArgs(const std::string &inputOutputValue, va_list args,
     std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams);
 

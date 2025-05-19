@@ -16,8 +16,10 @@
 #include "resource_manager_napi_async_impl.h"
 
 #include <unordered_map>
+#if !defined(__IDE_PREVIEW__)
 #include "hisysevent_adapter.h"
 #include "hitrace_meter.h"
+#endif
 #include "resource_manager_napi_utils.h"
 namespace OHOS {
 namespace Global {
@@ -418,7 +420,9 @@ auto getStringFunc = [](napi_env env, void* data) {
     RState state = resMgr->GetStringById(resId, dataContext->value_);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("GetStringById failed state", true, state);
+#if !defined(__IDE_PREVIEW__)
         ReportGetResourceByIdFail(resId, dataContext->value_, "failed in getStringFunc");
+#endif
         return;
     }
     dataContext->createValueFunc_ = ResourceManagerNapiUtils::CreateJsString;
@@ -447,8 +451,10 @@ auto getStringByNameFunc = [](napi_env env, void* data) {
         dataContext->value_);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("GetStringByName failed state", false, state);
+#if !defined(__IDE_PREVIEW__)
         ReportGetResourceByNameFail(dataContext->resName_, dataContext->value_,
             "failed in getStringByNameFunc");
+#endif
         return;
     }
     dataContext->createValueFunc_ = ResourceManagerNapiUtils::CreateJsString;
@@ -553,10 +559,14 @@ napi_value ResourceManagerNapiAsyncImpl::GetMediaContent(napi_env env, napi_call
 
 napi_value ResourceManagerNapiAsyncImpl::GetMedia(napi_env env, napi_callback_info info)
 {
+#if !defined(__IDE_PREVIEW__)
     std::string traceVal = "ResourceManagerAddon::GetMedia";
     StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
+#endif
     napi_value media = ProcessOnlyIdParam(env, info, "getMedia", getMediaFunc);
+#if !defined(__IDE_PREVIEW__)
     FinishTrace(HITRACE_TAG_GLOBAL_RESMGR);
+#endif
     return media;
 }
 
@@ -605,10 +615,14 @@ napi_value ResourceManagerNapiAsyncImpl::GetMediaContentBase64(napi_env env, nap
 
 napi_value ResourceManagerNapiAsyncImpl::GetMediaBase64(napi_env env, napi_callback_info info)
 {
+#if !defined(__IDE_PREVIEW__)
     std::string traceVal = "ResourceManagerAddon::GetMediaBase64";
     StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
+#endif
     napi_value mediaBase64 = ProcessOnlyIdParam(env, info, "GetMediaBase64", getMediaBase64Func);
+#if !defined(__IDE_PREVIEW__)
     FinishTrace(HITRACE_TAG_GLOBAL_RESMGR);
+#endif
     return mediaBase64;
 }
 
@@ -618,10 +632,14 @@ napi_value ResourceManagerNapiAsyncImpl::GetMediaBase64ByName(napi_env env, napi
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
+#if !defined(__IDE_PREVIEW__)
     std::string traceVal = "ResourceManagerAddon::GetMediaBase64ByName";
     StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
+#endif
     napi_value mediaBase64 = ProcessNameParamV9(env, info, "GetMediaBase64ByName", getMediaBase64Func);
+#if !defined(__IDE_PREVIEW__)
     FinishTrace(HITRACE_TAG_GLOBAL_RESMGR);
+#endif
     return mediaBase64;
 }
 
@@ -764,10 +782,14 @@ napi_value ResourceManagerNapiAsyncImpl::GetMediaByName(napi_env env, napi_callb
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
+#if !defined(__IDE_PREVIEW__)
     std::string traceVal = "ResourceManagerAddon::GetMediaByName";
     StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
+#endif
     napi_value media = ProcessNameParamV9(env, info, "getMediaByName", getMediaByNameFunc);
+#if !defined(__IDE_PREVIEW__)
     FinishTrace(HITRACE_TAG_GLOBAL_RESMGR);
+#endif
     return media;
 }
 
