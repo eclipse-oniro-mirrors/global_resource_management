@@ -134,8 +134,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as string);
-            }).catch((err: BusinessError): void => {
-                callback(err, "");
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, "");
             });
         }
 
@@ -145,7 +145,7 @@ export default namespace resourceManager {
                     return this.getStringSync(resId);
                 }).then((content: NullishType) => {
                     resolve(content as string);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -157,8 +157,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as string);
-            }).catch((err: BusinessError): void => {
-                callback(err, "");
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, "");
             });
         }
 
@@ -168,7 +168,7 @@ export default namespace resourceManager {
                     return this.getStringSync(resource);
                 }).then((content: NullishType) => {
                     resolve(content as string);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -180,8 +180,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as Uint8Array);
-            }, (err: BusinessError): void => {
-                callback(err, new Uint8Array());
+            }, (err: Error): void => {
+                callback(err as BusinessError, new Uint8Array());
             });
         }
 
@@ -191,7 +191,7 @@ export default namespace resourceManager {
                     return this.getRawFileContentSync(path);
                 }).then((content: NullishType) => {
                     resolve(content as Uint8Array);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
