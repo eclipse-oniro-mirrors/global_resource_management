@@ -30,6 +30,12 @@ class ResConfigImpl : public ResConfig {
 public:
     ResConfigImpl();
 
+    static std::string GetCurrentDeviceType();
+
+    static std::vector<std::string> GetAppSupportDeviceTypes();
+
+    static DeviceType ParseDeviceTypeStr(const std::string &deviceType);
+
     /**
      * Whether this resConfig more match request resConfig
      * @param other the other resConfig

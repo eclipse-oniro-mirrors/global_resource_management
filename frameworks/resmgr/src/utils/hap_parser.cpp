@@ -609,13 +609,8 @@ int32_t ParseKeyParam(ParserContext &context, uint32_t &offset, bool &match, std
     kp->InitStr();
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     auto resDeviceType = kp->GetDeviceTypeStr();
-    if (resDeviceType == NOT_DEVICE_TYPE ||
-        context.deviceType == DEVICE_DEFAULT ||
-        resDeviceType == context.deviceType) {
-        return OK;
-    }
-    
-    if (!context.deviceTypes.empty() &&
+    context.deviceTypes.push_back(context.deviceType);
+    if (context.deviceType != DEVICE_DEFAULT && resDeviceType != NOT_DEVICE_TYPE &&
         find(context.deviceTypes.begin(), context.deviceTypes.end(), resDeviceType) == context.deviceTypes.end()) {
         match = false;
     }
@@ -749,9 +744,9 @@ int32_t HapParser::ParseResHex(ParserContext &context)
     if (resHeader.keyCount_ == 0 || resHeader.length_ == 0) {
         return UNKNOWN_ERROR;
     }
-    context.deviceType = context.resDesc.GetCurrentDeviceType();
+    context.deviceType = ResConfigImpl::GetCurrentDeviceType();
     if (context.deviceType == std::string(TABLET_STR) || context.deviceType == std::string(TWOINONE_STR)) {
-        context.deviceTypes = context.resDesc.GetAppSupportDeviceTypes();
+        context.deviceTypes = ResConfigImpl::GetAppSupportDeviceTypes();
     }
     std::vector<bool> keyTypes(KeyType::KEY_TYPE_MAX, false);
     for (uint32_t i = 0; i < resHeader.keyCount_; i++) {

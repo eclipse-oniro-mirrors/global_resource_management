@@ -21,6 +21,10 @@
 #include "locale_matcher.h"
 #include "res_locale.h"
 #include "utils/utils.h"
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+#include "parameters.h"
+#endif
+
 #ifdef SUPPORT_GRAPHICS
 using icu::Locale;
 using icu::LocaleBuilder;
@@ -28,6 +32,9 @@ using icu::LocaleBuilder;
 namespace OHOS {
 namespace Global {
 namespace Resource {
+const std::string PROPERTY_DEVICE_TYPE = "const.product.devicetype";
+const std::string PROPERTY_SUPPORT_APP_TYPES = "const.bms.supportAppTypes";
+const std::string PROPERTY_DEVICE_TYPE_DEFAULT = "default";
 
 static const std::vector<std::pair<float, ScreenDensity>> resolutions = {
     { 0.0, ScreenDensity::SCREEN_DENSITY_NOT_SET },
@@ -395,13 +402,74 @@ bool ResConfigImpl::CopyLocaleAndPreferredLocale(ResConfig &other)
     return true;
 }
 
+std::string ResConfigImpl::GetCurrentDeviceType()
+{
+    std::string deviceType;
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    deviceType = system::GetParameter(PROPERTY_DEVICE_TYPE, PROPERTY_DEVICE_TYPE_DEFAULT);
+#endif
+    return deviceType;
+}
+
+std::vector<std::string> ResConfigImpl::GetAppSupportDeviceTypes()
+{
+    std::vector<std::string> supportDeviceTypes;
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    std::string deviceTypes = system::GetParameter(PROPERTY_SUPPORT_APP_TYPES, PROPERTY_DEVICE_TYPE_DEFAULT);
+    std::string deviceType = "";
+    for (size_t i = 0; i < deviceTypes.length(); i++) {
+        if (deviceTypes[i] == ',') {
+            supportDeviceTypes.push_back(deviceType);
+            deviceType = "";
+        } else {
+            deviceType += deviceTypes[i];
+        }
+    }
+    if (deviceType.length() != 0) {
+        supportDeviceTypes.push_back(deviceType);
+        deviceType = "";
+    }
+#endif
+    return supportDeviceTypes;
+}
+
+DeviceType ResConfigImpl::ParseDeviceTypeStr(const std::string &deviceType)
+{
+    if (deviceType == std::string(PHONE_STR)) {
+        return DeviceType::DEVICE_PHONE;
+    }
+    if (deviceType == std::string(TABLET_STR)) {
+        return DeviceType::DEVICE_TABLET;
+    }
+    if (deviceType == std::string(CAR_STR)) {
+        return DeviceType::DEVICE_CAR;
+    }
+    if (deviceType == std::string(PAD_STR)) {
+        return DeviceType::DEVICE_PAD;
+    }
+    if (deviceType == std::string(TV_STR)) {
+        return DeviceType::DEVICE_TV;
+    }
+    if (deviceType == std::string(WEARABLE_STR)) {
+        return DeviceType::DEVICE_WEARABLE;
+    }
+    if (deviceType == std::string(TWOINONE_STR)) {
+        return DeviceType::DEVICE_TWOINONE;
+    }
+    return DeviceType::DEVICE_NOT_SET;
+}
+
 bool ResConfigImpl::Copy(ResConfig &other, bool isRead)
 {
     if (!this->CopyLocaleAndPreferredLocale(other)) {
         return false;
     }
     if (this->GetDeviceType() != other.GetDeviceType()) {
-        this->SetDeviceType(other.GetDeviceType());
+        if (other.GetDeviceType() != DEVICE_NOT_SET) {
+            this->SetDeviceType(other.GetDeviceType());
+        } else {
+            this->SetDeviceType(ParseDeviceTypeStr(GetCurrentDeviceType()));
+        }
     }
     if (this->GetDirection() != other.GetDirection()) {
         this->SetDirection(other.GetDirection());
