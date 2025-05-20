@@ -571,7 +571,7 @@ ani_string ResMgrAddon::getPluralStringValueSyncById(ani_env* env, ani_object ob
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     uint32_t notUse = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, notUse);
-    if (!ret) {
+    if (!ret || resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getPluralStringValueSyncById");
         ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
         return nullptr;
