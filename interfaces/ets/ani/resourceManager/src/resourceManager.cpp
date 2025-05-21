@@ -1015,7 +1015,6 @@ void ResMgrAddon::AddResource(ani_env* env, ani_object object, ani_string path)
     dataContext->path_ = AniStrToString(env, path);
 
     auto resMgr = UnwrapAddon(env, object);
-
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "resMgr is null, add overlay path = %{public}s", dataContext->path_.c_str());
         return;
@@ -1034,7 +1033,6 @@ void ResMgrAddon::RemoveResource(ani_env* env, ani_object object, ani_string pat
     dataContext->path_ = AniStrToString(env, path);
 
     auto resMgr = UnwrapAddon(env, object);
-
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "resMgr is null, overlay path = %{public}s", dataContext->path_.c_str());
         return;
