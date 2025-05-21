@@ -691,6 +691,7 @@ ani_double ResMgrAddon::GetNumberByName(ani_env* env, ani_object object, ani_str
 
     if (dataContext->addon_ == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getNumberByName");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
         return ABNORMAL_NUMBER_RETURN_VALUE;
     }
 
@@ -818,6 +819,7 @@ ani_string ResMgrAddon::GetIntPluralStringByNameSync(ani_env* env, ani_object ob
 
     if (dataContext->addon_ == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getIntPluralStringByNameSync");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
         return nullptr;
     }
 
@@ -917,6 +919,7 @@ ani_string ResMgrAddon::GetDoublePluralStringByNameSync(ani_env* env, ani_object
 
     if (dataContext->addon_ == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getDoublePluralStringByNameSync");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
         return nullptr;
     }
 
@@ -1014,7 +1017,7 @@ void ResMgrAddon::AddResource(ani_env* env, ani_object object, ani_string path)
     auto resMgr = UnwrapAddon(env, object);
 
     if (resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in addResource");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "resMgr is null, add overlay path = %{public}s", dataContext->path_.c_str());
         return;
     }
 
@@ -1033,8 +1036,7 @@ void ResMgrAddon::RemoveResource(ani_env* env, ani_object object, ani_string pat
     auto resMgr = UnwrapAddon(env, object);
 
     if (resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in removeResource");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        RESMGR_HILOGE(RESMGR_JS_TAG, "resMgr is null, overlay path = %{public}s", dataContext->path_.c_str());
         return;
     }
 
@@ -1053,6 +1055,7 @@ ani_object ResMgrAddon::GetRawFdSync(ani_env* env, ani_object object, ani_string
 
     if (dataContext->addon_ == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getRawFdSync");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
         return nullptr;
     }
 
@@ -1105,6 +1108,7 @@ void ResMgrAddon::CloseRawFdSync(ani_env* env, ani_object object, ani_string pat
 
     if (dataContext->addon_ == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in closeRawFdSync");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
         return;
     }
 
@@ -1124,6 +1128,7 @@ ani_object ResMgrAddon::GetRawFileListSync(ani_env* env, ani_object object, ani_
 
     if (dataContext->addon_ == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getRawFileListSync");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
         return nullptr;
     }
 
@@ -1146,6 +1151,7 @@ ani_object ResMgrAddon::GetRawFileContentSync(ani_env* env, ani_object object, a
 
     if (dataContext->addon_ == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getRawFileContentSync");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
         return nullptr;
     }
 
