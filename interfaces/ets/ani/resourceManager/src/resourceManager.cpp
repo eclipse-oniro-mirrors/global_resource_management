@@ -689,6 +689,12 @@ ani_double ResMgrAddon::GetNumberByName(ani_env* env, ani_object object, ani_str
     dataContext->addon_ = UnwrapAddon(env, object);
     dataContext->resName_ = AniStrToString(env, static_cast<ani_ref>(resName));
 
+    if (dataContext->addon_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getNumberByName");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
+        return ABNORMAL_NUMBER_RETURN_VALUE;
+    }
+
     auto resMgr = dataContext->addon_->GetResMgr();
     RState state = resMgr->GetIntegerByName(dataContext->resName_.c_str(), dataContext->iValue_);
     if (state != RState::SUCCESS) {
@@ -811,6 +817,12 @@ ani_string ResMgrAddon::GetIntPluralStringByNameSync(ani_env* env, ani_object ob
         return nullptr;
     }
 
+    if (dataContext->addon_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getIntPluralStringByNameSync");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
+        return nullptr;
+    }
+
     RState state = dataContext->addon_->GetResMgr()->GetFormatPluralStringByName(dataContext->value_,
         dataContext->resName_.c_str(), dataContext->quantity_, dataContext->jsParams_);
     if (state != RState::SUCCESS) {
@@ -902,6 +914,12 @@ ani_string ResMgrAddon::GetDoublePluralStringByNameSync(ani_env* env, ani_object
     if (!InitAniParameters(env, args, dataContext->jsParams_)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "InitOptionalParameters formatting error");
         ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_ID_FORMAT_ERROR);
+        return nullptr;
+    }
+
+    if (dataContext->addon_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getDoublePluralStringByNameSync");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
         return nullptr;
     }
 
@@ -997,6 +1015,11 @@ void ResMgrAddon::AddResource(ani_env* env, ani_object object, ani_string path)
     dataContext->path_ = AniStrToString(env, path);
 
     auto resMgr = UnwrapAddon(env, object);
+    if (resMgr == nullptr) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "resMgr is null, add overlay path = %{public}s", dataContext->path_.c_str());
+        return;
+    }
+
     if (!resMgr->GetResMgr()->AddAppOverlay(dataContext->path_)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to add overlay path = %{public}s", dataContext->path_.c_str());
         ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_OVERLAY_RES_PATH_INVALID);
@@ -1010,6 +1033,11 @@ void ResMgrAddon::RemoveResource(ani_env* env, ani_object object, ani_string pat
     dataContext->path_ = AniStrToString(env, path);
 
     auto resMgr = UnwrapAddon(env, object);
+    if (resMgr == nullptr) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "resMgr is null, overlay path = %{public}s", dataContext->path_.c_str());
+        return;
+    }
+
     if (!resMgr->GetResMgr()->RemoveAppOverlay(dataContext->path_)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to add overlay path = %{public}s", dataContext->path_.c_str());
         ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_OVERLAY_RES_PATH_INVALID);
@@ -1022,6 +1050,12 @@ ani_object ResMgrAddon::GetRawFdSync(ani_env* env, ani_object object, ani_string
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->path_ = AniStrToString(env, path);
     dataContext->addon_ = UnwrapAddon(env, object);
+
+    if (dataContext->addon_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getRawFdSync");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
+        return nullptr;
+    }
 
     RState state = dataContext->addon_->GetResMgr()->GetRawFileDescriptorFromHap(dataContext->path_,
         dataContext->descriptor_);
@@ -1070,6 +1104,12 @@ void ResMgrAddon::CloseRawFdSync(ani_env* env, ani_object object, ani_string pat
     dataContext->path_ = AniStrToString(env, path);
     dataContext->addon_ = UnwrapAddon(env, object);
 
+    if (dataContext->addon_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in closeRawFdSync");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
+        return;
+    }
+
     RState state = dataContext->addon_->GetResMgr()->CloseRawFileDescriptor(dataContext->path_);
     if (state != RState::SUCCESS) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to close rawfd by %{public}s", dataContext->path_.c_str());
@@ -1083,6 +1123,12 @@ ani_object ResMgrAddon::GetRawFileListSync(ani_env* env, ani_object object, ani_
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->path_ = AniStrToString(env, path);
     dataContext->addon_ = UnwrapAddon(env, object);
+
+    if (dataContext->addon_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getRawFileListSync");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
+        return nullptr;
+    }
 
     RState state = dataContext->addon_->GetResMgr()->GetRawFileList(dataContext->path_.c_str(),
         dataContext->arrayValue_);
@@ -1100,6 +1146,12 @@ ani_object ResMgrAddon::GetRawFileContentSync(ani_env* env, ani_object object, a
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->path_ = AniStrToString(env, path);
     dataContext->addon_ = UnwrapAddon(env, object);
+
+    if (dataContext->addon_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getRawFileContentSync");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
+        return nullptr;
+    }
 
     RState state = dataContext->addon_->GetResMgr()->GetRawFileFromHap(dataContext->path_,
         dataContext->len_, dataContext->mediaData);
