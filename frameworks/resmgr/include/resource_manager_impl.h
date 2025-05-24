@@ -918,6 +918,10 @@ private:
 
     RState ProcessItem(std::shared_ptr<IdItem> idItem, std::map<std::string, ResData> &outValue);
 
+#if defined(__IDE_PREVIEW__)
+    void UpdateSystemResourceResConfig(ResConfig &resConfig);
+#endif
+
     std::shared_ptr<HapManager> GetHapManager();
 
     std::shared_ptr<HapManager> hapManager_;

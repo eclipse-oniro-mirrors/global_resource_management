@@ -1418,8 +1418,28 @@ RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig, bool isUpdateT
     if (state != SUCCESS) {
         return state;
     }
+#if defined(__IDE_PREVIEW__)
+    UpdateSystemResourceResConfig(resConfig);
+#endif
     return this->hapManager_->UpdateResConfig(resConfig);
 }
+
+#if defined(__IDE_PREVIEW__)
+void ResourceManagerImpl::UpdateSystemResourceResConfig(ResConfig &resConfig)
+{
+    if (isSystemResMgr_) {
+        return;
+    }
+
+    ResourceManagerImpl* systemResourceManager = SystemResourceManager::GetSystemResourceManager();
+    if (systemResourceManager != nullptr) {
+        ResConfigImpl sysResConfig;
+        systemResourceManager->GetResConfig(sysResConfig);
+        sysResConfig.SetDeviceType(resConfig.GetDeviceType());
+        systemResourceManager->GetHapManager()->UpdateResConfig(sysResConfig);
+    }
+}
+#endif
 
 RState ResourceManagerImpl::UpdateOverrideResConfig(ResConfig &resConfig)
 {
