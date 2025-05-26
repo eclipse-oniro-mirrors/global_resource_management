@@ -83,8 +83,15 @@ ohos_shared_library("resmgr_napi_core") {
   part_name = "resource_management"
 }
 
-ohos_shared_library("resmgr_napi_core_preview") {
+group("resmgr_napi_core_preview") {
   if (is_mingw || is_mac || is_linux) {
+    public_deps = [ ":resmgr_napi_core_preview_inner" ]
+  }
+}
+
+ohos_shared_library("resmgr_napi_core_preview_inner") {
+  if (is_mingw || is_mac || is_linux) {
+    output_name = "resmgr_napi_core_preview"
     defines = [
       "__IDE_PREVIEW__",
     ]
