@@ -443,9 +443,11 @@ ani_double ResMgrAddon::getNumberById(ani_env* env, ani_object object, ani_doubl
     RState state = resMgr->GetIntegerById(resId, dataContext->iValue_);
     if (state != RState::SUCCESS) {
         state = resMgr->GetFloatById(resId, dataContext->fValue_);
-        dataContext->SetErrorMsg("Failed to process string in getNumberById", true);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return ABNORMAL_NUMBER_RETURN_VALUE;
+        if (state != RState::SUCCESS) {
+            dataContext->SetErrorMsg("Failed to process string in getNumberById", true);
+            ResourceManagerAniUtils::AniThrow(env, state);
+            return ABNORMAL_NUMBER_RETURN_VALUE;
+        }
     }
 
     ani_double aniValue;
@@ -479,9 +481,11 @@ ani_double ResMgrAddon::getNumber(ani_env* env, ani_object object, ani_object re
     state = resMgr->GetIntegerById(resId, dataContext->iValue_);
     if (state != RState::SUCCESS) {
         state = resMgr->GetFloatById(resId, dataContext->fValue_);
-        dataContext->SetErrorMsg("Failed to process string in getNumber", true);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return ABNORMAL_NUMBER_RETURN_VALUE;
+        if (state != RState::SUCCESS) {
+            dataContext->SetErrorMsg("Failed to process string in getNumber", true);
+            ResourceManagerAniUtils::AniThrow(env, state);
+            return ABNORMAL_NUMBER_RETURN_VALUE;
+        }
     }
 
     ani_double aniValue;
