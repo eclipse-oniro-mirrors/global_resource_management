@@ -270,7 +270,7 @@ ani_object ResMgrAddon::GetSystemResourceManager(ani_env* env)
 }
 
 static bool GetHapResourceManager(const ResMgrDataContext* dataContext,
-    std::shared_ptr<ResourceManager> &resMgr, int32_t &resId)
+    std::shared_ptr<ResourceManager> &resMgr, uint32_t &resId)
 {
     std::shared_ptr<ResourceManager::Resource> resource = dataContext->resource_;
     // In fa module, resource is null.
@@ -323,7 +323,7 @@ ani_string ResMgrAddon::GetStringSyncById(ani_env* env, ani_object object, ani_d
     dataContext->resId_ = resId;
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t notUse = 0;
+    uint32_t notUse = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, notUse);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getStringSyncById");
@@ -400,7 +400,7 @@ ani_string ResMgrAddon::GetFormatStringSyncById(ani_env *env, ani_object object,
     dataContext->addon_ = UnwrapAddon(env, object);
     dataContext->resId_ = resId;
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t notUse = 0;
+    uint32_t notUse = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, notUse);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getStringSyncById");
@@ -432,7 +432,7 @@ ani_string ResMgrAddon::GetStringSync(ani_env* env, ani_object object, ani_objec
     }
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getStringSync");
@@ -460,7 +460,7 @@ ani_string ResMgrAddon::GetFormatStringSync(ani_env *env, ani_object object, ani
     }
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getFormatStringSync");
@@ -490,7 +490,7 @@ ani_string ResMgrAddon::GetStringByNameSync(ani_env* env, ani_object object, ani
     dataContext->resName_ = AniStrToString(env, static_cast<ani_ref>(resName));
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getStringByNameSync");
@@ -515,7 +515,7 @@ ani_string ResMgrAddon::GetFormatStringByNameSync(ani_env *env, ani_object objec
     dataContext->resName_ = AniStrToString(env, static_cast<ani_ref>(resName));
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getFormatStringByNameSync");
@@ -546,7 +546,7 @@ ani_boolean ResMgrAddon::GetBooleanById(ani_env* env, ani_object object, ani_dou
     dataContext->resId_ = resId;
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t notUse = 0;
+    uint32_t notUse = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, notUse);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getBooleanById");
@@ -574,7 +574,7 @@ ani_boolean ResMgrAddon::GetBoolean(ani_env* env, ani_object object, ani_object 
     }
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getBoolean");
@@ -598,7 +598,7 @@ ani_boolean ResMgrAddon::GetBooleanByName(ani_env* env, ani_object object, ani_s
     dataContext->resName_ = AniStrToString(env, static_cast<ani_ref>(resName));
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getBooleanByName");
@@ -622,7 +622,7 @@ ani_double ResMgrAddon::GetNumberById(ani_env* env, ani_object object, ani_doubl
     dataContext->resId_ = resId;
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t notUse = 0;
+    uint32_t notUse = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, notUse);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getNumberById");
@@ -633,9 +633,11 @@ ani_double ResMgrAddon::GetNumberById(ani_env* env, ani_object object, ani_doubl
     RState state = resMgr->GetIntegerById(resId, dataContext->iValue_);
     if (state != RState::SUCCESS) {
         state = resMgr->GetFloatById(resId, dataContext->fValue_);
-        dataContext->SetErrorMsg("Failed to process string in getNumberById", true);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return ABNORMAL_NUMBER_RETURN_VALUE;
+        if (state != RState::SUCCESS) {
+            dataContext->SetErrorMsg("Failed to process string in getNumberById", true);
+            ResourceManagerAniUtils::AniThrow(env, state);
+            return ABNORMAL_NUMBER_RETURN_VALUE;
+        }
     }
 
     ani_double aniValue;
@@ -658,7 +660,7 @@ ani_double ResMgrAddon::GetNumber(ani_env* env, ani_object object, ani_object re
     }
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getNumber");
@@ -669,9 +671,11 @@ ani_double ResMgrAddon::GetNumber(ani_env* env, ani_object object, ani_object re
     state = resMgr->GetIntegerById(resId, dataContext->iValue_);
     if (state != RState::SUCCESS) {
         state = resMgr->GetFloatById(resId, dataContext->fValue_);
-        dataContext->SetErrorMsg("Failed to process string in getNumber", true);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return ABNORMAL_NUMBER_RETURN_VALUE;
+        if (state != RState::SUCCESS) {
+            dataContext->SetErrorMsg("Failed to process string in getNumber", true);
+            ResourceManagerAniUtils::AniThrow(env, state);
+            return ABNORMAL_NUMBER_RETURN_VALUE;
+        }
     }
 
     ani_double aniValue;
@@ -688,6 +692,12 @@ ani_double ResMgrAddon::GetNumberByName(ani_env* env, ani_object object, ani_str
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
     dataContext->resName_ = AniStrToString(env, static_cast<ani_ref>(resName));
+
+    if (dataContext->addon_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getNumberByName");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
+        return ABNORMAL_NUMBER_RETURN_VALUE;
+    }
 
     auto resMgr = dataContext->addon_->GetResMgr();
     RState state = resMgr->GetIntegerByName(dataContext->resName_.c_str(), dataContext->iValue_);
@@ -724,7 +734,7 @@ ani_string ResMgrAddon::GetIntPluralStringValueSyncById(ani_env* env, ani_object
     dataContext->quantity_ = { true, number, 0.0 };
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t notUse = 0;
+    uint32_t notUse = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, notUse);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getIntPluralStringValueSyncById");
@@ -767,7 +777,7 @@ ani_string ResMgrAddon::GetIntPluralStringValueSync(ani_env* env, ani_object obj
     dataContext->quantity_ = { true, number, 0.0 };
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getIntPluralStringValueSync");
@@ -811,6 +821,12 @@ ani_string ResMgrAddon::GetIntPluralStringByNameSync(ani_env* env, ani_object ob
         return nullptr;
     }
 
+    if (dataContext->addon_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getIntPluralStringByNameSync");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
+        return nullptr;
+    }
+
     RState state = dataContext->addon_->GetResMgr()->GetFormatPluralStringByName(dataContext->value_,
         dataContext->resName_.c_str(), dataContext->quantity_, dataContext->jsParams_);
     if (state != RState::SUCCESS) {
@@ -830,7 +846,7 @@ ani_string ResMgrAddon::GetDoublePluralStringValueSyncById(ani_env* env, ani_obj
     dataContext->quantity_ = { false, 0, num };
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t notUse = 0;
+    uint32_t notUse = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, notUse);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getIntPluralStringValueSyncById");
@@ -867,7 +883,7 @@ ani_string ResMgrAddon::GetDoublePluralStringValueSync(ani_env* env, ani_object 
     dataContext->quantity_ = { false, 0, num };
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getIntPluralStringValueSync");
@@ -905,6 +921,12 @@ ani_string ResMgrAddon::GetDoublePluralStringByNameSync(ani_env* env, ani_object
         return nullptr;
     }
 
+    if (dataContext->addon_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getDoublePluralStringByNameSync");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
+        return nullptr;
+    }
+
     RState state = dataContext->addon_->GetResMgr()->GetFormatPluralStringByName(dataContext->value_,
         dataContext->resName_.c_str(), dataContext->quantity_, dataContext->jsParams_);
     if (state != RState::SUCCESS) {
@@ -922,7 +944,7 @@ ani_double ResMgrAddon::GetColorSyncById(ani_env* env, ani_object object, ani_do
     dataContext->resId_ = resId;
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t notUse = 0;
+    uint32_t notUse = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, notUse);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getColorSyncById");
@@ -950,7 +972,7 @@ ani_double ResMgrAddon::GetColorSync(ani_env* env, ani_object object, ani_object
     }
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getColorSync");
@@ -974,7 +996,7 @@ ani_double ResMgrAddon::GetColorByNameSync(ani_env* env, ani_object object, ani_
     dataContext->resName_ = AniStrToString(env, static_cast<ani_ref>(resName));
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getColorByNameSync");
@@ -997,6 +1019,11 @@ void ResMgrAddon::AddResource(ani_env* env, ani_object object, ani_string path)
     dataContext->path_ = AniStrToString(env, path);
 
     auto resMgr = UnwrapAddon(env, object);
+    if (resMgr == nullptr) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "resMgr is null, add overlay path = %{public}s", dataContext->path_.c_str());
+        return;
+    }
+
     if (!resMgr->GetResMgr()->AddAppOverlay(dataContext->path_)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to add overlay path = %{public}s", dataContext->path_.c_str());
         ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_OVERLAY_RES_PATH_INVALID);
@@ -1010,6 +1037,11 @@ void ResMgrAddon::RemoveResource(ani_env* env, ani_object object, ani_string pat
     dataContext->path_ = AniStrToString(env, path);
 
     auto resMgr = UnwrapAddon(env, object);
+    if (resMgr == nullptr) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "resMgr is null, overlay path = %{public}s", dataContext->path_.c_str());
+        return;
+    }
+
     if (!resMgr->GetResMgr()->RemoveAppOverlay(dataContext->path_)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to add overlay path = %{public}s", dataContext->path_.c_str());
         ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_OVERLAY_RES_PATH_INVALID);
@@ -1022,6 +1054,12 @@ ani_object ResMgrAddon::GetRawFdSync(ani_env* env, ani_object object, ani_string
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->path_ = AniStrToString(env, path);
     dataContext->addon_ = UnwrapAddon(env, object);
+
+    if (dataContext->addon_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getRawFdSync");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
+        return nullptr;
+    }
 
     RState state = dataContext->addon_->GetResMgr()->GetRawFileDescriptorFromHap(dataContext->path_,
         dataContext->descriptor_);
@@ -1070,6 +1108,12 @@ void ResMgrAddon::CloseRawFdSync(ani_env* env, ani_object object, ani_string pat
     dataContext->path_ = AniStrToString(env, path);
     dataContext->addon_ = UnwrapAddon(env, object);
 
+    if (dataContext->addon_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in closeRawFdSync");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
+        return;
+    }
+
     RState state = dataContext->addon_->GetResMgr()->CloseRawFileDescriptor(dataContext->path_);
     if (state != RState::SUCCESS) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to close rawfd by %{public}s", dataContext->path_.c_str());
@@ -1083,6 +1127,12 @@ ani_object ResMgrAddon::GetRawFileListSync(ani_env* env, ani_object object, ani_
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->path_ = AniStrToString(env, path);
     dataContext->addon_ = UnwrapAddon(env, object);
+
+    if (dataContext->addon_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getRawFileListSync");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
+        return nullptr;
+    }
 
     RState state = dataContext->addon_->GetResMgr()->GetRawFileList(dataContext->path_.c_str(),
         dataContext->arrayValue_);
@@ -1100,6 +1150,12 @@ ani_object ResMgrAddon::GetRawFileContentSync(ani_env* env, ani_object object, a
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->path_ = AniStrToString(env, path);
     dataContext->addon_ = UnwrapAddon(env, object);
+
+    if (dataContext->addon_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getRawFileContentSync");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
+        return nullptr;
+    }
 
     RState state = dataContext->addon_->GetResMgr()->GetRawFileFromHap(dataContext->path_,
         dataContext->len_, dataContext->mediaData);
@@ -1127,7 +1183,7 @@ ani_object ResMgrAddon::GetMediaContentSyncById(ani_env* env, ani_object object,
     }
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t notUse = 0;
+    uint32_t notUse = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, notUse);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getMediaContentSyncById");
@@ -1159,7 +1215,7 @@ ani_object ResMgrAddon::GetMediaContentSync(ani_env* env, ani_object object,
     }
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in GetMediaContentSync");
@@ -1192,7 +1248,7 @@ ani_string ResMgrAddon::GetMediaContentBase64SyncById(ani_env* env, ani_object o
     }
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t notUse = 0;
+    uint32_t notUse = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, notUse);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getMediaContentBase64SyncById");
@@ -1216,7 +1272,7 @@ ani_string ResMgrAddon::GetMediaContentBase64Sync(ani_env* env, ani_object objec
     int32_t state = InitIdResourceAddon(env, object, dataContext, resource);
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getMediaContentBase64Sync");
@@ -1240,7 +1296,7 @@ ani_object ResMgrAddon::GetStringArrayValueSyncById(ani_env* env, ani_object obj
     dataContext->resId_ = resId;
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t notUse = 0;
+    uint32_t notUse = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, notUse);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getStringArrayValueSyncById");
@@ -1268,7 +1324,7 @@ ani_object ResMgrAddon::GetStringArrayValueSync(ani_env* env, ani_object object,
     }
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getStringArrayValueSync");
@@ -1300,7 +1356,7 @@ ani_object ResMgrAddon::GetMediaByNameSync(ani_env* env, ani_object object, ani_
     }
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getMediaByNameSync");
@@ -1334,7 +1390,7 @@ ani_string ResMgrAddon::GetMediaBase64ByNameSync(ani_env* env, ani_object object
     }
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getMediaBase64ByNameSync");
@@ -1359,7 +1415,7 @@ ani_object ResMgrAddon::GetStringArrayByNameSync(ani_env* env, ani_object object
     dataContext->resName_ = AniStrToString(env, static_cast<ani_ref>(resName));
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getStringArrayByNameSync");
@@ -1578,7 +1634,7 @@ ani_double ResMgrAddon::GetSymbolById(ani_env* env, ani_object object, ani_doubl
     dataContext->resId_ = resId;
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t notUse = 0;
+    uint32_t notUse = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, notUse);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getSymbolById");
@@ -1606,7 +1662,7 @@ ani_double ResMgrAddon::GetSymbol(ani_env* env, ani_object object, ani_object re
     }
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getSymbol");
@@ -1630,7 +1686,7 @@ ani_double ResMgrAddon::GetSymbolByName(ani_env* env, ani_object object, ani_str
     dataContext->resName_ = AniStrToString(env, static_cast<ani_ref>(resName));
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getSymbolByName");
@@ -1654,7 +1710,7 @@ ani_boolean ResMgrAddon::IsRawDir(ani_env* env, ani_object object, ani_string pa
     dataContext->addon_ = UnwrapAddon(env, object);
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    int32_t resId = 0;
+    uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in isRawDir");
