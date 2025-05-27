@@ -21,7 +21,7 @@ namespace Global {
 namespace Resource {
 struct ResMgrDataContext {
     std::string bundleName_;
-    int32_t resId_;
+    uint32_t resId_;
     int32_t param_;
     ResourceManager::Quantity quantity_;
 
