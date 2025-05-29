@@ -44,7 +44,7 @@ ResLocale::ResLocale() : language_(nullptr), region_(nullptr), script_(nullptr)
 RState ResLocale::SetLanguage(const char *language, size_t len)
 {
     if (len == 0) {
-        delete this->language_;
+        delete[] this->language_;
         this->language_ = nullptr;
         return SUCCESS;
     }
@@ -52,7 +52,7 @@ RState ResLocale::SetLanguage(const char *language, size_t len)
     if (temp == nullptr) {
         return NOT_ENOUGH_MEM;
     }
-    delete this->language_;
+    delete[] this->language_;
     this->language_ = temp;
     size_t i = 0;
     while (i < len) {
@@ -66,7 +66,7 @@ RState ResLocale::SetLanguage(const char *language, size_t len)
 RState ResLocale::SetRegion(const char *region, size_t len)
 {
     if (len == 0) {
-        delete this->region_;
+        delete[] this->region_;
         this->region_ = nullptr;
         return SUCCESS;
     }
@@ -74,7 +74,7 @@ RState ResLocale::SetRegion(const char *region, size_t len)
     if (temp == nullptr) {
         return NOT_ENOUGH_MEM;
     }
-    delete this->region_;
+    delete[] this->region_;
     this->region_ = temp;
     size_t i = 0;
     while (i < len) {
@@ -88,7 +88,7 @@ RState ResLocale::SetRegion(const char *region, size_t len)
 RState ResLocale::SetScript(const char *script, size_t len)
 {
     if (len == 0) {
-        delete this->script_;
+        delete[] this->script_;
         this->script_ = nullptr;
         return SUCCESS;
     }
@@ -96,7 +96,7 @@ RState ResLocale::SetScript(const char *script, size_t len)
     if (temp == nullptr) {
         return NOT_ENOUGH_MEM;
     }
-    delete this->script_;
+    delete[] this->script_;
     this->script_ = temp;
     size_t i = 0;
     while (i < len) {
