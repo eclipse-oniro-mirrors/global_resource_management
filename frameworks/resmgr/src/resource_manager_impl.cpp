@@ -1380,16 +1380,14 @@ RState ResourceManagerImpl::UpdateFakeLocaleFlag(ResConfig &resConfig)
         return LOCALEINFO_IS_NULL;
     }
     const char* language = resConfig.GetLocaleInfo()->getLanguage();
-    const char* region = resConfig.GetLocaleInfo()->getCountry();
     if (language != nullptr && region != nullptr) {
         std::string languageStr = language;
-        std::string regionStr = region;
-        if (languageStr == "en" && regionStr == "XA") {
+        if (languageStr == "en-XA") {
             isFakeLocale = true;
         } else {
             isFakeLocale = false;
         }
-        if (languageStr == "ar" && regionStr == "XB") {
+        if (languageStr == "ar-XB") {
             isBidirectionFakeLocale = true;
         } else {
             isBidirectionFakeLocale = false;

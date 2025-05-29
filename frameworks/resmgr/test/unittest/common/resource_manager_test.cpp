@@ -294,7 +294,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest006, TestSize.Le
     rmc->AddResource("en", nullptr, "US");
     ResConfig *rc = CreateResConfig();
     EXPECT_FALSE(rc == nullptr);
-    rc->SetLocaleInfo("en", nullptr, "XA");
+    rc->SetLocaleInfo("en-XA", nullptr, nullptr);
     RState state = rm->UpdateResConfig(*rc);
     EXPECT_EQ(SUCCESS, state);
 
@@ -303,7 +303,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest006, TestSize.Le
     rm->GetStringById(id, outValue);
     EXPECT_TRUE(outValue != "App Name");
 
-    rc->SetLocaleInfo("ar", nullptr, "XB");
+    rc->SetLocaleInfo("ar-XB", nullptr, nullptr);
     EXPECT_EQ(SUCCESS, rm->UpdateResConfig(*rc, true));
     rm->GetStringById(id, outValue);
     delete rc;
