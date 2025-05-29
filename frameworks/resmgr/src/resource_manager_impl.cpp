@@ -1380,7 +1380,7 @@ RState ResourceManagerImpl::UpdateFakeLocaleFlag(ResConfig &resConfig)
         return LOCALEINFO_IS_NULL;
     }
     const char* language = resConfig.GetLocaleInfo()->getLanguage();
-    if (language != nullptr && region != nullptr) {
+    if (language != nullptr) {
         std::string languageStr = language;
         if (languageStr == "en-XA") {
             isFakeLocale = true;
