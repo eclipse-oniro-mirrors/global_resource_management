@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,8 @@
 #include <gtest/gtest.h>
 #define private public
 
+#include "hap_resource_v1.h"
+#include "hap_resource_v2.h"
 #include "res_config.h"
 #include "resource_manager.h"
 #include "resource_manager_impl.h"
@@ -122,25 +124,25 @@ public:
 
     void TestGetIntArrayByName(const char* intarray1);
 
-    void TestGetProfileById(HapResource *tmp);
+    void TestGetProfileById(HapResourceV1 *tmp);
 
-    void TestGetProfileByName(HapResource *tmp);
+    void TestGetProfileByName(HapResourceV1 *tmp);
 
-    void TestGetMediaWithDensityById(HapResource *tmp);
+    void TestGetMediaWithDensityById(HapResourceV1 *tmp);
 
-    void TestGetMediaById(HapResource *tmp);
+    void TestGetMediaById(HapResourceV1 *tmp);
 
-    void TestGetMediaWithDensityByName(HapResource *tmp);
+    void TestGetMediaWithDensityByName(HapResourceV1 *tmp);
 
-    void TestGetMediaByName(HapResource *tmp);
+    void TestGetMediaByName(HapResourceV1 *tmp);
     
-    void TestGetDrawableInfoWithDensityById(HapResource *tmp);
+    void TestGetDrawableInfoWithDensityById(HapResourceV1 *tmp);
 
-    void TestGetDrawableInfoById(HapResource *tmp);
+    void TestGetDrawableInfoById(HapResourceV1 *tmp);
 
-    void TestGetDrawableInfoWithDensityByName(HapResource *tmp);
+    void TestGetDrawableInfoWithDensityByName(HapResourceV1 *tmp);
 
-    void TestGetDrawableInfoByName(HapResource *tmp);
+    void TestGetDrawableInfoByName(HapResourceV1 *tmp);
 
     void TestGetResourceLimitKeys(uint32_t expectedLimitKeys);
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,11 @@
 #define private public
 
 #include "hap_parser.h"
+#include "hap_parser_v1.h"
+#include "hap_parser_v2.h"
 #include "hap_resource.h"
+#include "hap_resource_v1.h"
+#include "hap_resource_v2.h"
 #include "resource_manager.h"
 #include "resource_manager_impl.h"
 #include "test_common.h"
@@ -125,20 +129,17 @@ int ParseIndexCost(const std::string &pstr, char *buf, const size_t& bufLen)
             free(buf);
             return -1;
         }
-        ParserContext context = {
-        .buffer = reinterpret_cast<char *>(buf),
-        .bufLen = bufLen,
-        .resDesc = *resDesc,
-        .defaultConfig = nullptr,
-        };
-        int32_t out = HapParser::ParseResHex(context);
+        std::shared_ptr<ResConfigImpl> rc = nullptr;
+        HapParserV1 hapParser(rc, SELECT_ALL, false);
+        hapParser.Init(pstr.c_str());
+        int32_t out = hapParser.ParseResHex();
         if (out != OK) {
             free(buf);
             RESMGR_HILOGE(RESMGR_TAG, "ParseResHex failed! retcode:%d", out);
             return -1;
         }
 
-        auto pResource = new(std::nothrow) HapResource(pstr, 0, resDesc);
+        auto pResource = new(std::nothrow) HapResourceV1(pstr, 0, resDesc);
         if (pResource == nullptr) {
             RESMGR_HILOGE(RESMGR_TAG, "new HapResource failed when LoadFromIndex");
             free(buf);

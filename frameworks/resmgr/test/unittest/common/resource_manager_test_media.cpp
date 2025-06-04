@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -72,7 +72,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest001, TestSize.
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     rmc->TestGetMediaById(tmp);
     delete tmp;
 }
@@ -101,7 +101,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest003, TestSize.
 {
     rmc->AddResource("en", nullptr, "US");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     rmc->TestGetMediaWithDensityById(tmp);
     delete tmp;
 }
@@ -115,7 +115,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest004, TestSize.
 {
     rmc->AddResource("en", nullptr, "US");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mdpi/media/icon.png");
@@ -150,7 +150,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest005, TestSize.
 {
     rmc->AddResource("en", nullptr, "US");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/ldpi/media/icon.png");
@@ -185,7 +185,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest006, TestSize.
 {
     rmc->AddResource("en", nullptr, "US");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/xldpi/media/icon.png");
@@ -220,7 +220,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest007, TestSize.
 {
     rmc->AddResource("en", nullptr, "US");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/xxldpi/media/icon.png");
@@ -255,7 +255,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest008, TestSize.
 {
     rmc->AddResource("en", nullptr, "US");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/xxxldpi/media/icon.png");
@@ -338,7 +338,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest011, TestSize.
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-sdpi/media/icon.png");
@@ -373,7 +373,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest012, TestSize.
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-mdpi/media/icon.png");
@@ -408,7 +408,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest013, TestSize.
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-ldpi/media/icon.png");
@@ -443,7 +443,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest014, TestSize.
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-xldpi/media/icon.png");
@@ -478,7 +478,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest015, TestSize.
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-xxldpi/media/icon.png");
@@ -513,7 +513,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest016, TestSize.
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-xxxldpi/media/icon.png");
@@ -548,7 +548,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest017, TestSize.
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-sdpi/media/icon.png");
@@ -586,7 +586,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest018, TestSize.
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-mdpi/media/icon.png");
@@ -624,7 +624,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest019, TestSize.
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-ldpi/media/icon.png");
@@ -662,7 +662,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest020, TestSize.
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-xldpi/media/icon.png");
@@ -700,7 +700,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest021, TestSize.
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-xxldpi/media/icon.png");
@@ -738,7 +738,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest022, TestSize.
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-xxxldpi/media/icon.png");
@@ -821,7 +821,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest001, TestSiz
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     rmc->TestGetMediaByName(tmp);
     delete tmp;
 }
@@ -850,7 +850,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest003, TestSiz
 {
     rmc->AddResource("en", nullptr, "US");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     rmc->TestGetMediaWithDensityByName(tmp);
     delete tmp;
 }
@@ -864,7 +864,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest004, TestSiz
 {
     rmc->AddResource("en", nullptr, "US");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mdpi/media/icon.png");
@@ -897,7 +897,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest005, TestSiz
 {
     rmc->AddResource("en", nullptr, "US");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/ldpi/media/icon.png");
@@ -930,7 +930,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest006, TestSiz
 {
     rmc->AddResource("en", nullptr, "US");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/xldpi/media/icon.png");
@@ -963,7 +963,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest007, TestSiz
 {
     rmc->AddResource("en", nullptr, "US");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/xxldpi/media/icon.png");
@@ -996,7 +996,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest008, TestSiz
 {
     rmc->AddResource("en", nullptr, "US");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/xxxldpi/media/icon.png");
@@ -1074,7 +1074,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest011, TestSiz
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-sdpi/media/icon.png");
@@ -1107,7 +1107,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest012, TestSiz
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-mdpi/media/icon.png");
@@ -1140,7 +1140,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest013, TestSiz
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-ldpi/media/icon.png");
@@ -1173,7 +1173,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest014, TestSiz
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-xldpi/media/icon.png");
@@ -1206,7 +1206,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest015, TestSiz
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-xxldpi/media/icon.png");
@@ -1239,7 +1239,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest016, TestSiz
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-xxxldpi/media/icon.png");
@@ -1272,7 +1272,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest017, TestSiz
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-sdpi/media/icon.png");
@@ -1308,7 +1308,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest018, TestSiz
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-mdpi/media/icon.png");
@@ -1344,7 +1344,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest019, TestSiz
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-ldpi/media/icon.png");
@@ -1380,7 +1380,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest020, TestSiz
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-xldpi/media/icon.png");
@@ -1416,7 +1416,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest021, TestSiz
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-xxldpi/media/icon.png");
@@ -1452,7 +1452,7 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest022, TestSiz
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-xxxldpi/media/icon.png");

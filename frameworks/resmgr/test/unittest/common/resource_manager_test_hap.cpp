@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -468,7 +468,7 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetProfileByIdFromHapTest0029, T
 {
     rmc->AddHapResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
     rmc->TestGetProfileById(tmp);
     delete tmp;
 }
@@ -483,7 +483,7 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetProfileByNameFromHapTest0030,
 {
     rmc->AddHapResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
     rmc->TestGetProfileByName(tmp);
     delete tmp;
 }
@@ -498,7 +498,7 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetMediaByIdFromHapTest0031, Tes
 {
     rmc->AddHapResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
     rmc->TestGetMediaById(tmp);
     delete tmp;
 }
@@ -513,7 +513,7 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetMediaByIdFromHapTest0032, Tes
 {
     rmc->AddHapResource("en", nullptr, "US");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
     rmc->TestGetMediaWithDensityById(tmp);
     delete tmp;
 }
@@ -528,7 +528,7 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetMediaByNameFromHapTest0033, T
 {
     rmc->AddHapResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
     rmc->TestGetMediaByName(tmp);
     delete tmp;
 }
@@ -543,7 +543,7 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetMediaByNameFromHapTest0034, T
 {
     rmc->AddHapResource("en", nullptr, "US");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
     rmc->TestGetMediaWithDensityByName(tmp);
     delete tmp;
 }
@@ -1226,7 +1226,7 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetDrawableInfoByIdFromHapTest00
 {
     rmc->AddHapResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
     rmc->TestGetDrawableInfoById(tmp);
     delete tmp;
 }
@@ -1241,7 +1241,7 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetDrawableInfoByIdFromHapTest00
 {
     rmc->AddHapResource("en", nullptr, "US");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
     rmc->TestGetDrawableInfoWithDensityById(tmp);
     delete tmp;
 }
@@ -1256,7 +1256,7 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetDrawableInfoByNameFromHapTest
 {
     rmc->AddHapResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
     rmc->TestGetDrawableInfoByName(tmp);
     delete tmp;
 }
@@ -1271,7 +1271,7 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetDrawableInfoByNameFromHapTest
 {
     rmc->AddHapResource("en", nullptr, "US");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
     rmc->TestGetDrawableInfoWithDensityByName(tmp);
     delete tmp;
 }

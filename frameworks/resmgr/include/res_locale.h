@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_RESOURCE_MANAGER_RES_LOCALE_H
-#define OHOS_RESOURCE_MANAGER_RES_LOCALE_H
+#ifndef OHOS_RESOURCE_MANAGER_RESLOCALE_H
+#define OHOS_RESOURCE_MANAGER_RESLOCALE_H
 
 #include <cstddef>
 #include <cstdint>

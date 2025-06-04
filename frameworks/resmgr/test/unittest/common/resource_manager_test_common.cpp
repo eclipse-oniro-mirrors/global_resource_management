@@ -218,7 +218,7 @@ void ResourceManagerTestCommon::TestGetRawFilePathByName(const std::string &name
     ASSERT_EQ(cmp, outValue);
 }
 
-void ResourceManagerTestCommon::TestGetProfileById(HapResource *tmp)
+void ResourceManagerTestCommon::TestGetProfileById(HapResourceV1 *tmp)
 {
     tmp->Init(this->defaultResConfig);
     std::string res = tmp->GetResourcePath();
@@ -233,7 +233,7 @@ void ResourceManagerTestCommon::TestGetProfileById(HapResource *tmp)
     EXPECT_EQ(res, outValue);
 }
 
-void ResourceManagerTestCommon::TestGetProfileByName(HapResource *tmp)
+void ResourceManagerTestCommon::TestGetProfileByName(HapResourceV1 *tmp)
 {
     tmp->Init(this->defaultResConfig);
     std::string res = tmp->GetResourcePath();
@@ -245,7 +245,7 @@ void ResourceManagerTestCommon::TestGetProfileByName(HapResource *tmp)
     EXPECT_EQ(res, outValue);
 }
 
-void ResourceManagerTestCommon::TestGetMediaById(HapResource *tmp)
+void ResourceManagerTestCommon::TestGetMediaById(HapResourceV1 *tmp)
 {
     tmp->Init(this->defaultResConfig);
     std::string res = tmp->GetResourcePath();
@@ -259,7 +259,7 @@ void ResourceManagerTestCommon::TestGetMediaById(HapResource *tmp)
     EXPECT_EQ(res, outValue);
 }
 
-void ResourceManagerTestCommon::TestGetMediaWithDensityById(HapResource *tmp)
+void ResourceManagerTestCommon::TestGetMediaWithDensityById(HapResourceV1 *tmp)
 {
     tmp->Init(this->defaultResConfig);
     std::string res = tmp->GetResourcePath();
@@ -285,7 +285,7 @@ void ResourceManagerTestCommon::TestGetMediaWithDensityById(HapResource *tmp)
     EXPECT_EQ(res, outValue);
 }
 
-void ResourceManagerTestCommon::TestGetMediaByName(HapResource *tmp)
+void ResourceManagerTestCommon::TestGetMediaByName(HapResourceV1 *tmp)
 {
     tmp->Init(this->defaultResConfig);
     std::string res = tmp->GetResourcePath();
@@ -297,7 +297,7 @@ void ResourceManagerTestCommon::TestGetMediaByName(HapResource *tmp)
     EXPECT_EQ(res, outValue);
 }
 
-void ResourceManagerTestCommon::TestGetMediaWithDensityByName(HapResource *tmp)
+void ResourceManagerTestCommon::TestGetMediaWithDensityByName(HapResourceV1 *tmp)
 {
     tmp->Init(this->defaultResConfig);
     std::string res = tmp->GetResourcePath();
@@ -321,7 +321,7 @@ void ResourceManagerTestCommon::TestGetMediaWithDensityByName(HapResource *tmp)
     EXPECT_EQ(res, outValue);
 }
 
-void ResourceManagerTestCommon::TestGetDrawableInfoById(HapResource *tmp)
+void ResourceManagerTestCommon::TestGetDrawableInfoById(HapResourceV1 *tmp)
 {
     tmp->Init(this->defaultResConfig);
     int id = GetResId("icon1", ResType::MEDIA);
@@ -334,7 +334,7 @@ void ResourceManagerTestCommon::TestGetDrawableInfoById(HapResource *tmp)
     EXPECT_TRUE(jsonBuf != nullptr);
 }
 
-void ResourceManagerTestCommon::TestGetDrawableInfoWithDensityById(HapResource *tmp)
+void ResourceManagerTestCommon::TestGetDrawableInfoWithDensityById(HapResourceV1 *tmp)
 {
     tmp->Init(this->defaultResConfig);
     auto rc = CreateResConfig();
@@ -364,7 +364,7 @@ void ResourceManagerTestCommon::TestGetDrawableInfoWithDensityById(HapResource *
     EXPECT_TRUE(state == ERROR_CODE_INVALID_INPUT_PARAMETER);
 }
 
-void ResourceManagerTestCommon::TestGetDrawableInfoByName(HapResource *tmp)
+void ResourceManagerTestCommon::TestGetDrawableInfoByName(HapResourceV1 *tmp)
 {
     tmp->Init(this->defaultResConfig);
     std::string type;
@@ -375,7 +375,7 @@ void ResourceManagerTestCommon::TestGetDrawableInfoByName(HapResource *tmp)
     EXPECT_TRUE(jsonBuf != nullptr);
 }
 
-void ResourceManagerTestCommon::TestGetDrawableInfoWithDensityByName(HapResource *tmp)
+void ResourceManagerTestCommon::TestGetDrawableInfoWithDensityByName(HapResourceV1 *tmp)
 {
     tmp->Init(this->defaultResConfig);
     auto rc = CreateResConfig();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -188,22 +188,22 @@ const std::shared_ptr<IdItem> HapManager::FindResourceByName(
     return qualifierValue->GetIdItem();
 }
 
-const std::shared_ptr<HapResource::ValueUnderQualifierDir> HapManager::FindQualifierValueByName(
+const std::shared_ptr<ValueUnderQualifierDir> HapManager::FindQualifierValueByName(
     const char *name, const ResType resType, bool isGetOverrideResource, uint32_t density)
 {
     ReadLock lock(this->mutex_);
-    std::vector<std::shared_ptr<HapResource::IdValues>> candidates = this->GetResourceListByName(name, resType);
+    std::vector<std::shared_ptr<IdValues>> candidates = this->GetResourceListByName(name, resType);
     if (candidates.size() == 0) {
         return nullptr;
     }
     return this->GetBestMatchResource(candidates, density, isGetOverrideResource);
 }
 
-const std::shared_ptr<HapResource::ValueUnderQualifierDir> HapManager::FindQualifierValueById(uint32_t id,
+const std::shared_ptr<ValueUnderQualifierDir> HapManager::FindQualifierValueById(uint32_t id,
     bool isGetOverrideResource, uint32_t density)
 {
     ReadLock lock(this->mutex_);
-    std::vector<std::shared_ptr<HapResource::IdValues>> candidates = this->GetResourceList(id);
+    std::vector<std::shared_ptr<IdValues>> candidates = this->GetResourceList(id);
     if (candidates.size() == 0) {
         return nullptr;
     }
@@ -257,14 +257,14 @@ std::shared_ptr<ResConfigImpl> HapManager::getCompleteOverrideConfig(bool isGetO
 }
 
 void HapManager::MatchBestResource(std::shared_ptr<ResConfigImpl> &bestResConfig,
-    std::shared_ptr<HapResource::ValueUnderQualifierDir> &result,
-    const std::vector<std::shared_ptr<HapResource::ValueUnderQualifierDir>> &paths,
+    std::shared_ptr<ValueUnderQualifierDir> &result,
+    const std::vector<std::shared_ptr<ValueUnderQualifierDir>> &paths,
     uint32_t density, std::shared_ptr<ResConfigImpl> currentResConfig)
 {
     size_t len = paths.size();
     size_t i = 0;
     for (i = 0; i < len; i++) {
-        std::shared_ptr<HapResource::ValueUnderQualifierDir> path = paths[i];
+        std::shared_ptr<ValueUnderQualifierDir> path = paths[i];
         const auto resConfig = path->GetResConfig();
         if (!currentResConfig->Match(resConfig)) {
             continue;
@@ -281,13 +281,13 @@ void HapManager::MatchBestResource(std::shared_ptr<ResConfigImpl> &bestResConfig
     }
 }
 
-const std::shared_ptr<HapResource::ValueUnderQualifierDir> HapManager::GetBestMatchResource(
-    const std::vector<std::shared_ptr<HapResource::IdValues>> &candidates, uint32_t density, bool isGetOverrideResource)
+const std::shared_ptr<ValueUnderQualifierDir> HapManager::GetBestMatchResource(
+    const std::vector<std::shared_ptr<IdValues>> &candidates, uint32_t density, bool isGetOverrideResource)
 {
     std::shared_ptr<ResConfigImpl> bestResConfig = nullptr;
     std::shared_ptr<ResConfigImpl> bestOverlayResConfig = nullptr;
-    std::shared_ptr<HapResource::ValueUnderQualifierDir> result = nullptr;
-    std::shared_ptr<HapResource::ValueUnderQualifierDir> overlayResult = nullptr;
+    std::shared_ptr<ValueUnderQualifierDir> result = nullptr;
+    std::shared_ptr<ValueUnderQualifierDir> overlayResult = nullptr;
     const std::shared_ptr<ResConfigImpl> currentResConfig = getCompleteOverrideConfig(isGetOverrideResource);
     if (!currentResConfig) {
         return nullptr;
@@ -295,7 +295,7 @@ const std::shared_ptr<HapResource::ValueUnderQualifierDir> HapManager::GetBestMa
     // When there are multiple overlays, reverse the search to find the first match resource.
     for (auto iter = candidates.rbegin(); iter != candidates.rend(); iter++) {
         const auto &paths = (*iter)->GetLimitPathsConst();
-        bool isOverlayHapResource = paths[0]->IsOverlay();
+        bool isOverlayHapResource = paths[0]->IsOverlayResource();
         if (isOverlayHapResource) {
             MatchBestResource(bestOverlayResConfig, overlayResult, paths, density, currentResConfig);
         } else {
@@ -362,7 +362,7 @@ RState HapManager::UpdateResConfig(ResConfig &resConfig)
     this->resConfig_->Copy(resConfig);
     if (needUpdate) {
         for (auto &resource : hapResources_) {
-            RState state = resource->UpdateResConfig(this->resConfig_);
+            RState state = resource->Update(this->resConfig_);
             if (state != SUCCESS) {
                 return state;
             }
@@ -378,7 +378,7 @@ RState HapManager::UpdateOverrideResConfig(ResConfig &resConfig)
     this->overrideResConfig_->Copy(resConfig);
     if (needUpdate) {
         for (auto &resource : hapResources_) {
-            RState state = resource->UpdateResConfig(this->overrideResConfig_);
+            RState state = resource->Update(this->overrideResConfig_);
             if (state != SUCCESS) {
                 return state;
             }
@@ -441,8 +441,8 @@ bool HapManager::AddResource(const std::string &path, const std::vector<std::str
         return true;
     }
     std::shared_ptr<ResConfigImpl> config = getCompleteOverrideConfig(isOverride_);
-    std::unordered_map<std::string, std::shared_ptr<HapResource>> result = HapResource::LoadOverlays(path, overlayPaths,
-        config, isSystem_);
+    std::unordered_map<std::string, std::shared_ptr<HapResource>> result =
+        HapResourceManager::GetInstance()->LoadOverlays(path, overlayPaths, config, isSystem_);
     if (result.size() == 0) {
         return false;
     }
@@ -523,13 +523,13 @@ HapManager::~HapManager()
 #endif
 }
 
-std::vector<std::shared_ptr<HapResource::IdValues>> HapManager::GetResourceList(uint32_t ident) const
+std::vector<std::shared_ptr<IdValues>> HapManager::GetResourceList(uint32_t ident) const
 {
-    std::vector<std::shared_ptr<HapResource::IdValues>> result;
+    std::vector<std::shared_ptr<IdValues>> result;
     // one id only exit in one hap
     for (size_t i = 0; i < hapResources_.size(); ++i) {
         std::shared_ptr<HapResource> pResource = hapResources_[i];
-        const std::shared_ptr<HapResource::IdValues>out = pResource->GetIdValues(ident);
+        const std::shared_ptr<IdValues>out = pResource->GetIdValues(ident);
         if (out != nullptr) {
             result.emplace_back(out);
         }
@@ -537,10 +537,10 @@ std::vector<std::shared_ptr<HapResource::IdValues>> HapManager::GetResourceList(
     return result;
 }
 
-std::vector<std::shared_ptr<HapResource::IdValues>> HapManager::GetResourceListByName(const char *name,
+std::vector<std::shared_ptr<IdValues>> HapManager::GetResourceListByName(const char *name,
     const ResType resType) const
 {
-    std::vector<std::shared_ptr<HapResource::IdValues>> result;
+    std::vector<std::shared_ptr<IdValues>> result;
     // all match will return
     if (name == nullptr) {
         return result;
@@ -548,7 +548,7 @@ std::vector<std::shared_ptr<HapResource::IdValues>> HapManager::GetResourceListB
     std::string key(name);
     for (size_t i = 0; i < hapResources_.size(); ++i) {
         std::shared_ptr<HapResource> pResource = hapResources_[i];
-        const std::shared_ptr<HapResource::IdValues> out = pResource->GetIdValuesByName(key, resType);
+        const std::shared_ptr<IdValues> out = pResource->GetIdValuesByName(key, resType);
         if (out != nullptr) {
             result.emplace_back(out);
         }
@@ -570,7 +570,8 @@ bool HapManager::AddResourcePath(const char *path, const uint32_t &selectedTypes
         return false;
     }
     std::shared_ptr<ResConfigImpl> config = getCompleteOverrideConfig(isOverride_);
-    std::shared_ptr<HapResource> pResource = HapResource::Load(path, config, isSystem_, false, selectedTypes);
+    std::shared_ptr<HapResource> pResource =
+        HapResourceManager::GetInstance()->Load(path, config, isSystem_, false, selectedTypes);
     if (pResource == nullptr) {
         return false;
     }
@@ -623,7 +624,7 @@ RState HapManager::ReloadAll()
     for (auto iter = loadedHapPaths_.begin(); iter != loadedHapPaths_.end(); iter++) {
         std::vector<std::string> &overlayPaths = iter->second;
         if (overlayPaths.size() == 0) {
-            const auto pResource = HapResource::Load(iter->first.c_str(), resConfig_);
+            const auto pResource = HapResourceManager::GetInstance()->Load(iter->first.c_str(), resConfig_);
             if (pResource == nullptr) {
                 newResources.clear();
                 return HAP_INIT_FAILED;
@@ -631,8 +632,8 @@ RState HapManager::ReloadAll()
             newResources.push_back(pResource);
             continue;
         }
-        std::unordered_map<std::string, std::shared_ptr<HapResource>> result = HapResource::LoadOverlays(
-            iter->first.c_str(), overlayPaths, resConfig_);
+        std::unordered_map<std::string, std::shared_ptr<HapResource>> result =
+            HapResourceManager::GetInstance()->LoadOverlays(iter->first.c_str(), overlayPaths, resConfig_);
         if (result.size() == 0) {
             continue;
         }
@@ -675,7 +676,7 @@ std::string GetImageType(const std::string fileName)
 
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 std::string GetFilePathFromHap(std::shared_ptr<AbilityBase::Extractor> &extractor,
-    const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd, const ResType resType)
+    const std::shared_ptr<ValueUnderQualifierDir> qd, const ResType resType)
 {
     std::string filePath;
     if (qd == nullptr) {
@@ -705,9 +706,11 @@ std::string GetFilePathFromHap(std::shared_ptr<AbilityBase::Extractor> &extracto
     }
     return filePath;
 }
+#endif
 
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 std::shared_ptr<AbilityBase::Extractor> GetAbilityExtractor(
-    const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd)
+    const std::shared_ptr<ValueUnderQualifierDir> qd)
 {
     std::string hapPath = qd->GetIndexPath();
     bool isNewExtractor = false;
@@ -716,7 +719,7 @@ std::shared_ptr<AbilityBase::Extractor> GetAbilityExtractor(
 }
 #endif
 
-RState HapManager::GetProfileData(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd, size_t &len,
+RState HapManager::GetProfileData(const std::shared_ptr<ValueUnderQualifierDir> qd, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
@@ -739,7 +742,7 @@ RState HapManager::GetProfileData(const std::shared_ptr<HapResource::ValueUnderQ
     return SUCCESS;
 }
 
-RState HapManager::GetMediaData(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd, size_t &len,
+RState HapManager::GetMediaData(const std::shared_ptr<ValueUnderQualifierDir> qd, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue)
 {
     std::string filePath = qd->GetIndexPath();
@@ -752,7 +755,7 @@ RState HapManager::GetMediaData(const std::shared_ptr<HapResource::ValueUnderQua
     return state;
 }
 
-RState HapManager::GetMediaDataFromHap(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd, size_t &len,
+RState HapManager::GetMediaDataFromHap(const std::shared_ptr<ValueUnderQualifierDir> qd, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
@@ -776,7 +779,7 @@ RState HapManager::GetMediaDataFromHap(const std::shared_ptr<HapResource::ValueU
     return SUCCESS;
 }
 
-RState HapManager::GetMediaDataFromIndex(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd, size_t &len,
+RState HapManager::GetMediaDataFromIndex(const std::shared_ptr<ValueUnderQualifierDir> qd, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue)
 {
     std::string filePath;
@@ -788,7 +791,7 @@ RState HapManager::GetMediaDataFromIndex(const std::shared_ptr<HapResource::Valu
     return SUCCESS;
 }
 
-RState HapManager::GetMediaBase64Data(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd,
+RState HapManager::GetMediaBase64Data(const std::shared_ptr<ValueUnderQualifierDir> qd,
     std::string &outValue)
 {
     std::string filePath = qd->GetIndexPath();
@@ -801,7 +804,7 @@ RState HapManager::GetMediaBase64Data(const std::shared_ptr<HapResource::ValueUn
     return state;
 }
 
-RState HapManager::GetMediaBase64DataFromHap(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd,
+RState HapManager::GetMediaBase64DataFromHap(const std::shared_ptr<ValueUnderQualifierDir> qd,
     std::string &outValue)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
@@ -824,7 +827,7 @@ RState HapManager::GetMediaBase64DataFromHap(const std::shared_ptr<HapResource::
     return SUCCESS;
 }
 
-RState HapManager::GetMediaBase64DataFromIndex(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd,
+RState HapManager::GetMediaBase64DataFromIndex(const std::shared_ptr<ValueUnderQualifierDir> qd,
     std::string &outValue)
 {
     std::string filePath;
@@ -875,7 +878,7 @@ RState HapManager::FindRawFileFromHap(const std::string &rawFileName, size_t &le
         }
         std::string tempPath = (*iter)->GetIndexPath();
         std::string tempPatchPath;
-        if ((*iter)->IsPatch()) {
+        if ((*iter)->HasPatch()) {
             tempPatchPath = (*iter)->GetPatchPath();
         }
         if (Utils::ContainsTail(tempPath, Utils::tailSet)) { // if file path is compressed
@@ -924,7 +927,7 @@ RState HapManager::GetRawFd(const std::string &rawFileName, ResourceManager::Raw
         }
         std::string tempPath = (*iter)->GetIndexPath();
         std::string tempPatchPath;
-        if ((*iter)->IsPatch()) {
+        if ((*iter)->HasPatch()) {
             tempPatchPath = (*iter)->GetPatchPath();
         }
         if (Utils::ContainsTail(tempPath, Utils::tailSet)) { // if file path is compressed
@@ -951,7 +954,7 @@ RState HapManager::GetRawFileList(const std::string &rawDirPath, std::vector<std
                 if ((*iter)->IsSystemResource() || (*iter)->IsOverlayResource()) {
                     continue;
                 }
-                if ((*iter)->GetIndexPath() == hapOrIndexPath && (*iter)->IsPatch()) {
+                if ((*iter)->GetIndexPath() == hapOrIndexPath && (*iter)->HasPatch()) {
                     temPatchPath = (*iter)->GetPatchPath();
                 }
             }
@@ -978,7 +981,7 @@ bool HapManager::IsLoadHap(std::string &hapPath)
     return HapManager::GetValidHapPath(hapPath) == OK ? true : false;
 }
 
-RState HapManager::GetFilePath(const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd, const ResType resType,
+RState HapManager::GetFilePath(const std::shared_ptr<ValueUnderQualifierDir> vuqd, const ResType resType,
     std::string &outValue)
 {
     // not found or type invalid
@@ -1151,7 +1154,7 @@ uint32_t HapManager::GetResourceLimitKeys()
     ReadLock lock(this->mutex_);
     uint32_t limitKeysValue = 0;
     for (size_t i = 0; i < hapResources_.size(); i++) {
-        limitKeysValue |= hapResources_[i]->GetResourceLimitKeys();
+        limitKeysValue |= hapResources_[i]->GetLimitKeysValue();
     }
     RESMGR_HILOGD(RESMGR_TAG, "hap manager limit key is %{public}u", limitKeysValue);
     return limitKeysValue;

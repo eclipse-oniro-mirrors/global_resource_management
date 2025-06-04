@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -193,24 +193,31 @@ std::string KeyParam::ToString() const
 }
 
 // IdItem
+std::map<ResType, std::string> IdItem::resTypeStrList = {
+    {ResType::STRING, std::string("string")},
+    {ResType::BOOLEAN, std::string("boolean")},
+    {ResType::COLOR, std::string("color")},
+    {ResType::FLOAT, std::string("float")},
+    {ResType::INTEGER, std::string("integer")},
+    {ResType::PATTERN, std::string("pattern")},
+    {ResType::THEME, std::string("theme")},
+    {ResType::MEDIA, std::string("media")},
+    {ResType::SYMBOL, std::string("symbol")},
+    {ResType::PLURALS, std::string("plural")}
+};
 
-std::map<ResType, std::string> IdItem::resTypeStrList;
-
-bool IdItem::sInit = IdItem::Init();
-
-bool IdItem::Init()
+bool IdItem::IsArrayOfType(const ResType &type)
 {
-    resTypeStrList.insert(make_pair(ResType::STRING, std::string("string")));
-    resTypeStrList.insert(make_pair(ResType::BOOLEAN, std::string("boolean")));
-    resTypeStrList.insert(make_pair(ResType::COLOR, std::string("color")));
-    resTypeStrList.insert(make_pair(ResType::FLOAT, std::string("float")));
-    resTypeStrList.insert(make_pair(ResType::INTEGER, std::string("integer")));
-    resTypeStrList.insert(make_pair(ResType::PATTERN, std::string("pattern")));
-    resTypeStrList.insert(make_pair(ResType::THEME, std::string("theme")));
-    resTypeStrList.insert(make_pair(ResType::MEDIA, std::string("media")));
-    resTypeStrList.insert(make_pair(ResType::SYMBOL, std::string("symbol")));
-    resTypeStrList.insert(make_pair(ResType::PLURALS, std::string("plural")));
-    return true;
+    if (type == ResType::STRINGARRAY || type == ResType::INTARRAY || type == ResType::THEME ||
+        type == ResType::PLURALS || type == ResType::PATTERN) {
+        return true;
+    }
+    return false;
+}
+
+void IdItem::JudgeArray()
+{
+    this->isArray_ = IsArrayOfType(resType_);
 }
 
 bool IdItem::HaveParent() const
@@ -281,9 +288,6 @@ std::string IdParam::ToString() const
     return FormatString("[id:%u, offset:%u, data:%s]", id_, offset_,
         idItem_->ToString().c_str());
 }
-
-ResId::~ResId()
-{}
 
 std::string ResId::ToString() const
 {
