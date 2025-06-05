@@ -99,7 +99,10 @@ ohos_shared_library("resourcemanager_preview") {
 }
 
 ohos_shared_library("sendableresourcemanager") {
-  include_dirs = [ "../../inner_api/include" ]
+  include_dirs = [
+    "../../inner_api/include",
+    "../../../frameworks/resmgr/include",
+  ]
 
   sources = [ "src/sendable_resource_manager_napi.cpp" ]
 
@@ -127,7 +130,10 @@ ohos_shared_library("sendableresourcemanager") {
 ohos_shared_library("sendableresourcemanager_preview") {
   if (is_mingw || is_mac || is_linux) {
     output_name = "sendableresourcemanager"
-    include_dirs = [ "../../inner_api/include" ]
+    include_dirs = [
+      "../../inner_api/include",
+      "../../../frameworks/resmgr/include",
+    ]
 
     sources = [ "src/sendable_resource_manager_napi.cpp" ]
 
