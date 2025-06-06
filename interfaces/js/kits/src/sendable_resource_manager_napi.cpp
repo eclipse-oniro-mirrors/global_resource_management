@@ -16,7 +16,7 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "native_engine.h"
-#include "../../../../frameworks/resmgr/include/hilog_wrapper.h"
+#include "hilog_wrapper.h"
 
 namespace OHOS {
 namespace Global {
