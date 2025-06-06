@@ -33,6 +33,7 @@ ohos_shared_library("cj_resource_manager_ffi") {
       "hilog:libhilog",
       "hisysevent:libhisysevent",
       "hitrace:hitrace_meter",
+      "init:libbegetutil",
       "napi:ace_napi",
       "napi:cj_bind_ffi",
       "napi:cj_bind_native",
