@@ -565,55 +565,218 @@ ani_object ResMgrAddon::getRawFileContentSync(ani_env* env, ani_object object, a
     return CreateAniUint8Array(env, *dataContext);
 }
 
-ani_string ResMgrAddon::getPluralStringValueSyncById(ani_env* env, ani_object object, ani_double resId, ani_double num)
+ani_string ResMgrAddon::GetIntPluralStringValueSyncById(ani_env* env, ani_object object,
+    ani_double resId, ani_double num, ani_object args)
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
     dataContext->resId_ = resId;
-    dataContext->param_ = num;
+    double number = num;
+    if (number > INT_MAX) {
+        number = INT_MAX;
+    } else if (number < INT_MIN) {
+        number = INT_MIN;
+    }
+    dataContext->quantity_ = { true, number, 0.0 };
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     uint32_t notUse = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, notUse);
-    if (!ret || resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getPluralStringValueSyncById");
+    if (!ret) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getIntPluralStringValueSyncById");
         ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
         return nullptr;
     }
 
-    RState state = resMgr->GetFormatPluralStringById(dataContext->value_,
-        resId, dataContext->param_, dataContext->jsParams_);
+    if (!InitAniParameters(env, args, dataContext->jsParams_)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "InitOptionalParameters formatting error");
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_ID_FORMAT_ERROR);
+        return nullptr;
+    }
+
+    RState state = resMgr->GetFormatPluralStringById(dataContext->value_, resId, dataContext->quantity_,
+        dataContext->jsParams_);
     if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to getPluralStringValueSyncById state", true, state);
+        dataContext->SetErrorMsg("Failed to GetFormatPluralStringById state", true, state);
         ResourceManagerAniUtils::AniThrow(env, state);
         return nullptr;
     }
     return CreateAniString(env, *dataContext);
 }
 
-ani_string ResMgrAddon::getPluralStringValueSync(ani_env* env, ani_object object, ani_object resource, ani_double num)
+ani_string ResMgrAddon::GetIntPluralStringValueSync(ani_env* env, ani_object object,
+    ani_object resource, ani_double num, ani_object args)
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     int32_t state = InitIdResourceAddon(env, object, dataContext, resource);
     if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to init para in getPluralStringValueSync", true);
+        dataContext->SetErrorMsg("Failed to init para in getIntPluralStringValueSync", true);
         ResourceManagerAniUtils::AniThrow(env, state);
         return nullptr;
     }
-    dataContext->param_ = num;
+    double number = num;
+    if (number > INT_MAX) {
+        number = INT_MAX;
+    } else if (number < INT_MIN) {
+        number = INT_MIN;
+    }
+    dataContext->quantity_ = { true, number, 0.0 };
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
-    if (!ret || resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getPluralStringValueSync");
+    if (!ret) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getIntPluralStringValueSync");
         ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
         return nullptr;
     }
 
-    state = resMgr->GetFormatPluralStringById(dataContext->value_, resId, dataContext->param_, dataContext->jsParams_);
+    if (!InitAniParameters(env, args, dataContext->jsParams_)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "InitOptionalParameters formatting error");
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_ID_FORMAT_ERROR);
+        return nullptr;
+    }
+
+    state = resMgr->GetFormatPluralStringById(dataContext->value_, resId, dataContext->quantity_,
+        dataContext->jsParams_);
     if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to getPluralStringValueSync state", true, state);
+        dataContext->SetErrorMsg("Failed to GetFormatPluralStringById state", true, state);
+        ResourceManagerAniUtils::AniThrow(env, state);
+        return nullptr;
+    }
+    return CreateAniString(env, *dataContext);
+}
+
+ani_string ResMgrAddon::GetIntPluralStringByNameSync(ani_env* env, ani_object object,
+    ani_string resName, ani_double num, ani_object args)
+{
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    dataContext->addon_ = UnwrapAddon(env, object);
+    dataContext->resName_ = AniStrToString(env, static_cast<ani_ref>(resName));
+    double number = num;
+    if (number > INT_MAX) {
+        number = INT_MAX;
+    } else if (number < INT_MIN) {
+        number = INT_MIN;
+    }
+    dataContext->quantity_ = { true, number, 0.0 };
+
+    if (!InitAniParameters(env, args, dataContext->jsParams_)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "InitOptionalParameters formatting error");
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_ID_FORMAT_ERROR);
+        return nullptr;
+    }
+
+    if (dataContext->addon_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getIntPluralStringByNameSync");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
+        return nullptr;
+    }
+
+    RState state = dataContext->addon_->GetResMgr()->GetFormatPluralStringByName(dataContext->value_,
+        dataContext->resName_.c_str(), dataContext->quantity_, dataContext->jsParams_);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("GetFormatPluralStringByName failed state", false);
+        ResourceManagerAniUtils::AniThrow(env, state);
+        return nullptr;
+    }
+    return CreateAniString(env, *dataContext);
+}
+
+ani_string ResMgrAddon::GetDoublePluralStringValueSyncById(ani_env* env, ani_object object,
+    ani_double resId, ani_double num, ani_object args)
+{
+    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
+    dataContext->addon_ = UnwrapAddon(env, object);
+    dataContext->resId_ = resId;
+    dataContext->quantity_ = { false, 0, num };
+
+    std::shared_ptr<ResourceManager> resMgr = nullptr;
+    uint32_t notUse = 0;
+    bool ret = GetHapResourceManager(dataContext.get(), resMgr, notUse);
+    if (!ret) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getIntPluralStringValueSyncById");
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        return nullptr;
+    }
+
+    if (!InitAniParameters(env, args, dataContext->jsParams_)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "InitOptionalParameters formatting error");
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_ID_FORMAT_ERROR);
+        return nullptr;
+    }
+
+    RState state = resMgr->GetFormatPluralStringById(dataContext->value_, resId, dataContext->quantity_,
+        dataContext->jsParams_);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to GetFormatPluralStringById state", true, state);
+        ResourceManagerAniUtils::AniThrow(env, state);
+        return nullptr;
+    }
+    return CreateAniString(env, *dataContext);
+}
+
+ani_string ResMgrAddon::GetDoublePluralStringValueSync(ani_env* env, ani_object object,
+    ani_object resource, ani_double num, ani_object args)
+{
+    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
+    int32_t state = InitIdResourceAddon(env, object, dataContext, resource);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to init para in getIntPluralStringValueSync", true);
+        ResourceManagerAniUtils::AniThrow(env, state);
+        return nullptr;
+    }
+    dataContext->quantity_ = { false, 0, num };
+
+    std::shared_ptr<ResourceManager> resMgr = nullptr;
+    uint32_t resId = 0;
+    bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
+    if (!ret) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getIntPluralStringValueSync");
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        return nullptr;
+    }
+
+    if (!InitAniParameters(env, args, dataContext->jsParams_)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "InitOptionalParameters formatting error");
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_ID_FORMAT_ERROR);
+        return nullptr;
+    }
+
+    state = resMgr->GetFormatPluralStringById(dataContext->value_, resId, dataContext->quantity_,
+        dataContext->jsParams_);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to GetFormatPluralStringById state", true, state);
+        ResourceManagerAniUtils::AniThrow(env, state);
+        return nullptr;
+    }
+    return CreateAniString(env, *dataContext);
+}
+
+ani_string ResMgrAddon::GetDoublePluralStringByNameSync(ani_env* env, ani_object object,
+    ani_string resName, ani_double num, ani_object args)
+{
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    dataContext->addon_ = UnwrapAddon(env, object);
+    dataContext->resName_ = AniStrToString(env, static_cast<ani_ref>(resName));
+    dataContext->quantity_ = { false, 0, num };
+
+    if (!InitAniParameters(env, args, dataContext->jsParams_)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "InitOptionalParameters formatting error");
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_ID_FORMAT_ERROR);
+        return nullptr;
+    }
+
+    if (dataContext->addon_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getDoublePluralStringByNameSync");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
+        return nullptr;
+    }
+
+    RState state = dataContext->addon_->GetResMgr()->GetFormatPluralStringByName(dataContext->value_,
+        dataContext->resName_.c_str(), dataContext->quantity_, dataContext->jsParams_);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("GetFormatPluralStringByName failed state", false);
         ResourceManagerAniUtils::AniThrow(env, state);
         return nullptr;
     }
@@ -641,10 +804,21 @@ ani_status ResMgrAddon::BindContext(ani_env* env)
         ani_native_function { "getColorSync", "D:D", reinterpret_cast<void*>(getColorSyncById) },
         ani_native_function { "getColorSync", "Lglobal/resource/Resource;:D", reinterpret_cast<void*>(getColorSync) },
         ani_native_function { "getRawFileContentSync", nullptr, reinterpret_cast<void*>(getRawFileContentSync) },
-        ani_native_function { "getPluralStringValueSync", "DD:Lstd/core/String;",
-            reinterpret_cast<void*>(getPluralStringValueSyncById) },
-        ani_native_function { "getPluralStringValueSync", "Lglobal/resource/Resource;D:Lstd/core/String;",
-            reinterpret_cast<void*>(getPluralStringValueSync) },
+        ani_native_function { "getIntPluralStringValueSync", "DD[Lstd/core/Object;:Lstd/core/String;",
+            reinterpret_cast<void*>(GetIntPluralStringValueSyncById) },
+        ani_native_function { "getIntPluralStringValueSync",
+            "Lglobal/resource/Resource;D[Lstd/core/Object;:Lstd/core/String;",
+            reinterpret_cast<void*>(GetIntPluralStringValueSync) },
+        ani_native_function { "getIntPluralStringByNameSync", nullptr,
+            reinterpret_cast<void*>(GetIntPluralStringByNameSync) },
+
+        ani_native_function { "getDoublePluralStringValueSync", "DD[Lstd/core/Object;:Lstd/core/String;",
+            reinterpret_cast<void*>(GetDoublePluralStringValueSyncById) },
+        ani_native_function { "getDoublePluralStringValueSync",
+            "Lglobal/resource/Resource;D[Lstd/core/Object;:Lstd/core/String;",
+            reinterpret_cast<void*>(GetDoublePluralStringValueSync) },
+        ani_native_function { "getDoublePluralStringByNameSync", nullptr,
+            reinterpret_cast<void*>(GetDoublePluralStringByNameSync) },
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {

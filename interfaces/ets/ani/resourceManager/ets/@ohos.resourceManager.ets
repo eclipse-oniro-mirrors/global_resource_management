@@ -65,9 +65,6 @@ export default namespace resourceManager {
     }
 
     export interface ResourceManager {
-        getString(resId: number, callback: AsyncCallback<string, void>): void;
-        getString(resId: number): Promise<string>;
-
         getStringValue(resource: Resource, callback: AsyncCallback<string, void>): void;
         getStringValue(resource: Resource): Promise<string>;
 
@@ -90,8 +87,13 @@ export default namespace resourceManager {
 
         getRawFileContentSync(path: string): Uint8Array;
 
-        getPluralStringValueSync(resId: number, num: number): string;
-        getPluralStringValueSync(resource: Resource, num: number): string;
+        getIntPluralStringValueSync(resId: number, num: number, ...args: (string | number)[]): string;
+        getIntPluralStringValueSync(resource: Resource, num: number, ...args: (string | number)[]): string;
+        getIntPluralStringByNameSync(resName: string, num: number, ...args: (string | number)[]): string;
+
+        getDoublePluralStringValueSync(resId: number, num: number, ...args: (string | number)[]): string;
+        getDoublePluralStringValueSync(resource: Resource, num: number, ...args: (string | number)[]): string;
+        getDoublePluralStringByNameSync(resName: string, num: number, ...args: (string | number)[]): string;
     }
 
     export type RawFileDescriptor = _RawFileDescriptor;
@@ -117,31 +119,14 @@ export default namespace resourceManager {
         native getColorSync(resId: number): number;
         native getColorSync(resource: Resource): number;
         native getRawFileContentSync(path: string): Uint8Array;
-        native getPluralStringValueSync(resId: number, num: number): string;
-        native getPluralStringValueSync(resource: Resource, num: number): string;
 
-        getString(resId: number, callback: AsyncCallback<string, void>): void {
-            let p1 = taskpool.execute((): string => {
-                return this.getStringSync(resId);
-            })
-            p1.then((content: NullishType) => {
-                callback(new BusinessError(), content as string);
-            }).catch((err: BusinessError): void => {
-                callback(err, "");
-            });
-        }
+        native getIntPluralStringValueSync(resId: number, num: number, ...args: (string | number)[]): string;
+        native getIntPluralStringValueSync(resource: Resource, num: number, ...args: (string | number)[]): string;
+        native getIntPluralStringByNameSync(resName: string, num: number, ...args: (string | number)[]): string;
 
-        getString(resId: number): Promise<string> {
-            return new Promise<string>((resolve, reject) => {
-                taskpool.execute((): string => {
-                    return this.getStringSync(resId);
-                }).then((content: NullishType) => {
-                    resolve(content as string);
-                }, (err: BusinessError): void => {
-                    reject(err);
-                });
-            });
-        }
+        native getDoublePluralStringValueSync(resId: number, num: number, ...args: (string | number)[]): string;
+        native getDoublePluralStringValueSync(resource: Resource, num: number, ...args: (string | number)[]): string;
+        native getDoublePluralStringByNameSync(resName: string, num: number, ...args: (string | number)[]): string;
 
         getStringValue(resId: number, callback: AsyncCallback<string, void>): void {
             let p1 = taskpool.execute((): string => {

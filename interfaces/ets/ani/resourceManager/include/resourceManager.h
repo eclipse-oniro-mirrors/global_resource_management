@@ -44,8 +44,20 @@ public:
     static ani_double getColorSyncById(ani_env* env, ani_object object, ani_double resId);
     static ani_double getColorSync(ani_env* env, ani_object object, ani_object resource);
     static ani_object getRawFileContentSync(ani_env* env, ani_object object, ani_string path);
-    static ani_string getPluralStringValueSyncById(ani_env* env, ani_object object, ani_double resId, ani_double num);
-    static ani_string getPluralStringValueSync(ani_env* env, ani_object object, ani_object resource, ani_double num);
+
+    static ani_string GetIntPluralStringValueSyncById(ani_env* env, ani_object object,
+        ani_double resId, ani_double num, ani_object args);
+    static ani_string GetIntPluralStringValueSync(ani_env* env, ani_object object,
+        ani_object resource, ani_double num, ani_object args);
+    static ani_string GetIntPluralStringByNameSync(ani_env* env, ani_object object,
+        ani_string resName, ani_double num, ani_object args);
+
+    static ani_string GetDoublePluralStringValueSyncById(ani_env* env, ani_object object,
+        ani_double resId, ani_double num, ani_object args);
+    static ani_string GetDoublePluralStringValueSync(ani_env* env, ani_object object,
+        ani_object resource, ani_double num, ani_object args);
+    static ani_string GetDoublePluralStringByNameSync(ani_env* env, ani_object object,
+        ani_string resName, ani_double num, ani_object args);
     static ani_status BindContext(ani_env* env);
 
     inline std::shared_ptr<ResourceManager> GetResMgr()
