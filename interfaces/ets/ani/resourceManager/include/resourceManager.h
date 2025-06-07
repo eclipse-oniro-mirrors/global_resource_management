@@ -86,7 +86,7 @@ private:
     std::string bundleName_;
     std::shared_ptr<ResourceManager> resMgr_;
     std::shared_ptr<AbilityRuntime::Context> context_;
-    bool isSystem_;
+    bool isSystem_ = false;
     bool isOverrideAddon_ = false;
 };
 } // namespace Resource

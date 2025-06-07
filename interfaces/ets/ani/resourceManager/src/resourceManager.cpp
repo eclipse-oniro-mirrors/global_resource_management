@@ -35,6 +35,39 @@ struct ArrayElement {
 
 static std::shared_ptr<ResourceManager> sysResMgr = nullptr;
 static std::mutex sysMgrMutex;
+static std::array methods = {
+    ani_native_function { "getStringSync", "D:Lstd/core/String;",
+        reinterpret_cast<void*>(ResMgrAddon::getStringSyncById) },
+    ani_native_function { "getStringSync", "D[Lstd/core/Object;:Lstd/core/String;",
+        reinterpret_cast<void *>(ResMgrAddon::getFormatStringSyncById) },
+    ani_native_function { "getStringSync", "Lglobal/resource/Resource;:Lstd/core/String;",
+        reinterpret_cast<void*>(ResMgrAddon::getStringSync) },
+    ani_native_function { "getStringSync", "Lglobal/resource/Resource;[Lstd/core/Object;:Lstd/core/String;",
+        reinterpret_cast<void *>(ResMgrAddon::getFormatStringSync) },
+    ani_native_function { "getNumber", "D:D", reinterpret_cast<void*>(ResMgrAddon::getNumberById) },
+    ani_native_function { "getNumber", "Lglobal/resource/Resource;:D",
+        reinterpret_cast<void*>(ResMgrAddon::getNumber) },
+    ani_native_function { "getColorSync", "D:D", reinterpret_cast<void*>(ResMgrAddon::getColorSyncById) },
+    ani_native_function { "getColorSync", "Lglobal/resource/Resource;:D",
+        reinterpret_cast<void*>(ResMgrAddon::getColorSync) },
+    ani_native_function { "getRawFileContentSync", nullptr,
+        reinterpret_cast<void*>(ResMgrAddon::getRawFileContentSync) },
+    ani_native_function { "getIntPluralStringValueSync", "DD[Lstd/core/Object;:Lstd/core/String;",
+        reinterpret_cast<void*>(ResMgrAddon::GetIntPluralStringValueSyncById) },
+    ani_native_function { "getIntPluralStringValueSync",
+        "Lglobal/resource/Resource;D[Lstd/core/Object;:Lstd/core/String;",
+        reinterpret_cast<void*>(ResMgrAddon::GetIntPluralStringValueSync) },
+    ani_native_function { "getIntPluralStringByNameSync", nullptr,
+        reinterpret_cast<void*>(ResMgrAddon::GetIntPluralStringByNameSync) },
+
+    ani_native_function { "getDoublePluralStringValueSync", "DD[Lstd/core/Object;:Lstd/core/String;",
+        reinterpret_cast<void*>(ResMgrAddon::GetDoublePluralStringValueSyncById) },
+    ani_native_function { "getDoublePluralStringValueSync",
+        "Lglobal/resource/Resource;D[Lstd/core/Object;:Lstd/core/String;",
+        reinterpret_cast<void*>(ResMgrAddon::GetDoublePluralStringValueSync) },
+    ani_native_function { "getDoublePluralStringByNameSync", nullptr,
+        reinterpret_cast<void*>(ResMgrAddon::GetDoublePluralStringByNameSync) },
+};
 
 ResMgrAddon::ResMgrAddon(
     const std::string& bundleName, const std::shared_ptr<ResourceManager>& resMgr,
@@ -148,7 +181,7 @@ static std::shared_ptr<ResMgrAddon> UnwrapAddon(ani_env* env, ani_object object)
     return *reinterpret_cast<std::shared_ptr<ResMgrAddon>*>(ptr);
 }
 
-static int32_t InitIdResourceAddon(ani_env* env, ani_object object,
+static int32_t InitDataContext(ani_env* env, ani_object object,
     std::unique_ptr<ResMgrDataContext>& dataContext, const ani_object resource)
 {
     dataContext->addon_ = UnwrapAddon(env, object);
@@ -366,7 +399,7 @@ ani_string ResMgrAddon::getFormatStringSyncById(ani_env *env, ani_object object,
 ani_string ResMgrAddon::getStringSync(ani_env* env, ani_object object, ani_object resource)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
-    int32_t state = InitIdResourceAddon(env, object, dataContext, resource);
+    int32_t state = InitDataContext(env, object, dataContext, resource);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in getStringSync", true);
         ResourceManagerAniUtils::AniThrow(env, state);
@@ -394,7 +427,7 @@ ani_string ResMgrAddon::getStringSync(ani_env* env, ani_object object, ani_objec
 ani_string ResMgrAddon::getFormatStringSync(ani_env *env, ani_object object, ani_object resource, ani_object args)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
-    int32_t state = InitIdResourceAddon(env, object, dataContext, resource);
+    int32_t state = InitDataContext(env, object, dataContext, resource);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in getFormatStringSync", true);
         ResourceManagerAniUtils::AniThrow(env, state);
@@ -462,7 +495,7 @@ ani_double ResMgrAddon::getNumberById(ani_env* env, ani_object object, ani_doubl
 ani_double ResMgrAddon::getNumber(ani_env* env, ani_object object, ani_object resource)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
-    int32_t state = InitIdResourceAddon(env, object, dataContext, resource);
+    int32_t state = InitDataContext(env, object, dataContext, resource);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in getNumber", true);
         ResourceManagerAniUtils::AniThrow(env, state);
@@ -524,7 +557,7 @@ ani_double ResMgrAddon::getColorSyncById(ani_env* env, ani_object object, ani_do
 ani_double ResMgrAddon::getColorSync(ani_env* env, ani_object object, ani_object resource)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
-    int32_t state = InitIdResourceAddon(env, object, dataContext, resource);
+    int32_t state = InitDataContext(env, object, dataContext, resource);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in getColorSync", true);
         ResourceManagerAniUtils::AniThrow(env, state);
@@ -608,7 +641,7 @@ ani_string ResMgrAddon::GetIntPluralStringValueSync(ani_env* env, ani_object obj
     ani_object resource, ani_double num, ani_object args)
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
-    int32_t state = InitIdResourceAddon(env, object, dataContext, resource);
+    int32_t state = InitDataContext(env, object, dataContext, resource);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in getIntPluralStringValueSync", true);
         ResourceManagerAniUtils::AniThrow(env, state);
@@ -720,7 +753,7 @@ ani_string ResMgrAddon::GetDoublePluralStringValueSync(ani_env* env, ani_object 
     ani_object resource, ani_double num, ani_object args)
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
-    int32_t state = InitIdResourceAddon(env, object, dataContext, resource);
+    int32_t state = InitDataContext(env, object, dataContext, resource);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to init para in getIntPluralStringValueSync", true);
         ResourceManagerAniUtils::AniThrow(env, state);
@@ -791,35 +824,6 @@ ani_status ResMgrAddon::BindContext(ani_env* env)
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", className);
         return (ani_status)ANI_ERROR;
     }
-    std::array methods = {
-        ani_native_function { "getStringSync", "D:Lstd/core/String;", reinterpret_cast<void*>(getStringSyncById) },
-        ani_native_function { "getStringSync", "D[Lstd/core/Object;:Lstd/core/String;",
-            reinterpret_cast<void *>(getFormatStringSyncById) },
-        ani_native_function { "getStringSync", "Lglobal/resource/Resource;:Lstd/core/String;",
-            reinterpret_cast<void*>(getStringSync) },
-        ani_native_function { "getStringSync", "Lglobal/resource/Resource;[Lstd/core/Object;:Lstd/core/String;",
-            reinterpret_cast<void *>(getFormatStringSync) },
-        ani_native_function { "getNumber", "D:D", reinterpret_cast<void*>(getNumberById) },
-        ani_native_function { "getNumber", "Lglobal/resource/Resource;:D", reinterpret_cast<void*>(getNumber) },
-        ani_native_function { "getColorSync", "D:D", reinterpret_cast<void*>(getColorSyncById) },
-        ani_native_function { "getColorSync", "Lglobal/resource/Resource;:D", reinterpret_cast<void*>(getColorSync) },
-        ani_native_function { "getRawFileContentSync", nullptr, reinterpret_cast<void*>(getRawFileContentSync) },
-        ani_native_function { "getIntPluralStringValueSync", "DD[Lstd/core/Object;:Lstd/core/String;",
-            reinterpret_cast<void*>(GetIntPluralStringValueSyncById) },
-        ani_native_function { "getIntPluralStringValueSync",
-            "Lglobal/resource/Resource;D[Lstd/core/Object;:Lstd/core/String;",
-            reinterpret_cast<void*>(GetIntPluralStringValueSync) },
-        ani_native_function { "getIntPluralStringByNameSync", nullptr,
-            reinterpret_cast<void*>(GetIntPluralStringByNameSync) },
-
-        ani_native_function { "getDoublePluralStringValueSync", "DD[Lstd/core/Object;:Lstd/core/String;",
-            reinterpret_cast<void*>(GetDoublePluralStringValueSyncById) },
-        ani_native_function { "getDoublePluralStringValueSync",
-            "Lglobal/resource/Resource;D[Lstd/core/Object;:Lstd/core/String;",
-            reinterpret_cast<void*>(GetDoublePluralStringValueSync) },
-        ani_native_function { "getDoublePluralStringByNameSync", nullptr,
-            reinterpret_cast<void*>(GetDoublePluralStringByNameSync) },
-    };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Cannot bind native methods to '%{public}s'", className);
