@@ -206,9 +206,9 @@ const std::string ThemePackManager::FindThemeResource(const std::pair<std::strin
 {
     std::string result;
     for (size_t i = 0; i < idItems.size(); i++) {
-        std::string resName = idItems[i]->GetItemResName();
-        uint32_t id = idItems[i]->GetItemResId();
-        ResType resType = idItems[i]->GetItemResType();
+        std::string resName = idItems[i]->name_;
+        uint32_t id = idItems[i]->id_;
+        ResType resType = idItems[i]->resType_;
         if (id >= SYSTEM_ID_BEGIN && id <= SYSTEM_ID_END) {
             if (resType == ResType::COLOR && !isThemeSystemResEnable) {
                 break;

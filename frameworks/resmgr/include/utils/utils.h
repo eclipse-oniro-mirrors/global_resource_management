@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -121,6 +121,7 @@ public:
     static bool IsSystemPath(const std::string& path);
 private:
     static bool IsValidValue(const char* end, const std::string& str);
+
     static uint16_t EncodeLanguageOrRegion(const char *str, char base);
 
     static constexpr uint64_t ROOT_LOCALE = 0x0;

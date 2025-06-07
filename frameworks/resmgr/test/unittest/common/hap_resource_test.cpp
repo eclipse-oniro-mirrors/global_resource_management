@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,8 @@
 #include <gtest/gtest.h>
 
 #include "hap_parser.h"
+#include "hap_parser_v1.h"
+#include "hap_parser_v2.h"
 #include "hap_resource.h"
 #include "test_common.h"
 #include "utils/date_utils.h"
@@ -92,7 +94,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest001, TestSize.Level0)
 {
     auto start = CurrentTimeUsec();
     std::shared_ptr<ResConfigImpl> rc = nullptr;
-    auto pResource = HapResource::LoadFromIndex(FormatFullPath(g_resFilePath).c_str(), rc);
+    auto pResource = HapResourceManager::GetInstance()->Load(FormatFullPath(g_resFilePath).c_str(), rc);
     auto cost = CurrentTimeUsec() - start;
     RESMGR_HILOGD(RESMGR_TAG, "load cost: %ld us.", cost);
 
@@ -100,7 +102,8 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest001, TestSize.Level0)
         ASSERT_TRUE(false);
     }
 
-    int id = pResource->GetIdByName("app_name", ResType::STRING);
+    auto idValue = pResource->GetIdValuesByName("app_name", ResType::STRING);
+    int id = idValue->GetLimitPathsConst()[0]->GetIdItem()->id_;
     start = CurrentTimeUsec();
     auto idValues = pResource->GetIdValues(id);
     cost = CurrentTimeUsec() - start;
@@ -156,7 +159,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest002, TestSize.Level1)
     const char *path = resPath.c_str();
 
     auto start = CurrentTimeUsec();
-    auto pResource = HapResource::LoadFromIndex(path, rc);
+    auto pResource = HapResourceManager::GetInstance()->Load(path, rc);
     auto cost = CurrentTimeUsec() - start;
     RESMGR_HILOGD(RESMGR_TAG, "load cost: %ld us.", cost);
 
@@ -164,7 +167,8 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest002, TestSize.Level1)
         ASSERT_TRUE(false);
     }
 
-    int id = pResource->GetIdByName("app_name", ResType::STRING);
+    auto idValue = pResource->GetIdValuesByName("app_name", ResType::STRING);
+    int id = idValue->GetLimitPathsConst()[0]->GetIdItem()->id_;
     start = CurrentTimeUsec();
     auto idValues = pResource->GetIdValues(id);
     cost = CurrentTimeUsec() - start;
@@ -198,7 +202,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest003, TestSize.Level1)
 {
     auto start = CurrentTimeUsec();
     std::shared_ptr<ResConfigImpl> rc = nullptr;
-    auto pResource = HapResource::LoadFromIndex(FormatFullPath(g_resFilePath).c_str(), rc);
+    auto pResource = HapResourceManager::GetInstance()->Load(FormatFullPath(g_resFilePath).c_str(), rc);
     auto cost = CurrentTimeUsec() - start;
     RESMGR_HILOGD(RESMGR_TAG, "load cost: %ld us.", cost);
 
@@ -234,60 +238,44 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest003, TestSize.Level1)
     PrintIdValues(idv);
 }
 
-ResDesc *LoadFromHap(const char *hapPath, const std::shared_ptr<ResConfigImpl> defaultConfig,
+int32_t LoadFromHap(const char *hapPath, std::shared_ptr<ResConfigImpl> defaultConfig,
     const uint32_t &selectedTypes = SELECT_ALL)
 {
-    std::unique_ptr<uint8_t[]> buf;
-    size_t bufLen;
-    int32_t out = HapParser::ReadIndexFromFile(hapPath, buf, bufLen);
+    HapParserV1 hapParser(defaultConfig, selectedTypes, false);
+    hapParser.Init(hapPath);
+    int32_t out = hapParser.ParseResHex();
     if (out != OK) {
-        RESMGR_HILOGE(RESMGR_TAG, "ReadIndexFromFile failed! retcode:%d", out);
-        return nullptr;
-    }
-    RESMGR_HILOGD(RESMGR_TAG, "extract success, bufLen:%zu", bufLen);
-
-    ResDesc *resDesc = new ResDesc();
-    ParserContext context = {
-        .buffer = reinterpret_cast<char *>(buf.get()),
-        .bufLen = bufLen,
-        .resDesc = *resDesc,
-        .defaultConfig = defaultConfig,
-        .selectedTypes = selectedTypes,
-    };
-    out = HapParser::ParseResHex(context);
-    if (out != OK) {
-        delete (resDesc);
         RESMGR_HILOGE(RESMGR_TAG, "ParseResHex failed! retcode:%d", out);
-        return nullptr;
+        return out;
     } else {
-        RESMGR_HILOGD(RESMGR_TAG, "ParseResHex success:\n%s", resDesc->ToString().c_str());
+        RESMGR_HILOGD(RESMGR_TAG, "ParseResHex success:\n%s", hapParser.GetResDesc()->ToString().c_str());
     }
     // construct hapresource
-    return resDesc;
+    return OK;
 }
 
 /*
  * @tc.name: HapResourceFuncTest004
- * @tc.desc: Test HapParser::ReadIndexFromFile function, file case.
+ * @tc.desc: Test HapParser::GetIndexData function, file case.
  * @tc.type: FUNC
  */
 HWTEST_F(HapResourceTest, HapResourceFuncTest004, TestSize.Level1)
 {
     // 1. normal case
-    ResDesc *resDesc = LoadFromHap(FormatFullPath("all.hap").c_str(), nullptr);
-    ASSERT_TRUE(resDesc != nullptr);
+    int32_t res = LoadFromHap(FormatFullPath("all.hap").c_str(), nullptr);
+    ASSERT_TRUE(res == OK);
 
     // 2. hap file exists, config.json does not exist
-    resDesc = LoadFromHap(FormatFullPath("err-config.json-1.hap").c_str(), nullptr);
-    ASSERT_TRUE(resDesc == nullptr);
+    res = LoadFromHap(FormatFullPath("err-config.json-1.hap").c_str(), nullptr);
+    ASSERT_TRUE(res != OK);
 
     // 3. hap file exists, config.json error: missing "moduleName"
-    resDesc = LoadFromHap(FormatFullPath("err-config.json-2.hap").c_str(), nullptr);
-    ASSERT_TRUE(resDesc == nullptr);
+    res = LoadFromHap(FormatFullPath("err-config.json-2.hap").c_str(), nullptr);
+    ASSERT_TRUE(res != OK);
 
     // 4. load select string type res
-    resDesc = LoadFromHap(FormatFullPath("all.hap").c_str(), nullptr, SELECT_STRING);
-    ASSERT_TRUE(resDesc != nullptr);
+    res = LoadFromHap(FormatFullPath("all.hap").c_str(), nullptr, SELECT_STRING);
+    ASSERT_TRUE(res == OK);
 }
 
 /*
@@ -297,16 +285,35 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest004, TestSize.Level1)
  */
 HWTEST_F(HapResourceTest, HapResourcePutAndGetResourceTest001, TestSize.Level1)
 {
-    std::shared_ptr<HapResource> pResource1 = std::make_shared<HapResource>("test1", 1000, nullptr, false, false);
+    std::shared_ptr<HapResource> pResource1 = std::make_shared<HapResourceV1>("test1", 1000, nullptr, false, false);
     ASSERT_TRUE(pResource1 != nullptr);
     std::shared_ptr<HapResource> pResource2 =
         HapResourceManager::GetInstance()->PutAndGetResource("test1", pResource1);
     EXPECT_EQ(pResource2, pResource1);
-    std::shared_ptr<HapResource> pResource3 = std::make_shared<HapResource>("test1", 1000, nullptr, false, false);
+    std::shared_ptr<HapResource> pResource3 = std::make_shared<HapResourceV1>("test1", 1000, nullptr, false, false);
     ASSERT_TRUE(pResource3 != nullptr);
     std::shared_ptr<HapResource> pResource4 =
         HapResourceManager::GetInstance()->PutAndGetResource("test1", pResource3);
     EXPECT_EQ(pResource4, pResource1);
+}
+
+/*
+ * @tc.name: HapResourcePutAndGetResourceTest002
+ * @tc.desc: Test HapResourceManager::PutAndGetResource function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapResourceTest, HapResourcePutAndGetResourceTest002, TestSize.Level1)
+{
+    std::shared_ptr<HapResource> pResource1 = std::make_shared<HapResourceV1>("test1", 1000, nullptr, false, false);
+    ASSERT_TRUE(pResource1 != nullptr);
+    std::shared_ptr<HapResource> pResource2 =
+        HapResourceManager::GetInstance()->PutAndGetResource("test1", pResource1);
+    EXPECT_EQ(pResource2, pResource1);
+    std::shared_ptr<HapResource> pResource3 = std::make_shared<HapResourceV2>("test2", 1000);
+    ASSERT_TRUE(pResource3 != nullptr);
+    std::shared_ptr<HapResource> pResource4 =
+        HapResourceManager::GetInstance()->PutAndGetResource("test2", pResource3);
+    EXPECT_EQ(pResource4, pResource3);
 }
 
 /*

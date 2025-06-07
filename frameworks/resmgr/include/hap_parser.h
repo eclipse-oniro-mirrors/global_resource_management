@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,14 +13,15 @@
  * limitations under the License.
  */
 
-#ifndef RESOURCE_MANAGER_ZIPARCHIVE_H
-#define RESOURCE_MANAGER_ZIPARCHIVE_H
+#ifndef OHOS_RESOURCE_MANAGER_HAPPARSER_H
+#define OHOS_RESOURCE_MANAGER_HAPPARSER_H
 
 #include <cstdint>
 #include <cstdio>
 #include <string>
 #include <set>
 #include <unzip.h>
+#include "hap_resource.h"
 #include "res_desc.h"
 #include "res_config_impl.h"
 #include "resource_manager.h"
@@ -33,75 +34,27 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
-
-struct ParserContext {
-    const char *buffer{nullptr};
-    const size_t bufLen{0};
-    ResDesc &resDesc;
-    uint32_t limitKeyValue{0};
-    std::set<std::string> locales;
-    const std::shared_ptr<ResConfigImpl> defaultConfig{nullptr};
-    const uint32_t &selectedTypes{SELECT_ALL};
-    std::string deviceType;
-    std::vector<std::string> deviceTypes;
-    bool loadAll{false};
-    bool isUpdate{false};
-};
-
 class HapParser {
 public:
-    /**
-     * Read specified file in zip to buffer
-     * @param uf
-     * @param fileName  file name in zip which we will read
-     * @param buffer    bytes will write to buffer
-     * @param bufLen    the file length in bytes
-     * @return
-     */
-    static int32_t ReadFileFromZip(unzFile &uf, const char *fileName, std::unique_ptr<uint8_t[]> &buffer,
-                                  size_t &bufLen);
+    HapParser();
 
-    /**
-     * Read resource.index in hap to buffer
-     * @param zipFile hap file path
-     * @param buffer  bytes will write to buffer
-     * @param bufLen  length in bytes
-     * @return
-     */
-    static int32_t ReadIndexFromFile(const char *zipFile, std::unique_ptr<uint8_t[]> &buffer, size_t &bufLen);
+    virtual ~HapParser();
 
-    /**
-     * Whether the hap is STAGE MODE or not
-     * @param uf the hap fd
-     * @return true if the hap is STAGE MODE, else false
-     */
-    static bool IsStageMode(unzFile &uf);
+    virtual bool Init(const char *path);
 
-    /**
-     * Get the rawfile path
-     * @param filePath the hap path
-     * @param rawFilePath the rawFile path
-     * @return the rawFile path
-     */
-    static std::string GetPath(const std::string &filePath, std::string &rawFilePath);
+    virtual int32_t ParseResHex();
 
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    /**
-     * Parse modulename of FA Model
-     * @param extractor the ability extractor
-     * @return the modulename
-     */
-    static std::string ParseModuleName(std::shared_ptr<AbilityBase::Extractor> &extractor);
+    virtual std::shared_ptr<HapResource> GetHapResource(const char *path, bool isSystem, bool isOverlay);
 
-    /**
-     * Get the raw file path
-     * @param extractor the ability extractor
-     * @param rawFilePath the rawFile path
-     * @return the rawFile path
-     */
-    static std::string GetRawFilePath(std::shared_ptr<AbilityBase::Extractor> &extractor,
-        const std::string &rawFileName);
-#endif
+    static bool GetIndexData(const char *path, std::unique_ptr<uint8_t[]> &buf, size_t &bufLen);
+
+    #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    static std::string GetIndexFilePath(std::shared_ptr<AbilityBase::Extractor> &extractor);
+    #endif
+
+    static bool GetIndexDataFromHap(const char *path, std::unique_ptr<uint8_t[]> &buf, size_t &bufLen);
+
+    static bool GetIndexDataFromIndex(const char *path, std::unique_ptr<uint8_t[]> &buf, size_t &bufLen);
 
     /**
      * Get the raw file data from hap
@@ -145,24 +98,6 @@ public:
      */
     static RState GetRawFileListUnCompressed(const std::string &indexPath, const std::string &rawDirPath,
         std::vector<std::string>& fileList);
-
-    /**
-     * Parse resource hex to resDesc
-     * @param buffer the resource bytes
-     * @param bufLen length in bytes
-     * @param resDesc index file in hap
-     * @param defaultConfig the default config
-     * @return OK if the resource hex parse success, else SYS_ERROR
-     */
-    static int32_t ParseResHex(ParserContext &context);
-
-    /**
-     * Create resource config from KeyParams
-     * @param keyParams the keyParams contain type and value
-     * @return the resource config related to the keyParams
-     */
-    static std::shared_ptr<ResConfigImpl> CreateResConfigFromKeyParams(
-        const std::vector<std::shared_ptr<KeyParam>> &keyParams);
 
     /**
      * Get screen density
@@ -225,20 +160,13 @@ public:
      */
     static RState IsRawDirUnCompressed(const std::string &pathName, bool &outValue);
 
-private:
-    static const char *RES_FILE_NAME;
-    struct Determiner {
-        std::string mcc;
-        std::string mnc;
-        std::string language;
-        std::string script;
-        std::string region;
-        std::string direction;
-        std::string deviceType;
-        std::string colorMode;
-        std::string inputDevice;
-        std::string screenDensity;
-    };
+    /**
+     * Create resource config from KeyParams
+     * @param keyParams the keyParams contain type and value
+     * @return the resource config related to the keyParams
+     */
+    static std::shared_ptr<ResConfigImpl> CreateResConfigFromKeyParams(
+        const std::vector<std::shared_ptr<KeyParam>> &keyParams);
 
     struct ResConfigKey {
         const char *language = nullptr;
@@ -254,6 +182,16 @@ private:
     };
 
     static std::shared_ptr<ResConfigImpl> BuildResConfig(ResConfigKey *configKey);
+
+    static void GetKeyParamsLocales(std::shared_ptr<KeyParam> kp, std::string &locale, bool &isLocale);
+
+    #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    static std::string ParseModuleName(std::shared_ptr<AbilityBase::Extractor> &extractor);
+    #endif
+protected:
+    uint32_t limitKeyValue_{0};
+    
+    std::set<std::string> locales_;
 };
 } // namespace Resource
 } // namespace Global

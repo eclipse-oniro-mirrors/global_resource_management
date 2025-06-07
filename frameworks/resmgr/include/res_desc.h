@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_RESOURCE_MANAGER_RES_DESC_H
-#define OHOS_RESOURCE_MANAGER_RES_DESC_H
+#ifndef OHOS_RESOURCE_MANAGER_RESDESC_H
+#define OHOS_RESOURCE_MANAGER_RESDESC_H
 
 #include <cstdint>
 #include <map>
@@ -26,14 +26,15 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
-static constexpr uint32_t RES_HEADER_LEN = 136;
-
 static constexpr uint32_t RES_VERSION_LEN = 128;
 
 /**
- * resource.index file header
+ * old module resource.index file header
  */
-typedef struct ResHeader {
+class ResHeader {
+public:
+    static const uint32_t RES_HEADER_LEN = 136;
+
     // Type identifier for this chunk.  The meaning of this value depends
     // on the containing chunk.
     char version_[RES_VERSION_LEN];
@@ -43,31 +44,25 @@ typedef struct ResHeader {
 
     // determiner key count
     uint32_t keyCount_;
-} ResHeader;
+};
 
 class IdItem {
 public:
     static const uint32_t HEADER_LEN = 12;
     static const uint32_t SIZE_LEN = 2;
+    static std::map<ResType, std::string> resTypeStrList;
 
     /**
      * Whether the resType is array or not
      * @param type the resType
      * @return true if the resType is array, else false
      */
-    static bool IsArrayOfType(ResType type)
-    {
-        if (type == ResType::STRINGARRAY || type == ResType::INTARRAY || type == ResType::THEME ||
-            type == ResType::PLURALS || type == ResType::PATTERN) {
-            return true;
-        }
-        return false;
-    }
+    static bool IsArrayOfType(const ResType &type);
 
-    void JudgeArray()
-    {
-        this->isArray_ = IsArrayOfType(resType_);
-    }
+    /**
+     * Judge the IdItem is array resource or not
+     */
+    void JudgeArray();
 
     /**
      * only theme and pattern may have parent
@@ -75,9 +70,8 @@ public:
      */
     bool HaveParent() const;
 
-    static std::map<ResType, std::string> resTypeStrList;
     /**
-     * judge the std::string value is ref or not
+     * Whether the std::string value is ref or not
      * ref start with '$' end with id
      * sample: "$string:16777225"
      * @param value
@@ -89,21 +83,6 @@ public:
 
     std::string ToString() const;
 
-    std::string GetItemResName() const
-    {
-        return name_;
-    }
-
-    uint32_t GetItemResId() const
-    {
-        return id_;
-    }
-
-    ResType GetItemResType() const
-    {
-        return resType_;
-    }
-
     uint32_t size_;
     ResType resType_;
     uint32_t id_;
@@ -112,10 +91,6 @@ public:
     std::string value_;
     std::vector<std::string> values_;
     std::string name_;
-
-private:
-    static bool sInit;
-    static bool Init();
 };
 
 class IdParam {
@@ -133,7 +108,6 @@ public:
     static const uint32_t RESID_HEADER_LEN = 8;
     static const uint32_t IDPARAM_HEADER_LEN = 8;
 
-    ~ResId();
     std::string ToString() const;
 
     char tag_[4];
@@ -146,6 +120,8 @@ public:
  */
 class KeyParam {
 public:
+    static const uint32_t KEYPARAM_LEN = 8;
+
     // type of qualifier
     KeyType type_;
 
@@ -180,17 +156,15 @@ private:
 
 /**
  * a ResKey means a Qualifiers Sub-directories
- *
  */
 class ResKey {
 public:
     static const uint32_t RESKEY_HEADER_LEN = 12;
 
-    static const uint32_t KEYPARAM_HEADER_LEN = 8;
-
     ~ResKey();
 
     std::string ToString() const;
+
     // always 'KEYS'
     char tag_[4];
 
@@ -206,6 +180,7 @@ public:
     // the resConfig of each ResKey and all resConfig_ in ValueUnderQualifierDir will point to this resConfig_
     std::shared_ptr<ResConfigImpl> resConfig_;
 };
+
 /**
  * a ResDesc means a index file in hap zip
  */
@@ -218,6 +193,134 @@ public:
     std::string ToString() const;
 
     std::vector<std::shared_ptr<ResKey>> keys_;
+};
+
+/**
+ * new module resource.index file header
+ */
+class ResIndexHeader {
+public:
+    static const uint32_t RES_HEADER_LEN = 140;
+
+    // Type identifier for this chunk.  The meaning of this value depends
+    // on the containing chunk.
+    char version_[RES_VERSION_LEN];
+
+    // Size of the resource.index file (in bytes).  Including header
+    uint32_t length_;
+
+    // determiner key count
+    uint32_t keyCount_;
+
+    // offset from the beginning of the index file, pointing to the data block
+    uint32_t dataBlockOffset_;
+};
+
+/**
+ * a ResKey means a Qualifiers Sub-directories
+ */
+class KeyInfo {
+public:
+    static const uint32_t RESKEY_HEADER_LEN = 12;
+
+    // always 'KEYS'
+    char tag_[4];
+
+    // unique resconfig id
+    uint32_t resConfigId_;
+
+    // count of qualifiers
+    uint32_t keyParamsCount_;
+
+    // key param list
+    std::vector<std::shared_ptr<KeyParam>> params_;
+};
+
+class IdsHeader {
+public:
+    static const uint32_t IDS_HEADER_LEN = 16;
+
+    // always 'IDSS'
+    char tag_[4];
+
+    // size of the idss block
+    uint32_t length_;
+
+    // resource type count
+    uint32_t typeCount_;
+
+    // resource id count
+    uint32_t idCount_;
+};
+
+class TypeInfo {
+public:
+    static const uint32_t TYPE_INFO_LEN = 12;
+
+    // resource type
+    uint32_t type_;
+
+    // size of current resource type
+    uint32_t length_;
+
+    // resource id count
+    uint32_t count_;
+};
+
+class ResItem {
+public:
+    static const uint32_t RES_ITEM_LEN = 12;
+
+    // resource id
+    uint32_t resId_;
+
+    // offset from the beginning of the index file, pointing to the resource data
+    uint32_t offset_;
+
+    // size of resource name
+    uint32_t length_;
+
+    // resource name
+    std::string name_;
+};
+
+class DataHander {
+public:
+    static const uint32_t DATA_HANDER_LEN = 12;
+
+    // always 'DATA'
+    char tag_[4];
+
+    // size of the data block
+    uint32_t length_;
+
+    // resource id count
+    uint32_t idCount_;
+};
+
+class ResInfo {
+public:
+    static const uint32_t RES_INFO_LEN = 12;
+
+    // resource id
+    uint32_t resId_;
+
+    // size of the resource information
+    uint32_t length_;
+
+    // resource key count
+    uint32_t valueCount_;
+};
+
+class ConfigItem {
+public:
+    static const uint32_t CONFIG_ITEM_LEN = 8;
+
+    // resource config id
+    uint32_t resCfgId_;
+
+    // offset from the beginning of the index file, pointing to the resource data
+    uint32_t offset_;
 };
 } // namespace Resource
 } // namespace Global

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,8 @@
 #include "utils/string_utils.h"
 
 #include "hap_parser.h"
+#include "hap_parser_v1.h"
+#include "hap_parser_v2.h"
 
 using namespace OHOS::Global::Resource;
 using namespace testing::ext;
@@ -158,7 +160,7 @@ HWTEST_F(HapParserTest, HapParserFuncTest004, TestSize.Level1)
 
 /*
  * @tc.name: ReadIndexFromFileTest001
- * @tc.desc: Test ReadIndexFromFile
+ * @tc.desc: Test GetIndexData
  * @tc.type: FUNC
  */
 HWTEST_F(HapParserTest, ReadIndexFromFileTest001, TestSize.Level1)
@@ -166,13 +168,13 @@ HWTEST_F(HapParserTest, ReadIndexFromFileTest001, TestSize.Level1)
     std::string zipFile = FormatFullPath("not_exist_all.hap");
     std::unique_ptr<uint8_t[]> buffer;
     size_t len;
-    int32_t ret = HapParser::ReadIndexFromFile(zipFile.c_str(), buffer, len);
-    EXPECT_EQ(ret, UNKNOWN_ERROR);
+    bool ret = HapParser::GetIndexData(zipFile.c_str(), buffer, len);
+    EXPECT_EQ(ret, false);
 }
 
 /*
  * @tc.name: ReadIndexFromFileTest002
- * @tc.desc: Test ReadIndexFromFile
+ * @tc.desc: Test GetIndexData
  * @tc.type: FUNC
  */
 HWTEST_F(HapParserTest, ReadIndexFromFileTest002, TestSize.Level1)
@@ -180,13 +182,13 @@ HWTEST_F(HapParserTest, ReadIndexFromFileTest002, TestSize.Level1)
     std::string zipFile = FormatFullPath(g_hapPath);
     std::unique_ptr<uint8_t[]> buffer;
     size_t len;
-    int32_t ret = HapParser::ReadIndexFromFile(zipFile.c_str(), buffer, len);
-    EXPECT_EQ(ret, OK);
+    bool ret = HapParser::GetIndexData(zipFile.c_str(), buffer, len);
+    EXPECT_EQ(ret, true);
 }
 
 /*
  * @tc.name: ReadIndexFromFileTest002
- * @tc.desc: Test ReadIndexFromFile
+ * @tc.desc: Test GetIndexData
  * @tc.type: FUNC
  */
 HWTEST_F(HapParserTest, ReadIndexFromFileTest003, TestSize.Level1)
@@ -194,8 +196,8 @@ HWTEST_F(HapParserTest, ReadIndexFromFileTest003, TestSize.Level1)
     std::string zipFile = FormatFullPath(HAP_PATH_FA);
     std::unique_ptr<uint8_t[]> buffer;
     size_t len;
-    int32_t ret = HapParser::ReadIndexFromFile(zipFile.c_str(), buffer, len);
-    EXPECT_EQ(ret, OK);
+    bool ret = HapParser::GetIndexData(zipFile.c_str(), buffer, len);
+    EXPECT_EQ(ret, true);
 }
 
 /*
@@ -497,14 +499,23 @@ HWTEST_F(HapParserTest, GetRawFileListTest001, TestSize.Level1)
  */
 HWTEST_F(HapParserTest, ParseResHex001, TestSize.Level1)
 {
-    ResDesc *resDesc = new ResDesc();
-    ASSERT_TRUE(resDesc != nullptr);
-    ParserContext context = {
-        .resDesc = *resDesc,
-    };
-    int32_t state = HapParser::ParseResHex(context);
+    std::shared_ptr<ResConfigImpl> rc = nullptr;
+    HapParserV1 hapParser(rc, SELECT_ALL, false);
+    int32_t state = hapParser.ParseResHex();
     EXPECT_EQ(state, SYS_ERROR);
-    delete (resDesc);
+}
+
+/*
+ * @tc.name: ParseResHex002
+ * @tc.desc: Test ParseResHex
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, ParseResHex002, TestSize.Level1)
+{
+    std::shared_ptr<ResConfigImpl> rc = nullptr;
+    HapParserV2 hapParser;
+    int32_t state = hapParser.ParseResHex();
+    EXPECT_EQ(state, SYS_ERROR);
 }
 
 /*

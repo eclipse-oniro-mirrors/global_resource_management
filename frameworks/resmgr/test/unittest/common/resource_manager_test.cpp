@@ -269,7 +269,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest005, TestSize.Le
     rmc->AddResource("zh", nullptr, nullptr);
 
     // make a fake hapResource, then reload will fail
-    auto hapResource = std::make_shared<HapResource>("/data/test/non_exist", 0, nullptr);
+    auto hapResource = std::make_shared<HapResourceV1>("/data/test/non_exist", 0, nullptr);
     ((ResourceManagerImpl *)rm)->hapManager_->hapResources_.push_back(hapResource);
     ((ResourceManagerImpl *)rm)->hapManager_->loadedHapPaths_["/data/test/non_exist"] = std::vector<std::string>();
     RState state;
@@ -1720,7 +1720,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileByIdTest001, TestSize.Lev
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     rmc->TestGetProfileById(tmp);
     delete tmp;
 }
@@ -1749,7 +1749,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileByNameTest001, TestSize.L
 {
     rmc->AddResource("zh", nullptr, "CN");
 
-    HapResource *tmp = new HapResource(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
+    HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     rmc->TestGetProfileByName(tmp);
     delete tmp;
 }

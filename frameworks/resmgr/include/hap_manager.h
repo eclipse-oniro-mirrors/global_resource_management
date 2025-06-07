@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -175,7 +175,7 @@ public:
      * @param density the input screen density
      * @return the best resource path
      */
-    const std::shared_ptr<HapResource::ValueUnderQualifierDir> FindQualifierValueById(uint32_t id,
+    const std::shared_ptr<ValueUnderQualifierDir> FindQualifierValueById(uint32_t id,
         bool isGetOverrideResource = false, uint32_t density = 0);
     
     /**
@@ -185,7 +185,7 @@ public:
      * @param density the input screen density
      * @return the best resource path
      */
-    const std::shared_ptr<HapResource::ValueUnderQualifierDir> FindQualifierValueByName(const char *name,
+    const std::shared_ptr<ValueUnderQualifierDir> FindQualifierValueByName(const char *name,
         const ResType resType, bool isGetOverrideResource = false, uint32_t density = 0);
 
     /**
@@ -215,7 +215,7 @@ public:
      * @param outValue the media data
      * @return SUCCESS if get the media data success, else NOT_FOUND
      */
-    RState GetMediaData(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd, size_t& len,
+    RState GetMediaData(const std::shared_ptr<ValueUnderQualifierDir> qd, size_t& len,
         std::unique_ptr<uint8_t[]> &outValue);
 
     /**
@@ -224,7 +224,7 @@ public:
      * @param outValue the mediabase64 data
      * @return SUCCESS if get the mediabase64 data success, else NOT_FOUND
      */
-    RState GetMediaBase64Data(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd, std::string &outValue);
+    RState GetMediaBase64Data(const std::shared_ptr<ValueUnderQualifierDir> qd, std::string &outValue);
 
     /**
      * Get the Profile data
@@ -233,7 +233,7 @@ public:
      * @param outValue the profile data
      * @return SUCCESS if get the profile data success, else NOT_FOUND
      */
-    RState GetProfileData(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd, size_t &len,
+    RState GetProfileData(const std::shared_ptr<ValueUnderQualifierDir> qd, size_t &len,
         std::unique_ptr<uint8_t[]> &outValue);
 
     /**
@@ -290,7 +290,7 @@ public:
      * @param outValue the resource path write to
      * @return SUCCESS if resource exist, else not found
      */
-    RState GetFilePath(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd, const ResType resType,
+    RState GetFilePath(const std::shared_ptr<ValueUnderQualifierDir> qd, const ResType resType,
         std::string &outValue);
 
     /**
@@ -300,7 +300,7 @@ public:
      * @param outValue the media data write to
      * @return SUCCESS if resource exist, else not found
      */
-    RState GetMediaDataFromHap(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd, size_t &len,
+    RState GetMediaDataFromHap(const std::shared_ptr<ValueUnderQualifierDir> qd, size_t &len,
         std::unique_ptr<uint8_t[]> &outValue);
 
     /**
@@ -310,7 +310,7 @@ public:
      * @param outValue the media data write to
      * @return SUCCESS if resource exist, else not found
      */
-    RState GetMediaDataFromIndex(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd, size_t &len,
+    RState GetMediaDataFromIndex(const std::shared_ptr<ValueUnderQualifierDir> qd, size_t &len,
         std::unique_ptr<uint8_t[]> &outValue);
 
     /**
@@ -319,7 +319,7 @@ public:
      * @param outValue the mediabase64 data write to
      * @return SUCCESS if resource exist, else not found
      */
-    RState GetMediaBase64DataFromHap(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd,
+    RState GetMediaBase64DataFromHap(const std::shared_ptr<ValueUnderQualifierDir> qd,
         std::string &outValue);
 
     /**
@@ -328,7 +328,7 @@ public:
      * @param outValue the mediabase64 data write to
      * @return SUCCESS if resource exist, else not found
      */
-    RState GetMediaBase64DataFromIndex(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd,
+    RState GetMediaBase64DataFromIndex(const std::shared_ptr<ValueUnderQualifierDir> qd,
         std::string &outValue);
 
     /**
@@ -433,18 +433,18 @@ private:
 
     void GetResConfigImpl(ResConfigImpl &resConfig);
 
-    std::vector<std::shared_ptr<HapResource::IdValues>> GetResourceList(uint32_t ident) const;
+    std::vector<std::shared_ptr<IdValues>> GetResourceList(uint32_t ident) const;
 
-    std::vector<std::shared_ptr<HapResource::IdValues>> GetResourceListByName(const char *name,
+    std::vector<std::shared_ptr<IdValues>> GetResourceListByName(const char *name,
         const ResType resType) const;
 
     void MatchBestResource(std::shared_ptr<ResConfigImpl> &bestResConfig,
-        std::shared_ptr<HapResource::ValueUnderQualifierDir> &result,
-        const std::vector<std::shared_ptr<HapResource::ValueUnderQualifierDir>> &paths,
+        std::shared_ptr<ValueUnderQualifierDir> &result,
+        const std::vector<std::shared_ptr<ValueUnderQualifierDir>> &paths,
         uint32_t density, std::shared_ptr<ResConfigImpl> currentResConfig);
 
-    const std::shared_ptr<HapResource::ValueUnderQualifierDir> GetBestMatchResource(
-        const std::vector<std::shared_ptr<HapResource::IdValues>> &candidates,
+    const std::shared_ptr<ValueUnderQualifierDir> GetBestMatchResource(
+        const std::vector<std::shared_ptr<IdValues>> &candidates,
         uint32_t density, bool isGetOverrideResource);
 
     bool AddResourcePath(const char *path, const uint32_t &selectedTypes = SELECT_ALL, bool forceReload = false);

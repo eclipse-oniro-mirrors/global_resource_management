@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -854,8 +854,7 @@ private:
 
     RState GetTheme(const std::shared_ptr<IdItem> idItem, std::map<std::string, std::string> &outValue);
 
-    RState GetPluralString(const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd, Quantity quantity,
-        std::string &outValue);
+    RState GetPluralString(const std::shared_ptr<IdItem> &idItem, Quantity quantity, std::string &outValue);
 
     RState ResolveReference(const std::string value, std::string &outValue);
 

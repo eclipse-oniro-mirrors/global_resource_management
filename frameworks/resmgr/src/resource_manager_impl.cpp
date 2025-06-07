@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,7 +24,6 @@
 #include <sstream>
 #include <sys/types.h>
 #include <unistd.h>
-#include <fstream>
 
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 #include "hitrace_meter.h"
@@ -371,31 +370,28 @@ RState ResourceManagerImpl::GetPatternData(const std::shared_ptr<IdItem> idItem,
 
 RState ResourceManagerImpl::GetPluralStringById(uint32_t id, int quantity, std::string &outValue)
 {
-    const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd = hapManager_->FindQualifierValueById(id,
-        isOverrideResMgr_);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
     Quantity intQuantity = { true, quantity, 0.0 };
-    return GetPluralString(vuqd, intQuantity, outValue);
+    return GetPluralString(idItem, intQuantity, outValue);
 }
 
 RState ResourceManagerImpl::GetPluralStringByName(const char *name, int quantity, std::string &outValue)
 {
-    const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd =
-        hapManager_->FindQualifierValueByName(name, ResType::PLURALS, isOverrideResMgr_);
-        Quantity intQuantity = { true, quantity, 0.0 };
-    return GetPluralString(vuqd, intQuantity, outValue);
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::PLURALS, isOverrideResMgr_);
+    Quantity intQuantity = { true, quantity, 0.0 };
+    return GetPluralString(idItem, intQuantity, outValue);
 }
 
 RState ResourceManagerImpl::GetPluralStringByIdFormat(std::string &outValue, uint32_t id, int quantity, ...)
 {
-    const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd = hapManager_->FindQualifierValueById(id,
-        isOverrideResMgr_);
-    if (vuqd == nullptr) {
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
+    if (idItem == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "GetPluralStringByIdFormat error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     std::string temp;
     Quantity intQuantity = { true, quantity, 0.0 };
-    RState rState = GetPluralString(vuqd, intQuantity, temp);
+    RState rState = GetPluralString(idItem, intQuantity, temp);
     if (rState == ERROR_CODE_RES_REF_TOO_MUCH) {
         return rState;
     }
@@ -413,15 +409,14 @@ RState ResourceManagerImpl::GetPluralStringByIdFormat(std::string &outValue, uin
 
 RState ResourceManagerImpl::GetPluralStringByNameFormat(std::string &outValue, const char *name, int quantity, ...)
 {
-    const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd =
-        hapManager_->FindQualifierValueByName(name, ResType::PLURALS, isOverrideResMgr_);
-    if (vuqd == nullptr) {
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::PLURALS, isOverrideResMgr_);
+    if (idItem == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "GetPluralStringByNameFormat error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
     std::string temp;
     Quantity intQuantity = { true, quantity, 0.0 };
-    RState rState = GetPluralString(vuqd, intQuantity, temp);
+    RState rState = GetPluralString(idItem, intQuantity, temp);
     if (rState == ERROR_CODE_RES_REF_TOO_MUCH) {
         return rState;
     }
@@ -437,14 +432,9 @@ RState ResourceManagerImpl::GetPluralStringByNameFormat(std::string &outValue, c
     return SUCCESS;
 }
 
-RState ResourceManagerImpl::GetPluralString(const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd,
+RState ResourceManagerImpl::GetPluralString(const std::shared_ptr<IdItem> &idItem,
     Quantity quantity, std::string &outValue)
 {
-    // not found or type invalid
-    if (vuqd == nullptr) {
-        return NOT_FOUND;
-    }
-    auto idItem = vuqd->GetIdItem();
     if (idItem == nullptr || idItem->resType_ != ResType::PLURALS) {
         return NOT_FOUND;
     }
@@ -1665,9 +1655,8 @@ RState ResourceManagerImpl::GetRawFileList(const std::string &rawDirPath, std::v
     return hapManager_->GetRawFileList(rawDirPath, rawfileList);
 }
 
-std::string GetSuffix(const std::shared_ptr<HapResource::ValueUnderQualifierDir> qd)
+std::string GetSuffix(const std::shared_ptr<IdItem> &idItem)
 {
-    const std::shared_ptr<IdItem> idItem = qd->GetIdItem();
     if (idItem == nullptr || idItem->resType_ != ResType::MEDIA) {
         return std::string();
     }
@@ -1682,7 +1671,7 @@ std::string GetSuffix(const std::shared_ptr<HapResource::ValueUnderQualifierDir>
 RState ResourceManagerImpl::GetThemeIcon(const std::shared_ptr<IdItem> idItem, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue, uint32_t density)
 {
-    std::string iconName = idItem->GetItemResName();
+    std::string iconName = idItem->name_;
     std::string result = ThemePackManager::GetThemePackManager()->FindThemeIconResource(
         bundleInfo, iconName, userId);
     if (result.empty()) {
@@ -1720,7 +1709,7 @@ RState ResourceManagerImpl::GetDrawableInfoById(uint32_t id, std::string &type, 
         RESMGR_HILOGE(RESMGR_TAG, "GetDrawableInfoById id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
-    type = GetSuffix(qd);
+    type = GetSuffix(qd->GetIdItem());
     if (type.empty()) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get resourceType");
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
@@ -1740,7 +1729,7 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name, std::string 
         RESMGR_HILOGE(RESMGR_TAG, "GetDrawableInfoByName error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
-    type = GetSuffix(qd);
+    type = GetSuffix(qd->GetIdItem());
     if (type.empty()) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get resourceType");
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
@@ -1761,7 +1750,7 @@ RState ResourceManagerImpl::GetDrawableInfoById(uint32_t id,
         RESMGR_HILOGE(RESMGR_TAG, "GetDrawableInfoById error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
-    std::string type = GetSuffix(qd);
+    std::string type = GetSuffix(qd->GetIdItem());
     if (type.empty()) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get resourceType");
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
@@ -1793,7 +1782,7 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name,
         RESMGR_HILOGE(RESMGR_TAG, "GetDrawableInfoByName error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
-    std::string type = GetSuffix(qd);
+    std::string type = GetSuffix(qd->GetIdItem());
     if (type.empty()) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get resourceType");
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
@@ -1859,13 +1848,12 @@ RState ResourceManagerImpl::GetFormatPluralStringByName(std::string &outValue, c
 RState ResourceManagerImpl::GetFormatPluralStringById(std::string &outValue, uint32_t id, Quantity quantity,
     va_list args)
 {
-    const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd = hapManager_->FindQualifierValueById(id,
-        isOverrideResMgr_);
-    if (vuqd == nullptr) {
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
+    if (idItem == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "GetFormatPluralStringById error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
-    RState rState = GetPluralString(vuqd, quantity, outValue);
+    RState rState = GetPluralString(idItem, quantity, outValue);
     if (rState == ERROR_CODE_RES_REF_TOO_MUCH) {
         RESMGR_HILOGE(RESMGR_TAG, "find too much ref by plural id = %{public}d", id);
         return rState;
@@ -1891,13 +1879,12 @@ RState ResourceManagerImpl::GetFormatPluralStringById(std::string &outValue, uin
 RState ResourceManagerImpl::GetFormatPluralStringByName(std::string &outValue, const char *name, Quantity quantity,
     va_list args)
 {
-    const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd =
-        hapManager_->FindQualifierValueByName(name, ResType::PLURALS, isOverrideResMgr_);
-    if (vuqd == nullptr) {
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::PLURALS, isOverrideResMgr_);
+    if (idItem == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "GetFormatPluralStringByName error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
-    RState rState = GetPluralString(vuqd, quantity, outValue);
+    RState rState = GetPluralString(idItem, quantity, outValue);
     if (rState == ERROR_CODE_RES_REF_TOO_MUCH) {
         RESMGR_HILOGE(RESMGR_TAG, "find too much ref by plural name = %{public}s", name);
         return rState;
@@ -1922,13 +1909,12 @@ RState ResourceManagerImpl::GetFormatPluralStringByName(std::string &outValue, c
 RState ResourceManagerImpl::GetFormatPluralStringById(std::string &outValue, uint32_t id, Quantity quantity,
     std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
 {
-    const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd = hapManager_->FindQualifierValueById(id,
-        isOverrideResMgr_);
-    if (vuqd == nullptr) {
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
+    if (idItem == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "GetFormatPluralStringById error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
-    RState rState = GetPluralString(vuqd, quantity, outValue);
+    RState rState = GetPluralString(idItem, quantity, outValue);
     if (rState == ERROR_CODE_RES_REF_TOO_MUCH) {
         RESMGR_HILOGE(RESMGR_TAG, "find too much ref by plural id = %{public}d", id);
         return rState;
@@ -1949,13 +1935,12 @@ RState ResourceManagerImpl::GetFormatPluralStringById(std::string &outValue, uin
 RState ResourceManagerImpl::GetFormatPluralStringByName(std::string &outValue, const char *name, Quantity quantity,
     std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
 {
-    const std::shared_ptr<HapResource::ValueUnderQualifierDir> vuqd =
-        hapManager_->FindQualifierValueByName(name, ResType::PLURALS, isOverrideResMgr_);
-    if (vuqd == nullptr) {
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::PLURALS, isOverrideResMgr_);
+    if (idItem == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "GetFormatPluralStringByName error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
-    RState rState = GetPluralString(vuqd, quantity, outValue);
+    RState rState = GetPluralString(idItem, quantity, outValue);
     if (rState == ERROR_CODE_RES_REF_TOO_MUCH) {
         RESMGR_HILOGE(RESMGR_TAG, "find too much ref by plural name = %{public}s", name);
         return rState;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,8 @@
 #define RESOURCE_MANAGER_TEST_COMMON_H
 
 #include "hap_resource.h"
+#include "hap_resource_v1.h"
+#include "hap_resource_v2.h"
 #include "hilog_wrapper.h"
 
 #include <unicode/localebuilder.h>
@@ -39,7 +41,7 @@ static const int NON_EXIST_ID = 1111;
 static const char *HAP_PATH_FA = "all_fa.hap";
 std::string FormatFullPath(const char *fileRelativePath);
 
-void PrintIdValues(const std::shared_ptr<HapResource::IdValues> &idValues);
+void PrintIdValues(const std::shared_ptr<IdValues> &idValues);
 
 void PrintMapString(const std::map<std::string, std::string> &value);
 
