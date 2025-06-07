@@ -247,6 +247,7 @@ ohos_shared_library("librawfile") {
 
   external_deps = [
     "ability_base:configuration",
+    "ability_runtime:app_context",
     "bundle_framework:appexecfwk_base",
     "cJSON:cjson_static",
     "c_utils:utils",
