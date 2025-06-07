@@ -37,7 +37,9 @@
 #include "utils/string_utils.h"
 #include "utils/utils.h"
 #include "tuple"
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 #include "parameter.h"
+#endif
 
 namespace OHOS {
 namespace Global {
@@ -1374,11 +1376,13 @@ bool ResourceManagerImpl::RemoveAppOverlay(const std::string &path)
 
 std::string ResourceManagerImpl::ReadParameter(const char *paramKey, const int paramLength)
 {
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     char param[paramLength];
     int status = GetParameter(paramKey, "", param, paramLength);
     if (status > 0) {
         return param;
     }
+#endif
     return "";
 }
 
