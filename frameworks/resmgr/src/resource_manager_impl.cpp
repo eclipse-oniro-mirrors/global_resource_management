@@ -36,6 +36,9 @@
 #include "utils/string_utils.h"
 #include "utils/utils.h"
 #include "tuple"
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+#include "parameter.h"
+#endif
 
 namespace OHOS {
 namespace Global {
@@ -49,6 +52,7 @@ constexpr int HEX_ADECIMAL = 16;
 const std::string FOREGROUND = "foreground";
 const std::string BACKGROUND = "background";
 const std::regex FLOAT_REGEX = std::regex("(\\+|-)?\\d+(\\.\\d+)? *(px|vp|fp)?");
+const char* ResourceManagerImpl::LANGUAGE_KEY = "persist.global.language";
 
 void ResourceManagerImpl::AddSystemResource(ResourceManagerImpl *systemResourceManager)
 {
@@ -1360,6 +1364,18 @@ bool ResourceManagerImpl::RemoveAppOverlay(const std::string &path)
     return this->hapManager_->RemoveAppOverlay(path);
 }
 
+std::string ResourceManagerImpl::ReadParameter(const char *paramKey, const int paramLength)
+{
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    char param[paramLength];
+    int status = GetParameter(paramKey, "", param, paramLength);
+    if (status > 0) {
+        return param;
+    }
+#endif
+    return "";
+}
+
 RState ResourceManagerImpl::UpdateFakeLocaleFlag(ResConfig &resConfig)
 {
 #ifdef SUPPORT_GRAPHICS
@@ -1369,17 +1385,14 @@ RState ResourceManagerImpl::UpdateFakeLocaleFlag(ResConfig &resConfig)
     if (resConfig.GetLocaleInfo()->getLanguage() == nullptr) {
         return LOCALEINFO_IS_NULL;
     }
-    const char* language = resConfig.GetLocaleInfo()->getLanguage();
-    const char* region = resConfig.GetLocaleInfo()->getCountry();
-    if (language != nullptr && region != nullptr) {
-        std::string languageStr = language;
-        std::string regionStr = region;
-        if (languageStr == "en" && regionStr == "XA") {
+    std::string sysLanguage = ReadParameter(LANGUAGE_KEY, CONFIG_LEN);
+    if (!sysLanguage.empty()) {
+        if (sysLanguage == "en-XA") {
             isFakeLocale = true;
         } else {
             isFakeLocale = false;
         }
-        if (languageStr == "ar" && regionStr == "XB") {
+        if (sysLanguage == "ar-XB") {
             isBidirectionFakeLocale = true;
         } else {
             isBidirectionFakeLocale = false;

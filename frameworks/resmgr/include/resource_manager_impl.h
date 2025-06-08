@@ -921,6 +921,8 @@ private:
     void UpdateSystemResourceResConfig(ResConfig &resConfig);
 #endif
 
+    std::string ReadParameter(const char *paramKey, const int paramLength);
+
     std::shared_ptr<HapManager> GetHapManager();
 
     std::shared_ptr<HapManager> hapManager_;
@@ -942,6 +944,10 @@ private:
     bool isOverrideResMgr_ = false;
 
     bool isSystemResMgr_ = false;
+
+    static constexpr int CONFIG_LEN = 128;
+
+    static const char* LANGUAGE_KEY;
 };
 } // namespace Resource
 } // namespace Global
