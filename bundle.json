@@ -64,7 +64,8 @@
             "bounds_checking_function",
             "icu",
             "cJSON",
-            "graphic_2d"
+            "graphic_2d",
+            "runtime_core"
           ]
       },
         "build": {
@@ -78,6 +79,7 @@
               "//base/global/resource_management/frameworks/resmgr:linux_resmgr",
               "//base/global/resource_management/frameworks/resmgr:mac_resmgr",
               "//base/global/resource_management/frameworks/resmgr:ohresmgr",
+              "//base/global/resource_management/interfaces/ets/ani:ani_package_resmgr",
               "//base/global/resource_management/interfaces/js/innerkits/core:resmgr_napi_core_preview"
             ],
             "inner_kits": [
@@ -162,6 +164,20 @@
                   "header_files": []
                 },
                 "name": "//base/global/resource_management/interfaces/cj:cj_resource_manager_ffi"
+              },
+              {
+                "header": {
+                  "header_base": "//base/global/resource_management/interfaces/ets/ani/resourceManager/include",
+                  "header_files": [
+                    "resource_manager_ani_utils.h",
+                    "resource_manager_data_context.h",
+                    "resourceManager.h"
+                  ]
+                },
+                "name": "//base/global/resource_management/interfaces/ets/ani/resourceManager:resourceManager_ani"
+              },
+              {
+                "name": "//base/global/resource_management/interfaces/ets/ani/resourceManager:copy_resourceManager_ets"
               }
             ],
             "test": [
