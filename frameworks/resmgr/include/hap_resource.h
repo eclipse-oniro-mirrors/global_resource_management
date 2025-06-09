@@ -256,7 +256,7 @@ protected:
     // last mod time of hap file
     time_t lastModTime_;
 
-    uint32_t limitKeyValue_;
+    uint32_t limitKeyValue_{0};
 
     // hqf resource path.
     std::string patchPath_;

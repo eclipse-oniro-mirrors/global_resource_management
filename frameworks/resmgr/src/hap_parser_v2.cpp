@@ -52,6 +52,11 @@ HapParserV2::~HapParserV2()
         delete[] mmap_;
 #endif
     }
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    if (fd_ > 0) {
+        close(fd_);
+    }
+#endif
 }
 
 bool HapParserV2::Init(const char *path)
@@ -61,7 +66,7 @@ bool HapParserV2::Init(const char *path)
         return false;
     }
 
-    uint32_t out = this->ParseResHex();
+    int32_t out = this->ParseResHex();
     if (out != OK) {
         RESMGR_HILOGE(RESMGR_TAG, "ParseResHex failed! retcode:%d", out);
         return false;
@@ -120,7 +125,7 @@ int32_t HapParserV2::ParseResHex()
     return OK;
 }
 
-uint32_t HapParserV2::ParseHeader(uint32_t &offset, const size_t bufLen, const uint8_t *buf)
+int32_t HapParserV2::ParseHeader(uint32_t &offset, const size_t bufLen, const uint8_t *buf)
 {
     if (offset + ResIndexHeader::RES_HEADER_LEN > bufLen) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse ResHeader failed, the offset will be out of bounds.");
@@ -140,7 +145,7 @@ uint32_t HapParserV2::ParseHeader(uint32_t &offset, const size_t bufLen, const u
     return OK;
 }
 
-uint32_t HapParserV2::ParseKeys(uint32_t &offset, const size_t bufLen, const uint8_t *buf)
+int32_t HapParserV2::ParseKeys(uint32_t &offset, const size_t bufLen, const uint8_t *buf)
 {
     for (uint32_t i = 0; i < resHeader_.keyCount_; i++) {
         std::shared_ptr<KeyInfo> key = std::make_shared<KeyInfo>();
@@ -160,7 +165,7 @@ uint32_t HapParserV2::ParseKeys(uint32_t &offset, const size_t bufLen, const uin
     return OK;
 }
 
-uint32_t HapParserV2::ParseIds(uint32_t &offset, const size_t bufLen, const uint8_t *buf)
+int32_t HapParserV2::ParseIds(uint32_t &offset, const size_t bufLen, const uint8_t *buf)
 {
     if (offset + IdsHeader::IDS_HEADER_LEN > bufLen) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse IdsHeader failed, the offset will be out of bounds.");
@@ -191,7 +196,7 @@ uint32_t HapParserV2::ParseIds(uint32_t &offset, const size_t bufLen, const uint
     return OK;
 }
 
-uint32_t HapParserV2::ParseType(uint32_t &offset, const size_t bufLen, const uint8_t *buf)
+int32_t HapParserV2::ParseType(uint32_t &offset, const size_t bufLen, const uint8_t *buf)
 {
     if (offset + TypeInfo::TYPE_INFO_LEN > bufLen) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse TypeInfo failed, the offset will be out of bounds.");
@@ -220,7 +225,7 @@ uint32_t HapParserV2::ParseType(uint32_t &offset, const size_t bufLen, const uin
     return OK;
 }
 
-uint32_t HapParserV2::ParseItem(uint32_t &offset, const size_t bufLen, const uint8_t *buf, const TypeInfo &typeInfo)
+int32_t HapParserV2::ParseItem(uint32_t &offset, const size_t bufLen, const uint8_t *buf, const TypeInfo &typeInfo)
 {
     if (offset + ResItem::RES_ITEM_LEN > bufLen) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse ResItem failed, the offset will be out of bounds.");
@@ -300,7 +305,7 @@ int32_t HapParserV2::ParseString(uint32_t &offset, std::string &id, size_t bufLe
     return OK;
 }
 
-uint32_t HapParserV2::ParseResInfo(uint32_t &offset, ResInfo &resInfo, const size_t bufLen, const uint8_t *buf)
+int32_t HapParserV2::ParseResInfo(uint32_t &offset, ResInfo &resInfo, const size_t bufLen, const uint8_t *buf)
 {
     if (offset + ResInfo::RES_INFO_LEN > bufLen) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse ResInfo failed, the offset will be out of bounds.");
@@ -315,7 +320,7 @@ uint32_t HapParserV2::ParseResInfo(uint32_t &offset, ResInfo &resInfo, const siz
     return OK;
 }
 
-uint32_t HapParserV2::ParseConfigItem(uint32_t &offset, ConfigItem &configItem, const size_t bufLen, const uint8_t *buf)
+int32_t HapParserV2::ParseConfigItem(uint32_t &offset, ConfigItem &configItem, const size_t bufLen, const uint8_t *buf)
 {
     if (offset + ConfigItem::CONFIG_ITEM_LEN > bufLen) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse ConfigItem failed, the offset will be out of bounds.");
@@ -330,7 +335,7 @@ uint32_t HapParserV2::ParseConfigItem(uint32_t &offset, ConfigItem &configItem, 
     return OK;
 }
 
-uint32_t HapParserV2::ParseKey(uint32_t &offset, std::shared_ptr<KeyInfo> key, const size_t bufLen, const uint8_t *buf)
+int32_t HapParserV2::ParseKey(uint32_t &offset, std::shared_ptr<KeyInfo> key, const size_t bufLen, const uint8_t *buf)
 {
     if (offset + KeyInfo::RESKEY_HEADER_LEN > bufLen) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse ResKey failed, the offset will be out of bounds.");
@@ -369,7 +374,7 @@ uint32_t HapParserV2::ParseKey(uint32_t &offset, std::shared_ptr<KeyInfo> key, c
     return OK;
 }
 
-uint32_t HapParserV2::ParseKeyParam(uint32_t &offset, std::shared_ptr<KeyParam> keyParam,
+int32_t HapParserV2::ParseKeyParam(uint32_t &offset, std::shared_ptr<KeyParam> keyParam,
     const size_t bufLen, const uint8_t *buf)
 {
     if (offset + KeyParam::KEYPARAM_LEN > bufLen) {
@@ -441,6 +446,7 @@ std::shared_ptr<HapResource> HapParserV2::GetHapResource(const char *path, bool 
 #endif
 
     pResource->SetLimitKeysValue(limitKeyValue_);
+    pResource->InitThemeSystemRes();
     return pResource;
 }
 
@@ -482,14 +488,14 @@ bool HapParserV2::GetIndexMmapFromIndex(const char *path)
     char indexPath[PATH_MAX + 1] = {0};
     Utils::CanonicalizePath(path, indexPath, PATH_MAX);
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    int fd = open(indexPath, O_RDONLY);
-    if (fd <= 0) {
+    fd_ = open(indexPath, O_RDONLY);
+    if (fd_ <= 0) {
         return false;
     }
     struct stat fileStat;
-    fstat(fd, &fileStat);
-    mmapLen_ = fileStat.st_size;
-    mmap_ = (uint8_t*)mmap(nullptr, mmapLen_, PROT_READ, MAP_PRIVATE, fd, 0);
+    fstat(fd_, &fileStat);
+    mmapLen_ = static_cast<size_t>(fileStat.st_size);
+    mmap_ = (uint8_t*)mmap(nullptr, mmapLen_, PROT_READ, MAP_PRIVATE, fd_, 0);
     if (mmap_ == MAP_FAILED) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get mmap data indexFilePath, %{public}s", indexPath);
         return false;
@@ -506,7 +512,7 @@ bool HapParserV2::GetIndexMmapFromIndex(const char *path)
         inFile.close();
         return false;
     }
-    mmapLen_ = fileLen;
+    mmapLen_ = static_cast<size_t>(fileLen);
     mmap_ = new uint8_t[fileLen + 1];
     inFile.seekg(0, std::ios::beg);
     inFile.read(reinterpret_cast<char*>(mmap_), fileLen);

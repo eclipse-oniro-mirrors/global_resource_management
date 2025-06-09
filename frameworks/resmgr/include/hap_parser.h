@@ -48,9 +48,9 @@ public:
 
     static bool GetIndexData(const char *path, std::unique_ptr<uint8_t[]> &buf, size_t &bufLen);
 
-    #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     static std::string GetIndexFilePath(std::shared_ptr<AbilityBase::Extractor> &extractor);
-    #endif
+#endif
 
     static bool GetIndexDataFromHap(const char *path, std::unique_ptr<uint8_t[]> &buf, size_t &bufLen);
 
@@ -185,9 +185,9 @@ public:
 
     static void GetKeyParamsLocales(std::shared_ptr<KeyParam> kp, std::string &locale, bool &isLocale);
 
-    #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     static std::string ParseModuleName(std::shared_ptr<AbilityBase::Extractor> &extractor);
-    #endif
+#endif
 protected:
     uint32_t limitKeyValue_{0};
     

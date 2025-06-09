@@ -171,7 +171,7 @@ bool HapParser::GetIndexDataFromIndex(const char *path, std::unique_ptr<uint8_t[
         inFile.close();
         return false;
     }
-    bufLen = fileLen;
+    bufLen = static_cast<size_t>(fileLen);
     buf = std::make_unique<uint8_t[]>(fileLen);
     if (buf == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "Error allocating memory");

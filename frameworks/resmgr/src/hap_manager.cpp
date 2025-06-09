@@ -423,13 +423,42 @@ void HapManager::GetOverrideResConfig(ResConfig &resConfig)
 bool HapManager::AddResource(const char *path, const uint32_t &selectedTypes, bool forceReload)
 {
     WriteLock lock(this->mutex_);
-    return this->AddResourcePath(path, selectedTypes, forceReload);
+    std::string sPath(path);
+#if defined(__ARKUI_CROSS__)
+    if (forceReload) {
+        HapResourceManager::GetInstance()->RemoveHapResource(sPath);
+        RemoveHapResource(sPath);
+    }
+#endif
+    auto it = loadedHapPaths_.find(sPath);
+    if (it != loadedHapPaths_.end()) {
+        return false;
+    }
+    std::shared_ptr<ResConfigImpl> config = getCompleteOverrideConfig(isOverride_);
+    std::shared_ptr<HapResource> pResource =
+        HapResourceManager::GetInstance().Load(path, config, isSystem_, false, selectedTypes);
+    if (pResource == nullptr) {
+        return false;
+    }
+    this->loadedHapPaths_[sPath] = std::vector<std::string>();
+    this->hapResources_.push_back(pResource);
+    if (pResource->HasDarkRes()) {
+        this->resConfig_->SetAppDarkRes(true);
+    }
+    return true;
 }
 
 bool HapManager::AddPatchResource(const char *path, const char *patchPath)
 {
     WriteLock lock(this->mutex_);
-    return this->AddPatchResourcePath(path, patchPath);
+    std::string sPath(path);
+    auto it = loadedHapPaths_.find(sPath);
+    if (it == loadedHapPaths_.end()) {
+        RESMGR_HILOGW(RESMGR_TAG, "AddPatchResource hapPath not load, hapPath = %{public}s", sPath.c_str());
+        return false;
+    }
+    std::string sPatchPath(patchPath);
+    return HapResourceManager::GetInstance().PutPatchResource(sPath, sPatchPath);
 }
 
 bool HapManager::AddResource(const std::string &path, const std::vector<std::string> &overlayPaths)
@@ -556,33 +585,6 @@ std::vector<std::shared_ptr<IdValues>> HapManager::GetResourceListByName(const c
     return result;
 }
 
-bool HapManager::AddResourcePath(const char *path, const uint32_t &selectedTypes, bool forceReload)
-{
-    std::string sPath(path);
-#if defined(__ARKUI_CROSS__)
-    if (forceReload) {
-        HapResourceManager::GetInstance().RemoveHapResource(sPath);
-        RemoveHapResource(sPath);
-    }
-#endif
-    auto it = loadedHapPaths_.find(sPath);
-    if (it != loadedHapPaths_.end()) {
-        return false;
-    }
-    std::shared_ptr<ResConfigImpl> config = getCompleteOverrideConfig(isOverride_);
-    std::shared_ptr<HapResource> pResource =
-        HapResourceManager::GetInstance().Load(path, config, isSystem_, false, selectedTypes);
-    if (pResource == nullptr) {
-        return false;
-    }
-    this->loadedHapPaths_[sPath] = std::vector<std::string>();
-    this->hapResources_.push_back(pResource);
-    if (pResource->HasDarkRes()) {
-        this->resConfig_->SetAppDarkRes(true);
-    }
-    return true;
-}
-
 #if defined(__ARKUI_CROSS__)
 void HapManager::RemoveHapResource(const std::string &path)
 {
@@ -601,50 +603,6 @@ void HapManager::RemoveHapResource(const std::string &path)
     }
 }
 #endif
-
-bool HapManager::AddPatchResourcePath(const char *path, const char *patchPath)
-{
-    std::string sPath(path);
-    auto it = loadedHapPaths_.find(sPath);
-    if (it == loadedHapPaths_.end()) {
-        RESMGR_HILOGW(RESMGR_TAG, "AddPatchResourcePath hapPath not load, hapPath = %{public}s", sPath.c_str());
-        return false;
-    }
-    std::string sPatchPath(patchPath);
-    return HapResourceManager::GetInstance().PutPatchResource(sPath, sPatchPath);
-}
-
-RState HapManager::ReloadAll()
-{
-    WriteLock lock(this->mutex_);
-    if (hapResources_.size() == 0) {
-        return SUCCESS;
-    }
-    std::vector<std::shared_ptr<HapResource>> newResources;
-    for (auto iter = loadedHapPaths_.begin(); iter != loadedHapPaths_.end(); iter++) {
-        std::vector<std::string> &overlayPaths = iter->second;
-        if (overlayPaths.size() == 0) {
-            const auto pResource = HapResourceManager::GetInstance().Load(iter->first.c_str(), resConfig_);
-            if (pResource == nullptr) {
-                newResources.clear();
-                return HAP_INIT_FAILED;
-            }
-            newResources.push_back(pResource);
-            continue;
-        }
-        std::unordered_map<std::string, std::shared_ptr<HapResource>> result =
-            HapResourceManager::GetInstance().LoadOverlays(iter->first.c_str(), overlayPaths, resConfig_);
-        if (result.size() == 0) {
-            continue;
-        }
-        for (auto iter = result.begin(); iter != result.end(); iter++) {
-            newResources.push_back(iter->second);
-        }
-    }
-    hapResources_.clear();
-    hapResources_ = newResources;
-    return SUCCESS;
-}
 
 std::vector<std::string> HapManager::GetResourcePaths()
 {
@@ -719,16 +677,16 @@ std::shared_ptr<AbilityBase::Extractor> GetAbilityExtractor(
 }
 #endif
 
-RState HapManager::GetProfileData(const std::shared_ptr<ValueUnderQualifierDir> qd, size_t &len,
+RState HapManager::GetProfileData(const std::shared_ptr<ValueUnderQualifierDir> qualifierDir, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    auto extractor = GetAbilityExtractor(qd);
+    auto extractor = GetAbilityExtractor(qualifierDir);
     if (extractor == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor from ability");
         return NOT_FOUND;
     }
-    std::string filePath = GetFilePathFromHap(extractor, qd, ResType::PROF);
+    std::string filePath = GetFilePathFromHap(extractor, qualifierDir, ResType::PROF);
     if (filePath.empty()) {
         RESMGR_HILOGE(RESMGR_TAG, "get file path failed in GetProfileData");
         return NOT_FOUND;
@@ -742,30 +700,30 @@ RState HapManager::GetProfileData(const std::shared_ptr<ValueUnderQualifierDir> 
     return SUCCESS;
 }
 
-RState HapManager::GetMediaData(const std::shared_ptr<ValueUnderQualifierDir> qd, size_t &len,
+RState HapManager::GetMediaData(const std::shared_ptr<ValueUnderQualifierDir> qualifierDir, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue)
 {
-    std::string filePath = qd->GetIndexPath();
+    std::string filePath = qualifierDir->GetIndexPath();
     RState state;
     if (Utils::ContainsTail(filePath, Utils::tailSet)) {
-        state = HapManager::GetMediaDataFromHap(qd, len, outValue);
+        state = HapManager::GetMediaDataFromHap(qualifierDir, len, outValue);
     } else {
-        state = HapManager::GetMediaDataFromIndex(qd, len, outValue);
+        state = HapManager::GetMediaDataFromIndex(qualifierDir, len, outValue);
     }
     return state;
 }
 
-RState HapManager::GetMediaDataFromHap(const std::shared_ptr<ValueUnderQualifierDir> qd, size_t &len,
+RState HapManager::GetMediaDataFromHap(const std::shared_ptr<ValueUnderQualifierDir> qualifierDir, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
-    auto extractor = GetAbilityExtractor(qd);
+    auto extractor = GetAbilityExtractor(qualifierDir);
     if (extractor == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor from ability");
         return NOT_FOUND;
     }
-    std::string filePath = GetFilePathFromHap(extractor, qd, ResType::MEDIA);
+    std::string filePath = GetFilePathFromHap(extractor, qualifierDir, ResType::MEDIA);
     if (filePath.empty()) {
         RESMGR_HILOGE(RESMGR_TAG, "get file path failed in GetMediaDataFromHap");
         return NOT_FOUND;
@@ -779,11 +737,11 @@ RState HapManager::GetMediaDataFromHap(const std::shared_ptr<ValueUnderQualifier
     return SUCCESS;
 }
 
-RState HapManager::GetMediaDataFromIndex(const std::shared_ptr<ValueUnderQualifierDir> qd, size_t &len,
+RState HapManager::GetMediaDataFromIndex(const std::shared_ptr<ValueUnderQualifierDir> qualifierDir, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue)
 {
     std::string filePath;
-    RState state = HapManager::GetFilePath(qd, ResType::MEDIA, filePath);
+    RState state = HapManager::GetFilePath(qualifierDir, ResType::MEDIA, filePath);
     if (state != SUCCESS) {
         return NOT_FOUND;
     }
@@ -791,29 +749,29 @@ RState HapManager::GetMediaDataFromIndex(const std::shared_ptr<ValueUnderQualifi
     return SUCCESS;
 }
 
-RState HapManager::GetMediaBase64Data(const std::shared_ptr<ValueUnderQualifierDir> qd,
+RState HapManager::GetMediaBase64Data(const std::shared_ptr<ValueUnderQualifierDir> qualifierDir,
     std::string &outValue)
 {
-    std::string filePath = qd->GetIndexPath();
+    std::string filePath = qualifierDir->GetIndexPath();
     RState state;
     if (Utils::ContainsTail(filePath, Utils::tailSet)) {
-        state = HapManager::GetMediaBase64DataFromHap(qd, outValue);
+        state = HapManager::GetMediaBase64DataFromHap(qualifierDir, outValue);
     } else {
-        state = HapManager::GetMediaBase64DataFromIndex(qd, outValue);
+        state = HapManager::GetMediaBase64DataFromIndex(qualifierDir, outValue);
     }
     return state;
 }
 
-RState HapManager::GetMediaBase64DataFromHap(const std::shared_ptr<ValueUnderQualifierDir> qd,
+RState HapManager::GetMediaBase64DataFromHap(const std::shared_ptr<ValueUnderQualifierDir> qualifierDir,
     std::string &outValue)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    auto extractor = GetAbilityExtractor(qd);
+    auto extractor = GetAbilityExtractor(qualifierDir);
     if (extractor == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor from ability");
         return NOT_FOUND;
     }
-    std::string filePath = GetFilePathFromHap(extractor, qd, ResType::MEDIA);
+    std::string filePath = GetFilePathFromHap(extractor, qualifierDir, ResType::MEDIA);
     std::unique_ptr<uint8_t[]> buffer;
     size_t tmpLen;
     bool ret = extractor->ExtractToBufByName(filePath, buffer, tmpLen);
@@ -827,11 +785,11 @@ RState HapManager::GetMediaBase64DataFromHap(const std::shared_ptr<ValueUnderQua
     return SUCCESS;
 }
 
-RState HapManager::GetMediaBase64DataFromIndex(const std::shared_ptr<ValueUnderQualifierDir> qd,
+RState HapManager::GetMediaBase64DataFromIndex(const std::shared_ptr<ValueUnderQualifierDir> qualifierDir,
     std::string &outValue)
 {
     std::string filePath;
-    RState state = HapManager::GetFilePath(qd, ResType::MEDIA, filePath);
+    RState state = HapManager::GetFilePath(qualifierDir, ResType::MEDIA, filePath);
     if (state != SUCCESS) {
         return NOT_FOUND;
     }
@@ -854,7 +812,7 @@ int32_t HapManager::GetValidHapPath(std::string &hapPath)
     return NOT_FOUND;
 }
 
-int32_t HapManager::GetValidIndexPath(std::string &indexPath)
+int32_t HapManager::GetValidResourceIndexPath(std::string &indexPath)
 {
     ReadLock lock(this->mutex_);
     for (auto iter = hapResources_.rbegin(); iter != hapResources_.rend(); iter++) {
@@ -970,7 +928,7 @@ RState HapManager::GetRawFileList(const std::string &rawDirPath, std::vector<std
         }
         return (hapState != SUCCESS && hqfState != SUCCESS) ? ERROR_CODE_RES_PATH_INVALID : SUCCESS;
     }
-    if (HapManager::GetValidIndexPath(hapOrIndexPath) == OK) {
+    if (HapManager::GetValidResourceIndexPath(hapOrIndexPath) == OK) {
         return  HapParser::GetRawFileListUnCompressed(hapOrIndexPath, rawDirPath, fileList);
     }
     return ERROR_CODE_RES_PATH_INVALID;
@@ -981,18 +939,18 @@ bool HapManager::IsLoadHap(std::string &hapPath)
     return HapManager::GetValidHapPath(hapPath) == OK ? true : false;
 }
 
-RState HapManager::GetFilePath(const std::shared_ptr<ValueUnderQualifierDir> vuqd, const ResType resType,
+RState HapManager::GetFilePath(const std::shared_ptr<ValueUnderQualifierDir> qualifierDir, const ResType resType,
     std::string &outValue)
 {
     // not found or type invalid
-    if (vuqd == nullptr) {
+    if (qualifierDir == nullptr) {
         return NOT_FOUND;
     }
-    const std::shared_ptr<IdItem> idItem = vuqd->GetIdItem();
+    const std::shared_ptr<IdItem> idItem = qualifierDir->GetIdItem();
     if (idItem == nullptr || idItem->resType_ != resType) {
         return NOT_FOUND;
     }
-    outValue = vuqd->GetResourcePath();
+    outValue = qualifierDir->GetResourcePath();
 #if defined(__ARKUI_CROSS__)
     auto index = idItem->value_.find('/');
     if (index == std::string::npos) {

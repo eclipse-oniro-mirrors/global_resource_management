@@ -2839,7 +2839,7 @@ HWTEST_F(ResourceManagerTest, GetSystemResourceManagerTest001, TestSize.Level1)
 
 /*
  * @tc.name: AddPatchResourcePathTest001
- * @tc.desc: Test AddPatchResourcePath function
+ * @tc.desc: Test AddPatchResource function
  * @tc.type: FUNC
  */
 HWTEST_F(ResourceManagerTest, AddPatchResourcePathTest001, TestSize.Level1)

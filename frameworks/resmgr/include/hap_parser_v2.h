@@ -36,9 +36,9 @@ public:
 
     virtual std::shared_ptr<HapResource> GetHapResource(const char *path, bool isSystem, bool isOverlay);
 
-    static uint32_t ParseResInfo(uint32_t &offset, ResInfo &resInfo, const size_t bufLen, const uint8_t *buf);
+    static int32_t ParseResInfo(uint32_t &offset, ResInfo &resInfo, const size_t bufLen, const uint8_t *buf);
 
-    static uint32_t ParseConfigItem(uint32_t &offset, ConfigItem &resInfo, const size_t bufLen, const uint8_t *buf);
+    static int32_t ParseConfigItem(uint32_t &offset, ConfigItem &resInfo, const size_t bufLen, const uint8_t *buf);
 
     static int32_t ParseStringArray(uint32_t &offset, std::vector<std::string> &values, size_t bufLen, uint8_t *buf);
 
@@ -50,23 +50,25 @@ private:
 
     bool GetIndexMmapFromIndex(const char *path);
 
-    uint32_t ParseHeader(uint32_t &offset, const size_t bufLen, const uint8_t *buf);
+    int32_t ParseHeader(uint32_t &offset, const size_t bufLen, const uint8_t *buf);
 
-    uint32_t ParseKeys(uint32_t &offset, const size_t bufLen, const uint8_t *buf);
+    int32_t ParseKeys(uint32_t &offset, const size_t bufLen, const uint8_t *buf);
 
-    uint32_t ParseKey(uint32_t &offset, std::shared_ptr<KeyInfo> key, const size_t bufLen, const uint8_t *buf);
+    int32_t ParseKey(uint32_t &offset, std::shared_ptr<KeyInfo> key, const size_t bufLen, const uint8_t *buf);
 
-    uint32_t ParseKeyParam(uint32_t &offset, std::shared_ptr<KeyParam> keyParam,
+    int32_t ParseKeyParam(uint32_t &offset, std::shared_ptr<KeyParam> keyParam,
         const size_t bufLen, const uint8_t *buf);
 
     void GetLimitKeyValue(KeyType type);
 
-    uint32_t ParseIds(uint32_t &offset, const size_t bufLen, const uint8_t *buf);
+    int32_t ParseIds(uint32_t &offset, const size_t bufLen, const uint8_t *buf);
 
-    uint32_t ParseType(uint32_t &offset, const size_t bufLen, const uint8_t *buf);
+    int32_t ParseType(uint32_t &offset, const size_t bufLen, const uint8_t *buf);
 
-    uint32_t ParseItem(uint32_t &offset, const size_t bufLen, const uint8_t *buf, const TypeInfo &typeInfo);
+    int32_t ParseItem(uint32_t &offset, const size_t bufLen, const uint8_t *buf, const TypeInfo &typeInfo);
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    int fd_{0};
+
     std::shared_ptr<AbilityBase::Extractor> extractor_{nullptr};
 
     std::unique_ptr<AbilityBase::FileMapper> mapper_{nullptr};

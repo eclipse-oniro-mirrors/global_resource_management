@@ -366,13 +366,13 @@ bool ResConfigImpl::CopyLocale(Locale **currentLocaleInfo, ResLocale **currentRe
 #endif
 
 #ifdef SUPPORT_GRAPHICS
-bool ResConfigImpl::CopyPreferredLocale(ResConfig &other)
+bool ResConfigImpl::CopyPreferredLocale(const ResConfig &other)
 {
     return CopyLocale(&this->preferredLocaleInfo_, &this->resPreferredLocale_, other.GetPreferredLocaleInfo());
 }
 #endif
 
-bool ResConfigImpl::CopyLocale(ResConfig &other)
+bool ResConfigImpl::CopyLocale(const ResConfig &other)
 {
 #ifdef SUPPORT_GRAPHICS
     return CopyLocale(&this->localeInfo_, &this->resLocale_, other.GetLocaleInfo());
@@ -389,7 +389,7 @@ bool ResConfigImpl::isLocaleInfoSet()
     return false;
 }
 
-bool ResConfigImpl::CopyLocaleAndPreferredLocale(ResConfig &other)
+bool ResConfigImpl::CopyLocaleAndPreferredLocale(const ResConfig &other)
 {
     if (!this->CopyLocale(other)) {
         return false;
@@ -501,7 +501,7 @@ bool ResConfigImpl::Copy(ResConfig &other, bool isRead)
     return true;
 }
 
-bool ResConfigImpl::MatchLocal(ResConfig &other) const
+bool ResConfigImpl::MatchLocal(const ResConfig &other) const
 {
 #ifdef SUPPORT_GRAPHICS
     auto localeInfo = other.GetPreferredLocaleInfo();
