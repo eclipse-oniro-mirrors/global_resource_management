@@ -16,7 +16,7 @@
 #ifndef RESOURCE_MANAGER_IMPL_H
 #define RESOURCE_MANAGER_IMPL_H
 
-#include "foundation/ability/ability_runtime/interfaces/kits/native/appkit/ability_runtime/context/context.h"
+#include "application_context.h"
 #include "resource_manager.h"
 #include "ffi_remote_data.h"
 #include "resource_manager_interface.h"

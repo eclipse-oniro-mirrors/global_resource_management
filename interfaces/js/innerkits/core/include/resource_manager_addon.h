@@ -17,7 +17,7 @@
 #define RESOURCE_MANAGER_ADDON_H
 
 #if !defined(__IDE_PREVIEW__)
-#include "foundation/ability/ability_runtime/interfaces/kits/native/appkit/ability_runtime/context/context.h"
+#include "application_context.h"
 #else
 #include "context.h"
 #endif

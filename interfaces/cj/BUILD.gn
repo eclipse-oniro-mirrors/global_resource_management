@@ -25,6 +25,7 @@ ohos_shared_library("cj_resource_manager_ffi") {
 
     external_deps = [
       "ability_base:configuration",
+      "ability_runtime:app_context",
       "ability_runtime:ability_connect_callback_stub",
       "ace_engine:drawable_descriptor",
       "bounds_checking_function:libsec_shared",

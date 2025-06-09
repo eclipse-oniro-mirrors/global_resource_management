@@ -16,7 +16,6 @@
 #if !defined(__IDE_PREVIEW__)
 #include "resource_manager_addon.h"
 #include "ability.h"
-#include "foundation/ability/ability_runtime/interfaces/kits/native/appkit/ability_runtime/context/context.h"
 #include "hisysevent_adapter.h"
 #include "hitrace_meter.h"
 #include "js_runtime_utils.h"
