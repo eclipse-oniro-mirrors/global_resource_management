@@ -582,7 +582,7 @@ ani_string ResMgrAddon::GetIntPluralStringValueSyncById(ani_env* env, ani_object
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     uint32_t notUse = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, notUse);
-    if (!ret) {
+    if (!ret || resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getIntPluralStringValueSyncById");
         ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
         return nullptr;
@@ -625,7 +625,7 @@ ani_string ResMgrAddon::GetIntPluralStringValueSync(ani_env* env, ani_object obj
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
-    if (!ret) {
+    if (!ret || resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getIntPluralStringValueSync");
         ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
         return nullptr;
@@ -694,7 +694,7 @@ ani_string ResMgrAddon::GetDoublePluralStringValueSyncById(ani_env* env, ani_obj
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     uint32_t notUse = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, notUse);
-    if (!ret) {
+    if (!ret || resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getIntPluralStringValueSyncById");
         ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
         return nullptr;
@@ -731,7 +731,7 @@ ani_string ResMgrAddon::GetDoublePluralStringValueSync(ani_env* env, ani_object 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     uint32_t resId = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
-    if (!ret) {
+    if (!ret || resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getIntPluralStringValueSync");
         ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
         return nullptr;
