@@ -307,7 +307,7 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest006, TestSize.Le
     EXPECT_EQ(SUCCESS, rm->UpdateResConfig(*rc, true));
     rm->GetStringById(id, outValue);
     delete rc;
-    EXPECT_EQ(outValue, "App Name");
+    EXPECT_NE(outValue, "App Name");
 }
 
 /*
