@@ -32,8 +32,12 @@ ohos_shared_library("resourceManager_ani") {
     "./src/resource_manager_ani_utils.cpp",
   ]
   defines = [ "CONFIG_HILOG" ]
+
+  deps = [ "../../../../frameworks/resmgr:global_resmgr" ]
+
   external_deps = [
     "ability_base:configuration",
+    "ability_runtime:app_context",
     "ace_engine:drawable_descriptor",
     "bundle_framework:appexecfwk_base",
     "cJSON:cjson",
