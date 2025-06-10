@@ -189,6 +189,7 @@ private:
         const ResConfigImpl &resConfig);
 
     std::vector<std::string> GetRootDir(const std::string &strCurrentDir);
+    std::vector<std::string> GetThemeSkinRootDir(const std::string &newPath, const std::string &oldPath);
     bool IsSameResourceByUserId(const std::string &path, int32_t userId);
     void UpdateUserId(int32_t userId);
     std::mutex lockSkin_;
