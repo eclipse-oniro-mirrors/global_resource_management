@@ -35,6 +35,9 @@ public:
 
     ResourceManagerImpl();
 
+    ResourceManagerImpl(std::string bundleName, std::shared_ptr<Global::Resource::ResourceManager> resMgr,
+        std::shared_ptr<AbilityRuntime::Context> context);
+
     bool IsEmpty();
 
     int32_t CloseRawFd(const std::string &name) override;
@@ -80,6 +83,10 @@ public:
 
     void GetConfiguration(Configuration &configuration) override;
 
+    void GetConfiguration(ConfigurationEx *configuration) override;
+
+    void GetOverrideConfiguration(ConfigurationEx *configuration) override;
+
     void GetDeviceCapability(DeviceCapability &deviceCapability) override;
 
     int32_t GetMediaDataByName(const char *name, size_t &len, std::unique_ptr<uint8_t[]> &outValue,
@@ -102,14 +109,21 @@ public:
 
     int32_t GetSymbolByName(const char *name, uint32_t &outValue) override;
 
+    std::shared_ptr<Global::Resource::ResourceManager> GetOverrideResMgr(ConfigurationEx &configuration,
+        int32_t &errCode) override;
+
     bool GetHapResourceManager(Global::Resource::ResourceManager::Resource resource,
         std::shared_ptr<Global::Resource::ResourceManager> &resMgr, uint32_t &resId);
+
+    std::string GetBundleName();
+
+    std::shared_ptr<AbilityRuntime::Context> GetContext();
 private:
     std::shared_ptr<Global::Resource::ResourceManager> resMgr_;
     bool isSystem_ = false;
     std::string bundleName_;
     std::shared_ptr<AbilityRuntime::Context> context_;
-    std::string GetLocale(std::unique_ptr<Global::Resource::ResConfig> &cfg);
+    bool isOverride_ = false;
 };
 
 class DrawableDescriptorImpl : public OHOS::FFI::FFIData {

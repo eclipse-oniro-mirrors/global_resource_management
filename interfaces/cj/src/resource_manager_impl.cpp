@@ -37,8 +37,8 @@ ResourceManagerImpl::ResourceManagerImpl(OHOS::AbilityRuntime::Context* context)
         return;
     }
     resMgr_ = context->GetResourceManager();
+    bundleName_ = context->GetBundleName();
     context_ = std::shared_ptr<OHOS::AbilityRuntime::Context>(context);
-    bundleName_ = context_->GetBundleName();
     isSystem_ = false;
     LOGI("ResourceManagerImpl::ResourceManagerImpl success");
 }
@@ -50,6 +50,13 @@ ResourceManagerImpl::ResourceManagerImpl()
     context_ = nullptr;
     bundleName_ = "";
     isSystem_ = true;
+}
+
+ResourceManagerImpl::ResourceManagerImpl(std::string bundleName,
+    std::shared_ptr<Global::Resource::ResourceManager> resMgr, std::shared_ptr<AbilityRuntime::Context> context)
+    : resMgr_(resMgr), bundleName_(bundleName), context_(context)
+{
+    isOverride_ = true;
 }
 
 bool ResourceManagerImpl::IsEmpty()
@@ -68,8 +75,8 @@ int32_t ResourceManagerImpl::CloseRawFd(const std::string &name)
     return state;
 }
 
-int32_t ResourceManagerImpl::GetRawFd(const std::string &rawFileName,
-    Global::Resource::ResourceManager::RawFileDescriptor &descriptor)
+int32_t ResourceManagerImpl::GetRawFd(
+    const std::string &rawFileName, Global::Resource::ResourceManager::RawFileDescriptor &descriptor)
 {
     RState state = resMgr_->GetRawFileDescriptorFromHap(rawFileName, descriptor);
     if (state != RState::SUCCESS) {
@@ -80,8 +87,8 @@ int32_t ResourceManagerImpl::GetRawFd(const std::string &rawFileName,
     return state;
 }
 
-int32_t ResourceManagerImpl::GetRawFileContent(const std::string &name, size_t &len,
-    std::unique_ptr<uint8_t[]> &outValue)
+int32_t ResourceManagerImpl::GetRawFileContent(
+    const std::string &name, size_t &len, std::unique_ptr<uint8_t[]> &outValue)
 {
     RState state = resMgr_->GetRawFileFromHap(name, len, outValue);
     if (state != RState::SUCCESS) {
@@ -92,7 +99,7 @@ int32_t ResourceManagerImpl::GetRawFileContent(const std::string &name, size_t &
     return state;
 }
 
-int32_t ResourceManagerImpl::GetRawFileList(const std::string &rawDirPath, std::vector<std::string>& rawfileList)
+int32_t ResourceManagerImpl::GetRawFileList(const std::string &rawDirPath, std::vector<std::string> &rawfileList)
 {
     RState state = resMgr_->GetRawFileList(rawDirPath, rawfileList);
     if (state != RState::SUCCESS) {
@@ -276,6 +283,33 @@ int32_t ResourceManagerImpl::GetFloatByName(const char *name, float &outValue)
     return state;
 }
 
+std::string GetLocale(std::unique_ptr<Global::Resource::ResConfig> &cfg)
+{
+    std::string result;
+#ifdef SUPPORT_GRAPHICS
+    const icu::Locale *localeInfo = cfg->GetLocaleInfo();
+    if (localeInfo == nullptr) {
+        return result;
+    }
+    const char *lang = localeInfo->getLanguage();
+    if (lang == nullptr) {
+        return result;
+    }
+    result = lang;
+
+    const char *script = localeInfo->getScript();
+    if (script != nullptr) {
+        result += std::string("_") + script;
+    }
+
+    const char *region = localeInfo->getCountry();
+    if (region != nullptr) {
+        result += std::string("_") + region;
+    }
+#endif
+    return result;
+}
+
 void ResourceManagerImpl::GetConfiguration(Configuration &configuration)
 {
     LOGI("ResourceManagerImpl::GetConfiguration start");
@@ -296,6 +330,46 @@ void ResourceManagerImpl::GetConfiguration(Configuration &configuration)
     configuration.locale = temp;
 }
 
+void ResConfigToConfigurationEx(std::unique_ptr<ResConfig> &config, ConfigurationEx *configuration)
+{
+    configuration->direction = static_cast<int32_t>(config->GetDirection());
+    configuration->deviceType = static_cast<int32_t>(config->GetDeviceType());
+    configuration->screenDensity = static_cast<int32_t>(config->GetScreenDensityDpi());
+    configuration->colorMode = static_cast<int32_t>(config->GetColorMode());
+    configuration->mcc = config->GetMcc();
+    configuration->mnc = config->GetMnc();
+
+    std::string locale = GetLocale(config);
+    auto temp = ::Utils::MallocCString(locale);
+    if (temp == nullptr) {
+        return;
+    }
+    configuration->locale = temp;
+    return;
+}
+
+void ResourceManagerImpl::GetConfiguration(ConfigurationEx *configuration)
+{
+    std::unique_ptr<ResConfig> cfg(CreateResConfig());
+    if (!cfg) {
+        LOGE("Failed to create ResConfig object.");
+        return;
+    }
+    resMgr_->GetResConfig(*cfg);
+    return ResConfigToConfigurationEx(cfg, configuration);
+}
+
+void ResourceManagerImpl::GetOverrideConfiguration(ConfigurationEx *configuration)
+{
+    std::unique_ptr<ResConfig> cfg(CreateResConfig());
+    if (!cfg) {
+        LOGE("Failed to create ResConfig object.");
+        return;
+    }
+    resMgr_->GetOverrideResConfig(*cfg);
+    return ResConfigToConfigurationEx(cfg, configuration);
+}
+
 void ResourceManagerImpl::GetDeviceCapability(DeviceCapability &deviceCapability)
 {
     std::unique_ptr<ResConfig> cfg(CreateResConfig());
@@ -306,12 +380,11 @@ void ResourceManagerImpl::GetDeviceCapability(DeviceCapability &deviceCapability
     resMgr_->GetResConfig(*cfg);
     deviceCapability.screenDensity = static_cast<int32_t>(cfg->ConvertDensity(cfg->GetScreenDensity()));
     deviceCapability.deviceType = static_cast<int32_t>(cfg->GetDeviceType());
-    LOGI("ResourceManagerImpl::GetDeviceCapability ok screenDensity %{public}" PRId32,
-        deviceCapability.screenDensity);
+    LOGI("ResourceManagerImpl::GetDeviceCapability ok screenDensity %{public}" PRId32, deviceCapability.screenDensity);
 }
 
-int32_t ResourceManagerImpl::GetMediaDataByName(const char *name, size_t &len, std::unique_ptr<uint8_t[]> &outValue,
-    uint32_t density)
+int32_t ResourceManagerImpl::GetMediaDataByName(
+    const char *name, size_t &len, std::unique_ptr<uint8_t[]> &outValue, uint32_t density)
 {
     RState state = resMgr_->GetMediaDataByName(name, len, outValue, density);
     if (state != RState::SUCCESS) {
@@ -322,8 +395,8 @@ int32_t ResourceManagerImpl::GetMediaDataByName(const char *name, size_t &len, s
     return state;
 }
 
-int32_t ResourceManagerImpl::GetMediaDataById(uint32_t id, size_t &len, std::unique_ptr<uint8_t[]> &outValue,
-    uint32_t density)
+int32_t ResourceManagerImpl::GetMediaDataById(
+    uint32_t id, size_t &len, std::unique_ptr<uint8_t[]> &outValue, uint32_t density)
 {
     RState state = resMgr_->GetMediaDataById(id, len, outValue, density);
     if (state != RState::SUCCESS) {
@@ -360,8 +433,8 @@ int32_t ResourceManagerImpl::GetDrawableDescriptor(uint32_t id, int64_t &outValu
 {
     RState state = SUCCESS;
     OHOS::Ace::Napi::DrawableDescriptor::DrawableType drawableType;
-    auto drawableDescriptor = OHOS::Ace::Napi::DrawableDescriptorFactory::Create(id, resMgr_,
-        state, drawableType, density);
+    auto drawableDescriptor =
+        OHOS::Ace::Napi::DrawableDescriptorFactory::Create(id, resMgr_, state, drawableType, density);
     if (state != SUCCESS) {
         LOGE("Failed to Create drawableDescriptor by %{public}" PRIu32, id);
         return state;
@@ -378,8 +451,8 @@ int32_t ResourceManagerImpl::GetDrawableDescriptorByName(const char *name, int64
 {
     RState state = SUCCESS;
     OHOS::Ace::Napi::DrawableDescriptor::DrawableType drawableType;
-    auto drawableDescriptor = OHOS::Ace::Napi::DrawableDescriptorFactory::Create(name, resMgr_,
-        state, drawableType, density);
+    auto drawableDescriptor =
+        OHOS::Ace::Napi::DrawableDescriptorFactory::Create(name, resMgr_, state, drawableType, density);
     if (state != SUCCESS) {
         return state;
     }
@@ -417,39 +490,12 @@ bool ResourceManagerImpl::GetHapResourceManager(Global::Resource::ResourceManage
     return true;
 }
 
-std::string ResourceManagerImpl::GetLocale(std::unique_ptr<Global::Resource::ResConfig> &cfg)
-{
-    std::string result;
-#ifdef SUPPORT_GRAPHICS
-        const icu::Locale *localeInfo = cfg->GetLocaleInfo();
-        if (localeInfo == nullptr) {
-            return result;
-        }
-        const char *lang = localeInfo->getLanguage();
-        if (lang == nullptr) {
-            return result;
-        }
-        result = lang;
-
-        const char *script = localeInfo->getScript();
-        if (script != nullptr) {
-            result += std::string("_") + script;
-        }
-
-        const char *region = localeInfo->getCountry();
-        if (region != nullptr) {
-            result += std::string("_") + region;
-        }
-#endif
-    return result;
-}
-
-OHOS::Ace::Napi::DrawableDescriptor* GetDrawableDescriptorPtr(uint32_t id,
-    std::shared_ptr<Global::Resource::ResourceManager> resMgr, uint32_t density, RState &state)
+OHOS::Ace::Napi::DrawableDescriptor* GetDrawableDescriptorPtr(
+    uint32_t id, std::shared_ptr<Global::Resource::ResourceManager> resMgr, uint32_t density, RState &state)
 {
     OHOS::Ace::Napi::DrawableDescriptor::DrawableType drawableType;
-    auto drawableDescriptor = OHOS::Ace::Napi::DrawableDescriptorFactory::Create(id, resMgr, state, drawableType,
-    density);
+    auto drawableDescriptor =
+        OHOS::Ace::Napi::DrawableDescriptorFactory::Create(id, resMgr, state, drawableType, density);
     if (state != SUCCESS) {
         LOGE("Failed to Create drawableDescriptor by %{public}" PRIu32, id);
         return nullptr;
@@ -483,5 +529,40 @@ int32_t ResourceManagerImpl::GetSymbolByName(const char *name, uint32_t &outValu
         LOGI("ResourceManagerImpl::GetSymbolByName success");
     }
     return state;
+}
+
+std::shared_ptr<ResourceManager> ResourceManagerImpl::GetOverrideResMgr(ConfigurationEx &cfg, int32_t &errCode)
+{
+    std::shared_ptr<ResConfig> config(CreateDefaultResConfig());
+    if (config == nullptr) {
+        LOGE("GetOverrideResMgr, new config failed");
+        errCode = ERROR_CODE_INVALID_INPUT_PARAMETER;
+        return nullptr;
+    }
+    config->SetDirection(static_cast<Direction>(cfg.direction));
+    config->SetDeviceType(static_cast<DeviceType>(cfg.deviceType));
+    config->SetScreenDensityDpi(static_cast<ScreenDensity>(cfg.screenDensity));
+    config->SetColorMode(static_cast<ColorMode>(cfg.colorMode));
+    config->SetMcc(cfg.mcc);
+    config->SetMnc(cfg.mnc);
+#ifdef SUPPORT_GRAPHICS
+    config->SetLocaleInfo(cfg.locale);
+#endif
+    std::shared_ptr<ResourceManager> overrideResMgr = resMgr_->GetOverrideResourceManager(config);
+    if (overrideResMgr == nullptr) {
+        errCode = ERROR_CODE_INVALID_INPUT_PARAMETER;
+        return nullptr;
+    }
+    return overrideResMgr;
+}
+
+std::string ResourceManagerImpl::GetBundleName()
+{
+    return bundleName_;
+}
+
+std::shared_ptr<AbilityRuntime::Context> ResourceManagerImpl::GetContext()
+{
+    return context_;
 }
 }

@@ -79,6 +79,29 @@ RetDataI64 CJ_GetSystemResMgr()
     return ret;
 }
 
+
+RetDataI64 FfiGetOverrideResMgr(int64_t id, OHOS::Resource::ConfigurationEx cfg)
+{
+    RetDataI64 ret = { .code = SUCCESS_CODE, .data = -1 };
+    auto instance = FFIData::GetData<ResourceManagerImpl>(id);
+    if (!instance) {
+        ret.code = ERR_INVALID_INSTANCE_CODE;
+        return ret;
+    }
+    std::shared_ptr<ResourceManager> overrideResMgr = instance->GetOverrideResMgr(cfg, ret.code);
+    if (ret.code != SUCCESS_CODE) {
+        return ret;
+    }
+    auto nativeResMgrLibrary = FFIData::Create<ResourceManagerImpl>(instance->GetBundleName(), overrideResMgr,
+        instance->GetContext());
+    if (!nativeResMgrLibrary) {
+        ret.code = ERR_INVALID_INSTANCE_CODE;
+        return ret;
+    }
+    ret.data = nativeResMgrLibrary->GetID();
+    return ret;
+}
+
 int32_t CJ_CloseRawFd(int64_t id, const char* path)
 {
     auto instance = FFIData::GetData<ResourceManagerImpl>(id);
@@ -506,6 +529,34 @@ int32_t CJ_GetConfiguration(int64_t id, OHOS::Resource::Configuration &cfg)
     }
     instance->GetConfiguration(cfg);
     return SUCCESS_CODE;
+}
+
+int32_t FfiResMgrGetConfiguration(int64_t id, OHOS::Resource::ConfigurationEx* cfg)
+{
+    auto instance = FFIData::GetData<ResourceManagerImpl>(id);
+    if (!instance) {
+        LOGE("ResourceManager instance not exist %{public}" PRId64, id);
+        return ERR_INVALID_INSTANCE_CODE;
+    }
+    instance->GetConfiguration(cfg);
+    return SUCCESS_CODE;
+}
+
+int32_t FfiResMgrGetOverrideConfiguration(int64_t id, OHOS::Resource::ConfigurationEx* cfg)
+{
+    auto instance = FFIData::GetData<ResourceManagerImpl>(id);
+    if (!instance) {
+        LOGE("ResourceManager instance not exist %{public}" PRId64, id);
+        return ERR_INVALID_INSTANCE_CODE;
+    }
+    instance->GetOverrideConfiguration(cfg);
+    return SUCCESS_CODE;
+}
+
+void FfiResMgrFreeConfiguration(OHOS::Resource::ConfigurationEx* cfg)
+{
+    free(cfg->locale);
+    cfg->locale = nullptr;
 }
 
 int32_t CJ_GetDeviceCapability(int64_t id, OHOS::Resource::DeviceCapability &deviceCapability)
