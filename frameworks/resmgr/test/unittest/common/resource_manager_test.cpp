@@ -301,13 +301,13 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest006, TestSize.Le
     int id = rmc->GetResId("app_name", ResType::STRING);
     std::string outValue;
     rm->GetStringById(id, outValue);
-    EXPECT_TRUE(outValue != "App Name");
+    EXPECT_EQ(outValue, "App Name");
 
     rc->SetLocaleInfo("ar", nullptr, "XB");
     EXPECT_EQ(SUCCESS, rm->UpdateResConfig(*rc, true));
     rm->GetStringById(id, outValue);
     delete rc;
-    EXPECT_TRUE(outValue != "App Name");
+    EXPECT_EQ(outValue, "App Name");
 }
 
 /*
