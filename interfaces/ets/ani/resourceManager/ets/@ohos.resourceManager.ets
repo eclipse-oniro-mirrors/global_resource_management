@@ -185,7 +185,7 @@ export default namespace resourceManager {
 
         getStringArrayValueSync(resId: number): Array<string>;
         getStringArrayValueSync(resource: Resource): Array<string>;
-        
+
         getMediaByNameSync(resName: string, density?: number): Uint8Array;
         getMediaBase64ByNameSync(resName: string, density?: number): string;
 
@@ -289,8 +289,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as string);
-            }).catch((err: BusinessError): void => {
-                callback(err, "");
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, "");
             });
         }
 
@@ -300,7 +300,7 @@ export default namespace resourceManager {
                     return this.getStringSync(resId);
                 }).then((content: NullishType) => {
                     resolve(content as string);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -312,8 +312,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as string);
-            }).catch((err: BusinessError): void => {
-                callback(err, "");
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, "");
             });
         }
 
@@ -323,7 +323,7 @@ export default namespace resourceManager {
                     return this.getStringSync(resource);
                 }).then((content: NullishType) => {
                     resolve(content as string);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -335,8 +335,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as Array<string>);
-            }).catch((err: BusinessError): void => {
-                callback(err, new Array<string>);
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, new Array<string>);
             });
         }
 
@@ -346,7 +346,7 @@ export default namespace resourceManager {
                     return this.getStringArrayValueSync(resource);
                 }).then((content: NullishType) => {
                     resolve(content as Array<string>);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -358,8 +358,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as Array<string>);
-            }).catch((err: BusinessError): void => {
-                callback(err, new Array<string>);
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, new Array<string>);
             });
         }
 
@@ -369,7 +369,7 @@ export default namespace resourceManager {
                     return this.getStringArrayValueSync(resId);
                 }).then((content: NullishType) => {
                     resolve(content as Array<string>);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -381,8 +381,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as Uint8Array);
-            }).catch((err: BusinessError): void => {
-                callback(err, new Uint8Array());
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, new Uint8Array());
             });
         }
 
@@ -392,7 +392,7 @@ export default namespace resourceManager {
                     return this.getMediaContentSync(resource);
                 }).then((content: NullishType) => {
                     resolve(content as Uint8Array);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -404,8 +404,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as Uint8Array);
-            }).catch((err: BusinessError): void => {
-                callback(err, new Uint8Array());
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, new Uint8Array());
             });
         }
 
@@ -415,7 +415,7 @@ export default namespace resourceManager {
                     return this.getMediaContentSync(resource, density);
                 }).then((content: NullishType) => {
                     resolve(content as Uint8Array);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -427,8 +427,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as string);
-            }).catch((err: BusinessError): void => {
-                callback(err, "");
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, "");
             });
         }
 
@@ -438,7 +438,7 @@ export default namespace resourceManager {
                     return this.getMediaContentBase64Sync(resource);
                 }).then((content: NullishType) => {
                     resolve(content as string);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -450,8 +450,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as string);
-            }).catch((err: BusinessError): void => {
-                callback(err, "");
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, "");
             });
         }
 
@@ -461,7 +461,7 @@ export default namespace resourceManager {
                     return this.getMediaContentBase64Sync(resource, density);
                 }).then((content: NullishType) => {
                     resolve(content as string);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -473,8 +473,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as DeviceCapability);
-            }).catch((err: BusinessError): void => {
-                callback(err, new DeviceCapability());
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, new DeviceCapability());
             });
         }
 
@@ -484,7 +484,7 @@ export default namespace resourceManager {
                     return this.getDeviceCapabilitySync();
                 }).then((content: NullishType) => {
                     resolve(content as DeviceCapability);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -496,8 +496,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as Configuration);
-            }).catch((err: BusinessError): void => {
-                callback(err, new Configuration());
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, new Configuration());
             });
         }
 
@@ -507,7 +507,7 @@ export default namespace resourceManager {
                     return this.getConfigurationSync();
                 }).then((content: NullishType) => {
                     resolve(content as Configuration);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -519,8 +519,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as string);
-            }).catch((err: BusinessError): void => {
-                callback(err, "");
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, "");
             });
         }
 
@@ -530,7 +530,7 @@ export default namespace resourceManager {
                     return this.getStringByNameSync(resName);
                 }).then((content: NullishType) => {
                     resolve(content as string);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -542,8 +542,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as Array<string>);
-            }).catch((err: BusinessError): void => {
-                callback(err, new Array<string>);
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, new Array<string>);
             });
         }
 
@@ -553,7 +553,7 @@ export default namespace resourceManager {
                     return this.getStringArrayByNameSync(resName);
                 }).then((content: NullishType) => {
                     resolve(content as Array<string>);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -565,8 +565,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as Uint8Array);
-            }).catch((err: BusinessError): void => {
-                callback(err, new Uint8Array());
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, new Uint8Array());
             });
         }
 
@@ -576,7 +576,7 @@ export default namespace resourceManager {
                     return this.getMediaByNameSync(resName);
                 }).then((content: NullishType) => {
                     resolve(content as Uint8Array);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -588,8 +588,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as Uint8Array);
-            }).catch((err: BusinessError): void => {
-                callback(err, new Uint8Array());
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, new Uint8Array());
             });
         }
 
@@ -599,7 +599,7 @@ export default namespace resourceManager {
                     return this.getMediaByNameSync(resName, density);
                 }).then((content: NullishType) => {
                     resolve(content as Uint8Array);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -611,8 +611,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as string);
-            }).catch((err: BusinessError): void => {
-                callback(err, "");
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, "");
             });
         }
 
@@ -622,7 +622,7 @@ export default namespace resourceManager {
                     return this.getMediaBase64ByNameSync(resName);
                 }).then((content: NullishType) => {
                     resolve(content as string);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -634,8 +634,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as string);
-            }).catch((err: BusinessError): void => {
-                callback(err, "");
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, "");
             });
         }
 
@@ -645,7 +645,7 @@ export default namespace resourceManager {
                     return this.getMediaBase64ByNameSync(resName, density);
                 }).then((content: NullishType) => {
                     resolve(content as string);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -657,8 +657,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as Uint8Array);
-            }).catch((err: BusinessError): void => {
-                callback(err, new Uint8Array());
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, new Uint8Array());
             });
         }
 
@@ -668,7 +668,7 @@ export default namespace resourceManager {
                     return this.getMediaContentSync(resId);
                 }).then((content: NullishType) => {
                     resolve(content as Uint8Array);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -680,8 +680,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as Uint8Array);
-            }).catch((err: BusinessError): void => {
-                callback(err, new Uint8Array());
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, new Uint8Array());
             });
         }
 
@@ -691,7 +691,7 @@ export default namespace resourceManager {
                     return this.getMediaContentSync(resId, density);
                 }).then((content: NullishType) => {
                     resolve(content as Uint8Array);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -703,8 +703,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as string);
-            }).catch((err: BusinessError): void => {
-                callback(err, "");
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, "");
             });
         }
 
@@ -714,7 +714,7 @@ export default namespace resourceManager {
                     return this.getMediaContentBase64Sync(resId);
                 }).then((content: NullishType) => {
                     resolve(content as string);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -726,8 +726,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as string);
-            }).catch((err: BusinessError): void => {
-                callback(err, "");
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, "");
             });
         }
 
@@ -737,7 +737,7 @@ export default namespace resourceManager {
                     return this.getMediaContentBase64Sync(resId, density);
                 }).then((content: NullishType) => {
                     resolve(content as string);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -749,8 +749,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as Uint8Array);
-            }, (err: BusinessError): void => {
-                callback(err, new Uint8Array());
+            }, (err: Error): void => {
+                callback(err as BusinessError, new Uint8Array());
             });
         }
 
@@ -760,7 +760,7 @@ export default namespace resourceManager {
                     return this.getRawFileContentSync(path);
                 }).then((content: NullishType) => {
                     resolve(content as Uint8Array);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -772,8 +772,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as RawFileDescriptor);
-            }, (err: BusinessError): void => {
-                callback(err, new RawFileDescriptorInner());
+            }, (err: Error): void => {
+                callback(err as BusinessError, new RawFileDescriptorInner());
             });
         }
 
@@ -783,7 +783,7 @@ export default namespace resourceManager {
                     return this.getRawFdSync(path);
                 }).then((content: NullishType) => {
                     resolve(content as RawFileDescriptor);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -795,8 +795,8 @@ export default namespace resourceManager {
             })
             p1.then(() => {
                 callback(new BusinessError(), undefined);
-            }, (err: BusinessError): void => {
-                callback(err, undefined);
+            }, (err: Error): void => {
+                callback(err as BusinessError, undefined);
             });
         }
 
@@ -806,7 +806,7 @@ export default namespace resourceManager {
                     return this.closeRawFdSync(path);
                 }).then(() => {
                     resolve(undefined);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -818,8 +818,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as Array<string>);
-            }, (err: BusinessError): void => {
-                callback(err, new Array<string>);
+            }, (err: Error): void => {
+                callback(err as BusinessError, new Array<string>);
             });
         }
 
@@ -829,7 +829,7 @@ export default namespace resourceManager {
                     return this.getRawFileListSync(path);
                 }).then((content: NullishType) => {
                     resolve(content as Array<string>);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -841,8 +841,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as number);
-            }).catch((err: BusinessError): void => {
-                callback(err, -1);
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, -1);
             });
         }
 
@@ -852,7 +852,7 @@ export default namespace resourceManager {
                     return this.getColorSync(resId);
                 }).then((content: NullishType) => {
                     resolve(content as number);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -864,8 +864,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as number);
-            }).catch((err: BusinessError): void => {
-                callback(err, -1);
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, -1);
             });
         }
 
@@ -875,7 +875,7 @@ export default namespace resourceManager {
                     return this.getColorSync(resource);
                 }).then((content: NullishType) => {
                     resolve(content as number);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
@@ -887,8 +887,8 @@ export default namespace resourceManager {
             })
             p1.then((content: NullishType) => {
                 callback(new BusinessError(), content as number);
-            }).catch((err: BusinessError): void => {
-                callback(err, -1);
+            }).catch((err: Error): void => {
+                callback(err as BusinessError, -1);
             });
         }
 
@@ -898,7 +898,7 @@ export default namespace resourceManager {
                     return this.getColorByNameSync(resName);
                 }).then((content: NullishType) => {
                     resolve(content as number);
-                }, (err: BusinessError): void => {
+                }, (err: Error): void => {
                     reject(err);
                 });
             });
