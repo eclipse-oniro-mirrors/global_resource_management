@@ -33,7 +33,7 @@ public:
     HapResourceManager() {}
     ~HapResourceManager() {}
 
-    static std::shared_ptr<HapResourceManager> GetInstance();
+    static HapResourceManager& GetInstance();
 
     /**
      * Load a HapResource.
@@ -97,8 +97,6 @@ private:
      */
     std::shared_ptr<HapResource> GetHapResource(const std::string &path);
 
-    static std::recursive_mutex mutex_;
-    static std::shared_ptr<HapResourceManager> instance_;
     std::shared_mutex mutexRw_;
     std::unordered_map<std::string, std::weak_ptr<HapResource>> hapResourceMap_;
 };
