@@ -442,7 +442,7 @@ bool HapManager::AddResource(const std::string &path, const std::vector<std::str
     }
     std::shared_ptr<ResConfigImpl> config = getCompleteOverrideConfig(isOverride_);
     std::unordered_map<std::string, std::shared_ptr<HapResource>> result =
-        HapResourceManager::GetInstance()->LoadOverlays(path, overlayPaths, config, isSystem_);
+        HapResourceManager::GetInstance().LoadOverlays(path, overlayPaths, config, isSystem_);
     if (result.size() == 0) {
         return false;
     }
@@ -561,7 +561,7 @@ bool HapManager::AddResourcePath(const char *path, const uint32_t &selectedTypes
     std::string sPath(path);
 #if defined(__ARKUI_CROSS__)
     if (forceReload) {
-        HapResourceManager::GetInstance()->RemoveHapResource(sPath);
+        HapResourceManager::GetInstance().RemoveHapResource(sPath);
         RemoveHapResource(sPath);
     }
 #endif
@@ -571,7 +571,7 @@ bool HapManager::AddResourcePath(const char *path, const uint32_t &selectedTypes
     }
     std::shared_ptr<ResConfigImpl> config = getCompleteOverrideConfig(isOverride_);
     std::shared_ptr<HapResource> pResource =
-        HapResourceManager::GetInstance()->Load(path, config, isSystem_, false, selectedTypes);
+        HapResourceManager::GetInstance().Load(path, config, isSystem_, false, selectedTypes);
     if (pResource == nullptr) {
         return false;
     }
@@ -611,7 +611,7 @@ bool HapManager::AddPatchResourcePath(const char *path, const char *patchPath)
         return false;
     }
     std::string sPatchPath(patchPath);
-    return HapResourceManager::GetInstance()->PutPatchResource(sPath, sPatchPath);
+    return HapResourceManager::GetInstance().PutPatchResource(sPath, sPatchPath);
 }
 
 RState HapManager::ReloadAll()
@@ -624,7 +624,7 @@ RState HapManager::ReloadAll()
     for (auto iter = loadedHapPaths_.begin(); iter != loadedHapPaths_.end(); iter++) {
         std::vector<std::string> &overlayPaths = iter->second;
         if (overlayPaths.size() == 0) {
-            const auto pResource = HapResourceManager::GetInstance()->Load(iter->first.c_str(), resConfig_);
+            const auto pResource = HapResourceManager::GetInstance().Load(iter->first.c_str(), resConfig_);
             if (pResource == nullptr) {
                 newResources.clear();
                 return HAP_INIT_FAILED;
@@ -633,7 +633,7 @@ RState HapManager::ReloadAll()
             continue;
         }
         std::unordered_map<std::string, std::shared_ptr<HapResource>> result =
-            HapResourceManager::GetInstance()->LoadOverlays(iter->first.c_str(), overlayPaths, resConfig_);
+            HapResourceManager::GetInstance().LoadOverlays(iter->first.c_str(), overlayPaths, resConfig_);
         if (result.size() == 0) {
             continue;
         }

@@ -94,7 +94,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest001, TestSize.Level0)
 {
     auto start = CurrentTimeUsec();
     std::shared_ptr<ResConfigImpl> rc = nullptr;
-    auto pResource = HapResourceManager::GetInstance()->Load(FormatFullPath(g_resFilePath).c_str(), rc);
+    auto pResource = HapResourceManager::GetInstance().Load(FormatFullPath(g_resFilePath).c_str(), rc);
     auto cost = CurrentTimeUsec() - start;
     RESMGR_HILOGD(RESMGR_TAG, "load cost: %ld us.", cost);
 
@@ -159,7 +159,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest002, TestSize.Level1)
     const char *path = resPath.c_str();
 
     auto start = CurrentTimeUsec();
-    auto pResource = HapResourceManager::GetInstance()->Load(path, rc);
+    auto pResource = HapResourceManager::GetInstance().Load(path, rc);
     auto cost = CurrentTimeUsec() - start;
     RESMGR_HILOGD(RESMGR_TAG, "load cost: %ld us.", cost);
 
@@ -202,7 +202,7 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest003, TestSize.Level1)
 {
     auto start = CurrentTimeUsec();
     std::shared_ptr<ResConfigImpl> rc = nullptr;
-    auto pResource = HapResourceManager::GetInstance()->Load(FormatFullPath(g_resFilePath).c_str(), rc);
+    auto pResource = HapResourceManager::GetInstance().Load(FormatFullPath(g_resFilePath).c_str(), rc);
     auto cost = CurrentTimeUsec() - start;
     RESMGR_HILOGD(RESMGR_TAG, "load cost: %ld us.", cost);
 
@@ -288,12 +288,12 @@ HWTEST_F(HapResourceTest, HapResourcePutAndGetResourceTest001, TestSize.Level1)
     std::shared_ptr<HapResource> pResource1 = std::make_shared<HapResourceV1>("test1", 1000, nullptr, false, false);
     ASSERT_TRUE(pResource1 != nullptr);
     std::shared_ptr<HapResource> pResource2 =
-        HapResourceManager::GetInstance()->PutAndGetResource("test1", pResource1);
+        HapResourceManager::GetInstance().PutAndGetResource("test1", pResource1);
     EXPECT_EQ(pResource2, pResource1);
     std::shared_ptr<HapResource> pResource3 = std::make_shared<HapResourceV1>("test1", 1000, nullptr, false, false);
     ASSERT_TRUE(pResource3 != nullptr);
     std::shared_ptr<HapResource> pResource4 =
-        HapResourceManager::GetInstance()->PutAndGetResource("test1", pResource3);
+        HapResourceManager::GetInstance().PutAndGetResource("test1", pResource3);
     EXPECT_EQ(pResource4, pResource1);
 }
 
@@ -307,12 +307,12 @@ HWTEST_F(HapResourceTest, HapResourcePutAndGetResourceTest002, TestSize.Level1)
     std::shared_ptr<HapResource> pResource1 = std::make_shared<HapResourceV1>("test1", 1000, nullptr, false, false);
     ASSERT_TRUE(pResource1 != nullptr);
     std::shared_ptr<HapResource> pResource2 =
-        HapResourceManager::GetInstance()->PutAndGetResource("test1", pResource1);
+        HapResourceManager::GetInstance().PutAndGetResource("test1", pResource1);
     EXPECT_EQ(pResource2, pResource1);
     std::shared_ptr<HapResource> pResource3 = std::make_shared<HapResourceV2>("test2", 1000);
     ASSERT_TRUE(pResource3 != nullptr);
     std::shared_ptr<HapResource> pResource4 =
-        HapResourceManager::GetInstance()->PutAndGetResource("test2", pResource3);
+        HapResourceManager::GetInstance().PutAndGetResource("test2", pResource3);
     EXPECT_EQ(pResource4, pResource3);
 }
 
@@ -325,7 +325,7 @@ HWTEST_F(HapResourceTest, HapResourcePutPatchResourceTest001, TestSize.Level1)
 {
     std::string path = "test";
     std::string patchPath = "testPatch";
-    bool result = HapResourceManager::GetInstance()->PutPatchResource(path, patchPath);
+    bool result = HapResourceManager::GetInstance().PutPatchResource(path, patchPath);
     ASSERT_FALSE(result);
 }
 }
