@@ -15,7 +15,7 @@
 import { RawFileDescriptor } from 'global.rawFileDescriptor';
 
 export class RawFileDescriptorInner implements RawFileDescriptor {
-    fd: number = 0;
-    offset: number = 0;
-    length: number = 0;
+    public fd: number = 0;
+    public offset: number = 0;
+    public length: number = 0;
 }
