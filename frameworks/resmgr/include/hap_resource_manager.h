@@ -30,8 +30,8 @@ namespace Global {
 namespace Resource {
 class HapResourceManager {
 public:
-    HapResourceManager() {}
-    ~HapResourceManager() {}
+    HapResourceManager(const HapResourceManager &other) = delete;
+    HapResourceManager operator=(const HapResourceManager &other) = delete;
 
     static HapResourceManager& GetInstance();
 
@@ -90,6 +90,8 @@ public:
 #endif
 
 private:
+    HapResourceManager() = default;
+
     /**
      * get resource from map
      * @param path hap file path
