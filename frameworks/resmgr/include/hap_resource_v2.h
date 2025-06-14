@@ -48,10 +48,10 @@ private:
     friend class HapResourceV2;
 
     uint32_t offset_;
-    size_t bufLen_;
-    uint8_t *buf_;
-    ResType resType_;
-    uint32_t id_;
+    size_t bufLen_{0};
+    uint8_t *buf_{nullptr};
+    ResType resType_{VALUES};
+    uint32_t id_{0};
     std::string name_;
 };
 
@@ -117,10 +117,10 @@ private:
     std::string name_;
 
     // length of the resource.index data
-    size_t bufLen_;
+    size_t bufLen_{0};
 
     // pointer to the resource.index data
-    uint8_t *buf_;
+    uint8_t *buf_{nullptr};
 
     // the folder desc
     std::vector<std::shared_ptr<ValueUnderQualifierDir>> limitPaths_;
@@ -129,13 +129,19 @@ private:
 class HapResourceV2 : public HapResource {
 public:
     HapResourceV2(const std::string path, time_t lastModTime, bool hasDarkRes = false);
+
     virtual ~HapResourceV2();
+
     virtual bool IsSystemResource() const;
+
     virtual bool IsOverlayResource() const;
+
     virtual const std::shared_ptr<IdValues> GetIdValues(const uint32_t id);
+
     virtual const std::shared_ptr<IdValues> GetIdValuesByName(const std::string name, const ResType resType);
-    virtual RState Update(std::shared_ptr<ResConfigImpl> &defaultConfig);
+
     virtual std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> BuildNameTypeIdMapping();
+
     virtual void GetLocales(std::set<std::string> &outValue, bool includeSystem);
 
     bool Init(std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> &keys,
@@ -145,11 +151,13 @@ public:
     void InitMmap(std::shared_ptr<AbilityBase::Extractor> extractor, std::unique_ptr<AbilityBase::FileMapper> &mapper);
 #endif
     bool InitMmap(size_t mmapLen, uint8_t *mmap);
+
+    void InitThemeSystemRes();
 protected:
     friend class HapResourceManager;
     friend class HapParser;
 
-    virtual uint32_t ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue);
+    virtual int32_t ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue);
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     std::shared_ptr<AbilityBase::Extractor> extractor_{nullptr};
 
@@ -177,7 +185,7 @@ public:
     virtual bool IsSystemResource() const;
     virtual void GetLocales(std::set<std::string> &outValue, bool includeSystem);
 protected:
-    virtual uint32_t ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue);
+    virtual int32_t ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue);
 };
 
 class OverlayResource : virtual public HapResourceV2 {
@@ -189,7 +197,7 @@ public:
     virtual void GetLocales(std::set<std::string> &outValue, bool includeSystem);
     virtual void UpdateOverlayInfo(std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> &nameTypeId);
 protected:
-    virtual uint32_t ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue);
+    virtual int32_t ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue);
 };
 
 class SystemOverlayResource : public SystemResource, public OverlayResource {
@@ -198,7 +206,7 @@ public:
     virtual ~SystemOverlayResource();
     virtual void GetLocales(std::set<std::string> &outValue, bool includeSystem);
 protected:
-    virtual uint32_t ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue);
+    virtual int32_t ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue);
 };
 }
 }

@@ -1240,24 +1240,24 @@ RState ResourceManagerImpl::GetThemeData(const std::shared_ptr<IdItem> idItem, s
 
 RState ResourceManagerImpl::GetProfileById(uint32_t id, std::string &outValue)
 {
-    auto qd = hapManager_->FindQualifierValueById(id, isOverrideResMgr_);
-    if (qd == nullptr) {
+    auto qualifierDir = hapManager_->FindQualifierValueById(id, isOverrideResMgr_);
+    if (qualifierDir == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "GetProfileById error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
-    RState state = hapManager_->GetFilePath(qd, ResType::PROF, outValue);
+    RState state = hapManager_->GetFilePath(qualifierDir, ResType::PROF, outValue);
     return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_ID;
 }
 
 RState ResourceManagerImpl::GetProfileByName(const char *name, std::string &outValue)
 {
-    auto qd = hapManager_->FindQualifierValueByName(name, ResType::PROF, isOverrideResMgr_);
-    if (qd == nullptr) {
+    auto qualifierDir = hapManager_->FindQualifierValueByName(name, ResType::PROF, isOverrideResMgr_);
+    if (qualifierDir == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG,
             "GetProfileByName error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
-    RState state = hapManager_->GetFilePath(qd, ResType::PROF, outValue);
+    RState state = hapManager_->GetFilePath(qualifierDir, ResType::PROF, outValue);
     return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_NAME;
 }
 
@@ -1267,12 +1267,12 @@ RState ResourceManagerImpl::GetMediaById(uint32_t id, std::string &outValue, uin
         RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    auto qd = hapManager_->FindQualifierValueById(id, isOverrideResMgr_, density);
-    if (qd == nullptr) {
+    auto qualifierDir = hapManager_->FindQualifierValueById(id, isOverrideResMgr_, density);
+    if (qualifierDir == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "GetMediaById error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
-    RState state = hapManager_->GetFilePath(qd, ResType::MEDIA, outValue);
+    RState state = hapManager_->GetFilePath(qualifierDir, ResType::MEDIA, outValue);
     return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_ID;
 }
 
@@ -1282,12 +1282,12 @@ RState ResourceManagerImpl::GetMediaByName(const char *name, std::string &outVal
         RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, isOverrideResMgr_, density);
-    if (qd == nullptr) {
+    auto qualifierDir = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, isOverrideResMgr_, density);
+    if (qualifierDir == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "GetMediaByName error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
-    RState state = hapManager_->GetFilePath(qd, ResType::MEDIA, outValue);
+    RState state = hapManager_->GetFilePath(qualifierDir, ResType::MEDIA, outValue);
     return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_NAME;
 }
 
@@ -1525,19 +1525,19 @@ RState ResourceManagerImpl::GetMediaDataById(uint32_t id, size_t &len, std::uniq
         RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    auto qd = hapManager_->FindQualifierValueById(id, isOverrideResMgr_, density);
-    if (qd == nullptr) {
+    auto qualifierDir = hapManager_->FindQualifierValueById(id, isOverrideResMgr_, density);
+    if (qualifierDir == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "GetMediaDataById error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
 
     // find in theme
-    const std::shared_ptr<IdItem> idItem = qd->GetIdItem();
+    const std::shared_ptr<IdItem> idItem = qualifierDir->GetIdItem();
     if (GetThemeMedia(idItem, len, outValue, density) == SUCCESS) {
         return SUCCESS;
     }
 
-    RState state = hapManager_->GetMediaData(qd, len, outValue);
+    RState state = hapManager_->GetMediaData(qualifierDir, len, outValue);
     return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_ID;
 }
 
@@ -1549,19 +1549,19 @@ RState ResourceManagerImpl::GetMediaDataByName(const char *name, size_t &len, st
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
 
-    auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, isOverrideResMgr_, density);
-    if (qd == nullptr) {
+    auto qualifierDir = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, isOverrideResMgr_, density);
+    if (qualifierDir == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG,
             "GetMediaDataByName error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
 
-    const std::shared_ptr<IdItem> idItem = qd->GetIdItem();
+    const std::shared_ptr<IdItem> idItem = qualifierDir->GetIdItem();
     if (GetThemeMedia(idItem, len, outValue, density) == SUCCESS) {
         return SUCCESS;
     }
 
-    RState state = hapManager_->GetMediaData(qd, len, outValue);
+    RState state = hapManager_->GetMediaData(qualifierDir, len, outValue);
     return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_NAME;
 }
 
@@ -1586,18 +1586,18 @@ RState ResourceManagerImpl::GetMediaBase64DataById(uint32_t id, std::string &out
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     
-    auto qd = hapManager_->FindQualifierValueById(id, isOverrideResMgr_, density);
-    if (qd == nullptr) {
+    auto qualifierDir = hapManager_->FindQualifierValueById(id, isOverrideResMgr_, density);
+    if (qualifierDir == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "GetMediaBase64DataById error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
 
-    const std::shared_ptr<IdItem> idItem = qd->GetIdItem();
+    const std::shared_ptr<IdItem> idItem = qualifierDir->GetIdItem();
     if (GetThemeMediaBase64(idItem, outValue) == SUCCESS) {
         return SUCCESS;
     }
 
-    RState state = hapManager_->GetMediaBase64Data(qd, outValue);
+    RState state = hapManager_->GetMediaBase64Data(qualifierDir, outValue);
     return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_ID;
 }
 
@@ -1607,41 +1607,41 @@ RState ResourceManagerImpl::GetMediaBase64DataByName(const char *name, std::stri
         RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, isOverrideResMgr_, density);
-    if (qd == nullptr) {
+    auto qualifierDir = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, isOverrideResMgr_, density);
+    if (qualifierDir == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG,
             "GetMediaBase64DataByName error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
 
-    const std::shared_ptr<IdItem> idItem = qd->GetIdItem();
+    const std::shared_ptr<IdItem> idItem = qualifierDir->GetIdItem();
     if (GetThemeMediaBase64(idItem, outValue) == SUCCESS) {
         return SUCCESS;
     }
 
-    RState state = hapManager_->GetMediaBase64Data(qd, outValue);
+    RState state = hapManager_->GetMediaBase64Data(qualifierDir, outValue);
     return state == SUCCESS ? state : ERROR_CODE_RES_NOT_FOUND_BY_NAME;
 }
 
 RState ResourceManagerImpl::GetProfileDataById(uint32_t id, size_t &len, std::unique_ptr<uint8_t[]> &outValue)
 {
-    auto qd = hapManager_->FindQualifierValueById(id, isOverrideResMgr_);
-    if (qd == nullptr) {
+    auto qualifierDir = hapManager_->FindQualifierValueById(id, isOverrideResMgr_);
+    if (qualifierDir == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "GetProfileDataById error id = %{public}d", id);
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
-    return hapManager_->GetProfileData(qd, len, outValue);
+    return hapManager_->GetProfileData(qualifierDir, len, outValue);
 }
 
 RState ResourceManagerImpl::GetProfileDataByName(const char *name, size_t &len, std::unique_ptr<uint8_t[]> &outValue)
 {
-    auto qd = hapManager_->FindQualifierValueByName(name, ResType::PROF, isOverrideResMgr_);
-    if (qd == nullptr) {
+    auto qualifierDir = hapManager_->FindQualifierValueByName(name, ResType::PROF, isOverrideResMgr_);
+    if (qualifierDir == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG,
             "GetProfileDataByName error name = %{public}s", name);
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
     }
-    return hapManager_->GetProfileData(qd, len, outValue);
+    return hapManager_->GetProfileData(qualifierDir, len, outValue);
 }
 
 RState ResourceManagerImpl::GetRawFileFromHap(const std::string &rawFileName, size_t &len,
@@ -1717,17 +1717,17 @@ RState ResourceManagerImpl::GetDrawableInfoById(uint32_t id, std::string &type, 
         RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    auto qd = hapManager_->FindQualifierValueById(id, isOverrideResMgr_, density);
-    if (qd == nullptr) {
+    auto qualifierDir = hapManager_->FindQualifierValueById(id, isOverrideResMgr_, density);
+    if (qualifierDir == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "GetDrawableInfoById id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
-    type = GetSuffix(qd->GetIdItem());
+    type = GetSuffix(qualifierDir->GetIdItem());
     if (type.empty()) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get resourceType");
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
-    return hapManager_->GetMediaData(qd, len, outValue);
+    return hapManager_->GetMediaData(qualifierDir, len, outValue);
 }
 
 RState ResourceManagerImpl::GetDrawableInfoByName(const char *name, std::string &type, size_t &len,
@@ -1737,17 +1737,17 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name, std::string 
         RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, isOverrideResMgr_, density);
-    if (qd == nullptr) {
+    auto qualifierDir = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, isOverrideResMgr_, density);
+    if (qualifierDir == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "GetDrawableInfoByName error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
-    type = GetSuffix(qd->GetIdItem());
+    type = GetSuffix(qualifierDir->GetIdItem());
     if (type.empty()) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get resourceType");
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
     }
-    return hapManager_->GetMediaData(qd, len, outValue);
+    return hapManager_->GetMediaData(qualifierDir, len, outValue);
 }
 
 RState ResourceManagerImpl::GetDrawableInfoById(uint32_t id,
@@ -1758,26 +1758,26 @@ RState ResourceManagerImpl::GetDrawableInfoById(uint32_t id,
         RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    auto qd = hapManager_->FindQualifierValueById(id, isOverrideResMgr_, density);
-    if (qd == nullptr) {
+    auto qualifierDir = hapManager_->FindQualifierValueById(id, isOverrideResMgr_, density);
+    if (qualifierDir == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "GetDrawableInfoById error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
-    std::string type = GetSuffix(qd->GetIdItem());
+    std::string type = GetSuffix(qualifierDir->GetIdItem());
     if (type.empty()) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get resourceType");
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
     size_t len = 0;
     // find in theme
-    const std::shared_ptr<IdItem> idItem = qd->GetIdItem();
+    const std::shared_ptr<IdItem> idItem = qualifierDir->GetIdItem();
     std::string themeMask = ThemePackManager::GetThemePackManager()->GetMask();
     if (GetThemeDrawable(idItem, len, outValue, iconType, density) == SUCCESS) {
         drawableInfo = std::make_tuple(type, len, themeMask);
         return SUCCESS;
     }
 
-    RState state = hapManager_->GetMediaData(qd, len, outValue);
+    RState state = hapManager_->GetMediaData(qualifierDir, len, outValue);
     drawableInfo = std::make_tuple(type, len, themeMask);
     return state;
 }
@@ -1790,12 +1790,12 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name,
         RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
-    auto qd = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, isOverrideResMgr_, density);
-    if (qd == nullptr) {
+    auto qualifierDir = hapManager_->FindQualifierValueByName(name, ResType::MEDIA, isOverrideResMgr_, density);
+    if (qualifierDir == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "GetDrawableInfoByName error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
-    std::string type = GetSuffix(qd->GetIdItem());
+    std::string type = GetSuffix(qualifierDir->GetIdItem());
     if (type.empty()) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get resourceType");
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
@@ -1803,13 +1803,13 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name,
     size_t len = 0;
     // find in theme
     std::string themeMask = ThemePackManager::GetThemePackManager()->GetMask();
-    const std::shared_ptr<IdItem> idItem = qd->GetIdItem();
+    const std::shared_ptr<IdItem> idItem = qualifierDir->GetIdItem();
     if (GetThemeDrawable(idItem, len, outValue, iconType, density) == SUCCESS) {
         drawableInfo = std::make_tuple(type, len, themeMask);
         return SUCCESS;
     }
 
-    RState state = hapManager_->GetMediaData(qd, len, outValue);
+    RState state = hapManager_->GetMediaData(qualifierDir, len, outValue);
     drawableInfo = std::make_tuple(type, len, themeMask);
     return state;
 }

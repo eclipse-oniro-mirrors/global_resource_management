@@ -34,9 +34,8 @@ class HapManager {
 public:
     /**
      * The constructor of HapManager
-     *
      * @param resConfig resource config
-     * @param isSystem system flag, default value is false
+     * @param isSystem system resource flag, default value is false
      */
     HapManager(std::shared_ptr<ResConfigImpl> resConfig, bool isSystem = false);
 
@@ -45,7 +44,7 @@ public:
      * @param resConfig resource config
      * @param hapResources hap resources
      * @param loadedHapPaths loaded hap paths
-     * @param isSystem system flag, default value is false
+     * @param isSystem system resource flag, default value is false
     */
     HapManager(std::shared_ptr<ResConfigImpl> resConfig, std::vector<std::shared_ptr<HapResource>> hapResources,
         std::unordered_map<std::string, std::vector<std::string>> loadedHapPaths, bool isSystem = false);
@@ -57,50 +56,52 @@ public:
 
     /**
      * Update the resConfig
-     * @param resConfig the resource config
+     * @param resConfig the input new resource config
      * @return SUCCESS if the resConfig updated success, else HAP_INIT_FAILED
      */
     RState UpdateResConfig(ResConfig &resConfig);
 
     /**
      * Update the override resConfig
-     * @param resConfig the override resource config
+     * @param resConfig the input new override resource config
      * @return SUCCESS if the override resConfig updated success, else ERROR
      */
     RState UpdateOverrideResConfig(ResConfig &resConfig);
 
     /**
      * Get the resConfig
-     * @param resConfig the resource config
+     * @param resConfig the output resource config
      */
     void GetResConfig(ResConfig &resConfig);
 
     /**
      * Get resConfig by id
      * @param resId the resource Id
-     * @param resConfig the resource config
-     * @param isGetOverrideResource override resource flag
-     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
-     * @return SUCCESS if config exist, else NOT_FOUND
+     * @param resConfig the output resource config
+     * @param isGetOverrideResource override resource flag, default value is false
+     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity,
+     *      default value is SCREEN_DENSITY_NOT_SET
+     * @return SUCCESS if resource exist, else ERROR_CODE_RES_NOT_FOUND_BY_ID
      */
     RState GetResConfigById(uint32_t resId, ResConfig &resConfig,
-        bool isGetOverrideResource = false, uint32_t density = 0);
+        bool isGetOverrideResource = false, uint32_t density = ScreenDensity::SCREEN_DENSITY_NOT_SET);
 
     /**
      * Get resConfig by name
      * @param name the resource name
      * @param type the resource type
-     * @param resConfig the resource config
-     * @param isGetOverrideResource override resource flag
-     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity
-     * @return SUCCESS if config exist, else NOT_FOUND
+     * @param resConfig the output resource config
+     * @param isGetOverrideResource override resource flag, default value is false
+     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity,
+     *      default value is SCREEN_DENSITY_NOT_SET
+     * @return SUCCESS if resource exist, else ERROR_CODE_RES_NOT_FOUND_BY_NAME
      */
     RState GetResConfigByName(const std::string &name, const ResType type, ResConfig &resConfig,
-        bool isGetOverrideResource = false, uint32_t density = 0);
+        bool isGetOverrideResource = false, uint32_t density = ScreenDensity::SCREEN_DENSITY_NOT_SET);
 
     /**
      * Get the override resConfig
-     * @param resConfig the override resource config
+     * @param resConfig the output override resource config
      * @return SUCCESS if the override resConfig updated success, else ERROR
      */
     void GetOverrideResConfig(ResConfig &resConfig);
@@ -108,10 +109,19 @@ public:
     /**
      * Add resource path to hap paths
      * @param path the resource path
+     * @param selectedTypes the selected resource types to add, defined in res_common.h,
+     *      multi types can be connected with "|" operator
+     * @param forceReload force reload flag, default value is false
      * @return true if add resource path success, else false
      */
     bool AddResource(const char *path, const uint32_t &selectedTypes, bool forceReload = false);
 
+    /**
+     * Add patch resource to hap resource
+     * @param path the hap resource path
+     * @param patchPath the patch resource path
+     * @return true if add patch resource path success, else false
+     */
     bool AddPatchResource(const char *path, const char *patchPath);
 
     /**
@@ -123,16 +133,15 @@ public:
     bool AddResource(const std::string &path, const std::vector<std::string> &overlayPaths);
 
     /**
-     * Remove resource path to overlay paths
+     * Remove resource
      * @param path the resource path
-     * @param overlayPaths the exist overlay resource path
-     * @return true if add resource path success, else false
+     * @param overlayPaths the remove overlay resource path
+     * @return true if remove resource success, else false
      */
     bool RemoveResource(const std::string &path, const std::vector<std::string> &overlayPaths);
 
     /**
      * Add the overlay resource for current application
-     *
      * @param path the overlay resource path
      * @return true if add resource path success, else false
      */
@@ -140,7 +149,6 @@ public:
 
     /**
      * Remove the overlay resource for current application
-     *
      * @param path the overlay resource path
      * @return true if add resource path success, else false
      */
@@ -148,7 +156,6 @@ public:
 
     /**
      * Obtain the hap path of the current application
-     *
      * @return the current application hap path
      */
     std::string GetValidAppPath();
@@ -156,6 +163,7 @@ public:
     /**
      * Find resource by resource id
      * @param id the resource id
+     * @param isGetOverrideResource get override resource flag, default value is false
      * @return the resources related to resource id
      */
     const std::shared_ptr<IdItem> FindResourceById(uint32_t id, bool isGetOverrideResource = false);
@@ -163,7 +171,8 @@ public:
     /**
      * Find resource by resource name
      * @param name the resource name
-     * @param resType the resource type
+     * @param resType the resource type, within the area of OHOS::Global::Resource::ResType
+     * @param isGetOverrideResource get override resource flag, default value is false
      * @return the resources related to resource name
      */
     const std::shared_ptr<IdItem> FindResourceByName(
@@ -172,17 +181,21 @@ public:
     /**
      * Find best resource path by resource id
      * @param id the resource id
-     * @param density the input screen density
+     * @param isGetOverrideResource get override resource flag, default value is false
+     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity,
+     *      default value is SCREEN_DENSITY_NOT_SET
      * @return the best resource path
      */
     const std::shared_ptr<ValueUnderQualifierDir> FindQualifierValueById(uint32_t id,
-        bool isGetOverrideResource = false, uint32_t density = 0);
+        bool isGetOverrideResource = false, uint32_t density = ScreenDensity::SCREEN_DENSITY_NOT_SET);
     
     /**
      * Find best resource path by resource name
      * @param name the resource name
-     * @param resType the resource type
-     * @param density the input screen density
+     * @param resType the resource type, within the area of OHOS::Global::Resource::ResType
+     * @param isGetOverrideResource get override resource flag, default value is false
+     * @param density the screen density, within the area of OHOS::Global::Resource::ScreenDensity,
+     *      default value is SCREEN_DENSITY_NOT_SET
      * @return the best resource path
      */
     const std::shared_ptr<ValueUnderQualifierDir> FindQualifierValueByName(const char *name,
@@ -190,8 +203,8 @@ public:
 
     /**
      * Find the raw file path
-     * @param name the resource name
-     * @param outValue raw file path
+     * @param name the raw file name
+     * @param outValue output raw file path
      * @return SUCCESS if find the raw file path success, else NOT_FOUND
      */
     RState FindRawFile(const std::string &name, std::string &outValue);
@@ -199,48 +212,50 @@ public:
     /**
      * Get the language pluralRule related to quantity
      * @param quantity the language quantity
+     * @param isGetOverrideResource get override resource flag, default value is false
      * @return the language pluralRule related to quantity
      */
     std::string GetPluralRulesAndSelect(ResourceManager::Quantity quantity, bool isGetOverrideResource = false);
 
     /**
      * Get resource paths vector
+     * @return the resource paths
      */
     std::vector<std::string> GetResourcePaths();
 
     /**
      * Get the media data
-     * @param qd the QualifierDir
-     * @param len the data len
-     * @param outValue the media data
+     * @param qualifierDir the QualifierDir
+     * @param len the output data len
+     * @param outValue the output media data
      * @return SUCCESS if get the media data success, else NOT_FOUND
      */
-    RState GetMediaData(const std::shared_ptr<ValueUnderQualifierDir> qd, size_t& len,
+    RState GetMediaData(const std::shared_ptr<ValueUnderQualifierDir> qualifierDir, size_t& len,
         std::unique_ptr<uint8_t[]> &outValue);
 
     /**
      * Get the mediabase64 data
-     * @param qd the QualifierDir
-     * @param outValue the mediabase64 data
+     * @param qualifierDir the QualifierDir
+     * @param outValue the output mediabase64 data
      * @return SUCCESS if get the mediabase64 data success, else NOT_FOUND
      */
-    RState GetMediaBase64Data(const std::shared_ptr<ValueUnderQualifierDir> qd, std::string &outValue);
+    RState GetMediaBase64Data(const std::shared_ptr<ValueUnderQualifierDir> qualifierDir, std::string &outValue);
 
     /**
      * Get the Profile data
-     * @param qd the QualifierDir
-     * @param len the data len write to
-     * @param outValue the profile data
+     * @param qualifierDir the QualifierDir
+     * @param len the output profile data len
+     * @param outValue the output profile data
      * @return SUCCESS if get the profile data success, else NOT_FOUND
      */
-    RState GetProfileData(const std::shared_ptr<ValueUnderQualifierDir> qd, size_t &len,
+    RState GetProfileData(const std::shared_ptr<ValueUnderQualifierDir> qualifierDir, size_t &len,
         std::unique_ptr<uint8_t[]> &outValue);
 
     /**
      * Find raw file from hap
-     * @param rawFileName the rawFileName
-     * @param len the data len write to
-     * @param outValue the rawfile data
+     * @param rawFileName the raw file name
+     * @param len the output rawfile data len
+     * @param outValue the output rawfile data
      * @return SUCCESS if resource exist, else NOT_FOUND
      */
     RState FindRawFileFromHap(const std::string &rawFileName, size_t &len,
@@ -248,8 +263,8 @@ public:
 
     /**
      * Find raw file descriptor from hap
-     * @param rawFileName the rawFileName
-     * @param descriptor the rawfile descriptor
+     * @param rawFileName the raw file name
+     * @param descriptor the output rawfile descriptor
      * @return SUCCESS if resource exist, else NOT_FOUND
      */
     RState FindRawFileDescriptorFromHap(const std::string &rawFileName,
@@ -257,144 +272,139 @@ public:
 
     /**
      * Is load hap
-     * @param hapPath the hap path
+     * @param hapPath the output hap path
+     * @return true if has loaded hap, else false
      */
     bool IsLoadHap(std::string &hapPath);
 
     /**
      * Get the valid hapPath
-     * @param hapPath the hap path
-     * @return OK if the hapPath exist, else NOT_FOUND
+     * @param hapPath the output hap path
+     * @return OK if has loaded hap, else NOT_FOUND
      */
     int32_t GetValidHapPath(std::string &hapPath);
 
     /**
      * Get the valid resource.index path
-     * @param hapPath the hap path
-     * @return OK if the hapPath exist, else NOT_FOUND
+     * @param indexPath the output resource.index path
+     * @return OK if the resource.index path exist, else NOT_FOUND
      */
-    int32_t GetValidIndexPath(std::string &indexPath);
+    int32_t GetValidResourceIndexPath(std::string &indexPath);
 
     /**
      * Get the raw file list
      * @param rawDirPath the rawfile directory path
-     * @param rawfileList the rawfile list write to
+     * @param rawfileList the output rawfile list
      * @return SUCCESS if resource exist, else not found
      */
     RState GetRawFileList(const std::string &rawDirPath, std::vector<std::string> &rawfileList);
 
     /**
-     * Get the raw file list
-     * @param qd the QualifierDir
+     * Get the resource file path
+     * @param qualifierDir the QualifierDir
      * @param resType the resource type
      * @param outValue the resource path write to
      * @return SUCCESS if resource exist, else not found
      */
-    RState GetFilePath(const std::shared_ptr<ValueUnderQualifierDir> qd, const ResType resType,
+    RState GetFilePath(const std::shared_ptr<ValueUnderQualifierDir> qualifierDir, const ResType resType,
         std::string &outValue);
 
     /**
-     * Get the raw file list
-     * @param qd the QualifierDir
-     * @param len the resource type
-     * @param outValue the media data write to
+     * Get the media data from hap
+     * @param qualifierDir the QualifierDir
+     * @param len the output media data len
+     * @param outValue the output media data
      * @return SUCCESS if resource exist, else not found
      */
-    RState GetMediaDataFromHap(const std::shared_ptr<ValueUnderQualifierDir> qd, size_t &len,
+    RState GetMediaDataFromHap(const std::shared_ptr<ValueUnderQualifierDir> qualifierDir, size_t &len,
         std::unique_ptr<uint8_t[]> &outValue);
 
     /**
-     * Get the raw file list
-     * @param qd the QualifierDir
-     * @param len the resource type
-     * @param outValue the media data write to
+     * Get the media data from resource.index
+     * @param qualifierDir the QualifierDir
+     * @param len the output media data len
+     * @param outValue the output media data
      * @return SUCCESS if resource exist, else not found
      */
-    RState GetMediaDataFromIndex(const std::shared_ptr<ValueUnderQualifierDir> qd, size_t &len,
+    RState GetMediaDataFromIndex(const std::shared_ptr<ValueUnderQualifierDir> qualifierDir, size_t &len,
         std::unique_ptr<uint8_t[]> &outValue);
 
     /**
-     * Get the raw file list
-     * @param qd the QualifierDir
-     * @param outValue the mediabase64 data write to
+     * Get the media base64 data from hap
+     * @param qualifierDir the QualifierDir
+     * @param outValue the output media base64 data
      * @return SUCCESS if resource exist, else not found
      */
-    RState GetMediaBase64DataFromHap(const std::shared_ptr<ValueUnderQualifierDir> qd,
+    RState GetMediaBase64DataFromHap(const std::shared_ptr<ValueUnderQualifierDir> qualifierDir,
         std::string &outValue);
 
     /**
-     * Get the raw file list
-     * @param qd the QualifierDir
-     * @param outValue the mediabase64 data write to
+     * Get the media base64 data from resource.index
+     * @param qualifierDir the QualifierDir
+     * @param outValue the output media base64 data
      * @return SUCCESS if resource exist, else not found
      */
-    RState GetMediaBase64DataFromIndex(const std::shared_ptr<ValueUnderQualifierDir> qd,
+    RState GetMediaBase64DataFromIndex(const std::shared_ptr<ValueUnderQualifierDir> qualifierDir,
         std::string &outValue);
 
     /**
-     * Get the raw file list
+     * Get the raw file descriptor
      * @param name the rawfile name
-     * @param descriptor the file descriptor write to
+     * @param descriptor the output file descriptor
      * @return SUCCESS if resource exist, else not found
      */
     RState FindRawFileDescriptor(const std::string &name, ResourceManager::RawFileDescriptor &descriptor);
 
     /**
      * Close rawFile descriptor by resource name
-     * @param name the resource name
+     * @param name the rawfile name
      * @return SUCCESS if close the rawFile descriptor, else ERROR
      */
     RState CloseRawFileDescriptor(const std::string &name);
 
     /**
-     * Get hap resource of manager
-     *
+     * Get hap resources in hap manager
      * @return HapResource vector of manager
      */
     std::vector<std::shared_ptr<HapResource>> GetHapResource();
 
     /**
-     * Get loaded hap path of manager
-     * @return loaded path map of manager
+     * Get loaded hap path in hap manager
+     * @return loaded path map in hap manager
      */
     std::unordered_map<std::string, std::vector<std::string>> GetLoadedHapPaths();
 
     /**
-     * Add system resourc to app resource vector
-     *
-     * @param systemHapManager system manager
+     * Add system resource
+     * @param systemHapManager system resource hap manager
      */
     void AddSystemResource(const std::shared_ptr<HapManager> &systemHapManager);
 
     /**
-     * Get the resource limit keys value which every binary bit corresponds to existing limit key {@link KeyType}
-     *
+     * Get the resource limit keys value which every binary bit corresponds to existing limit key
      * @return the resource limit keys
      */
     uint32_t GetResourceLimitKeys();
 
     /**
-     * Get the rawFile descriptor by resource name
-     *
-     * @param rawFile the rawfile name or relative path
-     * @param descriptor the obtain raw file member fd, length, offet write to
-     * @return SUCCESS if resource exist, else ERROR
+     * Get the raw file descriptor
+     * @param rawFile the raw file name or relative path
+     * @param descriptor the output raw file descriptor
+     * @return SUCCESS if raw file exist, else ERROR
      */
     RState GetRawFd(const std::string &rawFile, ResourceManager::RawFileDescriptor &descriptor);
 
     /**
      * Get the resource id by resType and resName
-     *
      * @param resTypeName the resType and resName
-     * @param resId the resId write to
+     * @param resId the output resId
      * @return SUCCESS if resource exist, else ERROR
      */
     RState GetResId(const std::string &resTypeName, uint32_t &resId);
 
     /**
      * Get locale list
-     *
-     * @param outValue the locales write to, the locale string is divided into three parts: language,
+     * @param outValue the output locales, the locale string is divided into three parts: language,
      *     script (optional), and region (optional), concatenated by the connector (-).
      * @param includeSystem the parameter controls whether to include system resources,
      *     the default value is false, it has no effect when only system resources query the locales list.
@@ -402,27 +412,29 @@ public:
     void GetLocales(std::vector<std::string> &outValue, bool includeSystem = false);
 
     /**
-     * Whether this raw resource is a directory
-     *
+     * Whether the raw resource is a directory
      * @param path the raw resource path
-     * @param outValue the obtain boolean value write to
-     * @return SUCCESS if raw resource is a directory, else ERROR
+     * @param outValue the output resoult
+     * @return SUCCESS if raw resource exist, else ERROR
      */
     RState IsRawDirFromHap(const std::string &pathName, bool &outValue);
 
     /**
-     * Whether this theme system resource is enabled
-     *
-     * @return true is enabled, else not.
+     * Whether the theme system resource is enabled
+     * @return true if theme system resource is enabled, else not.
      */
     bool IsThemeSystemResEnableHap();
 
     /**
-     * Whether this is system hap manager
-     * @return true is system hap manager, else not.
+     * Whether this is a system hap manager
+     * @return true if is system hap manager, else not.
      */
     bool IsSystem();
 
+    /**
+     * Set override flag
+     * @param isOverride override flag
+     */
     inline void SetOverride(bool isOverride)
     {
         isOverride_ = isOverride;
@@ -446,43 +458,28 @@ private:
     const std::shared_ptr<ValueUnderQualifierDir> GetBestMatchResource(
         const std::vector<std::shared_ptr<IdValues>> &candidates,
         uint32_t density, bool isGetOverrideResource);
-
-    bool AddResourcePath(const char *path, const uint32_t &selectedTypes = SELECT_ALL, bool forceReload = false);
-
 #if defined(__ARKUI_CROSS__)
     void RemoveHapResource(const std::string &path);
 #endif
-
-    bool AddPatchResourcePath(const char *path, const char *patchPath);
-
-    // when resConfig_ updated we must call ReloadAll()
-    RState ReloadAll();
-
     static bool Init();
 
     std::shared_ptr<ResConfigImpl> getCompleteOverrideConfig(bool isGetOverrideResource);
 
     static bool icuInitialized;
 
-    // app res config
     std::shared_ptr<ResConfigImpl> resConfig_;
 
-    // app override res config
     std::shared_ptr<ResConfigImpl> overrideResConfig_ = std::make_shared<ResConfigImpl>();
 
-    // set of hap Resources
     std::vector<std::shared_ptr<HapResource>> hapResources_;
 
-    // set of loaded hap path
     std::unordered_map<std::string, std::vector<std::string>> loadedHapPaths_;
 
     std::unordered_map<std::string, ResourceManager::RawFileDescriptor> rawFileDescriptor_;
-
 #ifdef SUPPORT_GRAPHICS
     // key is language
     std::vector<std::pair<std::string, icu::PluralRules *>> plurRulesCache_;
 #endif
-
     std::shared_mutex mutex_;
 
     // indicate manager is system hap manager

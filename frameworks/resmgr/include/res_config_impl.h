@@ -137,7 +137,7 @@ public:
 
     ScreenDensity GetScreenDensityDpi() const;
 
-    bool CopyLocaleAndPreferredLocale(ResConfig &other);
+    bool CopyLocaleAndPreferredLocale(const ResConfig &other);
 
     bool isLocaleInfoSet();
 
@@ -224,7 +224,7 @@ public:
      */
     bool GetAppDarkRes() const;
 
-    bool MatchLocal(ResConfig& other) const;
+    bool MatchLocal(const ResConfig& other) const;
 
     std::string ToString() const;
 
@@ -234,10 +234,10 @@ public:
 private:
     bool IsMoreSpecificThan(const std::shared_ptr<ResConfigImpl> other, uint32_t density = 0) const;
 
-    bool CopyLocale(ResConfig &other);
+    bool CopyLocale(const ResConfig &other);
 
 #ifdef SUPPORT_GRAPHICS
-    bool CopyPreferredLocale(ResConfig &other);
+    bool CopyPreferredLocale(const ResConfig &other);
 
     bool CopyLocale(Locale **currentLocaleInfo, ResLocale **currentResLocale,
         const Locale *otherLocaleInfo);

@@ -18,21 +18,6 @@
 
 #include "hap_parser.h"
 
-#include <cstdint>
-#include <cstdio>
-#include <string>
-#include <set>
-#include <unzip.h>
-#include "hap_resource.h"
-#include "res_desc.h"
-#include "res_config_impl.h"
-#include "resource_manager.h"
-
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-#include "file_mapper.h"
-#include "extractor.h"
-#endif
-
 namespace OHOS {
 namespace Global {
 namespace Resource {

@@ -65,13 +65,13 @@ void HapManagerTest::TearDown()
 /*
  * this test shows how to load a hap, then find value list by id
  * @tc.name: HapManagerFuncTest001
- * @tc.desc: Test AddResourcePath & GetResourceList function, file case.
+ * @tc.desc: Test AddResource & GetResourceList function, file case.
  * @tc.type: FUNC
  */
 HWTEST_F(HapManagerTest, HapManagerFuncTest001, TestSize.Level1)
 {
     HapManager *hapManager = new HapManager(std::make_shared<ResConfigImpl>());
-    bool ret = hapManager->AddResourcePath(FormatFullPath(g_resFilePath).c_str());
+    bool ret = hapManager->AddResource(FormatFullPath(g_resFilePath).c_str(), SELECT_ALL);
 
     EXPECT_TRUE(ret);
 
@@ -89,7 +89,7 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest001, TestSize.Level1)
 /*
  * this test shows how to reload a hap
  * @tc.name: HapManagerFuncTest002
- * @tc.desc: Test UpdateResConfig & AddResourcePath function, file case.
+ * @tc.desc: Test UpdateResConfig & AddResource function, file case.
  * @tc.type: FUNC
  */
 HWTEST_F(HapManagerTest, HapManagerFuncTest002, TestSize.Level1)
@@ -107,7 +107,7 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest002, TestSize.Level1)
         ASSERT_TRUE(false);
     }
     hapManager->UpdateResConfig(*rc);
-    bool ret = hapManager->AddResourcePath(path);
+    bool ret = hapManager->AddResource(path, SELECT_ALL);
 
     EXPECT_TRUE(ret);
 
@@ -152,7 +152,7 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest002, TestSize.Level1)
 /*
  * this test shows how to load resources from hap, then find value list by id
  * @tc.name: HapManagerFuncTest003
- * @tc.desc: Test AddResourcePath & GetResourceList function, file case.
+ * @tc.desc: Test AddResource & GetResourceList function, file case.
  * @tc.type: FUNC
  */
 HWTEST_F(HapManagerTest, HapManagerFuncTest003, TestSize.Level1)
@@ -164,11 +164,10 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest003, TestSize.Level1)
     rc->SetLocaleInfo("zh", nullptr, "CN");
     HapManager *hapManager = new HapManager(std::make_shared<ResConfigImpl>());
     hapManager->UpdateResConfig(*rc);
-    hapManager->ReloadAll();
     if (hapManager == nullptr) {
         ASSERT_TRUE(false);
     }
-    bool ret = hapManager->AddResourcePath(FormatFullPath(g_hapPath).c_str());
+    bool ret = hapManager->AddResource(FormatFullPath(g_hapPath).c_str(), SELECT_ALL);
 
     EXPECT_TRUE(ret);
 
@@ -190,7 +189,7 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest003, TestSize.Level1)
 /*
  * this test shows how to load resources from hap, then find value list by id
  * @tc.name: HapManagerFuncTest004
- * @tc.desc: Test AddResourcePath & GetResourceList function, file case.
+ * @tc.desc: Test AddResource & GetResourceList function, file case.
  * @tc.type: FUNC
  */
 HWTEST_F(HapManagerTest, HapManagerFuncTest004, TestSize.Level1)
@@ -203,8 +202,7 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest004, TestSize.Level1)
     HapManager *hapManager = new HapManager(std::make_shared<ResConfigImpl>());
     EXPECT_FALSE(hapManager == nullptr);
     hapManager->UpdateResConfig(*rc);
-    hapManager->ReloadAll();
-    bool ret = hapManager->AddResourcePath(FormatFullPath(g_hapPath).c_str());
+    bool ret = hapManager->AddResource(FormatFullPath(g_hapPath).c_str(), SELECT_ALL);
     EXPECT_TRUE(ret);
     int id = 16777221; // 16777221 means 'AboutPageFA' 'aboutPage_title_primary'
     auto idValues = hapManager->GetResourceList(id);
@@ -280,12 +278,12 @@ HWTEST_F(HapManagerTest, HapManagerGetMediaDataFromHapTest001, TestSize.Level1)
     ASSERT_TRUE(resKey != nullptr);
     resKey->resConfig_ = std::make_shared<ResConfigImpl>();
     std::pair<std::string, std::string> resPath;
-    std::shared_ptr<ValueUnderQualifierDir> qd =
+    std::shared_ptr<ValueUnderQualifierDir> qualifierDir =
         std::make_shared<ValueUnderQualifierDirV1>(resKey, nullptr, resPath);
-    ASSERT_TRUE(qd != nullptr);
+    ASSERT_TRUE(qualifierDir != nullptr);
     size_t len;
     std::unique_ptr<uint8_t[]> outValue;
-    RState result = hapManager->GetMediaDataFromHap(qd, len, outValue);
+    RState result = hapManager->GetMediaDataFromHap(qualifierDir, len, outValue);
     EXPECT_EQ(result, NOT_FOUND);
 }
 
@@ -302,13 +300,13 @@ HWTEST_F(HapManagerTest, HapManagerGetMediaDataFromHapTest002, TestSize.Level1)
     ASSERT_TRUE(resKey != nullptr);
     resKey->resConfig_ = std::make_shared<ResConfigImpl>();
     std::pair<std::string, std::string> resPath;
-    std::shared_ptr<ValueUnderQualifierDir> qd =
+    std::shared_ptr<ValueUnderQualifierDir> qualifierDir =
         std::make_shared<ValueUnderQualifierDirV1>(resKey, nullptr, resPath);
-    ASSERT_TRUE(qd != nullptr);
-    qd->indexPath_ = "/data/test/all.hap";
+    ASSERT_TRUE(qualifierDir != nullptr);
+    qualifierDir->indexPath_ = "/data/test/all.hap";
     size_t len;
     std::unique_ptr<uint8_t[]> outValue;
-    RState result = hapManager->GetMediaDataFromHap(qd, len, outValue);
+    RState result = hapManager->GetMediaDataFromHap(qualifierDir, len, outValue);
     EXPECT_EQ(result, NOT_FOUND);
 }
 
@@ -323,12 +321,12 @@ HWTEST_F(HapManagerTest, HapManagerGetMediaDataFromHapTest003, TestSize.Level1)
     ASSERT_TRUE(hapManager != nullptr);
     std::shared_ptr<ResConfigImpl> resConfig = std::make_shared<ResConfigImpl>();
     std::pair<std::string, std::string> resPath;
-    std::shared_ptr<ValueUnderQualifierDir> qd =
+    std::shared_ptr<ValueUnderQualifierDir> qualifierDir =
         std::make_shared<ValueUnderQualifierDirV2>(resPath, 0, resConfig);
-    ASSERT_TRUE(qd != nullptr);
+    ASSERT_TRUE(qualifierDir != nullptr);
     size_t len;
     std::unique_ptr<uint8_t[]> outValue;
-    RState result = hapManager->GetMediaDataFromHap(qd, len, outValue);
+    RState result = hapManager->GetMediaDataFromHap(qualifierDir, len, outValue);
     EXPECT_EQ(result, NOT_FOUND);
 }
 
@@ -343,13 +341,13 @@ HWTEST_F(HapManagerTest, HapManagerGetMediaDataFromHapTest004, TestSize.Level1)
     ASSERT_TRUE(hapManager != nullptr);
     std::shared_ptr<ResConfigImpl> resConfig = std::make_shared<ResConfigImpl>();
     std::pair<std::string, std::string> resPath;
-    std::shared_ptr<ValueUnderQualifierDir> qd =
+    std::shared_ptr<ValueUnderQualifierDir> qualifierDir =
         std::make_shared<ValueUnderQualifierDirV2>(resPath, 0, resConfig);
-    ASSERT_TRUE(qd != nullptr);
-    qd->indexPath_ = "/data/test/all.hap";
+    ASSERT_TRUE(qualifierDir != nullptr);
+    qualifierDir->indexPath_ = "/data/test/all.hap";
     size_t len;
     std::unique_ptr<uint8_t[]> outValue;
-    RState result = hapManager->GetMediaDataFromHap(qd, len, outValue);
+    RState result = hapManager->GetMediaDataFromHap(qualifierDir, len, outValue);
     EXPECT_EQ(result, NOT_FOUND);
 }
 
@@ -362,10 +360,10 @@ HWTEST_F(HapManagerTest, HapManagerGetMediaDataFromIndexTest001, TestSize.Level1
 {
     std::shared_ptr<HapManager> hapManager = std::make_shared<HapManager>(nullptr, false);
     ASSERT_TRUE(hapManager != nullptr);
-    std::shared_ptr<ValueUnderQualifierDir> qd = nullptr;
+    std::shared_ptr<ValueUnderQualifierDir> qualifierDir = nullptr;
     size_t len;
     std::unique_ptr<uint8_t[]> outValue;
-    RState result = hapManager->GetMediaDataFromIndex(qd, len, outValue);
+    RState result = hapManager->GetMediaDataFromIndex(qualifierDir, len, outValue);
     EXPECT_EQ(result, NOT_FOUND);
 }
 
@@ -382,11 +380,11 @@ HWTEST_F(HapManagerTest, HapManagerGetMediaBase64DataFromHapTest001, TestSize.Le
     ASSERT_TRUE(resKey != nullptr);
     resKey->resConfig_ = std::make_shared<ResConfigImpl>();
     std::pair<std::string, std::string> resPath;
-    std::shared_ptr<ValueUnderQualifierDir> qd =
+    std::shared_ptr<ValueUnderQualifierDir> qualifierDir =
         std::make_shared<ValueUnderQualifierDirV1>(resKey, nullptr, resPath);
-    ASSERT_TRUE(qd != nullptr);
+    ASSERT_TRUE(qualifierDir != nullptr);
     std::string outValue;
-    RState result = hapManager->GetMediaBase64DataFromHap(qd, outValue);
+    RState result = hapManager->GetMediaBase64DataFromHap(qualifierDir, outValue);
     EXPECT_EQ(result, NOT_FOUND);
 }
 
@@ -403,12 +401,12 @@ HWTEST_F(HapManagerTest, HapManagerGetMediaBase64DataFromHapTest002, TestSize.Le
     ASSERT_TRUE(resKey != nullptr);
     resKey->resConfig_ = std::make_shared<ResConfigImpl>();
     std::pair<std::string, std::string> resPath;
-    std::shared_ptr<ValueUnderQualifierDir> qd =
+    std::shared_ptr<ValueUnderQualifierDir> qualifierDir =
         std::make_shared<ValueUnderQualifierDirV1>(resKey, nullptr, resPath);
-    ASSERT_TRUE(qd != nullptr);
-    qd->indexPath_ = "/data/test/all.hap";
+    ASSERT_TRUE(qualifierDir != nullptr);
+    qualifierDir->indexPath_ = "/data/test/all.hap";
     std::string outValue;
-    RState result = hapManager->GetMediaBase64DataFromHap(qd, outValue);
+    RState result = hapManager->GetMediaBase64DataFromHap(qualifierDir, outValue);
     EXPECT_EQ(result, NOT_FOUND);
 }
 
@@ -423,11 +421,11 @@ HWTEST_F(HapManagerTest, HapManagerGetMediaBase64DataFromHapTest003, TestSize.Le
     ASSERT_TRUE(hapManager != nullptr);
     std::shared_ptr<ResConfigImpl> resConfig = std::make_shared<ResConfigImpl>();
     std::pair<std::string, std::string> resPath;
-    std::shared_ptr<ValueUnderQualifierDir> qd =
+    std::shared_ptr<ValueUnderQualifierDir> qualifierDir =
         std::make_shared<ValueUnderQualifierDirV2>(resPath, 0, resConfig);
-    ASSERT_TRUE(qd != nullptr);
+    ASSERT_TRUE(qualifierDir != nullptr);
     std::string outValue;
-    RState result = hapManager->GetMediaBase64DataFromHap(qd, outValue);
+    RState result = hapManager->GetMediaBase64DataFromHap(qualifierDir, outValue);
     EXPECT_EQ(result, NOT_FOUND);
 }
 
@@ -442,12 +440,12 @@ HWTEST_F(HapManagerTest, HapManagerGetMediaBase64DataFromHapTest004, TestSize.Le
     ASSERT_TRUE(hapManager != nullptr);
     std::shared_ptr<ResConfigImpl> resConfig = std::make_shared<ResConfigImpl>();
     std::pair<std::string, std::string> resPath;
-    std::shared_ptr<ValueUnderQualifierDir> qd =
+    std::shared_ptr<ValueUnderQualifierDir> qualifierDir =
         std::make_shared<ValueUnderQualifierDirV2>(resPath, 0, resConfig);
-    ASSERT_TRUE(qd != nullptr);
-    qd->indexPath_ = "/data/test/all.hap";
+    ASSERT_TRUE(qualifierDir != nullptr);
+    qualifierDir->indexPath_ = "/data/test/all.hap";
     std::string outValue;
-    RState result = hapManager->GetMediaBase64DataFromHap(qd, outValue);
+    RState result = hapManager->GetMediaBase64DataFromHap(qualifierDir, outValue);
     EXPECT_EQ(result, NOT_FOUND);
 }
 
@@ -460,15 +458,15 @@ HWTEST_F(HapManagerTest, HapManagerGetMediaBase64DataFromIndexTest001, TestSize.
 {
     std::shared_ptr<HapManager> hapManager = std::make_shared<HapManager>(nullptr, false);
     ASSERT_TRUE(hapManager != nullptr);
-    std::shared_ptr<ValueUnderQualifierDir> qd = nullptr;
+    std::shared_ptr<ValueUnderQualifierDir> qualifierDir = nullptr;
     std::string outValue;
-    RState result = hapManager->GetMediaBase64DataFromIndex(qd, outValue);
+    RState result = hapManager->GetMediaBase64DataFromIndex(qualifierDir, outValue);
     EXPECT_EQ(result, NOT_FOUND);
 }
 
 /*
  * @tc.name: HapManagerGetValidIndexPathTest001
- * @tc.desc: Test GetValidIndexPath function, file case.
+ * @tc.desc: Test GetValidResourceIndexPath function, file case.
  * @tc.type: FUNC
  */
 HWTEST_F(HapManagerTest, HapManagerGetValidIndexPathTest001, TestSize.Level1)
@@ -476,13 +474,13 @@ HWTEST_F(HapManagerTest, HapManagerGetValidIndexPathTest001, TestSize.Level1)
     std::shared_ptr<HapManager> hapManager = std::make_shared<HapManager>(nullptr, false);
     ASSERT_TRUE(hapManager != nullptr);
     std::string indexPath;
-    int32_t result = hapManager->GetValidIndexPath(indexPath);
+    int32_t result = hapManager->GetValidResourceIndexPath(indexPath);
     EXPECT_EQ(result, NOT_FOUND);
 }
 
 /*
  * @tc.name: HapManagerGetValidIndexPathTest002
- * @tc.desc: Test GetValidIndexPath function, file case.
+ * @tc.desc: Test GetValidResourceIndexPath function, file case.
  * @tc.type: FUNC
  */
 HWTEST_F(HapManagerTest, HapManagerGetValidIndexPathTest002, TestSize.Level1)
@@ -494,13 +492,13 @@ HWTEST_F(HapManagerTest, HapManagerGetValidIndexPathTest002, TestSize.Level1)
     ASSERT_TRUE(pResource != nullptr);
     hapManager->hapResources_.emplace_back(pResource);
     std::string indexPath;
-    int32_t result = hapManager->GetValidIndexPath(indexPath);
+    int32_t result = hapManager->GetValidResourceIndexPath(indexPath);
     EXPECT_EQ(result, NOT_FOUND);
 }
 
 /*
  * @tc.name: HapManagerGetValidIndexPathTest003
- * @tc.desc: Test GetValidIndexPath function, file case.
+ * @tc.desc: Test GetValidResourceIndexPath function, file case.
  * @tc.type: FUNC
  */
 HWTEST_F(HapManagerTest, HapManagerGetValidIndexPathTest003, TestSize.Level1)
@@ -512,7 +510,7 @@ HWTEST_F(HapManagerTest, HapManagerGetValidIndexPathTest003, TestSize.Level1)
     ASSERT_TRUE(pResource != nullptr);
     hapManager->hapResources_.emplace_back(pResource);
     std::string indexPath;
-    int32_t result = hapManager->GetValidIndexPath(indexPath);
+    int32_t result = hapManager->GetValidResourceIndexPath(indexPath);
     EXPECT_EQ(result, NOT_FOUND);
 }
 

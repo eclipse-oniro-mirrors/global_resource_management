@@ -142,11 +142,6 @@ const std::shared_ptr<IdValues> HapResourceV2::GetIdValuesByName(
     return iter->second;
 }
 
-RState HapResourceV2::Update(std::shared_ptr<ResConfigImpl> &defaultConfig)
-{
-    return SUCCESS;
-}
-
 std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> HapResourceV2::BuildNameTypeIdMapping()
 {
     ReadLock lock(mutex_);
@@ -223,11 +218,34 @@ bool HapResourceV2::InitMmap(size_t mmapLen, uint8_t *mmap)
     return true;
 }
 
-uint32_t HapResourceV2::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
+void HapResourceV2::InitThemeSystemRes()
+{
+    std::shared_ptr<IdValues> themeSystemRes = nullptr;
+    std::vector<std::shared_ptr<ValueUnderQualifierDir>> configList;
+    themeSystemRes = GetIdValuesByName("system_color_change", ResType::STRING);
+    if (themeSystemRes != nullptr) {
+        std::vector<std::shared_ptr<ValueUnderQualifierDir>> configs = themeSystemRes->GetLimitPathsConst();
+        configList.insert(configList.end(), configs.begin(), configs.end());
+    }
+    themeSystemRes = GetIdValuesByName("system_color_change", ResType::BOOLEAN);
+    if (themeSystemRes != nullptr) {
+        std::vector<std::shared_ptr<ValueUnderQualifierDir>> configs = themeSystemRes->GetLimitPathsConst();
+        configList.insert(configList.end(), configs.begin(), configs.end());
+    }
+
+    for (const auto &cfg : configList) {
+        if (cfg->GetIdItem()->value_ == "true") {
+            isThemeSystemResEnable_ = true;
+            return;
+        }
+    }
+}
+
+int32_t HapResourceV2::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
 {
     ResInfo resInfo;
     uint32_t offset = idValue->GetOffset();
-    uint32_t ret = HapParserV2::ParseResInfo(offset, resInfo, bufLen_, buf_);
+    int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, bufLen_, buf_);
     if (ret != OK) {
         return ret;
     }
@@ -281,11 +299,11 @@ void SystemResource::GetLocales(std::set<std::string> &outValue, bool includeSys
     outValue.insert(locales_.begin(), locales_.end());
 }
 
-uint32_t SystemResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
+int32_t SystemResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
 {
     ResInfo resInfo;
     uint32_t offset = idValue->GetOffset();
-    uint32_t ret = HapParserV2::ParseResInfo(offset, resInfo, bufLen_, buf_);
+    int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, bufLen_, buf_);
     if (ret != OK) {
         return ret;
     }
@@ -350,11 +368,11 @@ void OverlayResource::GetLocales(std::set<std::string> &outValue, bool includeSy
     return;
 }
 
-uint32_t OverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
+int32_t OverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
 {
     ResInfo resInfo;
     uint32_t offset = idValue->GetOffset();
-    uint32_t ret = HapParserV2::ParseResInfo(offset, resInfo, bufLen_, buf_);
+    int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, bufLen_, buf_);
     if (ret != OK) {
         return ret;
     }
@@ -392,11 +410,11 @@ void SystemOverlayResource::GetLocales(std::set<std::string> &outValue, bool inc
     SystemResource::GetLocales(outValue, includeSystem);
 }
 
-uint32_t SystemOverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
+int32_t SystemOverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
 {
     ResInfo resInfo;
     uint32_t offset = idValue->GetOffset();
-    uint32_t ret = HapParserV2::ParseResInfo(offset, resInfo, bufLen_, buf_);
+    int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, bufLen_, buf_);
     if (ret != OK) {
         return ret;
     }

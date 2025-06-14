@@ -16,12 +16,9 @@
 #include "hap_parser_v1.h"
 
 #include <cstdlib>
-#include <string>
 #include <fcntl.h>
 #include <fstream>
-#include <unzip.h>
 #include <unistd.h>
-#include <set>
 #include <sys/stat.h>
 #include <unordered_map>
 
@@ -29,17 +26,21 @@
 #include "hap_resource_v1.h"
 #include "hilog_wrapper.h"
 #include "locale_matcher.h"
+#include "utils/errors.h"
+#include "utils/string_utils.h"
+#include "utils/utils.h"
+
 #if defined(__WINNT__)
 #include <cstring>
 #else
 #include "securec.h"
 #endif
+
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 #include "hitrace_meter.h"
+#include "file_mapper.h"
+#include "extractor.h"
 #endif
-#include "utils/errors.h"
-#include "utils/string_utils.h"
-#include "utils/utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -90,7 +91,7 @@ bool HapParserV1::Init(const char *path)
         return false;
     }
 
-    uint32_t out = this->ParseResHex();
+    int32_t out = this->ParseResHex();
     if (out != OK) {
         RESMGR_HILOGE(RESMGR_TAG, "ParseResHex failed! retcode:%d", out);
         return false;
