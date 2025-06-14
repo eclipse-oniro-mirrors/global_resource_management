@@ -587,7 +587,9 @@ ani_object ResMgrAddon::getRawFileContentSync(ani_env* env, ani_object object, a
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->path_ = AniStrToString(env, path);
     dataContext->addon_ = UnwrapAddon(env, object);
-
+    if (dataContext->addon_ == nullptr) {
+        return nullptr;
+    }
     RState state = dataContext->addon_->GetResMgr()->GetRawFileFromHap(dataContext->path_,
         dataContext->len_, dataContext->mediaData);
     if (state != RState::SUCCESS) {
