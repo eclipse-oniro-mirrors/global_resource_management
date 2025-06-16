@@ -784,6 +784,698 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest023, TestSize.
 }
 
 /*
+ * @tc.name: ResourceManagerGetMediaByIdTest024
+ * @tc.desc: Test GetMediaById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest024, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    rmc->TestGetMediaById(tmp);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdTest025
+ * @tc.desc: Test GetMediaById, to match sdpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest025, TestSize.Level1)
+{
+    rmc->AddResource("en", nullptr, "US");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    rmc->TestGetMediaWithDensityById(tmp);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdTest026
+ * @tc.desc: Test GetMediaById, to match mdpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest026, TestSize.Level1)
+{
+    rmc->AddResource("en", nullptr, "US");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/mdpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 160;
+    std::string outValue;
+    RState state;
+    int id = rmc->GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetMediaById(id, outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdTest027
+ * @tc.desc: Test GetMediaById, to match ldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest027, TestSize.Level1)
+{
+    rmc->AddResource("en", nullptr, "US");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/ldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 240;
+    std::string outValue;
+    RState state;
+    int id = rmc->GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetMediaById(id, outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdTest028
+ * @tc.desc: Test GetMediaById, to match xldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest028, TestSize.Level1)
+{
+    rmc->AddResource("en", nullptr, "US");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/xldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 320;
+    std::string outValue;
+    RState state;
+    int id = rmc->GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetMediaById(id, outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdTest029
+ * @tc.desc: Test GetMediaById, to match xxldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest029, TestSize.Level1)
+{
+    rmc->AddResource("en", nullptr, "US");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/xxldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 480;
+    std::string outValue;
+    RState state;
+    int id = rmc->GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetMediaById(id, outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdTest030
+ * @tc.desc: Test GetMediaById, to match xxxldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest030, TestSize.Level1)
+{
+    rmc->AddResource("en", nullptr, "US");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/xxxldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 640;
+    std::string outValue;
+    RState state;
+    int id = rmc->GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetMediaById(id, outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdTest031
+ * @tc.desc: Test GetMediaById, to match zh_CN-sdpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest031, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/zh_CN-sdpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_TABLET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 120;
+    std::string outValue;
+    RState state;
+    int id = rmc->GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetMediaById(id, outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdTest032
+ * @tc.desc: Test GetMediaById, to match zh_CN-mdpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest032, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/zh_CN-mdpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_TABLET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 160;
+    std::string outValue;
+    RState state;
+    int id = rmc->GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetMediaById(id, outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdTest033
+ * @tc.desc: Test GetMediaById, to match zh_CN-ldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest033, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/zh_CN-ldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_TABLET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 240;
+    std::string outValue;
+    RState state;
+    int id = rmc->GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetMediaById(id, outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdTest034
+ * @tc.desc: Test GetMediaById, to match zh_CN-xldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest034, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/zh_CN-xldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_TABLET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 320;
+    std::string outValue;
+    RState state;
+    int id = rmc->GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetMediaById(id, outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdTest035
+ * @tc.desc: Test GetMediaById, to match zh_CN-xxldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest035, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/zh_CN-xxldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_TABLET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 480;
+    std::string outValue;
+    RState state;
+    int id = rmc->GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetMediaById(id, outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdTest036
+ * @tc.desc: Test GetMediaById, to match zh_CN-xxxldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest036, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/zh_CN-xxxldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_TABLET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 640;
+    std::string outValue;
+    RState state;
+    int id = rmc->GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetMediaById(id, outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdTest037
+ * @tc.desc: Test GetMediaById, to match mcc460_mnc101-zh_CN-phone-dark-sdpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest037, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-sdpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(DARK);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 120;
+    std::string outValue;
+    RState state;
+    int id = rmc->GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetMediaById(id, outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdTest038
+ * @tc.desc: Test GetMediaById, to match mcc460_mnc101-zh_CN-phone-dark-mdpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest038, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-mdpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(DARK);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 160;
+    std::string outValue;
+    RState state;
+    int id = rmc->GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetMediaById(id, outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdTest039
+ * @tc.desc: Test GetMediaById, to match mcc460_mnc101-zh_CN-phone-dark-ldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest039, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-ldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(DARK);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 240;
+    std::string outValue;
+    RState state;
+    int id = rmc->GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetMediaById(id, outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdTest040
+ * @tc.desc: Test GetMediaById, to match mcc460_mnc101-zh_CN-phone-dark-xldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest040, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-xldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(DARK);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 320;
+    std::string outValue;
+    RState state;
+    int id = rmc->GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetMediaById(id, outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdTest041
+ * @tc.desc: Test GetMediaById, to match mcc460_mnc101-zh_CN-phone-dark-xxldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest041, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-xxldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(DARK);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 480;
+    std::string outValue;
+    RState state;
+    int id = rmc->GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetMediaById(id, outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdTest042
+ * @tc.desc: Test GetMediaById, to match mcc460_mnc101-zh_CN-phone-dark-xxxldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest042, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-xxxldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(DARK);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXLDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 640;
+    std::string outValue;
+    RState state;
+    int id = rmc->GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetMediaById(id, outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
  * @tc.name: ResourceManagerGetDrawableInfoByIdTest001
  * @tc.desc: Test GetDrawableInfoById
  * @tc.type: FUNC
@@ -1454,6 +2146,664 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest022, TestSiz
 
     HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_resFilePath).c_str(), 0, nullptr);
     tmp->Init(rmc->defaultResConfig);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-xxxldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(DARK);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 640;
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("icon", outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameTest023
+ * @tc.desc: Test GetMediaByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest023, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    rmc->TestGetMediaByName(tmp);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameTest024
+ * @tc.desc: Test GetMediaByName, to match sdpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest024, TestSize.Level1)
+{
+    rmc->AddResource("en", nullptr, "US");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    rmc->TestGetMediaWithDensityByName(tmp);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameTest025
+ * @tc.desc: Test GetMediaByName, to match mdpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest025, TestSize.Level1)
+{
+    rmc->AddResource("en", nullptr, "US");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/mdpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    uint32_t density = 160;
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("icon", outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameTest026
+ * @tc.desc: Test GetMediaByName, to match ldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest026, TestSize.Level1)
+{
+    rmc->AddResource("en", nullptr, "US");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/ldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    uint32_t density = 240;
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("icon", outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameTest027
+ * @tc.desc: Test GetMediaByName, to match xldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest027, TestSize.Level1)
+{
+    rmc->AddResource("en", nullptr, "US");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/xldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    uint32_t density = 320;
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("icon", outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameTest028
+ * @tc.desc: Test GetMediaByName, to match xxldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest028, TestSize.Level1)
+{
+    rmc->AddResource("en", nullptr, "US");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/xxldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    uint32_t density = 480;
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("icon", outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameTest029
+ * @tc.desc: Test GetMediaByName, to match xxxldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest029, TestSize.Level1)
+{
+    rmc->AddResource("en", nullptr, "US");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/xxxldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    uint32_t density = 640;
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("icon", outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameTest030
+ * @tc.desc: Test GetMediaByName, to match zh_CN-sdpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest030, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/zh_CN-sdpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_TABLET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 120;
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("icon", outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameTest031
+ * @tc.desc: Test GetMediaByName, to match zh_CN-mdpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest031, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/zh_CN-mdpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_TABLET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 160;
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("icon", outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameTest032
+ * @tc.desc: Test GetMediaByName, to match zh_CN-ldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest032, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/zh_CN-ldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_TABLET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 240;
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("icon", outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameTest033
+ * @tc.desc: Test GetMediaByName, to match zh_CN-xldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest033, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/zh_CN-xldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_TABLET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 320;
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("icon", outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameTest034
+ * @tc.desc: Test GetMediaByName, to match zh_CN-xxldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest034, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/zh_CN-xxldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_TABLET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 480;
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("icon", outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameTest035
+ * @tc.desc: Test GetMediaByName, to match zh_CN-xxxldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest035, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/zh_CN-xxxldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetDeviceType(DEVICE_TABLET);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 640;
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("icon", outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameTest036
+ * @tc.desc: Test GetMediaByName, to match mcc460_mnc101-zh_CN-phone-dark-sdpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest036, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-sdpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(DARK);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 120;
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("icon", outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameTest037
+ * @tc.desc: Test GetMediaByName, to match mcc460_mnc101-zh_CN-phone-dark-mdpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest037, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-mdpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(DARK);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 160;
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("icon", outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameTest038
+ * @tc.desc: Test GetMediaByName, to match mcc460_mnc101-zh_CN-phone-dark-ldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest038, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-ldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(DARK);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 240;
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("icon", outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameTest039
+ * @tc.desc: Test GetMediaByName, to match mcc460_mnc101-zh_CN-phone-dark-xldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest039, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-xldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(DARK);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 320;
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("icon", outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameTest040
+ * @tc.desc: Test GetMediaByName, to match mcc460_mnc101-zh_CN-phone-dark-xxldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest040, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-xxldpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(DARK);
+    rc->SetScreenDensity(SCREEN_DENSITY_XXXLDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 480;
+    std::string outValue;
+    RState state;
+    state = rm->GetMediaByName("icon", outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameTest041
+ * @tc.desc: Test GetMediaByName, to match mcc460_mnc101-zh_CN-phone-dark-xxxldpi determinder
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest041, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-xxxldpi/media/icon.png");
 

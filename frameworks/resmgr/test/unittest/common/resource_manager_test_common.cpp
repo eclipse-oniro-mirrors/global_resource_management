@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -233,6 +233,24 @@ void ResourceManagerTestCommon::TestGetProfileById(HapResourceV1 *tmp)
     EXPECT_EQ(res, outValue);
 }
 
+void ResourceManagerTestCommon::TestGetProfileById(HapResourceV2 *tmp)
+{
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/base/profile/test_profile.json");
+
+    std::string outValue;
+    RState state;
+    int id = GetResId("test_profile", ResType::PROF);
+    EXPECT_TRUE(id > 0);
+    state = rm->GetProfileById(id, outValue);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+}
+
 void ResourceManagerTestCommon::TestGetProfileByName(HapResourceV1 *tmp)
 {
     tmp->Init(this->defaultResConfig);
@@ -245,9 +263,41 @@ void ResourceManagerTestCommon::TestGetProfileByName(HapResourceV1 *tmp)
     EXPECT_EQ(res, outValue);
 }
 
+void ResourceManagerTestCommon::TestGetProfileByName(HapResourceV2 *tmp)
+{
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/base/profile/test_profile.json");
+
+    std::string outValue;
+    RState state = rm->GetProfileByName("test_profile", outValue);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+}
+
 void ResourceManagerTestCommon::TestGetMediaById(HapResourceV1 *tmp)
 {
     tmp->Init(this->defaultResConfig);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/base/media/icon1.png");
+
+    std::string outValue;
+    int id = GetResId("icon1", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    RState state = rm->GetMediaById(id, outValue);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+}
+
+void ResourceManagerTestCommon::TestGetMediaById(HapResourceV2 *tmp)
+{
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/base/media/icon1.png");
 
@@ -285,9 +335,53 @@ void ResourceManagerTestCommon::TestGetMediaWithDensityById(HapResourceV1 *tmp)
     EXPECT_EQ(res, outValue);
 }
 
+void ResourceManagerTestCommon::TestGetMediaWithDensityById(HapResourceV2 *tmp)
+{
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/sdpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 120;
+    std::string outValue;
+    int id = GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    RState state = rm->GetMediaById(id, outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+}
+
 void ResourceManagerTestCommon::TestGetMediaByName(HapResourceV1 *tmp)
 {
     tmp->Init(this->defaultResConfig);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/base/media/icon1.png");
+
+    std::string outValue;
+    RState state = rm->GetMediaByName("icon1", outValue);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+}
+
+void ResourceManagerTestCommon::TestGetMediaByName(HapResourceV2 *tmp)
+{
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/base/media/icon1.png");
 
@@ -321,9 +415,52 @@ void ResourceManagerTestCommon::TestGetMediaWithDensityByName(HapResourceV1 *tmp
     EXPECT_EQ(res, outValue);
 }
 
+void ResourceManagerTestCommon::TestGetMediaWithDensityByName(HapResourceV2 *tmp)
+{
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string res = tmp->GetResourcePath();
+    res.append("entry/resources/sdpi/media/icon.png");
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    uint32_t density = 120;
+    std::string outValue;
+    RState state = rm->GetMediaByName("icon", outValue, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_EQ(res, outValue);
+}
+
 void ResourceManagerTestCommon::TestGetDrawableInfoById(HapResourceV1 *tmp)
 {
     tmp->Init(this->defaultResConfig);
+    int id = GetResId("icon1", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    std::string type;
+    size_t len;
+    std::unique_ptr<uint8_t[]> jsonBuf;
+    RState state = rm->GetDrawableInfoById(id, type, len, jsonBuf);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_TRUE(jsonBuf != nullptr);
+}
+
+void ResourceManagerTestCommon::TestGetDrawableInfoById(HapResourceV2 *tmp)
+{
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
     int id = GetResId("icon1", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
     std::string type;
@@ -364,6 +501,39 @@ void ResourceManagerTestCommon::TestGetDrawableInfoWithDensityById(HapResourceV1
     EXPECT_TRUE(state == ERROR_CODE_INVALID_INPUT_PARAMETER);
 }
 
+void ResourceManagerTestCommon::TestGetDrawableInfoWithDensityById(HapResourceV2 *tmp)
+{
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    int density = 120;
+    int id = GetResId("icon", ResType::MEDIA);
+    EXPECT_TRUE(id > 0);
+    std::string type;
+    size_t len;
+    std::unique_ptr<uint8_t[]> jsonBuf;
+    RState state = rm->GetDrawableInfoById(id, type, len, jsonBuf, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_TRUE(jsonBuf != nullptr);
+
+    // invalid density
+    int invalidDensity = 1000;
+    state = rm->GetDrawableInfoById(id, type, len, jsonBuf, invalidDensity);
+    EXPECT_TRUE(state == ERROR_CODE_INVALID_INPUT_PARAMETER);
+}
+
 void ResourceManagerTestCommon::TestGetDrawableInfoByName(HapResourceV1 *tmp)
 {
     tmp->Init(this->defaultResConfig);
@@ -375,9 +545,54 @@ void ResourceManagerTestCommon::TestGetDrawableInfoByName(HapResourceV1 *tmp)
     EXPECT_TRUE(jsonBuf != nullptr);
 }
 
+void ResourceManagerTestCommon::TestGetDrawableInfoByName(HapResourceV2 *tmp)
+{
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
+    std::string type;
+    size_t len;
+    std::unique_ptr<uint8_t[]> jsonBuf;
+    RState state = rm->GetDrawableInfoByName("icon1", type, len, jsonBuf);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_TRUE(jsonBuf != nullptr);
+}
+
 void ResourceManagerTestCommon::TestGetDrawableInfoWithDensityByName(HapResourceV1 *tmp)
 {
     tmp->Init(this->defaultResConfig);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        EXPECT_TRUE(false);
+        return;
+    }
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(COLOR_MODE_NOT_SET);
+    rc->SetScreenDensity(SCREEN_DENSITY_NOT_SET);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    uint32_t density = 120;
+    std::string type;
+    size_t len;
+    std::unique_ptr<uint8_t[]> jsonBuf;
+    RState state = rm->GetDrawableInfoByName("icon1", type, len, jsonBuf, density);
+    EXPECT_TRUE(state == SUCCESS);
+    EXPECT_TRUE(jsonBuf != nullptr);
+    
+    // invalid density
+    int invalidDensity = 1000;
+    state = rm->GetDrawableInfoByName("icon1", type, len, jsonBuf, invalidDensity);
+    EXPECT_TRUE(state == ERROR_CODE_INVALID_INPUT_PARAMETER);
+}
+
+void ResourceManagerTestCommon::TestGetDrawableInfoWithDensityByName(HapResourceV2 *tmp)
+{
+    std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
+    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
+    tmp->Init(keys, idMap, typeNameMap);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
         EXPECT_TRUE(false);

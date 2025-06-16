@@ -27,6 +27,7 @@ ohos_unittest("resmgr_test") {
     "unittest/common/res_config_impl_test.cpp",
     "unittest/common/res_config_test.cpp",
     "unittest/common/res_desc_test.cpp",
+    "unittest/common/resource_manager_new_module_performance_test.cpp",
     "unittest/common/resource_manager_performance_test.cpp",
     "unittest/common/resource_manager_test.cpp",
     "unittest/common/resource_manager_test_common.cpp",

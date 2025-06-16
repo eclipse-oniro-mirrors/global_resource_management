@@ -19,7 +19,9 @@
             <option name="push" value="data/all_fa.hap -> /data/test/" src="res"/>
             <option name="push" value="data/err-config.json-1.hap -> /data/test/" src="res"/>
             <option name="push" value="data/err-config.json-2.hap -> /data/test/" src="res"/>
+            <option name="push" value="data/newModule.hap -> /data/test/" src="res"/>
             <option name="push" value="data/all/assets/entry/resources.index -> /data/test/all/assets/entry/" src="res"/>
+            <option name="push" value="data/all/assets/entry/resourcesV2.index -> /data/test/all/assets/entry/" src="res"/>
             <option name="push" value="data/all/assets/entry/resources_performance.index -> /data/test/all/assets/entry/" src="res"/>
             <option name="push" value="data/all/assets/entry/resources_fa.index -> /data/test/all/assets/entry/" src="res"/>
             <option name="push" value="data/all/assets/entry/resources/rawfile/test_rawfile.txt -> /data/test/all/assets/entry/resources/rawfile/" src="res"/>        

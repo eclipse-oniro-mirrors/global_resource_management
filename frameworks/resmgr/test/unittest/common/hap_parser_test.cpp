@@ -385,6 +385,19 @@ HWTEST_F(HapParserTest, GetRawFileListUnCompressedTest001, TestSize.Level1)
 }
 
 /*
+ * @tc.name: GetRawFileListUnCompressedTest002
+ * @tc.desc: Test GetRawFileListUnCompressed in new resource module
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapParserTest, GetRawFileListUnCompressedTest002, TestSize.Level1)
+{
+    std::string indexPath = FormatFullPath(g_newResFilePath);
+    std::vector<std::string> fileList;
+    RState state = HapParser::GetRawFileListUnCompressed(indexPath, "", fileList);
+    EXPECT_EQ(state, SUCCESS);
+}
+
+/*
  * @tc.name: IsRawDirFromHapTest001
  * @tc.desc: Test IsRawDirFromHap
  * @tc.type: FUNC

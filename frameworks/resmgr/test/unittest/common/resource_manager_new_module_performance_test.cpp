@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,8 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "resource_manager_performance_test.h"
 
 #include <chrono>
 #include <climits>
@@ -42,7 +40,7 @@ using namespace std;
 namespace {
 static const char *PERFOR_FEIL_PATH = "all/assets/entry/resources_performance.index";
 static const char *PERFOR_FEIL_V2_PATH = "all/assets/entry/resourcesV2.index";
-class ResourceManagerPerformanceTest : public testing::Test {
+class ResourceManagerNewModulePerformanceTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
 
@@ -52,10 +50,10 @@ public:
 
     void TearDown();
 
-    ResourceManagerPerformanceTest() : rm(nullptr)
+    ResourceManagerNewModulePerformanceTest() : rm(nullptr)
     {}
 
-    ~ResourceManagerPerformanceTest()
+    ~ResourceManagerNewModulePerformanceTest()
     {}
 
 public:
@@ -64,7 +62,7 @@ public:
     int GetResId(std::string name, ResType resType) const;
 };
 
-int ResourceManagerPerformanceTest::GetResId(std::string name, ResType resType) const
+int ResourceManagerNewModulePerformanceTest::GetResId(std::string name, ResType resType) const
 {
     auto idValues = ((ResourceManagerImpl *)rm)->hapManager_->GetResourceListByName(name.c_str(), resType);
     if (idValues.size() == 0) {
@@ -79,17 +77,17 @@ int ResourceManagerPerformanceTest::GetResId(std::string name, ResType resType) 
     return OBJ_NOT_FOUND;
 }
 
-void ResourceManagerPerformanceTest::SetUpTestCase(void)
+void ResourceManagerNewModulePerformanceTest::SetUpTestCase(void)
 {
     // step 1: input testsuit setup step
 }
 
-void ResourceManagerPerformanceTest::TearDownTestCase(void)
+void ResourceManagerNewModulePerformanceTest::TearDownTestCase(void)
 {
     // step 2: input testsuit teardown step
 }
 
-void ResourceManagerPerformanceTest::SetUp(void)
+void ResourceManagerNewModulePerformanceTest::SetUp(void)
 {
     // PerformanceTest need higher log level
     g_logLevel = LOG_INFO;
@@ -104,13 +102,13 @@ void ResourceManagerPerformanceTest::SetUp(void)
     rc->SetLocaleInfo("zh", nullptr, nullptr);
     rm->UpdateResConfig(*rc);
     delete rc;
-    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
     if (!ret) {
         RESMGR_HILOGE(RESMGR_TAG, "AddResource failed. test would fail.");
     }
 }
 
-void ResourceManagerPerformanceTest::TearDown(void)
+void ResourceManagerNewModulePerformanceTest::TearDown(void)
 {
     if (this->rm != nullptr) {
         delete this->rm;
@@ -225,7 +223,7 @@ int TestLoadFromNewIndex(const char *filePath)
  * @tc.desc: Test AddResource
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest001, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest001, TestSize.Level1)
 {
     int ret = TestLoadFromIndex(PERFOR_FEIL_PATH);
     EXPECT_EQ(OK, ret);
@@ -236,7 +234,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest001, 
  * @tc.desc: Test UpdateResConfig
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest002, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest002, TestSize.Level1)
 {
     long long total = 0;
     double average = 0;
@@ -270,7 +268,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest002, 
  * @tc.desc: Test GetResConfig
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest003, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest003, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -302,7 +300,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest003, 
  * @tc.desc: Test GetStringByID
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest004, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest004, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -338,7 +336,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest004, 
  * @tc.desc: Test GetStringByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest005, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest005, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -367,7 +365,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest005, 
  * @tc.desc: Test GetStringByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest006, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest006, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -396,7 +394,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest006, 
  * @tc.desc: Test GetStringFormatById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest007, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest007, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -432,7 +430,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest007, 
  * @tc.desc: Test GetStringFormatByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest008, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest008, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -461,7 +459,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest008, 
  * @tc.desc: Test GetStringArrayById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest009, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest009, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -489,7 +487,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest009, 
  * @tc.desc: Test GetStringArrayByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest010, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest010, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -514,7 +512,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest010, 
  * @tc.desc: Test GetPatternById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest011, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest011, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -549,7 +547,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest011, 
  * @tc.desc: Test GetPatternByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest012, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest012, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -578,7 +576,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest012, 
  * @tc.desc: Test GetPluralStringById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest013, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest013, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -610,7 +608,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest013, 
  * @tc.desc: Test GetPluralStringByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest014, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest014, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -639,7 +637,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest014, 
  * @tc.desc: Test GetPluralStringByIdFormat
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest015, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest015, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -671,7 +669,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest015, 
  * @tc.desc: Test GetPluralStringByNameFormat
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest016, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest016, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -700,7 +698,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest016, 
  * @tc.desc: Test GetThemeById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest017, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest017, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -728,7 +726,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest017, 
  * @tc.desc: Test GetThemeByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest018, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest018, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -753,7 +751,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest018, 
  * @tc.desc: Test GetBooleanById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest019, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest019, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -781,7 +779,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest019, 
  * @tc.desc: Test GetBooleanByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest020, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest020, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -806,7 +804,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest020, 
  * @tc.desc: Test GetIntegerById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest021, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest021, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -834,7 +832,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest021, 
  * @tc.desc: Test GetIntegerByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest022, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest022, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -859,7 +857,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest022, 
  * @tc.desc: Test GetFloatById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest023, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest023, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -887,7 +885,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest023, 
  * @tc.desc: Test GetFloatByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest024, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest024, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -912,7 +910,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest024, 
  * @tc.desc: Test GetIntArrayById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest025, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest025, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -940,7 +938,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest025, 
  * @tc.desc: Test GetIntArrayByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest026, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest026, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -965,7 +963,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest026, 
  * @tc.desc: Test GetColorById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest027, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest027, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -993,7 +991,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest027, 
  * @tc.desc: Test GetColorByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest028, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest028, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1018,7 +1016,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest028, 
  * @tc.desc: Test GetProfileById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest029, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest029, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1046,7 +1044,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest029, 
  * @tc.desc: Test GetProfileByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest030, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest030, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1071,7 +1069,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest030, 
  * @tc.desc: Test GetMediaById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest031, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest031, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1099,7 +1097,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest031, 
  * @tc.desc: Test GetMediaByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest032, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest032, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1124,7 +1122,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest032, 
  * @tc.desc: Test GetResConfigById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest033, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest033, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1151,7 +1149,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest033, 
  * @tc.desc: Test GetResConfigByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest034, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest034, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1176,12 +1174,12 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest034, 
  * @tc.desc: Test GetRawFilePathByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest035, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest035, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
     }
-    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    bool ret = rm->AddResource(FormatFullPath(g_newModuleHapPath).c_str());
     EXPECT_TRUE(ret);
     unsigned long long total = 0;
     double average = 0;
@@ -1203,12 +1201,12 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest035, 
  * @tc.desc: Test GetRawFileDescriptor & CloseRawFileDescriptor
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest036, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest036, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
     }
-    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    bool ret = rm->AddResource(FormatFullPath(g_newModuleHapPath).c_str());
     EXPECT_TRUE(ret);
     unsigned long long total = 0;
     double average = 0;
@@ -1231,7 +1229,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest036, 
  * @tc.desc: Test GetMediaDataById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest037, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest037, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1259,7 +1257,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest037, 
  * @tc.desc: Test GetMediaDataByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest038, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest038, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1285,7 +1283,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest038, 
  * @tc.desc: Test GetMediaBase64DataById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest039, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest039, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1312,7 +1310,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest039, 
  * @tc.desc: Test GetMediaBase64DataByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest040, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest040, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1337,7 +1335,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest040, 
  * @tc.desc: Test GetProfileDataById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest041, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest041, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1365,7 +1363,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest041, 
  * @tc.desc: Test GetProfileDataByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest042, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest042, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1391,12 +1389,12 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest042, 
  * @tc.desc: Test GetRawFileFromHap
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest043, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest043, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
     }
-    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    bool ret = rm->AddResource(FormatFullPath(g_newModuleHapPath).c_str());
     EXPECT_TRUE(ret);
     unsigned long long total = 0;
     double average = 0;
@@ -1419,12 +1417,12 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest043, 
  * @tc.desc: Test GetRawFileDescriptorFromHap
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest044, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest044, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
     }
-    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    bool ret = rm->AddResource(FormatFullPath(g_newModuleHapPath).c_str());
     EXPECT_TRUE(ret);
     unsigned long long total = 0;
     double average = 0;
@@ -1446,16 +1444,16 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest044, 
  * @tc.desc: Test IsLoadHap
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest045, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest045, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
     }
-    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    bool ret = rm->AddResource(FormatFullPath(g_newModuleHapPath).c_str());
     EXPECT_TRUE(ret);
     unsigned long long total = 0;
     double average = 0;
-    std::string hapPath(FormatFullPath(g_hapPath));
+    std::string hapPath(FormatFullPath(g_newModuleHapPath));
     for (int k = 0; k < 1000; ++k) {
         auto t1 = std::chrono::high_resolution_clock::now();
         rm->IsLoadHap(hapPath);
@@ -1473,12 +1471,12 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest045, 
  * @tc.desc: Test GetRawFileList
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest046, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest046, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
     }
-    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    bool ret = rm->AddResource(FormatFullPath(g_newModuleHapPath).c_str());
     EXPECT_TRUE(ret);
     unsigned long long total = 0;
     double average = 0;
@@ -1500,7 +1498,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest046, 
  * @tc.desc: Test GetDrawableInfoById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest047, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest047, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1529,7 +1527,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest047, 
  * @tc.desc: Test GetDrawableInfoByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest048, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest048, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1556,7 +1554,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest048, 
  * @tc.desc: Test GetResourceLimitKeys
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest049, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest049, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1580,12 +1578,12 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest049, 
  * @tc.desc: Test GetRawFdNdkFromHap
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest050, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest050, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
     }
-    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    bool ret = rm->AddResource(FormatFullPath(g_newModuleHapPath).c_str());
     EXPECT_TRUE(ret);
     unsigned long long total = 0;
     double average = 0;
@@ -1607,7 +1605,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest050, 
  * @tc.desc: Test GetResId
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest051, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest051, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1632,7 +1630,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest051, 
  * @tc.desc: Test GetLocales
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest052, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest052, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1657,7 +1655,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest052, 
  * @tc.desc: Test GetSymbolById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest053, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest053, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1684,7 +1682,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest053, 
  * @tc.desc: Test GetSymbolByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest054, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest054, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1709,12 +1707,12 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest054, 
  * @tc.desc: Test IsRawDirFromHap
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest055, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest055, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
     }
-    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    bool ret = rm->AddResource(FormatFullPath(g_newModuleHapPath).c_str());
     EXPECT_TRUE(ret);
     unsigned long long total = 0;
     double average = 0;
@@ -1736,7 +1734,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest055, 
  * @tc.desc: Test GetStringFormatById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest056, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest056, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1764,7 +1762,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest056, 
  * @tc.desc: Test GetStringFormatByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest057, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest057, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1789,7 +1787,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest057, 
  * @tc.desc: Test GetFormatPluralStringById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest058, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest058, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1820,7 +1818,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest058, 
  * @tc.desc: Test GetFormatPluralStringByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest059, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest059, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
@@ -1848,12 +1846,12 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest059, 
  * @tc.desc: Test GetThemeDataByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest060, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest060, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
     }
-    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    bool ret = rm->AddResource(FormatFullPath(g_newModuleHapPath).c_str());
     EXPECT_TRUE(ret);
     unsigned long long total = 0;
     double average = 0;
@@ -1875,12 +1873,12 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest060, 
  * @tc.desc: Test GetThemeDataById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest061, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest061, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
     }
-    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    bool ret = rm->AddResource(FormatFullPath(g_newModuleHapPath).c_str());
     EXPECT_TRUE(ret);
     int id = GetResId("ohos_device_theme", ResType::THEME);
     ASSERT_TRUE(id > 0);
@@ -1904,12 +1902,12 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest061, 
  * @tc.desc: Test GetPatternDataByName
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest062, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest062, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
     }
-    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    bool ret = rm->AddResource(FormatFullPath(g_newModuleHapPath).c_str());
     EXPECT_TRUE(ret);
     unsigned long long total = 0;
     double average = 0;
@@ -1931,12 +1929,12 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest062, 
  * @tc.desc: Test GetPatternDataById
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest063, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest063, TestSize.Level1)
 {
     if (rm == nullptr) {
         ASSERT_TRUE(false);
     }
-    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    bool ret = rm->AddResource(FormatFullPath(g_newModuleHapPath).c_str());
     EXPECT_TRUE(ret);
     int id = GetResId("ohos_test_button_pattern", ResType::PATTERN);
     ASSERT_TRUE(id > 0);
@@ -1960,7 +1958,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest063, 
  * @tc.desc: Test AddResource
  * @tc.type: FUNC
  */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest064, TestSize.Level1)
+HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest064, TestSize.Level1)
 {
     int ret = TestLoadFromNewIndex(PERFOR_FEIL_V2_PATH);
     EXPECT_EQ(OK, ret);

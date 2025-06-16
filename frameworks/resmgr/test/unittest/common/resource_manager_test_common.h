@@ -126,23 +126,43 @@ public:
 
     void TestGetProfileById(HapResourceV1 *tmp);
 
+    void TestGetProfileById(HapResourceV2 *tmp);
+
     void TestGetProfileByName(HapResourceV1 *tmp);
+
+    void TestGetProfileByName(HapResourceV2 *tmp);
 
     void TestGetMediaWithDensityById(HapResourceV1 *tmp);
 
+    void TestGetMediaWithDensityById(HapResourceV2 *tmp);
+
     void TestGetMediaById(HapResourceV1 *tmp);
+
+    void TestGetMediaById(HapResourceV2 *tmp);
 
     void TestGetMediaWithDensityByName(HapResourceV1 *tmp);
 
+    void TestGetMediaWithDensityByName(HapResourceV2 *tmp);
+
     void TestGetMediaByName(HapResourceV1 *tmp);
+
+    void TestGetMediaByName(HapResourceV2 *tmp);
     
     void TestGetDrawableInfoWithDensityById(HapResourceV1 *tmp);
 
+    void TestGetDrawableInfoWithDensityById(HapResourceV2 *tmp);
+
     void TestGetDrawableInfoById(HapResourceV1 *tmp);
+
+    void TestGetDrawableInfoById(HapResourceV2 *tmp);
 
     void TestGetDrawableInfoWithDensityByName(HapResourceV1 *tmp);
 
+    void TestGetDrawableInfoWithDensityByName(HapResourceV2 *tmp);
+
     void TestGetDrawableInfoByName(HapResourceV1 *tmp);
+
+    void TestGetDrawableInfoByName(HapResourceV2 *tmp);
 
     void TestGetResourceLimitKeys(uint32_t expectedLimitKeys);
 };
