@@ -426,7 +426,7 @@ bool HapManager::AddResource(const char *path, const uint32_t &selectedTypes, bo
     std::string sPath(path);
 #if defined(__ARKUI_CROSS__)
     if (forceReload) {
-        HapResourceManager::GetInstance()->RemoveHapResource(sPath);
+        HapResourceManager::GetInstance().RemoveHapResource(sPath);
         RemoveHapResource(sPath);
     }
 #endif
