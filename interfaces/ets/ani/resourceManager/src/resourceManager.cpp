@@ -155,11 +155,6 @@ static ani_object CreateAniArray(ani_env *env, const std::vector<std::string> st
 static ani_object CreateAniUint8Array(ani_env* env, ResMgrDataContext &context)
 {
     size_t length = context.len_;
-    uint8_t* data = new uint8_t[length];
-    uint8_t *tempData = context.mediaData.release();
-    std::copy(tempData, tempData + length, data);
-    delete[] tempData;
-
     static const char *className = "Lescompat/Uint8Array;";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
@@ -186,13 +181,11 @@ static ani_object CreateAniUint8Array(ani_env* env, ResMgrDataContext &context)
     }
 
     for (size_t i = 0; i < length; i++) {
-        if (ANI_OK != env->Object_CallMethod_Void(ret, set, i, data[i])) {
+        if (ANI_OK != env->Object_CallMethod_Void(ret, set, i, context.mediaData[i])) {
             RESMGR_HILOGE(RESMGR_ANI_TAG, "Call method '$_set' failed");
             return nullptr;
         }
     }
-
-    delete[] data;
     return ret;
 }
 
