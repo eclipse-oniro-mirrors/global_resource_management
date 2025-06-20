@@ -238,6 +238,18 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest003, TestSize.Level1)
     PrintIdValues(idv);
 }
 
+int32_t LoadFromHap(const char *hapPath)
+{
+    HapParserV2 hapParser;
+    if (!hapParser.Init(hapPath)) {
+        RESMGR_HILOGE(RESMGR_TAG, "HapParserV2 Init failed!");
+        return UNKNOWN_ERROR;
+    } else {
+        RESMGR_HILOGD(RESMGR_TAG, "HapParserV2 Init success.");
+    }
+    return OK;
+}
+
 int32_t LoadFromHap(const char *hapPath, std::shared_ptr<ResConfigImpl> defaultConfig,
     const uint32_t &selectedTypes = SELECT_ALL)
 {
@@ -279,6 +291,123 @@ HWTEST_F(HapResourceTest, HapResourceFuncTest004, TestSize.Level1)
 }
 
 /*
+ * @tc.name: HapResourceFuncTest005
+ * @tc.desc: Test HapParser::GetIndexData function in new module, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapResourceTest, HapResourceFuncTest005, TestSize.Level1)
+{
+    int32_t res = LoadFromHap(FormatFullPath("newModule.hap").c_str());
+    ASSERT_TRUE(res == OK);
+}
+
+/*
+ * this test shows how to load a hap, defaultConfig set to null
+ * @tc.name: HapResourceFuncTest006
+ * @tc.desc: Test Load & GetIdValues & GetIdValuesByName function in new resource module, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapResourceTest, HapResourceFuncTest006, TestSize.Level0)
+{
+    auto start = CurrentTimeUsec();
+    std::shared_ptr<ResConfigImpl> rc = nullptr;
+    auto pResource = HapResourceManager::GetInstance().Load(FormatFullPath(g_newResFilePath).c_str(), rc);
+    auto cost = CurrentTimeUsec() - start;
+    RESMGR_HILOGD(RESMGR_TAG, "load cost: %ld us.", cost);
+
+    if (pResource == nullptr) {
+        ASSERT_TRUE(false);
+    }
+
+    auto idValue = pResource->GetIdValuesByName("app_name", ResType::STRING);
+    int id = idValue->GetLimitPathsConst()[0]->GetIdItem()->id_;
+    start = CurrentTimeUsec();
+    auto idValues = pResource->GetIdValues(id);
+    cost = CurrentTimeUsec() - start;
+    EXPECT_EQ(static_cast<size_t>(3), idValues->GetLimitPathsConst().size());
+    RESMGR_HILOGD(RESMGR_TAG, "GetIdValues by id cost: %ld us.", cost);
+    PrintIdValues(idValues);
+}
+
+/*
+ * load a hap, set config en_US
+ * @tc.name: HapResourceFuncTest007
+ * @tc.desc: Test Load & GetIdValues & GetIdValuesByName function in new resource module, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapResourceTest, HapResourceFuncTest007, TestSize.Level1)
+{
+    auto rc = std::make_shared<ResConfigImpl>();
+    rc->SetLocaleInfo("en", nullptr, "US");
+    std::string resPath = FormatFullPath(g_newResFilePath);
+    const char *path = resPath.c_str();
+
+    auto start = CurrentTimeUsec();
+    auto pResource = HapResourceManager::GetInstance().Load(path, rc);
+    auto cost = CurrentTimeUsec() - start;
+    RESMGR_HILOGD(RESMGR_TAG, "load cost: %ld us.", cost);
+
+    if (pResource == nullptr) {
+        ASSERT_TRUE(false);
+    }
+
+    auto idValue = pResource->GetIdValuesByName("app_name", ResType::STRING);
+    int id = idValue->GetLimitPathsConst()[0]->GetIdItem()->id_;
+    start = CurrentTimeUsec();
+    auto idValues = pResource->GetIdValues(id);
+    cost = CurrentTimeUsec() - start;
+    EXPECT_EQ(static_cast<size_t>(3), idValues->GetLimitPathsConst().size());
+    RESMGR_HILOGD(RESMGR_TAG, "GetIdValues by id cost: %ld us.", cost);
+    PrintIdValues(idValues);
+}
+
+/*
+ * load a hap, get a value which is ref
+ * @tc.name: HapResourceFuncTest008
+ * @tc.desc: Test GetIdValuesByName function in new resource module, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapResourceTest, HapResourceFuncTest008, TestSize.Level1)
+{
+    auto start = CurrentTimeUsec();
+    std::shared_ptr<ResConfigImpl> rc = nullptr;
+    auto pResource = HapResourceManager::GetInstance().Load(FormatFullPath(g_newResFilePath).c_str(), rc);
+    auto cost = CurrentTimeUsec() - start;
+    RESMGR_HILOGD(RESMGR_TAG, "load cost: %ld us.", cost);
+
+    if (pResource == nullptr) {
+        ASSERT_TRUE(false);
+    }
+
+    auto idv = pResource->GetIdValuesByName(std::string("integer_ref"), ResType::INTEGER);
+    PrintIdValues(idv);
+
+    idv = pResource->GetIdValuesByName(std::string("string_ref"), ResType::STRING);
+    PrintIdValues(idv);
+
+    // ref propagation
+    idv = pResource->GetIdValuesByName(std::string("string_ref2"), ResType::STRING);
+    PrintIdValues(idv);
+
+    idv = pResource->GetIdValuesByName(std::string("boolean_ref"), ResType::BOOLEAN);
+    PrintIdValues(idv);
+
+    idv = pResource->GetIdValuesByName(std::string("color_ref"), ResType::COLOR);
+    PrintIdValues(idv);
+
+    idv = pResource->GetIdValuesByName(std::string("float_ref"), ResType::FLOAT);
+    PrintIdValues(idv);
+
+    // ref in array ,
+    idv = pResource->GetIdValuesByName(std::string("intarray_1"), ResType::INTARRAY);
+    PrintIdValues(idv);
+
+    // "parent":   was ref too
+    idv = pResource->GetIdValuesByName(std::string("child"), ResType::PATTERN);
+    PrintIdValues(idv);
+}
+
+/*
  * @tc.name: HapResourcePutAndGetResourceTest001
  * @tc.desc: Test HapResourceManager::PutAndGetResource function, file case.
  * @tc.type: FUNC
@@ -303,6 +432,25 @@ HWTEST_F(HapResourceTest, HapResourcePutAndGetResourceTest001, TestSize.Level1)
  * @tc.type: FUNC
  */
 HWTEST_F(HapResourceTest, HapResourcePutAndGetResourceTest002, TestSize.Level1)
+{
+    std::shared_ptr<HapResource> pResource1 = std::make_shared<HapResourceV2>("test1", 1000);
+    ASSERT_TRUE(pResource1 != nullptr);
+    std::shared_ptr<HapResource> pResource2 =
+        HapResourceManager::GetInstance().PutAndGetResource("test1", pResource1);
+    EXPECT_EQ(pResource2, pResource1);
+    std::shared_ptr<HapResource> pResource3 = std::make_shared<HapResourceV2>("test1", 1000);
+    ASSERT_TRUE(pResource3 != nullptr);
+    std::shared_ptr<HapResource> pResource4 =
+        HapResourceManager::GetInstance().PutAndGetResource("test1", pResource3);
+    EXPECT_EQ(pResource4, pResource1);
+}
+
+/*
+ * @tc.name: HapResourcePutAndGetResourceTest003
+ * @tc.desc: Test HapResourceManager::PutAndGetResource function, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapResourceTest, HapResourcePutAndGetResourceTest003, TestSize.Level1)
 {
     std::shared_ptr<HapResource> pResource1 = std::make_shared<HapResourceV1>("test1", 1000, nullptr, false, false);
     ASSERT_TRUE(pResource1 != nullptr);

@@ -253,11 +253,12 @@ int32_t HapParserV2::ParseStringArray(uint32_t &offset, std::vector<std::string>
 {
     uint16_t arrLen;
     if (offset + ValueUnderQualifierDirV2::DATA_HEAD_LEN > bufLen) {
-        RESMGR_HILOGE(RESMGR_TAG, "ParseStringArray failed, the offset will be out of bounds");
+        RESMGR_HILOGE(RESMGR_TAG, "ParseStringArray failed, the offset will be out of bounds.");
         return SYS_ERROR;
     }
     errno_t eret = memcpy_s(&arrLen, sizeof(uint16_t), buf + offset, ValueUnderQualifierDirV2::DATA_HEAD_LEN);
     if (eret != OK) {
+        RESMGR_HILOGE(RESMGR_TAG, "ParseStringArray failed, memory copy failed.");
         return SYS_ERROR;
     }
     offset += ValueUnderQualifierDirV2::DATA_HEAD_LEN;
@@ -270,12 +271,14 @@ int32_t HapParserV2::ParseStringArray(uint32_t &offset, std::vector<std::string>
             return ret;
         }
         values.push_back(value);
+        offset++;
 
         uint32_t readSize = offset - startOffset;
         if (readSize == arrLen) {
             break;
         }
         if (readSize > arrLen) {
+            RESMGR_HILOGE(RESMGR_TAG, "ParseStringArray failed, the read size out of bounds.");
             return SYS_ERROR;
         }
     }
@@ -286,17 +289,18 @@ int32_t HapParserV2::ParseString(uint32_t &offset, std::string &id, size_t bufLe
 {
     uint16_t strLen;
     if (offset + ValueUnderQualifierDirV2::DATA_HEAD_LEN > bufLen) {
-        RESMGR_HILOGE(RESMGR_TAG, "ParseString length failed, the offset will be out of bounds");
+        RESMGR_HILOGE(RESMGR_TAG, "ParseString failed, the offset will be out of bounds.");
         return SYS_ERROR;
     }
     errno_t eret = memcpy_s(&strLen, sizeof(uint16_t), buf + offset, ValueUnderQualifierDirV2::DATA_HEAD_LEN);
     if (eret != OK) {
+        RESMGR_HILOGE(RESMGR_TAG, "ParseString failed, memory copy failed.");
         return SYS_ERROR;
     }
     offset += ValueUnderQualifierDirV2::DATA_HEAD_LEN;
 
     if (offset + strLen > bufLen) {
-        RESMGR_HILOGE(RESMGR_TAG, "ParseString value failed, the offset will be out of bounds");
+        RESMGR_HILOGE(RESMGR_TAG, "ParseString failed, the string offset will be out of bounds");
         return SYS_ERROR;
     }
     std::string tmp = std::string(reinterpret_cast<char *>(buf) + offset, strLen);

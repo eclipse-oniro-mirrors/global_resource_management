@@ -220,6 +220,93 @@ HWTEST_F(HapManagerTest, HapManagerFuncTest004, TestSize.Level1)
 }
 
 /*
+ * this test shows how to load a hap, then find value list by id
+ * @tc.name: HapManagerFuncTest005
+ * @tc.desc: Test AddResource & GetResourceList function in new resource module, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapManagerTest, HapManagerFuncTest005, TestSize.Level1)
+{
+    HapManager *hapManager = new HapManager(std::make_shared<ResConfigImpl>());
+    bool ret = hapManager->AddResource(FormatFullPath(g_newResFilePath).c_str(), SELECT_ALL);
+
+    EXPECT_TRUE(ret);
+
+    int id = 16777217;
+    auto idValues = hapManager->GetResourceList(id);
+    if (idValues.size() == 0) {
+        delete hapManager;
+        ASSERT_TRUE(false);
+    }
+
+    PrintIdValues(idValues[0]);
+    delete hapManager;
+}
+
+/*
+ * this test shows how to reload a hap
+ * @tc.name: HapManagerFuncTest006
+ * @tc.desc: Test UpdateResConfig & AddResource function in new resource module, file case.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapManagerTest, HapManagerFuncTest006, TestSize.Level1)
+{
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("en", nullptr, "US");
+    std::string resPath = FormatFullPath(g_newResFilePath);
+    const char *path = resPath.c_str();
+    HapManager *hapManager = new HapManager(std::make_shared<ResConfigImpl>());
+    if (hapManager == nullptr) {
+        delete (rc);
+        ASSERT_TRUE(false);
+    }
+    hapManager->UpdateResConfig(*rc);
+    bool ret = hapManager->AddResource(path, SELECT_ALL);
+
+    EXPECT_TRUE(ret);
+
+    uint32_t id = 16777238; // 16777238 means string_ref
+    auto idValues = hapManager->GetResourceList(id);
+    if (idValues.size() == 0) {
+        delete (hapManager);
+        delete (rc);
+        ASSERT_TRUE(false);
+    }
+
+    EXPECT_EQ(static_cast<size_t>(2), idValues[0]->GetLimitPathsConst().size());
+    PrintIdValues(idValues[0]);
+
+    // reload
+
+    auto rc2 = CreateResConfig();
+    if (rc2 == nullptr) {
+        delete (hapManager);
+        delete (rc);
+        ASSERT_TRUE(false);
+    }
+
+    rc2->SetLocaleInfo("zh", nullptr, "CN");
+    hapManager->UpdateResConfig(*rc2);
+    do {
+        idValues = hapManager->GetResourceList(id);
+        if (idValues.size() == 0) {
+            EXPECT_TRUE(false);
+            break;
+        }
+
+        EXPECT_EQ(static_cast<size_t>(2), idValues[0]->GetLimitPathsConst().size());
+
+        PrintIdValues(idValues[0]);
+    } while (false);
+    delete (hapManager);
+    delete (rc2);
+    delete (rc);
+}
+
+/*
  * @tc.name: HapManagerGetPluralRulesAndSelectTest001
  * @tc.desc: Test GetPluralRulesAndSelect function, file case.
  * @tc.type: FUNC

@@ -311,6 +311,29 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest006, TestSize.Le
 }
 
 /*
+ * @tc.name: ResourceManagerUpdateResConfigTest007
+ * @tc.desc: Test UpdateResConfig function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest007, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, nullptr);
+
+    auto hapResource = std::make_shared<HapResourceV2>("/data/test/non_exist", 0);
+    ((ResourceManagerImpl *)rm)->hapManager_->hapResources_.push_back(hapResource);
+    ((ResourceManagerImpl *)rm)->hapManager_->loadedHapPaths_["/data/test/non_exist"] = std::vector<std::string>();
+    RState state;
+    ResConfig *rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("en", nullptr, "US");
+    state = rm->UpdateResConfig(*rc);
+    delete rc;
+    EXPECT_EQ(SUCCESS, state);
+}
+
+/*
  * @tc.name: ResourceManagerGetResConfigTest001
  * @tc.desc: Test GetResConfig function
  * @tc.type: FUNC
@@ -1741,6 +1764,20 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileByIdTest002, TestSize.Lev
 }
 
 /*
+ * @tc.name: ResourceManagerGetProfileByIdTest003
+ * @tc.desc: Test GetProfileById
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileByIdTest003, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    rmc->TestGetProfileById(tmp);
+    delete tmp;
+}
+
+/*
  * @tc.name: ResourceManagerGetProfileByNameTest001
  * @tc.desc: Test GetProfileByName
  * @tc.type: FUNC
@@ -1767,6 +1804,20 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileByNameTest002, TestSize.L
     RState state;
     state = rm->GetProfileByName(g_nonExistName, outValue);
     ASSERT_EQ(ERROR_CODE_RES_NAME_NOT_FOUND, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetProfileByNameTest003
+ * @tc.desc: Test GetProfileByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetProfileByNameTest003, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newResFilePath).c_str(), 0);
+    rmc->TestGetProfileByName(tmp);
+    delete tmp;
 }
 
 /*

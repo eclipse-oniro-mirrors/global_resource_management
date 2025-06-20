@@ -139,6 +139,10 @@ const std::shared_ptr<IdValues> HapResourceV2::GetIdValuesByName(
     if (iter == mapIterator->second.end()) {
         return nullptr;
     }
+
+    if (iter->second->GetLimitPathsConst().empty() && ParseLimitPaths(iter->second) != OK) {
+        return nullptr;
+    }
     return iter->second;
 }
 

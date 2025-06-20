@@ -880,6 +880,96 @@ HWTEST_F(ResourceManagerTestHap, RawFileTestFromHap0048, TestSize.Level1)
 }
 
 /*
+ * @tc.name: ResourceManagerGetProfileByIdFromHapTest0049
+ * @tc.desc: Test GetProfileById
+ * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetProfileByIdFromHapTest0049, TestSize.Level1)
+{
+    rmc->AddHapResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newModuleHapPath).c_str(), 0);
+    rmc->TestGetProfileById(tmp);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetProfileByNameFromHapTest0050
+ * @tc.desc: Test GetProfileByName
+ * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetProfileByNameFromHapTest0050, TestSize.Level1)
+{
+    rmc->AddHapResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newModuleHapPath).c_str(), 0);
+    rmc->TestGetProfileByName(tmp);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdFromHapTest0051
+ * @tc.desc: Test GetMediaById
+ * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetMediaByIdFromHapTest0051, TestSize.Level1)
+{
+    rmc->AddHapResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newModuleHapPath).c_str(), 0);
+    rmc->TestGetMediaById(tmp);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByIdFromHapTest0052
+ * @tc.desc: Test GetMediaById, to match sdpi determinder
+ * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetMediaByIdFromHapTest0052, TestSize.Level1)
+{
+    rmc->AddHapResource("en", nullptr, "US");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newModuleHapPath).c_str(), 0);
+    rmc->TestGetMediaWithDensityById(tmp);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameFromHapTest0053
+ * @tc.desc: Test GetMediaByName
+ * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetMediaByNameFromHapTest0053, TestSize.Level1)
+{
+    rmc->AddHapResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newModuleHapPath).c_str(), 0);
+    rmc->TestGetMediaByName(tmp);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetMediaByNameFromHapTest0054
+ * @tc.desc: Test GetMediaByName, to match sdpi determinder
+ * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetMediaByNameFromHapTest0054, TestSize.Level1)
+{
+    rmc->AddHapResource("en", nullptr, "US");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newModuleHapPath).c_str(), 0);
+    rmc->TestGetMediaWithDensityByName(tmp);
+    delete tmp;
+}
+
+/*
  * @tc.name: ResourceManagerOverlayTest001
  * @tc.desc: Test overlay AddResource & UpdateResConfig function, file case.
  * @tc.type: FUNC
@@ -1247,6 +1337,36 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetDrawableInfoByIdFromHapTest00
 }
 
 /*
+ * @tc.name: ResourceManagerGetDrawableInfoByIdFromHapTest003
+ * @tc.desc: Test GetDrawableInfo
+ * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetDrawableInfoByIdFromHapTest003, TestSize.Level1)
+{
+    rmc->AddHapResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newModuleHapPath).c_str(), 0);
+    rmc->TestGetDrawableInfoById(tmp);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetDrawableInfoByIdFromHapTest004
+ * @tc.desc: Test GetDrawableInfo, to match sdpi determinder
+ * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetDrawableInfoByIdFromHapTest004, TestSize.Level1)
+{
+    rmc->AddHapResource("en", nullptr, "US");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newModuleHapPath).c_str(), 0);
+    rmc->TestGetDrawableInfoWithDensityById(tmp);
+    delete tmp;
+}
+
+/*
  * @tc.name: ResourceManagerGetDrawableInfoByNameFromHapTest001
  * @tc.desc: Test GetDrawableInfo
  * @tc.type: FUNC
@@ -1272,6 +1392,36 @@ HWTEST_F(ResourceManagerTestHap, ResourceManagerGetDrawableInfoByNameFromHapTest
     rmc->AddHapResource("en", nullptr, "US");
 
     HapResourceV1 *tmp = new HapResourceV1(FormatFullPath(g_hapPath).c_str(), 0, nullptr);
+    rmc->TestGetDrawableInfoWithDensityByName(tmp);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetDrawableInfoByNameFromHapTest003
+ * @tc.desc: Test GetDrawableInfo
+ * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetDrawableInfoByNameFromHapTest003, TestSize.Level1)
+{
+    rmc->AddHapResource("zh", nullptr, "CN");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newModuleHapPath).c_str(), 0);
+    rmc->TestGetDrawableInfoByName(tmp);
+    delete tmp;
+}
+
+/*
+ * @tc.name: ResourceManagerGetDrawableInfoByNameFromHapTest004
+ * @tc.desc: Test GetDrawableInfo, to match sdpi determinder
+ * @tc.type: FUNC
+ * @tc.require: issueI5LHLP
+ */
+HWTEST_F(ResourceManagerTestHap, ResourceManagerGetDrawableInfoByNameFromHapTest004, TestSize.Level1)
+{
+    rmc->AddHapResource("en", nullptr, "US");
+
+    HapResourceV2 *tmp = new HapResourceV2(FormatFullPath(g_newModuleHapPath).c_str(), 0);
     rmc->TestGetDrawableInfoWithDensityByName(tmp);
     delete tmp;
 }
