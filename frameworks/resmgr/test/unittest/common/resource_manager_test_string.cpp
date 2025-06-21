@@ -161,6 +161,38 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByIdTest006, TestSiz
 }
 
 /*
+ * @tc.name: ResourceManagerGetStringByIdTest007
+ * @tc.desc: Test GetStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByIdTest007, TestSize.Level1)
+{
+    rmc->AddResource("en", nullptr, nullptr);
+
+    std::vector<std::string> overlayPaths;
+    overlayPaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
+    bool ret = ((ResourceManagerImpl*)rm)->AddResource(FormatFullPath(g_newResFilePath).c_str(), overlayPaths);
+    ASSERT_TRUE(ret);
+    rmc->TestStringById("ohos_app_name", "SystemOverlay");
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByIdTest008
+ * @tc.desc: Test GetStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByIdTest008, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, nullptr);
+
+    std::vector<std::string> overlayPaths;
+    overlayPaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
+    bool ret = ((ResourceManagerImpl*)rm)->AddResource(FormatFullPath(g_newResFilePath).c_str(), overlayPaths);
+    ASSERT_TRUE(ret);
+    rmc->TestStringById("ohos_lab_answer_call", "overlay接听电话");
+}
+
+/*
  * @tc.name: ResourceManagerGetStringByNameTest001
  * @tc.desc: Test GetStringByName function
  * @tc.type: FUNC
@@ -245,6 +277,47 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameTest005, TestS
     std::vector<std::string> overlayPaths;
     overlayPaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
     bool ret = ((ResourceManagerImpl *)rm)->AddResource(FormatFullPath(g_resFilePath).c_str(), overlayPaths);
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    ((ResourceManagerImpl *)rm)->GetStringByName("hello", outValue);
+    ASSERT_EQ(outValue, "Helloooo");
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameTest006
+ * @tc.desc: Test GetStringByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameTest006, TestSize.Level1)
+{
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    rc->SetDirection(DIRECTION_VERTICAL);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+    std::vector<std::string> overlayPaths;
+    overlayPaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
+    bool ret = ((ResourceManagerImpl *)rm)->AddResource(FormatFullPath(g_newResFilePath).c_str(), overlayPaths);
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    ((ResourceManagerImpl *)rm)->GetStringByName("ohos_desc_camera", outValue);
+    ASSERT_EQ(outValue, "允许应用拍摄照片和视频。");
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameTest007
+ * @tc.desc: Test GetStringByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameTest007, TestSize.Level1)
+{
+    rmc->AddResource("en", nullptr, nullptr);
+    std::vector<std::string> overlayPaths;
+    overlayPaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
+    bool ret = ((ResourceManagerImpl *)rm)->AddResource(FormatFullPath(g_newResFilePath).c_str(), overlayPaths);
     ASSERT_TRUE(ret);
     std::string outValue;
     ((ResourceManagerImpl *)rm)->GetStringByName("hello", outValue);
@@ -624,6 +697,178 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest023, T
     const char *name = "test_string22";
     const char *cmp = "112";
     rmc->TestGetStringFormatByIdWithVaArgs(name, cmp, 1, 2, 3);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest024
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest024, TestSize.Level1)
+{
+    const char *name = "test_string2";
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId(name, ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_STRING, " 你好"},
+        {ResourceManager::NapiValueType::NAPI_NUMBER, "-9.999"}};
+    RState state = rm->GetStringFormatById(id, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_ID_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest025
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest025, TestSize.Level1)
+{
+    const char *name = "test_string2";
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId(name, ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "-9.999"}};
+    RState state = rm->GetStringFormatById(id, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_ID_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest026
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest026, TestSize.Level1)
+{
+    const char *name = "test_string14";
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId(name, ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    RState state = rm->GetStringFormatById(id, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_ID_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest027
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest027, TestSize.Level1)
+{
+    const char *name = "test_string15";
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId(name, ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_STRING, "hhh"}};
+    RState state = rm->GetStringFormatById(id, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_ID_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest028
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest028, TestSize.Level1)
+{
+    const char *name = "test_string16";
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId(name, ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_STRING, "hhh"}};
+    RState state = rm->GetStringFormatById(id, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_ID_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest029
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest029, TestSize.Level1)
+{
+    const char *name = "test_string17";
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId(name, ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    RState state = rm->GetStringFormatById(id, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_ID_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest030
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest030, TestSize.Level1)
+{
+    const char *name = "test_string18";
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId(name, ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    RState state = rm->GetStringFormatById(id, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_ID_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest031
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest031, TestSize.Level1)
+{
+    const char *name = "test_string20";
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId(name, ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    RState state = rm->GetStringFormatById(id, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_ID_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByIdTest032
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByIdTest032, TestSize.Level1)
+{
+    const char *name = "test_string21";
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId(name, ResType::STRING);
+    ASSERT_TRUE(id > 0);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    RState state = rm->GetStringFormatById(id, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_ID_FORMAT_ERROR, state);
 }
 
 /*
@@ -1051,6 +1296,160 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest029,
     const char *name = "test_string17";
     const char *cmp = "Hello World";
     rmc->TestGetStringFormatByNameWithVaArgs(name, cmp, "Hello World");
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest030
+ * @tc.desc: Test GetStringFormatByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest030, TestSize.Level1)
+{
+    const char *name = "test_string2";
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "-9.999"},
+        {ResourceManager::NapiValueType::NAPI_NUMBER, "abc"}};
+    RState state = rm->GetStringFormatByName(name, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest031
+ * @tc.desc: Test GetStringFormatByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest031, TestSize.Level1)
+{
+    const char *name = "test_string2";
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "-9.999"}};
+    RState state = rm->GetStringFormatByName(name, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest032
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest032, TestSize.Level1)
+{
+    const char *name = "test_string14";
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    RState state = rm->GetStringFormatByName(name, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest033
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest033, TestSize.Level1)
+{
+    const char *name = "test_string15";
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_STRING, "hhh"}};
+    RState state = rm->GetStringFormatByName(name, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest034
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest034, TestSize.Level1)
+{
+    const char *name = "test_string16";
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_STRING, "hhh"}};
+    RState state = rm->GetStringFormatByName(name, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest035
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest035, TestSize.Level1)
+{
+    const char *name = "test_string17";
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    RState state = rm->GetStringFormatByName(name, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest036
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest036, TestSize.Level1)
+{
+    const char *name = "test_string18";
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    RState state = rm->GetStringFormatByName(name, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest037
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest037, TestSize.Level1)
+{
+    const char *name = "test_string20";
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    RState state = rm->GetStringFormatByName(name, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_FORMAT_ERROR, state);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringFormatByNameTest038
+ * @tc.desc: Test GetStringFormatById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringFormatByNameTest038, TestSize.Level1)
+{
+    const char *name = "test_string21";
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams =
+        {{ResourceManager::NapiValueType::NAPI_NUMBER, "1"}};
+    RState state = rm->GetStringFormatByName(name, outValue, jsParams);
+    ASSERT_EQ(ERROR_CODE_RES_NAME_FORMAT_ERROR, state);
 }
 
 /*
@@ -2272,6 +2671,573 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest0
 HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest020, TestSize.Level1)
 {
     bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(DARK);
+    rc->SetScreenDensity(SCREEN_DENSITY_XLDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("mccmnc_str", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("str_mcc460_mnc101_en_phone_dark_xldpi", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForMccMncTest021
+ * @tc.desc: Test GetStringByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest021, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(LIGHT);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("mccmnc_str", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("str_en_us_light", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForMccMncTest022
+ * @tc.desc: Test GetStringByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest022, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("zh", nullptr, nullptr);
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(LIGHT);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("mccmnc_str", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("str_zh_cn", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForMccMncTest023
+ * @tc.desc: Test GetStringByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest023, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(LIGHT);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
+
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("mccmnc_str", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("str_mcc460_mnc101_en_light", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForMccMncTest024
+ * @tc.desc: Test GetStringByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest024, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetMcc(460);
+    rc->SetMnc(1);
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(LIGHT);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("mccmnc_str", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("str_mcc460_mnc001_en", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForMccMncTest025
+ * @tc.desc: Test GetStringByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest025, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetMcc(460);
+    rc->SetMnc(10);
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(LIGHT);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("mccmnc_str", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("str_mcc460_mnc010_en", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForMccMncTest026
+ * @tc.desc: Test GetStringByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest026, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(LIGHT);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("mccmnc_str", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("str_mcc460_mnc101_en_light", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForMccMncTest027
+ * @tc.desc: Test GetStringByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest027, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("zh", nullptr, nullptr);
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(LIGHT);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("mccmnc_str", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("str_mcc460_mnc101_zh", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForMccMncTest028
+ * @tc.desc: Test GetStringByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest028, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(LIGHT);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("mccmnc_str", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("str_en_us_phone", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForMccMncTest029
+ * @tc.desc: Test GetStringByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest029, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetColorMode(LIGHT);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("mccmnc_str", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("str_en_us_light", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForMccMncTest030
+ * @tc.desc: Test GetStringByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest030, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetDeviceType(DEVICE_PHONE);
+    rc->SetColorMode(LIGHT);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("mccmnc_str", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("str_mcc460_mnc101_en_phone", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForMccMncTest031
+ * @tc.desc: Test GetStringByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest031, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetColorMode(LIGHT);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("mccmnc_str", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("str_mcc460_mnc101_en_light", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForMccMncTest032
+ * @tc.desc: Test GetStringByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest032, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(DARK);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("mccmnc_str", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("str_en_us_dark", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForMccMncTest033
+ * @tc.desc: Test GetStringByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest033, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(LIGHT);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("mccmnc_str", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("str_en_us_light", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForMccMncTest034
+ * @tc.desc: Test GetStringByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest034, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(DARK);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("mccmnc_str", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("str_mcc460_mnc101_en_dark", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForMccMncTest035
+ * @tc.desc: Test GetStringByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest035, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(LIGHT);
+    rc->SetScreenDensity(SCREEN_DENSITY_SDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("mccmnc_str", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("str_mcc460_mnc101_en_light", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForMccMncTest036
+ * @tc.desc: Test GetStringByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest036, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(LIGHT);
+    rc->SetScreenDensity(SCREEN_DENSITY_LDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("mccmnc_str", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("str_en_us_light", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForMccMncTest037
+ * @tc.desc: Test GetStringByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest037, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(LIGHT);
+    rc->SetScreenDensity(SCREEN_DENSITY_XLDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("mccmnc_str", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("str_en_us_light", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForMccMncTest038
+ * @tc.desc: Test GetStringByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest038, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(LIGHT);
+    rc->SetScreenDensity(SCREEN_DENSITY_LDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("mccmnc_str", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("str_mcc460_mnc101_en_light", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForMccMncTest039
+ * @tc.desc: Test GetStringByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest039, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
+    ASSERT_TRUE(ret);
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("en", nullptr, nullptr);
+    rc->SetMcc(460);
+    rc->SetMnc(101);
+    rc->SetDeviceType(DEVICE_TV);
+    rc->SetColorMode(LIGHT);
+    rc->SetScreenDensity(SCREEN_DENSITY_XLDPI / BASE_DPI);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+
+    RState rState;
+    std::string outValue;
+    rState = rm->GetStringByName("mccmnc_str", outValue);
+    ASSERT_EQ(SUCCESS, rState);
+    ASSERT_EQ("str_mcc460_mnc101_en_light", outValue);
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameForMccMncTest040
+ * @tc.desc: Test GetStringByName
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameForMccMncTest040, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_newResFilePath).c_str());
     ASSERT_TRUE(ret);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
