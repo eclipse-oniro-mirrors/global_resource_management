@@ -183,6 +183,10 @@ export default namespace resourceManager {
         getMediaContentBase64Sync(resId: number, density?: number): string;
         getMediaContentBase64Sync(resource: Resource, density?: number): string;
 
+        getDrawableDescriptor(resId: number, density?: number, type?: number): DrawableDescriptor;
+        getDrawableDescriptorByName(resName: string, density?: number, type?: number): DrawableDescriptor;
+        getDrawableDescriptor(resource: Resource, density?: number, type?: number): DrawableDescriptor;
+
         getStringArrayValueSync(resId: number): Array<string>;
         getStringArrayValueSync(resource: Resource): Array<string>;
 
@@ -263,6 +267,10 @@ export default namespace resourceManager {
 
         native getMediaContentBase64Sync(resId: number, density?: number): string;
         native getMediaContentBase64Sync(resource: Resource, density?: number): string;
+
+        native getDrawableDescriptorById(resId: number, density?: number, type?: number): DrawableDescriptor;
+        native getDrawableDescriptorByName(resName: string, density?: number, type?: number): DrawableDescriptor;
+        native getDrawableDescriptorByRes(resource: Resource, density?: number, type?: number): DrawableDescriptor;
 
         native getStringArrayValueSync(resId: number): Array<string>;
         native getStringArrayValueSync(resource: Resource): Array<string>;
@@ -465,6 +473,14 @@ export default namespace resourceManager {
                     reject(err);
                 });
             });
+        }
+
+        getDrawableDescriptor(resId: number, density?: number, type?: number): DrawableDescriptor {
+            return this.getDrawableDescriptorById(number, density, type);
+        }
+
+        getDrawableDescriptor(resource: Resource, density?: number, type?: number): DrawableDescriptor {
+            return this.getDrawableDescriptorByRes(resource, density, type);
         }
 
         getDeviceCapability(callback: AsyncCallback<DeviceCapability, void>): void {
