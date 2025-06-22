@@ -17,6 +17,7 @@ import { AsyncCallback, BusinessError } from '@ohos.base';
 import { RawFileDescriptor as _RawFileDescriptor } from 'global.rawFileDescriptor';
 import { Resource as _Resource } from 'global.resource';
 import { RawFileDescriptorInner } from 'global.rawFileDescriptorInner';
+import { DrawableDescriptor } from '@ohos.arkui.drawableDescriptor';
 
 export default namespace resourceManager {
     loadLibrary("resourceManager_ani.z");
