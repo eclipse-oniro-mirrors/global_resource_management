@@ -1407,11 +1407,11 @@ ani_string ResMgrAddon::GetMediaBase64ByNameSync(ani_env* env, ani_object object
     return CreateAniString(env, *dataContext);
 }
 
-ani_object CreateDrawableDescriptorbyId(std::unique_ptr<ResMgrDataContext>& dataContext)
+ani_object CreateDrawableDescriptorbyId(ani_env* env, std::unique_ptr<ResMgrDataContext>& dataContext)
 {
     std::shared_ptr<ResourceManager> resMgr = nullptr;
-    uint32_t notUse = 0;
-    bool ret = GetHapResourceManager(dataContext.get(), resMgr, notUse);
+    uint32_t resId;
+    bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret || resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getDrawableDescriptorById");
         ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
@@ -1434,7 +1434,6 @@ ani_object CreateDrawableDescriptorbyId(std::unique_ptr<ResMgrDataContext>& data
             return Ace::Ani::DrawableDescriptorAni::CreateDrawableDescriptor(env, drawableInfo);
         }
     }
-    std::pair<std::unique_ptr<uint8_t[]>, size_t> firstBuffer;
     state = resMgr->GetDrawableInfoById(resId, drawableInfo.type,
         drawableInfo.firstBuffer.len, drawableInfo.firstBuffer.data, dataContext->density_);
     if (SUCCESS != state) {
@@ -1466,10 +1465,10 @@ ani_object ResMgrAddon::GetDrawableDescriptorById(ani_env* env, ani_object objec
         env->Object_CallMethodByName_Double(type, "unboxed", ":D", &typeInner);
         dataContext->iconType_ = typeInner;
     }
-    return CreateDrawableDescriptorbyId(dataContext);
+    return CreateDrawableDescriptorbyId(env, dataContext);
 }
 
-ani_object CreateDrawableDescriptorbyName(std::unique_ptr<ResMgrDataContext>& dataContext)
+ani_object CreateDrawableDescriptorbyName(ani_env* env, std::unique_ptr<ResMgrDataContext>& dataContext)
 {
     auto resMgr = dataContext->addon_->GetResMgr();
     if (resMgr == nullptr) {
@@ -1538,7 +1537,7 @@ ani_object ResMgrAddon::GetDrawableDescriptorByName(ani_env* env, ani_object obj
         return nullptr;
     }
     dataContext->resName_ = AniStrToString(env, resName);
-    return CreateDrawableDescriptorbyName(dataContext);
+    return CreateDrawableDescriptorbyName(env, dataContext);
 }
 
 ani_object ResMgrAddon::GetDrawableDescriptor(ani_env* env, ani_object object,
@@ -1566,7 +1565,7 @@ ani_object ResMgrAddon::GetDrawableDescriptor(ani_env* env, ani_object object,
         env->Object_CallMethodByName_Double(type, "unboxed", ":D", &typeInner);
         dataContext->iconType_ = typeInner;
     }
-    return CreateDrawableDescriptorbyId(dataContext);
+    return CreateDrawableDescriptorbyId(env, dataContext);
 }
 
 ani_object ResMgrAddon::GetStringArrayByNameSync(ani_env* env, ani_object object, ani_string resName)
