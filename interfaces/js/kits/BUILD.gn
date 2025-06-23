@@ -43,6 +43,7 @@ ohos_shared_library("resourcemanager") {
     "ability_runtime:abilitykit_native",
     "ability_runtime:extensionkit_native",
     "ability_runtime:runtime",
+    "c_utils:utils",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
