@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#include "drawable_descriptor/drawable_descriptor.h"
-#include "hilog_wrapper.h"
 #include "resourceManager.h"
+#include "hilog_wrapper.h"
+#include "drawable_descriptor_ani.h"
 #include "resource_manager_ani_utils.h"
 #include "resource_manager_data_context.h"
 #include "resource_manager_impl.h"
@@ -1407,6 +1407,167 @@ ani_string ResMgrAddon::GetMediaBase64ByNameSync(ani_env* env, ani_object object
     return CreateAniString(env, *dataContext);
 }
 
+ani_object CreateDrawableDescriptorbyId(ani_env* env, std::unique_ptr<ResMgrDataContext>& dataContext)
+{
+    std::shared_ptr<ResourceManager> resMgr = nullptr;
+    uint32_t resId;
+    bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
+    if (!ret || resMgr == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getDrawableDescriptorById");
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        return nullptr;
+    }
+    Ace::Ani::DrawableInfo drawableInfo;
+    drawableInfo.density = dataContext->density_;
+    drawableInfo.manager = resMgr;
+    RState state = SUCCESS;
+    if (dataContext->iconType_ == 1) {
+        std::pair<std::unique_ptr<uint8_t[]>, size_t> foregroundInfo;
+        std::pair<std::unique_ptr<uint8_t[]>, size_t> backgroundInfo;
+        state = resMgr->GetThemeIcons(resId, foregroundInfo, backgroundInfo, dataContext->density_);
+        if (state == SUCCESS) {
+            drawableInfo.firstBuffer.data = std::move(foregroundInfo.first);
+            drawableInfo.firstBuffer.len = foregroundInfo.second;
+            drawableInfo.secondBuffer.data = std::move(backgroundInfo.first);
+            drawableInfo.secondBuffer.len = backgroundInfo.second;
+            drawableInfo.type = "layered";
+            return Ace::Ani::DrawableDescriptorAni::CreateDrawableDescriptor(env, drawableInfo);
+        }
+    }
+    state = resMgr->GetDrawableInfoById(resId, drawableInfo.type,
+        drawableInfo.firstBuffer.len, drawableInfo.firstBuffer.data, dataContext->density_);
+    if (SUCCESS != state) {
+        dataContext->SetErrorMsg("Failed to Create drawableDescriptor", true);
+            ResourceManagerAniUtils::AniThrow(env, state);
+        return nullptr;
+    };
+    return Ace::Ani::DrawableDescriptorAni::CreateDrawableDescriptor(env, drawableInfo);
+}
+
+ani_object ResMgrAddon::GetDrawableDescriptorById(ani_env* env, ani_object object,
+    ani_double resId, ani_object density, ani_object type)
+{
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    dataContext->addon_ = UnwrapAddon(env, object);
+    dataContext->resId_ = resId;
+
+    ani_boolean isUndefined;
+    env->Reference_IsUndefined(density, &isUndefined);
+    if (!isUndefined) {
+        ani_double densityInner;
+        env->Object_CallMethodByName_Double(density, "unboxed", ":D", &densityInner);
+        dataContext->density_ = densityInner;
+    }
+
+    env->Reference_IsUndefined(type, &isUndefined);
+    if (!isUndefined) {
+        ani_double typeInner;
+        env->Object_CallMethodByName_Double(type, "unboxed", ":D", &typeInner);
+        dataContext->iconType_ = typeInner;
+    }
+    return CreateDrawableDescriptorbyId(env, dataContext);
+}
+
+ani_object CreateDrawableDescriptorbyName(ani_env* env, std::unique_ptr<ResMgrDataContext>& dataContext)
+{
+    auto resMgr = dataContext->addon_->GetResMgr();
+    if (resMgr == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getDrawableDescriptorByName");
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        return nullptr;
+    }
+    Ace::Ani::DrawableInfo drawableInfo;
+    drawableInfo.density = dataContext->density_;
+    drawableInfo.manager = resMgr;
+    RState state = SUCCESS;
+    if (dataContext->iconType_ == 1) {
+        std::pair<std::unique_ptr<uint8_t[]>, size_t> foregroundInfo;
+        std::pair<std::unique_ptr<uint8_t[]>, size_t> backgroundInfo;
+        state = resMgr->GetThemeIcons(0, foregroundInfo, backgroundInfo, dataContext->density_);
+        if (state == SUCCESS) {
+            drawableInfo.firstBuffer.data = std::move(foregroundInfo.first);
+            drawableInfo.firstBuffer.len = foregroundInfo.second;
+            drawableInfo.secondBuffer.data = std::move(backgroundInfo.first);
+            drawableInfo.secondBuffer.len = backgroundInfo.second;
+            drawableInfo.type = "layered";
+            return Ace::Ani::DrawableDescriptorAni::CreateDrawableDescriptor(env, drawableInfo);
+        }
+    }
+
+    if (dataContext->iconType_ == 2) { // 2 means get the dynamic icon from theme
+        std::pair<std::unique_ptr<uint8_t[]>, size_t> iconInfo;
+        if (resMgr->GetDynamicIcon(dataContext->resName_, iconInfo, dataContext->density_) == SUCCESS) {
+            drawableInfo.firstBuffer.data = std::move(iconInfo.first);
+            drawableInfo.firstBuffer.len = iconInfo.second;
+            return Ace::Ani::DrawableDescriptorAni::CreateDrawableDescriptor(env, drawableInfo);
+        }
+    }
+
+    state = resMgr->GetDrawableInfoByName(dataContext->resName_.c_str(), drawableInfo.type,
+        drawableInfo.firstBuffer.len, drawableInfo.firstBuffer.data, dataContext->density_);
+    if (SUCCESS != state) {
+        dataContext->SetErrorMsg("Failed to Create drawableDescriptor");
+        ResourceManagerAniUtils::AniThrow(env, state);
+        return nullptr;
+    };
+    return Ace::Ani::DrawableDescriptorAni::CreateDrawableDescriptor(env, drawableInfo);
+}
+
+ani_object ResMgrAddon::GetDrawableDescriptorByName(ani_env* env, ani_object object,
+    ani_string resName, ani_object density, ani_object type)
+{
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    ani_boolean isUndefined;
+    env->Reference_IsUndefined(density, &isUndefined);
+    if (!isUndefined) {
+        ani_double densityInner;
+        env->Object_CallMethodByName_Double(density, "unboxed", ":D", &densityInner);
+        dataContext->density_ = densityInner;
+    }
+
+    env->Reference_IsUndefined(type, &isUndefined);
+    if (!isUndefined) {
+        ani_double typeInner;
+        env->Object_CallMethodByName_Double(type, "unboxed", ":D", &typeInner);
+        dataContext->iconType_ = typeInner;
+    }
+
+    dataContext->addon_ = UnwrapAddon(env, object);
+    if (dataContext->addon_ == nullptr) {
+        return nullptr;
+    }
+    dataContext->resName_ = AniStrToString(env, resName);
+    return CreateDrawableDescriptorbyName(env, dataContext);
+}
+
+ani_object ResMgrAddon::GetDrawableDescriptor(ani_env* env, ani_object object,
+    ani_object resource, ani_object density, ani_object type)
+{
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    int32_t retState = InitIdResourceAddon(env, object, dataContext, resource);
+    if (retState != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to init para in getDrawableDescriptor", true);
+        ResourceManagerAniUtils::AniThrow(env, retState);
+        return nullptr;
+    }
+
+    ani_boolean isUndefined;
+    env->Reference_IsUndefined(density, &isUndefined);
+    if (!isUndefined) {
+        ani_double densityInner;
+        env->Object_CallMethodByName_Double(density, "unboxed", ":D", &densityInner);
+        dataContext->density_ = densityInner;
+    }
+
+    env->Reference_IsUndefined(type, &isUndefined);
+    if (!isUndefined) {
+        ani_double typeInner;
+        env->Object_CallMethodByName_Double(type, "unboxed", ":D", &typeInner);
+        dataContext->iconType_ = typeInner;
+    }
+    return CreateDrawableDescriptorbyId(env, dataContext);
+}
+
 ani_object ResMgrAddon::GetStringArrayByNameSync(ani_env* env, ani_object object, ani_string resName)
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
@@ -1993,7 +2154,13 @@ ani_status ResMgrAddon::BindContext(ani_env* env)
         
         ani_native_function { "getMediaByNameSync", nullptr, reinterpret_cast<void*>(GetMediaByNameSync) },
         ani_native_function { "getMediaBase64ByNameSync", nullptr, reinterpret_cast<void*>(GetMediaBase64ByNameSync) },
-
+        
+        ani_native_function { "getDrawableDescriptorById", nullptr,
+            reinterpret_cast<void*>(GetDrawableDescriptorById) },
+        ani_native_function { "getDrawableDescriptorByRes", nullptr, reinterpret_cast<void*>(GetDrawableDescriptor) },
+        ani_native_function { "getDrawableDescriptorByName", nullptr,
+            reinterpret_cast<void*>(GetDrawableDescriptorByName) },
+         
         ani_native_function { "getConfigurationSync", nullptr, reinterpret_cast<void*>(GetConfigurationSync) },
         ani_native_function { "getDeviceCapabilitySync", nullptr, reinterpret_cast<void*>(GetDeviceCapabilitySync) },
         ani_native_function { "getLocales", nullptr, reinterpret_cast<void*>(GetLocales) },
