@@ -477,7 +477,7 @@ export default namespace resourceManager {
         }
 
         getDrawableDescriptor(resId: number, density?: number, type?: number): DrawableDescriptor {
-            return this.getDrawableDescriptorById(number, density, type);
+            return this.getDrawableDescriptorById(resId, density, type);
         }
 
         getDrawableDescriptor(resource: Resource, density?: number, type?: number): DrawableDescriptor {
