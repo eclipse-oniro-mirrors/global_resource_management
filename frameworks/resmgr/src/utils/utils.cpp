@@ -463,7 +463,7 @@ bool Utils::ContainsTail(std::string hapPath, std::set<std::string> tailSet)
 void Utils::CanonicalizePath(const char *path, char *outPath, size_t len)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
+    HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
 #endif
     if (path == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "path is null");

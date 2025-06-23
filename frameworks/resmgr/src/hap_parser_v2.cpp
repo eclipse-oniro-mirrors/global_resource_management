@@ -77,7 +77,7 @@ bool HapParserV2::Init(const char *path)
 int32_t HapParserV2::ParseResHex()
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
+    HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
 #endif
     uint32_t offset = 0;
     uint8_t *buf = nullptr;
@@ -462,7 +462,7 @@ bool HapParserV2::GetIndexMmap(const char *path)
 bool HapParserV2::GetIndexMmapFromHap(const char *path)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
+    HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
     bool isNewExtractor = false;
     extractor_ = AbilityBase::ExtractorUtil::GetExtractor(path, isNewExtractor);
     if (extractor_ == nullptr) {

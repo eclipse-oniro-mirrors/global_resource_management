@@ -102,7 +102,7 @@ bool HapParserV1::Init(const char *path)
 int32_t HapParserV1::ParseResHex()
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
+    HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
 #endif
     ResHeader resHeader;
     uint32_t offset = 0;

@@ -81,7 +81,7 @@ HapResourceV1::~HapResourceV1()
 bool HapResourceV1::Init(std::shared_ptr<ResConfigImpl> &defaultConfig)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
+    HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
 #endif
 #ifdef __WINNT__
     char separator = '\\';
@@ -216,7 +216,7 @@ void HapResourceV1::UpdateOverlayInfo(
 bool HapResourceV1::InitIdList(std::shared_ptr<ResConfigImpl> &defaultConfig)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
+    HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
 #endif
     if (resDesc_ == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "resDesc_ is null ! InitIdList failed");

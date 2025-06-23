@@ -48,10 +48,9 @@ static void ExecuteGetResMgr(napi_env env, void* data)
     ResMgrDataContext *asyncContext = static_cast<ResMgrDataContext*>(data);
 
     asyncContext->createValueFunc_ = [](napi_env env, ResMgrDataContext &context) -> napi_value {
-        std::string traceVal = "Create ResourceManager";
-        StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
+        StartTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_GLOBAL_RESMGR, "Create ResourceManager");
         napi_value result = ResourceManagerAddon::Create(env, context.bundleName_, context.resMgr_, nullptr);
-        FinishTrace(HITRACE_TAG_GLOBAL_RESMGR);
+        FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_GLOBAL_RESMGR);
         if (result == nullptr) {
             context.SetErrorMsg("Failed to get ResourceManagerAddon");
             ReportInitResourceManagerFail(context.bundleName_, "failed to get ResourceManagerAddon");
@@ -269,9 +268,8 @@ static napi_value InitColorModeObject(napi_env env)
 
 static napi_value ResMgrInit(napi_env env, napi_value exports)
 {
-    std::string traceVal = "GetResourceManager";
 #if !defined(__IDE_PREVIEW__)
-    StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
+    StartTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_GLOBAL_RESMGR, "GetResourceManager");
     napi_property_descriptor creatorProp[] = {
         DECLARE_NAPI_FUNCTION("getResourceManager", GetResourceManager),
         DECLARE_NAPI_FUNCTION("getSystemResourceManager", GetSystemResourceManager),
@@ -284,7 +282,7 @@ static napi_value ResMgrInit(napi_env env, napi_value exports)
     napi_status status = napi_define_properties(env, exports, sizeof(creatorProp) / sizeof(creatorProp[0]),
         creatorProp);
 #if !defined(__IDE_PREVIEW__)
-    FinishTrace(HITRACE_TAG_GLOBAL_RESMGR);
+    FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_GLOBAL_RESMGR);
 #endif
     if (status != napi_ok) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to set getResourceManager at init");
