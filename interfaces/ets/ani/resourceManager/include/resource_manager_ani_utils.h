@@ -12,12 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef RESOURCE_MANAGER_ANI_UTILS_H
 #define RESOURCE_MANAGER_ANI_UTILS_H
 
 #include <string>
 #include <unordered_map>
-
 #include "ani.h"
 
 namespace OHOS {

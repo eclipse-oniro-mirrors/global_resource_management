@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include "hilog_wrapper.h"
 #include "resource_manager_ani_utils.h"
+
+#include "hilog_wrapper.h"
 #include "rstate.h"
 
 using namespace OHOS;
@@ -103,7 +104,7 @@ ani_object ResourceManagerAniUtils::CreateError(ani_env *env, ani_int code, cons
     }
     ani_object error = WrapStsError(env, msg);
     if (error == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "error nulll");
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "error null");
         return nullptr;
     }
     ani_double dCode(code);
