@@ -16,10 +16,9 @@
 #ifndef RESMGR_ANI_H
 #define RESMGR_ANI_H
 
-#include <ani.h>
 #include <array>
 #include <iostream>
-
+#include "ani.h"
 #include "foundation/ability/ability_runtime/interfaces/kits/native/appkit/ability_runtime/context/context.h"
 #include "resource_manager.h"
 
