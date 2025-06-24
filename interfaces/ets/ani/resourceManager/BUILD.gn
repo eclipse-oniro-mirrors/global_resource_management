@@ -34,7 +34,6 @@ ohos_shared_library("resourceManager_ani") {
   defines = [ "CONFIG_HILOG" ]
   external_deps = [
     "ability_base:configuration",
-    "ace_engine:drawable_descriptor",
     "bundle_framework:appexecfwk_base",
     "cJSON:cjson",
     "hilog:libhilog",

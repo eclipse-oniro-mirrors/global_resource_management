@@ -16,10 +16,9 @@
 #ifndef RESMGR_ANI_H
 #define RESMGR_ANI_H
 
-#include <ani.h>
 #include <array>
 #include <iostream>
-
+#include "ani.h"
 #include "foundation/ability/ability_runtime/interfaces/kits/native/appkit/ability_runtime/context/context.h"
 #include "resource_manager.h"
 
@@ -66,13 +65,6 @@ public:
         ani_object resource, ani_double num, ani_object args);
     static ani_string GetDoublePluralStringByNameSync(ani_env* env, ani_object object,
         ani_string resName, ani_double num, ani_object args);
-
-    static ani_object GetDrawableDescriptorById(ani_env* env, ani_object object,
-        ani_double resId, ani_object density, ani_object type);
-    static ani_object GetDrawableDescriptor(ani_env* env, ani_object object,
-        ani_object resource, ani_object density, ani_object type);
-    static ani_object GetDrawableDescriptorByName(ani_env* env, ani_object object,
-        ani_string resName, ani_object density, ani_object type);
 
     static ani_double GetColorSyncById(ani_env* env, ani_object object, ani_double resId);
     static ani_double GetColorSync(ani_env* env, ani_object object, ani_object resource);
