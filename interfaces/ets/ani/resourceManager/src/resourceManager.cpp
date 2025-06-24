@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#include "drawable_descriptor/drawable_descriptor.h"
-#include "hilog_wrapper.h"
 #include "resourceManager.h"
+
+#include "hilog_wrapper.h"
 #include "resource_manager_ani_utils.h"
 #include "resource_manager_data_context.h"
 #include "resource_manager_impl.h"
@@ -45,6 +45,103 @@ struct ArrayElement {
 
 static std::shared_ptr<ResourceManager> sysResMgr = nullptr;
 static std::mutex sysMgrMutex;
+std::array methods = {
+    ani_native_function { "getStringSync", "D:Lstd/core/String;",
+        reinterpret_cast<void*>(ResMgrAddon::GetStringSyncById) },
+    ani_native_function { "getStringSync", "DLescompat/Array;:Lstd/core/String;",
+        reinterpret_cast<void *>(ResMgrAddon::GetFormatStringSyncById) },
+    ani_native_function { "getStringSync", "Lglobal/resource/Resource;:Lstd/core/String;",
+        reinterpret_cast<void*>(ResMgrAddon::GetStringSync) },
+    ani_native_function { "getStringSync", "Lglobal/resource/Resource;Lescompat/Array;:Lstd/core/String;",
+        reinterpret_cast<void *>(ResMgrAddon::GetFormatStringSync) },
+
+    ani_native_function { "getStringByNameSync", "Lstd/core/String;:Lstd/core/String;",
+        reinterpret_cast<void*>(ResMgrAddon::GetStringByNameSync) },
+    ani_native_function { "getStringByNameSync", "Lstd/core/String;Lescompat/Array;:Lstd/core/String;",
+        reinterpret_cast<void*>(ResMgrAddon::GetFormatStringByNameSync) },
+
+    ani_native_function { "getBoolean", "D:Z", reinterpret_cast<void*>(ResMgrAddon::GetBooleanById) },
+    ani_native_function { "getBoolean", "Lglobal/resource/Resource;:Z",
+        reinterpret_cast<void*>(ResMgrAddon::GetBoolean) },
+    ani_native_function { "getBooleanByName", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetBooleanByName) },
+
+    ani_native_function { "getNumber", "D:D", reinterpret_cast<void*>(ResMgrAddon::GetNumberById) },
+    ani_native_function { "getNumber", "Lglobal/resource/Resource;:D",
+        reinterpret_cast<void*>(ResMgrAddon::GetNumber) },
+    ani_native_function { "getNumberByName", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetNumberByName) },
+    
+    ani_native_function { "getIntPluralStringValueSync", "DDLescompat/Array;:Lstd/core/String;",
+        reinterpret_cast<void*>(ResMgrAddon::GetIntPluralStringValueSyncById) },
+    ani_native_function { "getIntPluralStringValueSync",
+        "Lglobal/resource/Resource;DLescompat/Array;:Lstd/core/String;",
+        reinterpret_cast<void*>(ResMgrAddon::GetIntPluralStringValueSync) },
+    ani_native_function { "getIntPluralStringByNameSync", nullptr,
+        reinterpret_cast<void*>(ResMgrAddon::GetIntPluralStringByNameSync) },
+
+    ani_native_function { "getDoublePluralStringValueSync", "DDLescompat/Array;:Lstd/core/String;",
+        reinterpret_cast<void*>(ResMgrAddon::GetDoublePluralStringValueSyncById) },
+    ani_native_function { "getDoublePluralStringValueSync",
+        "Lglobal/resource/Resource;DLescompat/Array;:Lstd/core/String;",
+        reinterpret_cast<void*>(ResMgrAddon::GetDoublePluralStringValueSync) },
+    ani_native_function { "getDoublePluralStringByNameSync", nullptr,
+        reinterpret_cast<void*>(ResMgrAddon::GetDoublePluralStringByNameSync) },
+
+    ani_native_function { "getColorSync", "D:D", reinterpret_cast<void*>(ResMgrAddon::GetColorSyncById) },
+    ani_native_function { "getColorSync", "Lglobal/resource/Resource;:D",
+        reinterpret_cast<void*>(ResMgrAddon::GetColorSync) },
+    ani_native_function { "getColorByNameSync", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetColorByNameSync) },
+    
+    ani_native_function { "addResource", nullptr, reinterpret_cast<void*>(ResMgrAddon::AddResource) },
+    ani_native_function { "removeResource", nullptr, reinterpret_cast<void*>(ResMgrAddon::RemoveResource) },
+
+    ani_native_function { "getRawFdSync", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetRawFdSync) },
+    ani_native_function { "closeRawFdSync", nullptr, reinterpret_cast<void*>(ResMgrAddon::CloseRawFdSync) },
+    ani_native_function { "isRawDir", nullptr, reinterpret_cast<void*>(ResMgrAddon::IsRawDir) },
+
+    ani_native_function { "getRawFileListSync", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetRawFileListSync) },
+    ani_native_function { "getRawFileContentSync", nullptr,
+        reinterpret_cast<void*>(ResMgrAddon::GetRawFileContentSync) },
+    
+    ani_native_function { "getMediaContentSync", "DLstd/core/Double;:Lescompat/Uint8Array;",
+        reinterpret_cast<void*>(ResMgrAddon::GetMediaContentSyncById) },
+    ani_native_function { "getMediaContentSync",
+        "Lglobal/resource/Resource;Lstd/core/Double;:Lescompat/Uint8Array;",
+        reinterpret_cast<void*>(ResMgrAddon::GetMediaContentSync) },
+
+    ani_native_function { "getMediaContentBase64Sync", "DLstd/core/Double;:Lstd/core/String;",
+        reinterpret_cast<void*>(ResMgrAddon::GetMediaContentBase64SyncById) },
+    ani_native_function { "getMediaContentBase64Sync",
+        "Lglobal/resource/Resource;Lstd/core/Double;:Lstd/core/String;",
+        reinterpret_cast<void*>(ResMgrAddon::GetMediaContentBase64Sync) },
+    
+    ani_native_function { "getStringArrayValueSync", "D:Lescompat/Array;",
+        reinterpret_cast<void*>(ResMgrAddon::GetStringArrayValueSyncById) },
+    ani_native_function { "getStringArrayValueSync", "Lglobal/resource/Resource;:Lescompat/Array;",
+        reinterpret_cast<void*>(ResMgrAddon::GetStringArrayValueSync) },
+    ani_native_function { "getStringArrayByNameSync", nullptr,
+        reinterpret_cast<void*>(ResMgrAddon::GetStringArrayByNameSync) },
+    
+    ani_native_function { "getMediaByNameSync", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetMediaByNameSync) },
+    ani_native_function { "getMediaBase64ByNameSync", nullptr,
+        reinterpret_cast<void*>(ResMgrAddon::GetMediaBase64ByNameSync) },
+
+    ani_native_function { "getConfigurationSync", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetConfigurationSync) },
+    ani_native_function { "getDeviceCapabilitySync", nullptr,
+        reinterpret_cast<void*>(ResMgrAddon::GetDeviceCapabilitySync) },
+    ani_native_function { "getLocales", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetLocales) },
+
+    ani_native_function { "getSymbol", "D:D", reinterpret_cast<void*>(ResMgrAddon::GetSymbolById) },
+    ani_native_function { "getSymbol", "Lglobal/resource/Resource;:D",
+        reinterpret_cast<void*>(ResMgrAddon::GetSymbol) },
+    ani_native_function { "getSymbolByName", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetSymbolByName) },
+
+    ani_native_function { "getOverrideResourceManager", nullptr,
+        reinterpret_cast<void*>(ResMgrAddon::GetOverrideResourceManager) },
+    ani_native_function { "getOverrideConfiguration", nullptr,
+        reinterpret_cast<void*>(ResMgrAddon::GetOverrideConfiguration) },
+    ani_native_function { "updateOverrideConfiguration", nullptr,
+        reinterpret_cast<void*>(ResMgrAddon::UpdateOverrideConfiguration) },
+};
 
 ResMgrAddon::ResMgrAddon(
     const std::string& bundleName, const std::shared_ptr<ResourceManager>& resMgr,
@@ -1921,93 +2018,6 @@ ani_status ResMgrAddon::BindContext(ani_env* env)
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", className);
         return (ani_status)ANI_ERROR;
     }
-    std::array methods = {
-        ani_native_function { "getStringSync", "D:Lstd/core/String;", reinterpret_cast<void*>(GetStringSyncById) },
-        ani_native_function { "getStringSync", "DLescompat/Array;:Lstd/core/String;",
-            reinterpret_cast<void *>(GetFormatStringSyncById) },
-        ani_native_function { "getStringSync", "Lglobal/resource/Resource;:Lstd/core/String;",
-            reinterpret_cast<void*>(GetStringSync) },
-        ani_native_function { "getStringSync", "Lglobal/resource/Resource;Lescompat/Array;:Lstd/core/String;",
-            reinterpret_cast<void *>(GetFormatStringSync) },
-
-        ani_native_function { "getStringByNameSync", "Lstd/core/String;:Lstd/core/String;",
-            reinterpret_cast<void*>(GetStringByNameSync) },
-        ani_native_function { "getStringByNameSync", "Lstd/core/String;Lescompat/Array;:Lstd/core/String;",
-            reinterpret_cast<void*>(GetFormatStringByNameSync) },
-
-        ani_native_function { "getBoolean", "D:Z", reinterpret_cast<void*>(GetBooleanById) },
-        ani_native_function { "getBoolean", "Lglobal/resource/Resource;:Z", reinterpret_cast<void*>(GetBoolean) },
-        ani_native_function { "getBooleanByName", nullptr, reinterpret_cast<void*>(GetBooleanByName) },
-
-        ani_native_function { "getNumber", "D:D", reinterpret_cast<void*>(GetNumberById) },
-        ani_native_function { "getNumber", "Lglobal/resource/Resource;:D", reinterpret_cast<void*>(GetNumber) },
-        ani_native_function { "getNumberByName", nullptr, reinterpret_cast<void*>(GetNumberByName) },
-        
-        ani_native_function { "getIntPluralStringValueSync", "DDLescompat/Array;:Lstd/core/String;",
-            reinterpret_cast<void*>(GetIntPluralStringValueSyncById) },
-        ani_native_function { "getIntPluralStringValueSync",
-            "Lglobal/resource/Resource;DLescompat/Array;:Lstd/core/String;",
-            reinterpret_cast<void*>(GetIntPluralStringValueSync) },
-        ani_native_function { "getIntPluralStringByNameSync", nullptr,
-            reinterpret_cast<void*>(GetIntPluralStringByNameSync) },
-
-        ani_native_function { "getDoublePluralStringValueSync", "DDLescompat/Array;:Lstd/core/String;",
-            reinterpret_cast<void*>(GetDoublePluralStringValueSyncById) },
-        ani_native_function { "getDoublePluralStringValueSync",
-            "Lglobal/resource/Resource;DLescompat/Array;:Lstd/core/String;",
-            reinterpret_cast<void*>(GetDoublePluralStringValueSync) },
-        ani_native_function { "getDoublePluralStringByNameSync", nullptr,
-            reinterpret_cast<void*>(GetDoublePluralStringByNameSync) },
-
-        ani_native_function { "getColorSync", "D:D", reinterpret_cast<void*>(GetColorSyncById) },
-        ani_native_function { "getColorSync", "Lglobal/resource/Resource;:D", reinterpret_cast<void*>(GetColorSync) },
-        ani_native_function { "getColorByNameSync", nullptr, reinterpret_cast<void*>(GetColorByNameSync) },
-        
-        ani_native_function { "addResource", nullptr, reinterpret_cast<void*>(AddResource) },
-        ani_native_function { "removeResource", nullptr, reinterpret_cast<void*>(RemoveResource) },
-
-        ani_native_function { "getRawFdSync", nullptr, reinterpret_cast<void*>(GetRawFdSync) },
-        ani_native_function { "closeRawFdSync", nullptr, reinterpret_cast<void*>(CloseRawFdSync) },
-        ani_native_function { "isRawDir", nullptr, reinterpret_cast<void*>(IsRawDir) },
-
-        ani_native_function { "getRawFileListSync", nullptr, reinterpret_cast<void*>(GetRawFileListSync) },
-        ani_native_function { "getRawFileContentSync", nullptr, reinterpret_cast<void*>(GetRawFileContentSync) },
-        
-        ani_native_function { "getMediaContentSync", "DLstd/core/Double;:Lescompat/Uint8Array;",
-            reinterpret_cast<void*>(GetMediaContentSyncById) },
-        ani_native_function { "getMediaContentSync",
-            "Lglobal/resource/Resource;Lstd/core/Double;:Lescompat/Uint8Array;",
-            reinterpret_cast<void*>(GetMediaContentSync) },
-
-        ani_native_function { "getMediaContentBase64Sync", "DLstd/core/Double;:Lstd/core/String;",
-            reinterpret_cast<void*>(GetMediaContentBase64SyncById) },
-        ani_native_function { "getMediaContentBase64Sync",
-            "Lglobal/resource/Resource;Lstd/core/Double;:Lstd/core/String;",
-            reinterpret_cast<void*>(GetMediaContentBase64Sync) },
-        
-        ani_native_function { "getStringArrayValueSync", "D:Lescompat/Array;",
-            reinterpret_cast<void*>(GetStringArrayValueSyncById) },
-        ani_native_function { "getStringArrayValueSync", "Lglobal/resource/Resource;:Lescompat/Array;",
-            reinterpret_cast<void*>(GetStringArrayValueSync) },
-        ani_native_function { "getStringArrayByNameSync", nullptr, reinterpret_cast<void*>(GetStringArrayByNameSync) },
-        
-        ani_native_function { "getMediaByNameSync", nullptr, reinterpret_cast<void*>(GetMediaByNameSync) },
-        ani_native_function { "getMediaBase64ByNameSync", nullptr, reinterpret_cast<void*>(GetMediaBase64ByNameSync) },
-
-        ani_native_function { "getConfigurationSync", nullptr, reinterpret_cast<void*>(GetConfigurationSync) },
-        ani_native_function { "getDeviceCapabilitySync", nullptr, reinterpret_cast<void*>(GetDeviceCapabilitySync) },
-        ani_native_function { "getLocales", nullptr, reinterpret_cast<void*>(GetLocales) },
-
-        ani_native_function { "getSymbol", "D:D", reinterpret_cast<void*>(GetSymbolById) },
-        ani_native_function { "getSymbol", "Lglobal/resource/Resource;:D", reinterpret_cast<void*>(GetSymbol) },
-        ani_native_function { "getSymbolByName", nullptr, reinterpret_cast<void*>(GetSymbolByName) },
-
-        ani_native_function { "getOverrideResourceManager", nullptr,
-            reinterpret_cast<void*>(GetOverrideResourceManager) },
-        ani_native_function { "getOverrideConfiguration", nullptr, reinterpret_cast<void*>(GetOverrideConfiguration) },
-        ani_native_function { "updateOverrideConfiguration", nullptr,
-            reinterpret_cast<void*>(UpdateOverrideConfiguration) },
-    };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Cannot bind native methods to '%{public}s'", className);
