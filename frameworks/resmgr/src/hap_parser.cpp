@@ -135,7 +135,7 @@ std::string HapParser::GetIndexFilePath(std::shared_ptr<AbilityBase::Extractor> 
 bool HapParser::GetIndexDataFromHap(const char *path, std::unique_ptr<uint8_t[]> &buf, size_t &bufLen)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
+    HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
     bool isNewExtractor = false;
     std::shared_ptr<AbilityBase::Extractor> extractor = AbilityBase::ExtractorUtil::GetExtractor(path, isNewExtractor);
     if (extractor == nullptr) {
@@ -242,7 +242,7 @@ RState HapParser::ReadRawFileFromHap(const std::string &hapPath, const std::stri
     const std::string &rawFileName, size_t &len, std::unique_ptr<uint8_t[]> &outValue)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
+    HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
     bool isNewExtractor = false;
     std::string tempPath = patchPath.empty() ? hapPath : patchPath;
     auto extractor = AbilityBase::ExtractorUtil::GetExtractor(tempPath, isNewExtractor);
@@ -319,7 +319,7 @@ RState HapParser::ReadRawFileDescriptor(const char *hapPath, const char *patchPa
     ResourceManager::RawFileDescriptor &descriptor)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
+    HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
     char outPath[PATH_MAX + 1] = {0};
     std::string rawfilePath = "";
     std::shared_ptr<AbilityBase::Extractor> extractor = nullptr;
@@ -349,7 +349,7 @@ RState HapParser::GetRawFileList(const std::string &hapPath, const std::string &
     std::set<std::string>& fileSet)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
+    HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
     bool isNewExtractor = false;
     auto extractor = AbilityBase::ExtractorUtil::GetExtractor(hapPath, isNewExtractor);
     if (extractor == nullptr) {

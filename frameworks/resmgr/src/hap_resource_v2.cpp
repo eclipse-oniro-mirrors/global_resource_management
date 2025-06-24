@@ -172,7 +172,7 @@ bool HapResourceV2::Init(std::unordered_map<uint32_t, std::shared_ptr<ResConfigI
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> &typeNameMap)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
+    HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
 #endif
 #ifdef __WINNT__
     char separator = '\\';

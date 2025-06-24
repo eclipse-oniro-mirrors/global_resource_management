@@ -560,12 +560,11 @@ napi_value ResourceManagerNapiAsyncImpl::GetMediaContent(napi_env env, napi_call
 napi_value ResourceManagerNapiAsyncImpl::GetMedia(napi_env env, napi_callback_info info)
 {
 #if !defined(__IDE_PREVIEW__)
-    std::string traceVal = "ResourceManagerAddon::GetMedia";
-    StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
+    StartTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_GLOBAL_RESMGR, "ResourceManagerAddon::GetMedia");
 #endif
     napi_value media = ProcessOnlyIdParam(env, info, "getMedia", getMediaFunc);
 #if !defined(__IDE_PREVIEW__)
-    FinishTrace(HITRACE_TAG_GLOBAL_RESMGR);
+    FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_GLOBAL_RESMGR);
 #endif
     return media;
 }
@@ -616,12 +615,11 @@ napi_value ResourceManagerNapiAsyncImpl::GetMediaContentBase64(napi_env env, nap
 napi_value ResourceManagerNapiAsyncImpl::GetMediaBase64(napi_env env, napi_callback_info info)
 {
 #if !defined(__IDE_PREVIEW__)
-    std::string traceVal = "ResourceManagerAddon::GetMediaBase64";
-    StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
+    StartTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_GLOBAL_RESMGR, "ResourceManagerAddon::GetMediaBase64");
 #endif
     napi_value mediaBase64 = ProcessOnlyIdParam(env, info, "GetMediaBase64", getMediaBase64Func);
 #if !defined(__IDE_PREVIEW__)
-    FinishTrace(HITRACE_TAG_GLOBAL_RESMGR);
+    FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_GLOBAL_RESMGR);
 #endif
     return mediaBase64;
 }
@@ -633,12 +631,11 @@ napi_value ResourceManagerNapiAsyncImpl::GetMediaBase64ByName(napi_env env, napi
         return nullptr;
     }
 #if !defined(__IDE_PREVIEW__)
-    std::string traceVal = "ResourceManagerAddon::GetMediaBase64ByName";
-    StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
+    StartTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_GLOBAL_RESMGR, "ResourceManagerAddon::GetMediaBase64ByName");
 #endif
     napi_value mediaBase64 = ProcessNameParamV9(env, info, "GetMediaBase64ByName", getMediaBase64Func);
 #if !defined(__IDE_PREVIEW__)
-    FinishTrace(HITRACE_TAG_GLOBAL_RESMGR);
+    FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_GLOBAL_RESMGR);
 #endif
     return mediaBase64;
 }
@@ -783,12 +780,11 @@ napi_value ResourceManagerNapiAsyncImpl::GetMediaByName(napi_env env, napi_callb
         return nullptr;
     }
 #if !defined(__IDE_PREVIEW__)
-    std::string traceVal = "ResourceManagerAddon::GetMediaByName";
-    StartTrace(HITRACE_TAG_GLOBAL_RESMGR, traceVal);
+    StartTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_GLOBAL_RESMGR, "ResourceManagerAddon::GetMediaByName");
 #endif
     napi_value media = ProcessNameParamV9(env, info, "getMediaByName", getMediaByNameFunc);
 #if !defined(__IDE_PREVIEW__)
-    FinishTrace(HITRACE_TAG_GLOBAL_RESMGR);
+    FinishTraceEx(HITRACE_LEVEL_INFO, HITRACE_TAG_GLOBAL_RESMGR);
 #endif
     return media;
 }

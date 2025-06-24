@@ -1324,7 +1324,7 @@ ResourceManagerImpl::~ResourceManagerImpl()
 bool ResourceManagerImpl::AddResource(const char *path, const uint32_t &selectedTypes, bool forceReload)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
+    HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
 #endif
 #if defined(__ARKUI_CROSS__) || defined(__IDE_PREVIEW__)
     if (!isSystemResMgr_ && Utils::IsSystemPath(std::string(path))) {
@@ -1415,7 +1415,7 @@ RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig, bool isUpdateT
         }
     }
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
+    HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
 #endif
     RState state = UpdateFakeLocaleFlag(resConfig);
     if (state != SUCCESS) {
@@ -1447,7 +1447,7 @@ void ResourceManagerImpl::UpdateSystemResourceResConfig(ResConfig &resConfig)
 RState ResourceManagerImpl::UpdateOverrideResConfig(ResConfig &resConfig)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
+    HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
 #endif
     UpdateFakeLocaleFlag(resConfig);
     return this->hapManager_->UpdateOverrideResConfig(resConfig);

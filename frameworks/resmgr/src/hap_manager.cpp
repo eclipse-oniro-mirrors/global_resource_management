@@ -717,7 +717,7 @@ RState HapManager::GetMediaDataFromHap(const std::shared_ptr<ValueUnderQualifier
     std::unique_ptr<uint8_t[]> &outValue)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    HITRACE_METER_NAME(HITRACE_TAG_APP, __PRETTY_FUNCTION__);
+    HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
     auto extractor = GetAbilityExtractor(qualifierDir);
     if (extractor == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor from ability");
