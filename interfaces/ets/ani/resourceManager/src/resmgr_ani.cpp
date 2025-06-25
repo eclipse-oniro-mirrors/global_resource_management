@@ -12,10 +12,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { RawFileDescriptor } from 'global.rawFileDescriptor';
 
-export class RawFileDescriptorInner implements RawFileDescriptor {
-    fd: number = 0;
-    offset: number = 0;
-    length: number = 0;
+#include "hilog_wrapper.h"
+#include "resourceManager.h"
+
+ANI_EXPORT ani_status ANI_Constructor(ani_vm* vm, uint32_t* result)
+{
+    ani_env* env;
+    if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Unsupported ANI_VERSION_1");
+        return (ani_status)ANI_ERROR;
+    }
+
+    auto status = OHOS::Global::Resource::ResMgrAddon::BindContext(env);
+    if (status != ANI_OK) {
+        return status;
+    }
+    *result = ANI_VERSION_1;
+    return ANI_OK;
 }
