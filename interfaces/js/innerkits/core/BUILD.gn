@@ -60,6 +60,7 @@ ohos_shared_library("resmgr_napi_core") {
     "ace_engine:drawable_descriptor",
     "bounds_checking_function:libsec_shared",
     "bundle_framework:appexecfwk_base",
+    "c_utils:utils",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
