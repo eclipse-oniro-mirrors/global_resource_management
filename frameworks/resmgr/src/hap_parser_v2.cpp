@@ -450,6 +450,7 @@ std::shared_ptr<HapResource> HapParserV2::GetHapResource(const char *path, bool 
 #endif
 
     pResource->SetLimitKeysValue(limitKeyValue_);
+    pResource->SetLocales(locales_);
     pResource->InitThemeSystemRes();
     return pResource;
 }
