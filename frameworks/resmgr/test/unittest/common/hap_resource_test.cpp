@@ -476,4 +476,50 @@ HWTEST_F(HapResourceTest, HapResourcePutPatchResourceTest001, TestSize.Level1)
     bool result = HapResourceManager::GetInstance().PutPatchResource(path, patchPath);
     ASSERT_FALSE(result);
 }
+
+/*
+ * @tc.name: HapResourceGetLocaleTest001
+ * @tc.desc: Test GetLocale function.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapResourceTest, HapResourceGetLocaleTest001, TestSize.Level1)
+{
+    auto rc = std::make_shared<ResConfigImpl>();
+    rc->SetLocaleInfo("en", nullptr, "US");
+    std::string resPath = FormatFullPath(g_resFilePath);
+    const char *path = resPath.c_str();
+
+    auto pResource = HapResourceManager::GetInstance().Load(path, rc);
+
+    if (pResource == nullptr) {
+        ASSERT_TRUE(false);
+    }
+
+    std::set<std::string> locales;
+    pResource->GetLocales(locales, false);
+    EXPECT_EQ(locales.size(), 4);
+}
+
+/*
+ * @tc.name: HapResourceGetLocaleTest002
+ * @tc.desc: Test GetLocale function in new module.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapResourceTest, HapResourceGetLocaleTest002, TestSize.Level1)
+{
+    auto rc = std::make_shared<ResConfigImpl>();
+    rc->SetLocaleInfo("en", nullptr, "US");
+    std::string resPath = FormatFullPath(g_newResFilePath);
+    const char *path = resPath.c_str();
+
+    auto pResource = HapResourceManager::GetInstance().Load(path, rc);
+
+    if (pResource == nullptr) {
+        ASSERT_TRUE(false);
+    }
+
+    std::set<std::string> locales;
+    pResource->GetLocales(locales, false);
+    EXPECT_EQ(locales.size(), 4);
+}
 }
