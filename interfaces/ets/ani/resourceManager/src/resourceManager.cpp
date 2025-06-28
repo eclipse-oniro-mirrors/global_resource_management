@@ -45,7 +45,7 @@ struct ArrayElement {
 
 static std::shared_ptr<ResourceManager> sysResMgr = nullptr;
 static std::mutex sysMgrMutex;
-std::array methods = {
+static std::array methods = {
     ani_native_function { "getStringSync", "D:Lstd/core/String;",
         reinterpret_cast<void*>(ResMgrAddon::GetStringSyncById) },
     ani_native_function { "getStringSync", "DLescompat/Array;:Lstd/core/String;",
