@@ -33,10 +33,8 @@ ohos_shared_library("resourceManager_ani") {
   ]
   defines = [ "CONFIG_HILOG" ]
   external_deps = [
-    "ability_base:configuration",
+    "ability_runtime:app_context",
     "ace_engine:drawable_inner_ani",
-    "bundle_framework:appexecfwk_base",
-    "cJSON:cjson",
     "hilog:libhilog",
     "runtime_core:ani",
   ]
@@ -51,8 +49,7 @@ ohos_shared_library("resmgr_ani") {
   defines = [ "CONFIG_HILOG" ]
   deps = [ ":resourceManager_ani" ]
   external_deps = [
-    "ability_base:configuration",
-    "bundle_framework:appexecfwk_base",
+    "ability_runtime:app_context",
     "hilog:libhilog",
     "runtime_core:ani",
   ]

@@ -19,7 +19,7 @@
 #include "hilog_wrapper.h"
 #include "resource_manager_ani_utils.h"
 #include "resource_manager_data_context.h"
-#include "resource_manager_impl.h"
+#include "resource_manager.h"
 
 using namespace OHOS;
 using namespace Global;
@@ -484,7 +484,7 @@ static bool InitAniParameters(ani_env *env, ani_object args,
                 std::to_string(std::get<double>(param.value))));
         } else if (param.type == ArrayElement::ElementType::STRING) {
             jsParams.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_STRING,
-                std::get<string>(param.value)));
+                std::get<std::string>(param.value)));
         } else {
             return false;
         }

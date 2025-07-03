@@ -19,7 +19,7 @@
 #include <array>
 #include <iostream>
 #include "ani.h"
-#include "foundation/ability/ability_runtime/interfaces/kits/native/appkit/ability_runtime/context/context.h"
+#include "application_context.h"
 #include "resource_manager.h"
 
 namespace OHOS {
