@@ -74,6 +74,10 @@ ohos_shared_library("global_resmgr") {
 
   defines = [ "CONFIG_HILOG" ]
 
+  if (is_asan) {
+    defines += ["SUPPORT_ASAN"]
+  }
+
   configs = [ ":resmgr_config" ]
 
   version_script = "libresmgr.versionscript"
