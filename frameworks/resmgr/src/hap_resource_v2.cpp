@@ -380,10 +380,6 @@ int32_t OverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
     if (ret != OK) {
         return ret;
     }
-    if (resInfo.resId_ != idValue->GetId()) {
-        RESMGR_HILOGE(RESMGR_TAG, "Parse ResInfo failed, ResInfo data error.");
-        return UNKNOWN_ERROR;
-    }
 
     idValue->ReserveLimitPaths(resInfo.valueCount_);
     for (uint32_t i = 0; i < resInfo.valueCount_; i++) {
@@ -421,10 +417,6 @@ int32_t SystemOverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idVal
     int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, bufLen_, buf_);
     if (ret != OK) {
         return ret;
-    }
-    if (resInfo.resId_ != idValue->GetId()) {
-        RESMGR_HILOGE(RESMGR_TAG, "Parse ResInfo failed, ResInfo data error.");
-        return UNKNOWN_ERROR;
     }
 
     idValue->ReserveLimitPaths(resInfo.valueCount_);
