@@ -193,6 +193,38 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByIdTest008, TestSiz
 }
 
 /*
+ * @tc.name: ResourceManagerGetStringByIdTest009
+ * @tc.desc: Test GetStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByIdTest009, TestSize.Level1)
+{
+    rmc->AddResource("en", nullptr, nullptr);
+
+    std::vector<std::string> overlayPaths;
+    overlayPaths.push_back(FormatFullPath(g_newOverlayResFilePath).c_str());
+    bool ret = ((ResourceManagerImpl*)rm)->AddResource(FormatFullPath(g_newResFilePath).c_str(), overlayPaths);
+    ASSERT_TRUE(ret);
+    rmc->TestStringById("ohos_app_name", "SystemOverlay");
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByIdTest010
+ * @tc.desc: Test GetStringById function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByIdTest010, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, nullptr);
+
+    std::vector<std::string> overlayPaths;
+    overlayPaths.push_back(FormatFullPath(g_newOverlayResFilePath).c_str());
+    bool ret = ((ResourceManagerImpl*)rm)->AddResource(FormatFullPath(g_newResFilePath).c_str(), overlayPaths);
+    ASSERT_TRUE(ret);
+    rmc->TestStringById("ohos_lab_answer_call", "overlay接听电话");
+}
+
+/*
  * @tc.name: ResourceManagerGetStringByNameTest001
  * @tc.desc: Test GetStringByName function
  * @tc.type: FUNC
@@ -317,6 +349,47 @@ HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameTest007, TestS
     rmc->AddResource("en", nullptr, nullptr);
     std::vector<std::string> overlayPaths;
     overlayPaths.push_back(FormatFullPath(g_overlayResFilePath).c_str());
+    bool ret = ((ResourceManagerImpl *)rm)->AddResource(FormatFullPath(g_newResFilePath).c_str(), overlayPaths);
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    ((ResourceManagerImpl *)rm)->GetStringByName("hello", outValue);
+    ASSERT_EQ(outValue, "Helloooo");
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameTest008
+ * @tc.desc: Test GetStringByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameTest008, TestSize.Level1)
+{
+    auto rc = CreateResConfig();
+    if (rc == nullptr) {
+        ASSERT_TRUE(false);
+    }
+    rc->SetLocaleInfo("zh", nullptr, "CN");
+    rc->SetDirection(DIRECTION_VERTICAL);
+    rm->UpdateResConfig(*rc);
+    delete rc;
+    std::vector<std::string> overlayPaths;
+    overlayPaths.push_back(FormatFullPath(g_newOverlayResFilePath).c_str());
+    bool ret = ((ResourceManagerImpl *)rm)->AddResource(FormatFullPath(g_newResFilePath).c_str(), overlayPaths);
+    ASSERT_TRUE(ret);
+    std::string outValue;
+    ((ResourceManagerImpl *)rm)->GetStringByName("ohos_desc_camera", outValue);
+    ASSERT_EQ(outValue, "允许应用拍摄照片和视频。");
+}
+
+/*
+ * @tc.name: ResourceManagerGetStringByNameTest009
+ * @tc.desc: Test GetStringByName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTestString, ResourceManagerGetStringByNameTest009, TestSize.Level1)
+{
+    rmc->AddResource("en", nullptr, nullptr);
+    std::vector<std::string> overlayPaths;
+    overlayPaths.push_back(FormatFullPath(g_newOverlayResFilePath).c_str());
     bool ret = ((ResourceManagerImpl *)rm)->AddResource(FormatFullPath(g_newResFilePath).c_str(), overlayPaths);
     ASSERT_TRUE(ret);
     std::string outValue;

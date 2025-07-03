@@ -38,6 +38,7 @@ static const char *g_hapPath = "all.hap";
 static const char *g_newModuleHapPath = "newModule.hap";
 static const char *g_nonExistName = "non_existent_name";
 static const char *g_overlayResFilePath = "overlay/assets/entry/resources.index";
+static const char *g_newOverlayResFilePath = "overlay/assets/entry/resourcesV2.index";
 static const float BASE_DPI = 160.0f;
 static const int NON_EXIST_ID = 1111;
 static const char *HAP_PATH_FA = "all_fa.hap";
