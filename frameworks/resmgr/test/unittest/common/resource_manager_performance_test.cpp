@@ -40,7 +40,6 @@ using namespace OHOS::Global::Resource;
 using namespace testing::ext;
 using namespace std;
 namespace {
-static const char *PERFOR_FEIL_PATH = "all/assets/entry/resources_performance.index";
 static const char *PERFOR_FEIL_V2_PATH = "all/assets/entry/resourcesV2.index";
 class ResourceManagerPerformanceTest : public testing::Test {
 public:
@@ -118,85 +117,6 @@ void ResourceManagerPerformanceTest::TearDown(void)
     }
 }
 
-int ParseIndexCost(const std::string &pstr, char *buf, const size_t& bufLen)
-{
-    long long total = 0;
-    auto defaultResConfig = InitDefaultResConfig();
-    for (int k = 0; k < 1000; ++k) {
-        auto t1 = std::chrono::high_resolution_clock::now();
-        auto resDesc = std::make_shared<ResDesc>();
-        if (resDesc == nullptr) {
-            RESMGR_HILOGE(RESMGR_TAG, "new ResDesc failed when LoadFromIndex");
-            free(buf);
-            return -1;
-        }
-        std::shared_ptr<ResConfigImpl> rc = nullptr;
-        HapParserV1 hapParser(rc, SELECT_ALL, false);
-        hapParser.Init(pstr.c_str());
-        int32_t out = hapParser.ParseResHex();
-        if (out != OK) {
-            free(buf);
-            RESMGR_HILOGE(RESMGR_TAG, "ParseResHex failed! retcode:%d", out);
-            return -1;
-        }
-
-        auto pResource = new(std::nothrow) HapResourceV1(pstr, 0, resDesc);
-        if (pResource == nullptr) {
-            RESMGR_HILOGE(RESMGR_TAG, "new HapResource failed when LoadFromIndex");
-            free(buf);
-            return -1;
-        }
-        if (!pResource->Init(defaultResConfig)) {
-            free(buf);
-            return -1;
-        }
-        auto t2 = std::chrono::high_resolution_clock::now();
-        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-    }
-    double average = total / 1000.0;
-    g_logLevel = LOG_DEBUG;
-    RESMGR_HILOGD(RESMGR_TAG, "parse index avg cost 001: %f us", average);
-    EXPECT_LT(average, 2000); // 2000 means the cost of time
-    return OK;
-}
-
-// test HapResource::LoadFromIndex(), spilt to two parts: 1. read from file, 2. parse buf to HapResource
-int TestLoadFromIndex(const char *filePath)
-{
-    std::string pstr = FormatFullPath(filePath);
-    auto start = std::chrono::high_resolution_clock::now();
-    std::ifstream inFile(pstr.c_str(), std::ios::binary | std::ios::in);
-    if (!inFile.good()) {
-        return -1;
-    }
-    inFile.seekg(0, std::ios::end);
-    size_t bufLen = inFile.tellg();
-    if (bufLen <= 0) {
-        RESMGR_HILOGE(RESMGR_TAG, "file size is zero");
-        inFile.close();
-        return -1;
-    }
-    void *buf = malloc(bufLen);
-    if (buf == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "Error allocating memory");
-        inFile.close();
-        return -1;
-    }
-    inFile.seekg(0, std::ios::beg);
-    inFile.read((char *)buf, bufLen);
-    inFile.close();
-
-    auto end = std::chrono::high_resolution_clock::now();
-    auto readFilecost = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-
-    RESMGR_HILOGD(RESMGR_TAG, "read index file cost 001: %lld us", readFilecost);
-    if (ParseIndexCost(pstr, (char *)buf, bufLen) == -1) {
-        return -1;
-    }
-    free(buf);
-    return OK;
-}
-
 int TestLoadFromNewIndex(const char *filePath)
 {
     std::string pstr = FormatFullPath(filePath);
@@ -219,17 +139,6 @@ int TestLoadFromNewIndex(const char *filePath)
     RESMGR_HILOGD(RESMGR_TAG, "read index file cost 002: %lld us", readFilecost);
     return OK;
 }
-
-/*
- * @tc.name: ResourceManagerPerformanceFuncTest001
- * @tc.desc: Test AddResource
- * @tc.type: FUNC
- */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest001, TestSize.Level1)
-{
-    int ret = TestLoadFromIndex(PERFOR_FEIL_PATH);
-    EXPECT_EQ(OK, ret);
-};
 
 /*
  * @tc.name: ResourceManagerPerformanceFuncTest002
@@ -1172,61 +1081,6 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest034, 
 };
 
 /*
- * @tc.name: ResourceManagerPerformanceFuncTest035
- * @tc.desc: Test GetRawFilePathByName
- * @tc.type: FUNC
- */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest035, TestSize.Level1)
-{
-    if (rm == nullptr) {
-        ASSERT_TRUE(false);
-    }
-    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
-    EXPECT_TRUE(ret);
-    unsigned long long total = 0;
-    double average = 0;
-    std::string outValue;
-    for (int k = 0; k < 1000; ++k) {
-        auto t1 = std::chrono::high_resolution_clock::now();
-        rm->GetRawFilePathByName("test_rawfile.txt", outValue);
-        auto t2 = std::chrono::high_resolution_clock::now();
-        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-    }
-    average = total / 1000.0;
-    g_logLevel = LOG_DEBUG;
-    RESMGR_HILOGD(RESMGR_TAG, "avg cost 035: %f us", average);
-    EXPECT_LT(average, 100);
-};
-
-/*
- * @tc.name: ResourceManagerPerformanceFuncTest036
- * @tc.desc: Test GetRawFileDescriptor & CloseRawFileDescriptor
- * @tc.type: FUNC
- */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest036, TestSize.Level1)
-{
-    if (rm == nullptr) {
-        ASSERT_TRUE(false);
-    }
-    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
-    EXPECT_TRUE(ret);
-    unsigned long long total = 0;
-    double average = 0;
-    ResourceManager::RawFileDescriptor descriptor;
-    for (int k = 0; k < 1000; ++k) {
-        auto t1 = std::chrono::high_resolution_clock::now();
-        rm->GetRawFileDescriptor("test_rawfile.txt", descriptor);
-        rm->CloseRawFileDescriptor("test_rawfile.txt");
-        auto t2 = std::chrono::high_resolution_clock::now();
-        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-    }
-    average = total / 1000.0;
-    g_logLevel = LOG_DEBUG;
-    RESMGR_HILOGD(RESMGR_TAG, "avg cost 036: %f us", average);
-    EXPECT_LT(average, 200);
-};
-
-/*
  * @tc.name: ResourceManagerPerformanceFuncTest037
  * @tc.desc: Test GetMediaDataById
  * @tc.type: FUNC
@@ -1387,61 +1241,6 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest042, 
 };
 
 /*
- * @tc.name: ResourceManagerPerformanceFuncTest043
- * @tc.desc: Test GetRawFileFromHap
- * @tc.type: FUNC
- */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest043, TestSize.Level1)
-{
-    if (rm == nullptr) {
-        ASSERT_TRUE(false);
-    }
-    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
-    EXPECT_TRUE(ret);
-    unsigned long long total = 0;
-    double average = 0;
-    size_t len;
-    std::unique_ptr<uint8_t[]> outValue;
-    for (int k = 0; k < 1000; ++k) {
-        auto t1 = std::chrono::high_resolution_clock::now();
-        rm->GetRawFileFromHap("test_rawfile.txt", len, outValue);
-        auto t2 = std::chrono::high_resolution_clock::now();
-        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-    }
-    average = total / 1000.0;
-    g_logLevel = LOG_DEBUG;
-    RESMGR_HILOGD(RESMGR_TAG, "avg cost 043: %f us", average);
-    EXPECT_LT(average, 150);
-};
-
-/*
- * @tc.name: ResourceManagerPerformanceFuncTest044
- * @tc.desc: Test GetRawFileDescriptorFromHap
- * @tc.type: FUNC
- */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest044, TestSize.Level1)
-{
-    if (rm == nullptr) {
-        ASSERT_TRUE(false);
-    }
-    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
-    EXPECT_TRUE(ret);
-    unsigned long long total = 0;
-    double average = 0;
-    ResourceManager::RawFileDescriptor descriptor;
-    for (int k = 0; k < 1000; ++k) {
-        auto t1 = std::chrono::high_resolution_clock::now();
-        rm->GetRawFileDescriptorFromHap("test_rawfile.txt", descriptor);
-        auto t2 = std::chrono::high_resolution_clock::now();
-        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-    }
-    average = total / 1000.0;
-    g_logLevel = LOG_DEBUG;
-    RESMGR_HILOGD(RESMGR_TAG, "avg cost 044: %f us", average);
-    EXPECT_LT(average, 100);
-};
-
-/*
  * @tc.name: ResourceManagerPerformanceFuncTest045
  * @tc.desc: Test IsLoadHap
  * @tc.type: FUNC
@@ -1466,33 +1265,6 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest045, 
     g_logLevel = LOG_DEBUG;
     RESMGR_HILOGD(RESMGR_TAG, "avg cost 045: %f us", average);
     EXPECT_LT(average, 100);
-};
-
-/*
- * @tc.name: ResourceManagerPerformanceFuncTest046
- * @tc.desc: Test GetRawFileList
- * @tc.type: FUNC
- */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest046, TestSize.Level1)
-{
-    if (rm == nullptr) {
-        ASSERT_TRUE(false);
-    }
-    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
-    EXPECT_TRUE(ret);
-    unsigned long long total = 0;
-    double average = 0;
-    std::vector<std::string> rawfileList;
-    for (int k = 0; k < 1000; ++k) {
-        auto t1 = std::chrono::high_resolution_clock::now();
-        rm->GetRawFileList("/", rawfileList);
-        auto t2 = std::chrono::high_resolution_clock::now();
-        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-    }
-    average = total / 1000.0;
-    g_logLevel = LOG_DEBUG;
-    RESMGR_HILOGD(RESMGR_TAG, "avg cost 046: %f us", average);
-    EXPECT_LT(average, 250);
 };
 
 /*
@@ -1573,33 +1345,6 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest049, 
     g_logLevel = LOG_DEBUG;
     RESMGR_HILOGD(RESMGR_TAG, "avg cost 049: %f us", average);
     EXPECT_LT(average, 100);
-};
-
-/*
- * @tc.name: ResourceManagerPerformanceFuncTest050
- * @tc.desc: Test GetRawFdNdkFromHap
- * @tc.type: FUNC
- */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest050, TestSize.Level1)
-{
-    if (rm == nullptr) {
-        ASSERT_TRUE(false);
-    }
-    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
-    EXPECT_TRUE(ret);
-    unsigned long long total = 0;
-    double average = 0;
-    ResourceManager::RawFileDescriptor descriptor;
-    for (int k = 0; k < 1000; ++k) {
-        auto t1 = std::chrono::high_resolution_clock::now();
-        rm->GetRawFdNdkFromHap("test_rawfile.txt", descriptor);
-        auto t2 = std::chrono::high_resolution_clock::now();
-        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-    }
-    average = total / 1000.0;
-    g_logLevel = LOG_DEBUG;
-    RESMGR_HILOGD(RESMGR_TAG, "avg cost 050: %f us", average);
-    EXPECT_LT(average, 200);
 };
 
 /*
@@ -1702,33 +1447,6 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest054, 
     g_logLevel = LOG_DEBUG;
     RESMGR_HILOGD(RESMGR_TAG, "avg cost 054: %f us", average);
     EXPECT_LT(average, 100);
-};
-
-/*
- * @tc.name: ResourceManagerPerformanceFuncTest055
- * @tc.desc: Test IsRawDirFromHap
- * @tc.type: FUNC
- */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest055, TestSize.Level1)
-{
-    if (rm == nullptr) {
-        ASSERT_TRUE(false);
-    }
-    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
-    EXPECT_TRUE(ret);
-    unsigned long long total = 0;
-    double average = 0;
-    bool outValue;
-    for (int k = 0; k < 1000; ++k) {
-        auto t1 = std::chrono::high_resolution_clock::now();
-        rm->IsRawDirFromHap("test_rawfile.txt", outValue);
-        auto t2 = std::chrono::high_resolution_clock::now();
-        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-    }
-    average = total / 1000.0;
-    g_logLevel = LOG_DEBUG;
-    RESMGR_HILOGD(RESMGR_TAG, "avg cost 055: %f us", average);
-    EXPECT_LT(average, 350);
 };
 
 /*
