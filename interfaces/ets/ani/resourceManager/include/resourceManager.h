@@ -33,17 +33,17 @@ public:
     ResMgrAddon(const std::shared_ptr<ResourceManager>& resMgr, bool isSystem = false);
     static ani_object CreateResMgr(ani_env* env, const std::string& bundleName,
         const std::shared_ptr<ResourceManager>& resMgr, std::shared_ptr<AbilityRuntime::Context> context);
-    static ani_object getSystemResourceManager(ani_env* env);
+    static ani_object GetSystemResourceManager(ani_env* env);
 
-    static ani_string getStringSyncById(ani_env* env, ani_object object, ani_double resId);
-    static ani_string getFormatStringSyncById(ani_env *env, ani_object object, ani_double resId, ani_object args);
-    static ani_string getStringSync(ani_env* env, ani_object object, ani_object resource);
-    static ani_string getFormatStringSync(ani_env *env, ani_object object, ani_object resource, ani_object args);
-    static ani_double getNumberById(ani_env* env, ani_object object, ani_double resId);
-    static ani_double getNumber(ani_env* env, ani_object object, ani_object resource);
-    static ani_double getColorSyncById(ani_env* env, ani_object object, ani_double resId);
-    static ani_double getColorSync(ani_env* env, ani_object object, ani_object resource);
-    static ani_object getRawFileContentSync(ani_env* env, ani_object object, ani_string path);
+    static ani_string GetStringSyncById(ani_env* env, ani_object object, ani_double resId);
+    static ani_string GetFormatStringSyncById(ani_env *env, ani_object object, ani_double resId, ani_object args);
+    static ani_string GetStringSync(ani_env* env, ani_object object, ani_object resource);
+    static ani_string GetFormatStringSync(ani_env *env, ani_object object, ani_object resource, ani_object args);
+    static ani_double GetNumberById(ani_env* env, ani_object object, ani_double resId);
+    static ani_double GetNumber(ani_env* env, ani_object object, ani_object resource);
+    static ani_double GetColorSyncById(ani_env* env, ani_object object, ani_double resId);
+    static ani_double GetColorSync(ani_env* env, ani_object object, ani_object resource);
+    static ani_object GetRawFileContentSync(ani_env* env, ani_object object, ani_string path);
 
     static ani_string GetIntPluralStringValueSyncById(ani_env* env, ani_object object,
         ani_double resId, ani_double num, ani_object args);

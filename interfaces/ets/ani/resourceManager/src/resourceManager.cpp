@@ -37,21 +37,21 @@ static std::shared_ptr<ResourceManager> sysResMgr = nullptr;
 static std::mutex sysMgrMutex;
 static std::array methods = {
     ani_native_function { "getStringSync", "D:Lstd/core/String;",
-        reinterpret_cast<void*>(ResMgrAddon::getStringSyncById) },
+        reinterpret_cast<void*>(ResMgrAddon::GetStringSyncById) },
     ani_native_function { "getStringSync", "D[Lstd/core/Object;:Lstd/core/String;",
-        reinterpret_cast<void *>(ResMgrAddon::getFormatStringSyncById) },
+        reinterpret_cast<void *>(ResMgrAddon::GetFormatStringSyncById) },
     ani_native_function { "getStringSync", "Lglobal/resource/Resource;:Lstd/core/String;",
-        reinterpret_cast<void*>(ResMgrAddon::getStringSync) },
+        reinterpret_cast<void*>(ResMgrAddon::GetStringSync) },
     ani_native_function { "getStringSync", "Lglobal/resource/Resource;[Lstd/core/Object;:Lstd/core/String;",
-        reinterpret_cast<void *>(ResMgrAddon::getFormatStringSync) },
-    ani_native_function { "getNumber", "D:D", reinterpret_cast<void*>(ResMgrAddon::getNumberById) },
+        reinterpret_cast<void *>(ResMgrAddon::GetFormatStringSync) },
+    ani_native_function { "getNumber", "D:D", reinterpret_cast<void*>(ResMgrAddon::GetNumberById) },
     ani_native_function { "getNumber", "Lglobal/resource/Resource;:D",
-        reinterpret_cast<void*>(ResMgrAddon::getNumber) },
-    ani_native_function { "getColorSync", "D:D", reinterpret_cast<void*>(ResMgrAddon::getColorSyncById) },
+        reinterpret_cast<void*>(ResMgrAddon::GetNumber) },
+    ani_native_function { "getColorSync", "D:D", reinterpret_cast<void*>(ResMgrAddon::GetColorSyncById) },
     ani_native_function { "getColorSync", "Lglobal/resource/Resource;:D",
-        reinterpret_cast<void*>(ResMgrAddon::getColorSync) },
+        reinterpret_cast<void*>(ResMgrAddon::GetColorSync) },
     ani_native_function { "getRawFileContentSync", nullptr,
-        reinterpret_cast<void*>(ResMgrAddon::getRawFileContentSync) },
+        reinterpret_cast<void*>(ResMgrAddon::GetRawFileContentSync) },
     ani_native_function { "getIntPluralStringValueSync", "DD[Lstd/core/Object;:Lstd/core/String;",
         reinterpret_cast<void*>(ResMgrAddon::GetIntPluralStringValueSyncById) },
     ani_native_function { "getIntPluralStringValueSync",
@@ -226,7 +226,7 @@ static ani_string CreateAniString(ani_env *env, ResMgrDataContext& context)
     return result;
 }
 
-ani_object ResMgrAddon::getSystemResourceManager(ani_env* env)
+ani_object ResMgrAddon::GetSystemResourceManager(ani_env* env)
 {
     if (sysResMgr == nullptr) {
         std::lock_guard<std::mutex> lock(sysMgrMutex);
@@ -291,7 +291,7 @@ static bool GetHapResourceManager(const ResMgrDataContext* dataContext,
     return true;
 }
 
-ani_string ResMgrAddon::getStringSyncById(ani_env* env, ani_object object, ani_double resId)
+ani_string ResMgrAddon::GetStringSyncById(ani_env* env, ani_object object, ani_double resId)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
@@ -315,7 +315,7 @@ ani_string ResMgrAddon::getStringSyncById(ani_env* env, ani_object object, ani_d
     return CreateAniString(env, *dataContext);
 }
 
-static ArrayElement getArrayElement(ani_env* env, ani_object args, const int index)
+static ArrayElement GetArrayElement(ani_env* env, ani_object args, const int index)
 {
     ani_ref value;
     if (ANI_OK != env->Array_Get_Ref(static_cast<ani_array_ref>(args), index, &value)) {
@@ -355,7 +355,7 @@ static bool InitAniParameters(ani_env *env, ani_object args,
     }
 
     for (size_t i = 0; i < size; ++i) {
-        auto param = getArrayElement(env, args, i);
+        auto param = GetArrayElement(env, args, i);
         if (param.type == ArrayElement::ElementType::NUMBER) {
             jsParams.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_NUMBER,
                 std::to_string(std::get<double>(param.value))));
@@ -369,7 +369,7 @@ static bool InitAniParameters(ani_env *env, ani_object args,
     return true;
 }
 
-ani_string ResMgrAddon::getFormatStringSyncById(ani_env *env, ani_object object, ani_double resId, ani_object args)
+ani_string ResMgrAddon::GetFormatStringSyncById(ani_env *env, ani_object object, ani_double resId, ani_object args)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
@@ -396,7 +396,7 @@ ani_string ResMgrAddon::getFormatStringSyncById(ani_env *env, ani_object object,
     return CreateAniString(env, *dataContext);
 }
 
-ani_string ResMgrAddon::getStringSync(ani_env* env, ani_object object, ani_object resource)
+ani_string ResMgrAddon::GetStringSync(ani_env* env, ani_object object, ani_object resource)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     int32_t state = InitDataContext(env, object, dataContext, resource);
@@ -424,7 +424,7 @@ ani_string ResMgrAddon::getStringSync(ani_env* env, ani_object object, ani_objec
     return CreateAniString(env, *dataContext);
 }
 
-ani_string ResMgrAddon::getFormatStringSync(ani_env *env, ani_object object, ani_object resource, ani_object args)
+ani_string ResMgrAddon::GetFormatStringSync(ani_env *env, ani_object object, ani_object resource, ani_object args)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     int32_t state = InitDataContext(env, object, dataContext, resource);
@@ -458,7 +458,7 @@ ani_string ResMgrAddon::getFormatStringSync(ani_env *env, ani_object object, ani
     return CreateAniString(env, *dataContext);
 }
 
-ani_double ResMgrAddon::getNumberById(ani_env* env, ani_object object, ani_double resId)
+ani_double ResMgrAddon::GetNumberById(ani_env* env, ani_object object, ani_double resId)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
@@ -492,7 +492,7 @@ ani_double ResMgrAddon::getNumberById(ani_env* env, ani_object object, ani_doubl
     return aniValue;
 }
 
-ani_double ResMgrAddon::getNumber(ani_env* env, ani_object object, ani_object resource)
+ani_double ResMgrAddon::GetNumber(ani_env* env, ani_object object, ani_object resource)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     int32_t state = InitDataContext(env, object, dataContext, resource);
@@ -530,7 +530,7 @@ ani_double ResMgrAddon::getNumber(ani_env* env, ani_object object, ani_object re
     return aniValue;
 }
 
-ani_double ResMgrAddon::getColorSyncById(ani_env* env, ani_object object, ani_double resId)
+ani_double ResMgrAddon::GetColorSyncById(ani_env* env, ani_object object, ani_double resId)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
@@ -554,7 +554,7 @@ ani_double ResMgrAddon::getColorSyncById(ani_env* env, ani_object object, ani_do
     return dataContext->colorValue_;
 }
 
-ani_double ResMgrAddon::getColorSync(ani_env* env, ani_object object, ani_object resource)
+ani_double ResMgrAddon::GetColorSync(ani_env* env, ani_object object, ani_object resource)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     int32_t state = InitDataContext(env, object, dataContext, resource);
@@ -582,7 +582,7 @@ ani_double ResMgrAddon::getColorSync(ani_env* env, ani_object object, ani_object
     return dataContext->colorValue_;
 }
 
-ani_object ResMgrAddon::getRawFileContentSync(ani_env* env, ani_object object, ani_string path)
+ani_object ResMgrAddon::GetRawFileContentSync(ani_env* env, ani_object object, ani_string path)
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->path_ = AniStrToString(env, path);
@@ -840,7 +840,7 @@ ani_status ResMgrAddon::BindContext(ani_env* env)
     }
 
     std::array nsMethods = {
-        ani_native_function { "getSystemResourceManager", nullptr, reinterpret_cast<void*>(getSystemResourceManager) },
+        ani_native_function { "getSystemResourceManager", nullptr, reinterpret_cast<void*>(GetSystemResourceManager) },
     };
 
     if (ANI_OK != env->Namespace_BindNativeFunctions(ns, nsMethods.data(), nsMethods.size())) {
