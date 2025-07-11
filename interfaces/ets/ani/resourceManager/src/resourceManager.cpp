@@ -849,19 +849,3 @@ ani_status ResMgrAddon::BindContext(ani_env* env)
     };
     return ANI_OK;
 }
-
-ANI_EXPORT ani_status ANI_Constructor(ani_vm* vm, uint32_t* result)
-{
-    ani_env* env;
-    if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Unsupported ANI_VERSION_1");
-        return (ani_status)ANI_ERROR;
-    }
-
-    auto status = ResMgrAddon::BindContext(env);
-    if (status != ANI_OK) {
-        return status;
-    }
-    *result = ANI_VERSION_1;
-    return ANI_OK;
-}
