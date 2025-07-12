@@ -50,6 +50,23 @@ ohos_shared_library("resourceManager_ani") {
   subsystem_name = "global"
 }
 
+ohos_shared_library("resmgr_ani") {
+  include_dirs = [ "./include" ]
+  sources = [ "./src/resmgr_ani.cpp" ]
+  defines = [ "CONFIG_HILOG" ]
+  deps = [ ":resourceManager_ani" ]
+  external_deps = [
+    "ability_base:configuration",
+    "ability_runtime:app_context",
+    "bundle_framework:appexecfwk_base",
+    "hilog:libhilog",
+    "runtime_core:ani",
+  ]
+
+  part_name = "resource_management"
+  subsystem_name = "global"
+}
+
 generate_static_abc("resourceManager") {
   base_url = "./ets"
   files = [ "./ets/@ohos.resourceManager.ets" ]
