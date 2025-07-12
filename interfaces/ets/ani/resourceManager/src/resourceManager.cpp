@@ -15,7 +15,6 @@
 
 #include "resourceManager.h"
 
-#include "drawable_descriptor_ani.h"
 #include "hilog_wrapper.h"
 #include "resource_manager_ani_utils.h"
 #include "resource_manager_data_context.h"
@@ -1523,31 +1522,6 @@ ani_object CreateDrawableDescriptorbyId(ani_env* env, std::unique_ptr<ResMgrData
         return nullptr;
     }
     return nullptr;
-    // Ace::Ani::DrawableInfo drawableInfo;
-    // drawableInfo.density = dataContext->density_;
-    // drawableInfo.manager = resMgr;
-    // RState state = SUCCESS;
-    // if (dataContext->iconType_ == 1) {
-    //     std::pair<std::unique_ptr<uint8_t[]>, size_t> foregroundInfo;
-    //     std::pair<std::unique_ptr<uint8_t[]>, size_t> backgroundInfo;
-    //     state = resMgr->GetThemeIcons(resId, foregroundInfo, backgroundInfo, dataContext->density_);
-    //     if (state == SUCCESS) {
-    //         drawableInfo.firstBuffer.data = std::move(foregroundInfo.first);
-    //         drawableInfo.firstBuffer.len = foregroundInfo.second;
-    //         drawableInfo.secondBuffer.data = std::move(backgroundInfo.first);
-    //         drawableInfo.secondBuffer.len = backgroundInfo.second;
-    //         drawableInfo.type = "layered";
-    //         return Ace::Ani::DrawableDescriptorAni::CreateDrawableDescriptor(env, drawableInfo);
-    //     }
-    // }
-    // state = resMgr->GetDrawableInfoById(resId, drawableInfo.type,
-    //     drawableInfo.firstBuffer.len, drawableInfo.firstBuffer.data, dataContext->density_);
-    // if (SUCCESS != state) {
-    //     dataContext->SetErrorMsg("Failed to Create drawableDescriptor", true);
-    //         ResourceManagerAniUtils::AniThrow(env, state);
-    //     return nullptr;
-    // };
-    // return Ace::Ani::DrawableDescriptorAni::CreateDrawableDescriptor(env, drawableInfo);
 }
 
 ani_object ResMgrAddon::GetDrawableDescriptorById(ani_env* env, ani_object object,
