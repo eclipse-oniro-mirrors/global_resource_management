@@ -12,16 +12,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef RESOURCE_MANAGER_DATA_H
-#define RESOURCE_MANAGER_DATA_H
-#include "resource_manager.h"
+
+#ifndef RESOURCE_MANAGER_DATA_CONTEXT_H
+#define RESOURCE_MANAGER_DATA_CONTEXT_H
+
 #include "hilog_wrapper.h"
+#include "resource_manager.h"
+
 namespace OHOS {
 namespace Global {
 namespace Resource {
 struct ResMgrDataContext {
     std::string bundleName_;
-    int32_t resId_;
+    uint32_t resId_;
     int32_t param_;
     ResourceManager::Quantity quantity_;
 

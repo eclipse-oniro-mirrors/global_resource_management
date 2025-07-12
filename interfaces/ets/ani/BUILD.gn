@@ -16,6 +16,7 @@ import("//build/ohos.gni")
 group("ani_package_resmgr") {
   deps = [
     "./resourceManager:rawFileDescriptor_etc",
+    "./resourceManager:resmgr_ani",
     "./resourceManager:resourceManager_ani",
     "./resourceManager:resourceManager_etc",
     "./resourceManager:resource_etc",
