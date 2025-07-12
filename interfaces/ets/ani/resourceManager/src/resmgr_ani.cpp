@@ -12,12 +12,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Resource } from 'global.resource';
 
-export class ResourceInner implements Resource {
-    public bundleName: string = '';
-    public moduleName: string = '';
-    public id: number = 0;
-    public params?: Array<Object | undefined>;
-    public type?: number = 0;
+#include "hilog_wrapper.h"
+#include "resourceManager.h"
+
+ANI_EXPORT ani_status ANI_Constructor(ani_vm* vm, uint32_t* result)
+{
+    ani_env* env;
+    if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Unsupported ANI_VERSION_1");
+        return (ani_status)ANI_ERROR;
+    }
+
+    auto status = OHOS::Global::Resource::ResMgrAddon::BindContext(env);
+    if (status != ANI_OK) {
+        return status;
+    }
+    *result = ANI_VERSION_1;
+    return ANI_OK;
 }

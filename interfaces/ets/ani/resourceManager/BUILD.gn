@@ -32,16 +32,25 @@ ohos_shared_library("resourceManager_ani") {
     "./src/resource_manager_ani_utils.cpp",
   ]
   defines = [ "CONFIG_HILOG" ]
-
   deps = [ "../../../../frameworks/resmgr:global_resmgr" ]
-
   external_deps = [
-    "ability_base:configuration",
     "ability_runtime:app_context",
-    "ace_engine:drawable_descriptor",
-    "bundle_framework:appexecfwk_base",
-    "cJSON:cjson",
-    "c_utils:utils",
+    # "ace_engine:drawable_inner_ani",
+    "hilog:libhilog",
+    "runtime_core:ani",
+  ]
+
+  part_name = "resource_management"
+  subsystem_name = "global"
+}
+
+ohos_shared_library("resmgr_ani") {
+  include_dirs = [ "./include" ]
+  sources = [ "./src/resmgr_ani.cpp" ]
+  defines = [ "CONFIG_HILOG" ]
+  deps = [ ":resourceManager_ani" ]
+  external_deps = [
+    "ability_runtime:app_context",
     "hilog:libhilog",
     "runtime_core:ani",
   ]
@@ -69,7 +78,10 @@ generate_static_abc("resource") {
 
 generate_static_abc("rawFileDescriptor") {
   base_url = "./ets"
-  files = [ "./ets/global/rawFileDescriptor.ets" ]
+  files = [
+    "./ets/global/rawFileDescriptor.ets",
+    "./ets/global/rawFileDescriptorInner.ets",
+  ]
   is_boot_abc = "True"
   device_dst_file = "system/framework/rawFileDescriptor.abc"
   dependencies = [ ":copy_rawFileDescriptorInner_ets" ]
