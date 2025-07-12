@@ -1557,41 +1557,6 @@ ani_object CreateDrawableDescriptorbyName(ani_env* env, std::unique_ptr<ResMgrDa
         return nullptr;
     }
     return nullptr;
-    // Ace::Ani::DrawableInfo drawableInfo;
-    // drawableInfo.density = dataContext->density_;
-    // drawableInfo.manager = resMgr;
-    // RState state = SUCCESS;
-    // if (dataContext->iconType_ == 1) {
-    //     std::pair<std::unique_ptr<uint8_t[]>, size_t> foregroundInfo;
-    //     std::pair<std::unique_ptr<uint8_t[]>, size_t> backgroundInfo;
-    //     state = resMgr->GetThemeIcons(0, foregroundInfo, backgroundInfo, dataContext->density_);
-    //     if (state == SUCCESS) {
-    //         drawableInfo.firstBuffer.data = std::move(foregroundInfo.first);
-    //         drawableInfo.firstBuffer.len = foregroundInfo.second;
-    //         drawableInfo.secondBuffer.data = std::move(backgroundInfo.first);
-    //         drawableInfo.secondBuffer.len = backgroundInfo.second;
-    //         drawableInfo.type = "layered";
-    //         return Ace::Ani::DrawableDescriptorAni::CreateDrawableDescriptor(env, drawableInfo);
-    //     }
-    // }
-
-    // if (dataContext->iconType_ == 2) { // 2 means get the dynamic icon from theme
-    //     std::pair<std::unique_ptr<uint8_t[]>, size_t> iconInfo;
-    //     if (resMgr->GetDynamicIcon(dataContext->resName_, iconInfo, dataContext->density_) == SUCCESS) {
-    //         drawableInfo.firstBuffer.data = std::move(iconInfo.first);
-    //         drawableInfo.firstBuffer.len = iconInfo.second;
-    //         return Ace::Ani::DrawableDescriptorAni::CreateDrawableDescriptor(env, drawableInfo);
-    //     }
-    // }
-
-    // state = resMgr->GetDrawableInfoByName(dataContext->resName_.c_str(), drawableInfo.type,
-    //     drawableInfo.firstBuffer.len, drawableInfo.firstBuffer.data, dataContext->density_);
-    // if (SUCCESS != state) {
-    //     dataContext->SetErrorMsg("Failed to Create drawableDescriptor");
-    //     ResourceManagerAniUtils::AniThrow(env, state);
-    //     return nullptr;
-    // };
-    // return Ace::Ani::DrawableDescriptorAni::CreateDrawableDescriptor(env, drawableInfo);
 }
 
 ani_object ResMgrAddon::GetDrawableDescriptorByName(ani_env* env, ani_object object,
