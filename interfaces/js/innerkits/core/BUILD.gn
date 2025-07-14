@@ -65,6 +65,7 @@ ohos_shared_library("resmgr_napi_core") {
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "napi:ace_napi",
+    "cJSON:cjson",
   ]
 
   if (resource_management_support_icu) {
@@ -132,6 +133,7 @@ ohos_shared_library("resmgr_napi_core_preview_inner") {
       "bounds_checking_function:libsec_shared",
       "hilog:libhilog",
       "napi:ace_napi",
+      "cJSON:cjson_static",
     ]
   }
   subsystem_name = "global"

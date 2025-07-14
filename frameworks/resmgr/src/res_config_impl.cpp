@@ -1036,6 +1036,13 @@ bool ResConfigImpl::GetAppDarkRes() const
 {
     return this->isAppDarkRes_;
 }
+
+bool ResConfigImpl::IsInvalidResConfig()
+{
+    return this->colorMode_ == LIGHT && this->direction_ == DIRECTION_NOT_SET
+        && this->density_ == SCREEN_DENSITY_NOT_SET
+        && this->screenDensityDpi_ == SCREEN_DENSITY_NOT_SET;
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

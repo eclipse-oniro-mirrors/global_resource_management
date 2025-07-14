@@ -445,6 +445,10 @@ bool HapManager::AddResource(const char *path, const uint32_t &selectedTypes, bo
     if (pResource->HasDarkRes()) {
         this->resConfig_->SetAppDarkRes(true);
     }
+    if (!pResource->IsSystemResource() && !pResource->IsOverlayResource()
+        && pResource->IsThemeSystemResEnable()) {
+        this->isThemeSystemResEnable_ = true;
+    }
     return true;
 }
 
@@ -479,6 +483,10 @@ bool HapManager::AddResource(const std::string &path, const std::vector<std::str
         hapResources_.push_back(result[path]);
         if (result[path]->HasDarkRes()) {
             this->resConfig_->SetAppDarkRes(true);
+        }
+        if (!result[path]->IsSystemResource() && !result[path]->IsOverlayResource()
+            && result[path]->IsThemeSystemResEnable()) {
+            this->isThemeSystemResEnable_ = true;
         }
     }
     for (auto iter = overlayPaths.rbegin(); iter != overlayPaths.rend(); iter++) {
@@ -1274,15 +1282,7 @@ RState HapManager::IsRawDirFromHap(const std::string &pathName, bool &outValue)
 bool HapManager::IsThemeSystemResEnableHap()
 {
     ReadLock lock(this->mutex_);
-    for (auto iter = hapResources_.begin(); iter != hapResources_.end(); iter++) {
-        if ((*iter)->IsSystemResource() || (*iter)->IsOverlayResource()) {
-            continue;
-        }
-        if ((*iter)->IsThemeSystemResEnable()) {
-            return true;
-        }
-    }
-    return false;
+    return this->isThemeSystemResEnable_;
 }
 
 bool HapManager::IsSystem()
@@ -1293,6 +1293,16 @@ bool HapManager::IsSystem()
 std::unordered_map<std::string, std::vector<std::string>> HapManager::GetLoadedHapPaths()
 {
     return this->loadedHapPaths_;
+}
+
+void HapManager::UpdateAppConfigForSysResManager(bool isAppDarkRes, bool isThemeSystemResEnable)
+{
+    WriteLock lock(this->mutex_);
+    if (this->isSystem_ && this->isFirstUpdate_) {
+        this->isFirstUpdate_ = false;
+        this->resConfig_->SetAppDarkRes(isAppDarkRes);
+        this->isThemeSystemResEnable_ = isThemeSystemResEnable;
+    }
 }
 } // namespace Resource
 } // namespace Global

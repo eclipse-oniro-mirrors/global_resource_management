@@ -51,6 +51,8 @@ public:
 
     static napi_value GetSystemResMgr(napi_env env);
 
+    static napi_value GetSysResourceManager(napi_env env);
+
     ~ResourceManagerAddon();
 
     inline std::shared_ptr<ResourceManager> GetResMgr()

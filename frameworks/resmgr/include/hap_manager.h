@@ -440,6 +440,13 @@ public:
         isOverride_ = isOverride;
     }
 
+    /**
+     * Update the app config for system resource manager
+     *
+     * @param isAppDarkRes true if app set drak res, else not.
+     * @param isThemeSystemResEnable true if theme system resource is enabled, else not.
+     */
+    void UpdateAppConfigForSysResManager(bool isAppDarkRes, bool isThemeSystemResEnable);
 private:
     void UpdateResConfigImpl(ResConfigImpl &resConfig);
 
@@ -486,6 +493,10 @@ private:
     bool isSystem_;
 
     bool isOverride_{ false };
+
+    bool isThemeSystemResEnable_{ false };
+
+    bool isFirstUpdate_{ true };
 };
 } // namespace Resource
 } // namespace Global

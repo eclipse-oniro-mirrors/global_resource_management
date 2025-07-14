@@ -55,6 +55,20 @@ public:
      */
     static bool AddSystemResource(ResourceManagerImpl *resourceManager);
 
+    /**
+     * create system resource manager
+     *
+     * @return the new system resource manager
+     */
+    EXPORT_FUNC static std::shared_ptr<ResourceManagerImpl> CreateSysResourceManager();
+
+    /**
+     * update system resource manager resconfig
+     *
+     * @param resConfig the current resconfig
+     * @param isThemeSystemResEnable if true means is theme system res enable
+     */
+    static void UpdateSysResConfig(ResConfigImpl &resConfig, bool isThemeSystemResEnable);
 private:
     static std::mutex mutex_;
 
@@ -79,7 +93,14 @@ private:
     static bool LoadSystemResource(ResourceManagerImpl *impl, bool isSandbox = true);
 
     static ResourceManagerImpl *CreateSystemResourceManager(bool isSandbox);
+
     static std::shared_ptr<ResourceManagerImpl> CreateSystemResourceManager();
+
+    static bool CreateManagerInner(ResourceManagerImpl *impl);
+
+    static std::mutex sysResMgrMutex_;
+
+    static std::shared_ptr<ResourceManagerImpl> sysResMgr_;
 };
 } // namespace Resource
 } // namespace Global
