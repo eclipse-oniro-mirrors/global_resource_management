@@ -35,7 +35,7 @@ ohos_shared_library("resourceManager_ani") {
   deps = [ "../../../../frameworks/resmgr:global_resmgr" ]
   external_deps = [
     "ability_runtime:app_context",
-    # "ace_engine:drawable_inner_ani",
+    "ace_engine:drawable_inner_ani",
     "hilog:libhilog",
     "runtime_core:ani",
   ]
