@@ -69,6 +69,15 @@ public:
      * @param isThemeSystemResEnable if true means is theme system res enable
      */
     static void UpdateSysResConfig(ResConfigImpl &resConfig, bool isThemeSystemResEnable);
+
+#if defined(__ARKUI_CROSS__) || defined(__IDE_PREVIEW__)
+    /**
+     * add system resource for preview
+     *
+     * @param resMgr the system resource manager
+     */
+    static void AddSystemResourceForPreview(ResourceManagerImpl* resMgr);
+#endif
 private:
     static std::mutex mutex_;
 
