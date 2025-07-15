@@ -135,4 +135,3 @@ ohos_shared_library("resmgr_napi_core_preview_inner") {
   subsystem_name = "global"
   part_name = "resource_management"
 }
-
