@@ -386,8 +386,8 @@ ResourceManager_ErrorCode OH_ResourceManager_GetLocalesData(const NativeResource
     return copyStringArray(resultValue, resultLen, tempResultValue, "GetLocales");
 }
 
-ResourceManager_ErrorCode OH_ResourceManager_GetConfiguration(const NativeResourceManager *mgr,
-    ResourceManager_Configuration *configuration)
+ResourceManager_ErrorCode GetConfiguration(const NativeResourceManager *mgr,
+    ResourceManager_Configuration *configuration, bool getScreenDensityDpi)
 {
     if (mgr == nullptr || configuration == nullptr || mgr->resManager == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
@@ -403,12 +403,28 @@ ResourceManager_ErrorCode OH_ResourceManager_GetConfiguration(const NativeResour
     {
         configuration->direction = static_cast<::ResourceManager_Direction>(resConfig.GetDirection());
         configuration->deviceType = static_cast<::ResourceManager_DeviceType>(resConfig.GetDeviceType());
-        configuration->screenDensity = static_cast<::ScreenDensity>(resConfig.GetScreenDensity());
+        if (getScreenDensityDpi) {
+            configuration->screenDensity = static_cast<::ScreenDensity>(resConfig.GetScreenDensityDpi());
+        } else {
+            configuration->screenDensity = static_cast<::ScreenDensity>(resConfig.GetScreenDensity());
+        }
         configuration->colorMode = static_cast<::ResourceManager_ColorMode>(resConfig.GetColorMode());
         configuration->mcc = resConfig.GetMcc();
         configuration->mnc = resConfig.GetMnc();
     }
     return ResourceManager_ErrorCode::SUCCESS;
+}
+
+ResourceManager_ErrorCode OH_ResourceManager_GetConfiguration(const NativeResourceManager *mgr,
+    ResourceManager_Configuration *configuration)
+{
+    return GetConfiguration(mgr, configuration, false);
+}
+
+ResourceManager_ErrorCode OH_ResourceManager_GetResourceConfiguration(const NativeResourceManager *mgr,
+    ResourceManager_Configuration *configuration)
+{
+    return GetConfiguration(mgr, configuration, true);
 }
 
 ResourceManager_ErrorCode OH_ResourceManager_GetStringArray(const NativeResourceManager *mgr,
