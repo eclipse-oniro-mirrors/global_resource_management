@@ -220,6 +220,16 @@ void SystemResourceManager::UpdateSysResConfig(ResConfigImpl &resConfig, bool is
     hapManager->UpdateResConfig(resConfig);
     hapManager->UpdateAppConfigForSysResManager(resConfig.GetAppDarkRes(), isThemeSystemResEnable);
 }
+
+#if defined(__ARKUI_CROSS__) || defined(__IDE_PREVIEW__)
+void SystemResourceManager::AddSystemResourceForPreview(ResourceManagerImpl* resMgr)
+{
+    if (resMgr == nullptr || sysResMgr_ == nullptr) {
+        return;
+    }
+    sysResMgr_->AddSystemResource(resMgr);
+}
+#endif
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS
