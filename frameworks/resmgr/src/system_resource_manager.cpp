@@ -50,6 +50,12 @@ std::shared_ptr<ResourceManagerImpl> SystemResourceManager::sysResMgr_ = nullptr
 
 std::mutex SystemResourceManager::sysResMgrMutex_;
 
+std::shared_ptr<ResConfigImpl> SystemResourceManager::resConfig_ = nullptr;
+
+bool SystemResourceManager::isFirstUpdate_ = true;
+
+bool SystemResourceManager::isThemeSystemResEnable_ = false;
+
 SystemResourceManager::SystemResourceManager()
 {}
 
@@ -102,7 +108,6 @@ ResourceManagerImpl *SystemResourceManager::CreateSystemResourceManager(bool isS
         }
         resourceManager_ = impl;
     }
-    CreateSysResourceManager();
     return resourceManager_;
 }
 
@@ -202,16 +207,38 @@ std::shared_ptr<ResourceManagerImpl> SystemResourceManager::CreateSysResourceMan
         RESMGR_HILOGE(RESMGR_TAG, "init sys resource manager failed");
         return nullptr;
     }
+
+#if defined(__ARKUI_CROSS__) || defined(__IDE_PREVIEW__)
+    AddSystemResourceForPreview(resourceManager_);
+#endif
+    if (resConfig_ != nullptr) {
+        UpdateResConfig(*resConfig_, isThemeSystemResEnable_);
+    }
     return sysResMgr_;
 }
 
-void SystemResourceManager::UpdateSysResConfig(ResConfigImpl &resConfig, bool isThemeSystemResEnable)
+void SystemResourceManager::SaveResConfig(ResConfigImpl &resConfig, bool isThemeSystemResEnable)
 {
-    std::lock_guard<std::mutex> lock(sysResMgrMutex_);
-    if (sysResMgr_ == nullptr || resConfig.IsInvalidResConfig()) {
+    if (resConfig_ == nullptr) {
+        resConfig_ = std::make_shared<ResConfigImpl>();
+    }
+
+    if (resConfig_ == nullptr) {
         return;
     }
 
+    resConfig_->Copy(resConfig, true);
+    if (isFirstUpdate_) {
+        isFirstUpdate_ = false;
+        isThemeSystemResEnable_ = isThemeSystemResEnable;
+    }
+}
+
+void SystemResourceManager::UpdateResConfig(ResConfigImpl &resConfig, bool isThemeSystemResEnable)
+{
+    if (sysResMgr_ == nullptr) {
+        return;
+    }
     auto hapManager = sysResMgr_->GetHapManager();
     if (hapManager == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "sys resource manager hapManager is null");
@@ -219,6 +246,20 @@ void SystemResourceManager::UpdateSysResConfig(ResConfigImpl &resConfig, bool is
     }
     hapManager->UpdateResConfig(resConfig);
     hapManager->UpdateAppConfigForSysResManager(resConfig.GetAppDarkRes(), isThemeSystemResEnable);
+}
+
+void SystemResourceManager::UpdateSysResConfig(ResConfigImpl &resConfig, bool isThemeSystemResEnable)
+{
+    std::lock_guard<std::mutex> lock(sysResMgrMutex_);
+    if (resConfig.IsInvalidResConfig()) {
+        return;
+    }
+
+    if (sysResMgr_ == nullptr) {
+        SaveResConfig(resConfig, isThemeSystemResEnable);
+        return;
+    }
+    UpdateResConfig(resConfig, isThemeSystemResEnable);
 }
 
 #if defined(__ARKUI_CROSS__) || defined(__IDE_PREVIEW__)
