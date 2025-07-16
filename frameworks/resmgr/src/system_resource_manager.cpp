@@ -76,7 +76,7 @@ ResourceManagerImpl *SystemResourceManager::GetSystemResourceManagerNoSandBox()
     return CreateSystemResourceManager(false);
 }
 
-bool SystemResourceManager::CreateManagerInner(ResourceManagerImpl *impl)
+bool SystemResourceManager::InitResourceManager(ResourceManagerImpl *impl)
 {
     if (!impl->Init(true)) {
         RESMGR_HILOGE(RESMGR_TAG, "init failed");
@@ -228,8 +228,8 @@ void SystemResourceManager::SaveResConfig(ResConfigImpl &resConfig, bool isTheme
     }
 
     resConfig_->Copy(resConfig, true);
-    if (isFirstUpdate_) {
-        isFirstUpdate_ = false;
+    if (isUpdateAppConfig_) {
+        isUpdateAppConfig_ = false;
         isThemeSystemResEnable_ = isThemeSystemResEnable;
     }
 }
