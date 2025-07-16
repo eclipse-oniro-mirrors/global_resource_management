@@ -102,7 +102,7 @@ ResourceManagerImpl *SystemResourceManager::CreateSystemResourceManager(bool isS
             RESMGR_HILOGE(RESMGR_TAG, "new ResourceManagerImpl failed when CreateSystemResourceManager");
             return nullptr;
         }
-        if (!CreateManagerInner(impl)) {
+        if (!InitResourceManager(impl)) {
             delete impl;
             return nullptr;
         }
@@ -203,7 +203,7 @@ std::shared_ptr<ResourceManagerImpl> SystemResourceManager::CreateSysResourceMan
         return nullptr;
     }
 
-    if (!CreateManagerInner(sysResMgr_.get())) {
+    if (!InitResourceManager(sysResMgr_.get())) {
         RESMGR_HILOGE(RESMGR_TAG, "init sys resource manager failed");
         return nullptr;
     }
