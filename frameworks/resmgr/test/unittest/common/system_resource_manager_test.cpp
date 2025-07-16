@@ -29,17 +29,8 @@ protected:
     void TearDown() override;
 
     static constexpr int refCountTwo = 2;
-    static constexpr int refCountThree = 3;
     static constexpr int refCountFour = 4;
-    static constexpr int refCountFive = 5;
 };
-
-void ReleaseSysResourceManager()
-{
-    if (SystemResourceManager::sysResMgr_ != nullptr) {
-        SystemResourceManager::sysResMgr_ = nullptr;
-    }
-}
 
 void SystemResourceManagerTest::SetUp()
 {
@@ -69,11 +60,10 @@ HWTEST_F(SystemResourceManagerTest, GetSystemResourceManagerNoSandBoxTest, TestS
 {
     {
         SystemResourceManager::GetSystemResourceManagerNoSandBox();
-        EXPECT_EQ(SystemResourceManager::weakResourceManager_.use_count(), refCountTwo);
+        EXPECT_EQ(SystemResourceManager::weakResourceManager_.use_count(), 1);
     }
-    EXPECT_EQ(SystemResourceManager::weakResourceManager_.use_count(), refCountTwo);
+    EXPECT_EQ(SystemResourceManager::weakResourceManager_.use_count(), 1);
     SystemResourceManager::ReleaseSystemResourceManager();
-    ReleaseSysResourceManager();
     EXPECT_EQ(SystemResourceManager::weakResourceManager_.use_count(), 0);
 }
 
@@ -100,17 +90,16 @@ HWTEST_F(SystemResourceManagerTest, SystemResourceCreateBeforeGet, TestSize.Leve
     {
         std::shared_ptr<ResourceManager> resMgr(CreateResourceManager());
         SystemResourceManager::GetSystemResourceManagerNoSandBox();
-        EXPECT_EQ(SystemResourceManager::weakResourceManager_.use_count(), refCountThree);
+        EXPECT_EQ(SystemResourceManager::weakResourceManager_.use_count(), refCountTwo);
         auto sysResMgr = SystemResourceManager::weakResourceManager_.lock();
         ASSERT_TRUE(sysResMgr != nullptr);
         auto hapResources = sysResMgr->hapManager_->GetHapResource();
         ASSERT_GT(hapResources.size(), 0);
         weakResource = hapResources[0];
-        EXPECT_EQ(weakResource.use_count(), refCountFive);
+        EXPECT_EQ(weakResource.use_count(), refCountFour);
     }
-    EXPECT_EQ(weakResource.use_count(), refCountThree);
+    EXPECT_EQ(weakResource.use_count(), refCountTwo);
     SystemResourceManager::ReleaseSystemResourceManager();
-    ReleaseSysResourceManager();
     EXPECT_EQ(weakResource.use_count(), 0);
 }
 
@@ -120,15 +109,15 @@ HWTEST_F(SystemResourceManagerTest, SystemResourceCreateAfterGet, TestSize.Level
     {
         SystemResourceManager::GetSystemResourceManagerNoSandBox();
         std::shared_ptr<ResourceManager> resMgr(CreateResourceManager());
-        EXPECT_EQ(SystemResourceManager::weakResourceManager_.use_count(), refCountThree);
+        EXPECT_EQ(SystemResourceManager::weakResourceManager_.use_count(), refCountTwo);
         auto sysResMgr = SystemResourceManager::weakResourceManager_.lock();
         ASSERT_TRUE(sysResMgr != nullptr);
         auto hapResources = sysResMgr->hapManager_->GetHapResource();
         ASSERT_GT(hapResources.size(), 0);
         weakResource = hapResources[0];
-        EXPECT_EQ(weakResource.use_count(), refCountFive);
+        EXPECT_EQ(weakResource.use_count(), refCountFour);
     }
-    EXPECT_EQ(weakResource.use_count(), refCountThree);
+    EXPECT_EQ(weakResource.use_count(), refCountTwo);
     SystemResourceManager::ReleaseSystemResourceManager();
     ReleaseSysResourceManager();
     EXPECT_EQ(weakResource.use_count(), 0);
@@ -169,6 +158,7 @@ HWTEST_F(SystemResourceManagerTest, CreateSysResourceManagerTest002, TestSize.Le
     bool ret = resMgr->AddResource(FormatFullPath(g_resFilePath).c_str());
     ASSERT_TRUE(ret);
     ResConfigImpl rc;
+    rc.SetLocaleInfo("en", nullptr, "US"); 
     rc.SetColorMode(ColorMode::DARK);
     resMgr->UpdateResConfig(rc);
     uint32_t rmOutValue;
@@ -187,6 +177,7 @@ HWTEST_F(SystemResourceManagerTest, CreateSysResourceManagerTest003, TestSize.Le
     bool ret = resMgr->AddResource(FormatFullPath(g_resFilePath).c_str());
     ASSERT_TRUE(ret);
     ResConfigImpl rc;
+    rc.SetLocaleInfo("en", nullptr, "US");
     rc.SetScreenDensity(2.00);
     rc.SetDeviceType(DeviceType::DEVICE_WEARABLE);
     resMgr->UpdateResConfig(rc);
@@ -206,6 +197,7 @@ HWTEST_F(SystemResourceManagerTest, CreateSysResourceManagerTest004, TestSize.Le
     bool ret = resMgr->AddResource(FormatFullPath(g_resFilePath).c_str());
     ASSERT_TRUE(ret);
     ResConfigImpl rc;
+    rc.SetLocaleInfo("en", nullptr, "US");
     rc.SetScreenDensity(3.25);
     resMgr->UpdateResConfig(rc);
     float rmOutValue;
@@ -224,6 +216,7 @@ HWTEST_F(SystemResourceManagerTest, CreateSysResourceManagerTest005, TestSize.Le
     bool ret = resMgr->AddResource(FormatFullPath(g_resFilePath).c_str());
     ASSERT_TRUE(ret);
     ResConfigImpl rc;
+    rc.SetLocaleInfo("en", nullptr, "US");
     rc.SetDirection(Direction::DIRECTION_VERTICAL);
     resMgr->UpdateResConfig(rc);
     uint32_t rmOutValue;
@@ -242,6 +235,7 @@ HWTEST_F(SystemResourceManagerTest, CreateSysResourceManagerTest006, TestSize.Le
     bool ret = resMgr->AddResource(FormatFullPath(g_resFilePath).c_str());
     ASSERT_TRUE(ret);
     ResConfigImpl rc;
+    rc.SetLocaleInfo("en", nullptr, "US");
     rc.SetMcc(460);
     rc.SetMnc(001);
     resMgr->UpdateResConfig(rc);
