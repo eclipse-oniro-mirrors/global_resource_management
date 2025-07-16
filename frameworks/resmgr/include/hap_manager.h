@@ -496,7 +496,7 @@ private:
 
     bool isThemeSystemResEnable_{ false };
 
-    bool isFirstUpdate_{ true };
+    bool isUpdateAppConfig_{ true };
 };
 } // namespace Resource
 } // namespace Global
