@@ -1334,7 +1334,6 @@ bool ResourceManagerImpl::AddResource(const char *path, const uint32_t &selected
         if (systemResourceManager != nullptr) {
             systemResourceManager->AddResource(path);
             AddSystemResource(systemResourceManager);
-            SystemResourceManager::AddSystemResourceForPreview(systemResourceManager);
             return true;
         }
     }
