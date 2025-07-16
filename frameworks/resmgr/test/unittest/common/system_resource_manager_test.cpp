@@ -35,7 +35,6 @@ protected:
 void SystemResourceManagerTest::SetUp()
 {
     SystemResourceManager::ReleaseSystemResourceManager();
-    ReleaseSysResourceManager();
 }
 
 void SystemResourceManagerTest::TearDown()
@@ -119,7 +118,6 @@ HWTEST_F(SystemResourceManagerTest, SystemResourceCreateAfterGet, TestSize.Level
     }
     EXPECT_EQ(weakResource.use_count(), refCountTwo);
     SystemResourceManager::ReleaseSystemResourceManager();
-    ReleaseSysResourceManager();
     EXPECT_EQ(weakResource.use_count(), 0);
 }
 
