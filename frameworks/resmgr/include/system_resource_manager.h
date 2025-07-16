@@ -117,7 +117,7 @@ private:
 
     static std::shared_ptr<ResConfigImpl> resConfig_;
 
-    static bool isFirstUpdate_;
+    static bool isUpdateAppConfig_;
 
     static bool isThemeSystemResEnable_;
 };
