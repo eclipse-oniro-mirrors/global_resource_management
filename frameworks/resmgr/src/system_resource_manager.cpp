@@ -52,7 +52,7 @@ std::mutex SystemResourceManager::sysResMgrMutex_;
 
 std::shared_ptr<ResConfigImpl> SystemResourceManager::resConfig_ = nullptr;
 
-bool SystemResourceManager::isFirstUpdate_ = true;
+bool SystemResourceManager::isUpdateAppConfig_ = true;
 
 bool SystemResourceManager::isThemeSystemResEnable_ = false;
 
