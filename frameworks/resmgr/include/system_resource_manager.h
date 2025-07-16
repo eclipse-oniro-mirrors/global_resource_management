@@ -55,6 +55,29 @@ public:
      */
     static bool AddSystemResource(ResourceManagerImpl *resourceManager);
 
+    /**
+     * create system resource manager
+     *
+     * @return the new system resource manager
+     */
+    EXPORT_FUNC static std::shared_ptr<ResourceManagerImpl> CreateSysResourceManager();
+
+    /**
+     * update system resource manager resconfig
+     *
+     * @param resConfig the current resconfig
+     * @param isThemeSystemResEnable if true means is theme system res enable
+     */
+    static void UpdateSysResConfig(ResConfigImpl &resConfig, bool isThemeSystemResEnable);
+
+#if defined(__ARKUI_CROSS__) || defined(__IDE_PREVIEW__)
+    /**
+     * add system resource for preview
+     *
+     * @param resMgr the system resource manager
+     */
+    static void AddSystemResourceForPreview(ResourceManagerImpl* resMgr);
+#endif
 private:
     static std::mutex mutex_;
 
@@ -79,7 +102,24 @@ private:
     static bool LoadSystemResource(ResourceManagerImpl *impl, bool isSandbox = true);
 
     static ResourceManagerImpl *CreateSystemResourceManager(bool isSandbox);
+
     static std::shared_ptr<ResourceManagerImpl> CreateSystemResourceManager();
+
+    static void SaveResConfig(ResConfigImpl &resConfig, bool isThemeSystemResEnable);
+
+    static void UpdateResConfig(ResConfigImpl &resConfig, bool isThemeSystemResEnable);
+
+    static bool InitResourceManager(ResourceManagerImpl *impl);
+
+    static std::mutex sysResMgrMutex_;
+
+    static std::shared_ptr<ResourceManagerImpl> sysResMgr_;
+
+    static std::shared_ptr<ResConfigImpl> resConfig_;
+
+    static bool isUpdateAppConfig_;
+
+    static bool isThemeSystemResEnable_;
 };
 } // namespace Resource
 } // namespace Global

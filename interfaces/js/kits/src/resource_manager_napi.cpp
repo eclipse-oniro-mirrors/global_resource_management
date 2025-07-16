@@ -202,6 +202,11 @@ static napi_value GetSystemResourceManager(napi_env env, napi_callback_info info
     return ResourceManagerAddon::GetSystemResMgr(env);
 }
 
+static napi_value GetSysResourceManager(napi_env env, napi_callback_info info)
+{
+    return ResourceManagerAddon::GetSysResourceManager(env);
+}
+
 static napi_status SetEnumItem(napi_env env, napi_value object, const char* name, int32_t value)
 {
     napi_status status;
@@ -273,10 +278,12 @@ static napi_value ResMgrInit(napi_env env, napi_value exports)
     napi_property_descriptor creatorProp[] = {
         DECLARE_NAPI_FUNCTION("getResourceManager", GetResourceManager),
         DECLARE_NAPI_FUNCTION("getSystemResourceManager", GetSystemResourceManager),
+        DECLARE_NAPI_FUNCTION("getSysResourceManager", GetSysResourceManager),
     };
 #else
     napi_property_descriptor creatorProp[] = {
         DECLARE_NAPI_FUNCTION("getSystemResourceManager", GetSystemResourceManager),
+        DECLARE_NAPI_FUNCTION("getSysResourceManager", GetSysResourceManager),
     };
 #endif
     napi_status status = napi_define_properties(env, exports, sizeof(creatorProp) / sizeof(creatorProp[0]),
