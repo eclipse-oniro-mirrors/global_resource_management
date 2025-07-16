@@ -105,11 +105,21 @@ private:
 
     static std::shared_ptr<ResourceManagerImpl> CreateSystemResourceManager();
 
+    static void SaveResConfig(ResConfigImpl &resConfig, bool isThemeSystemResEnable);
+
+    static void UpdateResConfig(ResConfigImpl &resConfig, bool isThemeSystemResEnable);
+
     static bool CreateManagerInner(ResourceManagerImpl *impl);
 
     static std::mutex sysResMgrMutex_;
 
     static std::shared_ptr<ResourceManagerImpl> sysResMgr_;
+
+    static std::shared_ptr<ResConfigImpl> resConfig_;
+
+    static bool isFirstUpdate_;
+
+    static bool isThemeSystemResEnable_;
 };
 } // namespace Resource
 } // namespace Global
