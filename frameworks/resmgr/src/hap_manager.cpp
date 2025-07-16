@@ -1298,8 +1298,8 @@ std::unordered_map<std::string, std::vector<std::string>> HapManager::GetLoadedH
 void HapManager::UpdateAppConfigForSysResManager(bool isAppDarkRes, bool isThemeSystemResEnable)
 {
     WriteLock lock(this->mutex_);
-    if (this->isSystem_ && this->isFirstUpdate_) {
-        this->isFirstUpdate_ = false;
+    if (this->isSystem_ && this->isUpdateAppConfig_) {
+        this->isUpdateAppConfig_ = false;
         this->resConfig_->SetAppDarkRes(isAppDarkRes);
         this->isThemeSystemResEnable_ = isThemeSystemResEnable;
     }
