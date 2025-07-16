@@ -109,7 +109,7 @@ private:
 
     static void UpdateResConfig(ResConfigImpl &resConfig, bool isThemeSystemResEnable);
 
-    static bool CreateManagerInner(ResourceManagerImpl *impl);
+    static bool InitResourceManager(ResourceManagerImpl *impl);
 
     static std::mutex sysResMgrMutex_;
 
