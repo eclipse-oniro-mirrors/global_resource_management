@@ -156,7 +156,7 @@ HWTEST_F(SystemResourceManagerTest, CreateSysResourceManagerTest002, TestSize.Le
     bool ret = resMgr->AddResource(FormatFullPath(g_resFilePath).c_str());
     ASSERT_TRUE(ret);
     ResConfigImpl rc;
-    rc.SetLocaleInfo("en", nullptr, "US"); 
+    rc.SetLocaleInfo("en", nullptr, "US");
     rc.SetColorMode(ColorMode::DARK);
     resMgr->UpdateResConfig(rc);
     uint32_t rmOutValue;
