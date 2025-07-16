@@ -22,7 +22,7 @@ using namespace OHOS;
 using namespace Global;
 using namespace Resource;
 
-static const char* CLASS_NAME_BUSINESSERROR = "L@ohos/base/BusinessError;";
+static const char* CLASS_NAME_BUSINESSERROR = "@ohos.base.BusinessError";
 
 const std::unordered_map<int32_t, std::string> ResourceManagerAniUtils::ErrorCodeToMsg {
     {ERROR_CODE_INVALID_INPUT_PARAMETER, "Invalid input parameter"},
