@@ -50,45 +50,28 @@ static std::array methods = {
         reinterpret_cast<void*>(ResMgrAddon::GetStringSyncById) },
     ani_native_function { "getStringSync", "DLescompat/Array;:Lstd/core/String;",
         reinterpret_cast<void *>(ResMgrAddon::GetFormatStringSyncById) },
-    ani_native_function { "getStringSync", "Lglobal/resource/Resource;:Lstd/core/String;",
-        reinterpret_cast<void*>(ResMgrAddon::GetStringSync) },
-    ani_native_function { "getStringSync", "Lglobal/resource/Resource;Lescompat/Array;:Lstd/core/String;",
-        reinterpret_cast<void *>(ResMgrAddon::GetFormatStringSync) },
-
     ani_native_function { "getStringByNameSync", "Lstd/core/String;:Lstd/core/String;",
         reinterpret_cast<void*>(ResMgrAddon::GetStringByNameSync) },
     ani_native_function { "getStringByNameSync", "Lstd/core/String;Lescompat/Array;:Lstd/core/String;",
         reinterpret_cast<void*>(ResMgrAddon::GetFormatStringByNameSync) },
 
-    ani_native_function { "getBoolean", "D:Z", reinterpret_cast<void*>(ResMgrAddon::GetBooleanById) },
-    ani_native_function { "getBoolean", "Lglobal/resource/Resource;:Z",
-        reinterpret_cast<void*>(ResMgrAddon::GetBoolean) },
+    ani_native_function { "getBoolean", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetBooleanById) },
     ani_native_function { "getBooleanByName", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetBooleanByName) },
 
-    ani_native_function { "getNumber", "D:D", reinterpret_cast<void*>(ResMgrAddon::GetNumberById) },
-    ani_native_function { "getNumber", "Lglobal/resource/Resource;:D",
-        reinterpret_cast<void*>(ResMgrAddon::GetNumber) },
+    ani_native_function { "getNumber", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetNumberById) },
     ani_native_function { "getNumberByName", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetNumberByName) },
     
-    ani_native_function { "getIntPluralStringValueSync", "DDLescompat/Array;:Lstd/core/String;",
+    ani_native_function { "getIntPluralStringValueSync", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetIntPluralStringValueSyncById) },
-    ani_native_function { "getIntPluralStringValueSync",
-        "Lglobal/resource/Resource;DLescompat/Array;:Lstd/core/String;",
-        reinterpret_cast<void*>(ResMgrAddon::GetIntPluralStringValueSync) },
     ani_native_function { "getIntPluralStringByNameSync", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetIntPluralStringByNameSync) },
 
-    ani_native_function { "getDoublePluralStringValueSync", "DDLescompat/Array;:Lstd/core/String;",
+    ani_native_function { "getDoublePluralStringValueSync", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetDoublePluralStringValueSyncById) },
-    ani_native_function { "getDoublePluralStringValueSync",
-        "Lglobal/resource/Resource;DLescompat/Array;:Lstd/core/String;",
-        reinterpret_cast<void*>(ResMgrAddon::GetDoublePluralStringValueSync) },
     ani_native_function { "getDoublePluralStringByNameSync", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetDoublePluralStringByNameSync) },
 
-    ani_native_function { "getColorSync", "D:D", reinterpret_cast<void*>(ResMgrAddon::GetColorSyncById) },
-    ani_native_function { "getColorSync", "Lglobal/resource/Resource;:D",
-        reinterpret_cast<void*>(ResMgrAddon::GetColorSync) },
+    ani_native_function { "getColorSync", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetColorSyncById) },
     ani_native_function { "getColorByNameSync", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetColorByNameSync) },
     
     ani_native_function { "addResource", nullptr, reinterpret_cast<void*>(ResMgrAddon::AddResource) },
@@ -102,22 +85,15 @@ static std::array methods = {
     ani_native_function { "getRawFileContentSync", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetRawFileContentSync) },
     
-    ani_native_function { "getMediaContentSync", "DLstd/core/Double;:Lescompat/Uint8Array;",
+    ani_native_function { "getMediaContentSync", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetMediaContentSyncById) },
-    ani_native_function { "getMediaContentSync",
-        "Lglobal/resource/Resource;Lstd/core/Double;:Lescompat/Uint8Array;",
-        reinterpret_cast<void*>(ResMgrAddon::GetMediaContentSync) },
 
-    ani_native_function { "getMediaContentBase64Sync", "DLstd/core/Double;:Lstd/core/String;",
+    ani_native_function { "getMediaContentBase64Sync", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetMediaContentBase64SyncById) },
-    ani_native_function { "getMediaContentBase64Sync",
-        "Lglobal/resource/Resource;Lstd/core/Double;:Lstd/core/String;",
-        reinterpret_cast<void*>(ResMgrAddon::GetMediaContentBase64Sync) },
     
-    ani_native_function { "getStringArrayValueSync", "D:Lescompat/Array;",
+    ani_native_function { "getStringArrayValueSync", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetStringArrayValueSyncById) },
-    ani_native_function { "getStringArrayValueSync", "Lglobal/resource/Resource;:Lescompat/Array;",
-        reinterpret_cast<void*>(ResMgrAddon::GetStringArrayValueSync) },
+
     ani_native_function { "getStringArrayByNameSync", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetStringArrayByNameSync) },
     
@@ -125,10 +101,8 @@ static std::array methods = {
     ani_native_function { "getMediaBase64ByNameSync", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetMediaBase64ByNameSync) },
     
-    ani_native_function { "getDrawableDescriptorById", nullptr,
+    ani_native_function { "getDrawableDescriptor", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetDrawableDescriptorById) },
-    ani_native_function { "getDrawableDescriptorByRes", nullptr,
-        reinterpret_cast<void*>(ResMgrAddon::GetDrawableDescriptor) },
     ani_native_function { "getDrawableDescriptorByName", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetDrawableDescriptorByName) },
         
@@ -137,9 +111,7 @@ static std::array methods = {
         reinterpret_cast<void*>(ResMgrAddon::GetDeviceCapabilitySync) },
     ani_native_function { "getLocales", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetLocales) },
 
-    ani_native_function { "getSymbol", "D:D", reinterpret_cast<void*>(ResMgrAddon::GetSymbolById) },
-    ani_native_function { "getSymbol", "Lglobal/resource/Resource;:D",
-        reinterpret_cast<void*>(ResMgrAddon::GetSymbol) },
+    ani_native_function { "getSymbol", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetSymbolById) },
     ani_native_function { "getSymbolByName", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetSymbolByName) },
 
     ani_native_function { "getOverrideResourceManager", nullptr,
@@ -301,40 +273,6 @@ static std::shared_ptr<ResMgrAddon> UnwrapAddon(ani_env* env, ani_object object)
         return nullptr;
     }
     return *reinterpret_cast<std::shared_ptr<ResMgrAddon>*>(ptr);
-}
-
-static int32_t InitIdResourceAddon(ani_env* env, ani_object object,
-    std::unique_ptr<ResMgrDataContext>& dataContext, const ani_object resource)
-{
-    dataContext->addon_ = UnwrapAddon(env, object);
-    auto resourcePtr = std::make_shared<ResourceManager::Resource>();
-    if (resource == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Make shared ResourceManager::Resource failed");
-        return ERROR;
-    }
-
-    ani_ref bundleName;
-    if (ANI_OK != env->Object_GetPropertyByName_Ref(resource, "bundleName", &bundleName)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Get property 'bundleName' failed");
-        return ERROR;
-    }
-
-    resourcePtr->bundleName = AniStrToString(env, bundleName);
-    ani_ref moduleName;
-    if (ANI_OK != env->Object_GetPropertyByName_Ref(resource, "moduleName", &moduleName)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Get property 'moduleName' failed");
-        return ERROR;
-    }
-
-    resourcePtr->moduleName = AniStrToString(env, moduleName);
-    ani_double id;
-    if (ANI_OK != env->Object_GetPropertyByName_Double(resource, "id", &id)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Get property 'id' failed");
-        return ERROR;
-    }
-    resourcePtr->id = id;
-    dataContext->resource_ = resourcePtr;
-    return SUCCESS;
 }
 
 static ani_string CreateAniString(ani_env *env, ResMgrDataContext& context)
@@ -518,68 +456,6 @@ ani_string ResMgrAddon::GetFormatStringSyncById(ani_env *env, ani_object object,
     return CreateAniString(env, *dataContext);
 }
 
-ani_string ResMgrAddon::GetStringSync(ani_env* env, ani_object object, ani_object resource)
-{
-    auto dataContext = std::make_unique<ResMgrDataContext>();
-    int32_t state = InitIdResourceAddon(env, object, dataContext, resource);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to init para in getStringSync", true);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return nullptr;
-    }
-
-    std::shared_ptr<ResourceManager> resMgr = nullptr;
-    uint32_t resId = 0;
-    bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
-    if (!ret || resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getStringSync");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
-        return nullptr;
-    }
-
-    state = resMgr->GetStringFormatById(resId, dataContext->value_, dataContext->jsParams_);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("getStringSync failed state", true);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return nullptr;
-    }
-    return CreateAniString(env, *dataContext);
-}
-
-ani_string ResMgrAddon::GetFormatStringSync(ani_env *env, ani_object object, ani_object resource, ani_object args)
-{
-    auto dataContext = std::make_unique<ResMgrDataContext>();
-    int32_t state = InitIdResourceAddon(env, object, dataContext, resource);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to init para in getFormatStringSync", true);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return nullptr;
-    }
-
-    std::shared_ptr<ResourceManager> resMgr = nullptr;
-    uint32_t resId = 0;
-    bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
-    if (!ret || resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getFormatStringSync");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
-        return nullptr;
-    }
-
-    if (!InitAniParameters(env, args, dataContext->jsParams_)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "getFormatStringSync formatting error");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_ID_FORMAT_ERROR);
-        return nullptr;
-    }
-
-    state = resMgr->GetStringFormatById(resId, dataContext->value_, dataContext->jsParams_);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("getFormatStringSync failed state", true);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return nullptr;
-    }
-    return CreateAniString(env, *dataContext);
-}
-
 ani_string ResMgrAddon::GetStringByNameSync(ani_env* env, ani_object object, ani_string resName)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
@@ -660,34 +536,6 @@ ani_boolean ResMgrAddon::GetBooleanById(ani_env* env, ani_object object, ani_dou
     return dataContext->bValue_;
 }
 
-ani_boolean ResMgrAddon::GetBoolean(ani_env* env, ani_object object, ani_object resource)
-{
-    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
-    int32_t state = InitIdResourceAddon(env, object, dataContext, resource);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to init para in getBoolean", true);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return false;
-    }
-
-    std::shared_ptr<ResourceManager> resMgr = nullptr;
-    uint32_t resId = 0;
-    bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
-    if (!ret || resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getBoolean");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
-        return false;
-    }
-
-    state = resMgr->GetBooleanById(resId, dataContext->bValue_);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to GetBoolean state", true);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return false;
-    }
-    return dataContext->bValue_;
-}
-
 ani_boolean ResMgrAddon::GetBooleanByName(ani_env* env, ani_object object, ani_string resName)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
@@ -732,44 +580,6 @@ ani_double ResMgrAddon::GetNumberById(ani_env* env, ani_object object, ani_doubl
         state = resMgr->GetFloatById(resId, dataContext->fValue_);
         if (state != RState::SUCCESS) {
             dataContext->SetErrorMsg("Failed to process string in getNumberById", true);
-            ResourceManagerAniUtils::AniThrow(env, state);
-            return ABNORMAL_NUMBER_RETURN_VALUE;
-        }
-    }
-
-    ani_double aniValue;
-    if (dataContext->iValue_) {
-        aniValue = dataContext->iValue_;
-    } else {
-        aniValue = dataContext->fValue_;
-    }
-    return aniValue;
-}
-
-ani_double ResMgrAddon::GetNumber(ani_env* env, ani_object object, ani_object resource)
-{
-    auto dataContext = std::make_unique<ResMgrDataContext>();
-    int32_t state = InitIdResourceAddon(env, object, dataContext, resource);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to init para in getNumber", true);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return ABNORMAL_NUMBER_RETURN_VALUE;
-    }
-
-    std::shared_ptr<ResourceManager> resMgr = nullptr;
-    uint32_t resId = 0;
-    bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
-    if (!ret || resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getNumber");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
-        return ABNORMAL_NUMBER_RETURN_VALUE;
-    }
-
-    state = resMgr->GetIntegerById(resId, dataContext->iValue_);
-    if (state != RState::SUCCESS) {
-        state = resMgr->GetFloatById(resId, dataContext->fValue_);
-        if (state != RState::SUCCESS) {
-            dataContext->SetErrorMsg("Failed to process string in getNumber", true);
             ResourceManagerAniUtils::AniThrow(env, state);
             return ABNORMAL_NUMBER_RETURN_VALUE;
         }
@@ -861,49 +671,6 @@ ani_string ResMgrAddon::GetIntPluralStringValueSyncById(ani_env* env, ani_object
     return CreateAniString(env, *dataContext);
 }
 
-ani_string ResMgrAddon::GetIntPluralStringValueSync(ani_env* env, ani_object object,
-    ani_object resource, ani_double num, ani_object args)
-{
-    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
-    int32_t state = InitIdResourceAddon(env, object, dataContext, resource);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to init para in getIntPluralStringValueSync", true);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return nullptr;
-    }
-    double number = num;
-    if (number > INT_MAX) {
-        number = INT_MAX;
-    } else if (number < INT_MIN) {
-        number = INT_MIN;
-    }
-    dataContext->quantity_ = { true, number, 0.0 };
-
-    std::shared_ptr<ResourceManager> resMgr = nullptr;
-    uint32_t resId = 0;
-    bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
-    if (!ret || resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getIntPluralStringValueSync");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
-        return nullptr;
-    }
-
-    if (!InitAniParameters(env, args, dataContext->jsParams_)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "InitOptionalParameters formatting error");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_ID_FORMAT_ERROR);
-        return nullptr;
-    }
-
-    state = resMgr->GetFormatPluralStringById(dataContext->value_, resId, dataContext->quantity_,
-        dataContext->jsParams_);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to GetFormatPluralStringById state", true, state);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return nullptr;
-    }
-    return CreateAniString(env, *dataContext);
-}
-
 ani_string ResMgrAddon::GetIntPluralStringByNameSync(ani_env* env, ani_object object,
     ani_string resName, ani_double num, ani_object args)
 {
@@ -973,43 +740,6 @@ ani_string ResMgrAddon::GetDoublePluralStringValueSyncById(ani_env* env, ani_obj
     return CreateAniString(env, *dataContext);
 }
 
-ani_string ResMgrAddon::GetDoublePluralStringValueSync(ani_env* env, ani_object object,
-    ani_object resource, ani_double num, ani_object args)
-{
-    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
-    int32_t state = InitIdResourceAddon(env, object, dataContext, resource);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to init para in getIntPluralStringValueSync", true);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return nullptr;
-    }
-    dataContext->quantity_ = { false, 0, num };
-
-    std::shared_ptr<ResourceManager> resMgr = nullptr;
-    uint32_t resId = 0;
-    bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
-    if (!ret || resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getIntPluralStringValueSync");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
-        return nullptr;
-    }
-
-    if (!InitAniParameters(env, args, dataContext->jsParams_)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "InitOptionalParameters formatting error");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_ID_FORMAT_ERROR);
-        return nullptr;
-    }
-
-    state = resMgr->GetFormatPluralStringById(dataContext->value_, resId, dataContext->quantity_,
-        dataContext->jsParams_);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to GetFormatPluralStringById state", true, state);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return nullptr;
-    }
-    return CreateAniString(env, *dataContext);
-}
-
 ani_string ResMgrAddon::GetDoublePluralStringByNameSync(ani_env* env, ani_object object,
     ani_string resName, ani_double num, ani_object args)
 {
@@ -1058,34 +788,6 @@ ani_double ResMgrAddon::GetColorSyncById(ani_env* env, ani_object object, ani_do
     RState state = resMgr->GetColorById(resId, dataContext->colorValue_);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("getColorSyncById failed state", true);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return ABNORMAL_NUMBER_RETURN_VALUE;
-    }
-    return dataContext->colorValue_;
-}
-
-ani_double ResMgrAddon::GetColorSync(ani_env* env, ani_object object, ani_object resource)
-{
-    auto dataContext = std::make_unique<ResMgrDataContext>();
-    int32_t state = InitIdResourceAddon(env, object, dataContext, resource);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to init para in getColorSync", true);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return ABNORMAL_NUMBER_RETURN_VALUE;
-    }
-
-    std::shared_ptr<ResourceManager> resMgr = nullptr;
-    uint32_t resId = 0;
-    bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
-    if (!ret || resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getColorSync");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
-        return ABNORMAL_NUMBER_RETURN_VALUE;
-    }
-
-    state = resMgr->GetColorById(resId, dataContext->colorValue_);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("getColorSync failed state", true);
         ResourceManagerAniUtils::AniThrow(env, state);
         return ABNORMAL_NUMBER_RETURN_VALUE;
     }
@@ -1303,38 +1005,6 @@ ani_object ResMgrAddon::GetMediaContentSyncById(ani_env* env, ani_object object,
     return CreateAniUint8Array(env, *dataContext);
 }
 
-ani_object ResMgrAddon::GetMediaContentSync(ani_env* env, ani_object object,
-    ani_object resource, ani_object density)
-{
-    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
-    int32_t state = InitIdResourceAddon(env, object, dataContext, resource);
-
-    ani_boolean isUndefined;
-    env->Reference_IsUndefined(density, &isUndefined);
-    if (!isUndefined) {
-        ani_double densityInner;
-        env->Object_CallMethodByName_Double(density, "unboxed", ":D", &densityInner);
-        dataContext->density_ = densityInner;
-    }
-
-    std::shared_ptr<ResourceManager> resMgr = nullptr;
-    uint32_t resId = 0;
-    bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
-    if (!ret || resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in GetMediaContentSync");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
-        return nullptr;
-    }
-
-    state = resMgr->GetMediaDataById(resId, dataContext->len_, dataContext->mediaData, dataContext->density_);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to GetMediaContentSync state", true);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return nullptr;
-    }
-    return CreateAniUint8Array(env, *dataContext);
-}
-
 ani_string ResMgrAddon::GetMediaContentBase64SyncById(ani_env* env, ani_object object,
     ani_double resId, ani_object density)
 {
@@ -1368,30 +1038,6 @@ ani_string ResMgrAddon::GetMediaContentBase64SyncById(ani_env* env, ani_object o
     return CreateAniString(env, *dataContext);
 }
 
-ani_string ResMgrAddon::GetMediaContentBase64Sync(ani_env* env, ani_object object,
-    ani_object resource, ani_object density)
-{
-    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
-    int32_t state = InitIdResourceAddon(env, object, dataContext, resource);
-
-    std::shared_ptr<ResourceManager> resMgr = nullptr;
-    uint32_t resId = 0;
-    bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
-    if (!ret || resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getMediaContentBase64Sync");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
-        return nullptr;
-    }
-
-    state = resMgr->GetMediaBase64DataById(resId, dataContext->value_, dataContext->density_);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to GetMediaContentBase64Sync state", true);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return nullptr;
-    }
-    return CreateAniString(env, *dataContext);
-}
-
 ani_object ResMgrAddon::GetStringArrayValueSyncById(ani_env* env, ani_object object, ani_double resId)
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
@@ -1408,34 +1054,6 @@ ani_object ResMgrAddon::GetStringArrayValueSyncById(ani_env* env, ani_object obj
     }
 
     RState state = resMgr->GetStringArrayById(resId, dataContext->arrayValue_);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to GetStringArrayValueSync state", true);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return nullptr;
-    }
-    return CreateAniArray(env, dataContext->arrayValue_);
-}
-
-ani_object ResMgrAddon::GetStringArrayValueSync(ani_env* env, ani_object object, ani_object resource)
-{
-    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
-    int32_t state = InitIdResourceAddon(env, object, dataContext, resource);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to init para in getStringArrayValueSync", true);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return nullptr;
-    }
-
-    std::shared_ptr<ResourceManager> resMgr = nullptr;
-    uint32_t resId = 0;
-    bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
-    if (!ret || resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getStringArrayValueSync");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
-        return nullptr;
-    }
-
-    state = resMgr->GetStringArrayById(resId, dataContext->arrayValue_);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to GetStringArrayValueSync state", true);
         ResourceManagerAniUtils::AniThrow(env, state);
@@ -1642,34 +1260,6 @@ ani_object ResMgrAddon::GetDrawableDescriptorByName(ani_env* env, ani_object obj
     }
     dataContext->resName_ = AniStrToString(env, resName);
     return CreateDrawableDescriptorbyName(env, dataContext);
-}
-
-ani_object ResMgrAddon::GetDrawableDescriptor(ani_env* env, ani_object object,
-    ani_object resource, ani_object density, ani_object type)
-{
-    auto dataContext = std::make_unique<ResMgrDataContext>();
-    int32_t retState = InitIdResourceAddon(env, object, dataContext, resource);
-    if (retState != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to init para in getDrawableDescriptor", true);
-        ResourceManagerAniUtils::AniThrow(env, retState);
-        return nullptr;
-    }
-
-    ani_boolean isUndefined;
-    env->Reference_IsUndefined(density, &isUndefined);
-    if (!isUndefined) {
-        ani_double densityInner;
-        env->Object_CallMethodByName_Double(density, "unboxed", ":D", &densityInner);
-        dataContext->density_ = densityInner;
-    }
-
-    env->Reference_IsUndefined(type, &isUndefined);
-    if (!isUndefined) {
-        ani_double typeInner;
-        env->Object_CallMethodByName_Double(type, "unboxed", ":D", &typeInner);
-        dataContext->iconType_ = typeInner;
-    }
-    return CreateDrawableDescriptorbyId(env, dataContext);
 }
 
 ani_object ResMgrAddon::GetStringArrayByNameSync(ani_env* env, ani_object object, ani_string resName)
@@ -1907,34 +1497,6 @@ ani_double ResMgrAddon::GetSymbolById(ani_env* env, ani_object object, ani_doubl
     }
 
     RState state = resMgr->GetSymbolById(resId, dataContext->symbolValue_);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("GetSymbol failed state", true);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return ABNORMAL_NUMBER_RETURN_VALUE;
-    }
-    return dataContext->symbolValue_;
-}
-
-ani_double ResMgrAddon::GetSymbol(ani_env* env, ani_object object, ani_object resource)
-{
-    std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
-    int32_t state = InitIdResourceAddon(env, object, dataContext, resource);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to init para in getSymbol", true);
-        ResourceManagerAniUtils::AniThrow(env, state);
-        return ABNORMAL_NUMBER_RETURN_VALUE;
-    }
-
-    std::shared_ptr<ResourceManager> resMgr = nullptr;
-    uint32_t resId = 0;
-    bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
-    if (!ret || resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getSymbol");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
-        return ABNORMAL_NUMBER_RETURN_VALUE;
-    }
-
-    state = resMgr->GetSymbolById(resId, dataContext->symbolValue_);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("GetSymbol failed state", true);
         ResourceManagerAniUtils::AniThrow(env, state);

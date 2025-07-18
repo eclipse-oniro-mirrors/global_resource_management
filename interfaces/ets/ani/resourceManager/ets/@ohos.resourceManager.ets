@@ -67,22 +67,6 @@ export default namespace resourceManager {
     }
 
     export interface ResourceManager {
-        getStringValue(resource: Resource, callback: AsyncCallback<string, void>): void;
-        getStringValue(resource: Resource): Promise<string>;
-
-        getStringArrayValue(resource: Resource, callback: AsyncCallback<Array<string>, void>): void;
-        getStringArrayValue(resource: Resource): Promise<Array<string>>;
-
-        getMediaContent(resource: Resource, callback: AsyncCallback<Uint8Array, void>): void;
-        getMediaContent(resource: Resource, density: number, callback: AsyncCallback<Uint8Array, void>): void;
-        getMediaContent(resource: Resource): Promise<Uint8Array>;
-        getMediaContent(resource: Resource, density: number): Promise<Uint8Array>;
-
-        getMediaContentBase64(resource: Resource, callback: AsyncCallback<string, void>): void;
-        getMediaContentBase64(resource: Resource, density: number, callback: AsyncCallback<string, void>): void;
-        getMediaContentBase64(resource: Resource): Promise<string>;
-        getMediaContentBase64(resource: Resource, density: number): Promise<string>;
-
         getDeviceCapability(callback: AsyncCallback<DeviceCapability, void>): void;
         getDeviceCapability(): Promise<DeviceCapability>;
 
@@ -107,18 +91,14 @@ export default namespace resourceManager {
 
         getStringSync(resId: number): string;
         getStringSync(resId: number, ...args: (string | number)[]): string;
-        getStringSync(resource: Resource): string;
-        getStringSync(resource: Resource, ...args: (string | number)[]): string;
 
         getStringByNameSync(resName: string): string;
         getStringByNameSync(resName: string, ...args: (string | number)[]): string;
 
         getBoolean(resId: number): boolean;
-        getBoolean(resource: Resource): boolean;
         getBooleanByName(resName: string): boolean;
 
         getNumber(resId: number): number;
-        getNumber(resource: Resource): number;
         getNumberByName(resName: string): number;
 
         getStringValue(resId: number, callback: AsyncCallback<string, void>): void;
@@ -128,11 +108,9 @@ export default namespace resourceManager {
         getStringArrayValue(resId: number): Promise<Array<string>>;
 
         getIntPluralStringValueSync(resId: number, num: number, ...args: (string | number)[]): string;
-        getIntPluralStringValueSync(resource: Resource, num: number, ...args: (string | number)[]): string;
         getIntPluralStringByNameSync(resName: string, num: number, ...args: (string | number)[]): string;
 
         getDoublePluralStringValueSync(resId: number, num: number, ...args: (string | number)[]): string;
-        getDoublePluralStringValueSync(resource: Resource, num: number, ...args: (string | number)[]): string;
         getDoublePluralStringByNameSync(resName: string, num: number, ...args: (string | number)[]): string;
 
         getMediaContent(resId: number, callback: AsyncCallback<Uint8Array, void>): void;
@@ -159,14 +137,11 @@ export default namespace resourceManager {
 
         getColor(resId: number, callback: AsyncCallback<number, void>): void;
         getColor(resId: number): Promise<number>;
-        getColor(resource: Resource, callback: AsyncCallback<number, void>): void;
-        getColor(resource: Resource): Promise<number>;
 
         getColorByName(resName: string, callback: AsyncCallback<number, void>): void;
         getColorByName(resName: string): Promise<number>;
 
         getColorSync(resId: number): number;
-        getColorSync(resource: Resource): number;
         getColorByNameSync(resName: string) : number;
 
         addResource(path: string) : void;
@@ -179,17 +154,13 @@ export default namespace resourceManager {
         getRawFileContentSync(path: string): Uint8Array;
 
         getMediaContentSync(resId: number, density?: number): Uint8Array;
-        getMediaContentSync(resource: Resource, density?: number): Uint8Array;
 
         getMediaContentBase64Sync(resId: number, density?: number): string;
-        getMediaContentBase64Sync(resource: Resource, density?: number): string;
 
         getDrawableDescriptor(resId: number, density?: number, type?: number): DrawableDescriptor;
         getDrawableDescriptorByName(resName: string, density?: number, type?: number): DrawableDescriptor;
-        getDrawableDescriptor(resource: Resource, density?: number, type?: number): DrawableDescriptor;
 
         getStringArrayValueSync(resId: number): Array<string>;
-        getStringArrayValueSync(resource: Resource): Array<string>;
 
         getMediaByNameSync(resName: string, density?: number): Uint8Array;
         getMediaBase64ByNameSync(resName: string, density?: number): string;
@@ -201,7 +172,6 @@ export default namespace resourceManager {
         getLocales(includeSystem?: boolean): Array<string>;
 
         getSymbol(resId: number) : number;
-        getSymbol(resource: Resource) : number;
         getSymbolByName(resName: string) : number;
 
         isRawDir(path: string): boolean;
@@ -227,30 +197,23 @@ export default namespace resourceManager {
 
         native getStringSync(resId: number): string;
         native getStringSync(resId: number, ...args: (string | number)[]): string;
-        native getStringSync(resource: Resource): string;
-        native getStringSync(resource: Resource, ...args: (string | number)[]): string;
 
         native getStringByNameSync(resName: string): string;
         native getStringByNameSync(resName: string, ...args: (string | number)[]): string;
 
         native getBoolean(resId: number): boolean;
-        native getBoolean(resource: Resource): boolean;
         native getBooleanByName(resName: string): boolean;
 
         native getNumber(resId: number): number;
-        native getNumber(resource: Resource): number;
         native getNumberByName(resName: string): number;
 
         native getIntPluralStringValueSync(resId: number, num: number, ...args: (string | number)[]): string;
-        native getIntPluralStringValueSync(resource: Resource, num: number, ...args: (string | number)[]): string;
         native getIntPluralStringByNameSync(resName: string, num: number, ...args: (string | number)[]): string;
 
         native getDoublePluralStringValueSync(resId: number, num: number, ...args: (string | number)[]): string;
-        native getDoublePluralStringValueSync(resource: Resource, num: number, ...args: (string | number)[]): string;
         native getDoublePluralStringByNameSync(resName: string, num: number, ...args: (string | number)[]): string;
 
         native getColorSync(resId: number): number;
-        native getColorSync(resource: Resource): number;
         native getColorByNameSync(resName: string) : number;
 
         native addResource(path: string) : void;
@@ -264,17 +227,13 @@ export default namespace resourceManager {
         native getRawFileContentSync(path: string): Uint8Array;
 
         native getMediaContentSync(resId: number, density?: number): Uint8Array;
-        native getMediaContentSync(resource: Resource, density?: number): Uint8Array;
 
         native getMediaContentBase64Sync(resId: number, density?: number): string;
-        native getMediaContentBase64Sync(resource: Resource, density?: number): string;
 
-        native getDrawableDescriptorById(resId: number, density?: number, type?: number): DrawableDescriptor;
+        native getDrawableDescriptor(resId: number, density?: number, type?: number): DrawableDescriptor;
         native getDrawableDescriptorByName(resName: string, density?: number, type?: number): DrawableDescriptor;
-        native getDrawableDescriptorByRes(resource: Resource, density?: number, type?: number): DrawableDescriptor;
 
         native getStringArrayValueSync(resId: number): Array<string>;
-        native getStringArrayValueSync(resource: Resource): Array<string>;
         native getStringArrayByNameSync(resName: string): Array<string>;
 
         native getMediaByNameSync(resName: string, density?: number): Uint8Array;
@@ -285,7 +244,6 @@ export default namespace resourceManager {
         native getLocales(includeSystem?: boolean): Array<string>;
 
         native getSymbol(resId: number) : number;
-        native getSymbol(resource: Resource) : number;
         native getSymbolByName(resName: string) : number;
 
         native getOverrideResourceManager(configuration?: Configuration): ResourceManager;
@@ -315,52 +273,6 @@ export default namespace resourceManager {
             });
         }
 
-        getStringValue(resource: Resource, callback: AsyncCallback<string, void>): void {
-            let p1 = taskpool.execute((): string => {
-                return this.getStringSync(resource);
-            })
-            p1.then((content: NullishType) => {
-                callback(null, content as string);
-            }).catch((err: Error): void => {
-                callback(err as BusinessError, undefined);
-            });
-        }
-
-        getStringValue(resource: Resource): Promise<string> {
-            return new Promise<string>((resolve, reject) => {
-                taskpool.execute((): string => {
-                    return this.getStringSync(resource);
-                }).then((content: NullishType) => {
-                    resolve(content as string);
-                }, (err: Error): void => {
-                    reject(err);
-                });
-            });
-        }
-
-        getStringArrayValue(resource: Resource, callback: AsyncCallback<Array<string>, void>): void {
-            let p1 = taskpool.execute((): Array<string> => {
-                return this.getStringArrayValueSync(resource);
-            })
-            p1.then((content: NullishType) => {
-                callback(null, content as Array<string>);
-            }).catch((err: Error): void => {
-                callback(err as BusinessError, undefined);
-            });
-        }
-
-        getStringArrayValue(resource: Resource): Promise<Array<string>> {
-            return new Promise<Array<string>>((resolve, reject) => {
-                taskpool.execute((): Array<string> => {
-                    return this.getStringArrayValueSync(resource);
-                }).then((content: NullishType) => {
-                    resolve(content as Array<string>);
-                }, (err: Error): void => {
-                    reject(err);
-                });
-            });
-        }
-
         getStringArrayValue(resId: number, callback: AsyncCallback<Array<string>, void>): void {
             let p1 = taskpool.execute((): Array<string> => {
                 return this.getStringArrayValueSync(resId);
@@ -382,106 +294,6 @@ export default namespace resourceManager {
                     reject(err);
                 });
             });
-        }
-
-        getMediaContent(resource: Resource, callback: AsyncCallback<Uint8Array, void>): void {
-            let p1 = taskpool.execute((): Uint8Array => {
-                return this.getMediaContentSync(resource);
-            })
-            p1.then((content: NullishType) => {
-                callback(null, content as Uint8Array);
-            }).catch((err: Error): void => {
-                callback(err as BusinessError, undefined);
-            });
-        }
-
-        getMediaContent(resource: Resource): Promise<Uint8Array> {
-            return new Promise<Uint8Array>((resolve, reject) => {
-                taskpool.execute((): Uint8Array => {
-                    return this.getMediaContentSync(resource);
-                }).then((content: NullishType) => {
-                    resolve(content as Uint8Array);
-                }, (err: Error): void => {
-                    reject(err);
-                });
-            });
-        }
-
-        getMediaContent(resource: Resource, density: number, callback: AsyncCallback<Uint8Array, void>): void {
-            let p1 = taskpool.execute((): Uint8Array => {
-                return this.getMediaContentSync(resource, density);
-            })
-            p1.then((content: NullishType) => {
-                callback(null, content as Uint8Array);
-            }).catch((err: Error): void => {
-                callback(err as BusinessError, undefined);
-            });
-        }
-
-        getMediaContent(resource: Resource, density: number): Promise<Uint8Array> {
-            return new Promise<Uint8Array>((resolve, reject) => {
-                taskpool.execute((): Uint8Array => {
-                    return this.getMediaContentSync(resource, density);
-                }).then((content: NullishType) => {
-                    resolve(content as Uint8Array);
-                }, (err: Error): void => {
-                    reject(err);
-                });
-            });
-        }
-
-        getMediaContentBase64(resource: Resource, callback: AsyncCallback<string, void>): void {
-            let p1 = taskpool.execute((): string => {
-                return this.getMediaContentBase64Sync(resource);
-            })
-            p1.then((content: NullishType) => {
-                callback(null, content as string);
-            }).catch((err: Error): void => {
-                callback(err as BusinessError, undefined);
-            });
-        }
-
-        getMediaContentBase64(resource: Resource): Promise<string> {
-            return new Promise<string>((resolve, reject) => {
-                taskpool.execute((): string => {
-                    return this.getMediaContentBase64Sync(resource);
-                }).then((content: NullishType) => {
-                    resolve(content as string);
-                }, (err: Error): void => {
-                    reject(err);
-                });
-            });
-        }
-
-        getMediaContentBase64(resource: Resource, density: number, callback: AsyncCallback<string, void>): void {
-            let p1 = taskpool.execute((): string => {
-                return this.getMediaContentBase64Sync(resource, density);
-            })
-            p1.then((content: NullishType) => {
-                callback(null, content as string);
-            }).catch((err: Error): void => {
-                callback(err as BusinessError, undefined);
-            });
-        }
-
-        getMediaContentBase64(resource: Resource, density: number): Promise<string> {
-            return new Promise<string>((resolve, reject) => {
-                taskpool.execute((): string => {
-                    return this.getMediaContentBase64Sync(resource, density);
-                }).then((content: NullishType) => {
-                    resolve(content as string);
-                }, (err: Error): void => {
-                    reject(err);
-                });
-            });
-        }
-
-        getDrawableDescriptor(resId: number, density?: number, type?: number): DrawableDescriptor {
-            return this.getDrawableDescriptorById(resId, density, type);
-        }
-
-        getDrawableDescriptor(resource: Resource, density?: number, type?: number): DrawableDescriptor {
-            return this.getDrawableDescriptorByRes(resource, density, type);
         }
 
         getDeviceCapability(callback: AsyncCallback<DeviceCapability, void>): void {
@@ -867,29 +679,6 @@ export default namespace resourceManager {
             return new Promise<number>((resolve, reject) => {
                 taskpool.execute((): number => {
                     return this.getColorSync(resId);
-                }).then((content: NullishType) => {
-                    resolve(content as number);
-                }, (err: Error): void => {
-                    reject(err);
-                });
-            });
-        }
-
-        getColor(resource: Resource, callback: AsyncCallback<number, void>): void {
-            let p1 = taskpool.execute((): number => {
-                return this.getColorSync(resource);
-            })
-            p1.then((content: NullishType) => {
-                callback(null, content as number);
-            }).catch((err: Error): void => {
-                callback(err as BusinessError, undefined);
-            });
-        }
-
-        getColor(resource: Resource): Promise<number> {
-            return new Promise<number>((resolve, reject) => {
-                taskpool.execute((): number => {
-                    return this.getColorSync(resource);
                 }).then((content: NullishType) => {
                     resolve(content as number);
                 }, (err: Error): void => {

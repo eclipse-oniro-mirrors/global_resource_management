@@ -38,43 +38,32 @@ public:
 
     static ani_string GetStringSyncById(ani_env* env, ani_object object, ani_double resId);
     static ani_string GetFormatStringSyncById(ani_env *env, ani_object object, ani_double resId, ani_object args);
-    static ani_string GetStringSync(ani_env* env, ani_object object, ani_object resource);
-    static ani_string GetFormatStringSync(ani_env *env, ani_object object, ani_object resource, ani_object args);
 
     static ani_string GetStringByNameSync(ani_env* env, ani_object object, ani_string resName);
     static ani_string GetFormatStringByNameSync(ani_env *env, ani_object object, ani_string resName, ani_object args);
 
     static ani_boolean GetBooleanById(ani_env* env, ani_object object, ani_double resId);
-    static ani_boolean GetBoolean(ani_env* env, ani_object object, ani_object resource);
     static ani_boolean GetBooleanByName(ani_env* env, ani_object object, ani_string resName);
 
     static ani_double GetNumberById(ani_env* env, ani_object object, ani_double resId);
-    static ani_double GetNumber(ani_env* env, ani_object object, ani_object resource);
     static ani_double GetNumberByName(ani_env* env, ani_object object, ani_string resName);
 
     static ani_string GetIntPluralStringValueSyncById(ani_env* env, ani_object object,
         ani_double resId, ani_double num, ani_object args);
-    static ani_string GetIntPluralStringValueSync(ani_env* env, ani_object object,
-        ani_object resource, ani_double num, ani_object args);
     static ani_string GetIntPluralStringByNameSync(ani_env* env, ani_object object,
         ani_string resName, ani_double num, ani_object args);
 
     static ani_string GetDoublePluralStringValueSyncById(ani_env* env, ani_object object,
         ani_double resId, ani_double num, ani_object args);
-    static ani_string GetDoublePluralStringValueSync(ani_env* env, ani_object object,
-        ani_object resource, ani_double num, ani_object args);
     static ani_string GetDoublePluralStringByNameSync(ani_env* env, ani_object object,
         ani_string resName, ani_double num, ani_object args);
 
     static ani_object GetDrawableDescriptorById(ani_env* env, ani_object object,
         ani_double resId, ani_object density, ani_object type);
-    static ani_object GetDrawableDescriptor(ani_env* env, ani_object object,
-        ani_object resource, ani_object density, ani_object type);
     static ani_object GetDrawableDescriptorByName(ani_env* env, ani_object object,
         ani_string resName, ani_object density, ani_object type);
 
     static ani_double GetColorSyncById(ani_env* env, ani_object object, ani_double resId);
-    static ani_double GetColorSync(ani_env* env, ani_object object, ani_object resource);
     static ani_double GetColorByNameSync(ani_env* env, ani_object object, ani_string resName);
 
     static void AddResource(ani_env* env, ani_object object, ani_string path);
@@ -89,16 +78,11 @@ public:
 
     static ani_object GetMediaContentSyncById(ani_env* env, ani_object object,
         ani_double resId, ani_object density);
-    static ani_object GetMediaContentSync(ani_env* env, ani_object object,
-        ani_object resource, ani_object density);
 
     static ani_string GetMediaContentBase64SyncById(ani_env* env, ani_object object,
         ani_double resId, ani_object density);
-    static ani_string GetMediaContentBase64Sync(ani_env* env, ani_object object,
-        ani_object resource, ani_object density);
 
     static ani_object GetStringArrayValueSyncById(ani_env* env, ani_object object, ani_double resId);
-    static ani_object GetStringArrayValueSync(ani_env* env, ani_object object, ani_object resource);
     static ani_object GetStringArrayByNameSync(ani_env* env, ani_object object, ani_string resName);
 
     static ani_object GetMediaByNameSync(ani_env* env, ani_object object, ani_string resName, ani_object density);
@@ -109,7 +93,6 @@ public:
     static ani_object GetLocales(ani_env* env, ani_object object, ani_object includeSystem);
 
     static ani_double GetSymbolById(ani_env* env, ani_object object, ani_double resId);
-    static ani_double GetSymbol(ani_env* env, ani_object object, ani_object resource);
     static ani_double GetSymbolByName(ani_env* env, ani_object object, ani_string resName);
 
     static ani_object GetOverrideResourceManager(ani_env* env, ani_object object, ani_object configuration);
