@@ -16,7 +16,7 @@
 export interface Resource {
     bundleName: string;
     moduleName: string;
-    id: number;
+    id: long;
     params?: Array<Object | undefined>;
-    type?: number;
+    type?: int;
 }
