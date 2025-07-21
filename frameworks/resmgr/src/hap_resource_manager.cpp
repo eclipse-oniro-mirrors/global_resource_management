@@ -52,13 +52,13 @@ bool IsNewModule(const char *path)
     }
     if (ResHeader::RES_HEADER_LEN > bufLen) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse ResHeader failed, the offset will be out of bounds");
-        return SYS_ERROR;
+        return false;
     }
 
     ResHeader resHeader;
     errno_t eret = memcpy_s(&resHeader, sizeof(ResHeader), buffer.get(), ResHeader::RES_HEADER_LEN);
     if (eret != OK) {
-        return SYS_ERROR;
+        return false;
     }
 
     std::string version = std::string(resHeader.version_);
