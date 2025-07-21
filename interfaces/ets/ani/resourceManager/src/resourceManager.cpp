@@ -24,7 +24,7 @@ using namespace OHOS;
 using namespace Global;
 using namespace Resource;
 
-constexpr ani_double ABNORMAL_NUMBER_RETURN_VALUE = -1;
+constexpr ani_int ABNORMAL_NUMBER_RETURN_VALUE = -1;
 
 enum ScreenDensityIndex {
     SCREEN_DENSITY_ONE = 0,
@@ -46,9 +46,9 @@ struct ArrayElement {
 static std::shared_ptr<ResourceManager> sysResMgr = nullptr;
 static std::mutex sysMgrMutex;
 static std::array methods = {
-    ani_native_function { "getStringSync", "D:Lstd/core/String;",
+    ani_native_function { "getStringSync", "J:Lstd/core/String;",
         reinterpret_cast<void*>(ResMgrAddon::GetStringSyncById) },
-    ani_native_function { "getStringSync", "DLescompat/Array;:Lstd/core/String;",
+    ani_native_function { "getStringSync", "JLescompat/Array;:Lstd/core/String;",
         reinterpret_cast<void *>(ResMgrAddon::GetFormatStringSyncById) },
     ani_native_function { "getStringByNameSync", "Lstd/core/String;:Lstd/core/String;",
         reinterpret_cast<void*>(ResMgrAddon::GetStringByNameSync) },
@@ -58,8 +58,10 @@ static std::array methods = {
     ani_native_function { "getBoolean", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetBooleanById) },
     ani_native_function { "getBooleanByName", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetBooleanByName) },
 
-    ani_native_function { "getNumber", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetNumberById) },
-    ani_native_function { "getNumberByName", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetNumberByName) },
+    ani_native_function { "getInt", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetIntById) },
+    ani_native_function { "getIntByName", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetIntByName) },
+    ani_native_function { "getDouble", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetDoubleById) },
+    ani_native_function { "getDoubleByName", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetDoubleByName) },
     
     ani_native_function { "getIntPluralStringValueSync", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetIntPluralStringValueSyncById) },
@@ -351,7 +353,7 @@ static bool GetHapResourceManager(const ResMgrDataContext* dataContext,
     return true;
 }
 
-ani_string ResMgrAddon::GetStringSyncById(ani_env* env, ani_object object, ani_double resId)
+ani_string ResMgrAddon::GetStringSyncById(ani_env* env, ani_object object, ani_long resId)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
@@ -429,7 +431,7 @@ static bool InitAniParameters(ani_env *env, ani_object args,
     return true;
 }
 
-ani_string ResMgrAddon::GetFormatStringSyncById(ani_env *env, ani_object object, ani_double resId, ani_object args)
+ani_string ResMgrAddon::GetFormatStringSyncById(ani_env *env, ani_object object, ani_long resId, ani_object args)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
@@ -512,7 +514,7 @@ ani_string ResMgrAddon::GetFormatStringByNameSync(ani_env *env, ani_object objec
     return CreateAniString(env, *dataContext);
 }
 
-ani_boolean ResMgrAddon::GetBooleanById(ani_env* env, ani_object object, ani_double resId)
+ani_boolean ResMgrAddon::GetBooleanById(ani_env* env, ani_object object, ani_long resId)
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
@@ -560,7 +562,59 @@ ani_boolean ResMgrAddon::GetBooleanByName(ani_env* env, ani_object object, ani_s
     return dataContext->bValue_;
 }
 
-ani_double ResMgrAddon::GetNumberById(ani_env* env, ani_object object, ani_double resId)
+ani_int ResMgrAddon::GetIntById(ani_env* env, ani_object object, ani_long resId)
+{
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    dataContext->addon_ = UnwrapAddon(env, object);
+    dataContext->resId_ = resId;
+
+    std::shared_ptr<ResourceManager> resMgr = nullptr;
+    uint32_t notUse = 0;
+    bool ret = GetHapResourceManager(dataContext.get(), resMgr, notUse);
+    if (!ret || resMgr == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in GetIntById");
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        return ABNORMAL_NUMBER_RETURN_VALUE;
+    }
+
+    RState state = resMgr->GetIntegerById(resId, dataContext->iValue_);
+    if (state != RState::SUCCESS) {
+            dataContext->SetErrorMsg("Failed to process string in GetIntById", true);
+            ResourceManagerAniUtils::AniThrow(env, state);
+            return ABNORMAL_NUMBER_RETURN_VALUE;
+    }
+    return dataContext->iValue_;
+}
+
+ani_int ResMgrAddon::GetIntByName(ani_env* env, ani_object object, ani_string resName)
+{
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    dataContext->addon_ = UnwrapAddon(env, object);
+    dataContext->resName_ = AniStrToString(env, static_cast<ani_ref>(resName));
+
+    if (dataContext->addon_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in GetIntByName");
+        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
+        return ABNORMAL_NUMBER_RETURN_VALUE;
+    }
+
+    auto resMgr = dataContext->addon_->GetResMgr();
+    if (resMgr == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in GetIntByName");
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        return ABNORMAL_NUMBER_RETURN_VALUE;
+    }
+
+    RState state = resMgr->GetIntegerByName(dataContext->resName_.c_str(), dataContext->iValue_);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to process number in GetIntByName", false);
+        ResourceManagerAniUtils::AniThrow(env, state);
+        return ABNORMAL_NUMBER_RETURN_VALUE;
+    }
+    return dataContext->iValue_;
+}
+
+ani_double ResMgrAddon::GetDoubleById(ani_env* env, ani_object object, ani_long resId)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
@@ -575,26 +629,16 @@ ani_double ResMgrAddon::GetNumberById(ani_env* env, ani_object object, ani_doubl
         return ABNORMAL_NUMBER_RETURN_VALUE;
     }
 
-    RState state = resMgr->GetIntegerById(resId, dataContext->iValue_);
+    RState state = resMgr->GetFloatById(resId, dataContext->fValue_);
     if (state != RState::SUCCESS) {
-        state = resMgr->GetFloatById(resId, dataContext->fValue_);
-        if (state != RState::SUCCESS) {
-            dataContext->SetErrorMsg("Failed to process string in getNumberById", true);
-            ResourceManagerAniUtils::AniThrow(env, state);
-            return ABNORMAL_NUMBER_RETURN_VALUE;
-        }
+        dataContext->SetErrorMsg("Failed to process string in getNumberById", true);
+        ResourceManagerAniUtils::AniThrow(env, state);
+        return ABNORMAL_NUMBER_RETURN_VALUE;
     }
-
-    ani_double aniValue;
-    if (dataContext->iValue_) {
-        aniValue = dataContext->iValue_;
-    } else {
-        aniValue = dataContext->fValue_;
-    }
-    return aniValue;
+    return dataContext->fValue_;
 }
 
-ani_double ResMgrAddon::GetNumberByName(ani_env* env, ani_object object, ani_string resName)
+ani_double ResMgrAddon::GetDoubleByName(ani_env* env, ani_object object, ani_string resName)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
@@ -613,27 +657,17 @@ ani_double ResMgrAddon::GetNumberByName(ani_env* env, ani_object object, ani_str
         return ABNORMAL_NUMBER_RETURN_VALUE;
     }
 
-    RState state = resMgr->GetIntegerByName(dataContext->resName_.c_str(), dataContext->iValue_);
+    RState state = resMgr->GetFloatByName(dataContext->resName_.c_str(), dataContext->fValue_);
     if (state != RState::SUCCESS) {
-        state = resMgr->GetFloatByName(dataContext->resName_.c_str(), dataContext->fValue_);
-        if (state != RState::SUCCESS) {
-            dataContext->SetErrorMsg("Failed to process number in getNumberByName", false);
-            ResourceManagerAniUtils::AniThrow(env, state);
-            return ABNORMAL_NUMBER_RETURN_VALUE;
-        }
+        dataContext->SetErrorMsg("Failed to process number in getNumberByName", false);
+        ResourceManagerAniUtils::AniThrow(env, state);
+        return ABNORMAL_NUMBER_RETURN_VALUE;
     }
-
-    ani_double aniValue;
-    if (dataContext->iValue_) {
-        aniValue = dataContext->iValue_;
-    } else {
-        aniValue = dataContext->fValue_;
-    }
-    return aniValue;
+    return dataContext->fValue_;
 }
 
 ani_string ResMgrAddon::GetIntPluralStringValueSyncById(ani_env* env, ani_object object,
-    ani_double resId, ani_double num, ani_object args)
+    ani_long resId, ani_int num, ani_object args)
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
@@ -672,7 +706,7 @@ ani_string ResMgrAddon::GetIntPluralStringValueSyncById(ani_env* env, ani_object
 }
 
 ani_string ResMgrAddon::GetIntPluralStringByNameSync(ani_env* env, ani_object object,
-    ani_string resName, ani_double num, ani_object args)
+    ani_string resName, ani_int num, ani_object args)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
@@ -708,7 +742,7 @@ ani_string ResMgrAddon::GetIntPluralStringByNameSync(ani_env* env, ani_object ob
 }
 
 ani_string ResMgrAddon::GetDoublePluralStringValueSyncById(ani_env* env, ani_object object,
-    ani_double resId, ani_double num, ani_object args)
+    ani_long resId, ani_double num, ani_object args)
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
@@ -770,7 +804,7 @@ ani_string ResMgrAddon::GetDoublePluralStringByNameSync(ani_env* env, ani_object
     return CreateAniString(env, *dataContext);
 }
 
-ani_double ResMgrAddon::GetColorSyncById(ani_env* env, ani_object object, ani_double resId)
+ani_long ResMgrAddon::GetColorSyncById(ani_env* env, ani_object object, ani_long resId)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
@@ -794,7 +828,7 @@ ani_double ResMgrAddon::GetColorSyncById(ani_env* env, ani_object object, ani_do
     return dataContext->colorValue_;
 }
 
-ani_double ResMgrAddon::GetColorByNameSync(ani_env* env, ani_object object, ani_string resName)
+ani_long ResMgrAddon::GetColorByNameSync(ani_env* env, ani_object object, ani_string resName)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
@@ -973,7 +1007,7 @@ ani_object ResMgrAddon::GetRawFileContentSync(ani_env* env, ani_object object, a
 }
 
 ani_object ResMgrAddon::GetMediaContentSyncById(ani_env* env, ani_object object,
-    ani_double resId, ani_object density)
+    ani_long resId, ani_object density)
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
@@ -982,8 +1016,8 @@ ani_object ResMgrAddon::GetMediaContentSyncById(ani_env* env, ani_object object,
     ani_boolean isUndefined;
     env->Reference_IsUndefined(density, &isUndefined);
     if (!isUndefined) {
-        ani_double densityInner;
-        env->Object_CallMethodByName_Double(density, "unboxed", ":D", &densityInner);
+        ani_int densityInner;
+        env->Object_CallMethodByName_Int(density, "unboxed", ":I", &densityInner);
         dataContext->density_ = densityInner;
     }
 
@@ -1006,7 +1040,7 @@ ani_object ResMgrAddon::GetMediaContentSyncById(ani_env* env, ani_object object,
 }
 
 ani_string ResMgrAddon::GetMediaContentBase64SyncById(ani_env* env, ani_object object,
-    ani_double resId, ani_object density)
+    ani_long resId, ani_object density)
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
@@ -1015,8 +1049,8 @@ ani_string ResMgrAddon::GetMediaContentBase64SyncById(ani_env* env, ani_object o
     ani_boolean isUndefined;
     env->Reference_IsUndefined(density, &isUndefined);
     if (!isUndefined) {
-        ani_double densityInner;
-        env->Object_CallMethodByName_Double(density, "unboxed", ":D", &densityInner);
+        ani_int densityInner;
+        env->Object_CallMethodByName_Int(density, "unboxed", ":I", &densityInner);
         dataContext->density_ = densityInner;
     }
 
@@ -1038,7 +1072,7 @@ ani_string ResMgrAddon::GetMediaContentBase64SyncById(ani_env* env, ani_object o
     return CreateAniString(env, *dataContext);
 }
 
-ani_object ResMgrAddon::GetStringArrayValueSyncById(ani_env* env, ani_object object, ani_double resId)
+ani_object ResMgrAddon::GetStringArrayValueSyncById(ani_env* env, ani_object object, ani_long resId)
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
@@ -1071,8 +1105,8 @@ ani_object ResMgrAddon::GetMediaByNameSync(ani_env* env, ani_object object, ani_
     ani_boolean isUndefined;
     env->Reference_IsUndefined(density, &isUndefined);
     if (!isUndefined) {
-        ani_double densityInner;
-        env->Object_CallMethodByName_Double(density, "unboxed", ":D", &densityInner);
+        ani_int densityInner;
+        env->Object_CallMethodByName_Int(density, "unboxed", ":I", &densityInner);
         dataContext->density_ = densityInner;
     }
 
@@ -1105,8 +1139,8 @@ ani_string ResMgrAddon::GetMediaBase64ByNameSync(ani_env* env, ani_object object
     ani_boolean isUndefined;
     env->Reference_IsUndefined(density, &isUndefined);
     if (!isUndefined) {
-        ani_double densityInner;
-        env->Object_CallMethodByName_Double(density, "unboxed", ":D", &densityInner);
+        ani_int densityInner;
+        env->Object_CallMethodByName_Int(density, "unboxed", ":I", &densityInner);
         dataContext->density_ = densityInner;
     }
 
@@ -1167,7 +1201,7 @@ ani_object CreateDrawableDescriptorbyId(ani_env* env, std::unique_ptr<ResMgrData
 }
 
 ani_object ResMgrAddon::GetDrawableDescriptorById(ani_env* env, ani_object object,
-    ani_double resId, ani_object density, ani_object type)
+    ani_long resId, ani_object density, ani_object type)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
@@ -1176,15 +1210,15 @@ ani_object ResMgrAddon::GetDrawableDescriptorById(ani_env* env, ani_object objec
     ani_boolean isUndefined;
     env->Reference_IsUndefined(density, &isUndefined);
     if (!isUndefined) {
-        ani_double densityInner;
-        env->Object_CallMethodByName_Double(density, "unboxed", ":D", &densityInner);
+        ani_int densityInner;
+        env->Object_CallMethodByName_Int(density, "unboxed", ":I", &densityInner);
         dataContext->density_ = densityInner;
     }
 
     env->Reference_IsUndefined(type, &isUndefined);
     if (!isUndefined) {
-        ani_double typeInner;
-        env->Object_CallMethodByName_Double(type, "unboxed", ":D", &typeInner);
+        ani_int typeInner;
+        env->Object_CallMethodByName_Int(type, "unboxed", ":I", &typeInner);
         dataContext->iconType_ = typeInner;
     }
     return CreateDrawableDescriptorbyId(env, dataContext);
@@ -1242,15 +1276,15 @@ ani_object ResMgrAddon::GetDrawableDescriptorByName(ani_env* env, ani_object obj
     ani_boolean isUndefined;
     env->Reference_IsUndefined(density, &isUndefined);
     if (!isUndefined) {
-        ani_double densityInner;
-        env->Object_CallMethodByName_Double(density, "unboxed", ":D", &densityInner);
+        ani_int densityInner;
+        env->Object_CallMethodByName_Int(density, "unboxed", ":I", &densityInner);
         dataContext->density_ = densityInner;
     }
 
     env->Reference_IsUndefined(type, &isUndefined);
     if (!isUndefined) {
-        ani_double typeInner;
-        env->Object_CallMethodByName_Double(type, "unboxed", ":D", &typeInner);
+        ani_int typeInner;
+        env->Object_CallMethodByName_Int(type, "unboxed", ":I", &typeInner);
         dataContext->iconType_ = typeInner;
     }
 
@@ -1481,7 +1515,7 @@ ani_object ResMgrAddon::GetLocales(ani_env* env, ani_object object, ani_object i
     return CreateAniArray(env, dataContext->arrayValue_);
 }
 
-ani_double ResMgrAddon::GetSymbolById(ani_env* env, ani_object object, ani_double resId)
+ani_long ResMgrAddon::GetSymbolById(ani_env* env, ani_object object, ani_long resId)
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
@@ -1505,7 +1539,7 @@ ani_double ResMgrAddon::GetSymbolById(ani_env* env, ani_object object, ani_doubl
     return dataContext->symbolValue_;
 }
 
-ani_double ResMgrAddon::GetSymbolByName(ani_env* env, ani_object object, ani_string resName)
+ani_long ResMgrAddon::GetSymbolByName(ani_env* env, ani_object object, ani_string resName)
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);

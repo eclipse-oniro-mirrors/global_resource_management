@@ -14,7 +14,7 @@
  */
 
 export interface RawFileDescriptor {
-    fd: number;
-    offset: number;
-    length: number;
+    fd: int;
+    offset: long;
+    length: long;
 }

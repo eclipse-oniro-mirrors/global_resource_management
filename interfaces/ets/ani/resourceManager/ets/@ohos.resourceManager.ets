@@ -57,8 +57,8 @@ export default namespace resourceManager {
         deviceType: DeviceType;
         screenDensity: ScreenDensity;
         colorMode: ColorMode;
-        mcc: number;
-        mnc: number;
+        mcc: int;
+        mnc: int;
     }
 
     export class DeviceCapability {
@@ -80,48 +80,51 @@ export default namespace resourceManager {
         getStringArrayByName(resName: string): Promise<Array<string>>;
 
         getMediaByName(resName: string, callback: AsyncCallback<Uint8Array, void>): void;
-        getMediaByName(resName: string, density: number, callback: AsyncCallback<Uint8Array, void>): void;
+        getMediaByName(resName: string, density: int, callback: AsyncCallback<Uint8Array, void>): void;
         getMediaByName(resName: string): Promise<Uint8Array>;
-        getMediaByName(resName: string, density: number): Promise<Uint8Array>;
+        getMediaByName(resName: string, density: int): Promise<Uint8Array>;
 
         getMediaBase64ByName(resName: string, callback: AsyncCallback<string, void>): void;
-        getMediaBase64ByName(resName: string, density: number, callback: AsyncCallback<string, void>): void;
+        getMediaBase64ByName(resName: string, density: int, callback: AsyncCallback<string, void>): void;
         getMediaBase64ByName(resName: string): Promise<string>;
-        getMediaBase64ByName(resName: string, density: number): Promise<string>;
+        getMediaBase64ByName(resName: string, density: int): Promise<string>;
 
-        getStringSync(resId: number): string;
-        getStringSync(resId: number, ...args: (string | number)[]): string;
+        getStringSync(resId: long): string;
+        getStringSync(resId: long, ...args: (string | double)[]): string;
 
         getStringByNameSync(resName: string): string;
-        getStringByNameSync(resName: string, ...args: (string | number)[]): string;
+        getStringByNameSync(resName: string, ...args: (string | double)[]): string;
 
-        getBoolean(resId: number): boolean;
+        getBoolean(resId: long): boolean;
         getBooleanByName(resName: string): boolean;
 
-        getNumber(resId: number): number;
-        getNumberByName(resName: string): number;
+        getInt(resId: long): int;
+        getIntByName(resName: string): int;
 
-        getStringValue(resId: number, callback: AsyncCallback<string, void>): void;
-        getStringValue(resId: number): Promise<string>;
+        getDouble(resId: long): double;
+        getDoubleByName(resName: string): double;
 
-        getStringArrayValue(resId: number, callback: AsyncCallback<Array<string>, void>): void;
-        getStringArrayValue(resId: number): Promise<Array<string>>;
+        getStringValue(resId: long, callback: AsyncCallback<string, void>): void;
+        getStringValue(resId: long): Promise<string>;
 
-        getIntPluralStringValueSync(resId: number, num: number, ...args: (string | number)[]): string;
-        getIntPluralStringByNameSync(resName: string, num: number, ...args: (string | number)[]): string;
+        getStringArrayValue(resId: long, callback: AsyncCallback<Array<string>, void>): void;
+        getStringArrayValue(resId: long): Promise<Array<string>>;
 
-        getDoublePluralStringValueSync(resId: number, num: number, ...args: (string | number)[]): string;
-        getDoublePluralStringByNameSync(resName: string, num: number, ...args: (string | number)[]): string;
+        getIntPluralStringValueSync(resId: long, num: int, ...args: (string | double)[]): string;
+        getIntPluralStringByNameSync(resName: string, num: int, ...args: (string | double)[]): string;
 
-        getMediaContent(resId: number, callback: AsyncCallback<Uint8Array, void>): void;
-        getMediaContent(resId: number, density: number, callback: AsyncCallback<Uint8Array, void>): void;
-        getMediaContent(resId: number): Promise<Uint8Array>;
-        getMediaContent(resId: number, density: number): Promise<Uint8Array>;
+        getDoublePluralStringValueSync(resId: long, num: double, ...args: (string | double)[]): string;
+        getDoublePluralStringByNameSync(resName: string, num: double, ...args: (string | double)[]): string;
 
-        getMediaContentBase64(resId: number, callback: AsyncCallback<string, void>): void;
-        getMediaContentBase64(resId: number, density: number, callback: AsyncCallback<string, void>): void;
-        getMediaContentBase64(resId: number): Promise<string>;
-        getMediaContentBase64(resId: number, density: number): Promise<string>;
+        getMediaContent(resId: long, callback: AsyncCallback<Uint8Array, void>): void;
+        getMediaContent(resId: long, density: int, callback: AsyncCallback<Uint8Array, void>): void;
+        getMediaContent(resId: long): Promise<Uint8Array>;
+        getMediaContent(resId: long, density: int): Promise<Uint8Array>;
+
+        getMediaContentBase64(resId: long, callback: AsyncCallback<string, void>): void;
+        getMediaContentBase64(resId: long, density: int, callback: AsyncCallback<string, void>): void;
+        getMediaContentBase64(resId: long): Promise<string>;
+        getMediaContentBase64(resId: long, density: int): Promise<string>;
 
         getRawFileContent(path: string, callback: AsyncCallback<Uint8Array, void>): void;
         getRawFileContent(path: string): Promise<Uint8Array>;
@@ -135,14 +138,14 @@ export default namespace resourceManager {
         getRawFileList(path: string, callback: AsyncCallback<Array<string>, void>): void;
         getRawFileList(path: string): Promise<Array<string>>;
 
-        getColor(resId: number, callback: AsyncCallback<number, void>): void;
-        getColor(resId: number): Promise<number>;
+        getColor(resId: long, callback: AsyncCallback<long, void>): void;
+        getColor(resId: long): Promise<long>;
 
-        getColorByName(resName: string, callback: AsyncCallback<number, void>): void;
-        getColorByName(resName: string): Promise<number>;
+        getColorByName(resName: string, callback: AsyncCallback<long, void>): void;
+        getColorByName(resName: string): Promise<long>;
 
-        getColorSync(resId: number): number;
-        getColorByNameSync(resName: string) : number;
+        getColorSync(resId: long): long;
+        getColorByNameSync(resName: string) : long;
 
         addResource(path: string) : void;
         removeResource(path: string) : void;
@@ -153,17 +156,17 @@ export default namespace resourceManager {
         getRawFileListSync(path: string): Array<string>;
         getRawFileContentSync(path: string): Uint8Array;
 
-        getMediaContentSync(resId: number, density?: number): Uint8Array;
+        getMediaContentSync(resId: long, density?: int): Uint8Array;
 
-        getMediaContentBase64Sync(resId: number, density?: number): string;
+        getMediaContentBase64Sync(resId: long, density?: int): string;
 
-        getDrawableDescriptor(resId: number, density?: number, type?: number): DrawableDescriptor;
-        getDrawableDescriptorByName(resName: string, density?: number, type?: number): DrawableDescriptor;
+        getDrawableDescriptor(resId: long, density?: int, type?: int): DrawableDescriptor;
+        getDrawableDescriptorByName(resName: string, density?: int, type?: int): DrawableDescriptor;
 
-        getStringArrayValueSync(resId: number): Array<string>;
+        getStringArrayValueSync(resId: long): Array<string>;
 
-        getMediaByNameSync(resName: string, density?: number): Uint8Array;
-        getMediaBase64ByNameSync(resName: string, density?: number): string;
+        getMediaByNameSync(resName: string, density?: int): Uint8Array;
+        getMediaBase64ByNameSync(resName: string, density?: int): string;
 
         getStringArrayByNameSync(resName: string): Array<string>;
 
@@ -171,8 +174,8 @@ export default namespace resourceManager {
         getDeviceCapabilitySync(): DeviceCapability;
         getLocales(includeSystem?: boolean): Array<string>;
 
-        getSymbol(resId: number) : number;
-        getSymbolByName(resName: string) : number;
+        getSymbol(resId: long) : long;
+        getSymbolByName(resName: string) : long;
 
         isRawDir(path: string): boolean;
 
@@ -195,26 +198,29 @@ export default namespace resourceManager {
             }
         }
 
-        native getStringSync(resId: number): string;
-        native getStringSync(resId: number, ...args: (string | number)[]): string;
+        native getStringSync(resId: long): string;
+        native getStringSync(resId: long, ...args: (string | double)[]): string;
 
         native getStringByNameSync(resName: string): string;
-        native getStringByNameSync(resName: string, ...args: (string | number)[]): string;
+        native getStringByNameSync(resName: string, ...args: (string | double)[]): string;
 
-        native getBoolean(resId: number): boolean;
+        native getBoolean(resId: long): boolean;
         native getBooleanByName(resName: string): boolean;
 
-        native getNumber(resId: number): number;
-        native getNumberByName(resName: string): number;
+        native getInt(resId: long): int;
+        native getIntByName(resName: string): int;
 
-        native getIntPluralStringValueSync(resId: number, num: number, ...args: (string | number)[]): string;
-        native getIntPluralStringByNameSync(resName: string, num: number, ...args: (string | number)[]): string;
+        native getDouble(resId: long): double;
+        native getDoubleByName(resName: string): double;
 
-        native getDoublePluralStringValueSync(resId: number, num: number, ...args: (string | number)[]): string;
-        native getDoublePluralStringByNameSync(resName: string, num: number, ...args: (string | number)[]): string;
+        native getIntPluralStringValueSync(resId: long, num: int, ...args: (string | double)[]): string;
+        native getIntPluralStringByNameSync(resName: string, num: int, ...args: (string | double)[]): string;
 
-        native getColorSync(resId: number): number;
-        native getColorByNameSync(resName: string) : number;
+        native getDoublePluralStringValueSync(resId: long, num: double, ...args: (string | double)[]): string;
+        native getDoublePluralStringByNameSync(resName: string, num: double, ...args: (string | double)[]): string;
+
+        native getColorSync(resId: long): long;
+        native getColorByNameSync(resName: string) : long;
 
         native addResource(path: string) : void;
         native removeResource(path: string) : void;
@@ -226,31 +232,31 @@ export default namespace resourceManager {
         native getRawFileListSync(path: string): Array<string>;
         native getRawFileContentSync(path: string): Uint8Array;
 
-        native getMediaContentSync(resId: number, density?: number): Uint8Array;
+        native getMediaContentSync(resId: long, density?: int): Uint8Array;
 
-        native getMediaContentBase64Sync(resId: number, density?: number): string;
+        native getMediaContentBase64Sync(resId: long, density?: int): string;
 
-        native getDrawableDescriptor(resId: number, density?: number, type?: number): DrawableDescriptor;
-        native getDrawableDescriptorByName(resName: string, density?: number, type?: number): DrawableDescriptor;
+        native getDrawableDescriptor(resId: long, density?: int, type?: int): DrawableDescriptor;
+        native getDrawableDescriptorByName(resName: string, density?: int, type?: int): DrawableDescriptor;
 
-        native getStringArrayValueSync(resId: number): Array<string>;
+        native getStringArrayValueSync(resId: long): Array<string>;
         native getStringArrayByNameSync(resName: string): Array<string>;
 
-        native getMediaByNameSync(resName: string, density?: number): Uint8Array;
-        native getMediaBase64ByNameSync(resName: string, density?: number): string;
+        native getMediaByNameSync(resName: string, density?: int): Uint8Array;
+        native getMediaBase64ByNameSync(resName: string, density?: int): string;
 
         native getConfigurationSync(): Configuration;
         native getDeviceCapabilitySync(): DeviceCapability;
         native getLocales(includeSystem?: boolean): Array<string>;
 
-        native getSymbol(resId: number) : number;
-        native getSymbolByName(resName: string) : number;
+        native getSymbol(resId: long) : long;
+        native getSymbolByName(resName: string) : long;
 
         native getOverrideResourceManager(configuration?: Configuration): ResourceManager;
         native getOverrideConfiguration(): Configuration;
         native updateOverrideConfiguration(configuration: Configuration): void;
 
-        getStringValue(resId: number, callback: AsyncCallback<string, void>): void {
+        getStringValue(resId: long, callback: AsyncCallback<string, void>): void {
             let p1 = taskpool.execute((): string => {
                 return this.getStringSync(resId);
             })
@@ -261,7 +267,7 @@ export default namespace resourceManager {
             });
         }
 
-        getStringValue(resId: number): Promise<string> {
+        getStringValue(resId: long): Promise<string> {
             return new Promise<string>((resolve, reject) => {
                 taskpool.execute((): string => {
                     return this.getStringSync(resId);
@@ -273,7 +279,7 @@ export default namespace resourceManager {
             });
         }
 
-        getStringArrayValue(resId: number, callback: AsyncCallback<Array<string>, void>): void {
+        getStringArrayValue(resId: long, callback: AsyncCallback<Array<string>, void>): void {
             let p1 = taskpool.execute((): Array<string> => {
                 return this.getStringArrayValueSync(resId);
             })
@@ -284,7 +290,7 @@ export default namespace resourceManager {
             });
         }
 
-        getStringArrayValue(resId: number): Promise<Array<string>> {
+        getStringArrayValue(resId: long): Promise<Array<string>> {
             return new Promise<Array<string>>((resolve, reject) => {
                 taskpool.execute((): Array<string> => {
                     return this.getStringArrayValueSync(resId);
@@ -411,7 +417,7 @@ export default namespace resourceManager {
             });
         }
 
-        getMediaByName(resName: string, density: number, callback: AsyncCallback<Uint8Array, void>): void {
+        getMediaByName(resName: string, density: int, callback: AsyncCallback<Uint8Array, void>): void {
             let p1 = taskpool.execute((): Uint8Array => {
                 return this.getMediaByNameSync(resName, density);
             })
@@ -422,7 +428,7 @@ export default namespace resourceManager {
             });
         }
 
-        getMediaByName(resName: string, density: number): Promise<Uint8Array> {
+        getMediaByName(resName: string, density: int): Promise<Uint8Array> {
             return new Promise<Uint8Array>((resolve, reject) => {
                 taskpool.execute((): Uint8Array => {
                     return this.getMediaByNameSync(resName, density);
@@ -457,7 +463,7 @@ export default namespace resourceManager {
             });
         }
 
-        getMediaBase64ByName(resName: string, density: number, callback: AsyncCallback<string, void>): void {
+        getMediaBase64ByName(resName: string, density: int, callback: AsyncCallback<string, void>): void {
             let p1 = taskpool.execute((): string => {
                 return this.getMediaBase64ByNameSync(resName, density);
             })
@@ -468,7 +474,7 @@ export default namespace resourceManager {
             });
         }
 
-        getMediaBase64ByName(resName: string, density: number): Promise<string> {
+        getMediaBase64ByName(resName: string, density: int): Promise<string> {
             return new Promise<string>((resolve, reject) => {
                 taskpool.execute((): string => {
                     return this.getMediaBase64ByNameSync(resName, density);
@@ -480,7 +486,7 @@ export default namespace resourceManager {
             });
         }
 
-        getMediaContent(resId: number, callback: AsyncCallback<Uint8Array, void>): void {
+        getMediaContent(resId: long, callback: AsyncCallback<Uint8Array, void>): void {
             let p1 = taskpool.execute((): Uint8Array => {
                 return this.getMediaContentSync(resId);
             })
@@ -491,7 +497,7 @@ export default namespace resourceManager {
             });
         }
 
-        getMediaContent(resId: number): Promise<Uint8Array> {
+        getMediaContent(resId: long): Promise<Uint8Array> {
             return new Promise<Uint8Array>((resolve, reject) => {
                 taskpool.execute((): Uint8Array => {
                     return this.getMediaContentSync(resId);
@@ -503,7 +509,7 @@ export default namespace resourceManager {
             });
         }
 
-        getMediaContent(resId: number, density: number, callback: AsyncCallback<Uint8Array, void>): void {
+        getMediaContent(resId: long, density: int, callback: AsyncCallback<Uint8Array, void>): void {
             let p1 = taskpool.execute((): Uint8Array => {
                 return this.getMediaContentSync(resId, density);
             })
@@ -514,7 +520,7 @@ export default namespace resourceManager {
             });
         }
 
-        getMediaContent(resId: number, density: number): Promise<Uint8Array> {
+        getMediaContent(resId: long, density: int): Promise<Uint8Array> {
             return new Promise<Uint8Array>((resolve, reject) => {
                 taskpool.execute((): Uint8Array => {
                     return this.getMediaContentSync(resId, density);
@@ -526,7 +532,7 @@ export default namespace resourceManager {
             });
         }
 
-        getMediaContentBase64(resId: number, callback: AsyncCallback<string, void>): void {
+        getMediaContentBase64(resId: long, callback: AsyncCallback<string, void>): void {
             let p1 = taskpool.execute((): string => {
                 return this.getMediaContentBase64Sync(resId);
             })
@@ -537,7 +543,7 @@ export default namespace resourceManager {
             });
         }
 
-        getMediaContentBase64(resId: number): Promise<string> {
+        getMediaContentBase64(resId: long): Promise<string> {
             return new Promise<string>((resolve, reject) => {
                 taskpool.execute((): string => {
                     return this.getMediaContentBase64Sync(resId);
@@ -549,7 +555,7 @@ export default namespace resourceManager {
             });
         }
 
-        getMediaContentBase64(resId: number, density: number, callback: AsyncCallback<string, void>): void {
+        getMediaContentBase64(resId: long, density: int, callback: AsyncCallback<string, void>): void {
             let p1 = taskpool.execute((): string => {
                 return this.getMediaContentBase64Sync(resId, density);
             })
@@ -560,7 +566,7 @@ export default namespace resourceManager {
             });
         }
 
-        getMediaContentBase64(resId: number, density: number): Promise<string> {
+        getMediaContentBase64(resId: long, density: int): Promise<string> {
             return new Promise<string>((resolve, reject) => {
                 taskpool.execute((): string => {
                     return this.getMediaContentBase64Sync(resId, density);
@@ -664,46 +670,46 @@ export default namespace resourceManager {
             });
         }
 
-        getColor(resId: number, callback: AsyncCallback<number, void>): void {
-            let p1 = taskpool.execute((): number => {
+        getColor(resId: long, callback: AsyncCallback<long, void>): void {
+            let p1 = taskpool.execute((): long => {
                 return this.getColorSync(resId);
             })
             p1.then((content: NullishType) => {
-                callback(null, content as number);
+                callback(null, content as long);
             }).catch((err: Error): void => {
                 callback(err as BusinessError, undefined);
             });
         }
 
-        getColor(resId: number): Promise<number> {
-            return new Promise<number>((resolve, reject) => {
-                taskpool.execute((): number => {
+        getColor(resId: long): Promise<long> {
+            return new Promise<long>((resolve, reject) => {
+                taskpool.execute((): long => {
                     return this.getColorSync(resId);
                 }).then((content: NullishType) => {
-                    resolve(content as number);
+                    resolve(content as long);
                 }, (err: Error): void => {
                     reject(err);
                 });
             });
         }
 
-        getColorByName(resName: string, callback: AsyncCallback<number, void>): void {
-            let p1 = taskpool.execute((): number => {
+        getColorByName(resName: string, callback: AsyncCallback<long, void>): void {
+            let p1 = taskpool.execute((): long => {
                 return this.getColorByNameSync(resName);
             })
             p1.then((content: NullishType) => {
-                callback(null, content as number);
+                callback(null, content as long);
             }).catch((err: Error): void => {
                 callback(err as BusinessError, undefined);
             });
         }
 
-        getColorByName(resName: string): Promise<number> {
-            return new Promise<number>((resolve, reject) => {
-                taskpool.execute((): number => {
+        getColorByName(resName: string): Promise<long> {
+            return new Promise<long>((resolve, reject) => {
+                taskpool.execute((): long => {
                     return this.getColorByNameSync(resName);
                 }).then((content: NullishType) => {
-                    resolve(content as number);
+                    resolve(content as long);
                 }, (err: Error): void => {
                     reject(err);
                 });
