@@ -17,7 +17,7 @@ import { Resource } from 'global.resource';
 export class ResourceInner implements Resource {
     public bundleName: string = '';
     public moduleName: string = '';
-    public id: number = 0;
+    public id: long = 0;
     public params?: Array<Object | undefined>;
-    public type?: number;
+    public type?: int;
 }
