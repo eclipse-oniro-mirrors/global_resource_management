@@ -30,8 +30,7 @@ private:
     static const std::unordered_map<int32_t, std::string> ErrorCodeToMsg;
 
     static std::string FindErrMsg(int32_t errCode);
-    static ani_object WrapStsError(ani_env *env, const std::string &msg);
-    static ani_object CreateError(ani_env *env, ani_int code, const std::string &msg);
+    static void ThrowAniError(ani_env *env, ani_int code, const std::string &message);
 };
 } // namespace Resource
 } // namespace Global

@@ -22,6 +22,8 @@ using namespace OHOS;
 using namespace Global;
 using namespace Resource;
 
+static const char* CLASS_NAME_BUSINESSERROR = "L@ohos/base/BusinessError;";
+
 const std::unordered_map<int32_t, std::string> ResourceManagerAniUtils::ErrorCodeToMsg {
     {ERROR_CODE_INVALID_INPUT_PARAMETER, "Invalid input parameter"},
     {ERROR_CODE_RES_ID_NOT_FOUND, "Invalid resource ID"},
@@ -44,82 +46,45 @@ std::string ResourceManagerAniUtils::FindErrMsg(int32_t errCode)
     return errMsg;
 }
 
-ani_object ResourceManagerAniUtils::WrapStsError(ani_env *env, const std::string &msg)
+void ResourceManagerAniUtils::ThrowAniError(ani_env *env, ani_int code, const std::string &message)
 {
     ani_class cls {};
-    ani_method method {};
-    ani_object obj = nullptr;
-    ani_status status = ANI_ERROR;
-    if (env == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "null env");
-        return nullptr;
+    if (ANI_OK != env->FindClass(CLASS_NAME_BUSINESSERROR, &cls)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "find class %{public}s failed", CLASS_NAME_BUSINESSERROR);
+        return;
     }
-
-    ani_string aniMsg = nullptr;
-    if ((status = env->String_NewUTF8(msg.c_str(), msg.size(), &aniMsg)) != ANI_OK) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "String_NewUTF8 failed %{public}d", status);
-        return nullptr;
+    ani_method ctor {};
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":V", &ctor)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "find method BusinessError constructor failed");
+        return;
     }
-
-    ani_ref undefRef;
-    if ((status = env->GetUndefined(&undefRef)) != ANI_OK) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetUndefined failed %{public}d", status);
-        return nullptr;
+    ani_object error {};
+    if (ANI_OK != env->Object_New(cls, ctor, &error)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "new object %{public}s failed", CLASS_NAME_BUSINESSERROR);
+        return;
     }
-
-    if ((status = env->FindClass("Lescompat/Error;", &cls)) != ANI_OK) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "FindClass failed %{public}d", status);
-        return nullptr;
+    if (ANI_OK != env->Object_SetPropertyByName_Int(error, "code", code)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "set property BusinessError.code failed");
+        return;
     }
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "Lstd/core/String;Lescompat/ErrorOptions;:V", &method)) !=
-        ANI_OK) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Class_FindMethod failed %{public}d", status);
-        return nullptr;
+    ani_string messageRef {};
+    if (ANI_OK != env->String_NewUTF8(message.c_str(), message.size(), &messageRef)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "new message string failed");
+        return;
     }
-
-    if ((status = env->Object_New(cls, method, &obj, aniMsg, undefRef)) != ANI_OK) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Object_New failed %{public}d", status);
-        return nullptr;
+    if (ANI_OK != env->Object_SetPropertyByName_Ref(error, "message", static_cast<ani_ref>(messageRef))) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "set property BusinessError.message failed");
+        return;
     }
-    return obj;
-}
-
-ani_object ResourceManagerAniUtils::CreateError(ani_env *env, ani_int code, const std::string &msg)
-{
-    ani_class cls {};
-    ani_method method {};
-    ani_object obj = nullptr;
-    ani_status status = ANI_ERROR;
-    if (env == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "null env");
-        return nullptr;
+    if (ANI_OK != env->ThrowError(static_cast<ani_error>(error))) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "throwError ani_error object failed");
     }
-    if ((status = env->FindClass("L@ohos/base/BusinessError;", &cls)) != ANI_OK) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "FindClass failed %{public}d", status);
-        return nullptr;
-    }
-    if ((status = env->Class_FindMethod(cls, "<ctor>", "DLescompat/Error;:V", &method)) != ANI_OK) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Class_FindMethod failed %{public}d", status);
-        return nullptr;
-    }
-    ani_object error = WrapStsError(env, msg);
-    if (error == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "error null");
-        return nullptr;
-    }
-    ani_double dCode(code);
-    if ((status = env->Object_New(cls, method, &obj, dCode, error)) != ANI_OK) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Object_New failed %{public}d", status);
-        return nullptr;
-    }
-    return obj;
 }
 
 void ResourceManagerAniUtils::AniThrow(ani_env *env, int32_t errCode)
 {
     std::string errMsg = FindErrMsg(errCode);
     if (errMsg != "") {
-        ani_object error = CreateError(env, errCode, errMsg);
-        env->ThrowError(static_cast<ani_error>(error));
+        ThrowAniError(env, errCode, errMsg);
     }
 }
