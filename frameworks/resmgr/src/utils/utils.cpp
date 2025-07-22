@@ -479,7 +479,7 @@ void Utils::CanonicalizePath(const char *path, char *outPath, size_t len)
     }
 #else
     if (realpath(path, outPath) == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "failed to realpath the path, %{public}s, errno:%{public}d", path, errno);
+        RESMGR_HILOGE(RESMGR_TAG, "failed to realpath the path, errno:%{public}d", errno);
         return;
     }
 #endif
