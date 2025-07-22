@@ -185,7 +185,7 @@ RawFile *LoadRawFileFromHap(const NativeResourceManager *mgr, const char *fileNa
     std::unique_ptr<uint8_t[]> tmpBuf;
     RState state = mgr->resManager->GetRawFileFromHap(fileName, len, tmpBuf);
     if (state != SUCCESS || tmpBuf == nullptr) {
-        RESMGR_HILOGD(RESMGR_RAWFILE_TAG, "failed to get %{public}s rawfile", fileName);
+        RESMGR_HILOGD(RESMGR_RAWFILE_TAG, "failed to get rawfile");
         return nullptr;
     }
     auto result = std::make_unique<RawFile>(fileName);
@@ -451,7 +451,7 @@ RawFile64 *LoadRawFileFromHap64(const NativeResourceManager *mgr, const char *fi
     ResourceManager::RawFileDescriptor resMgrDescriptor;
     RState state = mgr->resManager->GetRawFdNdkFromHap(fileName, resMgrDescriptor);
     if (state != SUCCESS) {
-        RESMGR_HILOGD(RESMGR_RAWFILE_TAG, "failed to get %{public}s rawfile descriptor", fileName);
+        RESMGR_HILOGD(RESMGR_RAWFILE_TAG, "failed to get rawfile descriptor");
         return nullptr;
     }
     auto result = std::make_unique<Raw>(fileName);
@@ -461,7 +461,7 @@ RawFile64 *LoadRawFileFromHap64(const NativeResourceManager *mgr, const char *fi
             close(resMgrDescriptor.fd);
             resMgrDescriptor.fd = 0;
         }
-        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to open %{public}s rawfile descriptor", fileName);
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to open rawfile descriptor");
         return nullptr;
     }
     result->length = resMgrDescriptor.length;

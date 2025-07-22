@@ -642,7 +642,7 @@ ResourceManager_ErrorCode OH_ResourceManager_AddResource(const NativeResourceMan
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     if (!mgr->resManager->AddAppOverlay(path)) {
-        RESMGR_HILOGE(RESMGR_NATIVE_TAG, "Failed to add overlay path = %{public}s", path);
+        RESMGR_HILOGE(RESMGR_NATIVE_TAG, "Failed to add overlay path");
         return ResourceManager_ErrorCode::ERROR_CODE_OVERLAY_RES_PATH_INVALID;
     }
     return ResourceManager_ErrorCode::SUCCESS;
@@ -654,7 +654,7 @@ ResourceManager_ErrorCode OH_ResourceManager_RemoveResource(const NativeResource
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     if (!mgr->resManager->RemoveAppOverlay(path)) {
-        RESMGR_HILOGE(RESMGR_NATIVE_TAG, "Failed to remove overlay path = %{public}s", path);
+        RESMGR_HILOGE(RESMGR_NATIVE_TAG, "Failed to remove overlay path");
         return ResourceManager_ErrorCode::ERROR_CODE_OVERLAY_RES_PATH_INVALID;
     }
     return ResourceManager_ErrorCode::SUCCESS;
