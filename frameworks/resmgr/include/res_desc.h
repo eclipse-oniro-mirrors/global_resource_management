@@ -218,8 +218,6 @@ public:
     std::string ToString() const;
 
     std::vector<std::shared_ptr<ResKey>> keys_;
-
-    std::string GetCurrentDeviceType();
 };
 } // namespace Resource
 } // namespace Global
