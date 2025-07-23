@@ -43,6 +43,7 @@ ohos_shared_library("resourceManager_ani") {
     "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",
+    "ipc:ipc_single",
     "runtime_core:ani",
   ]
 
@@ -60,6 +61,7 @@ ohos_shared_library("resmgr_ani") {
     "ability_runtime:app_context",
     "bundle_framework:appexecfwk_base",
     "hilog:libhilog",
+    "ipc:ipc_single",
     "runtime_core:ani",
   ]
 
