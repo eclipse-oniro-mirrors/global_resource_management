@@ -87,7 +87,7 @@ bool HapParserV1::Init(const char *path)
     }
 
     if (!GetIndexData(path, buffer_, bufLen_)) {
-        RESMGR_HILOGE(RESMGR_TAG, "GetIndexData failed when construct hapParser, file path: %{public}s", path);
+        RESMGR_HILOGE(RESMGR_TAG, "GetIndexData failed when construct hapParser");
         return false;
     }
 

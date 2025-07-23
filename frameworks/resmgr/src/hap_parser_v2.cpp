@@ -62,7 +62,7 @@ HapParserV2::~HapParserV2()
 bool HapParserV2::Init(const char *path)
 {
     if (!GetIndexMmap(path)) {
-        RESMGR_HILOGE(RESMGR_TAG, "GetIndexMmap failed when construct hapParser, file path: %{public}s", path);
+        RESMGR_HILOGE(RESMGR_TAG, "GetIndexMmap failed when construct hapParser");
         return false;
     }
 
@@ -481,7 +481,7 @@ bool HapParserV2::GetIndexMmapFromHap(const char *path)
     }
     mapper_ = extractor_->GetMmapData(indexFilePath);
     if (mapper_ == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "failed to get mmap data indexFilePath, %{public}s", indexFilePath.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get mmap data indexFilePath from hap");
         return false;
     }
 #endif
@@ -502,7 +502,7 @@ bool HapParserV2::GetIndexMmapFromIndex(const char *path)
     mmapLen_ = static_cast<size_t>(fileStat.st_size);
     mmap_ = (uint8_t*)mmap(nullptr, mmapLen_, PROT_READ, MAP_PRIVATE, fd_, 0);
     if (mmap_ == MAP_FAILED) {
-        RESMGR_HILOGE(RESMGR_TAG, "failed to get mmap data indexFilePath, %{public}s", indexPath);
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get mmap data indexFilePath from index");
         return false;
     }
 #else

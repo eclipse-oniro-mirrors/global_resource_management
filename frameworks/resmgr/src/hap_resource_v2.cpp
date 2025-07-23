@@ -181,7 +181,7 @@ bool HapResourceV2::Init(std::unordered_map<uint32_t, std::shared_ptr<ResConfigI
 #endif
     auto index = indexPath_.rfind(separator);
     if (index == std::string::npos) {
-        RESMGR_HILOGE(RESMGR_TAG, "index path format error, %s", indexPath_.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "index path format error");
         return false;
     }
 #if defined(__IDE_PREVIEW__) || defined(__ARKUI_CROSS__)
@@ -192,7 +192,7 @@ bool HapResourceV2::Init(std::unordered_map<uint32_t, std::shared_ptr<ResConfigI
     }
     index = indexPath_.rfind(separator, index - 1);
     if (index == std::string::npos) {
-        RESMGR_HILOGE(RESMGR_TAG, "index path format error, %s", indexPath_.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "index path format error");
         return false;
     }
     resourcePath_ = indexPath_.substr(0, index + 1);
