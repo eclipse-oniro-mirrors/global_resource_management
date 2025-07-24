@@ -149,7 +149,7 @@ ani_object ResMgrAddon::CreateResMgr(
 ani_object ResMgrAddon::WrapResourceManager(ani_env* env, std::shared_ptr<ResMgrAddon> &addon)
 {
     ani_object nativeResMgr;
-    static const char *className = "L@ohos/resourceManager/resourceManager/ResourceManagerInner;";
+    static const char *className = "@ohos.resourceManager.resourceManager.ResourceManagerInner";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", className);
@@ -204,7 +204,7 @@ static ani_object CreateAniArray(ani_env *env, const std::vector<std::string> st
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "i:", &ctor)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find method '<ctor>' failed");
         return nullptr;
     }
@@ -216,7 +216,7 @@ static ani_object CreateAniArray(ani_env *env, const std::vector<std::string> st
     }
 
     ani_method set;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "ILstd/core/Object;:V", &set)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "iC{std.core.Object}:", &set)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find method '$_set' failed");
         return ret;
     }
@@ -233,7 +233,7 @@ static ani_object CreateAniArray(ani_env *env, const std::vector<std::string> st
 static ani_object CreateAniUint8Array(ani_env* env, ResMgrDataContext &context)
 {
     size_t length = context.len_;
-    static const char *className = "Lescompat/Uint8Array;";
+    static const char *className = "escompat.Uint8Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", className);
@@ -241,7 +241,7 @@ static ani_object CreateAniUint8Array(ani_env* env, ResMgrDataContext &context)
     }
 
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "I:V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "i:", &ctor)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find method '<ctor>' failed");
         return nullptr;
     }
@@ -253,7 +253,7 @@ static ani_object CreateAniUint8Array(ani_env* env, ResMgrDataContext &context)
     }
 
     ani_method set;
-    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "II:V", &set)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "$_set", "ii:", &set)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find method '$_set' failed");
         return nullptr;
     }
@@ -386,8 +386,8 @@ static ArrayElement GetArrayElement(ani_env* env, ani_object args, const int ind
     }
 
     ani_class stringClass;
-    if (ANI_OK != env->FindClass("Lstd/core/String;", &stringClass)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class 'Lstd/core/String;' failed");
+    if (ANI_OK != env->FindClass("std.core.String", &stringClass)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class 'C{std.core.String}' failed");
         return ArrayElement{ArrayElement::ElementType::NUMBER, 0};
     }
 
@@ -398,7 +398,7 @@ static ArrayElement GetArrayElement(ani_env* env, ani_object args, const int ind
         return ArrayElement{ArrayElement::ElementType::STRING, AniStrToString(env, value)};
     } else {
         ani_double param;
-        env->Object_CallMethodByName_Double(static_cast<ani_object>(value), "unboxed", ":D", &param);
+        env->Object_CallMethodByName_Double(static_cast<ani_object>(value), "unboxed", ":d", &param);
         return ArrayElement{ArrayElement::ElementType::NUMBER, param};
     }
 }
@@ -908,7 +908,7 @@ ani_object ResMgrAddon::GetRawFdSync(ani_env* env, ani_object object, ani_string
         return nullptr;
     }
 
-    static const char *className = "Lglobal/rawFileDescriptorInner/RawFileDescriptorInner;";
+    static const char *className = "global.rawFileDescriptorInner.RawFileDescriptorInner";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", className);
@@ -1017,7 +1017,7 @@ ani_object ResMgrAddon::GetMediaContentSyncById(ani_env* env, ani_object object,
     env->Reference_IsUndefined(density, &isUndefined);
     if (!isUndefined) {
         ani_int densityInner;
-        env->Object_CallMethodByName_Int(density, "unboxed", ":I", &densityInner);
+        env->Object_CallMethodByName_Int(density, "unboxed", ":i", &densityInner);
         dataContext->density_ = densityInner;
     }
 
@@ -1050,7 +1050,7 @@ ani_string ResMgrAddon::GetMediaContentBase64SyncById(ani_env* env, ani_object o
     env->Reference_IsUndefined(density, &isUndefined);
     if (!isUndefined) {
         ani_int densityInner;
-        env->Object_CallMethodByName_Int(density, "unboxed", ":I", &densityInner);
+        env->Object_CallMethodByName_Int(density, "unboxed", ":i", &densityInner);
         dataContext->density_ = densityInner;
     }
 
@@ -1106,7 +1106,7 @@ ani_object ResMgrAddon::GetMediaByNameSync(ani_env* env, ani_object object, ani_
     env->Reference_IsUndefined(density, &isUndefined);
     if (!isUndefined) {
         ani_int densityInner;
-        env->Object_CallMethodByName_Int(density, "unboxed", ":I", &densityInner);
+        env->Object_CallMethodByName_Int(density, "unboxed", ":i", &densityInner);
         dataContext->density_ = densityInner;
     }
 
@@ -1140,7 +1140,7 @@ ani_string ResMgrAddon::GetMediaBase64ByNameSync(ani_env* env, ani_object object
     env->Reference_IsUndefined(density, &isUndefined);
     if (!isUndefined) {
         ani_int densityInner;
-        env->Object_CallMethodByName_Int(density, "unboxed", ":I", &densityInner);
+        env->Object_CallMethodByName_Int(density, "unboxed", ":i", &densityInner);
         dataContext->density_ = densityInner;
     }
 
@@ -1211,14 +1211,14 @@ ani_object ResMgrAddon::GetDrawableDescriptorById(ani_env* env, ani_object objec
     env->Reference_IsUndefined(density, &isUndefined);
     if (!isUndefined) {
         ani_int densityInner;
-        env->Object_CallMethodByName_Int(density, "unboxed", ":I", &densityInner);
+        env->Object_CallMethodByName_Int(density, "unboxed", ":i", &densityInner);
         dataContext->density_ = densityInner;
     }
 
     env->Reference_IsUndefined(type, &isUndefined);
     if (!isUndefined) {
         ani_int typeInner;
-        env->Object_CallMethodByName_Int(type, "unboxed", ":I", &typeInner);
+        env->Object_CallMethodByName_Int(type, "unboxed", ":i", &typeInner);
         dataContext->iconType_ = typeInner;
     }
     return CreateDrawableDescriptorbyId(env, dataContext);
@@ -1277,14 +1277,14 @@ ani_object ResMgrAddon::GetDrawableDescriptorByName(ani_env* env, ani_object obj
     env->Reference_IsUndefined(density, &isUndefined);
     if (!isUndefined) {
         ani_int densityInner;
-        env->Object_CallMethodByName_Int(density, "unboxed", ":I", &densityInner);
+        env->Object_CallMethodByName_Int(density, "unboxed", ":i", &densityInner);
         dataContext->density_ = densityInner;
     }
 
     env->Reference_IsUndefined(type, &isUndefined);
     if (!isUndefined) {
         ani_int typeInner;
-        env->Object_CallMethodByName_Int(type, "unboxed", ":I", &typeInner);
+        env->Object_CallMethodByName_Int(type, "unboxed", ":i", &typeInner);
         dataContext->iconType_ = typeInner;
     }
 
@@ -1388,7 +1388,7 @@ static std::string GetLocale(std::unique_ptr<ResConfig> &cfg)
 
 static ani_object CreateConfig(ani_env* env, std::unique_ptr<ResConfig> &cfg)
 {
-    static const char *className = "L@ohos/resourceManager/resourceManager/Configuration;";
+    static const char *className = "@ohos.resourceManager.resourceManager.Configuration";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", className);
@@ -1407,13 +1407,13 @@ static ani_object CreateConfig(ani_env* env, std::unique_ptr<ResConfig> &cfg)
         return nullptr;
     }
 
-    SetEnumMember(env, obj, "direction", "L@ohos/resourceManager/resourceManager/Direction;",
+    SetEnumMember(env, obj, "direction", "@ohos.resourceManager.resourceManager.Direction",
         static_cast<int>(cfg->GetDirection()));
-    SetEnumMember(env, obj, "deviceType", "L@ohos/resourceManager/resourceManager/DeviceType;",
+    SetEnumMember(env, obj, "deviceType", "@ohos.resourceManager.resourceManager.DeviceType",
         static_cast<int>(cfg->GetDeviceType()));
-    SetEnumMember(env, obj, "screenDensity", "L@ohos/resourceManager/resourceManager/ScreenDensity;",
+    SetEnumMember(env, obj, "screenDensity", "@ohos.resourceManager.resourceManager.ScreenDensity",
         GetScreenDensityIndex(cfg->GetScreenDensityDpi()));
-    SetEnumMember(env, obj, "colorMode", "L@ohos/resourceManager/resourceManager/ColorMode;",
+    SetEnumMember(env, obj, "colorMode", "@ohos.resourceManager.resourceManager.ColorMode",
         static_cast<int>(cfg->GetColorMode()));
 
     if (ANI_OK != env->Object_SetPropertyByName_Double(obj, "mcc", static_cast<int>(cfg->GetMcc()))) {
@@ -1468,7 +1468,7 @@ ani_object ResMgrAddon::GetDeviceCapabilitySync(ani_env* env, ani_object object)
     }
     dataContext->addon_->GetResMgr()->GetResConfig(*cfg);
 
-    static const char *className = "L@ohos/resourceManager/resourceManager/DeviceCapability;";
+    static const char *className = "@ohos.resourceManager.resourceManager.DeviceCapability";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", className);
@@ -1487,9 +1487,9 @@ ani_object ResMgrAddon::GetDeviceCapabilitySync(ani_env* env, ani_object object)
         return nullptr;
     }
 
-    SetEnumMember(env, obj, "screenDensity", "L@ohos/resourceManager/resourceManager/ScreenDensity;",
+    SetEnumMember(env, obj, "screenDensity", "@ohos.resourceManager.resourceManager.ScreenDensity",
         GetScreenDensityIndex(cfg->GetScreenDensityDpi()));
-    SetEnumMember(env, obj, "deviceType", "L@ohos/resourceManager/resourceManager/DeviceType;",
+    SetEnumMember(env, obj, "deviceType", "@ohos.resourceManager.resourceManager.DeviceType",
         static_cast<int>(cfg->GetDeviceType()));
     return obj;
 }
@@ -1507,7 +1507,7 @@ ani_object ResMgrAddon::GetLocales(ani_env* env, ani_object object, ani_object i
     env->Reference_IsUndefined(includeSystem, &isUndefined);
     if (!isUndefined) {
         ani_boolean includeSys;
-        env->Object_CallMethodByName_Boolean(includeSystem, "unboxed", ":Z", &includeSys);
+        env->Object_CallMethodByName_Boolean(includeSystem, "unboxed", ":z", &includeSys);
         dataContext->bValue_ = includeSys;
     }
 
@@ -1776,7 +1776,7 @@ void ResMgrAddon::UpdateOverrideConfiguration(ani_env* env, ani_object object, a
 
 ani_status ResMgrAddon::BindContext(ani_env* env)
 {
-    static const char* className = "L@ohos/resourceManager/resourceManager/ResourceManagerInner;";
+    static const char* className = "@ohos.resourceManager.resourceManager.ResourceManagerInner";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", className);
@@ -1788,7 +1788,7 @@ ani_status ResMgrAddon::BindContext(ani_env* env)
         return (ani_status)ANI_ERROR;
     };
 
-    static const char* nameSpaceName = "L@ohos/resourceManager/resourceManager;";
+    static const char* nameSpaceName = "@ohos.resourceManager.resourceManager";
     ani_namespace ns;
     if (ANI_OK != env->FindNamespace(nameSpaceName, &ns)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find namespace '%{public}s' failed", nameSpaceName);
