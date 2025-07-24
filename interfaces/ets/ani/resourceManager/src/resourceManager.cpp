@@ -1416,12 +1416,12 @@ static ani_object CreateConfig(ani_env* env, std::unique_ptr<ResConfig> &cfg)
     SetEnumMember(env, obj, "colorMode", "@ohos.resourceManager.resourceManager.ColorMode",
         static_cast<int>(cfg->GetColorMode()));
 
-    if (ANI_OK != env->Object_SetPropertyByName_Double(obj, "mcc", static_cast<int>(cfg->GetMcc()))) {
+    if (ANI_OK != env->Object_SetPropertyByName_Int(obj, "mcc", static_cast<int>(cfg->GetMcc()))) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Set property 'mcc' failed");
         return obj;
     }
 
-    if (ANI_OK != env->Object_SetPropertyByName_Double(obj, "mnc", static_cast<int>(cfg->GetMnc()))) {
+    if (ANI_OK != env->Object_SetPropertyByName_Int(obj, "mnc", static_cast<int>(cfg->GetMnc()))) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Set property 'mnc' failed");
         return obj;
     }
@@ -1609,9 +1609,9 @@ static bool GetEnumMember(ani_env *env, ani_object options, const std::string na
     return true;
 }
 
-static bool GetNumberMember(ani_env *env, ani_object options, const std::string name, double& value)
+static bool GetNumberMember(ani_env *env, ani_object options, const std::string name, int& value)
 {
-    if (ANI_OK != env->Object_GetPropertyByName_Double(options, name.c_str(), &value)) {
+    if (ANI_OK != env->Object_GetPropertyByName_Int(options, name.c_str(), &value)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Get property '%{public}s' failed", name.c_str());
         return false;
     }
@@ -1634,7 +1634,7 @@ static bool GetEnumParamOfConfig(ani_env* env, std::shared_ptr<ResConfig> config
         configPtr->SetColorMode(static_cast<ColorMode>(intEnum));
     }
 
-    double value;
+    int value;
     if (GetNumberMember(env, configuration, "mcc", value)) {
         configPtr->SetMcc(value);
     }
