@@ -79,7 +79,7 @@ const std::shared_ptr<HapResource> HapResource::Load(const char *path,
     struct stat fileStat {};
     int ret = stat(path, &fileStat);
     if (selectedTypes == SELECT_ALL) {
-        pResource = HapResourceManager::GetInstance()->GetHapResource(path);
+        pResource = HapResourceManager::GetInstance().GetHapResource(path);
         if (pResource && ret == 0 && fileStat.st_mtime == pResource->GetLastModTime()) {
             pResource->UpdateResConfig(defaultConfig);
             return pResource;
@@ -92,7 +92,7 @@ const std::shared_ptr<HapResource> HapResource::Load(const char *path,
     }
     if (pResource != nullptr && selectedTypes == SELECT_ALL) {
         pResource->SetLastModTime(fileStat.st_mtime);
-        pResource = HapResourceManager::GetInstance()->PutAndGetResource(path, pResource);
+        pResource = HapResourceManager::GetInstance().PutAndGetResource(path, pResource);
     }
     if (pResource) {
         pResource->UpdateResConfig(defaultConfig);

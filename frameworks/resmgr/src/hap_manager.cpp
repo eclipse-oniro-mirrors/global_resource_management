@@ -561,7 +561,7 @@ bool HapManager::AddResourcePath(const char *path, const uint32_t &selectedTypes
     std::string sPath(path);
 #if defined(__ARKUI_CROSS__)
     if (forceReload) {
-        HapResourceManager::GetInstance()->RemoveHapResource(sPath);
+        HapResourceManager::GetInstance().RemoveHapResource(sPath);
         RemoveHapResource(sPath);
     }
 #endif
@@ -610,7 +610,7 @@ bool HapManager::AddPatchResourcePath(const char *path, const char *patchPath)
         return false;
     }
     std::string sPatchPath(patchPath);
-    return HapResourceManager::GetInstance()->PutPatchResource(sPath, sPatchPath);
+    return HapResourceManager::GetInstance().PutPatchResource(sPath, sPatchPath);
 }
 
 RState HapManager::ReloadAll()
