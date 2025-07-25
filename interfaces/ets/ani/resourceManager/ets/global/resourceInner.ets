@@ -18,6 +18,6 @@ export class ResourceInner implements Resource {
     public bundleName: string = '';
     public moduleName: string = '';
     public id: number = 0;
-    public params?: Array<Object | undefined> | undefined;
-    public type?: number | undefined = 0;
+    public params?: Array<Object | undefined>;
+    public type?: number;
 }
