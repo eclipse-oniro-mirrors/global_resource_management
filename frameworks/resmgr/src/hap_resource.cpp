@@ -213,7 +213,7 @@ const std::shared_ptr<HapResource> HapResource::LoadFromHap(const char *path,
     size_t bufLen = 0;
     bool ret = GetIndexDataFromHap(path, buf, bufLen);
     if (!ret) {
-        RESMGR_HILOGE(RESMGR_TAG, "read Index from file failed path, %{public}s", path);
+        RESMGR_HILOGE(RESMGR_TAG, "read Index from file failed path from hap");
         return nullptr;
     }
     std::shared_ptr<ResDesc> resDesc = std::make_shared<ResDesc>();
@@ -577,7 +577,7 @@ RState HapResource::UpdateResConfig(std::shared_ptr<ResConfigImpl> &defaultConfi
         ret = GetIndexDataFromIndex(rawIndexPath, buf, bufLen);
     }
     if (!ret) {
-        RESMGR_HILOGE(RESMGR_TAG, "read Index from file failed path, %{public}s", rawIndexPath);
+        RESMGR_HILOGE(RESMGR_TAG, "read Index from file failed path in update");
         return HAP_INIT_FAILED;
     }
     ParserContext context = {
