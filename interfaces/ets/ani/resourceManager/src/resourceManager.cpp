@@ -19,6 +19,7 @@
 #include "resource_manager_ani_utils.h"
 #include "resource_manager_data_context.h"
 #include "resource_manager.h"
+#include <cstdint>
 
 using namespace OHOS;
 using namespace Global;
@@ -357,7 +358,6 @@ ani_string ResMgrAddon::GetStringSyncById(ani_env* env, ani_object object, ani_l
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
-    dataContext->resId_ = resId;
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     uint32_t notUse = 0;
@@ -435,7 +435,6 @@ ani_string ResMgrAddon::GetFormatStringSyncById(ani_env *env, ani_object object,
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
-    dataContext->resId_ = resId;
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     uint32_t notUse = 0;
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, notUse);
@@ -518,7 +517,6 @@ ani_boolean ResMgrAddon::GetBooleanById(ani_env* env, ani_object object, ani_lon
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
-    dataContext->resId_ = resId;
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     uint32_t notUse = 0;
@@ -566,7 +564,6 @@ ani_int ResMgrAddon::GetIntById(ani_env* env, ani_object object, ani_long resId)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
-    dataContext->resId_ = resId;
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     uint32_t notUse = 0;
@@ -618,7 +615,6 @@ ani_double ResMgrAddon::GetDoubleById(ani_env* env, ani_object object, ani_long 
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
-    dataContext->resId_ = resId;
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     uint32_t notUse = 0;
@@ -671,7 +667,6 @@ ani_string ResMgrAddon::GetIntPluralStringValueSyncById(ani_env* env, ani_object
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
-    dataContext->resId_ = resId;
     double number = num;
     if (number > INT_MAX) {
         number = INT_MAX;
@@ -746,7 +741,6 @@ ani_string ResMgrAddon::GetDoublePluralStringValueSyncById(ani_env* env, ani_obj
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
-    dataContext->resId_ = resId;
     dataContext->quantity_ = { false, 0, num };
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
@@ -808,7 +802,6 @@ ani_long ResMgrAddon::GetColorSyncById(ani_env* env, ani_object object, ani_long
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
-    dataContext->resId_ = resId;
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     uint32_t notUse = 0;
@@ -1011,14 +1004,12 @@ ani_object ResMgrAddon::GetMediaContentSyncById(ani_env* env, ani_object object,
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
-    dataContext->resId_ = resId;
 
     ani_boolean isUndefined;
     env->Reference_IsUndefined(density, &isUndefined);
+    ani_int densityInner = 0;
     if (!isUndefined) {
-        ani_int densityInner;
         env->Object_CallMethodByName_Int(density, "unboxed", ":i", &densityInner);
-        dataContext->density_ = densityInner;
     }
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
@@ -1030,7 +1021,7 @@ ani_object ResMgrAddon::GetMediaContentSyncById(ani_env* env, ani_object object,
         return nullptr;
     }
 
-    RState state = resMgr->GetMediaDataById(resId, dataContext->len_, dataContext->mediaData, dataContext->density_);
+    RState state = resMgr->GetMediaDataById(resId, dataContext->len_, dataContext->mediaData, densityInner);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to GetMediaContentSync state", true);
         ResourceManagerAniUtils::AniThrow(env, state);
@@ -1044,14 +1035,12 @@ ani_string ResMgrAddon::GetMediaContentBase64SyncById(ani_env* env, ani_object o
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
-    dataContext->resId_ = resId;
 
     ani_boolean isUndefined;
     env->Reference_IsUndefined(density, &isUndefined);
+    ani_int densityInner = 0;
     if (!isUndefined) {
-        ani_int densityInner;
         env->Object_CallMethodByName_Int(density, "unboxed", ":i", &densityInner);
-        dataContext->density_ = densityInner;
     }
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
@@ -1063,7 +1052,7 @@ ani_string ResMgrAddon::GetMediaContentBase64SyncById(ani_env* env, ani_object o
         return nullptr;
     }
 
-    RState state = resMgr->GetMediaBase64DataById(resId, dataContext->value_, dataContext->density_);
+    RState state = resMgr->GetMediaBase64DataById(resId, dataContext->value_, densityInner);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to GetMediaContentBase64Sync state", true);
         ResourceManagerAniUtils::AniThrow(env, state);
@@ -1076,7 +1065,6 @@ ani_object ResMgrAddon::GetStringArrayValueSyncById(ani_env* env, ani_object obj
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
-    dataContext->resId_ = resId;
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     uint32_t notUse = 0;
@@ -1104,10 +1092,9 @@ ani_object ResMgrAddon::GetMediaByNameSync(ani_env* env, ani_object object, ani_
 
     ani_boolean isUndefined;
     env->Reference_IsUndefined(density, &isUndefined);
+    ani_int densityInner = 0;
     if (!isUndefined) {
-        ani_int densityInner;
         env->Object_CallMethodByName_Int(density, "unboxed", ":i", &densityInner);
-        dataContext->density_ = densityInner;
     }
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
@@ -1120,7 +1107,7 @@ ani_object ResMgrAddon::GetMediaByNameSync(ani_env* env, ani_object object, ani_
     }
 
     RState state = resMgr->GetMediaDataByName(dataContext->resName_.c_str(),
-        dataContext->len_, dataContext->mediaData, dataContext->density_);
+        dataContext->len_, dataContext->mediaData, densityInner);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("GetMediaByNameSync failed state", false);
         ResourceManagerAniUtils::AniThrow(env, state);
@@ -1138,10 +1125,9 @@ ani_string ResMgrAddon::GetMediaBase64ByNameSync(ani_env* env, ani_object object
 
     ani_boolean isUndefined;
     env->Reference_IsUndefined(density, &isUndefined);
+    ani_int densityInner = 0;
     if (!isUndefined) {
-        ani_int densityInner;
         env->Object_CallMethodByName_Int(density, "unboxed", ":i", &densityInner);
-        dataContext->density_ = densityInner;
     }
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
@@ -1154,7 +1140,7 @@ ani_string ResMgrAddon::GetMediaBase64ByNameSync(ani_env* env, ani_object object
     }
 
     RState state = resMgr->GetMediaBase64DataByName(dataContext->resName_.c_str(),
-        dataContext->value_, dataContext->density_);
+        dataContext->value_, densityInner);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to get media data in GetMediaBase64ByNameSync", false);
         ResourceManagerAniUtils::AniThrow(env, state);
@@ -1205,21 +1191,21 @@ ani_object ResMgrAddon::GetDrawableDescriptorById(ani_env* env, ani_object objec
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
-    dataContext->resId_ = resId;
+    dataContext->resId_ = static_cast<uint32_t>(resId);
 
     ani_boolean isUndefined;
     env->Reference_IsUndefined(density, &isUndefined);
     if (!isUndefined) {
         ani_int densityInner;
         env->Object_CallMethodByName_Int(density, "unboxed", ":i", &densityInner);
-        dataContext->density_ = densityInner;
+        dataContext->density_ = static_cast<uint32_t>(densityInner);
     }
 
     env->Reference_IsUndefined(type, &isUndefined);
     if (!isUndefined) {
         ani_int typeInner;
         env->Object_CallMethodByName_Int(type, "unboxed", ":i", &typeInner);
-        dataContext->iconType_ = typeInner;
+        dataContext->iconType_ = static_cast<uint32_t>(typeInner);
     }
     return CreateDrawableDescriptorbyId(env, dataContext);
 }
@@ -1278,14 +1264,14 @@ ani_object ResMgrAddon::GetDrawableDescriptorByName(ani_env* env, ani_object obj
     if (!isUndefined) {
         ani_int densityInner;
         env->Object_CallMethodByName_Int(density, "unboxed", ":i", &densityInner);
-        dataContext->density_ = densityInner;
+        dataContext->density_ = static_cast<uint32_t>(densityInner);
     }
 
     env->Reference_IsUndefined(type, &isUndefined);
     if (!isUndefined) {
         ani_int typeInner;
         env->Object_CallMethodByName_Int(type, "unboxed", ":i", &typeInner);
-        dataContext->iconType_ = typeInner;
+        dataContext->iconType_ = static_cast<uint32_t>(typeInner);
     }
 
     dataContext->addon_ = UnwrapAddon(env, object);
@@ -1519,7 +1505,6 @@ ani_long ResMgrAddon::GetSymbolById(ani_env* env, ani_object object, ani_long re
 {
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
-    dataContext->resId_ = resId;
 
     std::shared_ptr<ResourceManager> resMgr = nullptr;
     uint32_t notUse = 0;

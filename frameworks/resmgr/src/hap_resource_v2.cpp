@@ -238,7 +238,7 @@ void HapResourceV2::InitThemeSystemRes()
     }
 
     for (const auto &cfg : configList) {
-        if (cfg->GetIdItem()->value_ == "true") {
+        if (cfg->GetIdItem() != nullptr && cfg->GetIdItem()->value_ == "true") {
             isThemeSystemResEnable_ = true;
             return;
         }
