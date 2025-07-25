@@ -927,15 +927,15 @@ ani_object ResMgrAddon::GetRawFdSync(ani_env* env, ani_object object, ani_string
         return nullptr;
     }
 
-    if (ANI_OK != env->Object_SetPropertyByName_Double(obj, "fd", dataContext->descriptor_.fd)) {
+    if (ANI_OK != env->Object_SetPropertyByName_Int(obj, "fd", dataContext->descriptor_.fd)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Set property 'fd' failed");
     }
 
-    if (ANI_OK != env->Object_SetPropertyByName_Double(obj, "offset", dataContext->descriptor_.offset)) {
+    if (ANI_OK != env->Object_SetPropertyByName_Long(obj, "offset", dataContext->descriptor_.offset)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Set property 'offset' failed");
     }
 
-    if (ANI_OK != env->Object_SetPropertyByName_Double(obj, "length", dataContext->descriptor_.length)) {
+    if (ANI_OK != env->Object_SetPropertyByName_Long(obj, "length", dataContext->descriptor_.length)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Set property 'length' failed");
     }
     return obj;
