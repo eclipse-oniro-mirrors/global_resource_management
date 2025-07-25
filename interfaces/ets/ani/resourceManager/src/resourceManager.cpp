@@ -19,7 +19,6 @@
 #include "resource_manager_ani_utils.h"
 #include "resource_manager_data_context.h"
 #include "resource_manager.h"
-#include <cstdint>
 
 using namespace OHOS;
 using namespace Global;
