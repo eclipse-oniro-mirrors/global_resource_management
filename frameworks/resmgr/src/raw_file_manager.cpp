@@ -196,7 +196,7 @@ RawFile *LoadRawFileFromHap(const NativeResourceManager *mgr, const char *fileNa
     }
     FILE* zipFile = fopen(hapPath.c_str(), "r");
     if (!zipFile) {
-        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed open file %{public}s", hapPath.c_str());
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed open file");
         return nullptr;
     }
     result->pf = zipFile;

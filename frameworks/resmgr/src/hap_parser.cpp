@@ -149,7 +149,7 @@ bool HapParser::GetIndexDataFromHap(const char *path, std::unique_ptr<uint8_t[]>
     }
     bool ret = extractor->ExtractToBufByName(indexFilePath, buf, bufLen);
     if (!ret) {
-        RESMGR_HILOGE(RESMGR_TAG, "failed to get buf data indexFilePath, %{public}s", indexFilePath.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get buf data indexFilePath");
         return false;
     }
 #endif
@@ -247,32 +247,29 @@ RState HapParser::ReadRawFileFromHap(const std::string &hapPath, const std::stri
     std::string tempPath = patchPath.empty() ? hapPath : patchPath;
     auto extractor = AbilityBase::ExtractorUtil::GetExtractor(tempPath, isNewExtractor);
     if (extractor == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor hapPath, %{public}s", tempPath.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor by hapPath");
         return NOT_FOUND;
     }
     std::string rawfilePath = GetRawFilePath(extractor, rawFileName);
     if (!extractor->HasEntry(rawfilePath) && patchPath.empty()) {
-        RESMGR_HILOGD(RESMGR_TAG,
-            "the rawfile file %{public}s is not exist in %{public}s", rawfilePath.c_str(), tempPath.c_str());
+        RESMGR_HILOGD(RESMGR_TAG, "the rawfile file is not exist in hap");
         return ERROR_CODE_RES_PATH_INVALID;
     }
     if (!extractor->HasEntry(rawfilePath) && !patchPath.empty()) {
         extractor = AbilityBase::ExtractorUtil::GetExtractor(hapPath, isNewExtractor);
         if (extractor == nullptr) {
-            RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor hapPath, %{public}s", tempPath.c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor by patch");
             return NOT_FOUND;
         }
         rawfilePath = GetRawFilePath(extractor, rawFileName);
         if (!extractor->HasEntry(rawfilePath)) {
-            RESMGR_HILOGD(RESMGR_TAG,
-                "the rawfile file %{public}s is not exist in %{public}s", rawfilePath.c_str(), tempPath.c_str());
+            RESMGR_HILOGD(RESMGR_TAG, "the rawfile file is not exist patch");
             return ERROR_CODE_RES_PATH_INVALID;
         }
     }
     bool ret = extractor->ExtractToBufByName(rawfilePath, outValue, len);
     if (!ret) {
-        RESMGR_HILOGE(RESMGR_TAG, "failed to get rawfile data rawfilePath, %{public}s, hapPath, %{public}s",
-            rawfilePath.c_str(), tempPath.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get rawfile data");
         return NOT_FOUND;
     }
 #endif
@@ -289,7 +286,7 @@ RState GetExtractor(const char *hapPath, const char *patchPath, char *outPath, c
         Utils::CanonicalizePath(patchPath, outPath, PATH_MAX);
         extractor = AbilityBase::ExtractorUtil::GetExtractor(outPath, isNewExtractor);
         if (extractor == nullptr) {
-            RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor in ReadRawFileDescriptor hapPath, %{public}s", outPath);
+            RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor in ReadRawFileDescriptor");
             return NOT_FOUND;
         }
         rawfilePath = GetRawFilePath(extractor, rawFileName);
@@ -301,13 +298,12 @@ RState GetExtractor(const char *hapPath, const char *patchPath, char *outPath, c
         Utils::CanonicalizePath(hapPath, outPath, PATH_MAX);
         extractor = AbilityBase::ExtractorUtil::GetExtractor(outPath, isNewExtractor);
         if (extractor == nullptr) {
-            RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor in ReadRawFileDescriptor hapPath, %{public}s", outPath);
+            RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor in patch hap");
             return NOT_FOUND;
         }
         rawfilePath = GetRawFilePath(extractor, rawFileName);
         if (!extractor->HasEntry(rawfilePath)) {
-            RESMGR_HILOGD(RESMGR_TAG,
-                "the rawfile file %{public}s is not exist in %{public}s", rawfilePath.c_str(), outPath);
+            RESMGR_HILOGD(RESMGR_TAG, "the rawfile file is not exist in patch hap");
             return ERROR_CODE_RES_PATH_INVALID;
         }
     }
@@ -330,12 +326,12 @@ RState HapParser::ReadRawFileDescriptor(const char *hapPath, const char *patchPa
     AbilityBase::FileInfo fileInfo;
     bool ret = extractor->GetFileInfo(rawfilePath, fileInfo);
     if (!ret) {
-        RESMGR_HILOGE(RESMGR_TAG, "failed to get rawFileDescriptor rawfilePath, %{public}s", rawfilePath.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get rawFileDescriptor rawfilePath");
         return NOT_FOUND;
     }
     int zipFd = open(outPath, O_RDONLY);
     if (zipFd < 0) {
-        RESMGR_HILOGE(RESMGR_TAG, "failed open file %{public}s", outPath);
+        RESMGR_HILOGE(RESMGR_TAG, "failed open file by path");
         return NOT_FOUND;
     }
     descriptor.offset = static_cast<long>(fileInfo.offset);
@@ -353,19 +349,17 @@ RState HapParser::GetRawFileList(const std::string &hapPath, const std::string &
     bool isNewExtractor = false;
     auto extractor = AbilityBase::ExtractorUtil::GetExtractor(hapPath, isNewExtractor);
     if (extractor == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG,
-            "failed to get extractor from ability in GetRawFileList hapPath, %{public}s", hapPath.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor from ability in GetRawFileList hapPath");
         return NOT_FOUND;
     }
     std::string rawfilePath = GetRawFilePath(extractor, rawDirPath);
     if (!extractor->IsDirExist(rawfilePath)) {
-        RESMGR_HILOGD(RESMGR_TAG,
-            "the rawfile dir %{public}s is not exist in %{public}s", rawfilePath.c_str(), hapPath.c_str());
+        RESMGR_HILOGD(RESMGR_TAG, "the rawfile dir is not exist in hap");
         return ERROR_CODE_RES_PATH_INVALID;
     }
     bool ret = extractor->GetFileList(rawfilePath, fileSet);
     if (!ret) {
-        RESMGR_HILOGE(RESMGR_TAG, "failed to get fileSet from ability rawfilePath, %{public}s", rawfilePath.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get fileSet from ability rawfilePath");
         return ERROR_CODE_RES_PATH_INVALID;
     }
 #endif
@@ -518,7 +512,7 @@ RState HapParser::IsRawDirFromHap(const char *hapPath, const std::string &pathNa
     bool isNewExtractor = false;
     auto extractor = AbilityBase::ExtractorUtil::GetExtractor(hapPath, isNewExtractor);
     if (extractor == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor hapPath, %{public}s", hapPath);
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor hapPath");
         return NOT_FOUND;
     }
     std::string rawPath = GetRawFilePath(extractor, pathName);
@@ -527,7 +521,7 @@ RState HapParser::IsRawDirFromHap(const char *hapPath, const std::string &pathNa
     } else if (extractor->IsDirExist(rawPath)) {
         outValue = true;
     } else {
-        RESMGR_HILOGD(RESMGR_TAG, "the rawfile file %{public}s is not exist in %{public}s", rawPath.c_str(), hapPath);
+        RESMGR_HILOGD(RESMGR_TAG, "the rawfile file is not exist in hap");
         return ERROR_CODE_RES_PATH_INVALID;
     }
 #endif
@@ -540,7 +534,7 @@ RState HapParser::IsRawDirUnCompressed(const std::string &pathName, bool &outVal
     Utils::CanonicalizePath(pathName.c_str(), outPath, PATH_MAX);
     struct stat fileStat {};
     if (stat(outPath, &fileStat) != 0) {
-        RESMGR_HILOGE(RESMGR_TAG, "failed to get rawfile file info, %{public}s", outPath);
+        RESMGR_HILOGE(RESMGR_TAG, "failed to get rawfile file info");
         return ERROR_CODE_RES_PATH_INVALID;
     }
     if ((fileStat.st_mode & S_IFDIR)) {
@@ -548,7 +542,7 @@ RState HapParser::IsRawDirUnCompressed(const std::string &pathName, bool &outVal
     } else if ((fileStat.st_mode & S_IFREG)) {
         outValue = false;
     } else {
-        RESMGR_HILOGE(RESMGR_TAG, "the rawfile file %{public}s is not exist", outPath);
+        RESMGR_HILOGE(RESMGR_TAG, "the rawfile file is not exist");
         return ERROR_CODE_RES_PATH_INVALID;
     }
     return SUCCESS;

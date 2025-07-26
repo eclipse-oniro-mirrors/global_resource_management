@@ -322,7 +322,7 @@ RState HapManager::FindRawFile(const std::string &name, std::string &outValue)
         std::string indexPath = (*iter)->GetIndexPath();
         auto index = indexPath.rfind(seperator);
         if (index == std::string::npos) {
-            RESMGR_HILOGE(RESMGR_TAG, "index path format error, %s", indexPath.c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "index path format error by seperator");
             continue;
         }
         std::string resourcesIndexPath = indexPath.substr(0, index);
@@ -458,7 +458,7 @@ bool HapManager::AddPatchResource(const char *path, const char *patchPath)
     std::string sPath(path);
     auto it = loadedHapPaths_.find(sPath);
     if (it == loadedHapPaths_.end()) {
-        RESMGR_HILOGW(RESMGR_TAG, "AddPatchResource hapPath not load, hapPath = %{public}s", sPath.c_str());
+        RESMGR_HILOGW(RESMGR_TAG, "AddPatchResource hapPath not load");
         return false;
     }
     std::string sPatchPath(patchPath);
@@ -470,7 +470,7 @@ bool HapManager::AddResource(const std::string &path, const std::vector<std::str
     WriteLock lock(this->mutex_);
     std::vector<std::string> targetOverlay = loadedHapPaths_[path];
     if (!targetOverlay.empty() && targetOverlay == overlayPaths) {
-        RESMGR_HILOGI(RESMGR_TAG, "the overlay for %{public}s already been loaded", path.c_str());
+        RESMGR_HILOGI(RESMGR_TAG, "the overlay hap already been loaded");
         return true;
     }
     std::shared_ptr<ResConfigImpl> config = getCompleteOverrideConfig(isOverride_);
@@ -514,11 +514,10 @@ std::string HapManager::GetValidAppPath()
 
 bool HapManager::AddAppOverlay(const std::string &overlayPath)
 {
-    RESMGR_HILOGI(RESMGR_TAG, "AddAppOverlay overlayPath = %{public}s", overlayPath.c_str());
     char outPath[PATH_MAX + 1] = {0};
     Utils::CanonicalizePath(overlayPath.c_str(), outPath, PATH_MAX);
     if (outPath[0] == '\0') {
-        RESMGR_HILOGE(RESMGR_TAG, "invalid overlayPath, %{public}s", overlayPath.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "AddAppOverlay invalid overlayPath");
         return false;
     }
     std::vector<std::string> overlayPaths;
@@ -529,11 +528,10 @@ bool HapManager::AddAppOverlay(const std::string &overlayPath)
 
 bool HapManager::RemoveAppOverlay(const std::string &overlayPath)
 {
-    RESMGR_HILOGI(RESMGR_TAG, "RemoveAppOverlay overlayPath = %{public}s", overlayPath.c_str());
     char outPath[PATH_MAX + 1] = {0};
     Utils::CanonicalizePath(overlayPath.c_str(), outPath, PATH_MAX);
     if (outPath[0] == '\0') {
-        RESMGR_HILOGE(RESMGR_TAG, "invalid overlayPath, %{public}s", overlayPath.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "RemoveAppOverlay invalid overlayPath");
         return false;
     }
     std::vector<std::string> overlayPaths;
@@ -623,7 +621,7 @@ std::vector<std::string> HapManager::GetResourcePaths()
         std::string indexPath = (*iter)->GetIndexPath();
         auto index = indexPath.rfind('/');
         if (index == std::string::npos) {
-            RESMGR_HILOGE(RESMGR_TAG, "index path format error, %s", indexPath.c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "index path format error");
             continue;
         }
 
@@ -655,15 +653,15 @@ std::string GetFilePathFromHap(std::shared_ptr<AbilityBase::Extractor> &extracto
     const std::shared_ptr<IdItem> idItem = qd->GetIdItem();
     if (idItem == nullptr || idItem->resType_ != resType) {
         std::string hapPath = qd->GetIndexPath();
-        RESMGR_HILOGE(RESMGR_TAG, "actual resType = %{public}d, expect resType = %{public}d, hapPath = %{public}s",
-            idItem == nullptr ? -1 : idItem->resType_, resType, hapPath.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "actual resType = %{public}d, expect resType = %{public}d",
+            idItem == nullptr ? -1 : idItem->resType_, resType);
         return filePath;
     }
     if (extractor->IsStageModel()) {
         std::string tempFilePath(idItem->value_);
         auto index = tempFilePath.find('/');
         if (index == std::string::npos) {
-            RESMGR_HILOGE(RESMGR_TAG, "resource path format error, %s", tempFilePath.c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "resource path format error");
             return filePath;
         }
         filePath = idItem->value_.substr(index + 1);
@@ -965,7 +963,7 @@ RState HapManager::GetFilePath(const std::shared_ptr<ValueUnderQualifierDir> qua
 #if defined(__ARKUI_CROSS__)
     auto index = idItem->value_.find('/');
     if (index == std::string::npos) {
-        RESMGR_HILOGE(RESMGR_TAG, "resource path format error, %s", idItem->value_.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "resource path format error");
         return NOT_FOUND;
     }
     auto nameWithoutModule = idItem->value_.substr(index + 1);
@@ -977,7 +975,7 @@ RState HapManager::GetFilePath(const std::shared_ptr<ValueUnderQualifierDir> qua
     }
     auto index = idItem->value_.find('/');
     if (index == std::string::npos) {
-        RESMGR_HILOGE(RESMGR_TAG, "resource path format error, %s", idItem->value_.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "resource path format error");
         return NOT_FOUND;
     }
     auto nameWithoutModule = idItem->value_.substr(index + 1);
@@ -1048,20 +1046,19 @@ RState HapManager::CloseRawFileDescriptor(const std::string &name)
 bool HapManager::RemoveResource(const std::string &path, const std::vector<std::string> &overlayPaths)
 {
     WriteLock lock(this->mutex_);
-    RESMGR_HILOGI(RESMGR_TAG, "remove overlay for path, %{public}s", path.c_str());
     if (loadedHapPaths_.find(path) == loadedHapPaths_.end()) {
         return false;
     }
     std::vector<std::string> targetOverlay = loadedHapPaths_[path];
     if (targetOverlay.empty()) {
-        RESMGR_HILOGE(RESMGR_TAG, "the %{public}s have not overlay", path.c_str());
+        RESMGR_HILOGE(RESMGR_TAG, "the hap have not overlay");
         return false;
     }
     char outPath[PATH_MAX] = {0};
     for (auto iter = overlayPaths.begin(); iter != overlayPaths.end(); iter++) {
         Utils::CanonicalizePath((*iter).c_str(), outPath, PATH_MAX);
         if (outPath[0] == '\0') {
-            RESMGR_HILOGE(RESMGR_TAG, "invalid overlayPath, %{public}s", (*iter).c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "invalid overlayPath");
             continue;
         }
         if (std::find(targetOverlay.begin(), targetOverlay.end(), outPath) != targetOverlay.end()) {

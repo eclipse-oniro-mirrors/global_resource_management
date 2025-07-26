@@ -152,8 +152,7 @@ napi_value ResourceManagerNapiSyncImpl::GetRawFileListSync(napi_env env, napi_ca
 
     int32_t ret = InitPathAddon(env, info, dataContext);
     if (ret != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_JS_TAG,
-            "Failed to init para in GetRawFileListSync by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to init para in GetRawFileListSync by rawfile");
         ResourceManagerNapiUtils::NapiThrow(env, ret);
         return nullptr;
     }
@@ -161,7 +160,7 @@ napi_value ResourceManagerNapiSyncImpl::GetRawFileListSync(napi_env env, napi_ca
     RState state = dataContext->addon_->GetResMgr()->GetRawFileList(dataContext->path_.c_str(),
         dataContext->arrayValue_);
     if (state != RState::SUCCESS || dataContext->arrayValue_.empty()) {
-        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get rawfile list by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get rawfile list");
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_RES_PATH_INVALID);
         return nullptr;
     }
@@ -177,8 +176,7 @@ napi_value ResourceManagerNapiSyncImpl::GetRawFileContentSync(napi_env env, napi
 
     int32_t ret = InitPathAddon(env, info, dataContext);
     if (ret != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_JS_TAG,
-            "Failed to init para in GetRawFileContentSync by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to init para in GetRawFileContentSync");
         ResourceManagerNapiUtils::NapiThrow(env, ret);
         return nullptr;
     }
@@ -186,7 +184,7 @@ napi_value ResourceManagerNapiSyncImpl::GetRawFileContentSync(napi_env env, napi
     RState state = dataContext->addon_->GetResMgr()->GetRawFileFromHap(dataContext->path_,
         dataContext->len_, dataContext->mediaData);
     if (state != SUCCESS) {
-        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get rawfile by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get rawfile");
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -202,7 +200,7 @@ napi_value ResourceManagerNapiSyncImpl::GetRawFdSync(napi_env env, napi_callback
 
     int32_t ret = InitPathAddon(env, info, dataContext);
     if (ret != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to init para in GetRawFdSync by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to init para in GetRawFdSync");
         ResourceManagerNapiUtils::NapiThrow(env, ret);
         return nullptr;
     }
@@ -210,7 +208,7 @@ napi_value ResourceManagerNapiSyncImpl::GetRawFdSync(napi_env env, napi_callback
     RState state = dataContext->addon_->GetResMgr()->GetRawFileDescriptorFromHap(dataContext->path_,
         dataContext->descriptor_);
     if (state != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get rawfd by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get rawfd");
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -225,14 +223,14 @@ napi_value ResourceManagerNapiSyncImpl::CloseRawFdSync(napi_env env, napi_callba
 
     int32_t ret = InitPathAddon(env, info, dataContext);
     if (ret != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to init para in CloseRawFdSync by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to init para in CloseRawFdSync");
         ResourceManagerNapiUtils::NapiThrow(env, ret);
         return nullptr;
     }
 
     RState state = dataContext->addon_->GetResMgr()->CloseRawFileDescriptor(dataContext->path_);
     if (state != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to close rawfd by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to close rawfd");
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -816,11 +814,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessStrResourceByName(napi_env env, napi
 
     RState state = dataContext->addon_->GetResMgr()->GetStringFormatByName(dataContext->resName_.c_str(),
         dataContext->value_, dataContext->jsParams_);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("GetStringByNameSync failed state", false);
-        return state;
-    }
-    return SUCCESS;
+    return state;
 }
 
 napi_value ResourceManagerNapiSyncImpl::GetStringByNameSync(napi_env env, napi_callback_info info)
@@ -853,9 +847,6 @@ int32_t ResourceManagerNapiSyncImpl::ProcessSymbolResourceByName(napi_env env, n
 {
     RState state = dataContext->addon_->GetResMgr()->GetSymbolByName(dataContext->resName_.c_str(),
         dataContext->symbolValue_);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("GetSymbolByName failed state", false);
-    }
     return state;
 }
 
@@ -890,11 +881,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessColorResourceByName(napi_env env, na
 {
     RState state = dataContext->addon_->GetResMgr()->GetColorByName(dataContext->resName_.c_str(),
         dataContext->colorValue_);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("GetColorByNameSync failed state", false);
-        return state;
-    }
-    return SUCCESS;
+    return state;
 }
 
 napi_value ResourceManagerNapiSyncImpl::GetColorByNameSync(napi_env env, napi_callback_info info)
@@ -1065,11 +1052,11 @@ napi_value ResourceManagerNapiSyncImpl::AddResource(napi_env env, napi_callback_
     dataContext->path_ = ResourceManagerNapiUtils::GetResNameOrPath(env, argc, argv);
     auto resMgr = GetNativeResoruceManager(env, info);
     if (resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_JS_TAG, "resMgr is null, add overlay path = %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "resMgr is null, add overlay fail");
         return nullptr;
     }
     if (!resMgr->AddAppOverlay(dataContext->path_)) {
-        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to add overlay path = %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to add overlay");
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_OVERLAY_RES_PATH_INVALID);
         return nullptr;
     }
@@ -1090,11 +1077,11 @@ napi_value ResourceManagerNapiSyncImpl::RemoveResource(napi_env env, napi_callba
     dataContext->path_ = ResourceManagerNapiUtils::GetResNameOrPath(env, argc, argv);
     auto resMgr = GetNativeResoruceManager(env, info);
     if (resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_JS_TAG, "resMgr is null, overlay path = %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "resMgr is null, remove overlay fail");
         return nullptr;
     }
     if (!resMgr->RemoveAppOverlay(dataContext->path_)) {
-        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to remove overlay path = %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to remove overlay");
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_OVERLAY_RES_PATH_INVALID);
         return nullptr;
     }
@@ -1110,11 +1097,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessPluralStrResourceByName(napi_env env
     }
     RState state = dataContext->addon_->GetResMgr()->GetFormatPluralStringByName(dataContext->value_,
         dataContext->resName_.c_str(), dataContext->param_, dataContext->jsParams_);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("GetPluralStringByNameSync failed state", false);
-        return state;
-    }
-    return SUCCESS;
+    return state;
 }
 
 napi_value ResourceManagerNapiSyncImpl::GetPluralStringByNameSync(napi_env env, napi_callback_info info)
@@ -1157,11 +1140,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessMediaBase64ResourceByName(napi_env e
 {
     RState state = dataContext->addon_->GetResMgr()->GetMediaBase64DataByName(dataContext->resName_.c_str(),
         dataContext->value_, dataContext->density_);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("Failed to get media data in GetMediaBase64ByNameSync", false);
-        return state;
-    }
-    return SUCCESS;
+    return state;
 }
 
 napi_value ResourceManagerNapiSyncImpl::GetMediaBase64ByNameSync(napi_env env, napi_callback_info info)
@@ -1203,11 +1182,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessMediaResourceByName(napi_env env, na
 {
     RState state = dataContext->addon_->GetResMgr()->GetMediaDataByName(dataContext->resName_.c_str(),
         dataContext->len_, dataContext->mediaData, dataContext->density_);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("GetMediaByNameSync failed state", false);
-        return state;
-    }
-    return SUCCESS;
+    return state;
 }
 
 napi_value ResourceManagerNapiSyncImpl::GetMediaByNameSync(napi_env env, napi_callback_info info)
@@ -1249,11 +1224,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessStringArrayResourceByName(napi_env e
 {
     RState state = dataContext->addon_->GetResMgr()->GetStringArrayByName(dataContext->resName_.c_str(),
         dataContext->arrayValue_);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("GetStringArrayByNameSync failed state", false);
-        return state;
-    }
-    return SUCCESS;
+    return state;
 }
 
 napi_value ResourceManagerNapiSyncImpl::GetStringArrayByNameSync(napi_env env, napi_callback_info info)
@@ -1343,7 +1314,7 @@ napi_value ResourceManagerNapiSyncImpl::IsRawDir(napi_env env, napi_callback_inf
     }
     int32_t ret = InitPathAddon(env, info, dataContext);
     if (ret != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to init para in IsRawDir by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to init para in IsRawDir");
         ResourceManagerNapiUtils::NapiThrow(env, ret);
         return nullptr;
     }
@@ -1351,8 +1322,7 @@ napi_value ResourceManagerNapiSyncImpl::IsRawDir(napi_env env, napi_callback_inf
     RState state = dataContext->addon_->GetResMgr()->IsRawDirFromHap(dataContext->path_,
         dataContext->bValue_);
     if (state != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_JS_TAG,
-            "Failed to determine the raw file is directory by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to determine the raw file is directory");
         ResourceManagerNapiUtils::NapiThrow(env, state);
         return nullptr;
     }
@@ -1562,11 +1532,7 @@ int32_t ResourceManagerNapiSyncImpl::ProcessPluralStringResourceByName(napi_env 
     }
     RState state = dataContext->addon_->GetResMgr()->GetFormatPluralStringByName(dataContext->value_,
         dataContext->resName_.c_str(), dataContext->quantity_, dataContext->jsParams_);
-    if (state != RState::SUCCESS) {
-        dataContext->SetErrorMsg("GetFormatPluralStringByName failed state", false);
-        return state;
-    }
-    return SUCCESS;
+    return state;
 }
 
 napi_value ResourceManagerNapiSyncImpl::GetIntPluralStringByNameSync(napi_env env, napi_callback_info info)
