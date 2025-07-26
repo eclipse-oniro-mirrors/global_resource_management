@@ -78,10 +78,8 @@ public:
     static ani_object GetMediaContentSyncById(ani_env* env, ani_object object,
         ani_double resId, ani_object density);
 
-
     static ani_string GetMediaContentBase64SyncById(ani_env* env, ani_object object,
         ani_double resId, ani_object density);
-
 
     static ani_object GetStringArrayValueSyncById(ani_env* env, ani_object object, ani_double resId);
     static ani_object GetStringArrayByNameSync(ani_env* env, ani_object object, ani_string resName);
