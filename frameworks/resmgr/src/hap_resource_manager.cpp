@@ -47,7 +47,7 @@ bool IsNewModule(const char *path)
     std::unique_ptr<uint8_t[]> buffer = nullptr;
     size_t bufLen = 0;
     if (!HapParser::GetIndexData(path, buffer, bufLen)) {
-        RESMGR_HILOGE(RESMGR_TAG, "GetIndexData failed when construct hapParser, file path: %{public}s", path);
+        RESMGR_HILOGE(RESMGR_TAG, "GetIndexData failed when construct hapParser");
         return false;
     }
     if (ResHeader::RES_HEADER_LEN > bufLen) {

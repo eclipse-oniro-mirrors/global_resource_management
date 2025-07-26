@@ -593,7 +593,7 @@ ani_object ResMgrAddon::GetRawFileContentSync(ani_env* env, ani_object object, a
     RState state = dataContext->addon_->GetResMgr()->GetRawFileFromHap(dataContext->path_,
         dataContext->len_, dataContext->mediaData);
     if (state != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get rawfile by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get rawfile by path");
         ResourceManagerAniUtils::AniThrow(env, state);
         return nullptr;
     }
