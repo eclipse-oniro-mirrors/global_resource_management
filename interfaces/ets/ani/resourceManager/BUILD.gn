@@ -86,7 +86,10 @@ generate_static_abc("resource") {
 
 generate_static_abc("rawFileDescriptor") {
   base_url = "./ets"
-  files = [ "./ets/global/rawFileDescriptor.ets" ]
+  files = [ 
+    "./ets/global/rawFileDescriptor.ets",
+    "./ets/global/rawFileDescriptorInner.ets"
+    ]
   is_boot_abc = "True"
   device_dst_file = "system/framework/rawFileDescriptor.abc"
   dependencies = [ ":copy_rawFileDescriptorInner_ets" ]
