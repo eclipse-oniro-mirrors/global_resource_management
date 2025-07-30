@@ -32,12 +32,17 @@ ohos_shared_library("resourceManager_ani") {
     "./src/resource_manager_ani_utils.cpp",
   ]
   defines = [ "CONFIG_HILOG" ]
-  deps = [ "../../../../frameworks/resmgr:global_resmgr" ]
+  deps = [
+    "../../../js/innerkits/core:resmgr_napi_core",
+    "../../../../frameworks/resmgr:global_resmgr"
+  ]
   external_deps = [
     "ability_runtime:app_context",
     "ace_engine:drawable_inner_ani",
     "hilog:libhilog",
+    "napi:ace_napi",
     "runtime_core:ani",
+    "runtime_core:ani_helpers",
   ]
 
   part_name = "resource_management"
