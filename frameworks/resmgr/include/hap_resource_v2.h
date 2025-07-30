@@ -16,6 +16,8 @@
 #ifndef OHOS_RESOURCE_MANAGER_HAPRESOURCEV2_H
 #define OHOS_RESOURCE_MANAGER_HAPRESOURCEV2_H
 
+#include <atomic>
+
 #include "hap_resource.h"
 
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
@@ -103,6 +105,16 @@ public:
     {
         limitPaths_.push_back(vuqd);
     }
+
+    inline bool IsParsed()
+    {
+        return isParsed_.load();
+    }
+
+    inline void Parse()
+    {
+        isParsed_.store(true);
+    }
 private:
     // resource type
     ResType resType_;
@@ -121,6 +133,9 @@ private:
 
     // pointer to the resource.index data
     uint8_t *buf_{nullptr};
+
+    // if the IdValuesV2 has been parsed flag
+    std::atomic<bool> isParsed_{false};
 
     // the folder desc
     std::vector<std::shared_ptr<ValueUnderQualifierDir>> limitPaths_;
@@ -158,6 +173,8 @@ protected:
     friend class HapParser;
 
     virtual int32_t ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue);
+    
+    std::mutex idValuesMutex_;
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     std::shared_ptr<AbilityBase::Extractor> extractor_{nullptr};
 

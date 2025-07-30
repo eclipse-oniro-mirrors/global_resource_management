@@ -116,7 +116,7 @@ const std::shared_ptr<IdValues> HapResourceV2::GetIdValues(const uint32_t id)
         return nullptr;
     }
 
-    if (iter->second->GetLimitPathsConst().empty() && ParseLimitPaths(iter->second) != OK) {
+    if (!iter->second->IsParsed() && ParseLimitPaths(iter->second) != OK) {
         return nullptr;
     }
     return iter->second;
@@ -140,7 +140,7 @@ const std::shared_ptr<IdValues> HapResourceV2::GetIdValuesByName(
         return nullptr;
     }
 
-    if (iter->second->GetLimitPathsConst().empty() && ParseLimitPaths(iter->second) != OK) {
+    if (!iter->second->IsParsed() && ParseLimitPaths(iter->second) != OK) {
         return nullptr;
     }
     return iter->second;
@@ -247,6 +247,10 @@ void HapResourceV2::InitThemeSystemRes()
 
 int32_t HapResourceV2::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
 {
+    std::unique_lock<std::mutex> lock(idValuesMutex_);
+    if (idValue->IsParsed()) {
+        return OK;
+    }
     ResInfo resInfo;
     uint32_t offset = idValue->GetOffset();
     int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, bufLen_, buf_);
@@ -272,6 +276,7 @@ int32_t HapResourceV2::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
         vuqd->Init(bufLen_, buf_, idValue->GetResType(), idValue->GetId(), idValue->GetName());
         idValue->AddLimitPath(vuqd);
     }
+    idValue->Parse();
     return OK;
 }
 
