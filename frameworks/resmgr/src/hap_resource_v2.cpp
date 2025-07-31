@@ -247,6 +247,10 @@ void HapResourceV2::InitThemeSystemRes()
 
 int32_t HapResourceV2::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
 {
+    std::unique_lock<std::mutex> lock(idValuesMutex_);
+    if (!idValue->GetLimitPathsConst().empty()) {
+        return OK;
+    }
     ResInfo resInfo;
     uint32_t offset = idValue->GetOffset();
     int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, bufLen_, buf_);

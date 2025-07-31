@@ -158,6 +158,8 @@ protected:
     friend class HapParser;
 
     virtual int32_t ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue);
+    
+    std::mutex idValuesMutex_;
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     std::shared_ptr<AbilityBase::Extractor> extractor_{nullptr};
 
