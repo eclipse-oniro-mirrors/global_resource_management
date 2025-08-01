@@ -179,8 +179,8 @@ HWTEST_F(LocaleInfoTest, LocaleInfoGetSysDefaultTest001, TestSize.Level1)
     UpdateSysDefault(*localeInfo, false);
     const Locale *currentLocaleInfo = GetSysDefault();
     if (currentLocaleInfo == nullptr) {
-        ASSERT_TRUE(false);
         delete localeInfo;
+        ASSERT_TRUE(false);
     }
     EXPECT_TRUE(std::strcmp("zh", currentLocaleInfo->getLanguage()) == 0);
     EXPECT_TRUE(std::strcmp("CN", currentLocaleInfo->getCountry()) == 0);
@@ -202,8 +202,8 @@ HWTEST_F(LocaleInfoTest, LocaleInfoUpdateSysDefaultTest001, TestSize.Level1)
     UpdateSysDefault(*localeInfo, false);
     const Locale *currentLocaleInfo = GetSysDefault();
     if (currentLocaleInfo == nullptr) {
-        ASSERT_TRUE(false);
         delete localeInfo;
+        ASSERT_TRUE(false);
     }
     EXPECT_TRUE(std::strcmp("zh", currentLocaleInfo->getLanguage()) == 0);
     EXPECT_TRUE(std::strcmp("CN", currentLocaleInfo->getCountry()) == 0);
@@ -212,8 +212,8 @@ HWTEST_F(LocaleInfoTest, LocaleInfoUpdateSysDefaultTest001, TestSize.Level1)
     UpdateSysDefault(*localeInfo, false);
     currentLocaleInfo = GetSysDefault();
     if (currentLocaleInfo == nullptr) {
-        ASSERT_TRUE(false);
         delete localeInfo;
+        ASSERT_TRUE(false);
     }
     EXPECT_TRUE(std::strcmp("en", currentLocaleInfo->getLanguage()) == 0);
     EXPECT_TRUE(std::strcmp("US", currentLocaleInfo->getCountry()) == 0);
@@ -225,8 +225,8 @@ HWTEST_F(LocaleInfoTest, LocaleInfoUpdateSysDefaultTest001, TestSize.Level1)
     UpdateSysDefault(*localeInfo, false);
     currentLocaleInfo = GetSysDefault();
     if (currentLocaleInfo == nullptr) {
-        ASSERT_TRUE(false);
         delete localeInfo;
+        ASSERT_TRUE(false);
     }
     EXPECT_TRUE(std::strcmp("en", currentLocaleInfo->getLanguage()) == 0);
     EXPECT_TRUE(std::strcmp("US", currentLocaleInfo->getCountry()) == 0);

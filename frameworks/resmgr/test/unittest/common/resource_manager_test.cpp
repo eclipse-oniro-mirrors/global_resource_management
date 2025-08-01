@@ -231,8 +231,8 @@ HWTEST_F(ResourceManagerTest, ResourceManagerUpdateResConfigTest004, TestSize.Le
     EXPECT_EQ(SUCCESS, state);
     ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
     if (!ret) {
-        ASSERT_TRUE(false);
         delete rc;
+        ASSERT_TRUE(false);
     }
     // update to another language, will trigger reload
     // before reload:
