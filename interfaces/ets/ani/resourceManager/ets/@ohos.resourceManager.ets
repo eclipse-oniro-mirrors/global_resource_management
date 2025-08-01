@@ -153,18 +153,19 @@ export default namespace resourceManager {
         getRawFileContentSync(path: string): Uint8Array;
 
         getMediaContentSync(resId: number, density?: number): Uint8Array;
-
-        getMediaContentBase64Sync(resId: number, density?: number): string;
+        getMediaByNameSync(resName: string, density?: number): Uint8Array;
 
         getStringArrayValueSync(resId: number): Array<string>;
-
-        getMediaByNameSync(resName: string, density?: number): Uint8Array;
-        getMediaBase64ByNameSync(resName: string, density?: number): string;
-
         getStringArrayByNameSync(resName: string): Array<string>;
 
+        getMediaContentBase64Sync(resId: number, density?: number): string;
+        getMediaBase64ByNameSync(resName: string, density?: number): string;
+
+
         getConfigurationSync(): Configuration;
+
         getDeviceCapabilitySync(): DeviceCapability;
+
         getLocales(includeSystem?: boolean): Array<string>;
 
         getSymbol(resId: number) : number;
@@ -217,13 +218,13 @@ export default namespace resourceManager {
 
         native getRawFdSync(path: string): RawFileDescriptor;
         native closeRawFdSync(path: string): void;
+
         native isRawDir(path: string): boolean;
 
         native getRawFileListSync(path: string): Array<string>;
         native getRawFileContentSync(path: string): Uint8Array;
 
         native getMediaContentSync(resId: number, density?: number): Uint8Array;
-
         native getMediaContentBase64Sync(resId: number, density?: number): string;
 
         native getStringArrayValueSync(resId: number): Array<string>;
@@ -232,15 +233,19 @@ export default namespace resourceManager {
         native getMediaByNameSync(resName: string, density?: number): Uint8Array;
         native getMediaBase64ByNameSync(resName: string, density?: number): string;
 
-        native getConfigurationSync(): Configuration;
-        native getDeviceCapabilitySync(): DeviceCapability;
-        native getLocales(includeSystem?: boolean): Array<string>;
-
         native getSymbol(resId: number) : number;
         native getSymbolByName(resName: string) : number;
 
+        native getConfigurationSync(): Configuration;
+
+        native getDeviceCapabilitySync(): DeviceCapability;
+
+        native getLocales(includeSystem?: boolean): Array<string>;
+
         native getOverrideResourceManager(configuration?: Configuration): ResourceManager;
+
         native getOverrideConfiguration(): Configuration;
+
         native updateOverrideConfiguration(configuration: Configuration): void;
 
         getStringValue(resId: number, callback: AsyncCallback<string, void>): void {
@@ -704,5 +709,5 @@ export default namespace resourceManager {
         }
     }
 
-    export native function getSystemResourceManager(): ResourceManager;
+    export native function getSysResourceManager(): ResourceManager;
 }

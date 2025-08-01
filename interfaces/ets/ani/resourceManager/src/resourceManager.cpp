@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "system_resource_manager.h"
 #include "hilog_wrapper.h"
 #include "resourceManager.h"
 #include "resource_manager_ani_utils.h"
@@ -24,6 +25,21 @@ using namespace Global;
 using namespace Resource;
 
 constexpr ani_double ABNORMAL_NUMBER_RETURN_VALUE = -1;
+
+static constexpr const char *ANI_ARRAY_SIGN = "Lescompat/Array;";
+static constexpr const char *ANI_STRING_SIGN = "Lstd/core/String;";
+static constexpr const char *ANI_UINT8ARRAY_SIGN = "Lescompat/Uint8Array;";
+
+static constexpr const char *RESOURCE_MANAGER_INNER_SIGN =
+    "L@ohos/resourceManager/resourceManager/ResourceManagerInner;";
+static constexpr const char *RAW_FILE_DESCRIPTOR_SIGN = "Lglobal/rawFileDescriptorInner/RawFileDescriptorInner;";
+static constexpr const char *NAMESPACE_SIGN = "L@ohos/resourceManager/resourceManager;";
+static constexpr const char *CONFIGURATION_SIGN = "L@ohos/resourceManager/resourceManager/Configuration;";
+static constexpr const char *DIRECTION_SIGN = "L@ohos/resourceManager/resourceManager/Direction;";
+static constexpr const char *DEVICE_TYPE_SIGN = "L@ohos/resourceManager/resourceManager/DeviceType;";
+static constexpr const char *SCREEN_DENSITY_SIGN = "L@ohos/resourceManager/resourceManager/ScreenDensity;";
+static constexpr const char *COLOR_MODE_SIGN = "L@ohos/resourceManager/resourceManager/ColorMode;";
+static constexpr const char *DEVICE_CAPABILITY_SIGN = "L@ohos/resourceManager/resourceManager/DeviceCapability;";
 
 enum ScreenDensityIndex {
     SCREEN_DENSITY_ONE = 0,
@@ -55,23 +71,23 @@ static std::array methods = {
     ani_native_function { "getStringByNameSync", "Lstd/core/String;Lescompat/Array;:Lstd/core/String;",
         reinterpret_cast<void*>(ResMgrAddon::GetFormatStringByNameSync) },
 
-    ani_native_function { "getBoolean", "D:Z", reinterpret_cast<void*>(ResMgrAddon::GetBooleanById) },
+    ani_native_function { "getBoolean", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetBooleanById) },
     ani_native_function { "getBooleanByName", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetBooleanByName) },
 
-    ani_native_function { "getNumber", "D:D", reinterpret_cast<void*>(ResMgrAddon::GetNumberById) },
+    ani_native_function { "getNumber", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetNumberById) },
     ani_native_function { "getNumberByName", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetNumberByName) },
     
-    ani_native_function { "getIntPluralStringValueSync", "DDLescompat/Array;:Lstd/core/String;",
+    ani_native_function { "getIntPluralStringValueSync", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetIntPluralStringValueSyncById) },
     ani_native_function { "getIntPluralStringByNameSync", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetIntPluralStringByNameSync) },
 
-    ani_native_function { "getDoublePluralStringValueSync", "DDLescompat/Array;:Lstd/core/String;",
+    ani_native_function { "getDoublePluralStringValueSync", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetDoublePluralStringValueSyncById) },
     ani_native_function { "getDoublePluralStringByNameSync", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetDoublePluralStringByNameSync) },
 
-    ani_native_function { "getColorSync", "D:D", reinterpret_cast<void*>(ResMgrAddon::GetColorSyncById) },
+    ani_native_function { "getColorSync", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetColorSyncById) },
     ani_native_function { "getColorByNameSync", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetColorByNameSync) },
     
     ani_native_function { "addResource", nullptr, reinterpret_cast<void*>(ResMgrAddon::AddResource) },
@@ -85,12 +101,12 @@ static std::array methods = {
     ani_native_function { "getRawFileContentSync", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetRawFileContentSync) },
     
-    ani_native_function { "getMediaContentSync", "DLstd/core/Double;:Lescompat/Uint8Array;",
+    ani_native_function { "getMediaContentSync", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetMediaContentSyncById) },
-    ani_native_function { "getMediaContentBase64Sync", "DLstd/core/Double;:Lstd/core/String;",
+    ani_native_function { "getMediaContentBase64Sync", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetMediaContentBase64SyncById) },
     
-    ani_native_function { "getStringArrayValueSync", "D:Lescompat/Array;",
+    ani_native_function { "getStringArrayValueSync", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetStringArrayValueSyncById) },
     ani_native_function { "getStringArrayByNameSync", nullptr,
         reinterpret_cast<void*>(ResMgrAddon::GetStringArrayByNameSync) },
@@ -104,7 +120,7 @@ static std::array methods = {
         reinterpret_cast<void*>(ResMgrAddon::GetDeviceCapabilitySync) },
     ani_native_function { "getLocales", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetLocales) },
 
-    ani_native_function { "getSymbol", "D:D", reinterpret_cast<void*>(ResMgrAddon::GetSymbolById) },
+    ani_native_function { "getSymbol", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetSymbolById) },
     ani_native_function { "getSymbolByName", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetSymbolByName) },
 
     ani_native_function { "getOverrideResourceManager", nullptr,
@@ -140,10 +156,9 @@ ani_object ResMgrAddon::CreateResMgr(
 ani_object ResMgrAddon::WrapResourceManager(ani_env* env, std::shared_ptr<ResMgrAddon> &addon)
 {
     ani_object nativeResMgr;
-    static const char *className = "L@ohos/resourceManager/resourceManager/ResourceManagerInner;";
     ani_class cls;
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", className);
+    if (ANI_OK != env->FindClass(RESOURCE_MANAGER_INNER_SIGN, &cls)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", RESOURCE_MANAGER_INNER_SIGN);
         return nullptr;
     }
 
@@ -155,7 +170,7 @@ ani_object ResMgrAddon::WrapResourceManager(ani_env* env, std::shared_ptr<ResMgr
 
     auto addonPtr = std::make_unique<std::shared_ptr<ResMgrAddon>>(addon);
     if (ANI_OK != env->Object_New(cls, ctor, &nativeResMgr, reinterpret_cast<ani_long>(addonPtr.get()))) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "New object '%{public}s' failed", className);
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "New object '%{public}s' failed", RESOURCE_MANAGER_INNER_SIGN);
         return nullptr;
     }
     addonPtr.release();
@@ -182,10 +197,9 @@ static ani_object CreateAniUint8Array(ani_env* env, ResMgrDataContext &context)
     std::unique_ptr<uint8_t[]> tempData = std::move(context.mediaData);
     std::copy(tempData.get(), tempData.get() + length, data.get());
 
-    static const char *className = "Lescompat/Uint8Array;";
     ani_class cls;
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", className);
+    if (ANI_OK != env->FindClass(ANI_UINT8ARRAY_SIGN, &cls)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", ANI_UINT8ARRAY_SIGN);
         return nullptr;
     }
 
@@ -197,7 +211,7 @@ static ani_object CreateAniUint8Array(ani_env* env, ResMgrDataContext &context)
 
     ani_object ret = {};
     if (ANI_OK != env->Object_New(cls, ctor, &ret, length)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "New object '%{public}s' failed", className);
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "New object '%{public}s' failed", ANI_UINT8ARRAY_SIGN);
         return nullptr;
     }
 
@@ -238,68 +252,29 @@ static ani_string CreateAniString(ani_env *env, ResMgrDataContext& context)
     return result;
 }
 
-ani_object ResMgrAddon::GetSystemResourceManager(ani_env* env)
+ani_object ResMgrAddon::GetSysResourceManager(ani_env* env)
 {
-    if (sysResMgr == nullptr) {
-        std::lock_guard<std::mutex> lock(sysMgrMutex);
-        if (sysResMgr == nullptr) {
-            std::shared_ptr<Global::Resource::ResourceManager>
-                systemResManager(Global::Resource::GetSystemResourceManager());
-            if (systemResManager == nullptr) {
-                ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_SYSTEM_RES_MANAGER_GET_FAILED);
-                return nullptr;
-            }
-            sysResMgr = systemResManager;
-        }
+    auto systemResManager = OHOS::Global::Resource::SystemResourceManager::CreateSysResourceManager();
+    if (systemResManager == nullptr) {
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_SYSTEM_RES_MANAGER_GET_FAILED);
+        return nullptr;
     }
-    std::shared_ptr<ResMgrAddon> addon = std::make_shared<ResMgrAddon>(sysResMgr, true);
+    std::shared_ptr<ResMgrAddon> addon = std::make_shared<ResMgrAddon>(systemResManager, true);
+    if (addon == nullptr) {
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_SYSTEM_RES_MANAGER_GET_FAILED);
+        return nullptr;
+    }
     return WrapResourceManager(env, addon);
 }
 
 static bool GetHapResourceManager(const ResMgrDataContext* dataContext,
     std::shared_ptr<ResourceManager> &resMgr, uint32_t &resId)
 {
-    std::shared_ptr<ResourceManager::Resource> resource = dataContext->resource_;
-    // In fa module, resource is null.
-    if (resource == nullptr) {
-        resMgr = dataContext->addon_->GetResMgr();
-        resId = dataContext->resId_;
-        return true;
-    }
-
-    // In stage module and isSystem is true, resId is the resource object id.
-    if (dataContext->addon_->IsSystem()) {
-        resMgr = dataContext->addon_->GetResMgr();
-        resId = resource->id;
-        return true;
-    }
-
-    resId = resource->id;
-    if (dataContext->addon_->isOverrideAddon()) {
-        resMgr = dataContext->addon_->GetResMgr();
-        return true;
-    }
-
-    auto context = dataContext->addon_->GetContext();
-    if (context == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetHapResourceManager context == nullptr");
+    if (dataContext->addon_ == nullptr || dataContext->addon_->GetResMgr() == nullptr) {
         return false;
     }
-
-    std::string bundleName(resource->bundleName);
-    if (bundleName.empty()) {
-        auto applicationInfo = context->GetApplicationInfo();
-        if (applicationInfo != nullptr) {
-            bundleName = applicationInfo->name;
-        }
-    }
-    auto moduleContext = context->CreateModuleContext(bundleName, resource->moduleName);
-    if (moduleContext == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetHapResourceManager moduleContext == nullptr, bundleName = %{public}s," \
-            "moduleName = %{public}s", bundleName.c_str(), resource->moduleName.c_str());
-        return false;
-    }
-    resMgr = moduleContext->GetResourceManager();
+    resMgr = dataContext->addon_->GetResMgr();
+    resId = dataContext->resId_;
     return true;
 }
 
@@ -336,8 +311,8 @@ static ArrayElement GetArrayElement(ani_env* env, ani_object args, const int ind
     }
 
     ani_class stringClass;
-    if (ANI_OK != env->FindClass("Lstd/core/String;", &stringClass)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class 'Lstd/core/String;' failed");
+    if (ANI_OK != env->FindClass(ANI_STRING_SIGN, &stringClass)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class ' %{public}s' failed", ANI_STRING_SIGN);
         return ArrayElement{ArrayElement::ElementType::NUMBER, 0};
     }
 
@@ -423,7 +398,9 @@ ani_object ResMgrAddon::GetRawFileContentSync(ani_env* env, ani_object object, a
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->path_ = AniStrToString(env, path);
     dataContext->addon_ = UnwrapAddon(env, object);
-    if (dataContext->addon_ == nullptr) {
+    if (dataContext->addon_ == nullptr || dataContext->addon_->GetResMgr() == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in GetRawFileContentSync.");
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
     RState state = dataContext->addon_->GetResMgr()->GetRawFileFromHap(dataContext->path_,
@@ -495,8 +472,8 @@ ani_string ResMgrAddon::GetIntPluralStringByNameSync(ani_env* env, ani_object ob
         return nullptr;
     }
 
-    if (dataContext->addon_ == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getIntPluralStringByNameSync");
+    if (dataContext->addon_ == nullptr || dataContext->addon_->GetResMgr() == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getIntPluralStringByNameSync");
         ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
         return nullptr;
     }
@@ -558,8 +535,8 @@ ani_string ResMgrAddon::GetDoublePluralStringByNameSync(ani_env* env, ani_object
         return nullptr;
     }
 
-    if (dataContext->addon_ == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getDoublePluralStringByNameSync");
+    if (dataContext->addon_ == nullptr || dataContext->addon_->GetResMgr() == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getDoublePluralStringByNameSync");
         ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
         return nullptr;
     }
@@ -576,31 +553,29 @@ ani_string ResMgrAddon::GetDoublePluralStringByNameSync(ani_env* env, ani_object
 
 ani_status ResMgrAddon::BindContext(ani_env* env)
 {
-    static const char* className = "L@ohos/resourceManager/resourceManager/ResourceManagerInner;";
     ani_class cls;
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", className);
+    if (ANI_OK != env->FindClass(RESOURCE_MANAGER_INNER_SIGN, &cls)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", RESOURCE_MANAGER_INNER_SIGN);
         return (ani_status)ANI_ERROR;
     }
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Cannot bind native methods to '%{public}s'", className);
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Cannot bind native methods to '%{public}s'", RESOURCE_MANAGER_INNER_SIGN);
         return (ani_status)ANI_ERROR;
     };
 
-    static const char* nameSpaceName = "L@ohos/resourceManager/resourceManager;";
     ani_namespace ns;
-    if (ANI_OK != env->FindNamespace(nameSpaceName, &ns)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find namespace '%{public}s' failed", nameSpaceName);
+    if (ANI_OK != env->FindNamespace(NAMESPACE_SIGN, &ns)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find namespace '%{public}s' failed", NAMESPACE_SIGN);
         return (ani_status)ANI_ERROR;
     }
 
     std::array nsMethods = {
-        ani_native_function { "getSystemResourceManager", nullptr, reinterpret_cast<void*>(GetSystemResourceManager) },
+        ani_native_function { "getSysResourceManager", nullptr, reinterpret_cast<void*>(GetSysResourceManager) },
     };
 
     if (ANI_OK != env->Namespace_BindNativeFunctions(ns, nsMethods.data(), nsMethods.size())) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Cannot bind native methods to '%{public}s'", nameSpaceName);
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Cannot bind native methods to '%{public}s'", NAMESPACE_SIGN);
         return (ani_status)ANI_ERROR;
     };
     return ANI_OK;
@@ -839,13 +814,13 @@ void ResMgrAddon::AddResource(ani_env* env, ani_object object, ani_string path)
     dataContext->path_ = AniStrToString(env, path);
 
     auto resMgr = UnwrapAddon(env, object);
-    if (resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_JS_TAG, "resMgr is null, add overlay path = %{public}s", dataContext->path_.c_str());
+    if (resMgr == nullptr || resMgr->GetResMgr()) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "resMgr is null, add overlay failed.");
         return;
     }
 
     if (!resMgr->GetResMgr()->AddAppOverlay(dataContext->path_)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to add overlay path = %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to add overlay path.");
         ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_OVERLAY_RES_PATH_INVALID);
         return;
     }
@@ -857,13 +832,13 @@ void ResMgrAddon::RemoveResource(ani_env* env, ani_object object, ani_string pat
     dataContext->path_ = AniStrToString(env, path);
 
     auto resMgr = UnwrapAddon(env, object);
-    if (resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_JS_TAG, "resMgr is null, overlay path = %{public}s", dataContext->path_.c_str());
+    if (resMgr == nullptr || resMgr->GetResMgr()) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "resMgr is null, overlay path.");
         return;
     }
 
     if (!resMgr->GetResMgr()->RemoveAppOverlay(dataContext->path_)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to add overlay path = %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to remove overlay path.");
         ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_OVERLAY_RES_PATH_INVALID);
         return;
     }
@@ -875,7 +850,7 @@ ani_object ResMgrAddon::GetRawFdSync(ani_env* env, ani_object object, ani_string
     dataContext->path_ = AniStrToString(env, path);
     dataContext->addon_ = UnwrapAddon(env, object);
 
-    if (dataContext->addon_ == nullptr) {
+    if (dataContext->addon_ == nullptr || dataContext->addon_->GetResMgr() == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getRawFdSync");
         ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
         return nullptr;
@@ -884,15 +859,16 @@ ani_object ResMgrAddon::GetRawFdSync(ani_env* env, ani_object object, ani_string
     RState state = dataContext->addon_->GetResMgr()->GetRawFileDescriptorFromHap(dataContext->path_,
         dataContext->descriptor_);
     if (state != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get rawfd by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get rawfd.");
         ResourceManagerAniUtils::AniThrow(env, state);
         return nullptr;
     }
 
-    static const char *className = "Lglobal/rawFileDescriptorInner/RawFileDescriptorInner;";
     ani_class cls;
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", className);
+    auto ret = env->FindClass(RAW_FILE_DESCRIPTOR_SIGN, &cls);
+    if (ANI_OK != ret) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed, error code: %{public}d",
+            RAW_FILE_DESCRIPTOR_SIGN, ret);
         return nullptr;
     }
 
@@ -904,7 +880,7 @@ ani_object ResMgrAddon::GetRawFdSync(ani_env* env, ani_object object, ani_string
 
     ani_object obj;
     if (ANI_OK != env->Object_New(cls, ctor, &obj)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "New object '%{public}s' failed", className);
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "New object '%{public}s' failed", RAW_FILE_DESCRIPTOR_SIGN);
         return nullptr;
     }
 
@@ -928,15 +904,15 @@ void ResMgrAddon::CloseRawFdSync(ani_env* env, ani_object object, ani_string pat
     dataContext->path_ = AniStrToString(env, path);
     dataContext->addon_ = UnwrapAddon(env, object);
 
-    if (dataContext->addon_ == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in closeRawFdSync");
+    if (dataContext->addon_ == nullptr || dataContext->addon_->GetResMgr() == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in closeRawFdSync");
         ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
         return;
     }
 
     RState state = dataContext->addon_->GetResMgr()->CloseRawFileDescriptor(dataContext->path_);
     if (state != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to close rawfd by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to close rawfd.");
         ResourceManagerAniUtils::AniThrow(env, state);
         return;
     }
@@ -944,10 +920,9 @@ void ResMgrAddon::CloseRawFdSync(ani_env* env, ani_object object, ani_string pat
 
 static ani_object CreateAniArray(ani_env *env, const std::vector<std::string> strs)
 {
-    static const char *className = "Lescompat/Array;";
     ani_class cls;
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", className);
+    if (ANI_OK != env->FindClass(ANI_ARRAY_SIGN, &cls)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", ANI_ARRAY_SIGN);
         return nullptr;
     }
 
@@ -959,7 +934,7 @@ static ani_object CreateAniArray(ani_env *env, const std::vector<std::string> st
 
     ani_object ret;
     if (ANI_OK != env->Object_New(cls, ctor, &ret, strs.size())) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "New object '%{public}s' failed", className);
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "New object '%{public}s' failed", ANI_ARRAY_SIGN);
         return nullptr;
     }
 
@@ -984,8 +959,8 @@ ani_object ResMgrAddon::GetRawFileListSync(ani_env* env, ani_object object, ani_
     dataContext->path_ = AniStrToString(env, path);
     dataContext->addon_ = UnwrapAddon(env, object);
 
-    if (dataContext->addon_ == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getRawFileListSync");
+    if (dataContext->addon_ == nullptr || dataContext->addon_->GetResMgr() == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getRawFileListSync");
         ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
         return nullptr;
     }
@@ -993,7 +968,7 @@ ani_object ResMgrAddon::GetRawFileListSync(ani_env* env, ani_object object, ani_
     RState state = dataContext->addon_->GetResMgr()->GetRawFileList(dataContext->path_.c_str(),
         dataContext->arrayValue_);
     if (state != RState::SUCCESS || dataContext->arrayValue_.empty()) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get rawfile list by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get rawfile list.");
         ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_PATH_INVALID);
         return nullptr;
     }
@@ -1197,9 +1172,11 @@ static int GetScreenDensityIndex(ScreenDensity value)
 
 static void SetEnumMember(ani_env *env, ani_object obj, const char* memberName, const char* enumName, const int index)
 {
-    if (index < 0) {
-        RESMGR_HILOGE(RESMGR_TAG, "SetEnumMember: invalid index %{public}d", index);
-        return;
+    int realIndex = index;
+    if (realIndex < 0) {
+        RESMGR_HILOGW(RESMGR_TAG, "SetEnumMember %{public}s: invalid index %{public}d, reset index to 0.",
+            memberName, index);
+        realIndex = 0;
     }
 
     ani_enum aniEnum;
@@ -1209,7 +1186,7 @@ static void SetEnumMember(ani_env *env, ani_object obj, const char* memberName, 
     }
 
     ani_enum_item enumItem;
-    if (ANI_OK != env->Enum_GetEnumItemByIndex(aniEnum, index, &enumItem)) {
+    if (ANI_OK != env->Enum_GetEnumItemByIndex(aniEnum, realIndex, &enumItem)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Get enumItem '%{public}s' failed", enumName);
         return;
     }
@@ -1250,10 +1227,9 @@ static std::string GetLocale(std::unique_ptr<ResConfig> &cfg)
 
 static ani_object CreateConfig(ani_env* env, std::unique_ptr<ResConfig> &cfg)
 {
-    static const char *className = "L@ohos/resourceManager/resourceManager/Configuration;";
     ani_class cls;
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", className);
+    if (ANI_OK != env->FindClass(CONFIGURATION_SIGN, &cls)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", CONFIGURATION_SIGN);
         return nullptr;
     }
 
@@ -1265,18 +1241,14 @@ static ani_object CreateConfig(ani_env* env, std::unique_ptr<ResConfig> &cfg)
 
     ani_object obj;
     if (ANI_OK != env->Object_New(cls, ctor, &obj)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "New object '%{public}s' failed", className);
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "New object '%{public}s' failed", CONFIGURATION_SIGN);
         return nullptr;
     }
 
-    SetEnumMember(env, obj, "direction", "L@ohos/resourceManager/resourceManager/Direction;",
-        static_cast<int>(cfg->GetDirection()));
-    SetEnumMember(env, obj, "deviceType", "L@ohos/resourceManager/resourceManager/DeviceType;",
-        static_cast<int>(cfg->GetDeviceType()));
-    SetEnumMember(env, obj, "screenDensity", "L@ohos/resourceManager/resourceManager/ScreenDensity;",
-        GetScreenDensityIndex(cfg->GetScreenDensityDpi()));
-    SetEnumMember(env, obj, "colorMode", "L@ohos/resourceManager/resourceManager/ColorMode;",
-        static_cast<int>(cfg->GetColorMode()));
+    SetEnumMember(env, obj, "direction", DIRECTION_SIGN, static_cast<int>(cfg->GetDirection()));
+    SetEnumMember(env, obj, "deviceType", DEVICE_TYPE_SIGN, static_cast<int>(cfg->GetDeviceType()));
+    SetEnumMember(env, obj, "screenDensity", SCREEN_DENSITY_SIGN, GetScreenDensityIndex(cfg->GetScreenDensityDpi()));
+    SetEnumMember(env, obj, "colorMode", COLOR_MODE_SIGN, static_cast<int>(cfg->GetColorMode()));
 
     if (ANI_OK != env->Object_SetPropertyByName_Double(obj, "mcc", static_cast<int>(cfg->GetMcc()))) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Set property 'mcc' failed");
@@ -1300,8 +1272,8 @@ ani_object ResMgrAddon::GetConfigurationSync(ani_env* env, ani_object object)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
-    if (dataContext->addon_ == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in GetConfigurationSync");
+    if (dataContext->addon_ == nullptr || dataContext->addon_->GetResMgr() == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in GetConfigurationSync");
         return nullptr;
     }
 
@@ -1318,8 +1290,8 @@ ani_object ResMgrAddon::GetDeviceCapabilitySync(ani_env* env, ani_object object)
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
-    if (dataContext->addon_ == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in GetConfigurationSync");
+    if (dataContext->addon_ == nullptr || dataContext->addon_->GetResMgr() == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in GetConfigurationSync");
         return nullptr;
     }
 
@@ -1330,10 +1302,9 @@ ani_object ResMgrAddon::GetDeviceCapabilitySync(ani_env* env, ani_object object)
     }
     dataContext->addon_->GetResMgr()->GetResConfig(*cfg);
 
-    static const char *className = "L@ohos/resourceManager/resourceManager/DeviceCapability;";
     ani_class cls;
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", className);
+    if (ANI_OK != env->FindClass(DEVICE_CAPABILITY_SIGN, &cls)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", DEVICE_CAPABILITY_SIGN);
         return nullptr;
     }
 
@@ -1345,14 +1316,12 @@ ani_object ResMgrAddon::GetDeviceCapabilitySync(ani_env* env, ani_object object)
 
     ani_object obj;
     if (ANI_OK != env->Object_New(cls, ctor, &obj)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "New object '%{public}s' failed", className);
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "New object '%{public}s' failed", DEVICE_CAPABILITY_SIGN);
         return nullptr;
     }
 
-    SetEnumMember(env, obj, "screenDensity", "L@ohos/resourceManager/resourceManager/ScreenDensity;",
-        GetScreenDensityIndex(cfg->GetScreenDensityDpi()));
-    SetEnumMember(env, obj, "deviceType", "L@ohos/resourceManager/resourceManager/DeviceType;",
-        static_cast<int>(cfg->GetDeviceType()));
+    SetEnumMember(env, obj, "screenDensity", SCREEN_DENSITY_SIGN, GetScreenDensityIndex(cfg->GetScreenDensityDpi()));
+    SetEnumMember(env, obj, "deviceType", DEVICE_TYPE_SIGN, static_cast<int>(cfg->GetDeviceType()));
     return obj;
 }
 
@@ -1360,8 +1329,8 @@ ani_object ResMgrAddon::GetLocales(ani_env* env, ani_object object, ani_object i
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
-    if (dataContext->addon_ == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in GetConfigurationSync");
+    if (dataContext->addon_ == nullptr || dataContext->addon_->GetResMgr() == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in GetConfigurationSync");
         return nullptr;
     }
     
@@ -1442,8 +1411,7 @@ ani_boolean ResMgrAddon::IsRawDir(ani_env* env, ani_object object, ani_string pa
 
     RState state = resMgr->IsRawDirFromHap(dataContext->path_, dataContext->bValue_);
     if (state != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG,
-            "Failed to determine the raw file is directory by %{public}s", dataContext->path_.c_str());
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to determine the raw file is directory.");
         ResourceManagerAniUtils::AniThrow(env, state);
         return false;
     }
@@ -1597,8 +1565,8 @@ ani_object ResMgrAddon::GetOverrideConfiguration(ani_env* env, ani_object object
 {
     auto dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = UnwrapAddon(env, object);
-    if (dataContext->addon_ == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetOverrideConfiguration failed to get addon");
+    if (dataContext->addon_ == nullptr || dataContext->addon_->GetResMgr() == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetOverrideConfiguration failed to get resMgr");
         return nullptr;
     }
 
