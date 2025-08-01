@@ -567,7 +567,7 @@ std::vector<std::shared_ptr<IdValues>> HapManager::GetResourceList(uint32_t iden
     // one id only exit in one hap
     for (size_t i = 0; i < hapResources_.size(); ++i) {
         std::shared_ptr<HapResource> pResource = hapResources_[i];
-        const std::shared_ptr<IdValues>out = pResource->GetIdValues(ident);
+        const std::shared_ptr<IdValues> out = pResource->GetIdValues(ident);
         if (out != nullptr) {
             result.emplace_back(out);
         }

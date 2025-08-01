@@ -50,32 +50,23 @@ private:
 
     bool GetIndexMmapFromIndex(const char *path);
 
-    int32_t ParseHeader(uint32_t &offset, const size_t bufLen, const uint8_t *buf);
+    int32_t ParseHeader(uint32_t &offset);
 
-    int32_t ParseKeys(uint32_t &offset, const size_t bufLen, const uint8_t *buf);
+    int32_t ParseKeys(uint32_t &offset);
 
-    int32_t ParseKey(uint32_t &offset, std::shared_ptr<KeyInfo> key, const size_t bufLen, const uint8_t *buf);
+    int32_t ParseKey(uint32_t &offset, std::shared_ptr<KeyInfo> key);
 
-    int32_t ParseKeyParam(uint32_t &offset, std::shared_ptr<KeyParam> keyParam,
-        const size_t bufLen, const uint8_t *buf);
+    int32_t ParseKeyParam(uint32_t &offset, std::shared_ptr<KeyParam> keyParam);
 
     void GetLimitKeyValue(KeyType type);
 
-    int32_t ParseIds(uint32_t &offset, const size_t bufLen, const uint8_t *buf);
+    int32_t ParseIds(uint32_t &offset);
 
-    int32_t ParseType(uint32_t &offset, const size_t bufLen, const uint8_t *buf);
+    int32_t ParseType(uint32_t &offset);
 
-    int32_t ParseItem(uint32_t &offset, const size_t bufLen, const uint8_t *buf, const TypeInfo &typeInfo);
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    int fd_{0};
+    int32_t ParseItem(uint32_t &offset, const TypeInfo &typeInfo);
 
-    std::shared_ptr<AbilityBase::Extractor> extractor_{nullptr};
-
-    std::unique_ptr<AbilityBase::FileMapper> mapper_{nullptr};
-#endif
-    size_t mmapLen_{0};
-
-    uint8_t *mmap_{nullptr};
+    std::shared_ptr<MmapFile> mMapFile_{nullptr};
 
     ResIndexHeader resHeader_;
 

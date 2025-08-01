@@ -44,24 +44,17 @@ HapParserV2::HapParserV2()
 {}
 
 HapParserV2::~HapParserV2()
-{
-    if (mmap_ != nullptr) {
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-        munmap(mmap_, mmapLen_);
-#else
-        delete[] mmap_;
-#endif
-    }
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    if (fd_ > 0) {
-        close(fd_);
-    }
-#endif
-}
+{}
 
 bool HapParserV2::Init(const char *path)
 {
-    if (!GetIndexMmap(path)) {
+    mMapFile_ = std::make_shared<MmapFile>();
+    if (mMapFile_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "Init mmap file failed");
+        return false;
+    }
+
+    if (!this->GetIndexMmap(path)) {
         RESMGR_HILOGE(RESMGR_TAG, "GetIndexMmap failed when construct hapParser");
         return false;
     }
@@ -80,40 +73,17 @@ int32_t HapParserV2::ParseResHex()
     HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
 #endif
     uint32_t offset = 0;
-    uint8_t *buf = nullptr;
-    size_t bufLen = 0;
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    if (mapper_ != nullptr) {
-        buf = mapper_->GetDataPtr();
-        bufLen = mapper_->GetDataLen();
-    } else if (mmap_ != nullptr && mmapLen_ != 0) {
-        buf = mmap_;
-        bufLen = mmapLen_;
-    } else {
-        RESMGR_HILOGE(RESMGR_TAG, "ParseResHex failed, Mmap is empty.");
-        return SYS_ERROR;
-    }
-#else
-    if (mmap_ != nullptr && mmapLen_ != 0) {
-        buf = mmap_;
-        bufLen = mmapLen_;
-    } else {
-        RESMGR_HILOGE(RESMGR_TAG, "ParseResHex failed, Mmap is empty.");
-        return SYS_ERROR;
-    }
-#endif
-
-    int32_t ret = ParseHeader(offset, bufLen, buf);
+    int32_t ret = this->ParseHeader(offset);
     if (ret != OK) {
         return ret;
     }
 
-    ret = ParseKeys(offset, bufLen, buf);
+    ret = this->ParseKeys(offset);
     if (ret != OK) {
         return ret;
     }
 
-    ret = ParseIds(offset, bufLen, buf);
+    ret = this->ParseIds(offset);
     if (ret != OK) {
         return ret;
     }
@@ -125,18 +95,19 @@ int32_t HapParserV2::ParseResHex()
     return OK;
 }
 
-int32_t HapParserV2::ParseHeader(uint32_t &offset, const size_t bufLen, const uint8_t *buf)
+int32_t HapParserV2::ParseHeader(uint32_t &offset)
 {
-    if (offset + ResIndexHeader::RES_HEADER_LEN > bufLen) {
+    if (offset + ResIndexHeader::RES_HEADER_LEN > mMapFile_->mmapLen_) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse ResHeader failed, the offset will be out of bounds.");
         return SYS_ERROR;
     }
-    errno_t eret = memcpy_s(&resHeader_, sizeof(ResIndexHeader), buf + offset, ResIndexHeader::RES_HEADER_LEN);
+    errno_t eret = memcpy_s(&resHeader_, sizeof(ResIndexHeader),
+        mMapFile_->mmap_ + offset, ResIndexHeader::RES_HEADER_LEN);
     if (eret != OK) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse ResHeader failed, memory copy failed.");
         return SYS_ERROR;
     }
-    if (resHeader_.keyCount_ == 0 || resHeader_.length_ == 0 || resHeader_.dataBlockOffset_ > bufLen) {
+    if (resHeader_.keyCount_ == 0 || resHeader_.length_ == 0 || resHeader_.dataBlockOffset_ > mMapFile_->mmapLen_) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse ResHeader failed, ResHeader data error.");
         return UNKNOWN_ERROR;
     }
@@ -145,7 +116,7 @@ int32_t HapParserV2::ParseHeader(uint32_t &offset, const size_t bufLen, const ui
     return OK;
 }
 
-int32_t HapParserV2::ParseKeys(uint32_t &offset, const size_t bufLen, const uint8_t *buf)
+int32_t HapParserV2::ParseKeys(uint32_t &offset)
 {
     for (uint32_t i = 0; i < resHeader_.keyCount_; i++) {
         std::shared_ptr<KeyInfo> key = std::make_shared<KeyInfo>();
@@ -153,7 +124,7 @@ int32_t HapParserV2::ParseKeys(uint32_t &offset, const size_t bufLen, const uint
             RESMGR_HILOGE(RESMGR_TAG, "new ResKey failed when ParseResHex");
             return SYS_ERROR;
         }
-        int32_t ret = ParseKey(offset, key, bufLen, buf);
+        int32_t ret = this->ParseKey(offset, key);
         if (ret != OK) {
             return ret;
         }
@@ -165,13 +136,13 @@ int32_t HapParserV2::ParseKeys(uint32_t &offset, const size_t bufLen, const uint
     return OK;
 }
 
-int32_t HapParserV2::ParseIds(uint32_t &offset, const size_t bufLen, const uint8_t *buf)
+int32_t HapParserV2::ParseIds(uint32_t &offset)
 {
-    if (offset + IdsHeader::IDS_HEADER_LEN > bufLen) {
+    if (offset + IdsHeader::IDS_HEADER_LEN > mMapFile_->mmapLen_) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse IdsHeader failed, the offset will be out of bounds.");
         return SYS_ERROR;
     }
-    errno_t eret = memcpy_s(&idsHeader_, sizeof(IdsHeader), buf + offset, IdsHeader::IDS_HEADER_LEN);
+    errno_t eret = memcpy_s(&idsHeader_, sizeof(IdsHeader), mMapFile_->mmap_ + offset, IdsHeader::IDS_HEADER_LEN);
     if (eret != OK) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse IdsHeader failed, memory copy failed.");
         return SYS_ERROR;
@@ -188,7 +159,7 @@ int32_t HapParserV2::ParseIds(uint32_t &offset, const size_t bufLen, const uint8
     typeNameMap_.reserve(idsHeader_.typeCount_);
 
     for (uint32_t i = 0; i < idsHeader_.typeCount_; i++) {
-        int32_t ret = ParseType(offset, bufLen, buf);
+        int32_t ret = ParseType(offset);
         if (ret != OK) {
             return ret;
         }
@@ -196,14 +167,14 @@ int32_t HapParserV2::ParseIds(uint32_t &offset, const size_t bufLen, const uint8
     return OK;
 }
 
-int32_t HapParserV2::ParseType(uint32_t &offset, const size_t bufLen, const uint8_t *buf)
+int32_t HapParserV2::ParseType(uint32_t &offset)
 {
-    if (offset + TypeInfo::TYPE_INFO_LEN > bufLen) {
+    if (offset + TypeInfo::TYPE_INFO_LEN > mMapFile_->mmapLen_) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse TypeInfo failed, the offset will be out of bounds.");
         return SYS_ERROR;
     }
     TypeInfo typeInfo;
-    errno_t eret = memcpy_s(&typeInfo, sizeof(TypeInfo), buf + offset, TypeInfo::TYPE_INFO_LEN);
+    errno_t eret = memcpy_s(&typeInfo, sizeof(TypeInfo), mMapFile_->mmap_ + offset, TypeInfo::TYPE_INFO_LEN);
     if (eret != OK) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse TypeInfo failed, memory copy failed.");
         return SYS_ERROR;
@@ -217,7 +188,7 @@ int32_t HapParserV2::ParseType(uint32_t &offset, const size_t bufLen, const uint
     typeNameMap_[typeInfo.type_].reserve(typeInfo.count_);
 
     for (uint32_t i = 0; i < typeInfo.count_; i++) {
-        int32_t ret = ParseItem(offset, bufLen, buf, typeInfo);
+        int32_t ret = this->ParseItem(offset, typeInfo);
         if (ret != OK) {
             return ret;
         }
@@ -225,25 +196,25 @@ int32_t HapParserV2::ParseType(uint32_t &offset, const size_t bufLen, const uint
     return OK;
 }
 
-int32_t HapParserV2::ParseItem(uint32_t &offset, const size_t bufLen, const uint8_t *buf, const TypeInfo &typeInfo)
+int32_t HapParserV2::ParseItem(uint32_t &offset, const TypeInfo &typeInfo)
 {
-    if (offset + ResItem::RES_ITEM_LEN > bufLen) {
+    if (offset + ResItem::RES_ITEM_LEN > mMapFile_->mmapLen_) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse ResItem failed, the offset will be out of bounds.");
         return SYS_ERROR;
     }
     ResItem resItem;
-    errno_t eret = memcpy_s(&resItem, sizeof(ResItem), buf + offset, ResItem::RES_ITEM_LEN);
+    errno_t eret = memcpy_s(&resItem, sizeof(ResItem), mMapFile_->mmap_ + offset, ResItem::RES_ITEM_LEN);
     if (eret != OK) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse ResItem failed, memory copy failed.");
         return SYS_ERROR;
     }
     offset += ResItem::RES_ITEM_LEN;
-    resItem.name_ = std::string(reinterpret_cast<const char *>(buf) + offset, resItem.length_);
+    resItem.name_ = std::string(reinterpret_cast<const char *>(mMapFile_->mmap_) + offset, resItem.length_);
     offset += resItem.length_;
 
     std::shared_ptr<IdValuesV2> idValues =
         std::make_shared<IdValuesV2>((ResType)typeInfo.type_, resItem.resId_, resItem.offset_, resItem.name_);
-    idValues->SetBuf(bufLen, buf);
+    idValues->SetMMap(mMapFile_);
     typeNameMap_[typeInfo.type_][resItem.name_] = idValues;
     idMap_[resItem.resId_] = idValues;
     return OK;
@@ -339,13 +310,13 @@ int32_t HapParserV2::ParseConfigItem(uint32_t &offset, ConfigItem &configItem, c
     return OK;
 }
 
-int32_t HapParserV2::ParseKey(uint32_t &offset, std::shared_ptr<KeyInfo> key, const size_t bufLen, const uint8_t *buf)
+int32_t HapParserV2::ParseKey(uint32_t &offset, std::shared_ptr<KeyInfo> key)
 {
-    if (offset + KeyInfo::RESKEY_HEADER_LEN > bufLen) {
+    if (offset + KeyInfo::RESKEY_HEADER_LEN > mMapFile_->mmapLen_) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse ResKey failed, the offset will be out of bounds.");
         return SYS_ERROR;
     }
-    errno_t eret = memcpy_s(key.get(), sizeof(KeyInfo), buf + offset, KeyInfo::RESKEY_HEADER_LEN);
+    errno_t eret = memcpy_s(key.get(), sizeof(KeyInfo), mMapFile_->mmap_ + offset, KeyInfo::RESKEY_HEADER_LEN);
     if (eret != OK) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse ResKey failed, memory copy failed.");
         return SYS_ERROR;
@@ -365,7 +336,7 @@ int32_t HapParserV2::ParseKey(uint32_t &offset, std::shared_ptr<KeyInfo> key, co
             RESMGR_HILOGE(RESMGR_TAG, "new KeyParam failed when ParseResHex");
             return SYS_ERROR;
         }
-        int32_t ret = ParseKeyParam(offset, keyParam, bufLen, buf);
+        int32_t ret = this->ParseKeyParam(offset, keyParam);
         GetKeyParamsLocales(keyParam, locale, isLocale);
         if (ret != OK) {
             return ret;
@@ -378,14 +349,13 @@ int32_t HapParserV2::ParseKey(uint32_t &offset, std::shared_ptr<KeyInfo> key, co
     return OK;
 }
 
-int32_t HapParserV2::ParseKeyParam(uint32_t &offset, std::shared_ptr<KeyParam> keyParam,
-    const size_t bufLen, const uint8_t *buf)
+int32_t HapParserV2::ParseKeyParam(uint32_t &offset, std::shared_ptr<KeyParam> keyParam)
 {
-    if (offset + KeyParam::KEYPARAM_LEN > bufLen) {
+    if (offset + KeyParam::KEYPARAM_LEN > mMapFile_->mmapLen_) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse KeyParam failed, the offset will be out of bounds.");
         return SYS_ERROR;
     }
-    errno_t eret = memcpy_s(keyParam.get(), sizeof(KeyParam), buf + offset, KeyParam::KEYPARAM_LEN);
+    errno_t eret = memcpy_s(keyParam.get(), sizeof(KeyParam), mMapFile_->mmap_ + offset, KeyParam::KEYPARAM_LEN);
     if (eret != OK) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse KeyParam failed, memory copy failed.");
         return SYS_ERROR;
@@ -393,7 +363,7 @@ int32_t HapParserV2::ParseKeyParam(uint32_t &offset, std::shared_ptr<KeyParam> k
     offset += KeyParam::KEYPARAM_LEN;
     keyParam->InitStr();
 
-    GetLimitKeyValue(keyParam->type_);
+    this->GetLimitKeyValue(keyParam->type_);
     return OK;
 }
 
@@ -424,30 +394,10 @@ std::shared_ptr<HapResource> HapParserV2::GetHapResource(const char *path, bool 
         pResource = std::make_shared<HapResourceV2>(path, 0, hasDarkRes_);
     }
 
-    if (pResource == nullptr || !pResource->Init(keys_, idMap_, typeNameMap_)) {
+    if (pResource == nullptr || !pResource->Init(keys_, idMap_, typeNameMap_, mMapFile_)) {
         RESMGR_HILOGE(RESMGR_TAG, "Get Hap resource failed, HapResource init failed.");
         return nullptr;
     }
-
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    if (mapper_ != nullptr) {
-        pResource->InitMmap(extractor_, mapper_);
-    } else if (mmap_ != nullptr && mmapLen_ != 0) {
-        pResource->InitMmap(mmapLen_, mmap_);
-        mmap_ = nullptr;
-    } else {
-        RESMGR_HILOGE(RESMGR_TAG, "Get Hap resource failed, Mmap is empty.");
-        return nullptr;
-    }
-#else
-    if (mmap_ != nullptr && mmapLen_ != 0) {
-        pResource->InitMmap(mmapLen_, mmap_);
-        mmap_ = nullptr;
-    } else {
-        RESMGR_HILOGE(RESMGR_TAG, "Get Hap resource failed, Mmap is empty.");
-        return nullptr;
-    }
-#endif
 
     pResource->SetLimitKeysValue(limitKeyValue_);
     pResource->SetLocales(locales_);
@@ -458,9 +408,9 @@ std::shared_ptr<HapResource> HapParserV2::GetHapResource(const char *path, bool 
 bool HapParserV2::GetIndexMmap(const char *path)
 {
     if (Utils::ContainsTail(path, Utils::tailSet)) {
-        return GetIndexMmapFromHap(path);
+        return this->GetIndexMmapFromHap(path);
     } else {
-        return GetIndexMmapFromIndex(path);
+        return this->GetIndexMmapFromIndex(path);
     }
 }
 
@@ -469,21 +419,23 @@ bool HapParserV2::GetIndexMmapFromHap(const char *path)
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
     bool isNewExtractor = false;
-    extractor_ = AbilityBase::ExtractorUtil::GetExtractor(path, isNewExtractor);
-    if (extractor_ == nullptr) {
+    mMapFile_->extractor_ = AbilityBase::ExtractorUtil::GetExtractor(path, isNewExtractor);
+    if (mMapFile_->extractor_ == nullptr) {
         return false;
     }
     std::string indexFilePath;
-    if (extractor_->IsStageModel()) {
+    if (mMapFile_->extractor_->IsStageModel()) {
         indexFilePath = "resources.index";
     } else {
-        indexFilePath = HapParser::GetIndexFilePath(extractor_);
+        indexFilePath = HapParser::GetIndexFilePath(mMapFile_->extractor_);
     }
-    mapper_ = extractor_->GetMmapData(indexFilePath);
-    if (mapper_ == nullptr) {
+    mMapFile_->mapper_ = mMapFile_->extractor_->GetMmapData(indexFilePath);
+    if (mMapFile_->mapper_ == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get mmap data indexFilePath from hap");
         return false;
     }
+    mMapFile_->mmapLen_ = mMapFile_->mapper_->GetDataLen();
+    mMapFile_->mmap_ = mMapFile_->mapper_->GetDataPtr();
 #endif
     return true;
 }
@@ -493,15 +445,15 @@ bool HapParserV2::GetIndexMmapFromIndex(const char *path)
     char indexPath[PATH_MAX + 1] = {0};
     Utils::CanonicalizePath(path, indexPath, PATH_MAX);
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    fd_ = open(indexPath, O_RDONLY);
-    if (fd_ <= 0) {
+    mMapFile_->fd_ = open(indexPath, O_RDONLY);
+    if (mMapFile_->fd_ <= 0) {
         return false;
     }
     struct stat fileStat;
-    fstat(fd_, &fileStat);
-    mmapLen_ = static_cast<size_t>(fileStat.st_size);
-    mmap_ = (uint8_t*)mmap(nullptr, mmapLen_, PROT_READ, MAP_PRIVATE, fd_, 0);
-    if (mmap_ == MAP_FAILED) {
+    fstat(mMapFile_->fd_, &fileStat);
+    mMapFile_->mmapLen_ = static_cast<size_t>(fileStat.st_size);
+    mMapFile_->mmap_ = (uint8_t*)mmap(nullptr, mMapFile_->mmapLen_, PROT_READ, MAP_PRIVATE, mMapFile_->fd_, 0);
+    if (mMapFile_->mmap_ == MAP_FAILED) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get mmap data indexFilePath from index");
         return false;
     }
@@ -517,10 +469,10 @@ bool HapParserV2::GetIndexMmapFromIndex(const char *path)
         inFile.close();
         return false;
     }
-    mmapLen_ = static_cast<size_t>(fileLen);
-    mmap_ = new uint8_t[fileLen + 1];
+    mMapFile_->mmapLen_ = static_cast<size_t>(fileLen);
+    mMapFile_->mmap_ = new uint8_t[fileLen + 1];
     inFile.seekg(0, std::ios::beg);
-    inFile.read(reinterpret_cast<char*>(mmap_), fileLen);
+    inFile.read(reinterpret_cast<char*>(mMapFile_->mmap_), fileLen);
     inFile.close();
     RESMGR_HILOGD(RESMGR_TAG, "extract success, bufLen:%d", fileLen);
 #endif

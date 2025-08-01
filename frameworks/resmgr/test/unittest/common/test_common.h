@@ -20,6 +20,7 @@
 #include "hap_resource_v1.h"
 #include "hap_resource_v2.h"
 #include "hilog_wrapper.h"
+#include "mmap_file.h"
 
 #include <unicode/localebuilder.h>
 #include <unicode/locid.h>
