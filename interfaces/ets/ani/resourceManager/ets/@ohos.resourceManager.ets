@@ -718,4 +718,6 @@ export default namespace resourceManager {
     }
 
     export native function getSystemResourceManager(): ResourceManager;
+    export native function transferToDynamicResource(object: Object): Any;
+    export native function transferToStaticResource(object: Any): Object;
 }
