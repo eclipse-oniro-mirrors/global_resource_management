@@ -74,7 +74,9 @@ struct ResMgrDataContext {
         if (withResId) {
             RESMGR_HILOGE(RESMGR_JS_TAG, "%{public}s id = %{public}d", msg.c_str(), resId_);
         } else {
-            RESMGR_HILOGE(RESMGR_JS_TAG, "%{public}s name = %{public}s", msg.c_str(), resName_.c_str());
+            if (resName_.empty()) {
+                RESMGR_HILOGW(RESMGR_JS_TAG, "%{public}s, name is empty.", msg.c_str());
+            }
         }
     }
 
