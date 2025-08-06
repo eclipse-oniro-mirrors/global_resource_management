@@ -30,10 +30,10 @@ namespace Global {
 namespace Resource {
 class HapResourceManager {
 public:
-    HapResourceManager() {}
-    ~HapResourceManager() {}
+    HapResourceManager(const HapResourceManager &other) = delete;
+    HapResourceManager& operator=(const HapResourceManager &other) = delete;
 
-    static std::shared_ptr<HapResourceManager> GetInstance();
+    static HapResourceManager& GetInstance();
 
     /**
      * Put hapResource into the map of HapResourceManager
@@ -70,8 +70,7 @@ public:
 #endif
 
 private:
-    static std::recursive_mutex mutex_;
-    static std::shared_ptr<HapResourceManager> instance_;
+    HapResourceManager() = default;
     std::shared_mutex mutexRw_;
     std::unordered_map<std::string, std::weak_ptr<HapResource>> hapResourceMap_;
 };

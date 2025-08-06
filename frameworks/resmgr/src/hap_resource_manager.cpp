@@ -19,18 +19,11 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
-std::shared_ptr<HapResourceManager> HapResourceManager::instance_ = nullptr;
-std::recursive_mutex HapResourceManager::mutex_;
 
-std::shared_ptr<HapResourceManager> HapResourceManager::GetInstance()
+HapResourceManager& HapResourceManager::GetInstance()
 {
-    if (instance_ == nullptr) {
-        std::lock_guard<std::recursive_mutex> lock(mutex_);
-        if (instance_ == nullptr) {
-            instance_ = std::make_shared<HapResourceManager>();
-        }
-    }
-    return instance_;
+    static HapResourceManager instance;
+    return instance;
 }
 
 std::shared_ptr<HapResource> HapResourceManager::PutAndGetResource(const std::string &path,
