@@ -256,6 +256,7 @@ ohos_shared_library("librawfile") {
     "cJSON:cjson_static",
     "c_utils:utils",
     "hilog:libhilog",
+    "ipc:ipc_single",
     "napi:ace_napi",
   ]
 
