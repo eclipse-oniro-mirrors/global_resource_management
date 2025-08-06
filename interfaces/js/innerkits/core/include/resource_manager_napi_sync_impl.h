@@ -183,6 +183,10 @@ private:
     static int32_t ProcessSymbolResourceByName(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
 
+    static napi_value ProcessThemeIcon(napi_env env, std::unique_ptr<ResMgrDataContext> &dataContext,
+        std::pair<std::unique_ptr<uint8_t[]>, size_t> &foregroundInfo,
+        std::pair<std::unique_ptr<uint8_t[]>, size_t> &backgroundInfo, std::string &themeMask);
+
     static RState getAddonAndConfig(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
 

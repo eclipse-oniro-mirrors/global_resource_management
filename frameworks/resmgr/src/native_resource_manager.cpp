@@ -20,6 +20,7 @@
 #include "hilog_wrapper.h"
 #include "resource_manager_impl.h"
 #include "rstate.h"
+#include "utils/utils.h"
 
 using namespace OHOS::Global::Resource;
 using namespace OHOS::Ace::Napi;
@@ -254,6 +255,27 @@ ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptor(const NativeR
     return OH_ResourceManager_GetDrawableDescriptorData(mgr, resId, drawableDescriptor, density, type);
 }
 
+ResourceManager_ErrorCode ProcessThemeIcon(const std::shared_ptr<ResourceManager>& resourceMgr,
+    ArkUI_DrawableDescriptor **drawableDescriptor,
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> &foregroundInfo,
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> &backgroundInfo, std::string &themeMask)
+{
+    if (backgroundInfo.first == nullptr &&
+        Utils::GetSystemParameter("const.global.support_single_icon_theme") == "true") {
+        auto descriptor = std::make_unique<DrawableDescriptor>(std::move(foregroundInfo.first), foregroundInfo.second);
+        *drawableDescriptor = OH_ArkUI_CreateFromNapiDrawable(descriptor.get());
+        return (*drawableDescriptor != nullptr) ? ResourceManager_ErrorCode::SUCCESS :
+            ResourceManager_ErrorCode::ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+
+    DrawableDescriptor::DrawableType drawableType;
+    auto descriptor = DrawableDescriptorFactory::Create(foregroundInfo, backgroundInfo,
+        themeMask, drawableType, resourceMgr);
+    *drawableDescriptor = OH_ArkUI_CreateFromNapiDrawable(descriptor.get());
+    return (*drawableDescriptor != nullptr) ? ResourceManager_ErrorCode::SUCCESS :
+        ResourceManager_ErrorCode::ERROR_CODE_RES_NOT_FOUND_BY_ID;
+}
+
 ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptorData(const NativeResourceManager *mgr,
     uint32_t resId, ArkUI_DrawableDescriptor **drawableDescriptor, uint32_t density, uint32_t type)
 {
@@ -268,11 +290,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptorData(const Nat
         std::pair<std::unique_ptr<uint8_t[]>, size_t> backgroundInfo;
         state = mgr->resManager->GetThemeIcons(resId, foregroundInfo, backgroundInfo, density);
         if (state == RState::SUCCESS) {
-            auto descriptor = DrawableDescriptorFactory::Create(foregroundInfo, backgroundInfo,
-            themeMask, drawableType, mgr->resManager);
-            *drawableDescriptor = OH_ArkUI_CreateFromNapiDrawable(descriptor.get());
-            return (*drawableDescriptor != nullptr) ? ResourceManager_ErrorCode::SUCCESS :
-                ResourceManager_ErrorCode::ERROR_CODE_RES_NOT_FOUND_BY_ID;
+            return ProcessThemeIcon(mgr->resManager, drawableDescriptor, foregroundInfo, backgroundInfo, themeMask);
         }
     }
     auto descriptor = DrawableDescriptorFactory::Create(resId, mgr->resManager, state, drawableType, density);
@@ -305,11 +323,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptorDataByName(con
         std::pair<std::unique_ptr<uint8_t[]>, size_t> backgroundInfo;
         state = mgr->resManager->GetThemeIcons(0, foregroundInfo, backgroundInfo, density);
         if (state == RState::SUCCESS) {
-            auto descriptor = DrawableDescriptorFactory::Create(foregroundInfo, backgroundInfo,
-            themeMask, drawableType, mgr->resManager);
-            *drawableDescriptor = OH_ArkUI_CreateFromNapiDrawable(descriptor.get());
-            return (*drawableDescriptor != nullptr) ? ResourceManager_ErrorCode::SUCCESS :
-                ResourceManager_ErrorCode::ERROR_CODE_RES_NOT_FOUND_BY_ID;
+            return ProcessThemeIcon(mgr->resManager, drawableDescriptor, foregroundInfo, backgroundInfo, themeMask);
         }
     }
     if (type == 2) { // 2 means get the dynamic icon from theme

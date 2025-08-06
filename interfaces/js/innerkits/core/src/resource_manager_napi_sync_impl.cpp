@@ -23,6 +23,8 @@
 #include "drawable_descriptor/js_drawable_descriptor.h"
 #include "resource_manager_napi_utils.h"
 #include "resource_manager_addon.h"
+#include "utils/utils.h"
+
 namespace OHOS {
 namespace Global {
 namespace Resource {
@@ -772,9 +774,7 @@ napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptor(napi_env env, napi
         std::pair<std::unique_ptr<uint8_t[]>, size_t> backgroundInfo;
         state = resMgr->GetThemeIcons(resId, foregroundInfo, backgroundInfo, dataContext->density_);
         if (state == SUCCESS) {
-            auto drawableDescriptor = Ace::Napi::DrawableDescriptorFactory::Create(foregroundInfo, backgroundInfo,
-                themeMask, drawableType, resMgr);
-            return Ace::Napi::JsDrawableDescriptor::ToNapi(env, drawableDescriptor.release(), drawableType);
+            return ProcessThemeIcon(env, dataContext, foregroundInfo, backgroundInfo, themeMask);
         }
     }
     auto drawableDescriptor = Ace::Napi::DrawableDescriptorFactory::Create(resId, resMgr,
@@ -973,6 +973,22 @@ napi_value ResourceManagerNapiSyncImpl::GetBooleanByName(napi_env env, napi_call
     return ResourceManagerNapiUtils::CreateJsBool(env, *dataContext);
 }
 
+napi_value ResourceManagerNapiSyncImpl::ProcessThemeIcon(napi_env env, std::unique_ptr<ResMgrDataContext> &dataContext,
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> &foregroundInfo,
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> &backgroundInfo, std::string &themeMask)
+{
+    Ace::Napi::DrawableDescriptor::DrawableType drawableType = Ace::Napi::DrawableDescriptor::DrawableType::BASE;
+    if (backgroundInfo.first == nullptr &&
+        Utils::GetSystemParameter("const.global.support_single_icon_theme") == "true") {
+        auto drawableDescriptor = std::make_unique<Ace::Napi::DrawableDescriptor>(std::move(foregroundInfo.first),
+            foregroundInfo.second);
+        return Ace::Napi::JsDrawableDescriptor::ToNapi(env, drawableDescriptor.release(), drawableType);
+    }
+    auto drawableDescriptor = Ace::Napi::DrawableDescriptorFactory::Create(foregroundInfo, backgroundInfo,
+        themeMask, drawableType, dataContext->addon_->GetResMgr());
+    return Ace::Napi::JsDrawableDescriptor::ToNapi(env, drawableDescriptor.release(), drawableType);
+}
+
 napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptorByName(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, PARAMS_NUM_THREE);
@@ -1003,9 +1019,7 @@ napi_value ResourceManagerNapiSyncImpl::GetDrawableDescriptorByName(napi_env env
         std::pair<std::unique_ptr<uint8_t[]>, size_t> foregroundInfo;
         std::pair<std::unique_ptr<uint8_t[]>, size_t> backgroundInfo;
         if (resMgr->GetThemeIcons(0, foregroundInfo, backgroundInfo, dataContext->density_) == SUCCESS) {
-            auto drawableDescriptor = Ace::Napi::DrawableDescriptorFactory::Create(foregroundInfo, backgroundInfo,
-                themeMask, drawableType, resMgr);
-            return Ace::Napi::JsDrawableDescriptor::ToNapi(env, drawableDescriptor.release(), drawableType);
+            return ProcessThemeIcon(env, dataContext, foregroundInfo, backgroundInfo, themeMask);
         }
     }
 
