@@ -21,6 +21,7 @@
 #include <dirent.h>
 #include <set>
 #include <vector>
+#include "res_common.h"
 
 namespace OHOS {
 namespace Global {
@@ -119,6 +120,8 @@ public:
     static bool convertToDouble(const std::string& str, double& outValue);
 
     static bool IsSystemPath(const std::string& path);
+
+    EXPORT_FUNC static std::string GetSystemParameter(const std::string& paramKey);
 private:
     static bool IsValidValue(const char* end, const std::string& str);
 

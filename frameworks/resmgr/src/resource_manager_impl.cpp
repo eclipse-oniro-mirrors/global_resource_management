@@ -53,6 +53,7 @@ const std::string FOREGROUND = "foreground";
 const std::string BACKGROUND = "background";
 const std::regex FLOAT_REGEX = std::regex("(\\+|-)?\\d+(\\.\\d+)? *(px|vp|fp)?");
 const char* ResourceManagerImpl::LANGUAGE_KEY = "persist.global.language";
+const std::string KEY_SINGLE_ICON = "const.global.support_single_icon_theme";
 
 void ResourceManagerImpl::AddSystemResource(ResourceManagerImpl *systemResourceManager)
 {
@@ -2026,6 +2027,13 @@ RState ResourceManagerImpl::GetThemeIcons(uint32_t resId, std::pair<std::unique_
         RESMGR_HILOGW(RESMGR_TAG,
             "GetThemeIcons bundleName = %{public}s, abilityName = %{public}s, fLen = %{public}zu, bLen = %{public}zu",
             bundleInfo.first.c_str(), abilityName.c_str(), foregroundInfo.second, backgroundInfo.second);
+        return SUCCESS;
+    }
+
+    if (foreState == SUCCESS && Utils::GetSystemParameter(KEY_SINGLE_ICON) == "true") {
+        RESMGR_HILOGW(RESMGR_TAG,
+            "GetThemeIcons bundlename = %{public}s, abilityName = %{public}s, fLen = %{public}zu",
+            bundleInfo.first.c_str(), abilityName.c_str(), foregroundInfo.second);
         return SUCCESS;
     }
     return ERROR_CODE_RES_ID_NOT_FOUND;
