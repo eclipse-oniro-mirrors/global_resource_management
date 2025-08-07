@@ -74,6 +74,9 @@ const std::shared_ptr<HapResource> HapResourceManager::Load(const char *path,
     std::shared_ptr<HapResource> pResource = nullptr;
     struct stat fileStat {};
     int ret = stat(path, &fileStat);
+    if (ret != 0) {
+        fileStat.st_mtime = 0;
+    }
     if (selectedTypes == SELECT_ALL) {
         pResource = this->GetHapResource(path);
         if (pResource != nullptr && ret == 0 && fileStat.st_mtime == pResource->GetLastModTime()) {

@@ -52,6 +52,8 @@ static void NapiThrow(napi_env env, int32_t errCode)
         napi_value error = nullptr;
         napi_create_error(env, code, message, &error);
         napi_throw(env, error);
+    } else {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "napi throw error failed.");
     }
 }
 

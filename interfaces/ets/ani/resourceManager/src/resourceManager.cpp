@@ -51,7 +51,11 @@ enum ScreenDensityIndex {
 };
 
 struct ArrayElement {
-    enum class ElementType { NUMBER, STRING } type;
+    enum class ElementType {
+        ERROR,
+        NUMBER,
+        STRING,
+         } type;
     std::variant<double, std::string> value;
 
     ArrayElement(ElementType type, double number) : type(type), value(number) {}
@@ -186,7 +190,7 @@ static std::string AniStrToString(ani_env *env, ani_ref aniStr)
     std::string result;
     result.resize(size);
     ani_size written;
-    env->String_GetUTF8(str, result.data(), size + 1, &written);
+    env->String_GetUTF8(str, result.data(), size, &written);
     return result;
 }
 
@@ -307,13 +311,13 @@ static ArrayElement GetArrayElement(ani_env* env, ani_object args, const int ind
     ani_ref value;
     if (ANI_OK != env->Array_Get_Ref(static_cast<ani_array_ref>(args), index, &value)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Call get failed");
-        return ArrayElement{ArrayElement::ElementType::NUMBER, 0};
+        return ArrayElement{ArrayElement::ElementType::ERROR, 0};
     }
 
     ani_class stringClass;
     if (ANI_OK != env->FindClass(ANI_STRING_SIGN, &stringClass)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class ' %{public}s' failed", ANI_STRING_SIGN);
-        return ArrayElement{ArrayElement::ElementType::NUMBER, 0};
+        return ArrayElement{ArrayElement::ElementType::ERROR, 0};
     }
 
     ani_boolean isString;
@@ -323,7 +327,11 @@ static ArrayElement GetArrayElement(ani_env* env, ani_object args, const int ind
         return ArrayElement{ArrayElement::ElementType::STRING, AniStrToString(env, value)};
     } else {
         ani_double param;
-        env->Object_CallMethodByName_Double(static_cast<ani_object>(value), "unboxed", ":D", &param);
+        ani_status state = env->Object_CallMethodByName_Double(static_cast<ani_object>(value),
+            "unboxed", ":D", &param);
+        if (state != ANI_OK) {
+            return ArrayElement{ArrayElement::ElementType::ERROR, 0};
+        }
         return ArrayElement{ArrayElement::ElementType::NUMBER, param};
     }
 }
