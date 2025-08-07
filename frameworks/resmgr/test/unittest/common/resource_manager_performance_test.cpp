@@ -155,8 +155,8 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest002, 
     }
     ResConfig *rc = CreateResConfig();
     if (rc == nullptr) {
-        ASSERT_TRUE(false);
         delete tmpRm;
+        ASSERT_TRUE(false);
     }
     rc->SetLocaleInfo("en", nullptr, "US");
     rc->SetDeviceType(DeviceType::DEVICE_CAR);
