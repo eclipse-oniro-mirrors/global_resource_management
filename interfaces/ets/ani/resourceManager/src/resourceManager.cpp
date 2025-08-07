@@ -187,11 +187,10 @@ static std::string AniStrToString(ani_env *env, ani_ref aniStr)
     ani_size size = 0;
     env->String_GetUTF8Size(str, &size);
 
-    std::string result;
-    result.resize(size);
+    std::string result(size + 1, 0);
     ani_size written;
-    env->String_GetUTF8(str, result.data(), size, &written);
-    return result;
+    env->String_GetUTF8(str, result.data(), size + 1, &written);
+    return result.c_str();
 }
 
 static ani_object CreateAniUint8Array(ani_env* env, ResMgrDataContext &context)
