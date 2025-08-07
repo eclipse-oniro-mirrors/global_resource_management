@@ -515,7 +515,7 @@ bool ResConfigImpl::MatchLocal(const ResConfig &other) const
         return false;
     }
     ResLocale resLocal;
-    if(SUCCESS != resLocal.CopyFromLocaleInfo(localeInfo)) {
+    if (SUCCESS != resLocal.CopyFromLocaleInfo(localeInfo)) {
         return false;
     };
 
