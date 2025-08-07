@@ -31,6 +31,7 @@ manager_sources = [
   "src/hap_resource_v2.cpp",
   "src/hap_resource.cpp",
   "src/locale_matcher.cpp",
+  "src/mmap_file.cpp",
   "src/res_config_impl.cpp",
   "src/res_desc.cpp",
   "src/res_locale.cpp",

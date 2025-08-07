@@ -19,11 +19,7 @@
 #include <atomic>
 
 #include "hap_resource.h"
-
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-#include "file_mapper.h"
-#include "extractor.h"
-#endif
+#include "mmap_file.h"
 
 namespace OHOS {
 namespace Global {
@@ -38,10 +34,9 @@ public:
 
     virtual std::shared_ptr<IdItem> GetIdItem() const;
 
-    inline void Init(size_t bufLen, uint8_t *buf, ResType resType, uint32_t id, std::string name)
+    inline void Init(std::shared_ptr<MmapFile> mMapFile, ResType resType, uint32_t id, std::string name)
     {
-        bufLen_ = bufLen;
-        buf_ = buf;
+        mMapFile_ = mMapFile;
         resType_ = resType;
         id_ = id;
         name_ = name;
@@ -50,8 +45,7 @@ private:
     friend class HapResourceV2;
 
     uint32_t offset_;
-    size_t bufLen_{0};
-    uint8_t *buf_{nullptr};
+    std::shared_ptr<MmapFile> mMapFile_;
     ResType resType_{VALUES};
     uint32_t id_{0};
     std::string name_;
@@ -65,10 +59,14 @@ public:
 
     virtual const std::vector<std::shared_ptr<ValueUnderQualifierDir>> &GetLimitPathsConst() const;
 
-    inline void SetBuf(const size_t bufLen, const uint8_t *buf)
+    inline void SetMMap(std::shared_ptr<MmapFile> mMapFile)
     {
-        bufLen_ = bufLen;
-        buf_ = const_cast<uint8_t*>(buf);
+        mMapFile_ = mMapFile;
+    }
+
+    inline std::shared_ptr<MmapFile> GetMMap()
+    {
+        return mMapFile_;
     }
 
     inline uint32_t GetOffset() const
@@ -128,11 +126,8 @@ private:
     // resource name
     std::string name_;
 
-    // length of the resource.index data
-    size_t bufLen_{0};
-
-    // pointer to the resource.index data
-    uint8_t *buf_{nullptr};
+    // resource.index file inform
+    std::shared_ptr<MmapFile> mMapFile_;
 
     // if the IdValuesV2 has been parsed flag
     std::atomic<bool> isParsed_{false};
@@ -161,11 +156,8 @@ public:
 
     bool Init(std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> &keys,
         std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> &idMap,
-        std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> &typeNameMap);
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    void InitMmap(std::shared_ptr<AbilityBase::Extractor> extractor, std::unique_ptr<AbilityBase::FileMapper> &mapper);
-#endif
-    bool InitMmap(size_t mmapLen, uint8_t *mmap);
+        std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> &typeNameMap,
+        std::shared_ptr<MmapFile> mMapFile);
 
     void InitThemeSystemRes();
 protected:
@@ -175,14 +167,8 @@ protected:
     virtual int32_t ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue);
     
     std::mutex idValuesMutex_;
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    std::shared_ptr<AbilityBase::Extractor> extractor_{nullptr};
 
-    std::unique_ptr<AbilityBase::FileMapper> mapper_{nullptr};
-#endif
-    uint8_t *buf_{nullptr};
-
-    size_t bufLen_{0};
+    std::shared_ptr<MmapFile> mMapFile_;
 
     // <resconfig id, resconfig>
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys_;

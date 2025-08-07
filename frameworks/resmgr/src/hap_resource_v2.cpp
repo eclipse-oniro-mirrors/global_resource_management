@@ -53,11 +53,11 @@ std::shared_ptr<IdItem> ValueUnderQualifierDirV2::GetIdItem() const
     uint32_t offset = offset_;
     idItem->JudgeArray();
     if (idItem->isArray_) {
-        if (HapParserV2::ParseStringArray(offset, idItem->values_, bufLen_, buf_) != OK) {
+        if (HapParserV2::ParseStringArray(offset, idItem->values_, mMapFile_->mmapLen_, mMapFile_->mmap_) != OK) {
             return nullptr;
         }
     } else {
-        if (HapParserV2::ParseString(offset, idItem->value_, bufLen_, buf_) != OK) {
+        if (HapParserV2::ParseString(offset, idItem->value_, mMapFile_->mmapLen_, mMapFile_->mmap_) != OK) {
             return nullptr;
         }
         idItem->valueLen_ = idItem->value_.size();
@@ -84,15 +84,7 @@ HapResourceV2::HapResourceV2(const std::string path, time_t lastModTime, bool ha
 }
 
 HapResourceV2::~HapResourceV2()
-{
-    if (buf_ != nullptr) {
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-        munmap(buf_, bufLen_);
-#else
-        delete[] buf_;
-#endif
-    }
-}
+{}
 
 bool HapResourceV2::IsSystemResource() const
 {
@@ -169,7 +161,8 @@ void HapResourceV2::GetLocales(std::set<std::string> &outValue, bool includeSyst
 
 bool HapResourceV2::Init(std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> &keys,
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> &idMap,
-    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> &typeNameMap)
+    std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> &typeNameMap,
+    std::shared_ptr<MmapFile> mMapFile)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
@@ -201,24 +194,7 @@ bool HapResourceV2::Init(std::unordered_map<uint32_t, std::shared_ptr<ResConfigI
     keys_ = std::move(keys);
     idMap_ = std::move(idMap);
     typeNameMap_ = std::move(typeNameMap);
-    return true;
-}
-
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-void HapResourceV2::InitMmap(std::shared_ptr<AbilityBase::Extractor> extractor,
-    std::unique_ptr<AbilityBase::FileMapper> &mapper)
-{
-    extractor_ = extractor;
-    mapper_ = std::move(mapper);
-    buf_ = mapper_->GetDataPtr();
-    bufLen_ = mapper_->GetDataLen();
-}
-#endif
-
-bool HapResourceV2::InitMmap(size_t mmapLen, uint8_t *mmap)
-{
-    bufLen_ = mmapLen;
-    buf_ = mmap;
+    mMapFile_ = mMapFile;
     return true;
 }
 
@@ -253,7 +229,7 @@ int32_t HapResourceV2::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
     }
     ResInfo resInfo;
     uint32_t offset = idValue->GetOffset();
-    int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, bufLen_, buf_);
+    int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, idValue->GetMMap()->mmapLen_, idValue->GetMMap()->mmap_);
     if (ret != OK) {
         return ret;
     }
@@ -266,14 +242,14 @@ int32_t HapResourceV2::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
     std::pair<std::string, std::string> resPath = std::make_pair(indexPath_, resourcePath_);
     for (uint32_t i = 0; i < resInfo.valueCount_; i++) {
         ConfigItem configItem;
-        ret = HapParserV2::ParseConfigItem(offset, configItem, bufLen_, buf_);
+        ret = HapParserV2::ParseConfigItem(offset, configItem, idValue->GetMMap()->mmapLen_, idValue->GetMMap()->mmap_);
         if (ret != OK) {
             return ret;
         }
 
         std::shared_ptr<ValueUnderQualifierDirV2> vuqd =
             std::make_shared<ValueUnderQualifierDirV2>(resPath, configItem.offset_, keys_[configItem.resCfgId_]);
-        vuqd->Init(bufLen_, buf_, idValue->GetResType(), idValue->GetId(), idValue->GetName());
+        vuqd->Init(idValue->GetMMap(), idValue->GetResType(), idValue->GetId(), idValue->GetName());
         idValue->AddLimitPath(vuqd);
     }
     idValue->Parse();
@@ -310,9 +286,13 @@ void SystemResource::GetLocales(std::set<std::string> &outValue, bool includeSys
 
 int32_t SystemResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
 {
+    std::unique_lock<std::mutex> lock(idValuesMutex_);
+    if (idValue->IsParsed()) {
+        return OK;
+    }
     ResInfo resInfo;
     uint32_t offset = idValue->GetOffset();
-    int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, bufLen_, buf_);
+    int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, idValue->GetMMap()->mmapLen_, idValue->GetMMap()->mmap_);
     if (ret != OK) {
         return ret;
     }
@@ -324,7 +304,7 @@ int32_t SystemResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
     idValue->ReserveLimitPaths(resInfo.valueCount_);
     for (uint32_t i = 0; i < resInfo.valueCount_; i++) {
         ConfigItem configItem;
-        ret = HapParserV2::ParseConfigItem(offset, configItem, bufLen_, buf_);
+        ret = HapParserV2::ParseConfigItem(offset, configItem, idValue->GetMMap()->mmapLen_, idValue->GetMMap()->mmap_);
         if (ret != OK) {
             return ret;
         }
@@ -332,9 +312,10 @@ int32_t SystemResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
         std::pair<std::string, std::string> resPath = std::make_pair(indexPath_, resourcePath_);
         std::shared_ptr<ValueUnderQualifierDirV2> vuqd = std::make_shared<ValueUnderQualifierDirV2>(
             resPath, configItem.offset_, keys_[configItem.resCfgId_], false, true);
-        vuqd->Init(bufLen_, buf_, idValue->GetResType(), idValue->GetId(), idValue->GetName());
+        vuqd->Init(idValue->GetMMap(), idValue->GetResType(), idValue->GetId(), idValue->GetName());
         idValue->AddLimitPath(vuqd);
     }
+    idValue->Parse();
     return OK;
 }
 
@@ -379,9 +360,13 @@ void OverlayResource::GetLocales(std::set<std::string> &outValue, bool includeSy
 
 int32_t OverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
 {
+    std::unique_lock<std::mutex> lock(idValuesMutex_);
+    if (idValue->IsParsed()) {
+        return OK;
+    }
     ResInfo resInfo;
     uint32_t offset = idValue->GetOffset();
-    int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, bufLen_, buf_);
+    int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, idValue->GetMMap()->mmapLen_, idValue->GetMMap()->mmap_);
     if (ret != OK) {
         return ret;
     }
@@ -389,7 +374,7 @@ int32_t OverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
     idValue->ReserveLimitPaths(resInfo.valueCount_);
     for (uint32_t i = 0; i < resInfo.valueCount_; i++) {
         ConfigItem configItem;
-        ret = HapParserV2::ParseConfigItem(offset, configItem, bufLen_, buf_);
+        ret = HapParserV2::ParseConfigItem(offset, configItem, idValue->GetMMap()->mmapLen_, idValue->GetMMap()->mmap_);
         if (ret != OK) {
             return ret;
         }
@@ -397,9 +382,10 @@ int32_t OverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
         std::pair<std::string, std::string> resPath = std::make_pair(indexPath_, resourcePath_);
         std::shared_ptr<ValueUnderQualifierDirV2> vuqd = std::make_shared<ValueUnderQualifierDirV2>(
             resPath, configItem.offset_, keys_[configItem.resCfgId_], true, false);
-        vuqd->Init(bufLen_, buf_, idValue->GetResType(), idValue->GetId(), idValue->GetName());
+        vuqd->Init(idValue->GetMMap(), idValue->GetResType(), idValue->GetId(), idValue->GetName());
         idValue->AddLimitPath(vuqd);
     }
+    idValue->Parse();
     return OK;
 }
 
@@ -417,9 +403,13 @@ void SystemOverlayResource::GetLocales(std::set<std::string> &outValue, bool inc
 
 int32_t SystemOverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
 {
+    std::unique_lock<std::mutex> lock(idValuesMutex_);
+    if (idValue->IsParsed()) {
+        return OK;
+    }
     ResInfo resInfo;
     uint32_t offset = idValue->GetOffset();
-    int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, bufLen_, buf_);
+    int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, idValue->GetMMap()->mmapLen_, idValue->GetMMap()->mmap_);
     if (ret != OK) {
         return ret;
     }
@@ -427,7 +417,7 @@ int32_t SystemOverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idVal
     idValue->ReserveLimitPaths(resInfo.valueCount_);
     for (uint32_t i = 0; i < resInfo.valueCount_; i++) {
         ConfigItem configItem;
-        ret = HapParserV2::ParseConfigItem(offset, configItem, bufLen_, buf_);
+        ret = HapParserV2::ParseConfigItem(offset, configItem, idValue->GetMMap()->mmapLen_, idValue->GetMMap()->mmap_);
         if (ret != OK) {
             return ret;
         }
@@ -435,9 +425,10 @@ int32_t SystemOverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idVal
         std::pair<std::string, std::string> resPath = std::make_pair(indexPath_, resourcePath_);
         std::shared_ptr<ValueUnderQualifierDirV2> vuqd = std::make_shared<ValueUnderQualifierDirV2>(
             resPath, configItem.offset_, keys_[configItem.resCfgId_], true, true);
-        vuqd->Init(bufLen_, buf_, idValue->GetResType(), idValue->GetId(), idValue->GetName());
+        vuqd->Init(idValue->GetMMap(), idValue->GetResType(), idValue->GetId(), idValue->GetName());
         idValue->AddLimitPath(vuqd);
     }
+    idValue->Parse();
     return OK;
 }
 }

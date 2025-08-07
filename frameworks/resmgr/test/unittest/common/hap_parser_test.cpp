@@ -527,6 +527,7 @@ HWTEST_F(HapParserTest, ParseResHex002, TestSize.Level1)
 {
     std::shared_ptr<ResConfigImpl> rc = nullptr;
     HapParserV2 hapParser;
+    hapParser.Init("");
     int32_t state = hapParser.ParseResHex();
     EXPECT_EQ(state, SYS_ERROR);
 }

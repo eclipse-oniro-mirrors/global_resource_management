@@ -238,7 +238,8 @@ void ResourceManagerTestCommon::TestGetProfileById(HapResourceV2 *tmp)
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/base/profile/test_profile.json");
 
@@ -268,7 +269,8 @@ void ResourceManagerTestCommon::TestGetProfileByName(HapResourceV2 *tmp)
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/base/profile/test_profile.json");
 
@@ -297,7 +299,8 @@ void ResourceManagerTestCommon::TestGetMediaById(HapResourceV2 *tmp)
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/base/media/icon1.png");
 
@@ -340,7 +343,8 @@ void ResourceManagerTestCommon::TestGetMediaWithDensityById(HapResourceV2 *tmp)
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/sdpi/media/icon.png");
 
@@ -381,7 +385,8 @@ void ResourceManagerTestCommon::TestGetMediaByName(HapResourceV2 *tmp)
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/base/media/icon1.png");
 
@@ -420,7 +425,8 @@ void ResourceManagerTestCommon::TestGetMediaWithDensityByName(HapResourceV2 *tmp
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/sdpi/media/icon.png");
 
@@ -460,7 +466,8 @@ void ResourceManagerTestCommon::TestGetDrawableInfoById(HapResourceV2 *tmp)
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     int id = GetResId("icon1", ResType::MEDIA);
     EXPECT_TRUE(id > 0);
     std::string type;
@@ -506,7 +513,8 @@ void ResourceManagerTestCommon::TestGetDrawableInfoWithDensityById(HapResourceV2
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
         EXPECT_TRUE(false);
@@ -550,7 +558,8 @@ void ResourceManagerTestCommon::TestGetDrawableInfoByName(HapResourceV2 *tmp)
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string type;
     size_t len;
     std::unique_ptr<uint8_t[]> jsonBuf;
@@ -592,7 +601,8 @@ void ResourceManagerTestCommon::TestGetDrawableInfoWithDensityByName(HapResource
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     auto rc = CreateResConfig();
     if (rc == nullptr) {
         EXPECT_TRUE(false);
@@ -796,7 +806,6 @@ void ResourceManagerTestCommon::TestGetIntegerByName(const char* integer1, const
     RState state = rm->GetIntegerByName(integer1, outValue);
     ASSERT_EQ(SUCCESS, state);
     EXPECT_EQ(101, outValue); // 101 means the result of int resource
-
 
     state = rm->GetIntegerByName(integerRef, outValue);
     ASSERT_EQ(SUCCESS, state);

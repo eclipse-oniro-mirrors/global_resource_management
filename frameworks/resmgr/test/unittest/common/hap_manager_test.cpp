@@ -408,9 +408,11 @@ HWTEST_F(HapManagerTest, HapManagerGetMediaDataFromHapTest003, TestSize.Level1)
     ASSERT_TRUE(hapManager != nullptr);
     std::shared_ptr<ResConfigImpl> resConfig = std::make_shared<ResConfigImpl>();
     std::pair<std::string, std::string> resPath;
-    std::shared_ptr<ValueUnderQualifierDir> qualifierDir =
+    std::shared_ptr<ValueUnderQualifierDirV2> qualifierDir =
         std::make_shared<ValueUnderQualifierDirV2>(resPath, 0, resConfig);
     ASSERT_TRUE(qualifierDir != nullptr);
+    std::shared_ptr<MmapFile> mMapFile = std::make_shared<MmapFile>();
+    qualifierDir->Init(mMapFile, ResType::MEDIA, 0, "");
     size_t len;
     std::unique_ptr<uint8_t[]> outValue;
     RState result = hapManager->GetMediaDataFromHap(qualifierDir, len, outValue);
@@ -428,10 +430,12 @@ HWTEST_F(HapManagerTest, HapManagerGetMediaDataFromHapTest004, TestSize.Level1)
     ASSERT_TRUE(hapManager != nullptr);
     std::shared_ptr<ResConfigImpl> resConfig = std::make_shared<ResConfigImpl>();
     std::pair<std::string, std::string> resPath;
-    std::shared_ptr<ValueUnderQualifierDir> qualifierDir =
+    std::shared_ptr<ValueUnderQualifierDirV2> qualifierDir =
         std::make_shared<ValueUnderQualifierDirV2>(resPath, 0, resConfig);
     ASSERT_TRUE(qualifierDir != nullptr);
     qualifierDir->indexPath_ = "/data/test/all.hap";
+    std::shared_ptr<MmapFile> mMapFile = std::make_shared<MmapFile>();
+    qualifierDir->Init(mMapFile, ResType::MEDIA, 0, "");
     size_t len;
     std::unique_ptr<uint8_t[]> outValue;
     RState result = hapManager->GetMediaDataFromHap(qualifierDir, len, outValue);
@@ -508,9 +512,11 @@ HWTEST_F(HapManagerTest, HapManagerGetMediaBase64DataFromHapTest003, TestSize.Le
     ASSERT_TRUE(hapManager != nullptr);
     std::shared_ptr<ResConfigImpl> resConfig = std::make_shared<ResConfigImpl>();
     std::pair<std::string, std::string> resPath;
-    std::shared_ptr<ValueUnderQualifierDir> qualifierDir =
+    std::shared_ptr<ValueUnderQualifierDirV2> qualifierDir =
         std::make_shared<ValueUnderQualifierDirV2>(resPath, 0, resConfig);
     ASSERT_TRUE(qualifierDir != nullptr);
+    std::shared_ptr<MmapFile> mMapFile = std::make_shared<MmapFile>();
+    qualifierDir->Init(mMapFile, ResType::MEDIA, 0, "");
     std::string outValue;
     RState result = hapManager->GetMediaBase64DataFromHap(qualifierDir, outValue);
     EXPECT_EQ(result, NOT_FOUND);
@@ -527,10 +533,12 @@ HWTEST_F(HapManagerTest, HapManagerGetMediaBase64DataFromHapTest004, TestSize.Le
     ASSERT_TRUE(hapManager != nullptr);
     std::shared_ptr<ResConfigImpl> resConfig = std::make_shared<ResConfigImpl>();
     std::pair<std::string, std::string> resPath;
-    std::shared_ptr<ValueUnderQualifierDir> qualifierDir =
+    std::shared_ptr<ValueUnderQualifierDirV2> qualifierDir =
         std::make_shared<ValueUnderQualifierDirV2>(resPath, 0, resConfig);
     ASSERT_TRUE(qualifierDir != nullptr);
     qualifierDir->indexPath_ = "/data/test/all.hap";
+    std::shared_ptr<MmapFile> mMapFile = std::make_shared<MmapFile>();
+    qualifierDir->Init(mMapFile, ResType::MEDIA, 0, "");
     std::string outValue;
     RState result = hapManager->GetMediaBase64DataFromHap(qualifierDir, outValue);
     EXPECT_EQ(result, NOT_FOUND);

@@ -824,7 +824,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest026, TestSize.
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mdpi/media/icon.png");
 
@@ -862,7 +863,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest027, TestSize.
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/ldpi/media/icon.png");
 
@@ -900,7 +902,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest028, TestSize.
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/xldpi/media/icon.png");
 
@@ -938,7 +941,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest029, TestSize.
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/xxldpi/media/icon.png");
 
@@ -976,7 +980,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest030, TestSize.
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/xxxldpi/media/icon.png");
 
@@ -1014,7 +1019,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest031, TestSize.
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-sdpi/media/icon.png");
 
@@ -1052,7 +1058,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest032, TestSize.
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-mdpi/media/icon.png");
 
@@ -1090,7 +1097,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest033, TestSize.
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-ldpi/media/icon.png");
 
@@ -1128,7 +1136,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest034, TestSize.
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-xldpi/media/icon.png");
 
@@ -1166,7 +1175,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest035, TestSize.
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-xxldpi/media/icon.png");
 
@@ -1204,7 +1214,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest036, TestSize.
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-xxxldpi/media/icon.png");
 
@@ -1242,7 +1253,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest037, TestSize.
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-sdpi/media/icon.png");
 
@@ -1283,7 +1295,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest038, TestSize.
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-mdpi/media/icon.png");
 
@@ -1324,7 +1337,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest039, TestSize.
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-ldpi/media/icon.png");
 
@@ -1365,7 +1379,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest040, TestSize.
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-xldpi/media/icon.png");
 
@@ -1406,7 +1421,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest041, TestSize.
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-xxldpi/media/icon.png");
 
@@ -1447,7 +1463,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByIdTest042, TestSize.
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-xxxldpi/media/icon.png");
 
@@ -2212,7 +2229,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest025, TestSiz
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mdpi/media/icon.png");
 
@@ -2248,7 +2266,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest026, TestSiz
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/ldpi/media/icon.png");
 
@@ -2284,7 +2303,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest027, TestSiz
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/xldpi/media/icon.png");
 
@@ -2320,7 +2340,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest028, TestSiz
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/xxldpi/media/icon.png");
 
@@ -2356,7 +2377,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest029, TestSiz
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/xxxldpi/media/icon.png");
 
@@ -2392,7 +2414,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest030, TestSiz
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-sdpi/media/icon.png");
 
@@ -2428,7 +2451,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest031, TestSiz
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-mdpi/media/icon.png");
 
@@ -2464,7 +2488,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest032, TestSiz
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-ldpi/media/icon.png");
 
@@ -2500,7 +2525,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest033, TestSiz
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-xldpi/media/icon.png");
 
@@ -2536,7 +2562,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest034, TestSiz
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-xxldpi/media/icon.png");
 
@@ -2572,7 +2599,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest035, TestSiz
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/zh_CN-xxxldpi/media/icon.png");
 
@@ -2608,7 +2636,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest036, TestSiz
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-sdpi/media/icon.png");
 
@@ -2647,7 +2676,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest037, TestSiz
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-mdpi/media/icon.png");
 
@@ -2686,7 +2716,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest038, TestSiz
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-ldpi/media/icon.png");
 
@@ -2725,7 +2756,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest039, TestSiz
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-xldpi/media/icon.png");
 
@@ -2764,7 +2796,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest040, TestSiz
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-xxldpi/media/icon.png");
 
@@ -2803,7 +2836,8 @@ HWTEST_F(ResourceManagerTestMedia, ResourceManagerGetMediaByNameTest041, TestSiz
     std::unordered_map<uint32_t, std::shared_ptr<ResConfigImpl>> keys;
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> idMap;
     std::unordered_map<uint32_t, std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>> typeNameMap;
-    tmp->Init(keys, idMap, typeNameMap);
+    std::shared_ptr<MmapFile> mMap;
+    tmp->Init(keys, idMap, typeNameMap, mMap);
     std::string res = tmp->GetResourcePath();
     res.append("entry/resources/mcc460_mnc101-zh_CN-phone-dark-xxxldpi/media/icon.png");
 
