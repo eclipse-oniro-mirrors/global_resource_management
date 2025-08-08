@@ -55,7 +55,7 @@ struct ArrayElement {
         ERROR,
         NUMBER,
         STRING,
-         } type;
+    } type;
     std::variant<double, std::string> value;
 
     ArrayElement(ElementType type, double number) : type(type), value(number) {}
