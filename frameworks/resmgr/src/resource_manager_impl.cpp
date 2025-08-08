@@ -116,6 +116,8 @@ bool ResourceManagerImpl::Init(std::shared_ptr<HapManager> hapManager)
         return false;
     }
     hapManager_->SetOverride(isOverrideResMgr_);
+    hapManager_->UpdateAppConfigForSysResManager(
+        resConfig->GetAppDarkRes(), hapManager->IsThemeSystemResEnableHap());
     return true;
 }
 
@@ -1421,19 +1423,21 @@ RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig, bool isUpdateT
     if (state != SUCCESS) {
         return state;
     }
-#if defined(__IDE_PREVIEW__)
-    UpdateSystemResourceResConfig(resConfig);
-#endif
-    return this->hapManager_->UpdateResConfig(resConfig);
+    state = this->hapManager_->UpdateResConfig(resConfig);
+    UpdateSystemResourceResConfig();
+    return state;
 }
 
-#if defined(__IDE_PREVIEW__)
-void ResourceManagerImpl::UpdateSystemResourceResConfig(ResConfig &resConfig)
+void ResourceManagerImpl::UpdateSystemResourceResConfig()
 {
     if (isSystemResMgr_) {
         return;
     }
 
+    ResConfigImpl resConfig;
+    GetResConfig(resConfig);
+    SystemResourceManager::UpdateSysResConfig(resConfig, this->hapManager_->IsThemeSystemResEnableHap());
+#if defined(__IDE_PREVIEW__)
     ResourceManagerImpl* systemResourceManager = SystemResourceManager::GetSystemResourceManager();
     if (systemResourceManager != nullptr) {
         ResConfigImpl sysResConfig;
@@ -1441,8 +1445,8 @@ void ResourceManagerImpl::UpdateSystemResourceResConfig(ResConfig &resConfig)
         sysResConfig.SetDeviceType(resConfig.GetDeviceType());
         systemResourceManager->GetHapManager()->UpdateResConfig(sysResConfig);
     }
-}
 #endif
+}
 
 RState ResourceManagerImpl::UpdateOverrideResConfig(ResConfig &resConfig)
 {
