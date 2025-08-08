@@ -51,6 +51,8 @@ public:
 
     static napi_value GetSystemResMgr(napi_env env);
 
+    static napi_value WrapResourceManager(napi_env env, std::shared_ptr<ResourceManagerAddon> &addon);
+
     ~ResourceManagerAddon();
 
     inline std::shared_ptr<ResourceManager> GetResMgr()
@@ -161,8 +163,6 @@ private:
     static napi_value GetColor(napi_env env, napi_callback_info info);
 
     static napi_value GetColorByName(napi_env env, napi_callback_info info);
-
-    static napi_value WrapResourceManager(napi_env env, std::shared_ptr<ResourceManagerAddon> &addon);
 
     static napi_value AddResource(napi_env env, napi_callback_info info);
 

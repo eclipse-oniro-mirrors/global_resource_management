@@ -101,6 +101,8 @@ public:
     static ani_object GetOverrideResourceManager(ani_env* env, ani_object object, ani_object configuration);
     static ani_object GetOverrideConfiguration(ani_env* env, ani_object object);
     static void UpdateOverrideConfiguration(ani_env* env, ani_object object, ani_object configuration);
+    static ani_ref TransferToDynamicResource(ani_env* env, ani_object input);
+    static ani_object TransferToStaticResource(ani_env* env, ani_object input);
     static ani_status BindContext(ani_env* env);
 
     inline std::shared_ptr<ResourceManager> GetResMgr()

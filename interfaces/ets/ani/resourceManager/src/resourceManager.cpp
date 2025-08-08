@@ -16,6 +16,9 @@
 #include "resourceManager.h"
 #include "drawable_descriptor_ani.h"
 #include "hilog_wrapper.h"
+#include "interop_js/arkts_esvalue.h"
+#include "interop_js/arkts_interop_js_api.h"
+#include "resource_manager_addon.h"
 #include "resource_manager_ani_utils.h"
 #include "resource_manager_data_context.h"
 #include "resource_manager.h"
@@ -25,6 +28,8 @@ using namespace Global;
 using namespace Resource;
 
 constexpr ani_int ABNORMAL_NUMBER_RETURN_VALUE = -1;
+
+const int NUM_NAPI_VALUES_TO_WRAP = 1;
 
 enum ScreenDensityIndex {
     SCREEN_DENSITY_ONE = 0,
@@ -1758,6 +1763,57 @@ void ResMgrAddon::UpdateOverrideConfiguration(ani_env* env, ani_object object, a
     }
 }
 
+ani_ref ResMgrAddon::TransferToDynamicResource(ani_env *env, ani_object input)
+{
+    std::shared_ptr<ResMgrAddon> addon = UnwrapAddon(env, input);
+    if (addon == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "UnwrapAddon failed.");
+        return nullptr;
+    }
+    std::shared_ptr<ResourceManager> resMgr = addon->GetResMgr();
+    if (resMgr == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "resMgr is null.");
+        return nullptr;
+    }
+    std::shared_ptr<ResourceManagerAddon> resourceManagerAddon = std::make_shared<ResourceManagerAddon>(resMgr, true);
+
+    ani_ref resAny;
+    {
+        napi_env jsenv;
+        if (!arkts_napi_scope_open(env, &jsenv)) {
+            RESMGR_HILOGE(RESMGR_ANI_TAG, "arkts_napi_scope_open failed.");
+            return nullptr;
+        }
+        napi_value resNapi = ResourceManagerAddon::WrapResourceManager(jsenv, resourceManagerAddon);
+        if (!arkts_napi_scope_close_n(jsenv, NUM_NAPI_VALUES_TO_WRAP, &resNapi, &resAny)) {
+            RESMGR_HILOGE(RESMGR_ANI_TAG, "arkts_napi_scope_close_n failed.");
+            return nullptr;
+        }
+    }
+    return resAny;
+}
+
+ani_object ResMgrAddon::TransferToStaticResource(ani_env *env, ani_object esValue)
+{
+    void *nativePtr = nullptr;
+    if (!arkts_esvalue_unwrap(env, esValue, &nativePtr) || nativePtr == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "arkts_esvalue_unwrap failed.");
+        return nullptr;
+    }
+    std::shared_ptr<ResourceManagerAddon> addon = *reinterpret_cast<std::shared_ptr<ResourceManagerAddon>*>(nativePtr);
+    if (addon == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "reinterpret_cast failed.");
+        return nullptr;
+    }
+    std::shared_ptr<ResourceManager> resMgr = addon->GetResMgr();
+    if (resMgr == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetResMgr failed.");
+        return nullptr;
+    }
+    std::shared_ptr<ResMgrAddon> resMgrAddon = std::make_shared<ResMgrAddon>(resMgr, true);
+    return WrapResourceManager(env, resMgrAddon);
+}
+
 ani_status ResMgrAddon::BindContext(ani_env* env)
 {
     static const char* className = "@ohos.resourceManager.resourceManager.ResourceManagerInner";
@@ -1781,6 +1837,9 @@ ani_status ResMgrAddon::BindContext(ani_env* env)
 
     std::array nsMethods = {
         ani_native_function { "getSystemResourceManager", nullptr, reinterpret_cast<void*>(GetSystemResourceManager) },
+        ani_native_function{ "transferToDynamicResource", nullptr,
+            reinterpret_cast<void *>(TransferToDynamicResource) },
+        ani_native_function{ "transferToStaticResource", nullptr, reinterpret_cast<void *>(TransferToStaticResource) },
     };
 
     if (ANI_OK != env->Namespace_BindNativeFunctions(ns, nsMethods.data(), nsMethods.size())) {
