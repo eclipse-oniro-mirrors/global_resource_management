@@ -1824,6 +1824,7 @@ ani_status ResMgrAddon::BindContext(ani_env* env)
     }
 
     std::array nsMethods = {
+        ani_native_function { "getSystemResourceManager", nullptr, reinterpret_cast<void*>(GetSysResourceManager) },
         ani_native_function { "getSysResourceManager", nullptr, reinterpret_cast<void*>(GetSysResourceManager) },
         ani_native_function{ "transferToDynamicResource", nullptr,
             reinterpret_cast<void *>(TransferToDynamicResource) },
