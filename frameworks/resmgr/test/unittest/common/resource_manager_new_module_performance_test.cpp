@@ -38,7 +38,6 @@ using namespace OHOS::Global::Resource;
 using namespace testing::ext;
 using namespace std;
 namespace {
-static const char *PERFOR_FEIL_PATH = "all/assets/entry/resources_performance.index";
 static const char *PERFOR_FEIL_V2_PATH = "all/assets/entry/resourcesV2.index";
 class ResourceManagerNewModulePerformanceTest : public testing::Test {
 public:
