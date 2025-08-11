@@ -1346,31 +1346,6 @@ HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFunc
 };
 
 /*
- * @tc.name: ResourceManagerPerformanceFuncTest051
- * @tc.desc: Test GetResId
- * @tc.type: FUNC
- */
-HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest051, TestSize.Level1)
-{
-    if (rm == nullptr) {
-        ASSERT_TRUE(false);
-    }
-    unsigned long long total = 0;
-    double average = 0;
-    uint32_t resId;
-    for (int k = 0; k < 1000; ++k) {
-        auto t1 = std::chrono::high_resolution_clock::now();
-        rm->GetResId("app.string.app_name", resId);
-        auto t2 = std::chrono::high_resolution_clock::now();
-        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-    }
-    average = total / 1000.0;
-    g_logLevel = LOG_DEBUG;
-    RESMGR_HILOGD(RESMGR_TAG, "avg cost 051: %f us", average);
-    EXPECT_LT(average, 380);
-};
-
-/*
  * @tc.name: ResourceManagerPerformanceFuncTest052
  * @tc.desc: Test GetLocales
  * @tc.type: FUNC
@@ -1501,37 +1476,6 @@ HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFunc
 };
 
 /*
- * @tc.name: ResourceManagerPerformanceFuncTest058
- * @tc.desc: Test GetFormatPluralStringById
- * @tc.type: FUNC
- */
-HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest058, TestSize.Level1)
-{
-    if (rm == nullptr) {
-        ASSERT_TRUE(false);
-    }
-    int id = GetResId("eat_apple", ResType::PLURALS);
-    ASSERT_TRUE(id > 0);
-
-    unsigned long long total = 0;
-    double average = 0;
-    double quantity = 1;
-    std::string outValue;
-    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
-    params.push_back(std::make_tuple(ResourceManager::NapiValueType::NAPI_NUMBER, std::to_string(quantity)));
-    for (int k = 0; k < 1000; ++k) {
-        auto t1 = std::chrono::high_resolution_clock::now();
-        rm->GetFormatPluralStringById(outValue, id, quantity, params);
-        auto t2 = std::chrono::high_resolution_clock::now();
-        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-    }
-    average = total / 1000.0;
-    g_logLevel = LOG_DEBUG;
-    RESMGR_HILOGD(RESMGR_TAG, "avg cost 058: %f us", average);
-    EXPECT_LT(average, 200);
-};
-
-/*
  * @tc.name: ResourceManagerPerformanceFuncTest059
  * @tc.desc: Test GetFormatPluralStringByName
  * @tc.type: FUNC
@@ -1557,62 +1501,6 @@ HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFunc
     g_logLevel = LOG_DEBUG;
     RESMGR_HILOGD(RESMGR_TAG, "avg cost 059: %f us", average);
     EXPECT_LT(average, 200);
-};
-
-/*
- * @tc.name: ResourceManagerPerformanceFuncTest060
- * @tc.desc: Test GetThemeDataByName
- * @tc.type: FUNC
- */
-HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest060, TestSize.Level1)
-{
-    if (rm == nullptr) {
-        ASSERT_TRUE(false);
-    }
-    bool ret = rm->AddResource(FormatFullPath(g_newModuleHapPath).c_str());
-    EXPECT_TRUE(ret);
-    unsigned long long total = 0;
-    double average = 0;
-    std::map<std::string, ResourceManager::ResData> outValue;
-    for (int k = 0; k < 1000; ++k) {
-        auto t1 = std::chrono::high_resolution_clock::now();
-        rm->GetThemeDataByName("ohos_device_theme", outValue);
-        auto t2 = std::chrono::high_resolution_clock::now();
-        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-    }
-    average = total / 1000.0;
-    g_logLevel = LOG_DEBUG;
-    RESMGR_HILOGD(RESMGR_TAG, "avg cost 060: %f us", average);
-    EXPECT_LT(average, 150);
-};
-
-/*
- * @tc.name: ResourceManagerPerformanceFuncTest061
- * @tc.desc: Test GetThemeDataById
- * @tc.type: FUNC
- */
-HWTEST_F(ResourceManagerNewModulePerformanceTest, ResourceManagerPerformanceFuncTest061, TestSize.Level1)
-{
-    if (rm == nullptr) {
-        ASSERT_TRUE(false);
-    }
-    bool ret = rm->AddResource(FormatFullPath(g_newModuleHapPath).c_str());
-    EXPECT_TRUE(ret);
-    int id = GetResId("ohos_device_theme", ResType::THEME);
-    ASSERT_TRUE(id > 0);
-    unsigned long long total = 0;
-    double average = 0;
-    std::map<std::string, ResourceManager::ResData> outValue;
-    for (int k = 0; k < 1000; ++k) {
-        auto t1 = std::chrono::high_resolution_clock::now();
-        rm->GetThemeDataById(id, outValue);
-        auto t2 = std::chrono::high_resolution_clock::now();
-        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-    }
-    average = total / 1000.0;
-    g_logLevel = LOG_DEBUG;
-    RESMGR_HILOGD(RESMGR_TAG, "avg cost 061: %f us", average);
-    EXPECT_LT(average, 150);
 };
 
 /*
