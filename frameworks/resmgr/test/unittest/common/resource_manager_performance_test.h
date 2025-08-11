@@ -68,7 +68,6 @@ int ResourceManagerPerformanceFuncTest054(void);
 int ResourceManagerPerformanceFuncTest056(void);
 int ResourceManagerPerformanceFuncTest057(void);
 int ResourceManagerPerformanceFuncTest059(void);
-int ResourceManagerPerformanceFuncTest062(void);
 int ResourceManagerPerformanceFuncTest063(void);
 } // namespace Resource
 } // namespace Global

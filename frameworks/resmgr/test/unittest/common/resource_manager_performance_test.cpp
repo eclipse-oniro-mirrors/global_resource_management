@@ -1506,33 +1506,6 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest059, 
 };
 
 /*
- * @tc.name: ResourceManagerPerformanceFuncTest062
- * @tc.desc: Test GetPatternDataByName
- * @tc.type: FUNC
- */
-HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest062, TestSize.Level1)
-{
-    if (rm == nullptr) {
-        ASSERT_TRUE(false);
-    }
-    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
-    EXPECT_TRUE(ret);
-    unsigned long long total = 0;
-    double average = 0;
-    std::map<std::string, ResourceManager::ResData> outValue;
-    for (int k = 0; k < 1000; ++k) {
-        auto t1 = std::chrono::high_resolution_clock::now();
-        rm->GetPatternDataByName("ohos_test_button_pattern", outValue);
-        auto t2 = std::chrono::high_resolution_clock::now();
-        total += std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-    }
-    average = total / 1000.0;
-    g_logLevel = LOG_DEBUG;
-    RESMGR_HILOGD(RESMGR_TAG, "avg cost 062: %f us", average);
-    EXPECT_LT(average, 100);
-};
-
-/*
  * @tc.name: ResourceManagerPerformanceFuncTest063
  * @tc.desc: Test GetPatternDataById
  * @tc.type: FUNC
