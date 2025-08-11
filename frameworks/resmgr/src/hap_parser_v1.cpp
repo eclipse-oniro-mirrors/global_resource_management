@@ -82,12 +82,10 @@ void HapParserV1::SetResDesc(std::shared_ptr<ResDesc> &resDesc)
 bool HapParserV1::Init(const char *path)
 {
     if (resDesc_ == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "new ResDesc failed when construct hapParser");
         return false;
     }
 
     if (!GetIndexData(path, buffer_, bufLen_)) {
-        RESMGR_HILOGE(RESMGR_TAG, "GetIndexData failed when construct hapParser");
         return false;
     }
 
