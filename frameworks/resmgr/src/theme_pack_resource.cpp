@@ -25,11 +25,8 @@ constexpr int FIRST_ELEMENT = 0;
 constexpr int SECOND_ELEMENT = 1;
 constexpr int THIRED_ELEMENT = 2;
 const std::string DYNAMIC_ICON = "dynamic_icons";
-ThemeResource *ThemeResource::themeRes = nullptr;
 ThemeResource::ThemeResource(std::string path) : themePath_(path)
-{
-    themeRes = this;
-}
+{}
 
 ThemeResource::~ThemeResource()
 {
@@ -117,6 +114,10 @@ void ThemeResource::InitThemeRes(std::pair<std::string, std::string> bundleInfo,
     if (root->type == cJSON_Array) {
         cJSON *childValue = root->child;
         while (childValue != nullptr) {
+            if (childValue->type != cJSON_Object) {
+                childValue = childValue->next;
+                continue;
+            }
             cJSON *name = cJSON_GetObjectItem(childValue, "name");
             if (name == nullptr || !cJSON_IsString(name)) {
                 RESMGR_HILOGW(RESMGR_TAG, "The resource name is not exist in childValue");
@@ -307,9 +308,9 @@ const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeResource(const std:
         }
         std::string tail = path.substr(pos + 1);
         if (tail == "json") {
-            themeRes->ParseJson(std::get<FIRST_ELEMENT>(bundleInfo), std::get<SECOND_ELEMENT>(bundleInfo), path);
+            themeResource->ParseJson(std::get<FIRST_ELEMENT>(bundleInfo), std::get<SECOND_ELEMENT>(bundleInfo), path);
         } else {
-            themeRes->ParseIcon(std::get<FIRST_ELEMENT>(bundleInfo), std::get<SECOND_ELEMENT>(bundleInfo), path);
+            themeResource->ParseIcon(std::get<FIRST_ELEMENT>(bundleInfo), std::get<SECOND_ELEMENT>(bundleInfo), path);
         }
     }
     return themeResource;
@@ -343,7 +344,7 @@ void ThemeResource::AddIconValue(const std::string &bundleName, const std::strin
     const std::string &iconName, const std::string &path, const std::string &abilityName)
 {
     ThemeKey themeKey = ThemeKey(bundleName, moduleName, ResType::MEDIA, iconName, abilityName);
-    themeRes->iconValues_.emplace_back(std::make_pair(themeKey, path));
+    iconValues_.emplace_back(std::make_pair(themeKey, path));
 }
 
 const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeIconResource(const std::string& iconPath)
@@ -368,24 +369,24 @@ const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeIconResource(const 
                 continue;
             }
             std::string dynamicBundle = path.substr(iconPath.length() + 1, pos3 - iconPath.length() - 1);
-            AddIconValue(bundleName, dynamicBundle, iconName, path);
+            themeResource->AddIconValue(bundleName, dynamicBundle, iconName, path);
             continue;
         }
 
         auto pos3 = path.find('/', iconPath.length() + 1);
         if (pos3 == std::string::npos || pos3 < iconPath.length() + 1) {
-            AddIconValue(bundleName, "", iconName, path);
+            themeResource->AddIconValue(bundleName, "", iconName, path);
             continue;
         }
 
         auto pos4 = path.find('/', pos3 + 1);
         if (pos4 == std::string::npos || pos4 < pos3 + 1 || pos4 != pos2) {
-            AddIconValue(bundleName, "", iconName, path);
+            themeResource->AddIconValue(bundleName, "", iconName, path);
             continue;
         }
 
         std::string abilityName = path.substr(pos3 + 1, pos4 - pos3 - 1);
-        AddIconValue(bundleName, "", iconName, path, abilityName);
+        themeResource->AddIconValue(bundleName, "", iconName, path, abilityName);
     }
     return themeResource;
 }

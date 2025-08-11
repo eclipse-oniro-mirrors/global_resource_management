@@ -617,10 +617,12 @@ bool OH_ResourceManager_GetRawFileDescriptor64(const RawFile64 *rawFile, RawFile
 #ifdef __WINNT__
     if (!PathCanonicalizeA(paths, rawFile->raw->filePath.c_str())) {
         RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to PathCanonicalizeA the rawFile path");
+        return false;
     }
 #else
     if (realpath(rawFile->raw->filePath.c_str(), paths) == nullptr) {
         RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to realpath the rawFile path");
+        return false;
     }
 #endif
     int fd = open(paths, O_RDONLY);
