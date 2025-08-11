@@ -34,7 +34,7 @@ public:
 
     static ani_object CreateResMgr(ani_env* env, const std::string& bundleName,
         const std::shared_ptr<ResourceManager>& resMgr, std::shared_ptr<AbilityRuntime::Context> context);
-    static ani_object GetSystemResourceManager(ani_env* env);
+    static ani_object GetSysResourceManager(ani_env* env);
 
     static ani_string GetStringSyncById(ani_env* env, ani_object object, ani_long resId);
     static ani_string GetFormatStringSyncById(ani_env *env, ani_object object, ani_long resId, ani_object args);
