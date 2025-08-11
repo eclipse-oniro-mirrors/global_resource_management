@@ -47,6 +47,16 @@ ohos_shared_library("resourceManager_ani") {
     "runtime_core:ani",
   ]
 
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    integer_overflow = true
+    ubsan = true
+  }
+
   part_name = "resource_management"
   subsystem_name = "global"
 }
@@ -64,6 +74,16 @@ ohos_shared_library("resmgr_ani") {
     "ipc:ipc_single",
     "runtime_core:ani",
   ]
+  
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    integer_overflow = true
+    ubsan = true
+  }
 
   part_name = "resource_management"
   subsystem_name = "global"
