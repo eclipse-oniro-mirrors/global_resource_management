@@ -439,7 +439,7 @@ RState Utils::ConvertColorToUInt32(const char *s, uint32_t &outValue)
 bool Utils::endWithTail(const std::string& path, const std::string& tail)
 {
     if (path.size() < tail.size()) {
-        RESMGR_HILOGE(RESMGR_TAG, "the path is shorter than tail");
+        RESMGR_HILOGD(RESMGR_TAG, "the path is shorter than tail");
         return false;
     }
     return path.compare(path.size() - tail.size(), tail.size(), tail) == 0;

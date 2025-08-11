@@ -47,11 +47,9 @@ bool IsNewModule(const char *path)
     std::unique_ptr<uint8_t[]> buffer = nullptr;
     size_t bufLen = 0;
     if (!HapParser::GetIndexData(path, buffer, bufLen)) {
-        RESMGR_HILOGE(RESMGR_TAG, "GetIndexData failed when construct hapParser");
         return false;
     }
     if (ResHeader::RES_HEADER_LEN > bufLen) {
-        RESMGR_HILOGE(RESMGR_TAG, "Parse ResHeader failed, the offset will be out of bounds");
         return false;
     }
 
@@ -83,12 +81,16 @@ const std::shared_ptr<HapResource> HapResourceManager::Load(const char *path,
     }
 
     std::unique_ptr<HapParser> hapParser = nullptr;
-    if (IsNewModule(path)) {
+    bool isNewModule = IsNewModule(path);
+    if (isNewModule) {
         hapParser = std::make_unique<HapParserV2>();
     } else {
         hapParser = std::make_unique<HapParserV1>(defaultConfig, selectedTypes, isSystem || isOverlay);
     }
     if (hapParser == nullptr || !hapParser->Init(path)) {
+        if (path == nullptr || std::string(path).empty()) {
+            RESMGR_HILOGE(RESMGR_TAG, "empty path, module:%{public}d", isNewModule);
+        }
         return nullptr;
     }
     
