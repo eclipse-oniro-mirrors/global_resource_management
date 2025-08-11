@@ -62,16 +62,12 @@ int ResourceManagerPerformanceFuncTest045(void);
 int ResourceManagerPerformanceFuncTest047(void);
 int ResourceManagerPerformanceFuncTest048(void);
 int ResourceManagerPerformanceFuncTest049(void);
-int ResourceManagerPerformanceFuncTest051(void);
 int ResourceManagerPerformanceFuncTest052(void);
 int ResourceManagerPerformanceFuncTest053(void);
 int ResourceManagerPerformanceFuncTest054(void);
 int ResourceManagerPerformanceFuncTest056(void);
 int ResourceManagerPerformanceFuncTest057(void);
-int ResourceManagerPerformanceFuncTest058(void);
 int ResourceManagerPerformanceFuncTest059(void);
-int ResourceManagerPerformanceFuncTest060(void);
-int ResourceManagerPerformanceFuncTest061(void);
 int ResourceManagerPerformanceFuncTest062(void);
 int ResourceManagerPerformanceFuncTest063(void);
 } // namespace Resource
