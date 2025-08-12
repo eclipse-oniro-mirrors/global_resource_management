@@ -22,6 +22,7 @@
 #include "resource_manager_ani_utils.h"
 #include "resource_manager_data_context.h"
 #include "resource_manager.h"
+#include "system_resource_manager.h"
 
 using namespace OHOS;
 using namespace Global;
@@ -48,8 +49,6 @@ struct ArrayElement {
     ArrayElement(ElementType type, const std::string& str) : type(type), value(str) {}
 };
 
-static std::shared_ptr<ResourceManager> sysResMgr = nullptr;
-static std::mutex sysMgrMutex;
 static std::array methods = {
     ani_native_function { "getStringSync", "J:Lstd/core/String;",
         reinterpret_cast<void*>(ResMgrAddon::GetStringSyncById) },
@@ -293,20 +292,9 @@ static ani_string CreateAniString(ani_env *env, ResMgrDataContext& context)
     return result;
 }
 
-ani_object ResMgrAddon::GetSystemResourceManager(ani_env* env)
+ani_object ResMgrAddon::GetSysResourceManager(ani_env* env)
 {
-    if (sysResMgr == nullptr) {
-        std::lock_guard<std::mutex> lock(sysMgrMutex);
-        if (sysResMgr == nullptr) {
-            std::shared_ptr<Global::Resource::ResourceManager>
-                systemResManager(Global::Resource::GetSystemResourceManager());
-            if (systemResManager == nullptr) {
-                ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_SYSTEM_RES_MANAGER_GET_FAILED);
-                return nullptr;
-            }
-            sysResMgr = systemResManager;
-        }
-    }
+    std::shared_ptr<Global::Resource::ResourceManager> sysResMgr(SystemResourceManager::CreateSysResourceManager());
     std::shared_ptr<ResMgrAddon> addon = std::make_shared<ResMgrAddon>(sysResMgr, true);
     return WrapResourceManager(env, addon);
 }
@@ -1836,7 +1824,7 @@ ani_status ResMgrAddon::BindContext(ani_env* env)
     }
 
     std::array nsMethods = {
-        ani_native_function { "getSystemResourceManager", nullptr, reinterpret_cast<void*>(GetSystemResourceManager) },
+        ani_native_function { "getSysResourceManager", nullptr, reinterpret_cast<void*>(GetSysResourceManager) },
         ani_native_function{ "transferToDynamicResource", nullptr,
             reinterpret_cast<void *>(TransferToDynamicResource) },
         ani_native_function{ "transferToStaticResource", nullptr, reinterpret_cast<void *>(TransferToStaticResource) },

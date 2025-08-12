@@ -46,6 +46,16 @@ std::weak_ptr<ResourceManagerImpl> SystemResourceManager::weakResourceManager_;
 
 std::mutex SystemResourceManager::mutex_;
 
+std::shared_ptr<ResourceManagerImpl> SystemResourceManager::sysResMgr_ = nullptr;
+
+std::mutex SystemResourceManager::sysResMgrMutex_;
+
+std::shared_ptr<ResConfigImpl> SystemResourceManager::resConfig_ = nullptr;
+
+bool SystemResourceManager::isUpdateAppConfig_ = true;
+
+bool SystemResourceManager::isThemeSystemResEnable_ = false;
+
 SystemResourceManager::SystemResourceManager()
 {}
 
@@ -66,6 +76,23 @@ ResourceManagerImpl *SystemResourceManager::GetSystemResourceManagerNoSandBox()
     return CreateSystemResourceManager(false);
 }
 
+bool SystemResourceManager::InitResourceManager(ResourceManagerImpl *impl)
+{
+    if (!impl->Init(true)) {
+        RESMGR_HILOGE(RESMGR_TAG, "init failed");
+        return false;
+    }
+    std::shared_ptr<ResourceManagerImpl> sysResMgr = weakResourceManager_.lock();
+    if (!sysResMgr) {
+        sysResMgr = CreateSystemResourceManager();
+    }
+    if (!impl->AddSystemResource(sysResMgr)) {
+        RESMGR_HILOGE(RESMGR_TAG, "add system resource failed");
+        return false;
+    }
+    return true;
+}
+
 ResourceManagerImpl *SystemResourceManager::CreateSystemResourceManager(bool isSandbox)
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -75,15 +102,7 @@ ResourceManagerImpl *SystemResourceManager::CreateSystemResourceManager(bool isS
             RESMGR_HILOGE(RESMGR_TAG, "new ResourceManagerImpl failed when CreateSystemResourceManager");
             return nullptr;
         }
-        if (!impl->Init(true)) {
-            delete impl;
-            return nullptr;
-        }
-        std::shared_ptr<ResourceManagerImpl> sysResMgr = weakResourceManager_.lock();
-        if (!sysResMgr) {
-            sysResMgr = CreateSystemResourceManager();
-        }
-        if (!impl->AddSystemResource(sysResMgr)) {
+        if (!InitResourceManager(impl)) {
             delete impl;
             return nullptr;
         }
@@ -171,6 +190,87 @@ std::shared_ptr<ResourceManagerImpl> SystemResourceManager::CreateSystemResource
     weakResourceManager_ = sysResMgr;
     return sysResMgr;
 }
+
+std::shared_ptr<ResourceManagerImpl> SystemResourceManager::CreateSysResourceManager()
+{
+    std::lock_guard<std::mutex> lock(sysResMgrMutex_);
+    if (sysResMgr_ != nullptr) {
+        return sysResMgr_;
+    }
+    sysResMgr_ = std::make_shared<ResourceManagerImpl>();
+    if (sysResMgr_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "new ResourceManagerImpl failed when CreateSysResourceManager");
+        return nullptr;
+    }
+
+    if (!InitResourceManager(sysResMgr_.get())) {
+        RESMGR_HILOGE(RESMGR_TAG, "init sys resource manager failed");
+        return nullptr;
+    }
+
+#if defined(__ARKUI_CROSS__) || defined(__IDE_PREVIEW__)
+    AddSystemResourceForPreview(resourceManager_);
+#endif
+    if (resConfig_ != nullptr) {
+        UpdateResConfig(*resConfig_, isThemeSystemResEnable_);
+    }
+    return sysResMgr_;
+}
+
+void SystemResourceManager::SaveResConfig(ResConfigImpl &resConfig, bool isThemeSystemResEnable)
+{
+    if (resConfig_ == nullptr) {
+        resConfig_ = std::make_shared<ResConfigImpl>();
+    }
+
+    if (resConfig_ == nullptr) {
+        return;
+    }
+
+    resConfig_->Copy(resConfig, true);
+    if (isUpdateAppConfig_) {
+        isUpdateAppConfig_ = false;
+        isThemeSystemResEnable_ = isThemeSystemResEnable;
+    }
+}
+
+void SystemResourceManager::UpdateResConfig(ResConfigImpl &resConfig, bool isThemeSystemResEnable)
+{
+    if (sysResMgr_ == nullptr) {
+        return;
+    }
+    auto hapManager = sysResMgr_->GetHapManager();
+    if (hapManager == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "sys resource manager hapManager is null");
+        return;
+    }
+    hapManager->UpdateResConfig(resConfig);
+    hapManager->UpdateAppConfigForSysResManager(resConfig.GetAppDarkRes(), isThemeSystemResEnable);
+}
+
+void SystemResourceManager::UpdateSysResConfig(ResConfigImpl &resConfig, bool isThemeSystemResEnable)
+{
+    std::lock_guard<std::mutex> lock(sysResMgrMutex_);
+    if (resConfig.IsInvalidResConfig()) {
+        return;
+    }
+
+    if (sysResMgr_ == nullptr) {
+        SaveResConfig(resConfig, isThemeSystemResEnable);
+        return;
+    }
+    UpdateResConfig(resConfig, isThemeSystemResEnable);
+}
+
+#if defined(__ARKUI_CROSS__) || defined(__IDE_PREVIEW__)
+void SystemResourceManager::AddSystemResourceForPreview(ResourceManagerImpl* resMgr)
+{
+    if (resMgr == nullptr || sysResMgr_ == nullptr) {
+        return;
+    }
+    sysResMgr_->AddSystemResource(resMgr);
+}
+#endif
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

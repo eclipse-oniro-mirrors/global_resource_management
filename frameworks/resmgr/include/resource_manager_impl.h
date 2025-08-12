@@ -23,7 +23,6 @@
 #include "resource_manager.h"
 #include "res_config_impl.h"
 #include "utils/psue_manager.h"
-#include "theme_pack_manager.h"
 
 namespace OHOS {
 namespace Global {
@@ -845,6 +844,13 @@ public:
     virtual RState GetFormatPluralStringByName(std::string &outValue, const char *name, Quantity quantity,
         std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams);
 
+    /**
+     * Get the hap manager
+     *
+     * @return the hap manager
+     */
+    std::shared_ptr<HapManager> GetHapManager();
+
 private:
     RState GetString(const std::shared_ptr<IdItem> idItem, std::string &outValue);
 
@@ -917,13 +923,9 @@ private:
 
     RState ProcessItem(std::shared_ptr<IdItem> idItem, std::map<std::string, ResData> &outValue);
 
-#if defined(__IDE_PREVIEW__)
-    void UpdateSystemResourceResConfig(ResConfig &resConfig);
-#endif
+    void UpdateSystemResourceResConfig();
 
     std::string ReadParameter(const char *paramKey, const int paramLength);
-
-    std::shared_ptr<HapManager> GetHapManager();
 
     std::shared_ptr<HapManager> hapManager_;
     
