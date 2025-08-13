@@ -231,6 +231,13 @@ public:
     std::string GetDeviceTypeStr() const;
 
     std::string GetScreenDensityStr() const;
+
+    /**
+     * Get whether the resconfig is invalid
+     *
+     * @return True if the resconfig is invalid
+     */
+    bool IsInvalidResConfig();
 private:
     bool IsMoreSpecificThan(const std::shared_ptr<ResConfigImpl> other, uint32_t density = 0) const;
 

@@ -51,6 +51,8 @@ public:
 
     static napi_value GetSystemResMgr(napi_env env);
 
+    static napi_value GetSysResourceManager(napi_env env);
+
     static napi_value WrapResourceManager(napi_env env, std::shared_ptr<ResourceManagerAddon> &addon);
 
     ~ResourceManagerAddon();
