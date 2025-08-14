@@ -626,7 +626,7 @@ export default namespace resourceManager {
 
         closeRawFd(path: string, callback: AsyncCallback<void, void>): void {
             let p1 = taskpool.execute((): void => {
-                return this.closeRawFdSync(path);
+                this.closeRawFdSync(path);
             })
             p1.then(() => {
                 callback(null, undefined);
@@ -638,7 +638,7 @@ export default namespace resourceManager {
         closeRawFd(path: string): Promise<void> {
             return new Promise<void>((resolve, reject) => {
                 taskpool.execute((): void => {
-                    return this.closeRawFdSync(path);
+                    this.closeRawFdSync(path);
                 }).then(() => {
                     resolve(undefined);
                 }, (err: Error): void => {
