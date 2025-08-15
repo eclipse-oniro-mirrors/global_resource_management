@@ -18,6 +18,7 @@
 #include "hilog_wrapper.h"
 #include "interop_js/arkts_esvalue.h"
 #include "interop_js/arkts_interop_js_api.h"
+#include "ani_signature_builder.h"
 #include "resource_manager_addon.h"
 #include "resource_manager_ani_utils.h"
 #include "resource_manager_data_context.h"
@@ -50,13 +51,13 @@ struct ArrayElement {
 };
 
 static std::array methods = {
-    ani_native_function { "getStringSync", "J:Lstd/core/String;",
+    ani_native_function { "getStringSync", "l:C{std.core.String}",
         reinterpret_cast<void*>(ResMgrAddon::GetStringSyncById) },
-    ani_native_function { "getStringSync", "JLescompat/Array;:Lstd/core/String;",
+    ani_native_function { "getStringSync", "lC{escompat.Array}:C{std.core.String}",
         reinterpret_cast<void *>(ResMgrAddon::GetFormatStringSyncById) },
-    ani_native_function { "getStringByNameSync", "Lstd/core/String;:Lstd/core/String;",
+    ani_native_function { "getStringByNameSync", "C{std.core.String}:C{std.core.String}",
         reinterpret_cast<void*>(ResMgrAddon::GetStringByNameSync) },
-    ani_native_function { "getStringByNameSync", "Lstd/core/String;Lescompat/Array;:Lstd/core/String;",
+    ani_native_function { "getStringByNameSync", "C{std.core.String}C{escompat.Array}:C{std.core.String}",
         reinterpret_cast<void*>(ResMgrAddon::GetFormatStringByNameSync) },
 
     ani_native_function { "getBoolean", nullptr, reinterpret_cast<void*>(ResMgrAddon::GetBooleanById) },
@@ -200,7 +201,7 @@ static ani_string StringToAniStr(ani_env *env, const std::string &str)
 
 static ani_object CreateAniArray(ani_env *env, const std::vector<std::string> strs)
 {
-    static const char *className = "Lescompat/Array;";
+    static const char *className = "escompat.Array";
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", className);
