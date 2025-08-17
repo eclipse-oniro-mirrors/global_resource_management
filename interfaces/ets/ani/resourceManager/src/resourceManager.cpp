@@ -372,7 +372,7 @@ ani_string ResMgrAddon::GetStringSyncById(ani_env* env, ani_object object, ani_l
 static ArrayElement GetArrayElement(ani_env* env, ani_object args, const int index)
 {
     ani_ref value;
-    if (ANI_OK != env->Array_Get_Ref(static_cast<ani_array_ref>(args), index, &value)) {
+    if (ANI_OK != env->Array_Get(static_cast<ani_array>(args), index, &value)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Call get failed");
         return ArrayElement{ArrayElement::ElementType::NUMBER, 0};
     }
