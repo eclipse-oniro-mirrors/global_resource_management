@@ -29,36 +29,71 @@ ohos_shared_library("resourceManager_ani") {
   ]
   sources = [
     "./src/resourceManager.cpp",
-    "./src/resource_manager_ani_utils.cpp",
   ]
   defines = [ "CONFIG_HILOG" ]
   deps = [
-    "../../../js/innerkits/core:resmgr_napi_core",
     "../../../../frameworks/resmgr:global_resmgr"
   ]
   external_deps = [
     "ability_runtime:app_context",
-    "ace_engine:drawable_inner_ani",
     "hilog:libhilog",
-    "napi:ace_napi",
     "runtime_core:ani",
     "runtime_core:ani_helpers",
   ]
+
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    integer_overflow = true
+    ubsan = true
+  }
 
   part_name = "resource_management"
   subsystem_name = "global"
 }
 
 ohos_shared_library("resmgr_ani") {
-  include_dirs = [ "./include" ]
-  sources = [ "./src/resmgr_ani.cpp" ]
-  defines = [ "CONFIG_HILOG" ]
-  deps = [ ":resourceManager_ani" ]
-  external_deps = [
-    "ability_runtime:app_context",
-    "hilog:libhilog",
-    "runtime_core:ani",
+  include_dirs = [ 
+    "./include",
+    "../../../../frameworks/resmgr/include",
   ]
+
+  sources = [ 
+    "./src/resmgr_ani.cpp",
+    "./src/ani_utils.cpp",
+  ]
+
+  defines = [ "CONFIG_HILOG" ]
+
+  shlib_type = "ani"
+
+  deps = [ 
+    ":resourceManager_ani",
+    "../../../js/innerkits/core:resmgr_napi_core",
+    "../../../../frameworks/resmgr:global_resmgr",
+  ]
+  
+  external_deps = [
+    "hilog:libhilog",
+    "ability_runtime:app_context",
+    "ace_engine:drawable_inner_ani",
+    "napi:ace_napi",
+    "runtime_core:ani",
+    "runtime_core:ani_helpers",
+  ]
+  
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    integer_overflow = true
+    ubsan = true
+  }
 
   part_name = "resource_management"
   subsystem_name = "global"

@@ -19,6 +19,23 @@ import { Resource as _Resource } from 'global.resource';
 import { RawFileDescriptorInner } from 'global.rawFileDescriptorInner';
 import { DrawableDescriptor } from '@ohos.arkui.drawableDescriptor';
 
+class ResMgrCleaner {
+    private nativeResMgr: long = 0;
+    
+    constructor(ptr:long) {
+        this.nativeResMgr = ptr;
+    }
+
+    native destoryResMgr(): void;
+}
+
+function cleanCallback(cleanner:ResMgrCleaner): void {
+    cleanner.destoryResMgr();
+}
+
+let destoryRegister = new FinalizationRegistry<ResMgrCleaner>(cleanCallback);
+let unregisterToken = new object();
+
 export default namespace resourceManager {
     loadLibrary("resmgr_ani.z");
 
@@ -191,11 +208,14 @@ export default namespace resourceManager {
         static { loadLibrary("resmgr_ani.z"); }
 
         private nativeResMgr: long = 0;
+        private cleaner: ResMgrCleaner | null = null;
 
         constructor(context: long) {
             if (this.nativeResMgr == 0) {
                 this.nativeResMgr = context;
             }
+            this.cleaner = new ResMgrCleaner(this.nativeResMgr);
+            destoryRegister.register(this, this.cleaner!, unregisterToken);
         }
 
         native getStringSync(resId: long): string;
@@ -717,7 +737,6 @@ export default namespace resourceManager {
         }
     }
 
-    export native function getSystemResourceManager(): ResourceManager;
     export native function getSysResourceManager(): ResourceManager;
     export native function transferToDynamicResource(object: Object): Any;
     export native function transferToStaticResource(object: Any): Object;

@@ -119,6 +119,10 @@ public:
     static bool convertToDouble(const std::string& str, double& outValue);
 
     static bool IsSystemPath(const std::string& path);
+
+    static std::string GetSystemParameter(const std::string& paramKey);
+
+    static bool SupportSingleLayerThemeIcon();
 private:
     static bool IsValidValue(const char* end, const std::string& str);
 
