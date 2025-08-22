@@ -1314,9 +1314,10 @@ static int GetScreenDensityIndex(ScreenDensity value)
 
 static void SetEnumMember(ani_env *env, ani_object obj, const char* memberName, const char* enumName, const int index)
 {
+    int realIndex = index;
     if (index < 0) {
-        RESMGR_HILOGE(RESMGR_TAG, "SetEnumMember: invalid index %{public}d", index);
-        return;
+        RESMGR_HILOGE(RESMGR_TAG, "SetEnumMember: invalid index %{public}d, set index to zero.", index);
+        realIndex = 0;
     }
 
     ani_enum aniEnum;
@@ -1326,7 +1327,7 @@ static void SetEnumMember(ani_env *env, ani_object obj, const char* memberName, 
     }
 
     ani_enum_item enumItem;
-    if (ANI_OK != env->Enum_GetEnumItemByIndex(aniEnum, index, &enumItem)) {
+    if (ANI_OK != env->Enum_GetEnumItemByIndex(aniEnum, realIndex, &enumItem)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Get enumItem '%{public}s' failed", enumName);
         return;
     }
