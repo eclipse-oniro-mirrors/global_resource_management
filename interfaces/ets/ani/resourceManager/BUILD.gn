@@ -23,10 +23,7 @@ config("resourceManager_config") {
 
 ohos_shared_library("resourceManager_ani") {
   public_configs = [ ":resourceManager_config" ]
-  include_dirs = [
-    "./include",
-    "../../../../frameworks/resmgr/include",
-  ]
+
   sources = [
     "./src/resourceManager.cpp",
   ]
@@ -55,10 +52,7 @@ ohos_shared_library("resourceManager_ani") {
 }
 
 ohos_shared_library("resmgr_ani") {
-  include_dirs = [ 
-    "./include",
-    "../../../../frameworks/resmgr/include",
-  ]
+  public_configs = [ ":resourceManager_config" ]
 
   sources = [ 
     "./src/resmgr_ani.cpp",

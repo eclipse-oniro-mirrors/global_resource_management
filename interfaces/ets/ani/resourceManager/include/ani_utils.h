@@ -27,13 +27,13 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
-using FormatArgs = std::vector<std::tuple<ResourceManager::NapiValueType, std::string>>;
 class AniUtils {
 public:
     static void AniThrow(ani_env *env, int32_t errCode);
 
     static std::shared_ptr<ResourceManager> GetResourceManager(ani_env* env, ani_object jsResMgr);
-    static bool InitAniParameters(ani_env *env, ani_object args, FormatArgs &params);
+    static bool InitAniParameters(ani_env *env, ani_object args,
+        std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &params);
     static std::string AniStrToString(ani_env *env, ani_string aniStr);
     static RState ConfigurationToResConfig(ani_env *env,
         ani_object configuration, std::shared_ptr<ResConfig> &resConfig);

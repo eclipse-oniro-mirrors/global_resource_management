@@ -127,6 +127,7 @@ static std::array methods = {
     ani_native_function { "updateOverrideConfiguration", nullptr,
         reinterpret_cast<void*>(ResMgrAni::UpdateOverrideConfiguration) },
 };
+
 ani_string ResMgrAni::GetStringSyncById(ani_env* env, ani_object object, ani_long resId)
 {
     std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, object);
@@ -399,6 +400,7 @@ ani_string ResMgrAni::GetDoublePluralStringValueSyncById(ani_env* env, ani_objec
         AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
         return nullptr;
     }
+
     std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
     if (!AniUtils::InitAniParameters(env, args, params)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "InitOptionalParameters formatting error");
@@ -760,9 +762,8 @@ ani_object CreateDrawableDescriptorbyId(ani_env* env, std::shared_ptr<ResourceMa
     state = resMgr->GetDrawableInfoById(resId, drawableInfo.type,
         drawableInfo.firstBuffer.len, drawableInfo.firstBuffer.data, density);
     if (SUCCESS != state) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "drawableDescriptor failed, state: %{public}d, id: %{public}u",
-            state, resId);
-            AniUtils::AniThrow(env, state);
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "drawableDescriptor failed, state: %{public}d, id: %{public}u", state, resId);
+        AniUtils::AniThrow(env, state);
         return nullptr;
     };
     return Ace::Ani::DrawableDescriptorAni::CreateDrawableDescriptor(env, drawableInfo);
@@ -946,7 +947,7 @@ ani_object ResMgrAni::GetOverrideResourceManager(ani_env* env, ani_object object
 
     std::shared_ptr<ResourceManager> overrideResMgr = resMgr->GetOverrideResourceManager(overrideResConfig);
     if (overrideResMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get GetOverrideResourceManager in GetOverrideResourceManager");
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get overrideResMgr in GetOverrideResourceManager");
         AniUtils::AniThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
@@ -959,7 +960,7 @@ ani_object ResMgrAni::GetOverrideConfiguration(ani_env* env, ani_object object)
 {
     std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, object);
     if (resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetOverrideConfiguration failed to get resMgr");
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in GetOverrideConfiguration");
         return nullptr;
     }
 
@@ -990,7 +991,7 @@ void ResMgrAni::UpdateOverrideConfiguration(ani_env* env, ani_object object, ani
 
     state = resMgr->UpdateOverrideResConfig(*overrideResConfig);
     if (state != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "UpdateOverrideConfiguration failed, status: %{public}d.", state);
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to update override configuration failed, status: %{public}d.", state);
         AniUtils::AniThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return;
     }
@@ -1017,7 +1018,7 @@ ani_object ResMgrAni::GetLocales(ani_env* env, ani_object object, ani_object inc
 {
     std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, object);
     if (resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in GetConfigurationSync");
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in GetConfigurationSync");
         return nullptr;
     }
     
@@ -1052,8 +1053,7 @@ ani_boolean ResMgrAni::IsRawDir(ani_env* env, ani_object object, ani_string aniP
     bool result = false;
     RState state = resMgr->IsRawDirFromHap(path, result);
     if (state != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG,
-            "Failed to determine the raw file is directory.");
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to determine the raw file is directory.");
         AniUtils::AniThrow(env, state);
         return false;
     }
@@ -1071,7 +1071,7 @@ void ResMgrAni::DestoryResMgr(ani_env* env, ani_object jsResMgr)
     ani_long nativeResMgrPtr;
     ani_status status = env->Object_GetFieldByName_Long(jsResMgr, "nativeResMgr", &nativeResMgrPtr);
     if (ANI_OK != status) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get nativeResMgr,in DestoryResMgr, status: %{public}d.", status);
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get nativeResMgr in DestoryResMgr, status: %{public}d.", status);
         return;
     }
     std::shared_ptr<ResourceManager>* resMgr = reinterpret_cast<std::shared_ptr<ResourceManager>*>(nativeResMgrPtr);
@@ -1079,7 +1079,7 @@ void ResMgrAni::DestoryResMgr(ani_env* env, ani_object jsResMgr)
         delete resMgr;
         status = env->Object_SetPropertyByName_Long(jsResMgr, "nativeResMgr", 0);
         if (ANI_OK != status) {
-            RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to reset nativeResMgr,in DestoryResMgr, status: %{public}d.", status);
+            RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to reset nativeResMgr in DestoryResMgr, status: %{public}d.", status);
             return;
         }
     }
@@ -1089,7 +1089,7 @@ ani_ref ResMgrAni::TransferToDynamicResource(ani_env *env, ani_object etsResMgr)
 {
     std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, etsResMgr);
     if (resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "resMgr is null.");
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in TransferToDynamicResource.");
         return nullptr;
     }
     std::shared_ptr<ResourceManagerImpl> impl = std::static_pointer_cast<ResourceManagerImpl>(resMgr);
@@ -1100,12 +1100,12 @@ ani_ref ResMgrAni::TransferToDynamicResource(ani_env *env, ani_object etsResMgr)
     {
         napi_env jsenv;
         if (!arkts_napi_scope_open(env, &jsenv)) {
-            RESMGR_HILOGE(RESMGR_ANI_TAG, "arkts_napi_scope_open failed.");
+            RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to open napi js env.");
             return nullptr;
         }
         napi_value resNapi = ResourceManagerAddon::WrapResourceManager(jsenv, resourceManagerAddon);
         if (!arkts_napi_scope_close_n(jsenv, NUM_NAPI_VALUES_TO_WRAP, &resNapi, &resAny)) {
-            RESMGR_HILOGE(RESMGR_ANI_TAG, "arkts_napi_scope_close_n failed.");
+            RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to close napi js env.");
             return nullptr;
         }
     }
@@ -1126,7 +1126,7 @@ ani_object ResMgrAni::TransferToStaticResource(ani_env *env, ani_object esValue)
     }
     std::shared_ptr<ResourceManager> resMgr = addon->GetResMgr();
     if (resMgr == nullptr) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetResMgr failed.");
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in TransferToStaticResource.");
         return nullptr;
     }
     return ResMgrAddon::WrapResourceManager(env, resMgr);
@@ -1135,14 +1135,17 @@ ani_object ResMgrAni::TransferToStaticResource(ani_env *env, ani_object esValue)
 ani_status ResMgrAni::BindResMgr(ani_env* env)
 {
     ani_class cls;
-    if (ANI_OK != env->FindClass(AniSignature::RESOURCE_MANAGER_INNER, &cls)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", AniSignature::RESOURCE_MANAGER_INNER);
-        return (ani_status)ANI_ERROR;
+    ani_status status = env->FindClass(AniSignature::RESOURCE_MANAGER_INNER, &cls);
+    if (ANI_OK != status) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed, status: %{public}d",
+            AniSignature::RESOURCE_MANAGER_INNER, status);
+        return status;
     }
-
-    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Can't bind native methods to %{public}s.", AniSignature::RESOURCE_MANAGER_INNER);
-        return (ani_status)ANI_ERROR;
+    status = env->Class_BindNativeMethods(cls, methods.data(), methods.size());
+    if (ANI_OK != status) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Can't bind native methods to %{public}s, status: %{public}d.",
+            AniSignature::RESOURCE_MANAGER_INNER, status);
+        return status;
     };
     return ANI_OK;
 }
@@ -1151,16 +1154,19 @@ ani_status ResMgrAni::BindResMgrCleaner(ani_env* env)
 {
     static const char* className = "@ohos.resourceManager.ResMgrCleaner";
     ani_class cls;
-    if (ANI_OK != env->FindClass(className, &cls)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", className);
-        return (ani_status)ANI_ERROR;
+    ani_status status = env->FindClass(className, &cls);
+    if (ANI_OK != status) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed, status: %{public}d.", className, status);
+        return status;
     }
     std::array methods = {
         ani_native_function { "destoryResMgr", nullptr, reinterpret_cast<void*>(DestoryResMgr) },
     };
-    if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Cannot bind native methods to '%{public}s'", className);
-        return (ani_status)ANI_ERROR;
+    status = env->Class_BindNativeMethods(cls, methods.data(), methods.size());
+    if (ANI_OK != status) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Can't bind native methods to '%{public}s', status: %{public}d",
+            className, status);
+        return status;
     };
     return ANI_OK;
 }
@@ -1169,9 +1175,10 @@ ani_status ResMgrAni::BindStaticFunc(ani_env* env)
 {
     static const char* nameSpaceName = "@ohos.resourceManager.resourceManager";
     ani_namespace ns;
-    if (ANI_OK != env->FindNamespace(nameSpaceName, &ns)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find namespace '%{public}s' failed", nameSpaceName);
-        return (ani_status)ANI_ERROR;
+    ani_status status = env->FindNamespace(nameSpaceName, &ns);
+    if (ANI_OK != status) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find namespace '%{public}s' failed, status: %{public}d.", nameSpaceName, status);
+        return status;
     }
 
     std::array nsMethods = {
@@ -1180,18 +1187,18 @@ ani_status ResMgrAni::BindStaticFunc(ani_env* env)
             reinterpret_cast<void *>(TransferToDynamicResource) },
         ani_native_function{ "transferToStaticResource", nullptr, reinterpret_cast<void *>(TransferToStaticResource) },
     };
-
-    if (ANI_OK != env->Namespace_BindNativeFunctions(ns, nsMethods.data(), nsMethods.size())) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Cannot bind native methods to '%{public}s'", nameSpaceName);
-        return (ani_status)ANI_ERROR;
+    status = env->Namespace_BindNativeFunctions(ns, nsMethods.data(), nsMethods.size());
+    if (ANI_OK != status) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Cannot bind native methods to '%{public}s', status: %{public}d.",
+            nameSpaceName, status);
+        return status;
     };
     return ANI_OK;
 }
 
 ani_status ResMgrAni::BindContext(ani_env* env)
 {
-    ani_status status = ANI_OK;
-    status = BindStaticFunc(env);
+    ani_status status = BindStaticFunc(env);
     if (ANI_OK != status) {
         return status;
     }

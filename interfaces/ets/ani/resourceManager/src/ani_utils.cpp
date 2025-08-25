@@ -553,7 +553,7 @@ bool AniUtils::InitAniParameters(ani_env *env, ani_object args,
         status = env->Array_Get(static_cast<ani_array>(args), i, &value);
         if (ANI_OK != status) {
             RESMGR_HILOGE(RESMGR_ANI_TAG, "Call get args array value failed, index: %{public}d, status: %{public}d",
-            i, status);
+                i, status);
             return false;
         }
 
