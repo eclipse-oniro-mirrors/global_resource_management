@@ -47,7 +47,7 @@ constexpr ani_int ABNORMAL_NUMBER_RETURN_VALUE = -1;
 constexpr int NUM_NAPI_VALUES_TO_WRAP = 1;
 
 constexpr int LAYER_ICON = 1;
-constexpr int DYNAMIC_ICON = 2;    
+constexpr int DYNAMIC_ICON = 2;
 
 static std::array methods = {
     ani_native_function { "getStringSync", "l:C{std.core.String}",

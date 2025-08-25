@@ -38,7 +38,6 @@ ohos_shared_library("resourceManager_ani") {
     "ability_runtime:app_context",
     "hilog:libhilog",
     "runtime_core:ani",
-    "runtime_core:ani_helpers",
   ]
 
   branch_protector_ret = "pac_ret"

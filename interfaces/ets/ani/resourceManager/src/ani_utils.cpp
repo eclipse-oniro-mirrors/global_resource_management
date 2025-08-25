@@ -20,8 +20,9 @@
 #include <memory>
 #include <unordered_map>
 
-#include "ani_signature.h"
 #include "hilog_wrapper.h"
+#include "ani_signature_builder.h"
+#include "ani_signature.h"
 #include "rstate.h"
 
 namespace OHOS {
@@ -71,7 +72,8 @@ void AniUtils::ThrowAniError(ani_env *env, ani_int code, const std::string &mess
         return;
     }
     ani_method ctor;
-    status = env->Class_FindMethod(cls, "<ctor>", ":V", &ctor);
+    arkts::ani_signature::SignatureBuilder sb;
+    status = env->Class_FindMethod(cls, "<ctor>", sb.BuildSignatureDescriptor().c_str(), &ctor);
     if (ANI_OK != status) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find method BusinessError constructor failed, status: %{public}d.", status);
         return;
@@ -240,7 +242,7 @@ ani_object AniUtils::CreateConfig(ani_env* env, std::unique_ptr<ResConfig> &cfg)
     ani_method ctor;
     status = env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor);
     if (ANI_OK != status) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find method Configuration.<ctor> failed, status: %{public}d.", status);
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find method <ctor> in Configuration failed, status: %{public}d.", status);
         return nullptr;
     }
 
@@ -251,27 +253,35 @@ ani_object AniUtils::CreateConfig(ani_env* env, std::unique_ptr<ResConfig> &cfg)
         return nullptr;
     }
 
-    SetEnumMember(env, obj, "direction", AniSignature::DIRECTION, static_cast<int>(cfg->GetDirection()));
-    SetEnumMember(env, obj, "deviceType", AniSignature::DEVICE_TYPE, static_cast<int>(cfg->GetDeviceType()));
-    SetEnumMember(env, obj, "colorMode", AniSignature::COLOR_MODE, static_cast<int>(cfg->GetColorMode()));
-    SetEnumMember(env, obj, "screenDensity", AniSignature::SCREEN_DENSITY,
-        GetScreenDensityIndex(cfg->GetScreenDensityDpi()));
+    if (!SetEnumMember(env, obj, "direction", AniSignature::DIRECTION, static_cast<int>(cfg->GetDirection()))) {
+        return nullptr;
+    }
+    if (!SetEnumMember(env, obj, "deviceType", AniSignature::DEVICE_TYPE, static_cast<int>(cfg->GetDeviceType()))) {
+        return nullptr;
+    }
+    if (!SetEnumMember(env, obj, "colorMode", AniSignature::COLOR_MODE, static_cast<int>(cfg->GetColorMode()))) {
+        return nullptr;
+    }
+    if (!SetEnumMember(env, obj, "screenDensity", AniSignature::SCREEN_DENSITY,
+        GetScreenDensityIndex(cfg->GetScreenDensityDpi()))) {
+        return nullptr;
+    }
     
     status = env->Object_SetPropertyByName_Int(obj, "mcc", static_cast<int>(cfg->GetMcc()));
     if (ANI_OK != status) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Set Configuration.mcc failed, status: %{public}d.", status);
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Set Configuration property 'mcc' failed, status: %{public}d.", status);
         return nullptr;
     }
     status = env->Object_SetPropertyByName_Int(obj, "mnc", static_cast<int>(cfg->GetMnc()));
     if (ANI_OK != status) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Set Configuration.mnc failed, status: %{public}d.", status);
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Set Configuration property 'mnc' failed, status: %{public}d.", status);
         return nullptr;
     }
 
     std::string value = GetLocale(cfg);
     status = env->Object_SetPropertyByName_Ref(obj, "locale", CreateAniString(env, value));
     if (ANI_OK != status) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Set Configuration.locale failed, status: %{public}d.", status);
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Set Configuration property 'locale' failed, status: %{public}d.", status);
         return nullptr;
     }
     return obj;
@@ -317,12 +327,13 @@ bool AniUtils::GetEnumMember(ani_env *env, ani_object options, const std::string
     ani_ref ref;
     ani_status status = env->Object_GetPropertyByName_Ref(options, name.c_str(), &ref);
     if (ANI_OK != status) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Get Configuration.%{public}s failed, status: %{public}d.", name.c_str(), status);
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Get Configuration property '%{public}s' failed, status: %{public}d.",
+            name.c_str(), status);
         return false;
     }
     status = env->EnumItem_GetValue_Int(static_cast<ani_enum_item>(ref), &member);
     if (ANI_OK != status) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Get Configuration.%{public}s value failed, status: %{public}d.",
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Get Configuration property '%{public}s' value failed, status: %{public}d.",
             name.c_str(), status);
         return false;
     }
@@ -335,7 +346,7 @@ bool AniUtils::GetLocaleOfConfig(ani_env* env, std::shared_ptr<ResConfig> config
     ani_ref ret;
     ani_status status = env->Object_GetPropertyByName_Ref(configuration, "locale", &ret);
     if (ANI_OK != status) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Get Configuration.locale failed, status: %{public}d.", status);
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Get Configuration property 'locale' failed, status: %{public}d.", status);
         return false;
     }
     if (configPtr->SetLocaleInfo(AniStrToString(env, static_cast<ani_string>(ret)).c_str()) != SUCCESS) {
@@ -371,7 +382,8 @@ bool AniUtils::SetEnumMember(ani_env *env, ani_object obj, const char* memberNam
     }
     status = env->Object_SetPropertyByName_Ref(obj, memberName, enumItem);
     if (ANI_OK != status) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Set Configuration.%{public}s failed, status: %{public}d.", memberName, status);
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Set Configuration property '%{public}s' failed, status: %{public}d.",
+            memberName, status);
         return false;
     }
     return true;
@@ -538,7 +550,7 @@ bool AniUtils::InitAniParameters(ani_env *env, ani_object args,
 
     for (size_t i = 0; i < len; ++i) {
         ani_ref value;
-        status = env->Array_Get_Ref(static_cast<ani_array_ref>(args), i, &value);
+        status = env->Array_Get(static_cast<ani_array>(args), i, &value);
         if (ANI_OK != status) {
             RESMGR_HILOGE(RESMGR_ANI_TAG, "Call get args array value failed, index: %{public}d, status: %{public}d",
             i, status);
@@ -549,7 +561,7 @@ bool AniUtils::InitAniParameters(ani_env *env, ani_object args,
         status = env->Object_InstanceOf(static_cast<ani_object>(value), stringClass, &isString);
         if (ANI_OK != status) {
             RESMGR_HILOGE(RESMGR_ANI_TAG, "Check args value isString failed, index: %{public}d, status: %{public}d",
-            i, status);
+                i, status);
             return false;
         }
 

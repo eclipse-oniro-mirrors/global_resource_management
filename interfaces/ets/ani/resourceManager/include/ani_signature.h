@@ -37,7 +37,6 @@ public:
     static constexpr const char *SCREEN_DENSITY = "@ohos.resourceManager.resourceManager.ScreenDensity";
     static constexpr const char *COLOR_MODE = "@ohos.resourceManager.resourceManager.ColorMode";
     static constexpr const char *DEVICE_CAPABILITY = "@ohos.resourceManager.resourceManager.DeviceCapability";
-
 };
 }
 }
