@@ -177,7 +177,7 @@ ani_string ResMgrAni::GetStringByNameSync(ani_env* env, ani_object object, ani_s
     std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, object);
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getStringByNameSync");
-        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return nullptr;
     }
     std::string name = AniUtils::AniStrToString(env, aniName);
@@ -197,7 +197,7 @@ ani_string ResMgrAni::GetFormatStringByNameSync(ani_env *env, ani_object object,
     std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, object);
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getStringByNameSync");
-        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return nullptr;
     }
     std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
@@ -242,7 +242,7 @@ ani_boolean ResMgrAni::GetBooleanByName(ani_env* env, ani_object object, ani_str
     std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, object);
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getBooleanByName");
-        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return false;
     }
     std::string name = AniUtils::AniStrToString(env, aniName);
@@ -281,7 +281,7 @@ ani_int ResMgrAni::GetIntByName(ani_env* env, ani_object object, ani_string aniN
     std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, object);
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in GetIntByName");
-        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return ABNORMAL_NUMBER_RETURN_VALUE;
     }
     std::string name = AniUtils::AniStrToString(env, aniName);
@@ -320,7 +320,7 @@ ani_double ResMgrAni::GetDoubleByName(ani_env* env, ani_object object, ani_strin
     std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, object);
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in GetDoubleByName");
-        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return ABNORMAL_NUMBER_RETURN_VALUE;
     }
 
@@ -368,7 +368,7 @@ ani_string ResMgrAni::GetIntPluralStringByNameSync(ani_env* env, ani_object obje
     std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, object);
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getIntPluralStringByNameSync");
-        AniUtils::AniThrow(env, NOT_FOUND);
+        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return nullptr;
     }
 
@@ -424,7 +424,7 @@ ani_string ResMgrAni::GetDoublePluralStringByNameSync(ani_env* env, ani_object o
     std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, object);
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get addon in getDoublePluralStringByNameSync");
-        AniUtils::AniThrow(env, NOT_FOUND);
+        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return nullptr;
     }
     
@@ -471,7 +471,7 @@ ani_long ResMgrAni::GetColorByNameSync(ani_env* env, ani_object object, ani_stri
     std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, object);
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getColorByNameSync");
-        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return ABNORMAL_NUMBER_RETURN_VALUE;
     }
     std::string name = AniUtils::AniStrToString(env, aniName);
@@ -674,7 +674,7 @@ ani_object ResMgrAni::GetMediaByNameSync(ani_env* env, ani_object object, ani_st
     std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, object);
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in GetMediaByNameSync");
-        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return nullptr;
     }
     int density = 0;
@@ -703,7 +703,7 @@ ani_string ResMgrAni::GetMediaBase64ByNameSync(ani_env* env, ani_object object,
     std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, object);
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in GetMediaBase64ByNameSync");
-        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return nullptr;
     }
 
@@ -833,7 +833,7 @@ ani_object ResMgrAni::GetDrawableDescriptorByName(ani_env* env, ani_object objec
     std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, object);
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in GetDrawableDescriptorByName");
-        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return nullptr;
     }
     int density = 0;
@@ -858,7 +858,7 @@ ani_object ResMgrAni::GetStringArrayByNameSync(ani_env* env, ani_object object, 
     std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, object);
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getStringArrayByNameSync");
-        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return nullptr;
     }
     std::string resName = AniUtils::AniStrToString(env, aniName);
@@ -897,7 +897,7 @@ ani_long ResMgrAni::GetSymbolByName(ani_env* env, ani_object object, ani_string 
     std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, object);
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getSymbolByName");
-        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return ABNORMAL_NUMBER_RETURN_VALUE;
     }
     std::string resName = AniUtils::AniStrToString(env, aniName);
@@ -1152,11 +1152,11 @@ ani_status ResMgrAni::BindResMgr(ani_env* env)
 
 ani_status ResMgrAni::BindResMgrCleaner(ani_env* env)
 {
-    static const char* className = "@ohos.resourceManager.ResMgrCleaner";
     ani_class cls;
-    ani_status status = env->FindClass(className, &cls);
+    ani_status status = env->FindClass(AniSignature::RESMGR_CLEANER, &cls);
     if (ANI_OK != status) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed, status: %{public}d.", className, status);
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed, status: %{public}d.",
+            AniSignature::RESMGR_CLEANER, status);
         return status;
     }
     std::array methods = {
@@ -1165,7 +1165,7 @@ ani_status ResMgrAni::BindResMgrCleaner(ani_env* env)
     status = env->Class_BindNativeMethods(cls, methods.data(), methods.size());
     if (ANI_OK != status) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Can't bind native methods to '%{public}s', status: %{public}d",
-            className, status);
+            AniSignature::RESMGR_CLEANER, status);
         return status;
     };
     return ANI_OK;
@@ -1173,11 +1173,11 @@ ani_status ResMgrAni::BindResMgrCleaner(ani_env* env)
 
 ani_status ResMgrAni::BindStaticFunc(ani_env* env)
 {
-    static const char* nameSpaceName = "@ohos.resourceManager.resourceManager";
     ani_namespace ns;
-    ani_status status = env->FindNamespace(nameSpaceName, &ns);
+    ani_status status = env->FindNamespace(AniSignature::NAMESPACE, &ns);
     if (ANI_OK != status) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find namespace '%{public}s' failed, status: %{public}d.", nameSpaceName, status);
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find namespace '%{public}s' failed, status: %{public}d.",
+            AniSignature::NAMESPACE, status);
         return status;
     }
 
@@ -1190,7 +1190,7 @@ ani_status ResMgrAni::BindStaticFunc(ani_env* env)
     status = env->Namespace_BindNativeFunctions(ns, nsMethods.data(), nsMethods.size());
     if (ANI_OK != status) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Cannot bind native methods to '%{public}s', status: %{public}d.",
-            nameSpaceName, status);
+            AniSignature::NAMESPACE, status);
         return status;
     };
     return ANI_OK;
@@ -1215,9 +1215,9 @@ ani_status ResMgrAni::BindContext(ani_env* env)
 
     return ANI_OK;
 }
-}
-}
-}
+} // namespace Resource
+} // namespace Global
+} // namespace OHOS
 
 ANI_EXPORT ani_status ANI_Constructor(ani_vm* vm, uint32_t* result)
 {
