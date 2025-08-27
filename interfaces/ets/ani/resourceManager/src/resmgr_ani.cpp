@@ -680,7 +680,7 @@ ani_object ResMgrAni::GetMediaByNameSync(ani_env* env, ani_object object, ani_st
     int density = 0;
     if (!AniUtils::GetOptionalInt(env, aniDensity, density)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get density in GetMediaByNameSync");
-        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return nullptr;
     }
 
@@ -710,7 +710,7 @@ ani_string ResMgrAni::GetMediaBase64ByNameSync(ani_env* env, ani_object object,
     int density = 0;
     if (!AniUtils::GetOptionalInt(env, aniDensity, density)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get density in GetMediaBase64ByNameSync");
-        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return nullptr;
     }
 
@@ -839,13 +839,13 @@ ani_object ResMgrAni::GetDrawableDescriptorByName(ani_env* env, ani_object objec
     int density = 0;
     if (!AniUtils::GetOptionalInt(env, aniDensity, density)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get density in GetDrawableDescriptorByName");
-        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return nullptr;
     }
     int type = 0;
     if (!AniUtils::GetOptionalInt(env, aniType, type)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get type in GetDrawableDescriptorByName");
-        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return nullptr;
     }
 
@@ -978,7 +978,7 @@ void ResMgrAni::UpdateOverrideConfiguration(ani_env* env, ani_object object, ani
     std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, object);
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in updateOverrideConfiguration");
-        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        AniUtils::AniThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return;
     }
     std::shared_ptr<ResConfig> overrideResConfig;
@@ -1046,7 +1046,7 @@ ani_boolean ResMgrAni::IsRawDir(ani_env* env, ani_object object, ani_string aniP
     std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, object);
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in isRawDir");
-        AniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        AniUtils::AniThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return false;
     }
     std::string path = AniUtils::AniStrToString(env, aniPath);

@@ -32,7 +32,6 @@ public:
     static ani_object CreateResMgr(ani_env* env, const std::string& bundleName,
         const std::shared_ptr<ResourceManager>& resMgr, std::shared_ptr<AbilityRuntime::Context> context);
     static ani_object WrapResourceManager(ani_env* env, std::shared_ptr<ResourceManager> resMgr);
-private:
 };
 } // namespace Resource
 } // namespace Global
