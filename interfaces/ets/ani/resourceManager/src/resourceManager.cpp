@@ -14,9 +14,10 @@
  */
 
 #include "resourceManager.h"
+
+#include "ani_signature.h"
 #include "hilog_wrapper.h"
 #include "resource_manager.h"
-#include "ani_signature.h"
 
 namespace OHOS {
 namespace Global {

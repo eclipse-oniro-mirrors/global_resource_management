@@ -18,7 +18,9 @@
 #include <cstdint>
 #include <vector>
 #include <set>
+
 #include <dirent.h>
+
 #include "res_locale.h"
 #include "rstate.h"
 #include "res_common.h"

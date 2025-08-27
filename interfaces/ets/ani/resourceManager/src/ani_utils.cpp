@@ -30,12 +30,12 @@ namespace Global {
 namespace Resource {
 
 enum ScreenDensityIndex {
-    SCREEN_DENSITY_ONE = 0,
-    SCREEN_DENSITY_TWO = 1,
-    SCREEN_DENSITY_THREE = 2,
-    SCREEN_DENSITY_FOUR = 3,
-    SCREEN_DENSITY_FIVE = 4,
-    SCREEN_DENSITY_SIX = 5,
+    ORDER_ONE = 0,
+    ORDER_TWO = 1,
+    ORDER_THREE = 2,
+    ORDER_FOUR = 3,
+    ORDER_FIVE = 4,
+    ORDER_SIX = 5,
 };
 
 const std::unordered_map<int32_t, std::string> errorMsg {
@@ -507,12 +507,12 @@ ani_object AniUtils::CreateAniUint8Array(ani_env* env, std::unique_ptr<uint8_t[]
 int AniUtils::GetScreenDensityIndex(ScreenDensity value)
 {
     switch (value) {
-        case ScreenDensity::SCREEN_DENSITY_SDPI: return static_cast<int>(ScreenDensityIndex::SCREEN_DENSITY_ONE);
-        case ScreenDensity::SCREEN_DENSITY_MDPI: return static_cast<int>(ScreenDensityIndex::SCREEN_DENSITY_TWO);
-        case ScreenDensity::SCREEN_DENSITY_LDPI: return static_cast<int>(ScreenDensityIndex::SCREEN_DENSITY_THREE);
-        case ScreenDensity::SCREEN_DENSITY_XLDPI: return static_cast<int>(ScreenDensityIndex::SCREEN_DENSITY_FOUR);
-        case ScreenDensity::SCREEN_DENSITY_XXLDPI: return static_cast<int>(ScreenDensityIndex::SCREEN_DENSITY_FIVE);
-        case ScreenDensity::SCREEN_DENSITY_XXXLDPI: return static_cast<int>(ScreenDensityIndex::SCREEN_DENSITY_SIX);
+        case ScreenDensity::SCREEN_DENSITY_SDPI: return static_cast<int>(ScreenDensityIndex::ORDER_ONE);
+        case ScreenDensity::SCREEN_DENSITY_MDPI: return static_cast<int>(ScreenDensityIndex::ORDER_TWO);
+        case ScreenDensity::SCREEN_DENSITY_LDPI: return static_cast<int>(ScreenDensityIndex::ORDER_THREE);
+        case ScreenDensity::SCREEN_DENSITY_XLDPI: return static_cast<int>(ScreenDensityIndex::ORDER_FOUR);
+        case ScreenDensity::SCREEN_DENSITY_XXLDPI: return static_cast<int>(ScreenDensityIndex::ORDER_FIVE);
+        case ScreenDensity::SCREEN_DENSITY_XXXLDPI: return static_cast<int>(ScreenDensityIndex::ORDER_SIX);
         default: return -1;
     }
 }
