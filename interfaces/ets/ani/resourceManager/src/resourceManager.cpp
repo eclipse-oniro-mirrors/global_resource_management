@@ -481,7 +481,7 @@ ani_string ResMgrAddon::GetIntPluralStringByNameSync(ani_env* env, ani_object ob
 
     if (dataContext->addon_ == nullptr || dataContext->addon_->GetResMgr() == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getIntPluralStringByNameSync");
-        ResourceManagerAniUtils::AniThrow(env, NOT_FOUND);
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return nullptr;
     }
 
@@ -600,7 +600,7 @@ ani_string ResMgrAddon::GetStringByNameSync(ani_env* env, ani_object object, ani
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret || resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getStringByNameSync");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return nullptr;
     }
 
@@ -625,7 +625,7 @@ ani_string ResMgrAddon::GetFormatStringByNameSync(ani_env *env, ani_object objec
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret || resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getFormatStringByNameSync");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return nullptr;
     }
 
@@ -680,7 +680,7 @@ ani_boolean ResMgrAddon::GetBooleanByName(ani_env* env, ani_object object, ani_s
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret || resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getBooleanByName");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return false;
     }
 
@@ -742,7 +742,7 @@ ani_double ResMgrAddon::GetNumberByName(ani_env* env, ani_object object, ani_str
     auto resMgr = dataContext->addon_->GetResMgr();
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getNumberByName");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return ABNORMAL_NUMBER_RETURN_VALUE;
     }
 
@@ -801,7 +801,7 @@ ani_double ResMgrAddon::GetColorByNameSync(ani_env* env, ani_object object, ani_
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret || resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getColorByNameSync");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return ABNORMAL_NUMBER_RETURN_VALUE;
     }
 
@@ -1092,7 +1092,7 @@ ani_object ResMgrAddon::GetMediaByNameSync(ani_env* env, ani_object object, ani_
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret || resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getMediaByNameSync");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return nullptr;
     }
 
@@ -1126,7 +1126,7 @@ ani_string ResMgrAddon::GetMediaBase64ByNameSync(ani_env* env, ani_object object
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret || resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getMediaBase64ByNameSync");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return nullptr;
     }
 
@@ -1151,7 +1151,7 @@ ani_object ResMgrAddon::GetStringArrayByNameSync(ani_env* env, ani_object object
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret || resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getStringArrayByNameSync");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return nullptr;
     }
 
@@ -1388,7 +1388,7 @@ ani_double ResMgrAddon::GetSymbolByName(ani_env* env, ani_object object, ani_str
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret || resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getSymbolByName");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
         return ABNORMAL_NUMBER_RETURN_VALUE;
     }
 
@@ -1412,7 +1412,7 @@ ani_boolean ResMgrAddon::IsRawDir(ani_env* env, ani_object object, ani_string pa
     bool ret = GetHapResourceManager(dataContext.get(), resMgr, resId);
     if (!ret || resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in isRawDir");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return false;
     }
 
@@ -1553,7 +1553,7 @@ ani_object ResMgrAddon::GetOverrideResourceManager(ani_env* env, ani_object obje
     std::shared_ptr<ResourceManager> resMgr = dataContext->addon_->GetResMgr();
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in getOverrideResourceManager");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
 
@@ -1599,7 +1599,7 @@ void ResMgrAddon::UpdateOverrideConfiguration(ani_env* env, ani_object object, a
     std::shared_ptr<ResourceManager> resMgr = dataContext->addon_->GetResMgr();
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in updateOverrideConfiguration");
-        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        ResourceManagerAniUtils::AniThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return;
     }
 
