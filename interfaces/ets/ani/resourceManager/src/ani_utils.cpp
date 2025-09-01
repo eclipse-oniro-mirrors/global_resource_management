@@ -29,14 +29,12 @@ namespace OHOS {
 namespace Global {
 namespace Resource {
 
-enum ScreenDensityIndex {
-    ORDER_ONE = 0,
-    ORDER_TWO = 1,
-    ORDER_THREE = 2,
-    ORDER_FOUR = 3,
-    ORDER_FIVE = 4,
-    ORDER_SIX = 5,
-};
+constexpr int SCREEN_DENSITY_SDPI_ORDER = 0;
+constexpr int SCREEN_DENSITY_MDPI_ORDER= 1;
+constexpr int SCREEN_DENSITY_LDPI_ORDER = 2;
+constexpr int SCREEN_DENSITY_XLDPI_ORDER = 3;
+constexpr int SCREEN_DENSITY_XXLDPI_ORDER = 4;
+constexpr int SCREEN_DENSITY_XXXLDPI_ORDER = 5;
 
 const std::unordered_map<int32_t, std::string> errorMsg {
     {ERROR_CODE_INVALID_INPUT_PARAMETER, "Invalid input parameter"},
@@ -507,12 +505,12 @@ ani_object AniUtils::CreateAniUint8Array(ani_env* env, std::unique_ptr<uint8_t[]
 int AniUtils::GetScreenDensityIndex(ScreenDensity value)
 {
     switch (value) {
-        case ScreenDensity::SCREEN_DENSITY_SDPI: return static_cast<int>(ScreenDensityIndex::ORDER_ONE);
-        case ScreenDensity::SCREEN_DENSITY_MDPI: return static_cast<int>(ScreenDensityIndex::ORDER_TWO);
-        case ScreenDensity::SCREEN_DENSITY_LDPI: return static_cast<int>(ScreenDensityIndex::ORDER_THREE);
-        case ScreenDensity::SCREEN_DENSITY_XLDPI: return static_cast<int>(ScreenDensityIndex::ORDER_FOUR);
-        case ScreenDensity::SCREEN_DENSITY_XXLDPI: return static_cast<int>(ScreenDensityIndex::ORDER_FIVE);
-        case ScreenDensity::SCREEN_DENSITY_XXXLDPI: return static_cast<int>(ScreenDensityIndex::ORDER_SIX);
+        case ScreenDensity::SCREEN_DENSITY_SDPI: return SCREEN_DENSITY_SDPI_ORDER;
+        case ScreenDensity::SCREEN_DENSITY_MDPI: return SCREEN_DENSITY_MDPI_ORDER;
+        case ScreenDensity::SCREEN_DENSITY_LDPI: return SCREEN_DENSITY_LDPI_ORDER;
+        case ScreenDensity::SCREEN_DENSITY_XLDPI: return SCREEN_DENSITY_XLDPI_ORDER;
+        case ScreenDensity::SCREEN_DENSITY_XXLDPI: return SCREEN_DENSITY_XXLDPI_ORDER;
+        case ScreenDensity::SCREEN_DENSITY_XXXLDPI: return SCREEN_DENSITY_XXXLDPI_ORDER;
         default: return -1;
     }
 }
