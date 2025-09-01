@@ -30,7 +30,7 @@ namespace Global {
 namespace Resource {
 
 constexpr int SCREEN_DENSITY_SDPI_ORDER = 0;
-constexpr int SCREEN_DENSITY_MDPI_ORDER= 1;
+constexpr int SCREEN_DENSITY_MDPI_ORDER = 1;
 constexpr int SCREEN_DENSITY_LDPI_ORDER = 2;
 constexpr int SCREEN_DENSITY_XLDPI_ORDER = 3;
 constexpr int SCREEN_DENSITY_XXLDPI_ORDER = 4;
