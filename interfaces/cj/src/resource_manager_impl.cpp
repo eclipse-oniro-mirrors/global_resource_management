@@ -66,137 +66,112 @@ bool ResourceManagerImpl::IsEmpty()
 
 int32_t ResourceManagerImpl::CloseRawFd(const std::string &name)
 {
-    RState state = resMgr_->CloseRawFileDescriptor(name);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::CloseRawFd failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::CloseRawFd success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->CloseRawFileDescriptor(name);
 }
 
 int32_t ResourceManagerImpl::GetRawFd(
     const std::string &rawFileName, Global::Resource::ResourceManager::RawFileDescriptor &descriptor)
 {
-    RState state = resMgr_->GetRawFileDescriptorFromHap(rawFileName, descriptor);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetRawFd failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetRawFd success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetRawFileDescriptorFromHap(rawFileName, descriptor);
 }
 
 int32_t ResourceManagerImpl::GetRawFileContent(
     const std::string &name, size_t &len, std::unique_ptr<uint8_t[]> &outValue)
 {
-    RState state = resMgr_->GetRawFileFromHap(name, len, outValue);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetRawFileContent failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetRawFileContent success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetRawFileFromHap(name, len, outValue);
 }
 
 int32_t ResourceManagerImpl::GetRawFileList(const std::string &rawDirPath, std::vector<std::string> &rawfileList)
 {
-    RState state = resMgr_->GetRawFileList(rawDirPath, rawfileList);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetRawFileList failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetRawFileList success, list size %{public}" PRIu64,
-            static_cast<uint64_t>(rawfileList.size()));
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetRawFileList(rawDirPath, rawfileList);
 }
 
 int32_t ResourceManagerImpl::GetColorByName(const char *name, uint32_t &outValue)
 {
-    RState state = resMgr_->GetColorByName(name, outValue);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetColorByName failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetColorByName success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetColorByName(name, outValue);
 }
 
 int32_t ResourceManagerImpl::GetColorById(uint32_t id, uint32_t &outValue)
 {
-    RState state = resMgr_->GetColorById(id, outValue);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetColorById failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetColorById success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetColorById(id, outValue);
 }
 
 int32_t ResourceManagerImpl::GetPluralStringValue(uint32_t resId, int64_t num, std::string &outValue)
 {
-    RState state = resMgr_->GetPluralStringByIdFormat(outValue, resId, num, num);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetPluralStringByIdFormat failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetPluralStringByIdFormat success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetPluralStringByIdFormat(outValue, resId, num, num);
 }
 
 int32_t ResourceManagerImpl::GetStringArrayValue(uint32_t resId, std::vector<std::string> &outValue)
 {
-    RState state = resMgr_->GetStringArrayById(resId, outValue);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetStringArrayById failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetStringArrayById success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetStringArrayById(resId, outValue);
 }
 
 int32_t ResourceManagerImpl::GetStringArrayByName(const char *name, std::vector<std::string> &outValue)
 {
-    RState state = resMgr_->GetStringArrayByName(name, outValue);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetStringArrayById failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetStringArrayById success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetStringArrayByName(name, outValue);
 }
 
 int32_t ResourceManagerImpl::GetString(uint32_t resId, std::string &outValue)
 {
-    RState state = resMgr_->GetStringById(resId, outValue);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetStringById failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetStringById success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetStringById(resId, outValue);
 }
 
 int32_t ResourceManagerImpl::GetStringByName(const char *name, std::string &outValue)
 {
-    RState state = resMgr_->GetStringByName(name, outValue);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetStringById failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetStringById success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetStringByName(name, outValue);
 }
 
 int32_t ResourceManagerImpl::GetPluralStringValue(const char *name, int64_t num, std::string &outValue)
 {
-    RState state = resMgr_->GetPluralStringByNameFormat(outValue, name, num, num);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetPluralStringByName failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetPluralStringByName success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetPluralStringByNameFormat(outValue, name, num, num);
 }
 
 int32_t ResourceManagerImpl::AddResource(const char *path)
@@ -219,68 +194,56 @@ int32_t ResourceManagerImpl::RemoveResource(const char *path)
 
 int32_t ResourceManagerImpl::GetBooleanById(uint32_t id, bool &outValue)
 {
-    RState state = resMgr_->GetBooleanById(id, outValue);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetBooleanById failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetBooleanById success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetBooleanById(id, outValue);
 }
 
 int32_t ResourceManagerImpl::GetBooleanByName(const char *name, bool &outValue)
 {
-    RState state = resMgr_->GetBooleanByName(name, outValue);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetBooleanByName failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetBooleanByName success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetBooleanByName(name, outValue);
 }
 
 int32_t ResourceManagerImpl::GetIntegerById(uint32_t id, int &outValue)
 {
-    RState state = resMgr_->GetIntegerById(id, outValue);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetIntegerById failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetIntegerById success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetIntegerById(id, outValue);
 }
 
 int32_t ResourceManagerImpl::GetIntegerByName(const char *name, int &outValue)
 {
-    RState state = resMgr_->GetIntegerByName(name, outValue);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetIntegerByName failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetIntegerByName success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetIntegerByName(name, outValue);
 }
 
 int32_t ResourceManagerImpl::GetFloatById(uint32_t id, float &outValue)
 {
-    RState state = resMgr_->GetFloatById(id, outValue);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetFloatById failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetFloatById success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetFloatById(id, outValue);
 }
 
 int32_t ResourceManagerImpl::GetFloatByName(const char *name, float &outValue)
 {
-    RState state = resMgr_->GetFloatByName(name, outValue);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetFloatByName failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetFloatByName success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetFloatByName(name, outValue);
 }
 
 std::string GetLocale(std::unique_ptr<Global::Resource::ResConfig> &cfg)
@@ -386,47 +349,39 @@ void ResourceManagerImpl::GetDeviceCapability(DeviceCapability &deviceCapability
 int32_t ResourceManagerImpl::GetMediaDataByName(
     const char *name, size_t &len, std::unique_ptr<uint8_t[]> &outValue, uint32_t density)
 {
-    RState state = resMgr_->GetMediaDataByName(name, len, outValue, density);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetMediaDataByName failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetMediaDataByName success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetMediaDataByName(name, len, outValue, density);
 }
 
 int32_t ResourceManagerImpl::GetMediaDataById(
     uint32_t id, size_t &len, std::unique_ptr<uint8_t[]> &outValue, uint32_t density)
 {
-    RState state = resMgr_->GetMediaDataById(id, len, outValue, density);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetMediaDataById failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetMediaDataById success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetMediaDataById(id, len, outValue, density);
 }
 
 int32_t ResourceManagerImpl::GetMediaContentBase64ById(uint32_t id, std::string &outValue, uint32_t density)
 {
-    RState state = resMgr_->GetMediaBase64DataById(id, outValue, density);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetMediaDataById failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetMediaDataById success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetMediaBase64DataById(id, outValue, density);
 }
 
 int32_t ResourceManagerImpl::GetMediaContentBase64ByName(const char *name, std::string &outValue, uint32_t density)
 {
-    RState state = resMgr_->GetMediaBase64DataByName(name, outValue, density);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetMediaDataById failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetMediaDataById success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetMediaBase64DataByName(name, outValue, density);
 }
 
 int32_t ResourceManagerImpl::GetDrawableDescriptor(uint32_t id, int64_t &outValue, uint32_t density)
@@ -506,29 +461,29 @@ OHOS::Ace::Napi::DrawableDescriptor* GetDrawableDescriptorPtr(
 
 void ResourceManagerImpl::GetLocales(bool includeSystem, std::vector<std::string> &outValue)
 {
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return;
+    }
     return resMgr_->GetLocales(outValue, includeSystem);
 }
 
 int32_t ResourceManagerImpl::GetSymbolById(uint32_t id, uint32_t &outValue)
 {
-    RState state = resMgr_->GetSymbolById(id, outValue);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetSymbolById failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetSymbolById success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetSymbolById(id, outValue);
 }
 
 int32_t ResourceManagerImpl::GetSymbolByName(const char *name, uint32_t &outValue)
 {
-    RState state = resMgr_->GetSymbolByName(name, outValue);
-    if (state != RState::SUCCESS) {
-        LOGE("ResourceManagerImpl::GetSymbolByName failed %{public}" PRIu32, state);
-    } else {
-        LOGI("ResourceManagerImpl::GetSymbolByName success");
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
     }
-    return state;
+    return resMgr_->GetSymbolByName(name, outValue);
 }
 
 std::shared_ptr<ResourceManager> ResourceManagerImpl::GetOverrideResMgr(ConfigurationEx &cfg, int32_t &errCode)
