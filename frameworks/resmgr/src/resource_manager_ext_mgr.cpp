@@ -39,7 +39,7 @@ ResourceManagerExtMgr::~ResourceManagerExtMgr()
 }
 
 bool ResourceManagerExtMgr::Init(std::shared_ptr<ResourceManager> &resMgrExt, const std::string &bundleName,
-    const int32_t appType)
+    const int32_t appType, const int32_t userId)
 {
     if (handle_ == nullptr) {
         std::string pluginPath = "system/lib64/libglobal_resmgr_broker.z.so";
@@ -56,7 +56,7 @@ bool ResourceManagerExtMgr::Init(std::shared_ptr<ResourceManager> &resMgrExt, co
         return true;
     }
     IResMgrExt iResMgrExt = (IResMgrExt)dlsym(handle_, "CreateResMgrExt");
-    int ret = (*iResMgrExt)(resMgrExt, bundleName, appType);
+    int ret = (*iResMgrExt)(resMgrExt, bundleName, appType, userId);
     if (ret) {
         RESMGR_HILOGE(RESMGR_TAG, "CreateResMgrExt fail.");
         return false;
