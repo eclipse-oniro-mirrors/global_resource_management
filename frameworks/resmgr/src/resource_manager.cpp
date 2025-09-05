@@ -72,7 +72,7 @@ std::shared_ptr<ResourceManager> CreateResourceManagerDef(
     if (userId == INVALID_USER_ID) {
         resourceManagerImpl->userId = DEFAULT_USER_ID;
     } else {
-    resourceManagerImpl->userId = userId;
+        resourceManagerImpl->userId = userId;
     }
     uint32_t currentId = resConfig.GetThemeId();
     auto themePackManager = ThemePackManager::GetThemePackManager();
