@@ -19,7 +19,7 @@ import { Resource as _Resource } from 'global.resource';
 import { RawFileDescriptorInner } from 'global.rawFileDescriptorInner';
 
 export default namespace resourceManager {
-    loadLibrary("resmgr_ani.z");
+    loadLibraryWithPermissionCheck("resmgr_ani.z", "@ohos.resourceManager");
 
     export enum Direction {
         DIRECTION_VERTICAL = 0,
@@ -182,7 +182,7 @@ export default namespace resourceManager {
     export type Resource = _Resource;
 
     export class ResourceManagerInner implements ResourceManager {
-        static { loadLibrary("resmgr_ani.z"); }
+        static { loadLibraryWithPermissionCheck("resmgr_ani.z", "@ohos.resourceManager"); }
 
         private nativeResMgr: long = 0;
 
