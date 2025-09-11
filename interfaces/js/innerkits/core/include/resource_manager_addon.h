@@ -49,6 +49,9 @@ public:
 
     ResourceManagerAddon(const std::shared_ptr<ResourceManager>& resMgr, bool isSystem = false);
 
+    ResourceManagerAddon(const std::shared_ptr<ResourceManager>& resMgr,
+        const std::shared_ptr<AbilityRuntime::Context>& context, bool isSystem, bool isOverride);
+
     static napi_value GetSystemResMgr(napi_env env);
 
     static napi_value GetSysResourceManager(napi_env env);
