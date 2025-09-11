@@ -32,6 +32,7 @@ static const char *VERTICAL = "vertical";
 static const char *HORIZONTAL = "horizontal";
 
 // DEVICETYPE
+static const char *DEFAULT_STR = "default";
 static const char *PHONE_STR = "phone";
 static const char *TABLET_STR = "tablet";
 static const char *CAR_STR = "car";

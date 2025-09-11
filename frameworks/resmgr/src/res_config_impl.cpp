@@ -435,7 +435,7 @@ std::vector<std::string> ResConfigImpl::GetAppSupportDeviceTypes()
 
 DeviceType ResConfigImpl::ParseDeviceTypeStr(const std::string &deviceType)
 {
-    if (deviceType == std::string(PHONE_STR)) {
+    if (deviceType == std::string(PHONE_STR) || deviceType == std::string(DEFAULT_STR)) {
         return DeviceType::DEVICE_PHONE;
     }
     if (deviceType == std::string(TABLET_STR)) {
