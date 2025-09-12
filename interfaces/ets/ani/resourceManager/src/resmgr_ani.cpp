@@ -139,7 +139,6 @@ ani_string ResMgrAni::GetStringSyncById(ani_env* env, ani_object object, ani_lon
     std::string result;
     RState state = resMgr->GetStringById(resId, result);
     if (state != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetStringById failed, state: %{public}d, id: %{public}lld", state, resId);
         AniUtils::AniThrow(env, state);
         return nullptr;
     }
@@ -164,8 +163,6 @@ ani_string ResMgrAni::GetFormatStringSyncById(ani_env *env, ani_object object, a
     std::string result;
     RState state = resMgr->GetStringFormatById(resId, result, params);
     if (state != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetFormatStringSyncById failed, state: %{public}d, id: %{public}lld",
-            state, resId);
         AniUtils::AniThrow(env, state);
         return nullptr;
     }
@@ -229,8 +226,6 @@ ani_boolean ResMgrAni::GetBooleanById(ani_env* env, ani_object object, ani_long 
     bool result;
     RState state = resMgr->GetBooleanById(resId, result);
     if (state != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetBooleanById failed, state: %{public}d, id: %{public}lld",
-            state, resId);
         AniUtils::AniThrow(env, state);
         return false;
     }
@@ -268,8 +263,6 @@ ani_int ResMgrAni::GetIntById(ani_env* env, ani_object object, ani_long resId)
     int result;
     RState state = resMgr->GetIntegerById(resId, result);
     if (state != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetIntById failed, state: %{public}d, id: %{public}lld",
-            state, resId);
         AniUtils::AniThrow(env, state);
         return ABNORMAL_NUMBER_RETURN_VALUE;
     }
@@ -307,8 +300,6 @@ ani_double ResMgrAni::GetDoubleById(ani_env* env, ani_object object, ani_long re
     float result;
     RState state = resMgr->GetFloatById(resId, result);
     if (state != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetDoubleById failed, state: %{public}d, id: %{public}lld",
-            state, resId);
         AniUtils::AniThrow(env, state);
         return ABNORMAL_NUMBER_RETURN_VALUE;
     }
@@ -354,8 +345,6 @@ ani_string ResMgrAni::GetIntPluralStringValueSyncById(ani_env* env, ani_object o
     std::string result;
     RState state = resMgr->GetFormatPluralStringById(result, resId, { true, num, 0.0 }, params);
     if (state != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetFormatPluralStringById failed, state: %{public}d, id: %{public}lld",
-            state, resId);
         AniUtils::AniThrow(env, state);
         return nullptr;
     }
@@ -410,8 +399,6 @@ ani_string ResMgrAni::GetDoublePluralStringValueSyncById(ani_env* env, ani_objec
     std::string result;
     RState state = resMgr->GetFormatPluralStringById(result, resId, { false, 0, num }, params);
     if (state != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetFormatPluralStringById failed, state: %{public}d, id: %{public}lld",
-            state, resId);
         AniUtils::AniThrow(env, state);
         return nullptr;
     }
@@ -458,8 +445,6 @@ ani_long ResMgrAni::GetColorSyncById(ani_env* env, ani_object object, ani_long r
     uint32_t result;
     RState state = resMgr->GetColorById(resId, result);
     if (state != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetColorSyncById failed, state: %{public}d, id: %{public}lld",
-            state, resId);
         AniUtils::AniThrow(env, state);
         return ABNORMAL_NUMBER_RETURN_VALUE;
     }
@@ -615,8 +600,6 @@ ani_object ResMgrAni::GetMediaContentSyncById(ani_env* env, ani_object object,
     std::unique_ptr<uint8_t[]> mediaData;
     RState state = resMgr->GetMediaDataById(resId, len, mediaData, density);
     if (state != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetMediaContentSync failed, state: %{public}d, id: %{public}lld",
-            state, resId);
         AniUtils::AniThrow(env, state);
         return nullptr;
     }
@@ -642,8 +625,6 @@ ani_string ResMgrAni::GetMediaContentBase64SyncById(ani_env* env, ani_object obj
     std::string result;
     RState state = resMgr->GetMediaBase64DataById(resId, result, density);
     if (state != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetMediaContentBase64Sync failed, state: %{public}d, id: %{public}lld",
-            state, resId);
         AniUtils::AniThrow(env, state);
         return nullptr;
     }
@@ -661,8 +642,6 @@ ani_object ResMgrAni::GetStringArrayValueSyncById(ani_env* env, ani_object objec
     std::vector<std::string> result;
     RState state = resMgr->GetStringArrayById(resId, result);
     if (state != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetStringArrayValueSync failed, state: %{public}d, id: %{public}lld",
-            state, resId);
         AniUtils::AniThrow(env, state);
         return nullptr;
     }
@@ -885,7 +864,6 @@ ani_long ResMgrAni::GetSymbolById(ani_env* env, ani_object object, ani_long resI
     uint32_t result;
     RState state = resMgr->GetSymbolById(resId, result);
     if (state != RState::SUCCESS) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetSymbolById failed, state: %{public}d, id: %{public}lld", state, resId);
         AniUtils::AniThrow(env, state);
         return ABNORMAL_NUMBER_RETURN_VALUE;
     }
