@@ -451,7 +451,7 @@ ani_object AniUtils::CreateAniArray(ani_env *env, const std::vector<std::string>
     for (size_t i = 0; i < strs.size(); i++) {
         status = env->Object_CallMethod_Void(ret, set, i, CreateAniString(env, strs[i]));
         if (ANI_OK != status) {
-            RESMGR_HILOGE(RESMGR_ANI_TAG, "Call method '$_set' failed, status :%{}d, currentIndex: %{}d.", status, i);
+            RESMGR_HILOGE(RESMGR_ANI_TAG, "Call method '$_set' failed, status :%{}d.", status);
             return nullptr;
         }
     }
@@ -550,16 +550,14 @@ bool AniUtils::InitAniParameters(ani_env *env, ani_object args,
         ani_ref value;
         status = env->Array_Get(static_cast<ani_array>(args), i, &value);
         if (ANI_OK != status) {
-            RESMGR_HILOGE(RESMGR_ANI_TAG, "Call get args array value failed, index: %{public}d, status: %{public}d",
-                i, status);
+            RESMGR_HILOGE(RESMGR_ANI_TAG, "Call get args array value failed, status: %{public}d", status);
             return false;
         }
 
         ani_boolean isString;
         status = env->Object_InstanceOf(static_cast<ani_object>(value), stringClass, &isString);
         if (ANI_OK != status) {
-            RESMGR_HILOGE(RESMGR_ANI_TAG, "Check args value isString failed, index: %{public}d, status: %{public}d",
-                i, status);
+            RESMGR_HILOGE(RESMGR_ANI_TAG, "Check args value isString failed, status: %{public}d", status);
             return false;
         }
 
