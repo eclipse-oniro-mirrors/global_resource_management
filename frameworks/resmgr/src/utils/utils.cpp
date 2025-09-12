@@ -27,6 +27,7 @@
 
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 #include "hitrace_meter.h"
+#include "parameters.h"
 #endif
 
 #ifdef __WINNT__
@@ -589,6 +590,20 @@ bool Utils::IsSystemPath(const std::string& path)
     return Utils::endWithTail(path, "/systemres/resources.index")
         || Utils::endWithTail(path, "\\resources\\resources.index")
         || Utils::endWithTail(path, "/resources/resources.index");
+}
+
+std::string Utils::GetSystemParameter(const std::string& paramKey)
+{
+    std::string paramValue;
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    paramValue = system::GetParameter(paramKey, "");
+#endif
+    return paramValue;
+}
+
+bool Utils::SupportSingleLayerThemeIcon()
+{
+    return GetSystemParameter("const.global.support_single_icon_theme") == "true";
 }
 } // namespace Resource
 } // namespace Global

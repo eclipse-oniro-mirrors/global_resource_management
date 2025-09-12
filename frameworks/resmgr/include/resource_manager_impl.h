@@ -851,6 +851,20 @@ public:
      */
     std::shared_ptr<HapManager> GetHapManager();
 
+    /**
+     * Determine whether it is system resourceManager
+     *
+     * @return true if system resourceManager, else not system resourceManager
+     */
+    bool IsSystem();
+
+    /**
+     * Determine whether it is override resourceManager
+     *
+     * @return true if override resourceManager, else not override resourceManager
+     */
+    bool IsOverride();
+
 private:
     RState GetString(const std::shared_ptr<IdItem> idItem, std::string &outValue);
 

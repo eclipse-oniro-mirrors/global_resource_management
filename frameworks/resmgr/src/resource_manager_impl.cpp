@@ -2074,6 +2074,16 @@ std::shared_ptr<HapManager> ResourceManagerImpl::GetHapManager()
     return hapManager_;
 }
 
+bool ResourceManagerImpl::IsSystem()
+{
+    return isSystemResMgr_;
+}
+
+bool ResourceManagerImpl::IsOverride()
+{
+    return isOverrideResMgr_;
+}
+
 std::shared_ptr<ResourceManager> ResourceManagerImpl::GetOverrideResourceManager(
     std::shared_ptr<ResConfig> overrideResConfig)
 {

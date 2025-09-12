@@ -113,6 +113,14 @@ ResourceManagerAddon::ResourceManagerAddon(
     napiContext_ = std::make_shared<ResourceManagerNapiContext>();
 }
 
+ResourceManagerAddon::ResourceManagerAddon(const std::shared_ptr<ResourceManager>& resMgr,
+    const std::shared_ptr<AbilityRuntime::Context>& context, bool isSystem, bool isOverride)
+    : resMgr_(resMgr), context_(context), isSystem_(isSystem), isOverrideAddon_(isOverride)
+{
+    RESMGR_HILOGD(RESMGR_JS_TAG, "create ResourceManagerAddon, ets to js.");
+    napiContext_ = std::make_shared<ResourceManagerNapiContext>();
+}
+
 ResourceManagerAddon::ResourceManagerAddon(const std::shared_ptr<ResourceManager>& resMgr, bool isSystem)
     : resMgr_(resMgr), isSystem_(isSystem)
 {
