@@ -93,6 +93,7 @@ ohos_shared_library("global_resmgr") {
   external_deps = [
     "ability_base:extractortool",
     "bounds_checking_function:libsec_shared",
+    "bundle_framework:appexecfwk_core_headers",
     "cJSON:cjson",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
@@ -143,6 +144,7 @@ ohos_shared_library("global_resmgr_win") {
 
     external_deps = [
       "bounds_checking_function:libsec_shared",
+      "bundle_framework:appexecfwk_core_headers",
       "cJSON:cjson_static",
       "icu:static_icui18n",
       "zlib:libz",
@@ -178,6 +180,7 @@ ohos_shared_library("global_resmgr_mac") {
     if (host_os == "mac") {
       external_deps = [
         "bounds_checking_function:libsec_static",
+        "bundle_framework:appexecfwk_core_headers",
         "cJSON:cjson_static",
         "icu:static_icui18n",
         "zlib:libz",
@@ -214,6 +217,7 @@ ohos_shared_library("global_resmgr_linux") {
 
     external_deps = [
       "bounds_checking_function:libsec_shared",
+      "bundle_framework:appexecfwk_core_headers",
       "cJSON:cjson_static",
       "icu:shared_icui18n",
       "zlib:shared_libz",
@@ -254,7 +258,9 @@ ohos_shared_library("librawfile") {
     "ability_base:configuration",
     "ability_runtime:app_context",
     "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core_headers",
     "cJSON:cjson_static",
+    "common_event_service:cesfwk_innerkits",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
