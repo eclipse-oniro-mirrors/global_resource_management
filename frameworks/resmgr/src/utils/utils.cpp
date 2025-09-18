@@ -600,6 +600,11 @@ std::string Utils::GetSystemParameter(const std::string& paramKey)
 #endif
     return paramValue;
 }
+
+bool Utils::SupportSingleLayerThemeIcon()
+{
+    return GetSystemParameter("const.global.support_single_icon_theme") == "true";
+}
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

@@ -39,6 +39,7 @@
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 #include "parameter.h"
 #endif
+#include "theme_pack_manager.h"
 
 namespace OHOS {
 namespace Global {
@@ -53,7 +54,6 @@ const std::string FOREGROUND = "foreground";
 const std::string BACKGROUND = "background";
 const std::regex FLOAT_REGEX = std::regex("(\\+|-)?\\d+(\\.\\d+)? *(px|vp|fp)?");
 const char* ResourceManagerImpl::LANGUAGE_KEY = "persist.global.language";
-const std::string KEY_SINGLE_ICON = "const.global.support_single_icon_theme";
 
 void ResourceManagerImpl::AddSystemResource(ResourceManagerImpl *systemResourceManager)
 {
@@ -2030,7 +2030,7 @@ RState ResourceManagerImpl::GetThemeIcons(uint32_t resId, std::pair<std::unique_
         return SUCCESS;
     }
 
-    if (foreState == SUCCESS && Utils::GetSystemParameter(KEY_SINGLE_ICON) == "true") {
+    if (foreState == SUCCESS && Utils::SupportSingleLayerThemeIcon()) {
         RESMGR_HILOGW(RESMGR_TAG,
             "GetThemeIcons bundlename = %{public}s, abilityName = %{public}s, fLen = %{public}zu",
             bundleInfo.first.c_str(), abilityName.c_str(), foregroundInfo.second);
@@ -2079,6 +2079,16 @@ RState ResourceManagerImpl::IsRawDirFromHap(const std::string &pathName, bool &o
 std::shared_ptr<HapManager> ResourceManagerImpl::GetHapManager()
 {
     return hapManager_;
+}
+
+bool ResourceManagerImpl::IsSystem()
+{
+    return isSystemResMgr_;
+}
+
+bool ResourceManagerImpl::IsOverride()
+{
+    return isOverrideResMgr_;
 }
 
 std::shared_ptr<ResourceManager> ResourceManagerImpl::GetOverrideResourceManager(

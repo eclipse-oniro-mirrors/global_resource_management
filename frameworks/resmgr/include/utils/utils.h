@@ -16,11 +16,13 @@
 #define OHOS_RESOURCE_MANAGER_UTILS_H
 #include <cstddef>
 #include <cstdint>
+#include <vector>
+#include <set>
+
+#include <dirent.h>
+
 #include "res_locale.h"
 #include "rstate.h"
-#include <dirent.h>
-#include <set>
-#include <vector>
 #include "res_common.h"
 
 namespace OHOS {
@@ -122,6 +124,8 @@ public:
     static bool IsSystemPath(const std::string& path);
 
     EXPORT_FUNC static std::string GetSystemParameter(const std::string& paramKey);
+
+    EXPORT_FUNC static bool SupportSingleLayerThemeIcon();
 private:
     static bool IsValidValue(const char* end, const std::string& str);
 
