@@ -451,7 +451,7 @@ ani_object AniUtils::CreateAniArray(ani_env *env, const std::vector<std::string>
     for (size_t i = 0; i < strs.size(); i++) {
         status = env->Object_CallMethod_Void(ret, set, i, CreateAniString(env, strs[i]));
         if (ANI_OK != status) {
-            RESMGR_HILOGE(RESMGR_ANI_TAG, "Call method '$_set' failed, status :%{}d.", status);
+            RESMGR_HILOGE(RESMGR_ANI_TAG, "Call method '$_set' failed, status :%{public}d.", status);
             return nullptr;
         }
     }
