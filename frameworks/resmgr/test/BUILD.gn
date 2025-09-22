@@ -15,7 +15,7 @@ import("//build/test.gni")
 import("../../../resmgr.gni")
 
 ohos_unittest("resmgr_test") {
-  module_out_path = "resource_management/resmgr"
+  module_out_path = "resource_management/resource_management"
 
   defines = [ "CONFIG_HILOG" ]
 
