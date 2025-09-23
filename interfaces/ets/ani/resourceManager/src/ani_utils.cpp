@@ -287,6 +287,9 @@ ani_object AniUtils::CreateConfig(ani_env* env, std::unique_ptr<ResConfig> &cfg)
 
 bool AniUtils::GetEnumParamOfConfig(ani_env* env, std::shared_ptr<ResConfig> configPtr, ani_object configuration)
 {
+    if (!configPtr) {
+        return false;
+    }
     int intEnum;
     if (!GetEnumMember(env, configuration, "direction", intEnum)) {
         return false;
