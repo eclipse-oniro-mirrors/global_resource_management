@@ -1349,6 +1349,9 @@ bool ResourceManagerImpl::AddPatchResource(const char *path, const char *patchPa
 
 bool ResourceManagerImpl::AddResource(const std::string &path, const std::vector<std::string> &overlayPaths)
 {
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
+#endif
     return this->hapManager_->AddResource(path, overlayPaths);
 }
 
