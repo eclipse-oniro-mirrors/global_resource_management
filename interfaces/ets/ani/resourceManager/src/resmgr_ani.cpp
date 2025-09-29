@@ -961,7 +961,7 @@ void ResMgrAni::UpdateOverrideConfiguration(ani_env* env, ani_object object, ani
     }
     std::shared_ptr<ResConfig> overrideResConfig;
     RState state = AniUtils::ConfigurationToResConfig(env, configuration, overrideResConfig);
-    if (state != RState::SUCCESS) {
+    if (state != RState::SUCCESS || !overrideResConfig) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get config in GetOverrideResourceManager");
         AniUtils::AniThrow(env, state);
         return;
