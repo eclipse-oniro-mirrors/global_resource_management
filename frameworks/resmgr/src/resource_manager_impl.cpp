@@ -2004,17 +2004,22 @@ void ResourceManagerImpl::GetLocales(std::vector<std::string> &outValue, bool in
 }
 
 RState ResourceManagerImpl::GetThemeIconInfo(const std::string &iconName, size_t &len,
-    std::unique_ptr<uint8_t[]> &outValue, const std::string &abilityName)
+    std::unique_ptr<uint8_t[]> &outValue, const std::string &abilityName, bool printLog)
 {
     std::string result = ThemePackManager::GetThemePackManager()->FindThemeIconResource(
         bundleInfo, iconName, userId, abilityName);
     if (result.empty()) {
-        RESMGR_HILOGD(RESMGR_TAG, "GetThemeIconInfo FAILED bundlename = %{public}s,", result.c_str());
+        if (printLog) {
+            RESMGR_HILOGE(RESMGR_TAG, "ThemeIcon err. name:%{public}s bundle:%{public}s ability:%{public}s.",
+                iconName.c_str(), bundleInfo.first.c_str(), abilityName.c_str());
+        }
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     outValue = Utils::LoadResourceFile(result, len);
     if (outValue == nullptr) {
-        RESMGR_HILOGD(RESMGR_TAG, "LoadResourceFile FAILED");
+        if (printLog) {
+            RESMGR_HILOGE(RESMGR_TAG, "ThemeIcon LoadFile err. name:%{public}s.", iconName.c_str());
+        }
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     return SUCCESS;
@@ -2045,7 +2050,7 @@ RState ResourceManagerImpl::GetThemeIcons(uint32_t resId, std::pair<std::unique_
 RState ResourceManagerImpl::GetDynamicIcon(const std::string &resName,
     std::pair<std::unique_ptr<uint8_t[]>, size_t> &iconInfo, uint32_t density)
 {
-    return GetThemeIconInfo(resName, iconInfo.second, iconInfo.first);
+    return GetThemeIconInfo(resName, iconInfo.second, iconInfo.first, "", true);
 }
 
 std::string ResourceManagerImpl::GetThemeMask()
