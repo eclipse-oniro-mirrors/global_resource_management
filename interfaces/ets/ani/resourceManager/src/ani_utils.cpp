@@ -570,7 +570,7 @@ bool AniUtils::InitAniParameters(ani_env *env, ani_object args,
         } else {
             ani_double param;
             ani_status status =
-                env->Object_CallMethodByName_Double(static_cast<ani_object>(value), "unboxed", ":d", &param);
+                env->Object_CallMethodByName_Double(static_cast<ani_object>(value), "toDouble", ":d", &param);
             if (ANI_OK != status) {
                 return false;
             }
@@ -626,7 +626,7 @@ bool AniUtils::GetOptionalInt(ani_env *env, ani_object optionalInt, int& result)
     }
     ani_int value = 0;
     if (!isUndefined) {
-        status = env->Object_CallMethodByName_Int(optionalInt, "unboxed", ":i", &value);
+        status = env->Object_CallMethodByName_Int(optionalInt, "toInt", ":i", &value);
         if (ANI_OK != status) {
             RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get int, status: %{public}d.", status);
             return false;
