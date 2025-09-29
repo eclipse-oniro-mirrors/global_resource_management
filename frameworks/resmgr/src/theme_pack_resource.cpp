@@ -347,7 +347,7 @@ void ThemeResource::AddIconValue(const std::string &bundleName, const std::strin
     iconValues_.emplace_back(std::make_pair(themeKey, path));
 }
 
-const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeIconResource(const std::string& iconPath)
+const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeIconResource(const std::string& iconPath, bool printLog)
 {
     if (iconPath.empty()) {
         return nullptr;
@@ -355,6 +355,7 @@ const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeIconResource(const 
     auto themeResource = std::make_shared<ThemeResource>(iconPath);
     std::string bundleName = GetIconsBundleName(iconPath);
     std::vector<std::string> resPaths = GetFiles(iconPath);
+    std::string iconList = "";
     for (const auto &path : resPaths) {
         auto pos1 = path.rfind('.');
         auto pos2 = path.rfind('/');
@@ -370,6 +371,7 @@ const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeIconResource(const 
             }
             std::string dynamicBundle = path.substr(iconPath.length() + 1, pos3 - iconPath.length() - 1);
             themeResource->AddIconValue(bundleName, dynamicBundle, iconName, path);
+            iconList += iconName + ";";
             continue;
         }
 
@@ -387,6 +389,9 @@ const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeIconResource(const 
 
         std::string abilityName = path.substr(pos3 + 1, pos4 - pos3 - 1);
         themeResource->AddIconValue(bundleName, "", iconName, path, abilityName);
+    }
+    if (!iconList.empty() && printLog) {
+        RESMGR_HILOGI(RESMGR_TAG, "load dynamic icon: %{public}s.", iconList.c_str());
     }
     return themeResource;
 }

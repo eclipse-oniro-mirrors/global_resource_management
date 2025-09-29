@@ -920,7 +920,7 @@ private:
     RState ProcessReference(const std::string value, std::vector<std::shared_ptr<IdItem>> &idItems);
 
     RState GetThemeIconInfo(const std::string &iconName, size_t &len, std::unique_ptr<uint8_t[]> &outValue,
-        const std::string &abilityName = "");
+        const std::string &abilityName = "", bool printLog = false);
 
     RState GetThemeValues(const std::string &value, std::string &outValue, const ResConfigImpl &resConfig);
 

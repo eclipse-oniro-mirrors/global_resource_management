@@ -321,6 +321,7 @@ void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, con
     std::lock_guard<std::mutex> lock(this->lockIcon_);
     ChangeIconResourceStatus(userId);
     if (rootDirs.empty()) {
+        RESMGR_HILOGW(RESMGR_TAG, "theme resources will clean, id %{public}d", userId);
         ClearIconResource();
         return;
     }
@@ -331,7 +332,7 @@ void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, con
             continue;
         }
         RESMGR_HILOGW_BY_FLAG(isLogFlag_, RESMGR_TAG, "load img, %{public}s", GetMaskString(dir).c_str());
-        auto pThemeResource = ThemeResource::LoadThemeIconResource(dir);
+        auto pThemeResource = ThemeResource::LoadThemeIconResource(dir, isLogFlag_);
         if (pThemeResource != nullptr) {
             this->iconResource_.emplace_back(pThemeResource);
         }

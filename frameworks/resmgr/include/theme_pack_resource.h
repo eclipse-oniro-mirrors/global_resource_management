@@ -63,7 +63,8 @@ public:
     ThemeResource(std::string path);
     ~ThemeResource();
     static const std::shared_ptr<ThemeResource> LoadThemeResource(const std::string& rootDir);
-    static const std::shared_ptr<ThemeResource> LoadThemeIconResource(const std::string& rootDir);
+    static const std::shared_ptr<ThemeResource> LoadThemeIconResource(const std::string& rootDir,
+        bool printLog = false);
     class ThemeQualifierValue {
     public:
         inline const std::string GetResValue() const
