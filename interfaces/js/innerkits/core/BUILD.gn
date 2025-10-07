@@ -42,7 +42,10 @@ config("resmgr_napi_core_public_config") {
 ohos_shared_library("resmgr_napi_core") {
   sources = resmgr_napi_core_source
 
-  sources += [ "../../../../dfx/hisysevent_adapter/hisysevent_adapter.cpp" ]
+  sources += [
+    "../../../../dfx/hisysevent_adapter/hisysevent_adapter.cpp",
+    "src/resource_table_loader.cpp",
+  ]
 
   defines = [ "CONFIG_HILOG" ]
 
@@ -54,6 +57,7 @@ ohos_shared_library("resmgr_napi_core") {
 
   external_deps = [
     "ability_base:configuration",
+    "ability_base:extractortool",
     "ability_runtime:app_context",
     "ace_engine:drawable_descriptor",
     "bounds_checking_function:libsec_shared",
@@ -62,6 +66,7 @@ ohos_shared_library("resmgr_napi_core") {
     "cJSON:cjson",
     "common_event_service:cesfwk_innerkits",
     "c_utils:utils",
+    "ets_runtime:libark_jsruntime",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",

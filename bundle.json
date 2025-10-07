@@ -67,7 +67,9 @@
             "cJSON",
             "graphic_2d",
             "runtime_core",
-            "ipc"
+            "ipc",
+            "ets_runtime",
+            "ets_frontend"
           ]
       },
         "build": {
