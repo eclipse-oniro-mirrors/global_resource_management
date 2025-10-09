@@ -23,12 +23,13 @@ namespace Global {
 namespace Resource {
 
 typedef int (*IResMgrExt) (std::shared_ptr<ResourceManager> &resMgrExt, const std::string &bundleName,
-    const int32_t appType);
+    const int32_t appType, const int32_t userId);
 class ResourceManagerExtMgr {
 public:
     ResourceManagerExtMgr();
     virtual ~ResourceManagerExtMgr();
-    bool Init(std::shared_ptr<ResourceManager> &resMgrExt, const std::string &bundleName, const int32_t appType);
+    bool Init(std::shared_ptr<ResourceManager> &resMgrExt, const std::string &bundleName,
+        const int32_t appType, const int32_t userId);
 
 private:
     void *handle_ = nullptr;

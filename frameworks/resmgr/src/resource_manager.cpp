@@ -25,6 +25,10 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
+namespace {
+constexpr int32_t INVALID_USER_ID = -1;
+constexpr int32_t DEFAULT_USER_ID = 100;
+}
 static std::map<std::string, std::shared_ptr<ResourceManager>> resMgrMap;
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 static std::mutex resMgrExtLock;
@@ -65,7 +69,11 @@ std::shared_ptr<ResourceManager> CreateResourceManagerDef(
     }
     resourceManagerImpl->bundleInfo.first = bundleName;
     resourceManagerImpl->bundleInfo.second = moduleName;
-    resourceManagerImpl->userId = userId;
+    if (userId == INVALID_USER_ID) {
+        resourceManagerImpl->userId = DEFAULT_USER_ID;
+    } else {
+        resourceManagerImpl->userId = userId;
+    }
     uint32_t currentId = resConfig.GetThemeId();
     auto themePackManager = ThemePackManager::GetThemePackManager();
     if (themePackManager->IsFirstLoadResource() || themePackManager->UpdateThemeId(currentId)
@@ -77,7 +85,8 @@ std::shared_ptr<ResourceManager> CreateResourceManagerDef(
 }
 
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-std::shared_ptr<ResourceManager> CreateResourceManagerExt(const std::string &bundleName, const int32_t appType)
+std::shared_ptr<ResourceManager> CreateResourceManagerExt(
+    const std::string &bundleName, const int32_t appType, const int32_t userId)
 {
     if (bundleName.empty()) {
         RESMGR_HILOGE(RESMGR_TAG, "bundleName is empty when CreateResourceManagerExt");
@@ -85,7 +94,7 @@ std::shared_ptr<ResourceManager> CreateResourceManagerExt(const std::string &bun
     }
     std::lock_guard<std::mutex> lock(resMgrExtLock);
     std::shared_ptr<ResourceManager> resMgrExt;
-    if (!resMgrExtMgr->Init(resMgrExt, bundleName, appType) || resMgrExt == nullptr) {
+    if (!resMgrExtMgr->Init(resMgrExt, bundleName, appType, userId) || resMgrExt == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "ResourceManagerExt init fail");
         return nullptr;
     }
@@ -101,7 +110,7 @@ std::shared_ptr<ResourceManager> CreateResourceManager(const std::string &bundle
         return CreateResourceManagerDef(bundleName, moduleName, hapPath, overlayPath, resConfig, userId);
     } else {
     #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-        return CreateResourceManagerExt(bundleName, appType);
+        return CreateResourceManagerExt(bundleName, appType, userId);
     #else
         return nullptr;
     #endif
