@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//build/templates/abc/ohos_abc.gni")
 import("../../resmgr.gni")
 
 config("resmgr_config") {
@@ -101,6 +102,8 @@ ohos_shared_library("global_resmgr") {
     "init:libbegetutil",
     "zlib:shared_libz",
   ]
+
+  deps = [":resmgr_abc"]
 
   if (resource_management_support_icu) {
     external_deps += [ "icu:shared_icui18n" ]
@@ -324,6 +327,15 @@ ohos_shared_library("ohresmgr") {
     ubsan = true
   }
   innerapi_tags = [ "ndk" ]
+  subsystem_name = "global"
+  part_name = "resource_management"
+}
+
+ohos_abc("resmgr_abc") {
+  sources = [ "src/resmgr.js" ]
+  output_name = "resmgr"
+  install_images = [ "system" ]
+  module_install_dir = "etc/abc/global"
   subsystem_name = "global"
   part_name = "resource_management"
 }

@@ -14,8 +14,12 @@
  */
 
 #include "resource_manager_addon.h"
-#include "resource_manager_napi_utils.h"
+
 #include "hilog/log_cpp.h"
+#include "resource_manager_napi_utils.h"
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+#include "resource_table_loader.h"
+#endif
 #include "system_resource_manager.h"
 
 namespace OHOS {
@@ -30,6 +34,9 @@ napi_value ResourceManagerAddon::Create(
     std::shared_ptr<AbilityRuntime::Context> context)
 {
     std::shared_ptr<ResourceManagerAddon> addon = std::make_shared<ResourceManagerAddon>(bundleName, resMgr, context);
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    ResourceTableLoader::LoadTable(env, addon);
+#endif
     return WrapResourceManager(env, addon);
 }
 
