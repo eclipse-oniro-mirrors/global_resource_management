@@ -13,9 +13,8 @@
  * limitations under the License.
  */
 
-function __resourceIdHar__(res) {
+function resourceIdHar(res) {
     const arr = res?.params?.[0]?.split('.');
     return globalThis.__resourceTables__?.[res?.moduleName]?.[arr?.[1]]?.[arr?.[2]] ?? -1;
 }
-export default { __resourceIdHar__ };
-globalThis.__resourceIdHar__ = __resourceIdHar__;
+globalThis.__resourceIdHar__ = resourceIdHar;
