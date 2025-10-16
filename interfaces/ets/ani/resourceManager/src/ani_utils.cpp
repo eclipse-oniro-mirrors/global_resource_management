@@ -82,7 +82,7 @@ void AniUtils::ThrowAniError(ani_env *env, ani_int code, const std::string &mess
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Create BusinessError failed, status: %{public}d.", status);
         return;
     }
-    status = env->Object_SetPropertyByName_Int(error, "code", code);
+    status = env->Object_SetPropertyByName_Int(error, "code_", code);
     if (ANI_OK != status) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Set BusinessError.code = %{public}d failed, status: %{public}d.", code, status);
         return;
