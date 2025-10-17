@@ -287,7 +287,7 @@ void HapResourceV1::IsAppDarkRes(const std::shared_ptr<ValueUnderQualifierDir> &
     if (!defaultConfig) {
         return;
     }
-    if (isSystem_ || isOverlay_ || defaultConfig->GetAppDarkRes()) {
+    if (isSystem_ || isOverlay_ || hasDarkRes_) {
         return;
     }
 
