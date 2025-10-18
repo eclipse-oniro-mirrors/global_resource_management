@@ -17,4 +17,5 @@ function resourceIdHar(res) {
     const arr = res?.params?.[0]?.split('.');
     return globalThis.__resourceTables__?.[res?.moduleName]?.[arr?.[1]]?.[arr?.[2]] ?? -1;
 }
+export default { resourceIdHar };
 globalThis.__resourceIdHar__ = resourceIdHar;
