@@ -280,7 +280,7 @@ export default namespace resourceManager {
             let p1 = taskpool.execute((): string => {
                 return this.getStringSync(resId);
             })
-            p1.then((content: NullishType) => {
+            p1.then((content: Any) => {
                 callback(null, content as string);
             }).catch((err: Error): void => {
                 callback(err as BusinessError, undefined);
@@ -291,7 +291,7 @@ export default namespace resourceManager {
             return new Promise<string>((resolve, reject) => {
                 taskpool.execute((): string => {
                     return this.getStringSync(resId);
-                }).then((content: NullishType) => {
+                }).then((content: Any) => {
                     resolve(content as string);
                 }, (err: Error): void => {
                     reject(err);
@@ -303,7 +303,7 @@ export default namespace resourceManager {
             let p1 = taskpool.execute((): Array<string> => {
                 return this.getStringArrayValueSync(resId);
             })
-            p1.then((content: NullishType) => {
+            p1.then((content: Any) => {
                 callback(null, content as Array<string>);
             }).catch((err: Error): void => {
                 callback(err as BusinessError, undefined);
@@ -314,7 +314,7 @@ export default namespace resourceManager {
             return new Promise<Array<string>>((resolve, reject) => {
                 taskpool.execute((): Array<string> => {
                     return this.getStringArrayValueSync(resId);
-                }).then((content: NullishType) => {
+                }).then((content: Any) => {
                     resolve(content as Array<string>);
                 }, (err: Error): void => {
                     reject(err);
@@ -326,7 +326,7 @@ export default namespace resourceManager {
             let p1 = taskpool.execute((): DeviceCapability => {
                 return this.getDeviceCapabilitySync();
             })
-            p1.then((content: NullishType) => {
+            p1.then((content: Any) => {
                 callback(null, content as DeviceCapability);
             }).catch((err: Error): void => {
                 callback(err as BusinessError, undefined);
@@ -337,7 +337,7 @@ export default namespace resourceManager {
             return new Promise<DeviceCapability>((resolve, reject) => {
                 taskpool.execute((): DeviceCapability => {
                     return this.getDeviceCapabilitySync();
-                }).then((content: NullishType) => {
+                }).then((content: Any) => {
                     resolve(content as DeviceCapability);
                 }, (err: Error): void => {
                     reject(err);
@@ -349,7 +349,7 @@ export default namespace resourceManager {
             let p1 = taskpool.execute((): Configuration => {
                 return this.getConfigurationSync();
             })
-            p1.then((content: NullishType) => {
+            p1.then((content: Any) => {
                 callback(null, content as Configuration);
             }).catch((err: Error): void => {
                 callback(err as BusinessError, undefined);
@@ -360,7 +360,7 @@ export default namespace resourceManager {
             return new Promise<Configuration>((resolve, reject) => {
                 taskpool.execute((): Configuration => {
                     return this.getConfigurationSync();
-                }).then((content: NullishType) => {
+                }).then((content: Any) => {
                     resolve(content as Configuration);
                 }, (err: Error): void => {
                     reject(err);
@@ -372,7 +372,7 @@ export default namespace resourceManager {
             let p1 = taskpool.execute((): string => {
                 return this.getStringByNameSync(resName);
             })
-            p1.then((content: NullishType) => {
+            p1.then((content: Any) => {
                 callback(null, content as string);
             }).catch((err: Error): void => {
                 callback(err as BusinessError, undefined);
@@ -383,7 +383,7 @@ export default namespace resourceManager {
             return new Promise<string>((resolve, reject) => {
                 taskpool.execute((): string => {
                     return this.getStringByNameSync(resName);
-                }).then((content: NullishType) => {
+                }).then((content: Any) => {
                     resolve(content as string);
                 }, (err: Error): void => {
                     reject(err);
@@ -395,7 +395,7 @@ export default namespace resourceManager {
             let p1 = taskpool.execute((): Array<string> => {
                 return this.getStringArrayByNameSync(resName);
             })
-            p1.then((content: NullishType) => {
+            p1.then((content: Any) => {
                 callback(null, content as Array<string>);
             }).catch((err: Error): void => {
                 callback(err as BusinessError, undefined);
@@ -406,7 +406,7 @@ export default namespace resourceManager {
             return new Promise<Array<string>>((resolve, reject) => {
                 taskpool.execute((): Array<string> => {
                     return this.getStringArrayByNameSync(resName);
-                }).then((content: NullishType) => {
+                }).then((content: Any) => {
                     resolve(content as Array<string>);
                 }, (err: Error): void => {
                     reject(err);
@@ -418,7 +418,7 @@ export default namespace resourceManager {
             let p1 = taskpool.execute((): Uint8Array => {
                 return this.getMediaByNameSync(resName);
             })
-            p1.then((content: NullishType) => {
+            p1.then((content: Any) => {
                 callback(null, content as Uint8Array);
             }).catch((err: Error): void => {
                 callback(err as BusinessError, undefined);
@@ -429,7 +429,7 @@ export default namespace resourceManager {
             return new Promise<Uint8Array>((resolve, reject) => {
                 taskpool.execute((): Uint8Array => {
                     return this.getMediaByNameSync(resName);
-                }).then((content: NullishType) => {
+                }).then((content: Any) => {
                     resolve(content as Uint8Array);
                 }, (err: Error): void => {
                     reject(err);
@@ -441,7 +441,7 @@ export default namespace resourceManager {
             let p1 = taskpool.execute((): Uint8Array => {
                 return this.getMediaByNameSync(resName, density);
             })
-            p1.then((content: NullishType) => {
+            p1.then((content: Any) => {
                 callback(null, content as Uint8Array);
             }).catch((err: Error): void => {
                 callback(err as BusinessError, undefined);
@@ -452,7 +452,7 @@ export default namespace resourceManager {
             return new Promise<Uint8Array>((resolve, reject) => {
                 taskpool.execute((): Uint8Array => {
                     return this.getMediaByNameSync(resName, density);
-                }).then((content: NullishType) => {
+                }).then((content: Any) => {
                     resolve(content as Uint8Array);
                 }, (err: Error): void => {
                     reject(err);
@@ -464,7 +464,7 @@ export default namespace resourceManager {
             let p1 = taskpool.execute((): string => {
                 return this.getMediaBase64ByNameSync(resName);
             })
-            p1.then((content: NullishType) => {
+            p1.then((content: Any) => {
                 callback(null, content as string);
             }).catch((err: Error): void => {
                 callback(err as BusinessError, undefined);
@@ -475,7 +475,7 @@ export default namespace resourceManager {
             return new Promise<string>((resolve, reject) => {
                 taskpool.execute((): string => {
                     return this.getMediaBase64ByNameSync(resName);
-                }).then((content: NullishType) => {
+                }).then((content: Any) => {
                     resolve(content as string);
                 }, (err: Error): void => {
                     reject(err);
@@ -487,7 +487,7 @@ export default namespace resourceManager {
             let p1 = taskpool.execute((): string => {
                 return this.getMediaBase64ByNameSync(resName, density);
             })
-            p1.then((content: NullishType) => {
+            p1.then((content: Any) => {
                 callback(null, content as string);
             }).catch((err: Error): void => {
                 callback(err as BusinessError, undefined);
@@ -498,7 +498,7 @@ export default namespace resourceManager {
             return new Promise<string>((resolve, reject) => {
                 taskpool.execute((): string => {
                     return this.getMediaBase64ByNameSync(resName, density);
-                }).then((content: NullishType) => {
+                }).then((content: Any) => {
                     resolve(content as string);
                 }, (err: Error): void => {
                     reject(err);
@@ -510,7 +510,7 @@ export default namespace resourceManager {
             let p1 = taskpool.execute((): Uint8Array => {
                 return this.getMediaContentSync(resId);
             })
-            p1.then((content: NullishType) => {
+            p1.then((content: Any) => {
                 callback(null, content as Uint8Array);
             }).catch((err: Error): void => {
                 callback(err as BusinessError, undefined);
@@ -521,7 +521,7 @@ export default namespace resourceManager {
             return new Promise<Uint8Array>((resolve, reject) => {
                 taskpool.execute((): Uint8Array => {
                     return this.getMediaContentSync(resId);
-                }).then((content: NullishType) => {
+                }).then((content: Any) => {
                     resolve(content as Uint8Array);
                 }, (err: Error): void => {
                     reject(err);
@@ -533,7 +533,7 @@ export default namespace resourceManager {
             let p1 = taskpool.execute((): Uint8Array => {
                 return this.getMediaContentSync(resId, density);
             })
-            p1.then((content: NullishType) => {
+            p1.then((content: Any) => {
                 callback(null, content as Uint8Array);
             }).catch((err: Error): void => {
                 callback(err as BusinessError, undefined);
@@ -544,7 +544,7 @@ export default namespace resourceManager {
             return new Promise<Uint8Array>((resolve, reject) => {
                 taskpool.execute((): Uint8Array => {
                     return this.getMediaContentSync(resId, density);
-                }).then((content: NullishType) => {
+                }).then((content: Any) => {
                     resolve(content as Uint8Array);
                 }, (err: Error): void => {
                     reject(err);
@@ -556,7 +556,7 @@ export default namespace resourceManager {
             let p1 = taskpool.execute((): string => {
                 return this.getMediaContentBase64Sync(resId);
             })
-            p1.then((content: NullishType) => {
+            p1.then((content: Any) => {
                 callback(null, content as string);
             }).catch((err: Error): void => {
                 callback(err as BusinessError, undefined);
@@ -567,7 +567,7 @@ export default namespace resourceManager {
             return new Promise<string>((resolve, reject) => {
                 taskpool.execute((): string => {
                     return this.getMediaContentBase64Sync(resId);
-                }).then((content: NullishType) => {
+                }).then((content: Any) => {
                     resolve(content as string);
                 }, (err: Error): void => {
                     reject(err);
@@ -579,7 +579,7 @@ export default namespace resourceManager {
             let p1 = taskpool.execute((): string => {
                 return this.getMediaContentBase64Sync(resId, density);
             })
-            p1.then((content: NullishType) => {
+            p1.then((content: Any) => {
                 callback(null, content as string);
             }).catch((err: Error): void => {
                 callback(err as BusinessError, undefined);
@@ -590,7 +590,7 @@ export default namespace resourceManager {
             return new Promise<string>((resolve, reject) => {
                 taskpool.execute((): string => {
                     return this.getMediaContentBase64Sync(resId, density);
-                }).then((content: NullishType) => {
+                }).then((content: Any) => {
                     resolve(content as string);
                 }, (err: Error): void => {
                     reject(err);
@@ -602,7 +602,7 @@ export default namespace resourceManager {
             let p1 = taskpool.execute((): Uint8Array => {
                 return this.getRawFileContentSync(path);
             })
-            p1.then((content: NullishType) => {
+            p1.then((content: Any) => {
                 callback(null, content as Uint8Array);
             }, (err: Error): void => {
                 callback(err as BusinessError, undefined);
@@ -613,7 +613,7 @@ export default namespace resourceManager {
             return new Promise<Uint8Array>((resolve, reject) => {
                 taskpool.execute((): Uint8Array => {
                     return this.getRawFileContentSync(path);
-                }).then((content: NullishType) => {
+                }).then((content: Any) => {
                     resolve(content as Uint8Array);
                 }, (err: Error): void => {
                     reject(err);
@@ -625,7 +625,7 @@ export default namespace resourceManager {
             let p1 = taskpool.execute((): RawFileDescriptor => {
                 return this.getRawFdSync(path);
             })
-            p1.then((content: NullishType) => {
+            p1.then((content: Any) => {
                 callback(null, content as RawFileDescriptor);
             }, (err: Error): void => {
                 callback(err as BusinessError, undefined);
@@ -636,7 +636,7 @@ export default namespace resourceManager {
             return new Promise<RawFileDescriptor>((resolve, reject) => {
                 taskpool.execute((): RawFileDescriptor => {
                     return this.getRawFdSync(path);
-                }).then((content: NullishType) => {
+                }).then((content: Any) => {
                     resolve(content as RawFileDescriptor);
                 }, (err: Error): void => {
                     reject(err);
@@ -671,7 +671,7 @@ export default namespace resourceManager {
             let p1 = taskpool.execute((): Array<string> => {
                 return this.getRawFileListSync(path);
             })
-            p1.then((content: NullishType) => {
+            p1.then((content: Any) => {
                 callback(null, content as Array<string>);
             }, (err: Error): void => {
                 callback(err as BusinessError, undefined);
@@ -682,7 +682,7 @@ export default namespace resourceManager {
             return new Promise<Array<string>>((resolve, reject) => {
                 taskpool.execute((): Array<string> => {
                     return this.getRawFileListSync(path);
-                }).then((content: NullishType) => {
+                }).then((content: Any) => {
                     resolve(content as Array<string>);
                 }, (err: Error): void => {
                     reject(err);
@@ -694,7 +694,7 @@ export default namespace resourceManager {
             let p1 = taskpool.execute((): long => {
                 return this.getColorSync(resId);
             })
-            p1.then((content: NullishType) => {
+            p1.then((content: Any) => {
                 callback(null, content as long);
             }).catch((err: Error): void => {
                 callback(err as BusinessError, undefined);
@@ -705,7 +705,7 @@ export default namespace resourceManager {
             return new Promise<long>((resolve, reject) => {
                 taskpool.execute((): long => {
                     return this.getColorSync(resId);
-                }).then((content: NullishType) => {
+                }).then((content: Any) => {
                     resolve(content as long);
                 }, (err: Error): void => {
                     reject(err);
@@ -717,7 +717,7 @@ export default namespace resourceManager {
             let p1 = taskpool.execute((): long => {
                 return this.getColorByNameSync(resName);
             })
-            p1.then((content: NullishType) => {
+            p1.then((content: Any) => {
                 callback(null, content as long);
             }).catch((err: Error): void => {
                 callback(err as BusinessError, undefined);
@@ -728,7 +728,7 @@ export default namespace resourceManager {
             return new Promise<long>((resolve, reject) => {
                 taskpool.execute((): long => {
                     return this.getColorByNameSync(resName);
-                }).then((content: NullishType) => {
+                }).then((content: Any) => {
                     resolve(content as long);
                 }, (err: Error): void => {
                     reject(err);
