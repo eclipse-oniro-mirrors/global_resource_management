@@ -445,7 +445,7 @@ ani_object AniUtils::CreateAniArray(ani_env *env, const std::vector<std::string>
     }
 
     ani_method set;
-    status = env->Class_FindMethod(cls, "$_set", "iC{std.core.Object}:", &set);
+    status = env->Class_FindMethod(cls, "$_set", "iY:", &set);
     if (ANI_OK != status) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find method set in array failed, status %{public}d.", status);
         return nullptr;
