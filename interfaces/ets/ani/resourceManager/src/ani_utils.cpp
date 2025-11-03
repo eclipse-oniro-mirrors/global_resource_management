@@ -254,7 +254,7 @@ ani_object AniUtils::CreateConfig(ani_env* env, std::unique_ptr<ResConfig> &cfg)
     if (!SetEnumMember(env, obj, "direction", AniSignature::DIRECTION, static_cast<int>(cfg->GetDirection()))) {
         return nullptr;
     }
-    if (!SetEnumMember(env, obj, "deviceType", AniSignature::DEVICE_TYPE, static_cast<int>(cfg->GetDeviceType()))) {
+    if (!SetEnumMember(env, obj, "deviceType", AniSignature::DEVICE_TYPE, GetDeviceTypeIndex(cfg->GetDeviceType()))) {
         return nullptr;
     }
     if (!SetEnumMember(env, obj, "colorMode", AniSignature::COLOR_MODE, static_cast<int>(cfg->GetColorMode()))) {
@@ -518,6 +518,11 @@ int AniUtils::GetScreenDensityIndex(ScreenDensity value)
     }
 }
 
+int AniUtils::GetDeviceTypeIndex(DeviceType value)
+{
+    return value > DeviceType::DEVICE_TV ? static_cast<int>(value) - 1 : static_cast<int>(value);
+}
+
 bool AniUtils::GetNumberMember(ani_env *env, ani_object options, const std::string name, int& value)
 {
     ani_status status = env->Object_GetPropertyByName_Int(options, name.c_str(), &value);
@@ -609,7 +614,7 @@ ani_object AniUtils::CreateDeviceCapability(ani_env *env, std::unique_ptr<ResCon
     if (!SetEnumMember(env, obj, "screenDensity", AniSignature::SCREEN_DENSITY, index)) {
         return nullptr;
     };
-    index = static_cast<int>(cfg->GetDeviceType());
+    index = GetDeviceTypeIndex(cfg->GetDeviceType());
     if (!SetEnumMember(env, obj, "deviceType", AniSignature::DEVICE_TYPE, index)) {
         return nullptr;
     };

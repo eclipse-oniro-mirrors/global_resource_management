@@ -56,6 +56,7 @@ private:
         const int index);
     static std::string GetLocale(std::unique_ptr<ResConfig> &cfg);
     static int GetScreenDensityIndex(ScreenDensity value);
+    static int GetDeviceTypeIndex(DeviceType value);
     static bool GetNumberMember(ani_env *env, ani_object options, const std::string name, int& value);
 };
 } // namespace Resource
