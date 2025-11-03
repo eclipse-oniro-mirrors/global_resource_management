@@ -520,7 +520,7 @@ int AniUtils::GetScreenDensityIndex(ScreenDensity value)
 
 int AniUtils::GetDeviceTypeIndex(DeviceType value)
 {
-    return value > DeviceType::DEVICE_TV ? static_cast<DeviceType>(value) - 1 : static_cast<DeviceType>(value);
+    return value > DeviceType::DEVICE_TV ? static_cast<int>(value) - 1 : static_cast<int>(value);
 }
 
 bool AniUtils::GetNumberMember(ani_env *env, ani_object options, const std::string name, int& value)
