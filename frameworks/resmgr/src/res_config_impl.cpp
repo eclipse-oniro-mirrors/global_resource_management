@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 #include "res_config_impl.h"
+
+#include <cstring>
 #ifdef SUPPORT_GRAPHICS
 #include <unicode/localebuilder.h>
 #include <unicode/locid.h>
@@ -534,7 +536,7 @@ bool ResConfigImpl::MatchLocal(const ResConfig &other) const
 
 void PathAppend(std::string &path, const std::string &append, const std::string &connector)
 {
-    if (!append.size()) {
+    if (append.length() == 0) {
         return;
     }
     if (path.size() > 0) {
@@ -561,9 +563,19 @@ std::string ResConfigImpl::ToString() const
     }
 
     if (resLocale_ != nullptr) {
-        PathAppend(path, std::string(resLocale_->GetLanguage()), hyphen);
-        PathAppend(path, std::string(resLocale_->GetScript()), underScore);
-        PathAppend(path, std::string(resLocale_->GetRegion()), underScore);
+        std::string locale = "";
+        if (resLocale_->GetLanguage() != NULL && strlen(resLocale_->GetLanguage()) != 0) {
+            locale += std::string(resLocale_->GetLanguage()) + underScore;
+        }
+        if (resLocale_->GetScript() != NULL && strlen(resLocale_->GetScript()) != 0) {
+            locale += std::string(resLocale_->GetScript()) + underScore;
+        }
+        if (resLocale_->GetRegion() != NULL && strlen(resLocale_->GetRegion()) != 0) {
+            locale += std::string(resLocale_->GetRegion()) + underScore;
+        }
+        if (locale.length() != 0) {
+            PathAppend(path, locale.substr(0, locale.length() - 1), hyphen);
+        }
     }
 
     if (direction_ != Direction::DIRECTION_NOT_SET) {
