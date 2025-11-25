@@ -85,7 +85,6 @@ void ResourceTableLoader::Load(napi_env env, const std::string &bundleName, cons
         RESMGR_HILOGE(RESMGR_JS_TAG, "GetExtractor failed");
         return;
     }
-    bool ret = false;
     std::string abcPath = BUNDLE_INSTALL_PATH + moduleName + MERGE_ABC_PATH;
     auto safeData = extractor->GetSafeData(abcPath);
     if (!safeData) {
@@ -96,12 +95,18 @@ void ResourceTableLoader::Load(napi_env env, const std::string &bundleName, cons
     panda::LocalScope scope(vm);
     panda::TryCatch trycatch(vm);
     std::string table = "@normalized:N&&&" + moduleName + "/build/generated/r/ResourceTable&";
-    ret = panda::JSNApi::ExecuteSecureWithOhmUrl(vm, safeData->GetDataPtr(), safeData->GetDataLen(), abcPath, table);
+    auto data = safeData->GetDataPtr();
+    auto size = safeData->GetDataLen();
+    bool isTableExist = panda::JSNApi::IsExecuteModuleInAbcFileSecure(vm, data, size, abcPath, table);
+    if (!isTableExist) {
+        RESMGR_HILOGD(RESMGR_JS_TAG, "[%{public}s] res table not exist", moduleName.c_str());
+        return;
+    }
+    panda::JSNApi::ExecuteSecureWithOhmUrl(vm, data, size, abcPath, table);
     panda::Local<panda::ObjectRef> exception = trycatch.GetAndClearException();
     if (!exception.IsEmpty() && !exception->IsHole()) {
-        RESMGR_HILOGD(RESMGR_JS_TAG, "ResourceTable is not exist or has crash.");
+        RESMGR_HILOGE(RESMGR_JS_TAG, "[%{public}s] LoadTable failed", moduleName.c_str());
     }
-    RESMGR_HILOGI(RESMGR_JS_TAG, "LoadTable %{public}s", ret ? "success" : "failed");
 }
 } // namespace Resource
 } // namespace Global
