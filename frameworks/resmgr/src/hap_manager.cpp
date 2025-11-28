@@ -1084,6 +1084,7 @@ bool HapManager::RemoveResource(const std::string &path, const std::vector<std::
 
 std::vector<std::shared_ptr<HapResource>> HapManager::GetHapResource()
 {
+    ReadLock lock(this->mutex_);
     return hapResources_;
 }
 
@@ -1289,6 +1290,7 @@ bool HapManager::IsSystem()
 
 std::unordered_map<std::string, std::vector<std::string>> HapManager::GetLoadedHapPaths()
 {
+    ReadLock lock(this->mutex_);
     return this->loadedHapPaths_;
 }
 
