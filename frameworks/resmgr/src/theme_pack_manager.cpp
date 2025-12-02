@@ -37,12 +37,16 @@ const std::string themeFlagA = "data/themes/a/app/flag";
 const std::string themeFlagB = "data/themes/b/app/flag";
 const std::string themeSkinA = "/data/themes/a/app/skin";
 const std::string themeSkinB = "/data/themes/b/app/skin";
+const std::string themeSkinAPath = "/data/themes/a/skin";
+const std::string themeSkinBPath = "/data/themes/b/skin";
 const std::string themeIconsA = "/data/themes/a/app/icons";
 const std::string themeIconsB = "/data/themes/b/app/icons";
 const std::string absoluteThemeFlagA = "data/service/el1/public/themes/<currentUserId>/a/app/flag";
 const std::string absoluteThemeFlagB = "data/service/el1/public/themes/<currentUserId>/b/app/flag";
 const std::string absoluteThemeSkinA = "/data/service/el1/public/themes/<currentUserId>/a/app/skin";
 const std::string absoluteThemeSkinB = "/data/service/el1/public/themes/<currentUserId>/b/app/skin";
+const std::string absoluteThemeSkinAPath = "/data/service/el1/public/themes/<currentUserId>/a/skin";
+const std::string absoluteThemeSkinBPath = "/data/service/el1/public/themes/<currentUserId>/b/skin";
 const std::string absoluteThemeIconsA = "/data/service/el1/public/themes/<currentUserId>/a/app/icons";
 const std::string absoluteThemeIconsB = "/data/service/el1/public/themes/<currentUserId>/b/app/icons";
 const std::string absoluteThemePath = "/data/service/el1/public/themes/";
@@ -90,6 +94,15 @@ std::vector<std::string> ThemePackManager::GetRootDir(const std::string &strCurr
     closedir(dir);
 #endif
     return vDir;
+}
+
+std::vector<std::string> ThemePackManager::GetThemeSkinRootDir(const std::string &newPath, const std::string &oldPath)
+{
+    std::vector<std::string> result = GetRootDir(newPath);
+    if (result.empty()) {
+        result = GetRootDir(oldPath);
+    }
+    return result;
 }
 
 void ThemePackManager::ClearSkinResource()
@@ -140,10 +153,10 @@ void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::st
     std::vector<std::string> rootDirs;
     std::vector<std::string> iconDirs;
     if (Utils::IsFileExist(themeFlagA)) {
-        rootDirs = GetRootDir(themeSkinA);
+        rootDirs = GetThemeSkinRootDir(themeSkinAPath, themeSkinA);
         iconDirs = GetRootDir(themeIconsA);
     } else if (Utils::IsFileExist(themeFlagB)) {
-        rootDirs = GetRootDir(themeSkinB);
+        rootDirs = GetThemeSkinRootDir(themeSkinBPath, themeSkinB);
         iconDirs = GetRootDir(themeIconsB);
     } else {
         isLogFlag_ = true;
@@ -179,10 +192,12 @@ void ThemePackManager::LoadSAThemeRes(const std::string &bundleName, const std::
     int32_t userId, std::vector<std::string> &rootDirs, std::vector<std::string> &iconDirs)
 {
     if (Utils::IsFileExist(ReplaceUserIdInPath(absoluteThemeFlagA, userId))) {
-        rootDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeSkinA, userId));
+        rootDirs = GetThemeSkinRootDir(ReplaceUserIdInPath(absoluteThemeSkinAPath, userId),
+            ReplaceUserIdInPath(absoluteThemeSkinA, userId));
         iconDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeIconsA, userId));
     } else if (Utils::IsFileExist(ReplaceUserIdInPath(absoluteThemeFlagB, userId))) {
-        rootDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeSkinB, userId));
+        rootDirs = GetThemeSkinRootDir(ReplaceUserIdInPath(absoluteThemeSkinBPath, userId),
+            ReplaceUserIdInPath(absoluteThemeSkinB, userId));
         iconDirs = GetRootDir(ReplaceUserIdInPath(absoluteThemeIconsB, userId));
     } else {
         RESMGR_HILOGE(RESMGR_TAG, "LoadThemesRes failed, userId = %{public}d, bundleName = %{public}s",
