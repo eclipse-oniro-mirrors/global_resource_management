@@ -685,9 +685,17 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestGetOtherIconsInfoTest002, TestSize.Le
     std::unique_ptr<uint8_t[]> outValue;
     size_t len;
     RState state = rm->GetOtherIconsInfo("icon_mask", outValue, len, true);
+    EXPECT_EQ(len, 1825);
+    EXPECT_EQ(state, SUCCESS);
+
+    state = rm->GetOtherIconsInfo("icon_highlightstroke", outValue, len, true);
+    EXPECT_EQ(len, 4897);
     EXPECT_EQ(state, SUCCESS);
 
     state = rm->GetOtherIconsInfo("icon_mask", outValue, len, false);
+    EXPECT_EQ(state, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
+
+    state = rm->GetOtherIconsInfo("icon_highlightstroke", outValue, len, false);
     EXPECT_EQ(state, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
 }
 
@@ -706,12 +714,25 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestGetOtherIconsInfoTest003, TestSize.Le
     std::unique_ptr<uint8_t[]> outValue;
     size_t len;
     RState state = rm->GetOtherIconsInfo("icon_mask", outValue, len, true);
+    EXPECT_EQ(len, 1825);
+    EXPECT_EQ(state, SUCCESS);
+
+    state = rm->GetOtherIconsInfo("icon_highlightstroke", outValue, len, true);
+    EXPECT_EQ(len, 4897);
     EXPECT_EQ(state, SUCCESS);
 
     RState state1 = tm->GetThemeIconFromCache("global_icon_mask", outValue, len);
+    EXPECT_EQ(len, 1825);
+    EXPECT_EQ(state1, SUCCESS);
+
+    state1 = tm->GetThemeIconFromCache("global_icon_highlightstroke", outValue, len);
+    EXPECT_EQ(len, 4897);
     EXPECT_EQ(state1, SUCCESS);
 
     RState state2 = rm->GetOtherIconsInfo("icon_mask", outValue, len, true);
+    EXPECT_EQ(state2, SUCCESS);
+
+    state2 = rm->GetOtherIconsInfo("icon_highlightstroke", outValue, len, true);
     EXPECT_EQ(state2, SUCCESS);
 }
 
@@ -760,6 +781,11 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestGetThemeIconFromCacheTest002, TestSiz
     state = tm->GetOtherIconsInfo("icon_mask", outValue, len, true, userId);
     EXPECT_EQ(state, SUCCESS);
     state = tm->GetThemeIconFromCache("global_icon_mask", outValue, len);
+    EXPECT_EQ(state, SUCCESS);
+
+    state = tm->GetOtherIconsInfo("icon_highlightstroke", outValue, len, true, userId);
+    EXPECT_EQ(state, SUCCESS);
+    state = tm->GetThemeIconFromCache("global_icon_highlightstroke", outValue, len);
     EXPECT_EQ(state, SUCCESS);
 }
 

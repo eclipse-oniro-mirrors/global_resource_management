@@ -89,6 +89,9 @@ std::vector<std::string> ThemePackManager::GetRootDir(const std::string &strCurr
             if (filePath.find("icon_mask") != std::string::npos) {
                 themeMask = filePath;
             }
+            if (filePath.find("icon_highlightstroke") != std::string::npos) {
+                themeStroke = filePath;
+            }
         }
     }
     closedir(dir);
@@ -426,6 +429,9 @@ RState ThemePackManager::GetOtherIconsInfo(const std::string &iconName,
     std::string iconTag;
     if (iconName.find("icon_mask") != std::string::npos && isGlobalMask) {
         iconPath = themeMask;
+        iconTag = "global_" + iconName;
+    } else if (iconName.find("icon_highlightstroke") != std::string::npos && isGlobalMask) {
+        iconPath = themeStroke;
         iconTag = "global_" + iconName;
     } else {
         std::pair<std::string, std::string> bundleInfo;
