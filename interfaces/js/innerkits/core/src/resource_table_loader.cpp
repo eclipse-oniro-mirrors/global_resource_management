@@ -38,7 +38,7 @@ void ResourceTableLoader::LoadTable(napi_env env, const std::shared_ptr<Resource
     std::string loadPath;
     GetHapInfo(addon, bundleName, moduleName, loadPath);
     if (bundleName.empty() || moduleName.empty() || loadPath.empty()) {
-        RESMGR_HILOGE(RESMGR_JS_TAG, "GetHapInfo failed");
+        RESMGR_HILOGD(RESMGR_JS_TAG, "HapInfo from context is empty");
         return;
     }
     if (loadedHaps.count(moduleName)) {
@@ -53,12 +53,10 @@ void ResourceTableLoader::GetHapInfo(const std::shared_ptr<ResourceManagerAddon>
 {
     auto context = addon->GetContext();
     if (!context) {
-        RESMGR_HILOGE(RESMGR_JS_TAG, "GetHapInfo context null");
         return;
     }
     auto hapModuleInfo = context->GetHapModuleInfo();
     if (!hapModuleInfo) {
-        RESMGR_HILOGE(RESMGR_JS_TAG, "hapModuleInfo null");
         return;
     }
     bundleName = hapModuleInfo->bundleName;
