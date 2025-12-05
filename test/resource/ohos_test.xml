@@ -54,6 +54,7 @@
             <option name="push" value="data/theme/base/media/foreground.png -> /data/test/theme/themereource/foreground" src="res"/>
             <option name="push" value="data/theme/base/media/foreground.png -> /data/test/theme/icons/dynamic_icons/" src="res"/>
             <option name="push" value="data/theme/base/media/icon_mask.svg -> /data/test/theme/icons/" src="res"/>
+            <option name="push" value="data/theme/base/media/icon_highlightstroke.png -> /data/test/theme/icons/" src="res"/>
         </preparer>
     </target>
 </configuration>

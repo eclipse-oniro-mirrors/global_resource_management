@@ -168,6 +168,7 @@ public:
 private:
     ThemePackManager();
     std::string themeMask;
+    std::string themeStroke;
     void ChangeSkinResourceStatus(int32_t userId);
     void ChangeIconResourceStatus(int32_t userId);
     void ClearSkinResource();

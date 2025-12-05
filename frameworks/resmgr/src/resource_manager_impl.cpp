@@ -2067,7 +2067,8 @@ RState ResourceManagerImpl::GetOtherIconsInfo(const std::string &iconName,
     std::unique_ptr<uint8_t[]> &outValue, size_t &len, bool isGlobalMask)
 {
     std::string iconTag;
-    if (iconName.find("icon_mask") != std::string::npos && isGlobalMask) {
+    if ((iconName.find("icon_mask") != std::string::npos || iconName.find("icon_highlightstroke") != std::string::npos)
+        && isGlobalMask) {
         iconTag = "global_" + iconName;
     } else {
         iconTag = "other_icons_" + iconName;
