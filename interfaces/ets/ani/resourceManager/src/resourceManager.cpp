@@ -15,6 +15,7 @@
 
 #include "resourceManager.h"
 
+#include <mutex>
 #include "ani_signature.h"
 #include "hilog_wrapper.h"
 #include "resource_manager.h"
@@ -22,7 +23,9 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
-
+static ani_class cls = nullptr;
+static ani_method ctor = nullptr;
+static std::mutex initMutex;
 ani_object ResMgrAddon::CreateResMgr(
     ani_env* env, const std::string& bundleName, const std::shared_ptr<ResourceManager>& resMgr,
     std::shared_ptr<AbilityRuntime::Context> context)
@@ -32,19 +35,10 @@ ani_object ResMgrAddon::CreateResMgr(
 
 ani_object ResMgrAddon::WrapResourceManager(ani_env* env, std::shared_ptr<ResourceManager> resMgr)
 {
+    if (!Init(env)) {
+        return nullptr;
+    }
     ani_object nativeResMgr;
-    ani_class cls;
-    if (ANI_OK != env->FindClass(AniSignature::RESOURCE_MANAGER_INNER, &cls)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", AniSignature::RESOURCE_MANAGER_INNER);
-        return nullptr;
-    }
-
-    ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find method '<ctor>' failed");
-        return nullptr;
-    }
-
     auto resMgrPtr = std::make_unique<std::shared_ptr<ResourceManager>>(resMgr);
     if (ANI_OK != env->Object_New(cls, ctor, &nativeResMgr, reinterpret_cast<ani_long>(resMgrPtr.get()))) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "New object '%{public}s' failed", AniSignature::RESOURCE_MANAGER_INNER);
@@ -52,6 +46,24 @@ ani_object ResMgrAddon::WrapResourceManager(ani_env* env, std::shared_ptr<Resour
     }
     resMgrPtr.release();
     return nativeResMgr;
+}
+
+bool ResMgrAddon::Init(ani_env* env) {
+    std::lock_guard<std::mutex> lock(initMutex);
+    if (ctor) {
+        return true;
+    }
+    
+    if (ANI_OK != env->FindClass(AniSignature::RESOURCE_MANAGER_INNER, &cls)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", AniSignature::RESOURCE_MANAGER_INNER);
+        return false;
+    }
+
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find method '<ctor>' failed");
+        return false;
+    }
+    return true;
 }
 } // namespace Resource
 } // namespace Global
