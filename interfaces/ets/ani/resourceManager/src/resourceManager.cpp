@@ -51,7 +51,7 @@ ani_object ResMgrAddon::WrapResourceManager(ani_env* env, std::shared_ptr<Resour
 bool ResMgrAddon::Init(ani_env* env)
 {
     std::lock_guard<std::mutex> lock(g_initMutex);
-    if (g_ctor) {
+    if (g_cls && g_ctor) {
         return true;
     }
     
