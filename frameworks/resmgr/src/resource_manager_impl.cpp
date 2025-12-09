@@ -2066,18 +2066,21 @@ bool ResourceManagerImpl::HasIconInTheme(const std::string &bundleName)
 RState ResourceManagerImpl::GetOtherIconsInfo(const std::string &iconName,
     std::unique_ptr<uint8_t[]> &outValue, size_t &len, bool isGlobalMask)
 {
+    auto themeManager = ThemePackManager::GetThemePackManager();
+    if (iconName.find("icon_highlightstroke") != std::string::npos && isGlobalMask) {
+        return themeManager->GetHighlightIconInfo(iconName, outValue, len, isGlobalMask);
+    }
     std::string iconTag;
-    if ((iconName.find("icon_mask") != std::string::npos || iconName.find("icon_highlightstroke") != std::string::npos)
-        && isGlobalMask) {
+    if (iconName.find("icon_mask") != std::string::npos && isGlobalMask) {
         iconTag = "global_" + iconName;
     } else {
         iconTag = "other_icons_" + iconName;
     }
-    RState result = ThemePackManager::GetThemePackManager()->GetThemeIconFromCache(iconTag, outValue, len);
+    RState result = themeManager->GetThemeIconFromCache(iconTag, outValue, len);
     if (result == SUCCESS) {
         return SUCCESS;
     }
-    return ThemePackManager::GetThemePackManager()->GetOtherIconsInfo(iconName, outValue, len, isGlobalMask, userId);
+    return themeManager->GetOtherIconsInfo(iconName, outValue, len, isGlobalMask, userId);
 }
 
 RState ResourceManagerImpl::IsRawDirFromHap(const std::string &pathName, bool &outValue)
