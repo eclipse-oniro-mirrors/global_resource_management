@@ -146,6 +146,18 @@ public:
         std::unique_ptr<uint8_t[]> &outValue, size_t &len, bool isGlobalMask, int32_t userId);
 
     /**
+     * Get icons info of icon_highlightstroke
+     *
+     * @param iconName the icon name
+     * @param outValue the obtain resource wirte to
+     * @param len the data len wirte to
+     * @param isGlobalMask true if the global mask, else other icons
+     * @return SUCCESS if the theme icon get success, else failed
+     */
+    RState GetHighlightIconInfo(const std::string &iconName, std::unique_ptr<uint8_t[]> &outValue, size_t &len,
+        bool isGlobalMask);
+
+    /**
      * Get the theme icon from cache
      *
      * @param iconTag the tag of icon info
@@ -168,15 +180,17 @@ public:
 private:
     ThemePackManager();
     std::string themeMask;
-    std::string themeStroke;
+    std::string themeStroke_;
     void ChangeSkinResourceStatus(int32_t userId);
     void ChangeIconResourceStatus(int32_t userId);
     void ClearSkinResource();
     void ClearIconResource();
+    void ClearHighlightIcon();
     const std::string GetMaskString(const std::string &path);
     std::vector<std::shared_ptr<ThemeResource>> skinResource_;
     std::vector<std::shared_ptr<ThemeResource>> iconResource_;
     std::vector<std::tuple<std::string, std::unique_ptr<uint8_t[]>, size_t>> iconMaskValues_;
+    std::tuple<std::string, std::unique_ptr<uint8_t[]>, size_t> iconHighlightValue_;
     std::vector<std::shared_ptr<ThemeResource::ThemeValue> > GetThemeResourceList(
         const std::pair<std::string, std::string> &bundInfo, const ResType &resType, const std::string &resName,
         int32_t userId);
@@ -197,6 +211,7 @@ private:
     std::mutex lockIcon_;
     std::mutex lockThemeId_;
     std::mutex lockIconValue_;
+    std::mutex lockHighlightIcon_;
     std::mutex lockUserId_;
     uint32_t themeId_{0};
     bool isFirstCreate = true;

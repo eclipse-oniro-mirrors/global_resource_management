@@ -89,8 +89,9 @@ std::vector<std::string> ThemePackManager::GetRootDir(const std::string &strCurr
             if (filePath.find("icon_mask") != std::string::npos) {
                 themeMask = filePath;
             }
+            std::lock_guard<std::mutex> lock(this->lockHighlightIcon_);
             if (filePath.find("icon_highlightstroke") != std::string::npos) {
-                themeStroke = filePath;
+                themeStroke_ = filePath;
             }
         }
     }
@@ -153,6 +154,7 @@ void ThemePackManager::LoadThemeSkinResource(const std::string &bundleName, cons
 void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::string &moduleName, int32_t userId)
 {
     UpdateUserId(userId);
+    ClearHighlightIcon();
     std::vector<std::string> rootDirs;
     std::vector<std::string> iconDirs;
     if (Utils::IsFileExist(themeFlagA)) {
@@ -173,6 +175,7 @@ void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::st
 void ThemePackManager::LoadThemeIconRes(const std::string &bundleName, const std::string &moduleName, int32_t userId)
 {
     UpdateUserId(userId);
+    ClearHighlightIcon();
     std::vector<std::string> iconDirs;
     if (Utils::IsFileExist(themeFlagA)) {
         iconDirs = GetRootDir(themeIconsA);
@@ -333,6 +336,13 @@ void ThemePackManager::ClearIconResource()
     iconMaskValues_.clear();
 }
 
+void ThemePackManager::ClearHighlightIcon()
+{
+    std::lock_guard<std::mutex> lock(this->lockHighlightIcon_);
+    iconHighlightValue_ = { "", nullptr, 0 };
+    themeStroke_ = "";
+}
+
 void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, const std::string &moduleName,
     const std::vector<std::string> &rootDirs, int32_t userId)
 {
@@ -430,9 +440,6 @@ RState ThemePackManager::GetOtherIconsInfo(const std::string &iconName,
     if (iconName.find("icon_mask") != std::string::npos && isGlobalMask) {
         iconPath = themeMask;
         iconTag = "global_" + iconName;
-    } else if (iconName.find("icon_highlightstroke") != std::string::npos && isGlobalMask) {
-        iconPath = themeStroke;
-        iconTag = "global_" + iconName;
     } else {
         std::pair<std::string, std::string> bundleInfo;
         bundleInfo.first = "other_icons";
@@ -454,6 +461,48 @@ RState ThemePackManager::GetOtherIconsInfo(const std::string &iconName,
             return SUCCESS;
         }
         iconMaskValues_.emplace_back(std::make_tuple(iconTag, std::move(tmpInfo), len));
+        return SUCCESS;
+    }
+    return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
+}
+
+RState ThemePackManager::GetHighlightIconInfo(const std::string &iconName, std::unique_ptr<uint8_t[]> &outValue,
+    size_t &len, bool isGlobalMask)
+{
+    std::lock_guard<std::mutex> lock(this->lockHighlightIcon_);
+    std::string iconTag;
+    std::string iconPath;
+    if (iconName.find("icon_highlightstroke") != std::string::npos && isGlobalMask) {
+        iconTag = "global_" + iconName;
+    }
+    std::string tag = std::get<FIRST_ELEMENT>(iconHighlightValue_);
+    if (iconTag == tag) {
+        size_t length = std::get<THIRED_ELEMENT>(iconHighlightValue_);
+        auto iconInfo = std::make_unique<uint8_t[]>(length);
+        auto tmpInfo = std::get<SECOND_ELEMENT>(iconHighlightValue_).get();
+        errno_t ret = memcpy_s(iconInfo.get(), length, tmpInfo, length);
+        if (ret != 0) {
+            RESMGR_HILOGE(RESMGR_TAG, "get %{public}s info fail, ret = %{public}d", iconTag.c_str(), ret);
+            return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
+        }
+        len = length;
+        outValue = std::move(iconInfo);
+        return SUCCESS;
+    }
+    iconPath = themeStroke_;
+    if (iconPath.empty()) {
+        RESMGR_HILOGD(RESMGR_TAG, "no found, iconTag = %{public}s", iconTag.c_str());
+        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
+    }
+    outValue = Utils::LoadResourceFile(iconPath, len);
+    if (outValue != nullptr && len != 0) {
+        auto tmpInfo = std::make_unique<uint8_t[]>(len);
+        errno_t ret = memcpy_s(tmpInfo.get(), len, outValue.get(), len);
+        if (ret != 0) {
+            RESMGR_HILOGE(RESMGR_TAG, "save fail, iconName = %{public}s, ret = %{public}d", iconName.c_str(), ret);
+            return SUCCESS;
+        }
+        iconHighlightValue_ = std::make_tuple(iconTag, std::move(tmpInfo), len);
         return SUCCESS;
     }
     return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
