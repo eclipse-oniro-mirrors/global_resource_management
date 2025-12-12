@@ -1008,7 +1008,7 @@ ani_object ResMgrAni::GetLocales(ani_env* env, ani_object object, ani_object inc
     }
     ani_boolean includeSys = false;
     if (!isUndefined) {
-        status = env->Object_CallMethodByName_Boolean(includeSystem, "unboxed", ":z", &includeSys);
+        status = env->Object_CallMethodByName_Boolean(includeSystem, "toBoolean", ":z", &includeSys);
         if (ANI_OK != status) {
             RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get includeSystem, status: %{public}d.", status);
             return nullptr;

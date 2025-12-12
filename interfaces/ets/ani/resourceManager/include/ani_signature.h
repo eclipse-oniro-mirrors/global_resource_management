@@ -22,7 +22,7 @@ namespace Resource {
 class AniSignature {
 public:
 
-    static constexpr const char *ANI_ARRAY = "escompat.Array";
+    static constexpr const char *ANI_ARRAY = "std.core.Array";
     static constexpr const char *ANI_STRING = "std.core.String";
     static constexpr const char *ANI_UINT8ARRAY = "escompat.Uint8Array";
     static constexpr const char *BUSINESSERROR = "@ohos.base.BusinessError";
