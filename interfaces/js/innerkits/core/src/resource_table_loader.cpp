@@ -95,6 +95,7 @@ void ResourceTableLoader::Load(napi_env env, const std::string &bundleName, cons
     std::string table = "@normalized:N&&&" + moduleName + "/build/generated/r/ResourceTable&";
     auto data = safeData->GetDataPtr();
     auto size = safeData->GetDataLen();
+    panda::JSNApi::SetModuleName(vm, moduleName);
     bool isTableExist = panda::JSNApi::IsExecuteModuleInAbcFileSecure(vm, data, size, abcPath, table);
     if (!isTableExist) {
         RESMGR_HILOGD(RESMGR_JS_TAG, "[%{public}s] res table not exist", moduleName.c_str());
