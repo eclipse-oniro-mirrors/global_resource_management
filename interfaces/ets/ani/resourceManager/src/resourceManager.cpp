@@ -41,7 +41,8 @@ ani_object ResMgrAddon::WrapResourceManager(ani_env* env, std::shared_ptr<Resour
     }
     ani_object nativeResMgr;
     auto resMgrPtr = std::make_unique<std::shared_ptr<ResourceManager>>(resMgr);
-    if (ANI_OK != env->Object_New(static_cast<ani_class>(g_clsRef), g_ctor, &nativeResMgr, reinterpret_cast<ani_long>(resMgrPtr.get()))) {
+    if (ANI_OK != env->Object_New(static_cast<ani_class>(g_clsRef), g_ctor,
+        &nativeResMgr, reinterpret_cast<ani_long>(resMgrPtr.get()))) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "New object '%{public}s' failed", AniSignature::RESOURCE_MANAGER_INNER);
         return nullptr;
     }
