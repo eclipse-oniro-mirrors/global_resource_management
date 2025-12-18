@@ -17,6 +17,7 @@
 
 #include <unordered_set>
 
+#include "ability_stage_context.h"
 #include "ecmascript/napi/include/jsnapi.h"
 #include "extractor.h"
 #include "hilog_wrapper.h"
@@ -53,6 +54,9 @@ void ResourceTableLoader::GetHapInfo(const std::shared_ptr<ResourceManagerAddon>
 {
     auto context = addon->GetContext();
     if (!context) {
+        return;
+    }
+    if (AbilityRuntime::Context::ConvertTo<AbilityRuntime::AbilityStageContext>(context) != nullptr) {
         return;
     }
     auto hapModuleInfo = context->GetHapModuleInfo();
