@@ -52,11 +52,11 @@ constexpr int DYNAMIC_ICON = 2;
 static std::array methods = {
     ani_native_function { "getStringSync", "l:C{std.core.String}",
         reinterpret_cast<void*>(ResMgrAni::GetStringSyncById) },
-    ani_native_function { "getStringSync", "lC{escompat.Array}:C{std.core.String}",
+    ani_native_function { "getStringSync", "lC{std.core.Array}:C{std.core.String}",
         reinterpret_cast<void *>(ResMgrAni::GetFormatStringSyncById) },
     ani_native_function { "getStringByNameSync", "C{std.core.String}:C{std.core.String}",
         reinterpret_cast<void*>(ResMgrAni::GetStringByNameSync) },
-    ani_native_function { "getStringByNameSync", "C{std.core.String}C{escompat.Array}:C{std.core.String}",
+    ani_native_function { "getStringByNameSync", "C{std.core.String}C{std.core.Array}:C{std.core.String}",
         reinterpret_cast<void*>(ResMgrAni::GetFormatStringByNameSync) },
 
     ani_native_function { "getBoolean", nullptr, reinterpret_cast<void*>(ResMgrAni::GetBooleanById) },
@@ -1008,7 +1008,7 @@ ani_object ResMgrAni::GetLocales(ani_env* env, ani_object object, ani_object inc
     }
     ani_boolean includeSys = false;
     if (!isUndefined) {
-        status = env->Object_CallMethodByName_Boolean(includeSystem, "unboxed", ":z", &includeSys);
+        status = env->Object_CallMethodByName_Boolean(includeSystem, "toBoolean", ":z", &includeSys);
         if (ANI_OK != status) {
             RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get includeSystem, status: %{public}d.", status);
             return nullptr;
