@@ -49,6 +49,8 @@ napi_value ResourceManagerAddon::CreateOverrideAddon(napi_env env, const std::sh
 
 napi_value ResourceManagerAddon::WrapResourceManager(napi_env env, std::shared_ptr<ResourceManagerAddon> &addon)
 {
+    napi_escapable_handle_scope scope;
+    napi_open_escapable_handle_scope(env, &scope);
     if (!Init(env)) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to init resource manager addon");
         return nullptr;
@@ -79,7 +81,10 @@ napi_value ResourceManagerAddon::WrapResourceManager(napi_env env, std::shared_p
         return nullptr;
     }
     addonPtr.release();
-    return result;
+    napi_value escapedResult = nullptr;
+    napi_escape_handle(env, scope, result, &escapedResult);
+    napi_close_escapable_handle_scope(env, scope);
+    return escapedResult;
 }
 
 napi_value ResourceManagerAddon::GetSystemResMgr(napi_env env)
