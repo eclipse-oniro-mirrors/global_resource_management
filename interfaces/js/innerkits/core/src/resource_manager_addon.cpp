@@ -53,23 +53,27 @@ napi_value ResourceManagerAddon::WrapResourceManager(napi_env env, std::shared_p
     napi_open_escapable_handle_scope(env, &scope);
     if (!Init(env)) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to init resource manager addon");
+        napi_close_escapable_handle_scope(env, scope);
         return nullptr;
     }
 
     napi_value constructor = nullptr;
     if (g_constructor == nullptr) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to WrapResourceManager in Create, g_constructor is null");
+        napi_close_escapable_handle_scope(env, scope);
         return nullptr;
     }
     napi_status status = napi_get_reference_value(env, g_constructor, &constructor);
     if (status != napi_ok || constructor == nullptr) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get reference value in Create, status = %{public}d", status);
+        napi_close_escapable_handle_scope(env, scope);
         return nullptr;
     }
     napi_value result = nullptr;
     status = napi_new_instance(env, constructor, 0, nullptr, &result);
     if (status != napi_ok) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to new instance in Create, status = %{public}d", status);
+        napi_close_escapable_handle_scope(env, scope);
         return nullptr;
     }
 
@@ -78,6 +82,7 @@ napi_value ResourceManagerAddon::WrapResourceManager(napi_env env, std::shared_p
         nullptr, nullptr);
     if (status != napi_ok) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to wrape in Create");
+        napi_close_escapable_handle_scope(env, scope);
         return nullptr;
     }
     addonPtr.release();
