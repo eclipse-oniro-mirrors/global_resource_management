@@ -31,7 +31,9 @@ MmapFile::~MmapFile()
 {
     if (mmap_ != nullptr) {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-        munmap(mmap_, mmapLen_);
+        if (mapper_ == nullptr) {
+            munmap(mmap_, mmapLen_);
+        }
 #else
         delete[] mmap_;
 #endif
