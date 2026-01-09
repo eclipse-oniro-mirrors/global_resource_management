@@ -96,15 +96,22 @@ void ResourceTableLoader::Load(napi_env env, const std::string &bundleName, cons
     panda::JSExecutionScope executionScope(vm);
     panda::LocalScope scope(vm);
     panda::TryCatch trycatch(vm);
-    std::string table = "@normalized:N&&&" + moduleName + "/build/generated/r/ResourceTable&";
+    std::string tablePath = "/build/generated/r/ResourceTable";
+    std::string tableOhmurl = "@normalized:N&&&" + moduleName + tablePath + "&";
     auto data = safeData->GetDataPtr();
     auto size = safeData->GetDataLen();
-    bool isTableExist = panda::JSNApi::IsExecuteModuleInAbcFileSecure(vm, data, size, abcPath, table);
+    bool isTableExist = panda::JSNApi::IsExecuteModuleInAbcFileSecure(vm, data, size, abcPath, tableOhmurl);
     if (!isTableExist) {
-        RESMGR_HILOGD(RESMGR_JS_TAG, "[%{public}s] res table not exist", moduleName.c_str());
-        return;
+        RESMGR_HILOGD(RESMGR_JS_TAG, "[%{public}s] normalized res table not exist", moduleName.c_str());
+        // old format, unnormalized ohmurl
+        tableOhmurl = "@bundle:" + bundleName + "/" + moduleName + tablePath;
+        isTableExist = panda::JSNApi::IsExecuteModuleInAbcFileSecure(vm, data, size, abcPath, tableOhmurl);
+        if (!isTableExist) {
+            RESMGR_HILOGD(RESMGR_JS_TAG, "[%{public}s] unnormalized res table not exist", moduleName.c_str());
+            return;
+        }
     }
-    panda::JSNApi::ExecuteSecureWithOhmUrl(vm, data, size, abcPath, table);
+    panda::JSNApi::ExecuteSecureWithOhmUrl(vm, data, size, abcPath, tableOhmurl);
     panda::Local<panda::ObjectRef> exception = trycatch.GetAndClearException();
     if (!exception.IsEmpty() && !exception->IsHole()) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "[%{public}s] LoadTable failed", moduleName.c_str());
