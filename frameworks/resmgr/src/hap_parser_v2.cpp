@@ -129,6 +129,9 @@ int32_t HapParserV2::ParseKeys(uint32_t &offset)
             return ret;
         }
         keys_[key->resConfigId_] = HapParser::CreateResConfigFromKeyParams(key->params_);
+        if (keys_[key->resConfigId_] == nullptr) {
+            return SYS_ERROR;
+        }
         if (keys_[key->resConfigId_]->GetColorMode() == ColorMode::DARK) {
             hasDarkRes_ = true;
         }
