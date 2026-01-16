@@ -49,7 +49,7 @@ bool ResourceManagerExtMgr::Init(std::shared_ptr<ResourceManager> &resMgrExt, co
             return false;
         }
     }
-    std::string resMgrExtKey(bundleName);
+    std::string resMgrExtKey(bundleName + "+" + std::to_string(appType) + "+" + std::to_string(userId));
     auto iter = resMgrExtMap_.find(resMgrExtKey);
     if (iter != resMgrExtMap_.end()) {
         resMgrExt = resMgrExtMap_[resMgrExtKey];
