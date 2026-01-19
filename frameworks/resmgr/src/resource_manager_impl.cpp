@@ -1329,6 +1329,10 @@ bool ResourceManagerImpl::AddResource(const char *path, const uint32_t &selected
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
 #endif
+    if (Utils::IsStrEmpty(path)) {
+        RESMGR_HILOGE(RESMGR_TAG, "AddResource path is empty.");
+        return false;
+    }
 #if defined(__ARKUI_CROSS__) || defined(__IDE_PREVIEW__)
     if (!isSystemResMgr_ && Utils::IsSystemPath(std::string(path))) {
         ResourceManagerImpl* systemResourceManager = SystemResourceManager::GetSystemResourceManager();

@@ -50,7 +50,7 @@ const std::string absoluteThemeSkinBPath = "/data/service/el1/public/themes/<cur
 const std::string absoluteThemeIconsA = "/data/service/el1/public/themes/<currentUserId>/a/app/icons";
 const std::string absoluteThemeIconsB = "/data/service/el1/public/themes/<currentUserId>/b/app/icons";
 const std::string absoluteThemePath = "/data/service/el1/public/themes/";
-ThemePackManager::ThemePackManager()
+ThemePackManager::ThemePackManager() : isLogFlag_(Utils::IsFileExist(absoluteThemePath))
 {}
 
 ThemePackManager::~ThemePackManager()
@@ -164,7 +164,6 @@ void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::st
         rootDirs = GetThemeSkinRootDir(themeSkinBPath, themeSkinB);
         iconDirs = GetRootDir(themeIconsB);
     } else {
-        isLogFlag_ = true;
         LoadSAThemeRes(bundleName, moduleName, userId, rootDirs, iconDirs);
     }
     LoadThemeSkinResource(bundleName, moduleName, rootDirs, userId);
@@ -333,6 +332,7 @@ void ThemePackManager::ClearIconResource()
             ++it;
         }
     }
+    std::lock_guard<std::mutex> lock(lockIconValue_);
     iconMaskValues_.clear();
 }
 
