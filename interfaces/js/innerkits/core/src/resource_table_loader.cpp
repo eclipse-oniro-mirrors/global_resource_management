@@ -28,12 +28,11 @@ namespace Resource {
 constexpr char BUNDLE_INSTALL_PATH[] = "/data/storage/el1/bundle/";
 constexpr char MERGE_ABC_PATH[] = "/ets/modules.abc";
 
-static std::mutex mutex_;
+static std::recursive_mutex mutex_;
 static std::unordered_set<std::string> loadedHaps;
 
 void ResourceTableLoader::LoadTable(napi_env env, const std::shared_ptr<ResourceManagerAddon> &addon)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
     std::string bundleName;
     std::string moduleName;
     std::string loadPath;
@@ -42,11 +41,14 @@ void ResourceTableLoader::LoadTable(napi_env env, const std::shared_ptr<Resource
         RESMGR_HILOGD(RESMGR_JS_TAG, "HapInfo from context is empty");
         return;
     }
-    if (loadedHaps.count(moduleName)) {
-        return;
+    {
+        std::lock_guard<std::recursive_mutex> lock(mutex_);
+        if (loadedHaps.count(moduleName)) {
+            return;
+        }
+        loadedHaps.insert(moduleName);
     }
     Load(env, bundleName, moduleName, loadPath);
-    loadedHaps.insert(moduleName);
 }
 
 void ResourceTableLoader::GetHapInfo(const std::shared_ptr<ResourceManagerAddon> &addon, std::string &bundleName,
