@@ -309,6 +309,7 @@ static napi_value ResMgrInit(napi_env env, napi_value exports)
         return nullptr;
     }
 
+    ResourceManagerAddon::Init(env);
     return exports;
 }
 
