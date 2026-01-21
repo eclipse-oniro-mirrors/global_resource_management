@@ -91,6 +91,9 @@ const std::shared_ptr<HapResource> HapResourceManager::Load(const char *path,
         hapParser = std::make_unique<HapParserV1>(defaultConfig, selectedTypes, isSystem || isOverlay);
     }
     if (hapParser == nullptr || !hapParser->Init(path)) {
+        if (path == nullptr || std::string(path).empty()) {
+            RESMGR_HILOGE(RESMGR_TAG, "empty path, module:%{public}d", isNewModule);
+        }
         return nullptr;
     }
     
