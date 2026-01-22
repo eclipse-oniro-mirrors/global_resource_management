@@ -434,7 +434,6 @@ bool ThemePackManager::HasIconInTheme(const std::string &bundleName, int32_t use
 RState ThemePackManager::GetOtherIconsInfo(const std::string &iconName,
     std::unique_ptr<uint8_t[]> &outValue, size_t &len, bool isGlobalMask, int32_t userId)
 {
-    
     std::string iconPath;
     std::string iconTag;
     if (iconName.find("icon_mask") != std::string::npos && isGlobalMask) {
