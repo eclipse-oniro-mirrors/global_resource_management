@@ -61,7 +61,7 @@ bool ResourceManagerExtMgr::Init(std::shared_ptr<ResourceManager> &resMgrExt, co
         RESMGR_HILOGE(RESMGR_TAG, "CreateResMgrExt fail.");
         return false;
     }
-    resMgrExtMap_[bundleName] = resMgrExt;
+    resMgrExtMap_[resMgrExtKey] = resMgrExt;
     return true;
 }
 } // namespace Resource
