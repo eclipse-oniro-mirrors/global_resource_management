@@ -41,13 +41,6 @@ void ResourceTableLoader::LoadTable(napi_env env, const std::shared_ptr<Resource
         RESMGR_HILOGD(RESMGR_JS_TAG, "HapInfo from context is empty");
         return;
     }
-    {
-        std::lock_guard<std::recursive_mutex> lock(mutex_);
-        if (loadedHaps.count(moduleName)) {
-            return;
-        }
-        loadedHaps.insert(moduleName);
-    }
     Load(env, bundleName, moduleName, loadPath);
 }
 
@@ -70,6 +63,16 @@ void ResourceTableLoader::GetHapInfo(const std::shared_ptr<ResourceManagerAddon>
     loadPath = AbilityBase::ExtractorUtil::GetLoadFilePath(hapModuleInfo->hapPath);
 }
 
+bool ResourceTableLoader::CheckModuleLoaded(const std::string &moduleName)
+{
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    if (loadedHaps.count(moduleName)) {
+        return true;
+    }
+    loadedHaps.insert(moduleName);
+    return false;
+}
+
 void ResourceTableLoader::Load(napi_env env, const std::string &bundleName, const std::string &moduleName,
     const std::string &loadPath)
 {
@@ -83,36 +86,39 @@ void ResourceTableLoader::Load(napi_env env, const std::string &bundleName, cons
         RESMGR_HILOGE(RESMGR_JS_TAG, "vm is null");
         return;
     }
+    panda::JSExecutionScope executionScope(vm);
+    panda::LocalScope scope(vm);
+    panda::TryCatch trycatch(vm);
+    std::string abcPath = BUNDLE_INSTALL_PATH + moduleName + MERGE_ABC_PATH;
+    std::string tablePath = "/build/generated/r/ResourceTable";
+    std::string tableOhmurl = "@normalized:N&&&" + moduleName + tablePath + "&";
+    bool isTableExist = panda::JSNApi::FindModuleInAbcFile(vm, abcPath, tableOhmurl);
+    if (!isTableExist) {
+        RESMGR_HILOGD(RESMGR_JS_TAG, "[%{public}s] normalized res table not exist", moduleName.c_str());
+        // old format, unnormalized ohmurl
+        tableOhmurl = "@bundle:" + bundleName + "/" + moduleName + tablePath;
+        isTableExist = panda::JSNApi::FindModuleInAbcFile(vm, abcPath, tableOhmurl);
+        if (!isTableExist) {
+            RESMGR_HILOGD(RESMGR_JS_TAG, "[%{public}s] unnormalized res table not exist", moduleName.c_str());
+            return;
+        }
+    }
+    if (CheckModuleLoaded(moduleName)) {
+        return;
+    }
     bool newCreate = false;
     auto extractor = AbilityBase::ExtractorUtil::GetExtractor(loadPath, newCreate);
     if (!extractor) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "GetExtractor failed");
         return;
     }
-    std::string abcPath = BUNDLE_INSTALL_PATH + moduleName + MERGE_ABC_PATH;
     auto safeData = extractor->GetSafeData(abcPath);
     if (!safeData) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "GetSafeData failed");
         return;
     }
-    panda::JSExecutionScope executionScope(vm);
-    panda::LocalScope scope(vm);
-    panda::TryCatch trycatch(vm);
-    std::string tablePath = "/build/generated/r/ResourceTable";
-    std::string tableOhmurl = "@normalized:N&&&" + moduleName + tablePath + "&";
     auto data = safeData->GetDataPtr();
     auto size = safeData->GetDataLen();
-    bool isTableExist = panda::JSNApi::IsExecuteModuleInAbcFileSecure(vm, data, size, abcPath, tableOhmurl);
-    if (!isTableExist) {
-        RESMGR_HILOGD(RESMGR_JS_TAG, "[%{public}s] normalized res table not exist", moduleName.c_str());
-        // old format, unnormalized ohmurl
-        tableOhmurl = "@bundle:" + bundleName + "/" + moduleName + tablePath;
-        isTableExist = panda::JSNApi::IsExecuteModuleInAbcFileSecure(vm, data, size, abcPath, tableOhmurl);
-        if (!isTableExist) {
-            RESMGR_HILOGD(RESMGR_JS_TAG, "[%{public}s] unnormalized res table not exist", moduleName.c_str());
-            return;
-        }
-    }
     panda::JSNApi::ExecuteSecureWithOhmUrl(vm, data, size, abcPath, tableOhmurl);
     panda::Local<panda::ObjectRef> exception = trycatch.GetAndClearException();
     if (!exception.IsEmpty() && !exception->IsHole()) {

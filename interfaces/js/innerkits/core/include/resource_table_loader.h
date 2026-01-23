@@ -32,6 +32,7 @@ private:
         std::string &moduleName, std::string &loadPath);
     static void Load(napi_env env, const std::string &bundleName, const std::string &moduleName,
         const std::string &loadPath);
+    static bool CheckModuleLoaded(const std::string &moduleName);
 };
 } // namespace Resource
 } // namespace Global
