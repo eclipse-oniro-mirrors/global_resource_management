@@ -216,7 +216,7 @@ private:
     uint32_t themeId_{0};
     bool isFirstCreate = true;
     int32_t currentUserId_ = 0;
-    bool isLogFlag_ = false;
+    const bool isLogFlag_ = false;
 };
 } // namespace Resource
 } // namespace Global
