@@ -42,6 +42,7 @@ ohos_shared_library("resourcemanager") {
   external_deps = [
     "ability_runtime:abilitykit_native",
     "ability_runtime:extensionkit_native",
+    "ability_runtime:napi_common",
     "ability_runtime:runtime",
     "c_utils:utils",
     "hilog:libhilog",
