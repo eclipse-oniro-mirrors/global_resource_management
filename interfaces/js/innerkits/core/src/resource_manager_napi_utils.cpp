@@ -27,14 +27,38 @@ constexpr int PARAMS_NUM_TWO = 2;
 
 const std::unordered_map<int32_t, std::string> ResourceManagerNapiUtils::ErrorCodeToMsg {
     {ERROR_CODE_INVALID_INPUT_PARAMETER, "Invalid input parameter"},
-    {ERROR_CODE_RES_ID_NOT_FOUND, "Invalid resource ID: %lu"},
-    {ERROR_CODE_RES_NAME_NOT_FOUND, "Invalid resource name"},
-    {ERROR_CODE_RES_NOT_FOUND_BY_ID, "No matching resource is found based on the resource ID"},
-    {ERROR_CODE_RES_NOT_FOUND_BY_NAME, "No matching resource is found based on the resource name"},
-    {ERROR_CODE_RES_PATH_INVALID, "Invalid relative path"},
-    {ERROR_CODE_RES_REF_TOO_MUCH, "The resource is referenced cyclically"},
-    {ERROR_CODE_RES_ID_FORMAT_ERROR, "Failed to format the resource obtained based on the resource ID"},
-    {ERROR_CODE_RES_NAME_FORMAT_ERROR, "Failed to format the resource obtained based on the resource Name"},
+    {ERROR_CODE_RES_ID_NOT_FOUND,
+        "Invalid resource ID: %lu. ID not found in loaded hap/hsp packages. Please confirm:\n\
+        1. Whether the resource ID is correct;\n\
+        2. Whether there are any logs of resource loading failures;\n\
+        3. Whether the context used matches the resource."},
+    {ERROR_CODE_RES_NAME_NOT_FOUND,
+        "Invalid resource name. Name not found in loaded hap/hsp packages. Please confirm:\n\
+        1. Whether the resource Name is correct;\n\
+        2. Whether there are any logs of resource loading failures;\n\
+        3. Whether the context used matches the resource."},
+    {ERROR_CODE_RES_NOT_FOUND_BY_ID,
+        "No matching resource is found based on the resource ID. Please confirm:\n\
+        1. Whether the resource ID is correct;\n\
+        2. Whether there are any logs of resource loading failures;\n\
+        3. Whether the context used matches the resource."},
+    {ERROR_CODE_RES_NOT_FOUND_BY_NAME,
+        "No matching resource is found based on the resource name. Please confirm:\n\
+        1. Whether the resource Name is correct;\n\
+        2. Whether there are any logs of resource loading failures;\n\
+        3. Whether the context used matches the resource."},
+    {ERROR_CODE_RES_PATH_INVALID, "Invalid relative path. Please confirm:\n\
+        1. Whether the file path is correct;\n\
+        2. Whether there are any logs of resource loading failures;\n\
+        3. Whether the context used matches the resource."},
+    {ERROR_CODE_RES_REF_TOO_MUCH,
+        "The resource is referenced cyclically or the reference layer count exceeds the limit (maximum: 20)."},
+    {ERROR_CODE_RES_ID_FORMAT_ERROR,
+        "Failed to format the resource obtained based on the resource ID, \
+        Verify that placeholder types in string resource match input parameter types."},
+    {ERROR_CODE_RES_NAME_FORMAT_ERROR,
+        "Failed to format the resource obtained based on the resource Name, \
+        Verify that placeholder types in string resource match input parameter types."},
     {ERROR_CODE_SYSTEM_RES_MANAGER_GET_FAILED, "Failed to access the system resource"},
     {ERROR_CODE_OVERLAY_RES_PATH_INVALID, "Invalid overlay path"},
     {ERROR, "Unknow error"}
