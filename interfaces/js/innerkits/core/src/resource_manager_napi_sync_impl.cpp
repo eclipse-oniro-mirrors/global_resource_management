@@ -1411,6 +1411,12 @@ napi_value ResourceManagerNapiSyncImpl::UpdateOverrideConfiguration(napi_env env
         return nullptr;
     }
 
+    if (!dataContext->overrideResConfig_) {
+        dataContext->SetErrorMsg("Failed to get param in GetOverrideResourceManager", false);
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
+
     std::shared_ptr<ResourceManager> resMgr = dataContext->addon_->GetResMgr();
     state = resMgr->UpdateOverrideResConfig(*dataContext->overrideResConfig_);
     if (state != RState::SUCCESS) {
