@@ -168,7 +168,7 @@ ani_object AniUtils::CreateAniRawFileDescriptor(ani_env *env, const ResourceMana
     }
 
     ani_method ctor;
-    status = env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor);
+    status = env->Class_FindMethod(cls, "<ctor>", ":", &ctor);
     if (ANI_OK != status) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find method RawFileDescriptor.constructor failed, status: %{public}d.", status);
         return nullptr;
@@ -238,7 +238,7 @@ ani_object AniUtils::CreateConfig(ani_env* env, std::unique_ptr<ResConfig> &cfg)
     }
 
     ani_method ctor;
-    status = env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor);
+    status = env->Class_FindMethod(cls, "<ctor>", ":", &ctor);
     if (ANI_OK != status) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find method <ctor> in Configuration failed, status: %{public}d.", status);
         return nullptr;
@@ -553,7 +553,11 @@ bool AniUtils::InitAniParameters(ani_env *env, ani_object args,
             AniSignature::ANI_STRING, status);
         return false;
     }
-
+    ani_class doubleClass;
+    ani_method toDoubleMethod;
+    if (!GetToDoubleMethod(env, doubleClass, toDoubleMethod)) {
+        return false;
+    }
     for (size_t i = 0; i < len; ++i) {
         ani_ref value;
         status = env->Array_Get(static_cast<ani_array>(args), i, &value);
@@ -574,13 +578,22 @@ bool AniUtils::InitAniParameters(ani_env *env, ani_object args,
                 AniStrToString(env, static_cast<ani_string>(value)));
         } else {
             ani_double param;
-            ani_status status =
-                env->Object_CallMethodByName_Double(static_cast<ani_object>(value), "toDouble", ":d", &param);
+            ani_status status = env->Object_CallMethod_Double(static_cast<ani_object>(value), toDoubleMethod, &param);
             if (ANI_OK != status) {
                 return false;
             }
             params.emplace_back(ResourceManager::NapiValueType::NAPI_NUMBER, std::to_string(param));
         }
+    }
+    return true;
+}
+
+bool AniUtils::GetToDoubleMethod(ani_env *env, ani_class &doubleCls, ani_method &toDoubleMethod)
+{
+    if (ANI_OK != env->FindClass(AniSignature::ANI_DOUBLE, &doubleCls)
+        || ANI_OK != env->Class_FindMethod(doubleCls, "toDouble", ":d", &toDoubleMethod)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Find method toDouble failed.");
+        return false;
     }
     return true;
 }
@@ -596,7 +609,7 @@ ani_object AniUtils::CreateDeviceCapability(ani_env *env, std::unique_ptr<ResCon
     }
 
     ani_method ctor;
-    status = env->Class_FindMethod(cls, "<ctor>", nullptr, &ctor);
+    status = env->Class_FindMethod(cls, "<ctor>", ":", &ctor);
     if (ANI_OK != status) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find method <ctor> in %{public}s failed, status: %{public}d.",
             AniSignature::DEVICE_CAPABILITY, status);

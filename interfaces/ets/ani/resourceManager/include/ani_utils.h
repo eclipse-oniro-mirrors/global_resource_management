@@ -58,6 +58,7 @@ private:
     static int GetScreenDensityIndex(ScreenDensity value);
     static int GetDeviceTypeIndex(DeviceType value);
     static bool GetNumberMember(ani_env *env, ani_object options, const std::string name, int& value);
+    static bool GetToDoubleMethod(ani_env *env, ani_class &doubleCls, ani_method &toDoubleMethod);
 };
 } // namespace Resource
 } // namespace Global
