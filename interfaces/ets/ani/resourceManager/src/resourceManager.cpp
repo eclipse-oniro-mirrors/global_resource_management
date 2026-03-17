@@ -61,8 +61,7 @@ bool ResMgrAddon::Init(ani_env* env)
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class '%{public}s' failed", AniSignature::RESOURCE_MANAGER_INNER);
         return false;
     }
-
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", nullptr, &g_ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", "l:", &g_ctor)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find method '<ctor>' failed");
         g_ctor = nullptr;
         return false;
