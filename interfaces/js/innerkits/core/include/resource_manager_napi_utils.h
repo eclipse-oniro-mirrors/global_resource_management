@@ -62,6 +62,8 @@ public:
 
     static void NapiThrow(napi_env env, int32_t errCode, ...);
 
+    static void NapiThrowBusinessError(napi_env env, int32_t errCode, ...);
+
     static int32_t GetResourceObject(napi_env env, std::shared_ptr<ResourceManager::Resource> &resourcePtr,
         napi_value &value);
 

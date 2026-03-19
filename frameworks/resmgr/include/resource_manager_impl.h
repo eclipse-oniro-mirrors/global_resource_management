@@ -845,6 +845,14 @@ public:
         std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams);
 
     /**
+     * Get the resource name by resource id
+     * @param id the resource id
+     * @param outValue the resource name write to
+     * @return SUCCESS if resource id exist, else ERROR_CODE_RES_ID_NOT_FOUND
+     */
+    virtual RState GetResName(uint32_t id, std::string &outValue);
+
+    /**
      * Get the hap manager
      *
      * @return the hap manager

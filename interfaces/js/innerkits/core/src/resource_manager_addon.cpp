@@ -220,7 +220,8 @@ napi_property_descriptor ResourceManagerAddon::properties[] = {
     DECLARE_NAPI_FUNCTION("getIntPluralStringValueSync", GetIntPluralStringValueSync),
     DECLARE_NAPI_FUNCTION("getDoublePluralStringValueSync", GetDoublePluralStringValueSync),
     DECLARE_NAPI_FUNCTION("getIntPluralStringByNameSync", GetIntPluralStringByNameSync),
-    DECLARE_NAPI_FUNCTION("getDoublePluralStringByNameSync", GetDoublePluralStringByNameSync)
+    DECLARE_NAPI_FUNCTION("getDoublePluralStringByNameSync", GetDoublePluralStringByNameSync),
+    DECLARE_NAPI_FUNCTION("getResName", GetResName)
 };
 
 bool ResourceManagerAddon::Init(napi_env env)
@@ -593,6 +594,11 @@ napi_value ResourceManagerAddon::GetIntPluralStringByNameSync(napi_env env, napi
 napi_value ResourceManagerAddon::GetDoublePluralStringByNameSync(napi_env env, napi_callback_info info)
 {
     return AddonGetResource(env, info, "GetDoublePluralStringByNameSync", FunctionType::SYNC);
+}
+
+napi_value ResourceManagerAddon::GetResName(napi_env env, napi_callback_info info)
+{
+    return AddonGetResource(env, info, "GetResName", FunctionType::SYNC);
 }
 } // namespace Resource
 } // namespace Global

@@ -3093,4 +3093,46 @@ HWTEST_F(ResourceManagerTest, ResourceManagerGetResIdTest002, TestSize.Level1)
     ASSERT_EQ(state, SUCCESS);
     ASSERT_EQ(resId, 16777216);
 }
+
+/*
+ * @tc.name: ResourceManagerGetResNameTest001
+ * @tc.desc: Test GetResName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResNameTest001, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    std::string resName;
+    RState state = rm->GetResName(125829694, resName);
+    ASSERT_EQ(state, SUCCESS);
+    ASSERT_EQ(resName, "ohos_id_text_font_family_regular");
+}
+
+/*
+ * @tc.name: ResourceManagerGetResNameTest002
+ * @tc.desc: Test GetResName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResNameTest002, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    std::string resName;
+    RState state = rm->GetResName(16777216, resName);
+    ASSERT_EQ(state, SUCCESS);
+    ASSERT_EQ(resName, "app_name");
+}
+
+/*
+ * @tc.name: ResourceManagerGetResNameTest003
+ * @tc.desc: Test GetResName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResourceManagerTest, ResourceManagerGetResNameTest003, TestSize.Level1)
+{
+    rmc->AddResource("zh", nullptr, "CN");
+    std::string resName;
+    RState state = rm->GetResName(0, resName);
+    ASSERT_EQ(state, ERROR_CODE_RES_ID_NOT_FOUND);
+    ASSERT_EQ(resName, "");
+}
 }

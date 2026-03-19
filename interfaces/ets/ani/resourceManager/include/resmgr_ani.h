@@ -109,6 +109,8 @@ public:
 
     static void UpdateOverrideConfiguration(ani_env* env, ani_object object, ani_object configuration);
 
+    static ani_string GetResName(ani_env* env, ani_object object, ani_long resId);
+
     static ani_object GetSysResourceManager(ani_env* env);
 
     static ani_ref TransferToDynamicResource(ani_env* env, ani_object input);

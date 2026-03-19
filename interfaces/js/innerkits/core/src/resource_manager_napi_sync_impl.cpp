@@ -116,6 +116,8 @@ std::unordered_map<std::string, std::function<napi_value(napi_env&, napi_callbac
         return ResourceManagerNapiSyncImpl::GetIntPluralStringByNameSync(env, info);}},
     {"GetDoublePluralStringByNameSync", [](napi_env& env, napi_callback_info& info) -> napi_value {
         return ResourceManagerNapiSyncImpl::GetDoublePluralStringByNameSync(env, info);}},
+    {"GetResName", [](napi_env& env, napi_callback_info& info) -> napi_value {
+        return ResourceManagerNapiSyncImpl::GetResName(env, info);}},
 };
 
 napi_value ResourceManagerNapiSyncImpl::GetResource(napi_env env, napi_callback_info info,
@@ -1628,6 +1630,30 @@ napi_value ResourceManagerNapiSyncImpl::GetDoublePluralStringByNameSync(napi_env
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to process plural string in GetDoublePluralStringByNameSync", false);
         ResourceManagerNapiUtils::NapiThrow(env, state);
+        return nullptr;
+    }
+
+    return ResourceManagerNapiUtils::CreateJsString(env, *dataContext);
+}
+
+napi_value ResourceManagerNapiSyncImpl::GetResName(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, PARAMS_NUM_TWO);
+
+    auto dataContext = std::make_unique<ResMgrDataContext>();
+    if (dataContext == nullptr) {
+        return nullptr;
+    }
+    int32_t state = InitIdResourceAddon(env, info, dataContext);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to init para in GetResName", true);
+        ResourceManagerNapiUtils::NapiThrowBusinessError(env, state);
+        return nullptr;
+    }
+    state = dataContext->addon_->GetResMgr()->GetResName(dataContext->resId_, dataContext->value_);
+    if (state != RState::SUCCESS) {
+        dataContext->SetErrorMsg("Failed to GetResName", true);
+        ResourceManagerNapiUtils::NapiThrowBusinessError(env, state, dataContext->resId_);
         return nullptr;
     }
 
