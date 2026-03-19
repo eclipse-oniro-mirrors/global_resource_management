@@ -177,6 +177,8 @@ public:
 
     void LoadThemeIconRes(const std::string &bundleName, const std::string &moduleName, int32_t userId);
 
+    void LoadThemeSkinRes(const std::string &bundleName, const std::string &moduleName, int32_t userId);
+
 private:
     ThemePackManager();
     std::string themeMask;

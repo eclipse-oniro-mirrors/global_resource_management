@@ -121,6 +121,12 @@ public:
      */
     void SetThemeIcon(bool isIcon);
 
+    /**
+     * Set resConfig themeSkin
+     * @param isSkin the resConfig themeSkin flag
+     */
+    void SetThemeSkin(bool isSkin);
+
 #ifdef SUPPORT_GRAPHICS
     const ResLocale *GetResPreferredLocale() const;
 
@@ -150,6 +156,8 @@ public:
     uint32_t GetThemeId() const;
 
     bool GetThemeIcon() const;
+
+    bool GetThemeSkin() const;
 
     DeviceType GetDeviceType() const;
 
@@ -293,6 +301,7 @@ private:
     bool isAppColorMode_;
     bool isAppDarkRes_;
     bool isThemeIcon_;
+    bool isThemeSkin_;
 };
 } // namespace Resource
 } // namespace Global

@@ -67,7 +67,8 @@ ResConfigImpl::ResConfigImpl()
     isCompletedScript_(false),
     isAppColorMode_(false),
     isAppDarkRes_(false),
-    isThemeIcon_(false)
+    isThemeIcon_(false),
+    isThemeSkin_(false)
 {}
 
 #ifdef SUPPORT_GRAPHICS
@@ -218,6 +219,11 @@ void ResConfigImpl::SetThemeIcon(bool isIcon)
     this->isThemeIcon_ = isIcon;
 }
 
+void ResConfigImpl::SetThemeSkin(bool isSkin)
+{
+    this->isThemeSkin_ = isSkin;
+}
+
 ScreenDensity ResConfigImpl::ConvertDensity(float density)
 {
     float deviceDpi = density * Utils::DPI_BASE;
@@ -308,6 +314,11 @@ uint32_t ResConfigImpl::GetThemeId() const
 bool ResConfigImpl::GetThemeIcon() const
 {
     return this->isThemeIcon_;
+}
+
+bool ResConfigImpl::GetThemeSkin() const
+{
+    return this->isThemeSkin_;
 }
 
 DeviceType ResConfigImpl::GetDeviceType() const
