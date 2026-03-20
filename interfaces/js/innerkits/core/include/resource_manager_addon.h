@@ -223,6 +223,8 @@ private:
 
     static napi_value GetDoublePluralStringByNameSync(napi_env env, napi_callback_info info);
 
+    static napi_value GetResName(napi_env env, napi_callback_info info);
+
     std::string bundleName_;
     std::shared_ptr<ResourceManager> resMgr_;
     std::shared_ptr<AbilityRuntime::Context> context_;

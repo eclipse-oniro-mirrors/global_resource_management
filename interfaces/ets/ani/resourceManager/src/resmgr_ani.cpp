@@ -126,6 +126,8 @@ static std::array methods = {
         reinterpret_cast<void*>(ResMgrAni::GetOverrideConfiguration) },
     ani_native_function { "updateOverrideConfiguration", nullptr,
         reinterpret_cast<void*>(ResMgrAni::UpdateOverrideConfiguration) },
+
+    ani_native_function { "getResName", nullptr, reinterpret_cast<void*>(ResMgrAni::GetResName) },
 };
 
 ani_string ResMgrAni::GetStringSyncById(ani_env* env, ani_object object, ani_long resId)
@@ -1036,6 +1038,23 @@ ani_boolean ResMgrAni::IsRawDir(ani_env* env, ani_object object, ani_string aniP
         return false;
     }
     return result;
+}
+
+ani_string ResMgrAni::GetResName(ani_env *env, ani_object object, ani_long resId)
+{
+    std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, object);
+    if (resMgr == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get resMgr in GetResName.");
+        AniUtils::AniThrow(env, ERROR_CODE_RES_ID_NOT_FOUND);
+        return nullptr;
+    }
+    std::string result;
+    RState state = resMgr->GetResName(resId, result);
+    if (state != RState::SUCCESS) {
+        AniUtils::AniThrow(env, state);
+        return nullptr;
+    }
+    return AniUtils::CreateAniString(env, result);
 }
 
 ani_object ResMgrAni::GetSysResourceManager(ani_env* env)

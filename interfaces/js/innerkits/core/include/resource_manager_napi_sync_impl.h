@@ -114,6 +114,8 @@ private:
 
     static napi_value GetDoublePluralStringByNameSync(napi_env env, napi_callback_info info);
 
+    static napi_value GetResName(napi_env env, napi_callback_info info);
+
     static int32_t InitIdResourceAddon(napi_env env, napi_callback_info info,
         std::unique_ptr<ResMgrDataContext> &dataContext);
 

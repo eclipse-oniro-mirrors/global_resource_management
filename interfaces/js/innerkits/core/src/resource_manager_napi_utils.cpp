@@ -187,6 +187,18 @@ void ResourceManagerNapiUtils::NapiThrow(napi_env env, int32_t errCode, ...)
     }
 }
 
+// APIs added in API 21 and later versions should use this function to throw error
+void ResourceManagerNapiUtils::NapiThrowBusinessError(napi_env env, int32_t errCode, ...)
+{
+    va_list args;
+    va_start(args, errCode);
+    std::string errMsg = FormatString(FindErrMsg(errCode).c_str(), args);
+    va_end(args);
+    if (errMsg != "") {
+        napi_throw_business_error(env, errCode, errMsg.c_str());
+    }
+}
+
 napi_value ResourceManagerNapiUtils::CreateJsArray(napi_env env, ResMgrDataContext &dataContext)
 {
     napi_value result;

@@ -289,6 +289,8 @@ public:
 
     virtual RState GetFormatPluralStringByName(std::string &outValue, const char *name, Quantity quantity,
         std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams) = 0;
+
+    virtual RState GetResName(uint32_t id, std::string &outValue) = 0;
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager(bool includeSystemRes = true);

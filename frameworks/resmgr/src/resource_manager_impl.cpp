@@ -1983,6 +1983,17 @@ RState ResourceManagerImpl::GetFormatPluralStringByName(std::string &outValue, c
     return SUCCESS;
 }
 
+RState ResourceManagerImpl::GetResName(uint32_t id, std::string &outValue)
+{
+    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
+    if (idItem == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetResName error id = %{public}d", id);
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
+    outValue = idItem->name_;
+    return SUCCESS;
+}
+
 uint32_t ResourceManagerImpl::GetResourceLimitKeys()
 {
     if (hapManager_ == nullptr) {
