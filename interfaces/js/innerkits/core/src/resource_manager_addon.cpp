@@ -221,7 +221,7 @@ napi_property_descriptor ResourceManagerAddon::properties[] = {
     DECLARE_NAPI_FUNCTION("getDoublePluralStringValueSync", GetDoublePluralStringValueSync),
     DECLARE_NAPI_FUNCTION("getIntPluralStringByNameSync", GetIntPluralStringByNameSync),
     DECLARE_NAPI_FUNCTION("getDoublePluralStringByNameSync", GetDoublePluralStringByNameSync),
-    DECLARE_NAPI_FUNCTION("getResName", GetResName)
+    DECLARE_NAPI_FUNCTION("getResourceName", GetResName)
 };
 
 bool ResourceManagerAddon::Init(napi_env env)

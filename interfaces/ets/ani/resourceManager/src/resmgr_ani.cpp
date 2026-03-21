@@ -127,7 +127,7 @@ static std::array methods = {
     ani_native_function { "updateOverrideConfiguration", nullptr,
         reinterpret_cast<void*>(ResMgrAni::UpdateOverrideConfiguration) },
 
-    ani_native_function { "getResName", nullptr, reinterpret_cast<void*>(ResMgrAni::GetResName) },
+    ani_native_function { "getResourceName", nullptr, reinterpret_cast<void*>(ResMgrAni::GetResName) },
 };
 
 ani_string ResMgrAni::GetStringSyncById(ani_env* env, ani_object object, ani_long resId)
