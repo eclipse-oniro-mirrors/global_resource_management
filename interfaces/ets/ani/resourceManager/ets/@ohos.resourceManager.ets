@@ -200,7 +200,7 @@ export default namespace resourceManager {
         getOverrideConfiguration(): Configuration;
         updateOverrideConfiguration(configuration: Configuration): void;
 
-        getResName(resId: long): string;
+        getResourceName(resId: long): string;
     }
 
     export type RawFileDescriptor = _RawFileDescriptor;
@@ -278,7 +278,7 @@ export default namespace resourceManager {
         native getOverrideConfiguration(): Configuration;
         native updateOverrideConfiguration(configuration: Configuration): void;
 
-        native getResName(resId: long): string;
+        native getResourceName(resId: long): string;
 
         getStringValue(resId: long, callback: AsyncCallback<string, void>): void {
             let p1 = taskpool.execute((): string => {
