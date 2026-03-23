@@ -40,9 +40,9 @@ MmapFile::~MmapFile()
         mmap_ = nullptr;
     }
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    if (fd_ > 0) {
-        close(fd_);
-        fd_ = 0;
+    if (fp_ != nullptr) {
+        fclose(fp_);
+        fp_ = nullptr;
     }
 #endif
 }

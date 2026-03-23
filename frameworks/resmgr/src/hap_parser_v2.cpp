@@ -448,14 +448,25 @@ bool HapParserV2::GetIndexMmapFromIndex(const char *path)
     char indexPath[PATH_MAX + 1] = {0};
     Utils::CanonicalizePath(path, indexPath, PATH_MAX);
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    mMapFile_->fd_ = open(indexPath, O_RDONLY);
-    if (mMapFile_->fd_ <= 0) {
+    mMapFile_->fp_ = fopen(indexPath, "rb");
+    if (mMapFile_->fp_ == nullptr) {
         return false;
     }
-    struct stat fileStat;
-    fstat(mMapFile_->fd_, &fileStat);
-    mMapFile_->mmapLen_ = static_cast<size_t>(fileStat.st_size);
-    mMapFile_->mmap_ = (uint8_t*)mmap(nullptr, mMapFile_->mmapLen_, PROT_READ, MAP_PRIVATE, mMapFile_->fd_, 0);
+    if (fseek(mMapFile_->fp_, 0, SEEK_END) != 0) {
+        RESMGR_HILOGE(RESMGR_TAG, "failed to seek to end of file");
+        return false;
+    }
+    long fileLen = ftell(mMapFile_->fp_);
+    if (fseek(mMapFile_->fp_, 0, SEEK_SET) != 0) {
+        RESMGR_HILOGE(RESMGR_TAG, "failed to seek to beginning of file");
+        return false;
+    }
+    if (fileLen <= 0) {
+        RESMGR_HILOGE(RESMGR_TAG, "file size is zero");
+        return false;
+    }
+    mMapFile_->mmapLen_ = static_cast<size_t>(fileLen);
+    mMapFile_->mmap_ = (uint8_t*)mmap(nullptr, mMapFile_->mmapLen_, PROT_READ, MAP_PRIVATE, fileno(mMapFile_->fp_), 0);
     if (mMapFile_->mmap_ == MAP_FAILED) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get mmap data indexFilePath from index");
         return false;

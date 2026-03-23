@@ -17,6 +17,7 @@
 #define OHOS_RESOURCE_MANAGER_MMAPFILE_H
 
 #include <cstdint>
+#include <stdio.h>
 
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 #include "file_mapper.h"
@@ -32,7 +33,7 @@ public:
     
     ~MmapFile();
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    int fd_{0};
+    FILE* fp_{nullptr};
 
     std::shared_ptr<AbilityBase::Extractor> extractor_{nullptr};
 
