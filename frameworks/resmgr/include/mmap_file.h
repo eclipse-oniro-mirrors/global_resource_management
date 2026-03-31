@@ -32,9 +32,11 @@ public:
     MmapFile();
     
     ~MmapFile();
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    FILE* fp_{nullptr};
 
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
+    FILE* fp_{nullptr};
+#endif
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     std::shared_ptr<AbilityBase::Extractor> extractor_{nullptr};
 
     std::unique_ptr<AbilityBase::FileMapper> mapper_{nullptr};

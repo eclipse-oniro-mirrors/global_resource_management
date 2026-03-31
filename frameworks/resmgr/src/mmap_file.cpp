@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
 #include <sys/mman.h>
 #include <sys/stat.h>
 #endif
@@ -30,7 +30,7 @@ MmapFile::MmapFile()
 MmapFile::~MmapFile()
 {
     if (mmap_ != nullptr) {
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
         if (mapper_ == nullptr) {
             munmap(mmap_, mmapLen_);
         }
@@ -39,7 +39,7 @@ MmapFile::~MmapFile()
 #endif
         mmap_ = nullptr;
     }
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
     if (fp_ != nullptr) {
         fclose(fp_);
         fp_ = nullptr;
