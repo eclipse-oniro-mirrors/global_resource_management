@@ -30,10 +30,12 @@ MmapFile::MmapFile()
 MmapFile::~MmapFile()
 {
     if (mmap_ != nullptr) {
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
         if (mapper_ == nullptr) {
             munmap(mmap_, mmapLen_);
         }
+#elif defined(__ARKUI_CROSS__)
+        munmap(mmap_, mmapLen_);
 #else
         delete[] mmap_;
 #endif
