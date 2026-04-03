@@ -1412,18 +1412,31 @@ RState ResourceManagerImpl::UpdateFakeLocaleFlag(ResConfig &resConfig)
     return SUCCESS;
 }
 
-RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig, bool isUpdateTheme)
+void ResourceManagerImpl::UpdateTheme(ResConfig &resConfig)
 {
     auto themePackManager = ThemePackManager::GetThemePackManager();
-    if (themePackManager->UpdateThemeId(resConfig.GetThemeId())) {
-        if (resConfig.GetThemeIcon()) {
-            RESMGR_HILOGD(RESMGR_TAG, "The themeIcon enabled");
-            themePackManager->LoadThemeIconRes(bundleInfo.first, bundleInfo.second, userId);
-        } else {
-            RESMGR_HILOGD(RESMGR_TAG, "The theme enabled");
-            themePackManager->LoadThemeRes(bundleInfo.first, bundleInfo.second, userId);
-        }
+    if (!themePackManager->UpdateThemeId(resConfig.GetThemeId())) {
+        return;
     }
+    if (resConfig.GetThemeIcon()) {
+        RESMGR_HILOGD(RESMGR_TAG, "The themeIcon enabled");
+        themePackManager->LoadThemeIconRes(bundleInfo.first, bundleInfo.second, userId);
+        if (resConfig.GetThemeSkin()) {
+            RESMGR_HILOGD(RESMGR_TAG, "The themeSkin enabled");
+            themePackManager->LoadThemeSkinRes(bundleInfo.first, bundleInfo.second, userId);
+        }
+    } else if (resConfig.GetThemeSkin()) {
+        RESMGR_HILOGD(RESMGR_TAG, "The themeSkin enabled");
+        themePackManager->LoadThemeSkinRes(bundleInfo.first, bundleInfo.second, userId);
+    } else {
+        RESMGR_HILOGD(RESMGR_TAG, "The theme enabled");
+        themePackManager->LoadThemeRes(bundleInfo.first, bundleInfo.second, userId);
+    }
+}
+
+RState ResourceManagerImpl::UpdateResConfig(ResConfig &resConfig, bool isUpdateTheme)
+{
+    UpdateTheme(resConfig);
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
 #endif

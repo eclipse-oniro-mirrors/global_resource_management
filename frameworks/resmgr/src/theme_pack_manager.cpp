@@ -193,6 +193,30 @@ void ThemePackManager::LoadThemeIconRes(const std::string &bundleName, const std
     LoadThemeIconsResource(bundleName, moduleName, iconDirs, userId);
 }
 
+void ThemePackManager::LoadThemeSkinRes(const std::string &bundleName, const std::string &moduleName, int32_t userId)
+{
+    UpdateUserId(userId);
+    std::vector<std::string> rootDirs;
+    if (Utils::IsFileExist(themeFlagA)) {
+        rootDirs = GetThemeSkinRootDir(themeSkinAPath, themeSkinA);
+    } else if (Utils::IsFileExist(themeFlagB)) {
+        rootDirs = GetThemeSkinRootDir(themeSkinBPath, themeSkinB);
+    } else {
+        if (Utils::IsFileExist(ReplaceUserIdInPath(absoluteThemeFlagA, userId))) {
+            rootDirs = GetThemeSkinRootDir(ReplaceUserIdInPath(absoluteThemeSkinAPath, userId),
+                ReplaceUserIdInPath(absoluteThemeSkinA, userId));
+        } else if (Utils::IsFileExist(ReplaceUserIdInPath(absoluteThemeFlagB, userId))) {
+                rootDirs = GetThemeSkinRootDir(ReplaceUserIdInPath(absoluteThemeSkinBPath, userId),
+                    ReplaceUserIdInPath(absoluteThemeSkinB, userId));
+        } else {
+            RESMGR_HILOGE(RESMGR_TAG, "LoadThemesRes failed, userId = %{public}d, bundleName = %{public}s",
+                userId, bundleName.c_str());
+        }
+    }
+    LoadThemeSkinResource(bundleName, moduleName, rootDirs, userId);
+    return;
+}
+
 void ThemePackManager::LoadSAThemeRes(const std::string &bundleName, const std::string &moduleName,
     int32_t userId, std::vector<std::string> &rootDirs, std::vector<std::string> &iconDirs)
 {

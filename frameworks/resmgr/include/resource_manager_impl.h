@@ -947,6 +947,8 @@ private:
 
     void UpdateSystemResourceResConfig();
 
+    void UpdateTheme(ResConfig &resConfig);
+
     std::string ReadParameter(const char *paramKey, const int paramLength);
 
     std::shared_ptr<HapManager> hapManager_;
