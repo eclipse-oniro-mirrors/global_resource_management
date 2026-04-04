@@ -86,6 +86,9 @@ public:
     static constexpr uint16_t NULL_SCRIPT = 0x0;
     static constexpr uint64_t NULL_LOCALE = 0x0;
     static constexpr uint8_t TRACKPATH_ARRAY_SIZE = 5;
+    static constexpr uint64_t ES_419_ENCODE = 0x6573000000009029;
+    static constexpr uint64_t ES_US_ENCODE = 0x6573000000005553;
+    static constexpr uint64_t ES_MX_ENCODE = 0x6573000000004d58;
 };
 } // namespace Resource
 } // namespace Global

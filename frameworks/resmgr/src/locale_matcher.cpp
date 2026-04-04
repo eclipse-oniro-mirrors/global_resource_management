@@ -446,6 +446,14 @@ int8_t CompareDefaultRegion(const ResLocale *current,
     return 0;
 }
 
+uint64_t AdjustLocaleForRegion(const uint64_t candidateLocale)
+{
+    if (candidateLocale == LocaleMatcher::ES_US_ENCODE || candidateLocale == LocaleMatcher::ES_MX_ENCODE) {
+        return LocaleMatcher::ES_419_ENCODE;
+    }
+    return candidateLocale;
+}
+
 /**
  * @brief compare current and target region, which is better for request.
  * @param current current locale
@@ -454,23 +462,22 @@ int8_t CompareDefaultRegion(const ResLocale *current,
  * @return int8_t if current region is better than target region,return 1. if current region is equal target region,
  *         return 0. If target region is better than current region, return -1.
  */
-int8_t CompareRegion(const ResLocale *current,
-                     const ResLocale *other,
-                     const ResLocale *request)
+int8_t CompareRegion(const ResLocale *current, const ResLocale *other, const ResLocale *request)
 {
     uint16_t currentEncodedRegion = Utils::EncodeRegionByResLocale(current);
     uint16_t otherEncodedRegion = Utils::EncodeRegionByResLocale(other);
     if (request == nullptr || request->GetRegion() == nullptr) {
         return CompareWhenRegionIsNull(currentEncodedRegion, otherEncodedRegion, current, other, request);
     }
-    uint64_t requestEncodedLocale = Utils::EncodeLocale(
-        request->GetLanguage(), nullptr, request->GetRegion());
+    uint64_t requestEncodedLocale = Utils::EncodeLocale(request->GetLanguage(), nullptr, request->GetRegion());
     uint64_t requestEncodedTrackPath[LocaleMatcher::TRACKPATH_ARRAY_SIZE] = {0, 0, 0, 0, 0};
     FindTrackPath(request, LocaleMatcher::TRACKPATH_ARRAY_SIZE, requestEncodedLocale, requestEncodedTrackPath);
     uint64_t currentEncodedLocale = Utils::EncodeLocale(
         request->GetLanguage(), nullptr, (current == nullptr) ? nullptr : current->GetRegion());
     uint64_t otherEncodedLocale = Utils::EncodeLocale(
         request->GetLanguage(), nullptr, (other == nullptr) ? nullptr : other->GetRegion());
+    currentEncodedLocale = AdjustLocaleForRegion(currentEncodedLocale);
+    otherEncodedLocale = AdjustLocaleForRegion(otherEncodedLocale);
     int8_t currentMatchDistance = SearchTrackPathDistance(
         requestEncodedTrackPath,
         LocaleMatcher::TRACKPATH_ARRAY_SIZE,
@@ -493,8 +500,7 @@ int8_t CompareRegion(const ResLocale *current,
     if (result != 0) {
         return result;
     }
-    uint16_t requestDefaultRegion =
-        FindDefaultRegionEncode(request->GetLanguage(), request->GetScript());
+    uint16_t requestDefaultRegion = FindDefaultRegionEncode(request->GetLanguage(), request->GetScript());
     if (requestDefaultRegion == currentEncodedRegion) {
         return 1;
     }
