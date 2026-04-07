@@ -17,7 +17,7 @@
 
 #include <fcntl.h>
 #include <fstream>
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
 #include <sys/mman.h>
 #include <sys/stat.h>
 #endif
@@ -447,7 +447,7 @@ bool HapParserV2::GetIndexMmapFromIndex(const char *path)
 {
     char indexPath[PATH_MAX + 1] = {0};
     Utils::CanonicalizePath(path, indexPath, PATH_MAX);
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
     mMapFile_->fp_ = fopen(indexPath, "rb");
     if (mMapFile_->fp_ == nullptr) {
         return false;
