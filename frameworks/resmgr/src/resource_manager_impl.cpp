@@ -1421,16 +1421,10 @@ void ResourceManagerImpl::UpdateTheme(ResConfig &resConfig)
     if (resConfig.GetThemeIcon()) {
         RESMGR_HILOGD(RESMGR_TAG, "The themeIcon enabled");
         themePackManager->LoadThemeIconRes(bundleInfo.first, bundleInfo.second, userId);
-        if (resConfig.GetThemeSkin()) {
-            RESMGR_HILOGD(RESMGR_TAG, "The themeSkin enabled");
-            themePackManager->LoadThemeSkinRes(bundleInfo.first, bundleInfo.second, userId);
-        }
-    } else if (resConfig.GetThemeSkin()) {
+    }
+    if (resConfig.GetThemeSkin()) {
         RESMGR_HILOGD(RESMGR_TAG, "The themeSkin enabled");
         themePackManager->LoadThemeSkinRes(bundleInfo.first, bundleInfo.second, userId);
-    } else {
-        RESMGR_HILOGD(RESMGR_TAG, "The theme enabled");
-        themePackManager->LoadThemeRes(bundleInfo.first, bundleInfo.second, userId);
     }
 }
 
