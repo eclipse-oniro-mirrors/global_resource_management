@@ -15,7 +15,7 @@
 
 #include "hap_resource_v2.h"
 
-#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
 #include <sys/mman.h>
 #endif
 #include <unistd.h>
