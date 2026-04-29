@@ -25,7 +25,8 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
-static thread_local napi_ref g_constructor = nullptr;
+static std::unordered_map<napi_env, napi_ref> g_constructorMap;
+static std::mutex constructorMutex;
 static std::shared_ptr<ResourceManager> sysResMgr = nullptr;
 static std::mutex sysMgrMutex;
 
@@ -58,12 +59,13 @@ napi_value ResourceManagerAddon::WrapResourceManager(napi_env env, std::shared_p
     }
 
     napi_value constructor = nullptr;
-    if (g_constructor == nullptr) {
-        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to WrapResourceManager in Create, g_constructor is null");
+    napi_ref constructorRef = GetConstructorRef(env);
+    if (constructorRef == nullptr) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to WrapResourceManager in Create, constructor is null");
         napi_close_escapable_handle_scope(env, scope);
         return nullptr;
     }
-    napi_status status = napi_get_reference_value(env, g_constructor, &constructor);
+    napi_status status = napi_get_reference_value(env, constructorRef, &constructor);
     if (status != napi_ok || constructor == nullptr) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get reference value in Create, status = %{public}d", status);
         napi_close_escapable_handle_scope(env, scope);
@@ -224,9 +226,42 @@ napi_property_descriptor ResourceManagerAddon::properties[] = {
     DECLARE_NAPI_FUNCTION("getResourceName", GetResName)
 };
 
+void OnEnvCleanUp(void *data)
+{
+    EnvData *envData = static_cast<EnvData *>(data);
+    if (envData == nullptr) {
+        return;
+    }
+    std::lock_guard<std::mutex> lock(constructorMutex);
+    g_constructorMap.erase(envData->env);
+    delete envData;
+    envData = nullptr;
+}
+
+napi_ref ResourceManagerAddon::GetConstructorRef(napi_env env)
+{
+    std::lock_guard<std::mutex> lock(constructorMutex);
+    auto it = g_constructorMap.find(env);
+    if (it != g_constructorMap.end()) {
+        return it->second;
+    }
+    return nullptr;
+}
+
+bool ResourceManagerAddon::AddConstructorRef(napi_env env, napi_ref ref)
+{
+    std::lock_guard<std::mutex> lock(constructorMutex);
+    auto it = g_constructorMap.find(env);
+    if (it != g_constructorMap.end() && it->second != nullptr) {
+        return false;
+    }
+    g_constructorMap[env] = ref;
+    return true;
+}
+
 bool ResourceManagerAddon::Init(napi_env env)
 {
-    if (g_constructor != nullptr) {
+    if (GetConstructorRef(env) != nullptr) {
         return true;
     }
 
@@ -238,12 +273,29 @@ bool ResourceManagerAddon::Init(napi_env env)
         return false;
     }
 
-    status = napi_create_reference(env, constructor, 1, &g_constructor);
+    napi_ref constructorRef;
+    status = napi_create_reference(env, constructor, 1, &constructorRef);
     if (status != napi_ok) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to create reference at init");
         return false;
     }
-    napi_add_env_cleanup_hook(env, [](void *data) { g_constructor = nullptr; }, g_constructor);
+    EnvData *envData = new (std::nothrow) EnvData(env);
+    if (envData == nullptr) {
+        napi_delete_reference(env, constructorRef);
+        return false;
+    }
+    status = napi_add_env_cleanup_hook(env, OnEnvCleanUp, envData);
+    if (status != napi_status::napi_ok) {
+        delete envData;
+        napi_delete_reference(env, constructorRef);
+        return false;
+    }
+    if (!AddConstructorRef(env, constructorRef)) {
+        napi_remove_env_cleanup_hook(env, OnEnvCleanUp, envData);
+        delete envData;
+        napi_delete_reference(env, constructorRef);
+        return false;
+    }
     return true;
 }
 
