@@ -94,7 +94,7 @@ ohos_shared_library("resmgr_napi_core") {
 
 group("resmgr_napi_core_preview") {
   if (is_mingw || is_mac || is_linux) {
-    deps = [ ":resmgr_napi_core_preview_inner" ]
+    public_deps = [ ":resmgr_napi_core_preview_inner" ]
   }
 }
 
