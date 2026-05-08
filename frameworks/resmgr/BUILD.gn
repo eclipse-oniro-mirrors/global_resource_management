@@ -106,8 +106,10 @@ ohos_shared_library("global_resmgr") {
   deps = [":resmgr_abc"]
 
   if (resource_management_support_icu) {
-    external_deps += [ "icu:shared_icui18n" ]
-    public_external_deps = [ "icu:shared_icuuc" ]
+    external_deps += [
+      "icu:shared_icui18n",
+      "icu:shared_icuuc",
+    ]
   }
 
   if (resource_management_api_metrics) {
@@ -158,8 +160,8 @@ ohos_shared_library("global_resmgr_win") {
       "cJSON:cjson_static",
       "icu:static_icui18n",
       "zlib:libz",
+      "icu:static_icuuc",
     ]
-    public_external_deps = [ "icu:static_icuuc" ]
 
     libs = [ "shlwapi" ]
   }
@@ -169,7 +171,7 @@ ohos_shared_library("global_resmgr_win") {
 
 group("win_resmgr") {
   if (is_mingw && resource_management_support_icu) {
-    public_deps = [ ":global_resmgr_win" ]
+    deps = [ ":global_resmgr_win" ]
   }
 }
 
@@ -194,8 +196,8 @@ ohos_shared_library("global_resmgr_mac") {
         "cJSON:cjson_static",
         "icu:static_icui18n",
         "zlib:libz",
+        "icu:static_icuuc",
       ]
-      public_external_deps = [ "icu:static_icuuc" ]
     }
   }
   subsystem_name = "global"
@@ -204,7 +206,7 @@ ohos_shared_library("global_resmgr_mac") {
 
 group("mac_resmgr") {
   if (is_mac && resource_management_support_icu) {
-    public_deps = [ ":global_resmgr_mac" ]
+    deps = [ ":global_resmgr_mac" ]
   }
 }
 
@@ -231,8 +233,8 @@ ohos_shared_library("global_resmgr_linux") {
       "cJSON:cjson_static",
       "icu:shared_icui18n",
       "zlib:shared_libz",
+      "icu:static_icuuc",
     ]
-    public_external_deps = [ "icu:shared_icuuc" ]
   }
   subsystem_name = "global"
   part_name = "resource_management"
