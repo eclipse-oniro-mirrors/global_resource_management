@@ -78,6 +78,13 @@ ohos_shared_library("resmgr_napi_core") {
     defines += [ "SUPPORT_GRAPHICS" ]
   }
 
+  if (resource_management_api_metrics) {
+    defines += [ "SUPPORT_API_METRICS" ]
+    include_dirs = [ "../../../../dfx/api_metrics" ]
+    sources += [ "../../../../dfx/api_metrics/api_metrics_reporter.cpp" ]
+    external_deps += [ "api_metrics:histogrammanager" ]
+  }
+
   branch_protector_ret = "pac_ret"
   sanitize = {
     boundary_sanitize = true

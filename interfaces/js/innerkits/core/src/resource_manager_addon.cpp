@@ -15,6 +15,9 @@
 
 #include "resource_manager_addon.h"
 
+#ifdef SUPPORT_API_METRICS
+#include "api_metrics_reporter.h"
+#endif
 #include "hilog/log_cpp.h"
 #include "resource_manager_napi_utils.h"
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
@@ -515,11 +518,17 @@ napi_value ResourceManagerAddon::GetColorByNameSync(napi_env env, napi_callback_
 
 napi_value ResourceManagerAddon::AddResource(napi_env env, napi_callback_info info)
 {
+#ifdef ENABLE_API_METRICS
+    API_METRICS("LocalizationKit.resourceManager.addResource");
+#endif
     return AddonGetResource(env, info, "AddResource", FunctionType::SYNC);
 }
 
 napi_value ResourceManagerAddon::RemoveResource(napi_env env, napi_callback_info info)
 {
+#ifdef ENABLE_API_METRICS
+    API_METRICS("LocalizationKit.resourceManager.removeResource");
+#endif
     return AddonGetResource(env, info, "RemoveResource", FunctionType::SYNC);
 }
 

@@ -25,4 +25,10 @@ ability_runtime_path = "//foundation/ability/ability_runtime"
 
 declare_args() {
   resource_management_support_icu = true
+
+  if (defined(global_parts_info) && defined(global_parts_info.hiviewdfx_api_metrics)) {
+    resource_management_api_metrics = true
+  } else {
+    resource_management_api_metrics = false
+  }
 }

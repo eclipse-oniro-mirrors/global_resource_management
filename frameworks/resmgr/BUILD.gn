@@ -112,6 +112,13 @@ ohos_shared_library("global_resmgr") {
     ]
   }
 
+  if (resource_management_api_metrics) {
+    defines += [ "SUPPORT_API_METRICS" ]
+    include_dirs += [ "../../dfx/api_metrics" ]
+    sources += [ "../../dfx/api_metrics/api_metrics_reporter.cpp" ]
+    external_deps += [ "api_metrics:histogrammanager" ]
+  }
+
   branch_protector_ret = "pac_ret"
   sanitize = {
     boundary_sanitize = true
@@ -318,6 +325,13 @@ ohos_shared_library("ohresmgr") {
     "hilog:libhilog",
     "napi:ace_napi",
   ]
+
+  if (resource_management_api_metrics) {
+    defines += [ "SUPPORT_API_METRICS" ]
+    include_dirs += [ "../../dfx/api_metrics" ]
+    sources += [ "../../dfx/api_metrics/api_metrics_reporter.cpp" ]
+    external_deps += [ "api_metrics:histogrammanager" ]
+  }
 
   stack_protector_ret = true
   sanitize = {
