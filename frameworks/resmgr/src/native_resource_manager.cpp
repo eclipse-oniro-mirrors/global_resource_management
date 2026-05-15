@@ -37,7 +37,7 @@ ResourceManager_ErrorCode copyStringArray(char ***resultValue, uint32_t *resultL
     vector<string> tempResultValue, string apiName)
 {
     size_t len = tempResultValue.size();
-    *resultValue = new char* [tempResultValue.size()];
+    *resultValue = new (std::nothrow) char* [tempResultValue.size()]();
     if (*resultValue == nullptr) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG, "%{public}s malloc error", apiName.c_str());
         return ResourceManager_ErrorCode::ERROR_CODE_OUT_OF_MEMORY;
@@ -85,7 +85,7 @@ ResourceManager_ErrorCode copyLocalInfo(const icu::Locale *localeInfo, ResourceM
     if (region != nullptr) {
         locale += std::string("_") + region;
     }
-    configuration->locale = (char*)malloc(locale.size() + 1);
+    configuration->locale = static_cast<char *>(malloc(locale.size() + 1));
     if (configuration->locale == nullptr) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG, "GetConfiguration malloc error");
         return ResourceManager_ErrorCode::ERROR_CODE_OUT_OF_MEMORY;
@@ -102,7 +102,7 @@ ResourceManager_ErrorCode copyLocalInfo(const icu::Locale *localeInfo, ResourceM
 ResourceManager_ErrorCode copyString(char **resultValue, string tempResultValue, string apiName)
 {
     size_t len = tempResultValue.size();
-    *resultValue = (char*)malloc(tempResultValue.size() + 1);
+    *resultValue = static_cast<char *>(malloc(tempResultValue.size() + 1));
     if (*resultValue == nullptr) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG, "%{public}s malloc error", apiName.c_str());
         return ResourceManager_ErrorCode::ERROR_CODE_OUT_OF_MEMORY;
@@ -136,7 +136,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64Data(const NativeReso
             "failed get media base64 id = %{public}d, errorCode = %{public}d", resId, errorCode);
         return errorCode;
     }
-    *resultValue = (char*)malloc(tempResultValue.size() + 1);
+    *resultValue = static_cast<char *>(malloc(tempResultValue.size() + 1));
     if (*resultValue == nullptr) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG, "GetMediaBase64 malloc error");
         return ResourceManager_ErrorCode::ERROR_CODE_OUT_OF_MEMORY;
@@ -172,7 +172,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64DataByName(const Nati
             "failed get media base64 name = %{public}s, errorCode = %{public}d", resName, errorCode);
         return errorCode;
     }
-    *resultValue = (char*)malloc(tempResultValue.size() + 1);
+    *resultValue = static_cast<char *>(malloc(tempResultValue.size() + 1));
     if (*resultValue == nullptr) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG, "GetMediaBase64Byname malloc error");
         return ResourceManager_ErrorCode::ERROR_CODE_OUT_OF_MEMORY;
