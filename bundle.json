@@ -69,7 +69,8 @@
             "runtime_core",
             "ipc",
             "ets_runtime",
-            "ets_frontend"
+            "ets_frontend",
+            "api_metrics"
           ]
       },
         "build": {

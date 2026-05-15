@@ -29,6 +29,9 @@
 #include "interop_js/arkts_interop_js_api.h"
 #include "ani_signature_builder.h"
 
+#ifdef SUPPORT_API_METRICS
+#include "api_metrics_reporter.h"
+#endif
 #include "ani_utils.h"
 #include "ani_signature.h"
 #include "hilog_wrapper.h"
@@ -475,6 +478,9 @@ ani_long ResMgrAni::GetColorByNameSync(ani_env* env, ani_object object, ani_stri
 
 void ResMgrAni::AddResource(ani_env* env, ani_object object, ani_string aniPath)
 {
+#ifdef ENABLE_API_METRICS
+    API_METRICS("LocalizationKit.resourceManager.addResource");
+#endif
     std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, object);
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in AddResource.");
@@ -491,6 +497,9 @@ void ResMgrAni::AddResource(ani_env* env, ani_object object, ani_string aniPath)
 
 void ResMgrAni::RemoveResource(ani_env* env, ani_object object, ani_string aniPath)
 {
+#ifdef ENABLE_API_METRICS
+    API_METRICS("LocalizationKit.resourceManager.removeResource");
+#endif
     std::shared_ptr<ResourceManager> resMgr = AniUtils::GetResourceManager(env, object);
     if (resMgr == nullptr) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in RemoveResource.");

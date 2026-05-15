@@ -16,6 +16,10 @@
 #include "ohresmgr.h"
 
 #include <securec.h>
+
+#ifdef SUPPORT_API_METRICS
+#include "api_metrics_reporter.h"
+#endif
 #include "drawable_descriptor/drawable_descriptor.h"
 #include "hilog_wrapper.h"
 #include "resource_manager_impl.h"
@@ -652,6 +656,9 @@ ResourceManager_ErrorCode OH_ResourceManager_GetBoolByName(const NativeResourceM
 
 ResourceManager_ErrorCode OH_ResourceManager_AddResource(const NativeResourceManager *mgr, const char *path)
 {
+#ifdef ENABLE_API_METRICS
+    API_METRICS("LocalizationKit.OH_ResourceManager_AddResource");
+#endif
     if (mgr == nullptr || path == nullptr || mgr->resManager == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
@@ -664,6 +671,9 @@ ResourceManager_ErrorCode OH_ResourceManager_AddResource(const NativeResourceMan
 
 ResourceManager_ErrorCode OH_ResourceManager_RemoveResource(const NativeResourceManager *mgr, const char *path)
 {
+#ifdef ENABLE_API_METRICS
+    API_METRICS("LocalizationKit.OH_ResourceManager_RemoveResource");
+#endif
     if (mgr == nullptr || path == nullptr || mgr->resManager == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
