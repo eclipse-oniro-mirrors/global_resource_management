@@ -77,7 +77,7 @@ Ability* GetGlobalAbility(napi_env env)
     }
 
     Ability* ability = nullptr;
-    status = napi_get_value_external(env, abilityObj, (void **)&ability);
+    status = napi_get_value_external(env, abilityObj, reinterpret_cast<void **>(&ability));
     if (status == napi_ok && ability != nullptr) {
         return ability;
     }
@@ -319,7 +319,7 @@ static napi_module g_resourceManagerModule = {
     .nm_filename = nullptr,
     .nm_register_func = ResMgrInit,
     .nm_modname = "resourceManager",
-    .nm_priv = ((void*)0),
+    .nm_priv = nullptr,
     .reserved = {0}
 };
 

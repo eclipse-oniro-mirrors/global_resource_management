@@ -44,6 +44,13 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+struct ExtractorInfo {
+    char outPath[PATH_MAX + 1] = {0};
+    std::string rawfilePath;
+    std::shared_ptr<AbilityBase::Extractor> extractor;
+};
+#endif
 HapParser::HapParser()
 {}
 
@@ -277,32 +284,31 @@ RState HapParser::ReadRawFileFromHap(const std::string &hapPath, const std::stri
 }
 
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-RState GetExtractor(const char *hapPath, const char *patchPath, char *outPath, const std::string &rawFileName,
-                    std::string &rawfilePath, std::shared_ptr<AbilityBase::Extractor> &extractor)
+RState GetExtractor(const char *hapPath, const char *patchPath, const std::string &rawFileName, ExtractorInfo &info)
 {
     bool isNewExtractor = false;
     bool patchPathHasEntry = false;
     if (strlen(patchPath) != 0) {
-        Utils::CanonicalizePath(patchPath, outPath, PATH_MAX);
-        extractor = AbilityBase::ExtractorUtil::GetExtractor(outPath, isNewExtractor);
-        if (extractor == nullptr) {
+        Utils::CanonicalizePath(patchPath, info.outPath, PATH_MAX);
+        info.extractor = AbilityBase::ExtractorUtil::GetExtractor(info.outPath, isNewExtractor);
+        if (info.extractor == nullptr) {
             RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor in ReadRawFileDescriptor");
             return NOT_FOUND;
         }
-        rawfilePath = GetRawFilePath(extractor, rawFileName);
-        if (extractor->HasEntry(rawfilePath)) {
+        info.rawfilePath = GetRawFilePath(info.extractor, rawFileName);
+        if (info.extractor->HasEntry(info.rawfilePath)) {
             patchPathHasEntry = true;
         }
     }
     if (!patchPathHasEntry) {
-        Utils::CanonicalizePath(hapPath, outPath, PATH_MAX);
-        extractor = AbilityBase::ExtractorUtil::GetExtractor(outPath, isNewExtractor);
-        if (extractor == nullptr) {
+        Utils::CanonicalizePath(hapPath, info.outPath, PATH_MAX);
+        info.extractor = AbilityBase::ExtractorUtil::GetExtractor(info.outPath, isNewExtractor);
+        if (info.extractor == nullptr) {
             RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor in patch hap");
             return NOT_FOUND;
         }
-        rawfilePath = GetRawFilePath(extractor, rawFileName);
-        if (!extractor->HasEntry(rawfilePath)) {
+        info.rawfilePath = GetRawFilePath(info.extractor, rawFileName);
+        if (!info.extractor->HasEntry(info.rawfilePath)) {
             RESMGR_HILOGD(RESMGR_TAG, "the rawfile file is not exist in patch hap");
             return ERROR_CODE_RES_PATH_INVALID;
         }
@@ -316,20 +322,18 @@ RState HapParser::ReadRawFileDescriptor(const char *hapPath, const char *patchPa
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
     HITRACE_METER_NAME_EX(HITRACE_LEVEL_INFO, HITRACE_TAG_APP, __PRETTY_FUNCTION__, nullptr);
-    char outPath[PATH_MAX + 1] = {0};
-    std::string rawfilePath = "";
-    std::shared_ptr<AbilityBase::Extractor> extractor = nullptr;
-    RState resoult = GetExtractor(hapPath, patchPath, outPath, rawFileName, rawfilePath, extractor);
+    ExtractorInfo info;
+    RState resoult = GetExtractor(hapPath, patchPath, rawFileName, info);
     if (resoult != SUCCESS) {
         return resoult;
     }
     AbilityBase::FileInfo fileInfo;
-    bool ret = extractor->GetFileInfo(rawfilePath, fileInfo);
+    bool ret = info.extractor->GetFileInfo(info.rawfilePath, fileInfo);
     if (!ret) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get rawFileDescriptor rawfilePath");
         return NOT_FOUND;
     }
-    int zipFd = open(outPath, O_RDONLY);
+    int zipFd = open(info.outPath, O_RDONLY);
     if (zipFd < 0) {
         RESMGR_HILOGE(RESMGR_TAG, "failed open file by path");
         return NOT_FOUND;
