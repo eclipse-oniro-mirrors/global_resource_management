@@ -40,7 +40,9 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
-HapParserV2::HapParserV2()
+const std::string NOT_DEVICE_TYPE = "not_device_type";
+const std::string DEVICE_DEFAULT = "default";
+HapParserV2::HapParserV2() : deviceType_(DEVICE_DEFAULT)
 {}
 
 HapParserV2::~HapParserV2()
@@ -77,7 +79,10 @@ int32_t HapParserV2::ParseResHex()
     if (ret != OK) {
         return ret;
     }
-
+    deviceType_ = ResConfigImpl::GetCurrentDeviceType();
+    if (deviceType_ == std::string(TABLET_STR) || deviceType_ == std::string(TWOINONE_STR)) {
+        deviceTypes_ = ResConfigImpl::GetAppSupportDeviceTypes();
+    }
     ret = this->ParseKeys(offset);
     if (ret != OK) {
         return ret;
@@ -124,9 +129,13 @@ int32_t HapParserV2::ParseKeys(uint32_t &offset)
             RESMGR_HILOGE(RESMGR_TAG, "new ResKey failed when ParseResHex");
             return SYS_ERROR;
         }
-        int32_t ret = this->ParseKey(offset, key);
+        bool match = true;
+        int32_t ret = this->ParseKey(offset, key, match);
         if (ret != OK) {
             return ret;
+        }
+        if (!match) {
+            continue;
         }
         keys_[key->resConfigId_] = HapParser::CreateResConfigFromKeyParams(key->params_);
         if (keys_[key->resConfigId_] == nullptr) {
@@ -313,7 +322,7 @@ int32_t HapParserV2::ParseConfigItem(uint32_t &offset, ConfigItem &configItem, c
     return OK;
 }
 
-int32_t HapParserV2::ParseKey(uint32_t &offset, std::shared_ptr<KeyInfo> key)
+int32_t HapParserV2::ParseKey(uint32_t &offset, std::shared_ptr<KeyInfo> key, bool &match)
 {
     if (offset + KeyInfo::RESKEY_HEADER_LEN > mMapFile_->mmapLen_) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse ResKey failed, the offset will be out of bounds.");
@@ -339,7 +348,7 @@ int32_t HapParserV2::ParseKey(uint32_t &offset, std::shared_ptr<KeyInfo> key)
             RESMGR_HILOGE(RESMGR_TAG, "new KeyParam failed when ParseResHex");
             return SYS_ERROR;
         }
-        int32_t ret = this->ParseKeyParam(offset, keyParam);
+        int32_t ret = this->ParseKeyParam(offset, keyParam, match);
         GetKeyParamsLocales(keyParam, locale, isLocale);
         if (ret != OK) {
             return ret;
@@ -352,7 +361,7 @@ int32_t HapParserV2::ParseKey(uint32_t &offset, std::shared_ptr<KeyInfo> key)
     return OK;
 }
 
-int32_t HapParserV2::ParseKeyParam(uint32_t &offset, std::shared_ptr<KeyParam> keyParam)
+int32_t HapParserV2::ParseKeyParam(uint32_t &offset, std::shared_ptr<KeyParam> keyParam, bool &match)
 {
     if (offset + KeyParam::KEYPARAM_LEN > mMapFile_->mmapLen_) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse KeyParam failed, the offset will be out of bounds.");
@@ -367,6 +376,14 @@ int32_t HapParserV2::ParseKeyParam(uint32_t &offset, std::shared_ptr<KeyParam> k
     keyParam->InitStr();
 
     this->GetLimitKeyValue(keyParam->type_);
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    auto resDeviceType = keyParam->GetDeviceTypeStr();
+    deviceTypes_.push_back(deviceType_);
+    if (deviceType_ != DEVICE_DEFAULT && resDeviceType != NOT_DEVICE_TYPE &&
+        find(deviceTypes_.begin(), deviceTypes_.end(), resDeviceType) == deviceTypes_.end()) {
+        match = false;
+    }
+#endif
     return OK;
 }
 

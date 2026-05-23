@@ -295,6 +295,10 @@ const std::shared_ptr<ValueUnderQualifierDir> HapManager::GetBestMatchResource(
     // When there are multiple overlays, reverse the search to find the first match resource.
     for (auto iter = candidates.rbegin(); iter != candidates.rend(); iter++) {
         const auto &paths = (*iter)->GetLimitPathsConst();
+        if (paths.empty()) {
+            RESMGR_HILOGW(RESMGR_TAG, "GetBestMatchResource limitPaths is empty");
+            continue;
+        }
         bool isOverlayHapResource = paths[0]->IsOverlayResource();
         if (isOverlayHapResource) {
             MatchBestResource(bestOverlayResConfig, overlayResult, paths, density, currentResConfig);

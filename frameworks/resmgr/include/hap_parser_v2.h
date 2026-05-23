@@ -54,9 +54,9 @@ private:
 
     int32_t ParseKeys(uint32_t &offset);
 
-    int32_t ParseKey(uint32_t &offset, std::shared_ptr<KeyInfo> key);
+    int32_t ParseKey(uint32_t &offset, std::shared_ptr<KeyInfo> key, bool &match);
 
-    int32_t ParseKeyParam(uint32_t &offset, std::shared_ptr<KeyParam> keyParam);
+    int32_t ParseKeyParam(uint32_t &offset, std::shared_ptr<KeyParam> keyParam, bool &match);
 
     void GetLimitKeyValue(KeyType type);
 
@@ -83,6 +83,9 @@ private:
 
     // judge the resource is adapt dark mode or not.
     bool hasDarkRes_{false};
+
+    std::string deviceType_;
+    std::vector<std::string> deviceTypes_;
 };
 } // namespace Resource
 } // namespace Global
