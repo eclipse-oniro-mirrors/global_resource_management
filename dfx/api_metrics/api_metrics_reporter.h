@@ -28,7 +28,7 @@ namespace OHOS {
 namespace Global {
 namespace Resource {
 
-enum MetricsType {
+enum MetricsType : unsigned int {
     API_CALL = 1 << 0,
     TIME     = 1 << 1,
     ALL      = API_CALL | TIME
@@ -44,7 +44,7 @@ public:
 
 private:
     std::string name_;
-    int metricsType_;
+    unsigned int metricsType_;
     std::chrono::time_point<std::chrono::steady_clock> startTime_;
 };
 
