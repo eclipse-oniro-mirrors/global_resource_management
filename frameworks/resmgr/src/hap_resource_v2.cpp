@@ -104,11 +104,15 @@ const std::shared_ptr<IdValues> HapResourceV2::GetIdValues(const uint32_t id)
         return nullptr;
     }
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>>::const_iterator iter = idMap_.find(id);
-    if (iter == idMap_.end()) {
+    if (iter == idMap_.end() || iter->second == nullptr) {
         return nullptr;
     }
 
     if (!iter->second->IsParsed() && ParseLimitPaths(iter->second) != OK) {
+        return nullptr;
+    }
+    if (iter->second->GetLimitPathsConst().empty()) {
+        RESMGR_HILOGW(RESMGR_TAG, "by id=%{public}u limitPaths is empty", id);
         return nullptr;
     }
     return iter->second;
@@ -128,11 +132,15 @@ const std::shared_ptr<IdValues> HapResourceV2::GetIdValuesByName(
         return nullptr;
     }
     std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>::const_iterator iter = mapIterator->second.find(name);
-    if (iter == mapIterator->second.end()) {
+    if (iter == mapIterator->second.end() || iter->second == nullptr) {
         return nullptr;
     }
 
     if (!iter->second->IsParsed() && ParseLimitPaths(iter->second) != OK) {
+        return nullptr;
+    }
+    if (iter->second->GetLimitPathsConst().empty()) {
+        RESMGR_HILOGW(RESMGR_TAG, "by name=%{public}s limitPaths is empty", name.c_str());
         return nullptr;
     }
     return iter->second;
@@ -246,9 +254,13 @@ int32_t HapResourceV2::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
         if (ret != OK) {
             return ret;
         }
+        auto iter = keys_.find(configItem.resCfgId_);
+        if (iter == keys_.end() || iter->second == nullptr) {
+            continue;
+        }
 
         std::shared_ptr<ValueUnderQualifierDirV2> vuqd =
-            std::make_shared<ValueUnderQualifierDirV2>(resPath, configItem.offset_, keys_[configItem.resCfgId_]);
+            std::make_shared<ValueUnderQualifierDirV2>(resPath, configItem.offset_, iter->second);
         vuqd->Init(idValue->GetMMap(), idValue->GetResType(), idValue->GetId(), idValue->GetName());
         idValue->AddLimitPath(vuqd);
     }
@@ -309,9 +321,14 @@ int32_t SystemResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
             return ret;
         }
 
+        auto iter = keys_.find(configItem.resCfgId_);
+        if (iter == keys_.end() || iter->second == nullptr) {
+            continue;
+        }
+
         std::pair<std::string, std::string> resPath = std::make_pair(indexPath_, resourcePath_);
         std::shared_ptr<ValueUnderQualifierDirV2> vuqd = std::make_shared<ValueUnderQualifierDirV2>(
-            resPath, configItem.offset_, keys_[configItem.resCfgId_], false, true);
+            resPath, configItem.offset_, iter->second, false, true);
         vuqd->Init(idValue->GetMMap(), idValue->GetResType(), idValue->GetId(), idValue->GetName());
         idValue->AddLimitPath(vuqd);
     }
@@ -379,9 +396,14 @@ int32_t OverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
             return ret;
         }
 
+        auto iter = keys_.find(configItem.resCfgId_);
+        if (iter == keys_.end() || iter->second == nullptr) {
+            continue;
+        }
+
         std::pair<std::string, std::string> resPath = std::make_pair(indexPath_, resourcePath_);
         std::shared_ptr<ValueUnderQualifierDirV2> vuqd = std::make_shared<ValueUnderQualifierDirV2>(
-            resPath, configItem.offset_, keys_[configItem.resCfgId_], true, false);
+            resPath, configItem.offset_, iter->second, true, false);
         vuqd->Init(idValue->GetMMap(), idValue->GetResType(), idValue->GetId(), idValue->GetName());
         idValue->AddLimitPath(vuqd);
     }
@@ -422,9 +444,14 @@ int32_t SystemOverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idVal
             return ret;
         }
 
+        auto iter = keys_.find(configItem.resCfgId_);
+        if (iter == keys_.end() || iter->second == nullptr) {
+            continue;
+        }
+
         std::pair<std::string, std::string> resPath = std::make_pair(indexPath_, resourcePath_);
         std::shared_ptr<ValueUnderQualifierDirV2> vuqd = std::make_shared<ValueUnderQualifierDirV2>(
-            resPath, configItem.offset_, keys_[configItem.resCfgId_], true, true);
+            resPath, configItem.offset_, iter->second, true, true);
         vuqd->Init(idValue->GetMMap(), idValue->GetResType(), idValue->GetId(), idValue->GetName());
         idValue->AddLimitPath(vuqd);
     }
