@@ -233,7 +233,7 @@ ohos_shared_library("global_resmgr_linux") {
       "cJSON:cjson_static",
       "icu:shared_icui18n",
       "zlib:shared_libz",
-      "icu:static_icuuc",
+      "icu:shared_icuuc",
     ]
   }
   subsystem_name = "global"
