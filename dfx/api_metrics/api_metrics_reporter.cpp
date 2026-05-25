@@ -24,7 +24,7 @@ namespace Global {
 namespace Resource {
 
 ApiMetricsReporter::ApiMetricsReporter(const std::string &name, MetricsType metricsType) : name_(name),
-    metricsType_(static_cast<int>(metricsType)), startTime_(std::chrono::steady_clock::now())
+    metricsType_(static_cast<unsigned int>(metricsType)), startTime_(std::chrono::steady_clock::now())
 {}
 
 ApiMetricsReporter::~ApiMetricsReporter()
@@ -32,12 +32,12 @@ ApiMetricsReporter::~ApiMetricsReporter()
     if (name_.empty() || metricsType_ == 0) {
         return;
     }
-    if (metricsType_ & static_cast<int>(MetricsType::TIME)) {
+    if (metricsType_ & static_cast<unsigned int>(MetricsType::TIME)) {
         auto endTime = std::chrono::steady_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime_);
         HISTOGRAM_TIMES(std::string(name_ + ".Time").c_str(), static_cast<int32_t>(duration.count()));
     }
-    if (metricsType_ & static_cast<int>(MetricsType::API_CALL)) {
+    if (metricsType_ & static_cast<unsigned int>(MetricsType::API_CALL)) {
         HISTOGRAM_BOOLEAN(std::string(name_ + ".ApiCall").c_str(), true);
     }
 }
