@@ -38,5 +38,6 @@ ohos_fuzztest("ResmgrFuzzTest") {
 
   external_deps = [
     "bounds_checking_function:libsec_shared",
+    "icu:shared_icuuc",
   ]
 }
