@@ -285,8 +285,8 @@ bool ResourceManagerNapiSyncImpl::InitNapiParameters(napi_env env, napi_callback
     if (size == 1) {
         return true;
     }
-    napi_value paramArray[size];
-    napi_get_cb_info(env, info, &size, paramArray, nullptr, nullptr);
+    std::vector<napi_value> paramArray(size);
+    napi_get_cb_info(env, info, &size, paramArray.data(), nullptr, nullptr);
 
     for (size_t i = 1; i < size; ++i) {
         if (!InitParamsFromParamArray(env, paramArray[i], jsParams)) {
@@ -1431,18 +1431,14 @@ napi_value ResourceManagerNapiSyncImpl::UpdateOverrideConfiguration(napi_env env
 bool ResourceManagerNapiSyncImpl::InitOptionalParameters(napi_env env, napi_callback_info info, uint32_t startIndex,
     std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
 {
-    size_t size = startIndex;
+    size_t size = 0;
     napi_get_cb_info(env, info, &size, nullptr, nullptr, nullptr);
     // one parameter: resId or resource or Name
-    if (size <= startIndex || size > SIZE_MAX) {
+    if (size <= startIndex) {
         return true;
     }
-    napi_value paramArray[size];
-    napi_get_cb_info(env, info, &size, paramArray, nullptr, nullptr);
-    if (size > SIZE_MAX) {
-        return true;
-    }
-
+    std::vector<napi_value> paramArray(size);
+    napi_get_cb_info(env, info, &size, paramArray.data(), nullptr, nullptr);
     for (size_t i = startIndex; i < size; ++i) {
         if (!InitParamsFromParamArray(env, paramArray[i], jsParams)) {
             return false;

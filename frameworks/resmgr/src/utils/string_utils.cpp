@@ -303,7 +303,10 @@ int32_t GetPrecision(const std::string &precisionStr)
 {
     size_t posOfDecimalPoint = precisionStr.find(".");
     if (posOfDecimalPoint != std::string::npos) {
-        return std::stoi(precisionStr.substr(posOfDecimalPoint + 1));
+        int precision = 0;
+        if (Utils::convertToInteger(precisionStr.substr(posOfDecimalPoint + 1), precision)) {
+            return precision;
+        }
     }
     return INVALID_PRECISION;
 }
