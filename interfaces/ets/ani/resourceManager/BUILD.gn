@@ -39,6 +39,12 @@ ohos_shared_library("resourceManager_ani") {
     "runtime_core:ani",
   ]
 
+  if (resource_management_support_icu) {
+    external_deps += [
+      "icu:shared_icuuc"
+    ]
+  }
+
   branch_protector_ret = "pac_ret"
   sanitize = {
     boundary_sanitize = true
