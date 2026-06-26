@@ -28,6 +28,10 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
+struct EnvData {
+    napi_env env;
+    EnvData(napi_env napienv) : env(napienv) {}
+};
 class EXPORT_FUNC ResourceManagerAddon {
 #define GET_PARAMS(env, info, num)    \
     size_t argc = num;                \
@@ -222,6 +226,10 @@ private:
     static napi_value GetIntPluralStringByNameSync(napi_env env, napi_callback_info info);
 
     static napi_value GetDoublePluralStringByNameSync(napi_env env, napi_callback_info info);
+     
+    static bool AddConstructorRef(napi_env env, napi_ref ref);
+
+    static napi_ref GetConstructorRef(napi_env env);
 
     std::string bundleName_;
     std::shared_ptr<ResourceManager> resMgr_;
