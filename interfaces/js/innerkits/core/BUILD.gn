@@ -72,6 +72,8 @@ ohos_shared_library("resmgr_napi_core") {
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
+    "libuv:uv",
   ]
 
   if (resource_management_support_icu) {
@@ -145,6 +147,7 @@ ohos_shared_library("resmgr_napi_core_preview_inner") {
       "graphic_2d:librender_service_client",
       "hilog:libhilog",
       "napi:ace_napi",
+      "node:node_header_notice",
     ]
   }
   subsystem_name = "global"
