@@ -277,6 +277,7 @@ ohos_shared_library("librawfile") {
     "hilog:libhilog",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   if (resource_management_support_icu) {
@@ -324,6 +325,7 @@ ohos_shared_library("ohresmgr") {
     "c_utils:utils",
     "hilog:libhilog",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   if (resource_management_api_metrics) {

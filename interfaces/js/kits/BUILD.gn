@@ -50,6 +50,7 @@ ohos_shared_library("resourcemanager") {
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   stack_protector_ret = true
@@ -95,6 +96,7 @@ ohos_shared_library("resourcemanager_preview") {
     external_deps = [
       "hilog:libhilog",
       "napi:ace_napi",
+      "node:node_header_notice",
     ]
   }
   subsystem_name = "global"
@@ -114,6 +116,8 @@ ohos_shared_library("sendableresourcemanager") {
   external_deps = [
     "hilog:libhilog",
     "napi:ace_napi",
+    "node:node_header_notice",
+    "libuv:uv",
   ]
 
   stack_protector_ret = true
@@ -145,6 +149,7 @@ ohos_shared_library("sendableresourcemanager_preview") {
     external_deps = [
       "hilog:libhilog",
       "napi:ace_napi",
+      "node:node_header_notice",
     ]
   }
   subsystem_name = "global"
