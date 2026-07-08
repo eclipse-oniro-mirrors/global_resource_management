@@ -283,6 +283,7 @@ ohos_shared_library("librawfile") {
     external_deps += [ "cJSON:cjson_static" ]
   } else {
     external_deps += [ "cJSON:cjson" ]
+    branch_protector_ret = "pac_ret"
   }
 
   if (resource_management_support_icu) {
@@ -336,6 +337,7 @@ ohos_shared_library("ohresmgr") {
     external_deps += [ "cJSON:cjson_static" ]
   } else {
     external_deps += [ "cJSON:cjson" ]
+    branch_protector_ret = "pac_ret"
   }
 
   if (resource_management_api_metrics) {
