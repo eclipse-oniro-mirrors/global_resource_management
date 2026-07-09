@@ -183,10 +183,12 @@ napi_value ResourceManagerNapiAsyncImpl::GetResult(napi_env env, std::unique_ptr
     if (napi_create_async_work(env, nullptr, resource, execute, ResourceManagerNapiAsyncImpl::Complete,
         static_cast<void*>(dataContext.get()), &dataContext->work_) != napi_ok) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to create async work for %{public}s", name.c_str());
+        dataContext->Release(env);
         return result;
     }
     if (napi_queue_async_work_with_qos(env, dataContext->work_, napi_qos_user_initiated) != napi_ok) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to queue async work for %{public}s", name.c_str());
+        dataContext->Release(env);
         return result;
     }
     dataContext.release();
@@ -211,6 +213,7 @@ napi_value ResourceManagerNapiAsyncImpl::ProcessNameParamV9(napi_env env, napi_c
             napi_create_reference(env, argv[i], 1, &dataContext->callbackRef_);
             break;
         } else if (i == 1 && ResourceManagerNapiUtils::GetDataType(env, argv[i], dataContext->density_) != SUCCESS) {
+            dataContext->Release(env);
             ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
             return nullptr;
         } else if (i == 2 && valueType == napi_function) { // the third callback param
@@ -244,6 +247,7 @@ napi_value ResourceManagerNapiAsyncImpl::ProcessIdParamV9(napi_env env, napi_cal
             napi_create_reference(env, argv[i], 1, &dataContext->callbackRef_);
             break;
         } else if (i == 1 && ResourceManagerNapiUtils::GetDataType(env, argv[i], dataContext->density_) != SUCCESS) {
+            dataContext->Release(env);
             ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
             return nullptr;
         } else if (i == 2 && valueType == napi_function) { // the third callback param
@@ -284,6 +288,7 @@ napi_value ResourceManagerNapiAsyncImpl::ProcessResourceParamV9(napi_env env, na
             napi_create_reference(env, argv[i], 1, &dataContext->callbackRef_);
             break;
         } else if (i == 1 && ResourceManagerNapiUtils::GetDataType(env, argv[i], dataContext->density_) != SUCCESS) {
+            dataContext->Release(env);
             ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
             return nullptr;
         } else if (i == 2 && valueType == napi_function) { // the third callback param
