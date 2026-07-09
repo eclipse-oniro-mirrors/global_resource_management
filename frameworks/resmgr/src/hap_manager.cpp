@@ -1104,14 +1104,14 @@ void HapManager::AddSystemResource(const std::shared_ptr<HapManager> &systemHapM
     }
     WriteLock lock(this->mutex_);
     // add system resource to app resource vector
-    const std::vector<std::shared_ptr<HapResource>> &systemResources = systemHapManager->hapResources_;
+    const std::vector<std::shared_ptr<HapResource>> &systemResources = systemHapManager->GetHapResource();
     for (size_t i = 0; i < systemResources.size(); i++) {
         this->hapResources_.push_back(systemResources[i]);
     }
 
     // add system loaded path to app loaded path map.
     const std::unordered_map<std::string, std::vector<std::string>> &loadedSystemPaths =
-        systemHapManager->loadedHapPaths_;
+        systemHapManager->GetLoadedHapPaths();
     for (auto iter = loadedSystemPaths.begin(); iter != loadedSystemPaths.end(); iter++) {
         const std::vector<std::string> &overlayPaths = iter->second;
         if (this->loadedHapPaths_.find(iter->first) == this->loadedHapPaths_.end()) {

@@ -271,6 +271,8 @@ protected:
 
     // judge the hqf is enabled or not.
     bool hasPatch_{false};
+
+    bool isOverlayUpdated_{false};
 };
 } // namespace Resource
 } // namespace Global
