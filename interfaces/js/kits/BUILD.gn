@@ -53,6 +53,7 @@ ohos_shared_library("resourcemanager") {
     "node:node_header_notice",
   ]
 
+  branch_protector_ret = "pac_ret"
   stack_protector_ret = true
   sanitize = {
     boundary_sanitize = true
@@ -120,6 +121,7 @@ ohos_shared_library("sendableresourcemanager") {
     "libuv:uv",
   ]
 
+  branch_protector_ret = "pac_ret"
   stack_protector_ret = true
   sanitize = {
     boundary_sanitize = true
