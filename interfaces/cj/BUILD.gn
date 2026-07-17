@@ -53,6 +53,7 @@ ohos_shared_library("cj_resource_manager_ffi") {
     sources = [ "src/resource_manager_mock.cpp" ]
   }
 
+  branch_protector_ret = "pac_ret"
   innerapi_tags = [ "platformsdk" ]
   subsystem_name = "global"
   part_name = "resource_management"
