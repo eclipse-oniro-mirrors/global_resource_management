@@ -242,7 +242,7 @@ public:
     RState GetMediaBase64Data(const std::shared_ptr<ValueUnderQualifierDir> qualifierDir, std::string &outValue);
 
     /**
-     * Get the Profile data
+     * Get the Profile data, only for compress hap
      * @param qualifierDir the QualifierDir
      * @param len the output profile data len
      * @param outValue the output profile data
