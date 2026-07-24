@@ -694,6 +694,10 @@ RState HapManager::GetProfileData(const std::shared_ptr<ValueUnderQualifierDir> 
     std::unique_ptr<uint8_t[]> &outValue)
 {
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
+    if (!Utils::ContainsTail(qualifierDir->GetIndexPath(), Utils::tailSet)) {
+        // Not support uncompress hap
+        return NOT_FOUND;
+    }
     auto extractor = GetAbilityExtractor(qualifierDir);
     if (extractor == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get extractor from ability");

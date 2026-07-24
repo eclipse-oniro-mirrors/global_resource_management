@@ -14,12 +14,42 @@
 import("//build/test.gni")
 import("../../../resmgr.gni")
 
+resmgr_test_common_sources = [
+  "unittest/common/resource_manager_test_common.cpp",
+  "unittest/common/test_common.cpp",
+]
+
+resmgr_test_common_defines = [ "CONFIG_HILOG" ]
+resmgr_test_common_cflags = [
+  "-Dprivate=public",
+  "-Dprotected=public",
+]
+
+resmgr_test_common_include_dirs = [
+  "unittest/common",
+  "../include",
+  "../../../interfaces/inner_api/include",
+]
+
+resmgr_test_common_deps = [ "../:global_resmgr" ]
+
+resmgr_test_common_external_deps = [
+  "ability_base:extractortool",
+  "hilog:libhilog",
+  "zlib:libz",
+  "cJSON:cjson",
+]
+
 ohos_unittest("resmgr_test") {
   module_out_path = "resource_management/resource_management"
 
-  defines = [ "CONFIG_HILOG" ]
+  defines = resmgr_test_common_defines
+  cflags = resmgr_test_common_cflags
+  include_dirs = resmgr_test_common_include_dirs
+  deps = resmgr_test_common_deps
+  external_deps = resmgr_test_common_external_deps
 
-  sources = [
+  sources = resmgr_test_common_sources + [
     "unittest/common/hap_manager_test.cpp",
     "unittest/common/hap_parser_test.cpp",
     "unittest/common/hap_resource_test.cpp",
@@ -27,17 +57,13 @@ ohos_unittest("resmgr_test") {
     "unittest/common/res_config_impl_test.cpp",
     "unittest/common/res_config_test.cpp",
     "unittest/common/res_desc_test.cpp",
-    "unittest/common/resource_manager_new_module_performance_test.cpp",
-    "unittest/common/resource_manager_performance_test.cpp",
     "unittest/common/resource_manager_test.cpp",
-    "unittest/common/resource_manager_test_common.cpp",
     "unittest/common/resource_manager_test_hap.cpp",
     "unittest/common/resource_manager_test_media.cpp",
     "unittest/common/resource_manager_test_string.cpp",
     "unittest/common/resource_manager_v1_v2_test.cpp",
     "unittest/common/string_utils_test.cpp",
     "unittest/common/system_resource_manager_test.cpp",
-    "unittest/common/test_common.cpp",
     "unittest/common/theme_config_test.cpp",
     "unittest/common/theme_manager_test.cpp",
     "unittest/common/theme_resource_test.cpp",
@@ -45,26 +71,26 @@ ohos_unittest("resmgr_test") {
     "unittest/utils/utils_test.cpp",
   ]
 
-  cflags = [
-    "-Dprivate=public",
-    "-Dprotected=public",
-  ]
+  if (resource_management_support_icu) {
+    defines += [ "SUPPORT_GRAPHICS" ]
+    external_deps += [ "icu:shared_icuuc" ]
+  }
 
-  include_dirs = [
-    "unittest/common",
-    "../include",
-    "../../../interfaces/inner_api/include",
-  ]
+  resource_config_file = "../../../test/resource/ohos_test.xml"
+}
 
-  deps = [
-    "../:global_resmgr",
-  ]
+ohos_unittest("resmgr_performance_test") {
+  module_out_path = "resource_management/resource_management"
 
-  external_deps = [
-    "ability_base:extractortool",
-    "hilog:libhilog",
-    "zlib:libz",
-    "cJSON:cjson",
+  defines = resmgr_test_common_defines
+  cflags = resmgr_test_common_cflags
+  include_dirs = resmgr_test_common_include_dirs
+  deps = resmgr_test_common_deps
+  external_deps = resmgr_test_common_external_deps
+
+  sources = resmgr_test_common_sources + [
+    "unittest/common/resource_manager_new_module_performance_test.cpp",
+    "unittest/common/resource_manager_performance_test.cpp",
   ]
 
   if (resource_management_support_icu) {
@@ -77,5 +103,8 @@ ohos_unittest("resmgr_test") {
 
 group("unittest") {
   testonly = true
-  deps = [ ":resmgr_test" ]
+  deps = [
+    ":resmgr_test",
+    ":resmgr_performance_test",
+  ]
 }
