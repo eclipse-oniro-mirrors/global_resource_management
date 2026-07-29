@@ -29,6 +29,7 @@ ohos_shared_library("resourceManager_ani") {
   defines = [ "CONFIG_HILOG" ]
   deps = [ "../../../../frameworks/resmgr:global_resmgr" ]
   external_deps = [
+    "ability_base:configuration",
     "ability_runtime:app_context",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core_headers",
@@ -78,6 +79,7 @@ ohos_shared_library("resmgr_ani") {
   ]
 
   external_deps = [
+    "ability_base:configuration",
     "ability_runtime:app_context",
     "ace_engine:drawable_inner_ani",
     "bundle_framework:appexecfwk_base",

@@ -72,7 +72,9 @@
             "ipc",
             "ets_runtime",
             "ets_frontend",
-            "api_metrics"
+            "api_metrics",
+            "image_framework",
+            "form_fwk"
           ]
       },
         "build": {
