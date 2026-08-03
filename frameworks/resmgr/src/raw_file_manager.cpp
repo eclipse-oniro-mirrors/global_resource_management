@@ -228,7 +228,12 @@ RawFile *OH_ResourceManager_OpenRawFile(const NativeResourceManager *mgr, const 
     }
 
     std::fseek(result->pf, 0, SEEK_END);
-    result->length = ftell(result->pf);
+    long len = ftell(result->pf);
+    if (len < 0) {
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to tell raw file size: %{public}s", fileName);
+        return nullptr;
+    }
+    result->length = static_cast<int64_t>(len);
     std::fseek(result->pf, 0, SEEK_SET);
     return result.release();
 }
@@ -493,7 +498,12 @@ RawFile64 *OH_ResourceManager_OpenRawFile64(const NativeResourceManager *mgr, co
     }
 
     std::fseek(result->pf, 0, SEEK_END);
-    result->length = ftell(result->pf);
+    long len = ftell(result->pf);
+    if (len < 0) {
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "failed to tell raw file size: %{public}s", fileName);
+        return nullptr;
+    }
+    result->length = static_cast<int64_t>(len);
     std::fseek(result->pf, 0, SEEK_SET);
     return new RawFile64(std::move(result));
 }
