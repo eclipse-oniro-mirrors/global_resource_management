@@ -85,20 +85,6 @@ private:
 
     static std::weak_ptr<ResourceManagerImpl> weakResourceManager_;
 
-    static const std::string SYSTEM_RESOURCE_PATH;
-
-    static const std::string SYSTEM_RESOURCE_PATH_COMPRESSED;
-
-    static const std::string SYSTEM_RESOURCE_OVERLAY_PATH;
-
-    static const std::string SYSTEM_RESOURCE_OVERLAY_PATH_COMPRESSED;
-
-    static const std::string SYSTEM_RESOURCE_NO_SAND_BOX_PKG_PATH;
-
-    static const std::string SYSTEM_RESOURCE_NO_SAND_BOX_HAP_PATH;
-
-    static const std::string SYSTEM_RESOURCE_EXT_NO_SAND_BOX_HAP_PATH;
-
     static bool LoadSystemResource(ResourceManagerImpl *impl, bool isSandbox = true);
 
     static ResourceManagerImpl *CreateSystemResourceManager(bool isSandbox);
