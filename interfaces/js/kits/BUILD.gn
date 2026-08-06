@@ -49,17 +49,10 @@ ohos_shared_library("resourcemanager") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
-    "image_framework:image_native",
     "ipc:ipc_single",
     "napi:ace_napi",
     "node:node_header_notice",
   ]
-
-  if (ability_runtime_graphics) {
-    external_deps += [
-      "form_fwk:form_manager",
-    ]
-  }
 
   branch_protector_ret = "pac_ret"
   stack_protector_ret = true
