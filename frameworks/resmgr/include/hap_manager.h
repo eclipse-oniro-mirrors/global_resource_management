@@ -472,6 +472,8 @@ private:
 
     std::shared_ptr<ResConfigImpl> getCompleteOverrideConfig(bool isGetOverrideResource);
 
+    RState FindRawFileInternal(const std::string &name, std::string &outValue);
+
     static bool icuInitialized;
 
     std::shared_ptr<ResConfigImpl> resConfig_;
