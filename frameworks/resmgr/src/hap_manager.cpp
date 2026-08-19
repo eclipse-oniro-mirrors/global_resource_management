@@ -310,14 +310,13 @@ const std::shared_ptr<ValueUnderQualifierDir> HapManager::GetBestMatchResource(
     return result;
 }
 
-RState HapManager::FindRawFile(const std::string &name, std::string &outValue)
+RState HapManager::FindRawFileInternal(const std::string &name, std::string &outValue)
 {
 #ifdef __WINNT__
     char seperator = '\\';
 #else
     char seperator = '/';
 #endif
-    ReadLock lock(this->mutex_);
     for (auto iter = hapResources_.rbegin(); iter != hapResources_.rend(); iter++) {
         std::string indexPath = (*iter)->GetIndexPath();
         auto index = indexPath.rfind(seperator);
@@ -353,6 +352,12 @@ RState HapManager::FindRawFile(const std::string &name, std::string &outValue)
         }
     }
     return ERROR_CODE_RES_PATH_INVALID;
+}
+
+RState HapManager::FindRawFile(const std::string &name, std::string &outValue)
+{
+    ReadLock lock(this->mutex_);
+    return FindRawFileInternal(name, outValue);
 }
 
 RState HapManager::UpdateResConfig(ResConfig &resConfig)
@@ -855,7 +860,7 @@ RState HapManager::FindRawFileFromHap(const std::string &rawFileName, size_t &le
             }
         } else { // if file path is uncompressed
             std::string filePath;
-            HapManager::FindRawFile(rawFileName, filePath);
+            FindRawFileInternal(rawFileName, filePath);
             outValue = Utils::LoadResourceFile(filePath, len);
             if (outValue == nullptr) {
                 continue;
@@ -989,7 +994,7 @@ RState HapManager::GetFilePath(const std::shared_ptr<ValueUnderQualifierDir> qua
 RState HapManager::FindRawFileDescriptor(const std::string &name, ResourceManager::RawFileDescriptor &descriptor)
 {
     std::string paths = "";
-    RState rState = HapManager::FindRawFile(name, paths);
+    RState rState = FindRawFileInternal(name, paths);
     if (rState != SUCCESS) {
         return rState;
     }
