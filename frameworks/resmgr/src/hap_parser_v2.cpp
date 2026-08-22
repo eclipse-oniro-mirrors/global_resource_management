@@ -323,6 +323,11 @@ int32_t HapParserV2::ParseResInfo(uint32_t &offset, ResInfo &resInfo, const size
         return SYS_ERROR;
     }
     offset += ResInfo::RES_INFO_LEN;
+    if (resInfo.valueCount_ > MAX_RES_KEY_COUNT ||
+        (uint64_t)offset + (uint64_t)resInfo.valueCount_ * (uint64_t)ConfigItem::CONFIG_ITEM_LEN > (uint64_t)bufLen) {
+        RESMGR_HILOGE(RESMGR_TAG, "Parse ResInfo failed, valueCount out of range.");
+        return SYS_ERROR;
+    }
     return OK;
 }
 
