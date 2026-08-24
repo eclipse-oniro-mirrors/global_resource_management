@@ -78,6 +78,7 @@ ohos_shared_library("resmgr_napi_core") {
 
   if (resource_management_support_icu) {
     defines += [ "SUPPORT_GRAPHICS" ]
+    external_deps += [ "icu:shared_icuuc" ]
   }
 
   if (resource_management_api_metrics) {
