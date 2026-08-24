@@ -94,6 +94,10 @@ ohos_shared_library("resmgr_ani") {
     "runtime_core:ani_helpers",
   ]
 
+  if (resource_management_support_icu) {
+    external_deps += [ "icu:shared_icuuc" ]
+  }
+
   if (resource_management_api_metrics) {
     defines += [ "SUPPORT_API_METRICS" ]
     include_dirs = [ "../../../../dfx/api_metrics" ]

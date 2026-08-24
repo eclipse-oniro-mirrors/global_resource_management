@@ -44,6 +44,10 @@ ohos_shared_library("cj_resource_manager_ffi") {
       "node:node_header_notice",
     ]
 
+    if (resource_management_support_icu) {
+      external_deps += [ "icu:shared_icuuc" ]
+    }
+
     sources = [
       "src/resource_manager_ffi.cpp",
       "src/resource_manager_impl.cpp",
