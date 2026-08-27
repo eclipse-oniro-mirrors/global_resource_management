@@ -1311,13 +1311,10 @@ RState ResourceManagerImpl::CloseRawFileDescriptor(const std::string &name)
 
 void ResourceManagerImpl::ProcessPsuedoTranslate(std::string &outValue)
 {
-    auto len = outValue.length() + 1;
-    char src[len];
-    if (strcpy_s(src, len, outValue.c_str()) == EOK) {
-        std::string resultMsg = psueManager_->Convert(src, outValue);
-        if (resultMsg != "") {
-            RESMGR_HILOGE(RESMGR_TAG, "Psuedo translate failed, value:%s", src);
-        }
+    std::string src = outValue;
+    std::string resultMsg = psueManager_->Convert(src, outValue);
+    if (resultMsg != "") {
+        RESMGR_HILOGE(RESMGR_TAG, "Psuedo translate failed, value:%s", src.c_str());
     }
 }
 
