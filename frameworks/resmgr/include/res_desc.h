@@ -327,6 +327,14 @@ public:
     // offset from the beginning of the index file, pointing to the resource data
     uint32_t offset_;
 };
+
+static_assert(sizeof(ResHeader) == ResHeader::RES_HEADER_LEN, "ResHeader size mismatch");
+static_assert(sizeof(ResIndexHeader) == ResIndexHeader::RES_HEADER_LEN, "ResIndexHeader size mismatch");
+static_assert(sizeof(IdsHeader) == IdsHeader::IDS_HEADER_LEN, "IdsHeader size mismatch");
+static_assert(sizeof(TypeInfo) == TypeInfo::TYPE_INFO_LEN, "TypeInfo size mismatch");
+static_assert(sizeof(ResInfo) == ResInfo::RES_INFO_LEN, "ResInfo size mismatch");
+static_assert(sizeof(ConfigItem) == ConfigItem::CONFIG_ITEM_LEN, "ConfigItem size mismatch");
+static_assert(sizeof(DataHander) == DataHander::DATA_HANDER_LEN, "DataHander size mismatch");
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

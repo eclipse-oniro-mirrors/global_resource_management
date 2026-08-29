@@ -226,6 +226,10 @@ int32_t HapParserV1::ParseKeyParam(uint32_t &offset, bool &match, std::shared_pt
     if (eret != OK) {
         return SYS_ERROR;
     }
+    if (static_cast<uint32_t>(kp->type_) >= static_cast<uint32_t>(KeyType::KEY_TYPE_MAX)) {
+        RESMGR_HILOGE(RESMGR_TAG, "ParseKeyParam failed, invalid key type.");
+        return SYS_ERROR;
+    }
     offset += KeyParam::KEYPARAM_LEN;
     kp->InitStr();
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
@@ -243,7 +247,7 @@ void HapParserV1::GetLimitKeyValue(KeyType type, std::vector<bool> &keyTypes)
 {
     const uint32_t limitKeysBase = 0x00000001;
     uint32_t typeValue = static_cast<uint32_t>(type);
-    if (type < KeyType::KEY_TYPE_MAX && !keyTypes[typeValue]) {
+    if (typeValue < static_cast<uint32_t>(KeyType::KEY_TYPE_MAX) && !keyTypes[typeValue]) {
         keyTypes[typeValue] = true;
         limitKeyValue_ |= limitKeysBase << typeValue;
     }
@@ -339,6 +343,10 @@ int32_t HapParserV1::ParseIdItem(uint32_t &offset, std::shared_ptr<IdItem> idIte
     if (eret != OK) {
         return SYS_ERROR;
     }
+    if (static_cast<uint32_t>(idItem->resType_) >= static_cast<uint32_t>(ResType::MAX_RES_TYPE)) {
+        RESMGR_HILOGE(RESMGR_TAG, "ParseIdItem failed, invalid resType.");
+        return SYS_ERROR;
+    }
     if (selectedTypes_ != SELECT_ALL && (selectedTypes_ & ConvertType(idItem->resType_)) == 0) {
         return OK;
     }
@@ -376,6 +384,10 @@ int32_t HapParserV1::ParseStringArray(uint32_t &offset, std::vector<std::string>
         return SYS_ERROR;
     }
     offset += IdItem::SIZE_LEN; // Offset value plus 2
+    if (arrLen == 0 || (uint64_t)offset + (uint64_t)arrLen > (uint64_t)bufLen_) {
+        RESMGR_HILOGE(RESMGR_TAG, "ParseStringArray failed, arrLen out of bounds.");
+        return SYS_ERROR;
+    }
     // next arrLen bytes are several strings. then after, is one '\0'
     uint32_t startOffset = offset;
     std::string value;
@@ -411,7 +423,7 @@ int32_t HapParserV1::ParseString(uint32_t &offset, std::string &id, bool include
         return SYS_ERROR;
     }
     offset += IdItem::SIZE_LEN; // Offset value plus 2
-    if ((uint64_t)offset + (uint64_t)(includeTemi ? (strLen - 1) : strLen) > (uint64_t)bufLen_) {
+    if ((uint64_t)offset + (uint64_t)(includeTemi ? strLen : (strLen + 1)) > (uint64_t)bufLen_) {
         RESMGR_HILOGE(RESMGR_TAG, "ParseString value failed, the offset will be out of bounds");
         return SYS_ERROR;
     }

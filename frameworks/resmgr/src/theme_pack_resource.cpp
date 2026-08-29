@@ -16,6 +16,7 @@
 
 #include "hilog_wrapper.h"
 #include "utils/utils.h"
+#include <climits>
 #include <dirent.h>
 #include <tuple>
 namespace OHOS {
@@ -56,16 +57,15 @@ std::unordered_map<std::string, ResType> themeResTypeMap {
 std::string GetResKey(const std::string &jsonPath)
 {
     auto lastIndex = jsonPath.rfind('/');
-    if (lastIndex < 1) {
+    if (lastIndex == std::string::npos || lastIndex < 1) {
         return std::string("");
     }
     auto secondLastIndex = jsonPath.rfind('/', lastIndex - 1);
-    if (secondLastIndex < 1) {
+    if (secondLastIndex == std::string::npos || secondLastIndex < 1) {
         return std::string("");
     }
     auto thirdLastIndex = jsonPath.rfind('/', secondLastIndex - 1);
-    if (lastIndex == std::string::npos || secondLastIndex == std::string::npos
-        || thirdLastIndex == std::string::npos) {
+    if (thirdLastIndex == std::string::npos) {
         return std::string("");
     }
     if (secondLastIndex < thirdLastIndex + 1) {
@@ -140,46 +140,51 @@ void ThemeResource::InitThemeRes(std::pair<std::string, std::string> bundleInfo,
     return;
 }
 
-void ThemeResource::ReleaseJson(char* jsonData, FILE* pf)
+std::unique_ptr<char[]> ReadJsonFile(const std::string &jsonPath)
 {
-    if (jsonData != nullptr) {
-        free(jsonData);
-        jsonData = nullptr;
+    char realPath[PATH_MAX + 1] = {0};
+    Utils::CanonicalizePath(jsonPath.c_str(), realPath, PATH_MAX);
+    FILE* pf = std::fopen(realPath, "r");
+    if (pf == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "fopen failed in ParseJson");
+        return nullptr;
     }
-
-    if (pf != nullptr) {
-        fclose(pf);
-        pf = nullptr;
+    std::fseek(pf, 0, SEEK_END);
+    long len = ftell(pf);
+    if (len < 0) {
+        RESMGR_HILOGE(RESMGR_TAG, "ftell failed in ParseJson");
+        if (fclose(pf) != 0) {
+            RESMGR_HILOGE(RESMGR_TAG, "fclose failed in ParseJson");
+        }
+        return nullptr;
     }
+    std::fseek(pf, 0, SEEK_SET);
+    auto jsonData = std::make_unique<char[]>(len + 1);
+    if (jsonData == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "failed to allocate memory in ParseJson");
+        if (fclose(pf) != 0) {
+            RESMGR_HILOGE(RESMGR_TAG, "fclose failed in ParseJson");
+        }
+        return nullptr;
+    }
+    size_t readLen = std::fread(jsonData.get(), 1, len, pf);
+    jsonData[readLen] = '\0';
+    if (fclose(pf) != 0) {
+        RESMGR_HILOGE(RESMGR_TAG, "fclose failed in ParseJson");
+    }
+    return jsonData;
 }
 
 void ThemeResource::ParseJson(const std::string &bundleName, const std::string &moduleName,
     const std::string &jsonPath)
 {
-    auto len = 0;
-    FILE* pf = std::fopen(jsonPath.c_str(), "r");
-    if (pf == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "fopen failed in ParseJson");
-        return;
-    }
-    std::fseek(pf, 0, SEEK_END);
-    len = ftell(pf);
-    std::fseek(pf, 0, SEEK_SET);
-    char *jsonData = (char *)malloc(len + 1);
+    auto jsonData = ReadJsonFile(jsonPath);
     if (jsonData == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "failed malloc in ParseJson");
-        if (pf != nullptr) {
-            fclose(pf);
-            pf = nullptr;
-        }
         return;
     }
-    std::fread(jsonData, len, 1, pf);
-    jsonData[len] = '\0';
     auto themeConfig = GetThemeConfig(jsonPath);
-    cJSON *jsonValue = cJSON_Parse(jsonData);
+    cJSON *jsonValue = cJSON_Parse(jsonData.get());
     if (jsonValue == nullptr) {
-        ReleaseJson(jsonData, pf);
         RESMGR_HILOGE(RESMGR_TAG, "parse json fail");
         return;
     }
@@ -188,14 +193,11 @@ void ThemeResource::ParseJson(const std::string &bundleName, const std::string &
     if (floatRoot != nullptr) {
         InitThemeRes(bundleInfo, floatRoot, themeConfig, "float");
     }
-
     cJSON *colorRoot = cJSON_GetObjectItem(jsonValue, "color");
     if (colorRoot != nullptr) {
         InitThemeRes(bundleInfo, colorRoot, themeConfig, "color");
     }
-    ReleaseJson(jsonData, pf);
     cJSON_Delete(jsonValue);
-    return;
 }
 
 void ThemeResource::ParseIcon(const std::string &bundleName, const std::string &moduleName,

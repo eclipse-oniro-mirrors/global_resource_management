@@ -172,23 +172,23 @@ bool HapParser::GetIndexDataFromIndex(const char *path, std::unique_ptr<uint8_t[
         return false;
     }
     inFile.seekg(0, std::ios::end);
-    int fileLen = inFile.tellg();
-    if (fileLen <= 0) {
-        RESMGR_HILOGE(RESMGR_TAG, "file size is zero");
+    int64_t fileLen = static_cast<int64_t>(inFile.tellg());
+    if (fileLen <= 0 || fileLen > static_cast<int64_t>(MAX_INDEX_FILE_SIZE)) {
+        RESMGR_HILOGE(RESMGR_TAG, "file size is invalid or exceeds limit");
         inFile.close();
         return false;
     }
     bufLen = static_cast<size_t>(fileLen);
-    buf = std::make_unique<uint8_t[]>(fileLen);
+    buf = std::make_unique<uint8_t[]>(bufLen);
     if (buf == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "Error allocating memory");
         inFile.close();
         return false;
     }
     inFile.seekg(0, std::ios::beg);
-    inFile.read(reinterpret_cast<char*>(buf.get()), fileLen);
+    inFile.read(reinterpret_cast<char*>(buf.get()), bufLen);
     inFile.close();
-    RESMGR_HILOGD(RESMGR_TAG, "extract success, bufLen:%d", fileLen);
+    RESMGR_HILOGD(RESMGR_TAG, "extract success, bufLen:%zu", bufLen);
     return true;
 }
 
