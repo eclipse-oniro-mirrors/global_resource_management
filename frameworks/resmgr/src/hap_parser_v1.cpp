@@ -89,6 +89,11 @@ bool HapParserV1::Init(const char *path)
         return false;
     }
 
+    if (bufLen_ > MAX_INDEX_FILE_SIZE) {
+        RESMGR_HILOGE(RESMGR_TAG, "Init failed, index file size exceeds limit.");
+        return false;
+    }
+
     int32_t out = this->ParseResHex();
     if (out != OK) {
         RESMGR_HILOGE(RESMGR_TAG, "ParseResHex failed! retcode:%d", out);
@@ -104,7 +109,7 @@ int32_t HapParserV1::ParseResHex()
 #endif
     ResHeader resHeader;
     uint32_t offset = 0;
-    if (offset + ResHeader::RES_HEADER_LEN > bufLen_) {
+    if ((uint64_t)offset + (uint64_t)ResHeader::RES_HEADER_LEN > (uint64_t)bufLen_) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse ResHeader failed, the offset will be out of bounds");
         return SYS_ERROR;
     }
@@ -113,7 +118,7 @@ int32_t HapParserV1::ParseResHex()
         return SYS_ERROR;
     }
     offset += ResHeader::RES_HEADER_LEN;
-    if (resHeader.keyCount_ == 0 || resHeader.length_ == 0) {
+    if (resHeader.keyCount_ == 0 || resHeader.keyCount_ > MAX_RES_KEY_COUNT || resHeader.length_ == 0) {
         return UNKNOWN_ERROR;
     }
     deviceType_ = ResConfigImpl::GetCurrentDeviceType();
@@ -141,7 +146,7 @@ int32_t HapParserV1::ParseResHex()
 
 int32_t HapParserV1::ParseKey(uint32_t &offset, std::shared_ptr<ResKey> key, bool &match, std::vector<bool> &keyTypes)
 {
-    if (offset + ResKey::RESKEY_HEADER_LEN > bufLen_) {
+    if ((uint64_t)offset + (uint64_t)ResKey::RESKEY_HEADER_LEN > (uint64_t)bufLen_) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse ResKeyHeader failed, the offset will be out of bounds");
         return SYS_ERROR;
     }
@@ -153,6 +158,10 @@ int32_t HapParserV1::ParseKey(uint32_t &offset, std::shared_ptr<ResKey> key, boo
     if (key->tag_[ArrayIndex::INDEX_ZERO] != 'K' || key->tag_[ArrayIndex::INDEX_ONE] != 'E' ||
         key->tag_[ArrayIndex::INDEX_TWO] != 'Y' || key->tag_[ArrayIndex::INDEX_THREE] != 'S') {
         return -1;
+    }
+    if (key->keyParamsCount_ > MAX_KEY_PARAMS_COUNT) {
+        RESMGR_HILOGE(RESMGR_TAG, "Parse ResKey failed, keyParamsCount out of range.");
+        return SYS_ERROR;
     }
 
     std::vector<std::shared_ptr<KeyParam>> keyParams;
@@ -209,7 +218,7 @@ int32_t HapParserV1::ParseKeyParam(uint32_t &offset, bool &match, std::shared_pt
         RESMGR_HILOGE(RESMGR_TAG, "ParseKeyParam new KeyParam failed");
         return SYS_ERROR;
     }
-    if (offset + KeyParam::KEYPARAM_LEN > bufLen_) {
+    if ((uint64_t)offset + (uint64_t)KeyParam::KEYPARAM_LEN > (uint64_t)bufLen_) {
         RESMGR_HILOGE(RESMGR_TAG, "ParseKeyParam failed, the offset will be out of bounds");
         return SYS_ERROR;
     }
@@ -263,7 +272,7 @@ bool HapParserV1::SkipParseItem(const std::shared_ptr<ResKey> &key, bool &match)
 
 int32_t HapParserV1::ParseId(uint32_t &offset, std::shared_ptr<ResId> id)
 {
-    if (offset + ResId::RESID_HEADER_LEN > bufLen_) {
+    if ((uint64_t)offset + (uint64_t)ResId::RESID_HEADER_LEN > (uint64_t)bufLen_) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse ResIdHeader failed, the offset will be out of bounds");
         return SYS_ERROR;
     }
@@ -276,13 +285,17 @@ int32_t HapParserV1::ParseId(uint32_t &offset, std::shared_ptr<ResId> id)
         || id->tag_[ArrayIndex::INDEX_TWO] != 'S' || id->tag_[ArrayIndex::INDEX_THREE] != 'S') {
         return -1;
     }
+    if (id->count_ > MAX_RES_ID_COUNT) {
+        RESMGR_HILOGE(RESMGR_TAG, "Parse ResId failed, id count out of range.");
+        return SYS_ERROR;
+    }
     for (uint32_t i = 0; i < id->count_; ++i) {
         std::shared_ptr<IdParam> ip = std::make_shared<IdParam>();
         if (ip == nullptr) {
             RESMGR_HILOGE(RESMGR_TAG, "new IdParam failed when ParseId");
             return SYS_ERROR;
         }
-        if (offset + ResId::IDPARAM_HEADER_LEN > bufLen_) {
+        if ((uint64_t)offset + (uint64_t)ResId::IDPARAM_HEADER_LEN > (uint64_t)bufLen_) {
             RESMGR_HILOGE(RESMGR_TAG, "Parse IdParam failed, the offset will be out of bounds");
             return SYS_ERROR;
         }
@@ -318,7 +331,7 @@ uint32_t ConvertType(ResType type)
 
 int32_t HapParserV1::ParseIdItem(uint32_t &offset, std::shared_ptr<IdItem> idItem)
 {
-    if (offset + IdItem::HEADER_LEN > bufLen_) {
+    if ((uint64_t)offset + (uint64_t)IdItem::HEADER_LEN > (uint64_t)bufLen_) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse IdItemHeader failed, the offset will be out of bounds");
         return SYS_ERROR;
     }
@@ -354,7 +367,7 @@ int32_t HapParserV1::ParseIdItem(uint32_t &offset, std::shared_ptr<IdItem> idIte
 int32_t HapParserV1::ParseStringArray(uint32_t &offset, std::vector<std::string> &values)
 {
     uint16_t arrLen;
-    if (offset + IdItem::SIZE_LEN > bufLen_) {
+    if ((uint64_t)offset + (uint64_t)IdItem::SIZE_LEN > (uint64_t)bufLen_) {
         RESMGR_HILOGE(RESMGR_TAG, "ParseStringArray failed, the offset will be out of bounds");
         return SYS_ERROR;
     }
@@ -389,7 +402,7 @@ int32_t HapParserV1::ParseStringArray(uint32_t &offset, std::vector<std::string>
 int32_t HapParserV1::ParseString(uint32_t &offset, std::string &id, bool includeTemi)
 {
     uint16_t strLen;
-    if (offset + IdItem::SIZE_LEN > bufLen_) {
+    if ((uint64_t)offset + (uint64_t)IdItem::SIZE_LEN > (uint64_t)bufLen_) {
         RESMGR_HILOGE(RESMGR_TAG, "ParseString length failed, the offset will be out of bounds");
         return SYS_ERROR;
     }
@@ -398,7 +411,7 @@ int32_t HapParserV1::ParseString(uint32_t &offset, std::string &id, bool include
         return SYS_ERROR;
     }
     offset += IdItem::SIZE_LEN; // Offset value plus 2
-    if (offset + (includeTemi ? (strLen - 1) : strLen) > bufLen_) {
+    if ((uint64_t)offset + (uint64_t)(includeTemi ? (strLen - 1) : strLen) > (uint64_t)bufLen_) {
         RESMGR_HILOGE(RESMGR_TAG, "ParseString value failed, the offset will be out of bounds");
         return SYS_ERROR;
     }
