@@ -169,6 +169,10 @@ int32_t HapParserV1::ParseKey(uint32_t &offset, std::shared_ptr<ResKey> key, boo
         return SYS_ERROR;
     }
     key->resConfig_ = HapParser::CreateResConfigFromKeyParams(keyParams);
+    if (key->resConfig_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "CreateResConfigFromKeyParams failed.");
+        return SYS_ERROR;
+    }
     if (SkipParseItem(key, match)) {
         match = false;
         return OK;

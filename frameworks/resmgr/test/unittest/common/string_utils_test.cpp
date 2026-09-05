@@ -357,7 +357,7 @@ bool TestParseArgs(const std::string inputOutputValue, ...)
     std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams;
     va_list args;
     va_start(args, inputOutputValue);
-    bool ret = parseArgs(inputOutputValue, args, jsParams);
+    bool ret = ParseArgs(inputOutputValue, args, jsParams);
     va_end(args);
     return ret;
 }

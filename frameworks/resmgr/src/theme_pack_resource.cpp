@@ -18,6 +18,7 @@
 #include "utils/utils.h"
 #include <climits>
 #include <dirent.h>
+#include <memory>
 #include <tuple>
 namespace OHOS {
 namespace Global {
@@ -26,6 +27,8 @@ constexpr int FIRST_ELEMENT = 0;
 constexpr int SECOND_ELEMENT = 1;
 constexpr int THIRED_ELEMENT = 2;
 const std::string DYNAMIC_ICON = "dynamic_icons";
+static constexpr long MAX_THEME_JSON_SIZE = 1024 * 1024 * 1024;
+static constexpr int MAX_GET_FILES_DEPTH = 100;
 ThemeResource::ThemeResource(std::string path) : themePath_(path)
 {}
 
@@ -146,31 +149,31 @@ std::unique_ptr<char[]> ReadJsonFile(const std::string &jsonPath)
     Utils::CanonicalizePath(jsonPath.c_str(), realPath, PATH_MAX);
     FILE* pf = std::fopen(realPath, "r");
     if (pf == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "fopen failed in ParseJson");
+        RESMGR_HILOGE(RESMGR_TAG, "fopen failed in ReadJsonFile");
         return nullptr;
     }
     std::fseek(pf, 0, SEEK_END);
     long len = ftell(pf);
     if (len < 0) {
-        RESMGR_HILOGE(RESMGR_TAG, "ftell failed in ParseJson");
+        RESMGR_HILOGE(RESMGR_TAG, "ftell failed in ReadJsonFile");
         if (fclose(pf) != 0) {
-            RESMGR_HILOGE(RESMGR_TAG, "fclose failed in ParseJson");
+            RESMGR_HILOGE(RESMGR_TAG, "fclose failed in ReadJsonFile");
+        }
+        return nullptr;
+    }
+    if (len > MAX_THEME_JSON_SIZE) {
+        RESMGR_HILOGE(RESMGR_TAG, "Theme JSON file too large: %{public}ld", len);
+        if (fclose(pf) != 0) {
+            RESMGR_HILOGE(RESMGR_TAG, "fclose failed in ReadJsonFile");
         }
         return nullptr;
     }
     std::fseek(pf, 0, SEEK_SET);
-    auto jsonData = std::make_unique<char[]>(len + 1);
-    if (jsonData == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "failed to allocate memory in ParseJson");
-        if (fclose(pf) != 0) {
-            RESMGR_HILOGE(RESMGR_TAG, "fclose failed in ParseJson");
-        }
-        return nullptr;
-    }
-    size_t readLen = std::fread(jsonData.get(), 1, len, pf);
+    auto jsonData = std::make_unique<char[]>(static_cast<size_t>(len) + 1);
+    size_t readLen = std::fread(jsonData.get(), 1, static_cast<size_t>(len), pf);
     jsonData[readLen] = '\0';
     if (fclose(pf) != 0) {
-        RESMGR_HILOGE(RESMGR_TAG, "fclose failed in ParseJson");
+        RESMGR_HILOGE(RESMGR_TAG, "fclose failed in ReadJsonFile");
     }
     return jsonData;
 }
@@ -240,30 +243,33 @@ std::vector<std::shared_ptr<ThemeResource::ThemeValue> > ThemeResource::GetTheme
     return result;
 }
 
-std::vector<std::string> GetFiles(const std::string &strCurrentDir)
+std::vector<std::string> GetFiles(const std::string &strCurrentDir, int depth = 0)
 {
     std::vector<std::string> vFiles;
+    if (depth > MAX_GET_FILES_DEPTH) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetFiles depth exceeded limit: %d", depth);
+        return vFiles;
+    }
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
-    DIR *dir;
-    struct dirent *pDir;
-    if ((dir = opendir(strCurrentDir.c_str())) == nullptr) {
+    std::unique_ptr<DIR, decltype(&closedir)> dir(opendir(strCurrentDir.c_str()), closedir);
+    if (dir == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "opendir failed strCurrentDir = %{public}s", strCurrentDir.c_str());
         return vFiles;
     }
-    while ((pDir = readdir(dir)) != nullptr) {
+    struct dirent *pDir = nullptr;
+    while ((pDir = readdir(dir.get())) != nullptr) {
         if (strcmp(pDir->d_name, ".") == 0 || strcmp(pDir->d_name, "..") == 0) {
             continue;
         } else if (pDir->d_type == 8) { // 8 means the file
             vFiles.emplace_back(strCurrentDir + "/" + pDir->d_name);
         } else if (pDir->d_type == 4) { // 4 means the dir
             std::string strNextDir = strCurrentDir + "/" + pDir->d_name;
-            std::vector<std::string> temp = GetFiles(strNextDir);
+            std::vector<std::string> temp = GetFiles(strNextDir, depth + 1);
             vFiles.insert(vFiles.end(), temp.begin(), temp.end());
         } else {
             continue;
         }
     }
-    closedir(dir);
 #endif
     return vFiles;
 }
@@ -300,7 +306,12 @@ const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeResource(const std:
         return nullptr;
     }
     auto themeResource = std::make_shared<ThemeResource>(rootDir);
-    std::vector<std::string> resPaths = GetFiles(rootDir);
+    char resolvedRoot[PATH_MAX] = {0};
+    Utils::CanonicalizePath(rootDir.c_str(), resolvedRoot, PATH_MAX);
+    if (resolvedRoot[0] == '\0') {
+        return nullptr;
+    }
+    std::vector<std::string> resPaths = GetFiles(resolvedRoot);
     for (const auto &path : resPaths) {
         auto bundleInfo = GetBundleInfo(rootDir, path);
         auto pos = path.rfind('.');
@@ -356,7 +367,12 @@ const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeIconResource(const 
     }
     auto themeResource = std::make_shared<ThemeResource>(iconPath);
     std::string bundleName = GetIconsBundleName(iconPath);
-    std::vector<std::string> resPaths = GetFiles(iconPath);
+    char resolvedIcon[PATH_MAX] = {0};
+    Utils::CanonicalizePath(iconPath.c_str(), resolvedIcon, PATH_MAX);
+    if (resolvedIcon[0] == '\0') {
+        return nullptr;
+    }
+    std::vector<std::string> resPaths = GetFiles(resolvedIcon);
     std::string iconList = "";
     for (const auto &path : resPaths) {
         auto pos1 = path.rfind('.');

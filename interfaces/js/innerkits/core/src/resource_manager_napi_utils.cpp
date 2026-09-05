@@ -18,6 +18,7 @@
 #include "hilog/log_cpp.h"
 #include "securec.h"
 #include "utils/string_utils.h"
+#include <cstdint>
 
 namespace OHOS {
 namespace Global {
@@ -125,6 +126,10 @@ std::string ResourceManagerNapiUtils::GetResNameOrPath(napi_env env, size_t argc
     napi_status status = napi_get_value_string_utf8(env, argv[ARRAY_SUBCRIPTOR_ZERO], nullptr, 0, &len);
     if (status != napi_ok) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resName or rawfile path length");
+        return "";
+    }
+    if (len > UINT16_MAX) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "resName or rawfile path length too long, len = %{public}zu", len);
         return "";
     }
     std::vector<char> buf(len + 1);
@@ -256,7 +261,7 @@ napi_value ResourceManagerNapiUtils::CreateJsUint8Array(napi_env env, ResMgrData
 
 napi_value ResourceManagerNapiUtils::CreateJsRawFd(napi_env env, ResMgrDataContext &context)
 {
-    napi_value result;
+    napi_value result = nullptr;
     napi_status status = napi_create_object(env, &result);
     if (status != napi_ok) {
         context.SetErrorMsg("Failed to create result");

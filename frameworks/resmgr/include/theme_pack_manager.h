@@ -114,7 +114,8 @@ public:
 
     inline const std::string GetMask() const
     {
-        return themeMask;
+        std::lock_guard<std::mutex> lock(this->lockHighlightIcon_);
+        return themeMask_;
     }
 
     const std::string ReplaceUserIdInPath(const std::string &originalPath, int32_t userId);
@@ -181,7 +182,7 @@ public:
 
 private:
     ThemePackManager();
-    std::string themeMask;
+    std::string themeMask_;
     std::string themeStroke_;
     void ChangeSkinResourceStatus(int32_t userId);
     void ChangeIconResourceStatus(int32_t userId);
@@ -213,7 +214,7 @@ private:
     std::mutex lockIcon_;
     std::mutex lockThemeId_;
     std::mutex lockIconValue_;
-    std::mutex lockHighlightIcon_;
+    mutable std::mutex lockHighlightIcon_;
     std::mutex lockUserId_;
     uint32_t themeId_{0};
     bool isFirstCreate = true;

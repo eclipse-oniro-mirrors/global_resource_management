@@ -377,10 +377,10 @@ int32_t HapParserV2::ParseKey(uint32_t &offset, std::shared_ptr<KeyInfo> key, bo
             return SYS_ERROR;
         }
         int32_t ret = this->ParseKeyParam(offset, keyParam, match);
-        GetKeyParamsLocales(keyParam, locale, isLocale);
         if (ret != OK) {
             return ret;
         }
+        GetKeyParamsLocales(keyParam, locale, isLocale);
         key->params_.push_back(keyParam);
     }
     if (isLocale) {
@@ -497,6 +497,15 @@ bool HapParserV2::GetIndexMmapFromIndex(const char *path)
     char indexPath[PATH_MAX + 1] = {0};
     Utils::CanonicalizePath(path, indexPath, PATH_MAX);
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
+    return MmapIndexFile(indexPath);
+#else
+    return ReadIndexFile(indexPath);
+#endif
+}
+
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
+bool HapParserV2::MmapIndexFile(const char *indexPath)
+{
     mMapFile_->fp_ = fopen(indexPath, "rb");
     if (mMapFile_->fp_ == nullptr) {
         return false;
@@ -510,17 +519,24 @@ bool HapParserV2::GetIndexMmapFromIndex(const char *path)
         RESMGR_HILOGE(RESMGR_TAG, "failed to seek to beginning of file");
         return false;
     }
-    if (fileLen <= 0) {
-        RESMGR_HILOGE(RESMGR_TAG, "file size is zero");
+    if (fileLen <= 0 || static_cast<size_t>(fileLen) > MAX_INDEX_FILE_SIZE) {
+        RESMGR_HILOGE(RESMGR_TAG, "file size is invalid or exceeds limit");
         return false;
     }
     mMapFile_->mmapLen_ = static_cast<size_t>(fileLen);
     mMapFile_->mmap_ = (uint8_t*)mmap(nullptr, mMapFile_->mmapLen_, PROT_READ, MAP_PRIVATE, fileno(mMapFile_->fp_), 0);
     if (mMapFile_->mmap_ == MAP_FAILED) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get mmap data indexFilePath from index");
+        mMapFile_->mmap_ = nullptr;
+        fclose(mMapFile_->fp_);
+        mMapFile_->fp_ = nullptr;
         return false;
     }
+    return true;
+}
 #else
+bool HapParserV2::ReadIndexFile(const char *indexPath)
+{
     std::ifstream inFile(indexPath, std::ios::binary | std::ios::in);
     if (!inFile.good()) {
         return false;
@@ -538,9 +554,9 @@ bool HapParserV2::GetIndexMmapFromIndex(const char *path)
     inFile.read(reinterpret_cast<char*>(mMapFile_->mmap_), mMapFile_->mmapLen_);
     inFile.close();
     RESMGR_HILOGD(RESMGR_TAG, "extract success, bufLen:%zu", mMapFile_->mmapLen_);
-#endif
     return true;
 }
+#endif
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

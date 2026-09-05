@@ -187,7 +187,7 @@ RState ResourceManagerImpl::GetStringFormatById(std::string &outValue, uint32_t 
         return state;
     }
     std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams;
-    if (parseArgs(outValue, args, jsParams)) {
+    if (ParseArgs(outValue, args, jsParams)) {
         ResConfigImpl resConfig;
         GetResConfig(resConfig);
         if (!ReplacePlaceholderWithParams(outValue, resConfig, jsParams)) {
@@ -205,7 +205,7 @@ RState ResourceManagerImpl::GetStringFormatByName(std::string &outValue, const c
         return state;
     }
     std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams;
-    if (parseArgs(outValue, args, jsParams)) {
+    if (ParseArgs(outValue, args, jsParams)) {
         ResConfigImpl resConfig;
         GetResConfig(resConfig);
         if (!ReplacePlaceholderWithParams(outValue, resConfig, jsParams)) {
@@ -996,11 +996,11 @@ RState ResourceManagerImpl::ProcessReference(const std::string value,
             return ERROR;
         }
         const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
-        idItems.emplace_back(idItem);
         if (idItem == nullptr) {
             RESMGR_HILOGE(RESMGR_TAG, "ref %s id not found", refStr.c_str());
             return ERROR;
         }
+        idItems.emplace_back(idItem);
         // unless compile bug
         if (resType != idItem->resType_) {
             RESMGR_HILOGE(RESMGR_TAG,
@@ -1281,6 +1281,10 @@ RState ResourceManagerImpl::GetMediaById(uint32_t id, std::string &outValue, uin
 
 RState ResourceManagerImpl::GetMediaByName(const char *name, std::string &outValue, uint32_t density)
 {
+    if (name == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetMediaByName name is null");
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
     if (!IsDensityValid(density)) {
         RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
@@ -1531,6 +1535,9 @@ RState ResourceManagerImpl::GetThemeMedia(const std::shared_ptr<IdItem> idItem, 
     std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(
         bundleInfo, idItems, resConfig, userId);
     outValue = Utils::LoadResourceFile(result, len);
+    if (outValue == nullptr) {
+        RESMGR_HILOGW(RESMGR_TAG, "GetThemeMedia LoadResourceFile null");
+    }
     return result.empty() ? ERROR_CODE_RES_ID_NOT_FOUND : SUCCESS;
 }
 
@@ -1549,6 +1556,10 @@ RState ResourceManagerImpl::GetMediaDataById(uint32_t id, size_t &len, std::uniq
 
     // find in theme
     const std::shared_ptr<IdItem> idItem = qualifierDir->GetIdItem();
+    if (idItem == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetMediaDataById idItem null, id = %{public}d", id);
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
     if (GetThemeMedia(idItem, len, outValue, density) == SUCCESS) {
         return SUCCESS;
     }
@@ -1560,6 +1571,10 @@ RState ResourceManagerImpl::GetMediaDataById(uint32_t id, size_t &len, std::uniq
 RState ResourceManagerImpl::GetMediaDataByName(const char *name, size_t &len, std::unique_ptr<uint8_t[]> &outValue,
     uint32_t density)
 {
+    if (name == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetMediaDataByName name is null");
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
     if (!IsDensityValid(density)) {
         RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
@@ -1573,6 +1588,10 @@ RState ResourceManagerImpl::GetMediaDataByName(const char *name, size_t &len, st
     }
 
     const std::shared_ptr<IdItem> idItem = qualifierDir->GetIdItem();
+    if (idItem == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetMediaDataByName idItem null, name = %{public}s", name);
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
     if (GetThemeMedia(idItem, len, outValue, density) == SUCCESS) {
         return SUCCESS;
     }
@@ -1609,6 +1628,10 @@ RState ResourceManagerImpl::GetMediaBase64DataById(uint32_t id, std::string &out
     }
 
     const std::shared_ptr<IdItem> idItem = qualifierDir->GetIdItem();
+    if (idItem == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetMediaBase64DataById idItem null, id = %{public}d", id);
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
     if (GetThemeMediaBase64(idItem, outValue) == SUCCESS) {
         return SUCCESS;
     }
@@ -1619,6 +1642,10 @@ RState ResourceManagerImpl::GetMediaBase64DataById(uint32_t id, std::string &out
 
 RState ResourceManagerImpl::GetMediaBase64DataByName(const char *name, std::string &outValue, uint32_t density)
 {
+    if (name == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetMediaBase64DataByName name is null");
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
     if (!IsDensityValid(density)) {
         RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
@@ -1631,6 +1658,10 @@ RState ResourceManagerImpl::GetMediaBase64DataByName(const char *name, std::stri
     }
 
     const std::shared_ptr<IdItem> idItem = qualifierDir->GetIdItem();
+    if (idItem == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetMediaBase64DataByName idItem null, name = %{public}s", name);
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
     if (GetThemeMediaBase64(idItem, outValue) == SUCCESS) {
         return SUCCESS;
     }
@@ -1651,6 +1682,10 @@ RState ResourceManagerImpl::GetProfileDataById(uint32_t id, size_t &len, std::un
 
 RState ResourceManagerImpl::GetProfileDataByName(const char *name, size_t &len, std::unique_ptr<uint8_t[]> &outValue)
 {
+    if (name == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetProfileDataByName name is null");
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
     auto qualifierDir = hapManager_->FindQualifierValueByName(name, ResType::PROF, isOverrideResMgr_);
     if (qualifierDir == nullptr) {
         RESMGR_HILOGD(RESMGR_TAG,
@@ -1710,6 +1745,9 @@ RState ResourceManagerImpl::GetThemeIcon(const std::shared_ptr<IdItem> idItem, s
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
     outValue = Utils::LoadResourceFile(result, len);
+    if (outValue == nullptr) {
+        RESMGR_HILOGW(RESMGR_TAG, "GetThemeIcon LoadResourceFile null");
+    }
     return SUCCESS;
 }
 
@@ -1749,6 +1787,10 @@ RState ResourceManagerImpl::GetDrawableInfoById(uint32_t id, std::string &type, 
 RState ResourceManagerImpl::GetDrawableInfoByName(const char *name, std::string &type, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue, uint32_t density)
 {
+    if (name == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetDrawableInfoByName name is null");
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
     if (!IsDensityValid(density)) {
         RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
@@ -1802,6 +1844,10 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name,
     std::tuple<std::string, size_t, std::string> &drawableInfo,
     std::unique_ptr<uint8_t[]> &outValue, uint32_t iconType, uint32_t density)
 {
+    if (name == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetDrawableInfoByName name is null");
+        return ERROR_CODE_INVALID_INPUT_PARAMETER;
+    }
     if (!IsDensityValid(density)) {
         RESMGR_HILOGE(RESMGR_TAG, "density invalid");
         return ERROR_CODE_INVALID_INPUT_PARAMETER;
@@ -1820,6 +1866,10 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name,
     // find in theme
     std::string themeMask = ThemePackManager::GetThemePackManager()->GetMask();
     const std::shared_ptr<IdItem> idItem = qualifierDir->GetIdItem();
+    if (idItem == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetDrawableInfoByName idItem null, name = %{public}s", name);
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
     if (GetThemeDrawable(idItem, len, outValue, iconType, density) == SUCCESS) {
         drawableInfo = std::make_tuple(type, len, themeMask);
         return SUCCESS;
@@ -1893,7 +1943,7 @@ RState ResourceManagerImpl::GetFormatPluralStringById(std::string &outValue, uin
     }
 
     std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
-    if (parseArgs(outValue, args, params)) {
+    if (ParseArgs(outValue, args, params)) {
         ResConfigImpl resConfig;
         GetResConfig(resConfig);
         if (!ReplacePlaceholderWithParams(outValue, resConfig, params)) {
@@ -1923,7 +1973,7 @@ RState ResourceManagerImpl::GetFormatPluralStringByName(std::string &outValue, c
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
     }
     std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
-    if (parseArgs(outValue, args, params)) {
+    if (ParseArgs(outValue, args, params)) {
         ResConfigImpl resConfig;
         GetResConfig(resConfig);
         if (!ReplacePlaceholderWithParams(outValue, resConfig, params)) {

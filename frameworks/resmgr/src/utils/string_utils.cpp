@@ -85,7 +85,7 @@ std::string FormatString(const char *fmt, va_list args)
     return strResult;
 }
 
-bool getJsParams(const std::string &inputOutputValue, va_list args,
+bool GetJsParams(const std::string &inputOutputValue, va_list args,
     std::vector<std::pair<int, std::string>> paramsWithOutNum,
     std::vector<std::pair<int, std::string>> paramsWithNum,
     std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
@@ -94,17 +94,25 @@ bool getJsParams(const std::string &inputOutputValue, va_list args,
         [](const std::pair<int, std::string>& a, const std::pair<int, std::string>& b) {
             return a.first < b.first;
         });
-    for (size_t i = 0; i < paramsWithOutNum.size(); i++) {
-        std::string type = paramsWithOutNum[i].second;
+    auto appendParam = [&args, &jsParams](const std::string &type) -> bool {
         if (type == "d") {
             int temp = va_arg(args, int);
             jsParams.emplace_back(ResourceManager::NapiValueType::NAPI_NUMBER, std::to_string(temp));
         } else if (type == "s") {
             char *temp = va_arg(args, char*);
+            if (temp == nullptr) {
+                return false;
+            }
             jsParams.emplace_back(ResourceManager::NapiValueType::NAPI_STRING, temp);
         } else if (type == "f") {
             float temp = va_arg(args, double);
             jsParams.emplace_back(ResourceManager::NapiValueType::NAPI_NUMBER, std::to_string(temp));
+        }
+        return true;
+    };
+    for (size_t i = 0; i < paramsWithOutNum.size(); i++) {
+        if (!appendParam(paramsWithOutNum[i].second)) {
+            return false;
         }
     }
     for (size_t i = 0; i < paramsWithNum.size(); i++) {
@@ -116,15 +124,8 @@ bool getJsParams(const std::string &inputOutputValue, va_list args,
             }
         } else if (index == paramsWithOutNum.size()) {
             paramsWithOutNum.push_back({index, type});
-            if (type == "d") {
-                int temp = va_arg(args, int);
-                jsParams.emplace_back(ResourceManager::NapiValueType::NAPI_NUMBER, std::to_string(temp));
-            } else if (type == "s") {
-                char *temp = va_arg(args, char*);
-                jsParams.emplace_back(ResourceManager::NapiValueType::NAPI_STRING, temp);
-            } else if (type == "f") {
-                float temp = va_arg(args, double);
-                jsParams.emplace_back(ResourceManager::NapiValueType::NAPI_NUMBER, std::to_string(temp));
+            if (!appendParam(type)) {
+                return false;
             }
         } else {
             return false;
@@ -133,7 +134,7 @@ bool getJsParams(const std::string &inputOutputValue, va_list args,
     return true;
 }
 
-bool parseArgs(const std::string &inputOutputValue, va_list args,
+bool ParseArgs(const std::string &inputOutputValue, va_list args,
     std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
 {
     if (inputOutputValue.empty()) {
@@ -176,7 +177,7 @@ bool parseArgs(const std::string &inputOutputValue, va_list args,
         }
         start = inputOutputValue.begin() + prefixLength + matches[0].length();
     }
-    return getJsParams(inputOutputValue, args, paramsWithOutNum, paramsWithNum, jsParams);
+    return GetJsParams(inputOutputValue, args, paramsWithOutNum, paramsWithNum, jsParams);
 }
 
 std::string GetLocalInfo(const ResLocale *resLocale)

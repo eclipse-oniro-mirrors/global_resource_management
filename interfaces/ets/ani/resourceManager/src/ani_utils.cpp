@@ -29,6 +29,8 @@ namespace OHOS {
 namespace Global {
 namespace Resource {
 
+std::mutex AniUtils::g_resMgrMutex;
+
 constexpr int SCREEN_DENSITY_SDPI_ORDER = 0;
 constexpr int SCREEN_DENSITY_MDPI_ORDER = 1;
 constexpr int SCREEN_DENSITY_LDPI_ORDER = 2;
@@ -114,10 +116,14 @@ void AniUtils::AniThrow(ani_env *env, int32_t errCode)
 
 std::shared_ptr<ResourceManager> AniUtils::GetResourceManager(ani_env* env, ani_object jsResMgr)
 {
+    std::lock_guard<std::mutex> lock(g_resMgrMutex);
     ani_long nativePtr;
     ani_status status = env->Object_GetFieldByName_Long(jsResMgr, "nativeResMgr", &nativePtr);
     if (ANI_OK != status) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Get nativeResMgr failed from etsResMgr, status: %{public}d.", status);
+        return nullptr;
+    }
+    if (nativePtr == 0) {
         return nullptr;
     }
     std::shared_ptr<ResourceManager>* resMgr = reinterpret_cast<std::shared_ptr<ResourceManager>*>(nativePtr);
@@ -125,7 +131,28 @@ std::shared_ptr<ResourceManager> AniUtils::GetResourceManager(ani_env* env, ani_
         RESMGR_HILOGE(RESMGR_ANI_TAG, "NativePtr is nullptr, unknown error.");
         return nullptr;
     }
-    return *reinterpret_cast<std::shared_ptr<ResourceManager>*>(nativePtr);
+    return *resMgr;
+}
+
+void AniUtils::DestroyResMgr(ani_env* env, ani_object jsResMgr)
+{
+    std::lock_guard<std::mutex> lock(g_resMgrMutex);
+    ani_long nativeResMgrPtr;
+    ani_status status = env->Object_GetFieldByName_Long(jsResMgr, "nativeResMgr", &nativeResMgrPtr);
+    if (ANI_OK != status) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get nativeResMgr in DestroyResMgr, status: %{public}d.", status);
+        return;
+    }
+    std::shared_ptr<ResourceManager>* resMgr = reinterpret_cast<std::shared_ptr<ResourceManager>*>(nativeResMgrPtr);
+    if (resMgr == nullptr) {
+        return;
+    }
+    status = env->Object_SetPropertyByName_Long(jsResMgr, "nativeResMgr", 0);
+    if (ANI_OK != status) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to reset nativeResMgr in DestroyResMgr, status: %{public}d.", status);
+        return;
+    }
+    delete resMgr;
 }
 
 ani_string AniUtils::CreateAniString(ani_env *env, const std::string &str)

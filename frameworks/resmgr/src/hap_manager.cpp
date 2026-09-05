@@ -768,6 +768,9 @@ RState HapManager::GetMediaDataFromIndex(const std::shared_ptr<ValueUnderQualifi
         return NOT_FOUND;
     }
     outValue = Utils::LoadResourceFile(filePath, len);
+    if (outValue == nullptr) {
+        RESMGR_HILOGW(RESMGR_TAG, "GetMediaDataFromIndex LoadResourceFile null");
+    }
     return SUCCESS;
 }
 
@@ -1001,7 +1004,7 @@ RState HapManager::GetFilePath(const std::shared_ptr<ValueUnderQualifierDir> qua
 
 RState HapManager::FindRawFileDescriptor(const std::string &name, ResourceManager::RawFileDescriptor &descriptor)
 {
-    std::string paths = "";
+    std::string paths;
     RState rState = FindRawFileInternal(name, paths);
     if (rState != SUCCESS) {
         return rState;
@@ -1009,7 +1012,7 @@ RState HapManager::FindRawFileDescriptor(const std::string &name, ResourceManage
     char outPath[PATH_MAX + 1] = {0};
     Utils::CanonicalizePath(paths.c_str(), outPath, PATH_MAX);
     int fd = open(outPath, O_RDONLY);
-    if (fd > 0) {
+    if (fd >= 0) {
         long length = lseek(fd, 0, SEEK_END);
         if (length == -1) {
             close(fd);
@@ -1049,6 +1052,7 @@ RState HapManager::CloseRawFileDescriptor(const std::string &name)
 #endif
 
     if (close(fd) == -1) {
+        rawFileDescriptor_.erase(name);
         return ERROR_CODE_RES_PATH_INVALID;
     }
 
