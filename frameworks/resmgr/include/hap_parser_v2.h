@@ -50,6 +50,12 @@ private:
 
     bool GetIndexMmapFromIndex(const char *path);
 
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
+    bool MmapIndexFile(const char *indexPath);
+#else
+    bool ReadIndexFile(const char *indexPath);
+#endif
+
     int32_t ParseHeader(uint32_t &offset);
 
     int32_t ParseKeys(uint32_t &offset);

@@ -54,6 +54,7 @@ ohos_unittest("resmgr_test") {
     "unittest/common/hap_parser_test.cpp",
     "unittest/common/hap_resource_test.cpp",
     "unittest/common/locale_info_test.cpp",
+    "unittest/common/rawfile_path_test.cpp",
     "unittest/common/res_config_impl_test.cpp",
     "unittest/common/res_config_test.cpp",
     "unittest/common/res_desc_test.cpp",
@@ -101,10 +102,42 @@ ohos_unittest("resmgr_performance_test") {
   resource_config_file = "../../../test/resource/ohos_test.xml"
 }
 
+ohos_unittest("resmgr_ndk_test") {
+  module_out_path = "resource_management/resource_management"
+
+  defines = resmgr_test_common_defines
+  cflags = resmgr_test_common_cflags
+  include_dirs = resmgr_test_common_include_dirs + [
+    "../../../interfaces/native/resource/include",
+  ]
+  deps = resmgr_test_common_deps + [
+    "../:librawfile",
+    "../:ohresmgr",
+  ]
+  external_deps = resmgr_test_common_external_deps + [
+    "ace_engine:ace_ndk",
+    "ace_engine:drawable_descriptor",
+    "napi:ace_napi",
+    "node:node_header_notice",
+  ]
+
+  sources = resmgr_test_common_sources + [
+    "unittest/common/native_resource_manager_test.cpp",
+  ]
+
+  if (resource_management_support_icu) {
+    defines += [ "SUPPORT_GRAPHICS" ]
+    external_deps += [ "icu:shared_icuuc" ]
+  }
+
+  resource_config_file = "../../../test/resource/ohos_test.xml"
+}
+
 group("unittest") {
   testonly = true
   deps = [
     ":resmgr_test",
     ":resmgr_performance_test",
+    ":resmgr_ndk_test",
   ]
 }

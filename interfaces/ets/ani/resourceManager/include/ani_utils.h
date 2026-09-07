@@ -17,6 +17,7 @@
 #define RESOURCE_MANAGER_ANI_UTILS_H
 
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -32,6 +33,7 @@ public:
     static void AniThrow(ani_env *env, int32_t errCode);
 
     static std::shared_ptr<ResourceManager> GetResourceManager(ani_env* env, ani_object jsResMgr);
+    static void DestroyResMgr(ani_env* env, ani_object jsResMgr);
     static bool InitAniParameters(ani_env *env, ani_object args,
         std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &params);
     static std::string AniStrToString(ani_env *env, ani_string aniStr);
@@ -59,6 +61,8 @@ private:
     static int GetDeviceTypeIndex(DeviceType value);
     static bool GetNumberMember(ani_env *env, ani_object options, const std::string name, int& value);
     static bool GetToDoubleMethod(ani_env *env, ani_class &doubleCls, ani_method &toDoubleMethod);
+
+    static std::mutex g_resMgrMutex;
 };
 } // namespace Resource
 } // namespace Global

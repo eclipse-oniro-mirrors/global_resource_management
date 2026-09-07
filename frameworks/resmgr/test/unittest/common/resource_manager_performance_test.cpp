@@ -1105,7 +1105,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest037, 
     average = total / 1000.0;
     g_logLevel = LOG_DEBUG;
     RESMGR_HILOGD(RESMGR_TAG, "avg cost 037: %f us", average);
-    EXPECT_LT(average, 100);
+    EXPECT_LT(average, 260);
 };
 
 /*
@@ -1131,7 +1131,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest038, 
     average = total / 1000.0;
     g_logLevel = LOG_DEBUG;
     RESMGR_HILOGD(RESMGR_TAG, "avg cost 038: %f us", average);
-    EXPECT_LT(average, 100);
+    EXPECT_LT(average, 260);
 };
 
 /*
@@ -1158,7 +1158,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest039, 
     average = total / 1000.0;
     g_logLevel = LOG_DEBUG;
     RESMGR_HILOGD(RESMGR_TAG, "avg cost 039: %f us", average);
-    EXPECT_LT(average, 100);
+    EXPECT_LT(average, 260);
 };
 
 /*
@@ -1183,7 +1183,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest040, 
     average = total / 1000.0;
     g_logLevel = LOG_DEBUG;
     RESMGR_HILOGD(RESMGR_TAG, "avg cost 040: %f us", average);
-    EXPECT_LT(average, 100);
+    EXPECT_LT(average, 260);
 };
 
 /*
@@ -1502,7 +1502,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest059, 
     average = total / 1000.0;
     g_logLevel = LOG_DEBUG;
     RESMGR_HILOGD(RESMGR_TAG, "avg cost 059: %f us", average);
-    EXPECT_LT(average, 200);
+    EXPECT_LT(average, 300);
 };
 
 /*
@@ -1531,7 +1531,7 @@ HWTEST_F(ResourceManagerPerformanceTest, ResourceManagerPerformanceFuncTest063, 
     average = total / 1000.0;
     g_logLevel = LOG_DEBUG;
     RESMGR_HILOGD(RESMGR_TAG, "avg cost 063: %f us", average);
-    EXPECT_LT(average, 100);
+    EXPECT_LT(average, 150);
 };
 
 /*

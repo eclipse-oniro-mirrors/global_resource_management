@@ -20,6 +20,7 @@
 #include <cstdlib>
 #include <dirent.h>
 #include <fcntl.h>
+#include <memory>
 #include <securec.h>
 #include <unistd.h>
 
@@ -28,6 +29,7 @@
 #include "resource_manager.h"
 #include "resource_manager_addon.h"
 #include "resource_manager_impl.h"
+#include "utils/utils.h"
 #include "hilog_wrapper.h"
 
 #ifdef __WINNT__
@@ -149,32 +151,33 @@ RawDir *OH_ResourceManager_OpenRawDir(const NativeResourceManager *mgr, const ch
     ResourceManagerImpl* impl = static_cast<ResourceManagerImpl *>(mgr->resManager.get());
     std::string tempName = dirName;
     const std::string rawFileDirName = tempName.empty() ? "rawfile" : "rawfile/";
-    if (tempName.length() < rawFileDirName.length()
-        || (tempName.compare(0, rawFileDirName.length(), rawFileDirName) != 0)) {
+    if (tempName.length() < rawFileDirName.length() ||
+        (tempName.compare(0, rawFileDirName.length(), rawFileDirName) != 0)) {
         tempName = rawFileDirName + tempName;
     }
     std::unique_ptr<RawDir> result = std::make_unique<RawDir>();
     std::vector<std::string> resourcesPaths = impl->GetResourcePaths();
     for (auto iter = resourcesPaths.begin(); iter != resourcesPaths.end(); iter++) {
         std::string currentPath = *iter + tempName;
-        DIR* dir = opendir(currentPath.c_str());
+        char resolvedPath[PATH_MAX] = {0};
+        Utils::CanonicalizePath(currentPath.c_str(), resolvedPath, PATH_MAX);
+        std::unique_ptr<DIR, decltype(&closedir)> dir(opendir(resolvedPath), closedir);
         if (dir == nullptr) {
             continue;
         }
-        struct dirent *dirp = readdir(dir);
+        struct dirent *dirp = readdir(dir.get());
         while (dirp != nullptr) {
             if (std::strcmp(dirp->d_name, ".") == 0 ||
                 std::strcmp(dirp->d_name, "..") == 0) {
-                dirp = readdir(dir);
+                dirp = readdir(dir.get());
                 continue;
             }
             if (dirp->d_type == DT_REG || dirp->d_type == DT_DIR) {
                 result->fileNameCache.names.push_back(tempName + "/" + dirp->d_name);
             }
 
-            dirp = readdir(dir);
+            dirp = readdir(dir.get());
         }
-        closedir(dir);
     }
     return result.release();
 }
@@ -240,6 +243,7 @@ RawFile *OH_ResourceManager_OpenRawFile(const NativeResourceManager *mgr, const 
 
 int OH_ResourceManager_GetRawFileCount(RawDir *rawDir)
 {
+    std::lock_guard<std::mutex> lock(g_rawDirMutex);
     if (rawDir == nullptr) {
         return 0;
     }
@@ -248,6 +252,7 @@ int OH_ResourceManager_GetRawFileCount(RawDir *rawDir)
 
 const char *OH_ResourceManager_GetRawFileName(RawDir *rawDir, int index)
 {
+    std::lock_guard<std::mutex> lock(g_rawDirMutex);
     if (rawDir == nullptr || index < 0) {
         return nullptr;
     }

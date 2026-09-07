@@ -21,6 +21,7 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
+constexpr uint32_t MAX_PARAMS_LEN = 1024 * 1024;
 #define GET_PARAMS(env, info, num)    \
     size_t argc = num;                \
     napi_value argv[num] = {nullptr}; \
@@ -123,6 +124,10 @@ static bool GetParams(napi_env env, napi_value params, napi_value *newParams, bo
         napi_get_named_property(env, params, "length", &length) != napi_ok ||
         napi_get_value_uint32(env, length, &len) != napi_ok) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Resource params property params is error");
+        return false;
+    }
+    if (len > MAX_PARAMS_LEN) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Resource params length exceeds limit: %{public}u", len);
         return false;
     }
     if (isSendable) {

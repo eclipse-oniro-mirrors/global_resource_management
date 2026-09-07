@@ -44,7 +44,7 @@ ResourceManager_ErrorCode copyStringArray(char ***resultValue, uint32_t *resultL
     }
     for (size_t i = 0; i < len; i++) {
         size_t strLen = tempResultValue[i].size();
-        (*resultValue)[i] = new char[strLen + 1];
+        (*resultValue)[i] = new (std::nothrow) char[strLen + 1];
         if ((*resultValue)[i] == nullptr) {
             RESMGR_HILOGE(RESMGR_NATIVE_TAG, "%{public}s malloc error", apiName.c_str());
             OH_ResourceManager_ReleaseStringArray(resultValue, len);
@@ -160,7 +160,8 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64ByName(const NativeRe
 ResourceManager_ErrorCode OH_ResourceManager_GetMediaBase64DataByName(const NativeResourceManager *mgr,
     const char *resName, char **resultValue, uint64_t *resultLen, uint32_t density)
 {
-    if (mgr == nullptr || resultValue == nullptr || resultLen == nullptr || mgr->resManager == nullptr) {
+    if (mgr == nullptr || resName == nullptr || resultValue == nullptr || resultLen == nullptr ||
+        mgr->resManager == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
 
@@ -201,7 +202,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaData(const NativeResourceMa
     }
 
     std::unique_ptr<uint8_t[]> tempResultValue;
-    size_t len;
+    size_t len = 0;
     RState state = mgr->resManager->GetMediaDataById(resId, len, tempResultValue, density);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
@@ -210,6 +211,9 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaData(const NativeResourceMa
         return errorCode;
     }
     uint8_t *temPtr = tempResultValue.get();
+    if (temPtr == nullptr) {
+        return ResourceManager_ErrorCode::ERROR_CODE_OUT_OF_MEMORY;
+    }
     *resultValue = static_cast<uint8_t*>(malloc(len));
     if (*resultValue == nullptr) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG, "GetMedia malloc error");
@@ -226,15 +230,16 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaByName(const NativeResource
     return OH_ResourceManager_GetMediaDataByName(mgr, resName, resultValue, resultLen, density);
 }
 
-ResourceManager_ErrorCode OH_ResourceManager_GetMediaDataByName(const NativeResourceManager *mgr, const char *resName,
-    uint8_t **resultValue, uint64_t *resultLen, uint32_t density)
+ResourceManager_ErrorCode OH_ResourceManager_GetMediaDataByName(const NativeResourceManager *mgr,
+    const char *resName, uint8_t **resultValue, uint64_t *resultLen, uint32_t density)
 {
-    if (mgr == nullptr || resultValue == nullptr || resultLen == nullptr || mgr->resManager == nullptr) {
+    if (mgr == nullptr || resName == nullptr || resultValue == nullptr || resultLen == nullptr ||
+        mgr->resManager == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
 
     std::unique_ptr<uint8_t[]> tempResultValue;
-    size_t len;
+    size_t len = 0;
     RState state = mgr->resManager->GetMediaDataByName(resName, len, tempResultValue, density);
     ResourceManager_ErrorCode errorCode = static_cast<ResourceManager_ErrorCode>(state);
     if (errorCode != ResourceManager_ErrorCode::SUCCESS) {
@@ -243,6 +248,9 @@ ResourceManager_ErrorCode OH_ResourceManager_GetMediaDataByName(const NativeReso
         return errorCode;
     }
     uint8_t *temPtr = tempResultValue.get();
+    if (temPtr == nullptr) {
+        return ResourceManager_ErrorCode::ERROR_CODE_OUT_OF_MEMORY;
+    }
     *resultValue = static_cast<uint8_t*>(malloc(len));
     if (*resultValue == nullptr) {
         RESMGR_HILOGE(RESMGR_NATIVE_TAG, "GetMediaByName malloc error");
@@ -316,7 +324,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptorByName(const N
 ResourceManager_ErrorCode OH_ResourceManager_GetDrawableDescriptorDataByName(const NativeResourceManager *mgr,
     const char *resName, ArkUI_DrawableDescriptor **drawableDescriptor, uint32_t density, uint32_t type)
 {
-    if (mgr == nullptr || drawableDescriptor == nullptr || mgr->resManager == nullptr) {
+    if (mgr == nullptr || resName == nullptr || drawableDescriptor == nullptr || mgr->resManager == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     RState state = RState::SUCCESS;
@@ -372,7 +380,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetSymbol(const NativeResourceManag
 ResourceManager_ErrorCode OH_ResourceManager_GetSymbolByName(const NativeResourceManager *mgr, const char *resName,
     uint32_t *resultValue)
 {
-    if (mgr == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
+    if (mgr == nullptr || resName == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     uint32_t tempResultValue;
@@ -396,7 +404,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetLocales(const NativeResourceMana
 ResourceManager_ErrorCode OH_ResourceManager_GetLocalesData(const NativeResourceManager *mgr, char ***resultValue,
     uint32_t *resultLen, bool includeSystem)
 {
-    if (mgr == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
+    if (mgr == nullptr || resultValue == nullptr || resultLen == nullptr || mgr->resManager == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     std::vector<std::string> tempResultValue;
@@ -465,7 +473,8 @@ ResourceManager_ErrorCode OH_ResourceManager_GetStringArray(const NativeResource
 ResourceManager_ErrorCode OH_ResourceManager_GetStringArrayByName(const NativeResourceManager *mgr,
     const char *resName, char ***resultValue, uint32_t *resultLen)
 {
-    if (mgr == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
+    if (mgr == nullptr || resName == nullptr || resultValue == nullptr || resultLen == nullptr ||
+            mgr->resManager == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     std::vector<std::string> tempResultValue;
@@ -482,7 +491,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetStringArrayByName(const NativeRe
 ResourceManager_ErrorCode OH_ResourceManager_GetPluralStringByName(const NativeResourceManager *mgr,
     const char *resName, uint32_t num, char **resultValue)
 {
-    if (mgr == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
+    if (mgr == nullptr || resName == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     std::string tempResultValue;
@@ -533,7 +542,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetColor(const NativeResourceManage
 ResourceManager_ErrorCode OH_ResourceManager_GetColorByName(const NativeResourceManager *mgr, const char *resName,
     uint32_t *resultValue)
 {
-    if (mgr == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
+    if (mgr == nullptr || resName == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     uint32_t tempResultValue;
@@ -569,7 +578,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetInt(const NativeResourceManager 
 ResourceManager_ErrorCode OH_ResourceManager_GetIntByName(const NativeResourceManager *mgr, const char *resName,
     int *resultValue)
 {
-    if (mgr == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
+    if (mgr == nullptr || resName == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     int tempResultValue;
@@ -604,7 +613,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetFloat(const NativeResourceManage
 ResourceManager_ErrorCode OH_ResourceManager_GetFloatByName(const NativeResourceManager *mgr, const char *resName,
     float *resultValue)
 {
-    if (mgr == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
+    if (mgr == nullptr || resName == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     float tempResultValue;
@@ -639,7 +648,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetBool(const NativeResourceManager
 ResourceManager_ErrorCode OH_ResourceManager_GetBoolByName(const NativeResourceManager *mgr, const char *resName,
     bool *resultValue)
 {
-    if (mgr == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
+    if (mgr == nullptr || resName == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     bool tempResultValue;
@@ -736,7 +745,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetString(const NativeResourceManag
 ResourceManager_ErrorCode OH_ResourceManager_GetStringByName(const NativeResourceManager *mgr, const char *resName,
     char **resultValue, ...)
 {
-    if (mgr == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
+    if (mgr == nullptr || resName == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     string tempResultValue;
@@ -801,7 +810,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetDoublePluralString(const NativeR
 ResourceManager_ErrorCode OH_ResourceManager_GetIntPluralStringByName(const NativeResourceManager *mgr,
     const char *resName, uint32_t num, char **resultValue, ...)
 {
-    if (mgr == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
+    if (mgr == nullptr || resName == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     std::string tempResultValue;
@@ -823,7 +832,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetIntPluralStringByName(const Nati
 ResourceManager_ErrorCode OH_ResourceManager_GetDoublePluralStringByName(const NativeResourceManager *mgr,
     const char *resName, double num, char **resultValue, ...)
 {
-    if (mgr == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
+    if (mgr == nullptr || resName == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     std::string tempResultValue;

@@ -19,6 +19,7 @@
 #include <climits>
 #include <cstdint>
 #include <fstream>
+#include <memory>
 #include <vector>
 #include <sys/stat.h>
 #include "hilog_wrapper.h"
@@ -489,7 +490,7 @@ void Utils::CanonicalizePath(const char *path, char *outPath, size_t len)
 RState Utils::GetFilesForWin(const std::string &strCurrentDir, std::vector<std::string> &vFiles)
 {
 #if defined(__WINNT__) && defined(__IDE_PREVIEW__)
-    int ERROR_RESULT = -1;
+    constexpr int ERROR_RESULT = -1;
     struct _finddata_t findData;
     std::string findPath = strCurrentDir + "\\*.*";
     intptr_t handle = _findfirst(findPath.c_str(), &findData);
@@ -518,13 +519,13 @@ RState Utils::GetFiles(const std::string &strCurrentDir, std::vector<std::string
         return ERROR_CODE_RES_PATH_INVALID;
     }
 #if !defined(__WINNT__)
-    DIR *dir;
-    struct dirent *pDir;
-    if ((dir = opendir(strCurrentDir.c_str())) == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "opendir failed strCurrentDir = %{public}s", strCurrentDir.c_str());
+    std::unique_ptr<DIR, decltype(&closedir)> dir(opendir(outPath), closedir);
+    if (dir == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "opendir failed outPath = %{public}s", outPath);
         return ERROR_CODE_RES_PATH_INVALID;
     }
-    while ((pDir = readdir(dir)) != nullptr) {
+    struct dirent *pDir = nullptr;
+    while ((pDir = readdir(dir.get())) != nullptr) {
         if (strcmp(pDir->d_name, ".") == 0 || strcmp(pDir->d_name, "..") == 0) {
             continue;
         }
@@ -533,7 +534,6 @@ RState Utils::GetFiles(const std::string &strCurrentDir, std::vector<std::string
         }
         vFiles.emplace_back(pDir->d_name);
     }
-    closedir(dir);
 #else
     return GetFilesForWin(strCurrentDir, vFiles);
 #endif
