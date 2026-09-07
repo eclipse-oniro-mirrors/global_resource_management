@@ -222,7 +222,12 @@ void HapResourceV2::InitThemeSystemRes()
     }
 
     for (const auto &cfg : configList) {
-        if (cfg->GetIdItem()->value_ == "true") {
+        auto idItem = cfg->GetIdItem();
+        if (idItem == nullptr) {
+            RESMGR_HILOGE(RESMGR_TAG, "GetIdItem failed in InitThemeSystemRes.");
+            continue;
+        }
+        if (idItem->value_ == "true") {
             isThemeSystemResEnable_ = true;
             return;
         }

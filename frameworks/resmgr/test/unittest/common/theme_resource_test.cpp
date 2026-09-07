@@ -364,5 +364,9 @@ HWTEST_F(ThemeResourceTest, ThemeResourceLoadThemeResourceTest001, TestSize.Leve
     std::string rootDir = "";
     std::shared_ptr<ThemeResource> themeResource = ThemeResource::LoadThemeResource(rootDir);
     EXPECT_TRUE(themeResource == nullptr);
+
+    rootDir = "nonexistent_path";
+    themeResource = ThemeResource::LoadThemeResource(rootDir);
+    EXPECT_TRUE(themeResource == nullptr);
 }
 }

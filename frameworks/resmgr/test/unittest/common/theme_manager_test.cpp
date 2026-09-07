@@ -880,4 +880,32 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestGetMaskStringTest001, TestSize.Level1
     maskPath = tm->GetMaskString(path);
     EXPECT_EQ(maskPath, path);
 }
+
+/*
+ * @tc.name: ThemeManagerTestGetRootDirBadPathTest001
+ * @tc.desc: Test GetRootDir with non-existent path
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestGetRootDirBadPathTest001, TestSize.Level1)
+{
+    std::vector<std::string> rootDirs = tm->GetRootDir("/nonexistent/path/xyz");
+    EXPECT_TRUE(rootDirs.empty());
+}
+
+/*
+ * @tc.name: ThemeManagerTestFindThemeResourceNullIdItemTest001
+ * @tc.desc: Test FindThemeResource with nullptr in idItems vector
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestFindThemeResourceNullIdItemTest001, TestSize.Level1)
+{
+    std::pair<std::string, std::string> bundleInfo("ohos.global.test.all", "entry");
+    std::vector<std::shared_ptr<IdItem>> idItems;
+    idItems.push_back(nullptr);
+    ResConfigImpl resConfig;
+    resConfig.SetLocaleInfo("zh", nullptr, "CN");
+    int32_t userId = 100;
+    std::string result = tm->FindThemeResource(bundleInfo, idItems, resConfig, userId);
+    EXPECT_TRUE(result.empty());
+}
 }

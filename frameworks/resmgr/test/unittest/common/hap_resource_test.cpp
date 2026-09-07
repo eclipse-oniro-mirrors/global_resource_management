@@ -22,6 +22,7 @@
 #include "hap_parser_v1.h"
 #include "hap_parser_v2.h"
 #include "hap_resource.h"
+#include "hap_resource_v2.h"
 #include "test_common.h"
 #include "utils/date_utils.h"
 #include "utils/errors.h"
@@ -521,5 +522,50 @@ HWTEST_F(HapResourceTest, HapResourceGetLocaleTest002, TestSize.Level1)
     std::set<std::string> locales;
     pResource->GetLocales(locales, false);
     EXPECT_EQ(locales.size(), 4);
+}
+
+/*
+ * @tc.name: HapResourceSystemOverlayResourceTest001
+ * @tc.desc: Test SystemOverlayResource constructor, IsSystemResource, IsOverlayResource, GetLocales
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapResourceTest, HapResourceSystemOverlayResourceTest001, TestSize.Level1)
+{
+    auto pResource = std::make_shared<SystemOverlayResource>("/data/test/index/index.index", 1000);
+    ASSERT_TRUE(pResource != nullptr);
+    EXPECT_TRUE(pResource->IsSystemResource());
+    EXPECT_TRUE(pResource->IsOverlayResource());
+
+    std::set<std::string> locales;
+    pResource->GetLocales(locales, true);
+    EXPECT_TRUE(locales.empty());
+}
+
+/*
+ * @tc.name: HapResourceSystemOverlayResourceTest002
+ * @tc.desc: Test SystemOverlayResource PutAndGetResource
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapResourceTest, HapResourceSystemOverlayResourceTest002, TestSize.Level1)
+{
+    std::shared_ptr<HapResource> pResource1 =
+        std::make_shared<SystemOverlayResource>("/data/test/index/index.index", 1000);
+    ASSERT_TRUE(pResource1 != nullptr);
+    std::shared_ptr<HapResource> pResource2 =HapResourceManager::GetInstance().PutAndGetResource("test1", pResource1);
+    EXPECT_EQ(pResource2, pResource1);
+}
+
+/*
+ * @tc.name: HapResourceSystemOverlayResourceParseLimitPathsTest001
+ * @tc.desc: Test SystemOverlayResource ParseLimitPaths with null mmapFile
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapResourceTest, HapResourceSystemOverlayResourceParseLimitPathsTest001, TestSize.Level1)
+{
+    auto pResource = std::make_shared<SystemOverlayResource>("/data/test/index/index.index", 1000);
+    ASSERT_TRUE(pResource != nullptr);
+    auto idValuesV2 = std::make_shared<IdValuesV2>(ResType::STRING, 0, 0, "test");
+    int32_t result = pResource->ParseLimitPaths(idValuesV2);
+    EXPECT_EQ(result, SYS_ERROR);
 }
 }
