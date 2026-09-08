@@ -176,6 +176,10 @@ int32_t ResourceManagerImpl::GetPluralStringValue(const char *name, int64_t num,
 
 int32_t ResourceManagerImpl::AddResource(const char *path)
 {
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
+    }
     bool state = resMgr_->AddAppOverlay(path);
     if (!state) {
         return RState::ERROR_CODE_OVERLAY_RES_PATH_INVALID;
@@ -185,6 +189,10 @@ int32_t ResourceManagerImpl::AddResource(const char *path)
 
 int32_t ResourceManagerImpl::RemoveResource(const char *path)
 {
+    if (IsEmpty()) {
+        LOGE("Empty resource manager.");
+        return ERR_INVALID_INSTANCE_CODE;
+    }
     bool state = resMgr_->RemoveAppOverlay(path);
     if (!state) {
         return RState::ERROR_CODE_OVERLAY_RES_PATH_INVALID;
@@ -290,6 +298,7 @@ void ResourceManagerImpl::GetConfiguration(Configuration &configuration)
     if (temp == nullptr) {
         return;
     }
+    free(configuration.locale);
     configuration.locale = temp;
 }
 
@@ -307,6 +316,7 @@ void ResConfigToConfigurationEx(std::unique_ptr<ResConfig> &config, Configuratio
     if (temp == nullptr) {
         return;
     }
+    free(configuration->locale);
     configuration->locale = temp;
     return;
 }
