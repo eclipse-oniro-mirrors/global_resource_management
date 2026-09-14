@@ -102,4 +102,24 @@
             <option name="push" value="data/theme/base/media/icon_highlightstroke.png -> /data/test/theme/icons/" src="res"/>
         </preparer>
     </target>
+    <target name="resmgr_native_test">
+        <preparer>
+            <option name="push" value="data/all.hap -> /data/test/" src="res"/>
+            <option name="push" value="data/all_fa.hap -> /data/test/" src="res"/>
+            <option name="push" value="data/newModule.hap -> /data/test/" src="res"/>
+            <option name="push" value="data/all/assets/entry/resources.index -> /data/test/all/assets/entry/" src="res"/>
+            <option name="push" value="data/all/assets/entry/resourcesV2.index -> /data/test/all/assets/entry/" src="res"/>
+            <option name="push" value="data/all/assets/entry/resources/rawfile/test_rawfile.txt -> /data/test/all/assets/entry/resources/rawfile/" src="res"/>
+            <option name="push" value="data/all/assets/entry/resources/base/media/icon.png -> /data/test/all/assets/entry/resources/base/media/" src="res"/>
+            <option name="push" value="data/all/assets/entry/resources/base/media/icon.png -> /data/test/all/assets/entry/resources/ldpi/media/" src="res"/>
+            <option name="push" value="data/all/assets/entry/resources/base/media/icon.png -> /data/test/all/assets/entry/resources/mdpi/media/" src="res"/>
+            <option name="push" value="data/all/assets/entry/resources/base/media/icon.png -> /data/test/all/assets/entry/resources/sdpi/media/" src="res"/>
+            <option name="push" value="data/all/assets/entry/resources/base/media/icon.png -> /data/test/all/assets/entry/resources/xldpi/media/" src="res"/>
+            <option name="push" value="data/all/assets/entry/resources/base/media/icon.png -> /data/test/all/assets/entry/resources/xxldpi/media/" src="res"/>
+            <option name="push" value="data/all/assets/entry/resources/base/media/icon.png -> /data/test/all/assets/entry/resources/xxxldpi/media/" src="res"/>
+            <option name="push" value="data/all/assets/entry/resources/base/profile/test_profile.json -> /data/test/all/assets/entry/resources/base/profile/" src="res"/>
+            <option name="push" value="data/overlay/assets/entry/resources.index -> /data/test/overlay/assets/entry/" src="res"/>
+            <option name="push" value="data/overlay/assets/entry/resourcesV2.index -> /data/test/overlay/assets/entry/" src="res"/>
+        </preparer>
+    </target>
 </configuration>

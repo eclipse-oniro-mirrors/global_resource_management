@@ -1570,4 +1570,59 @@ HWTEST_F(ResConfigImplTest, ResConfigImplIsMoreSuitableTest061, TestSize.Level1)
     EXPECT_FALSE(current->IsMoreSuitable(other, request));
     EXPECT_TRUE(other->IsMoreSuitable(current, request));
 }
+
+/*
+ * @tc.name: ResConfigImplParseDeviceTypeStrTest001
+ * @tc.desc: Test ParseDeviceTypeStr with all device type strings
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResConfigImplTest, ResConfigImplParseDeviceTypeStrTest001, TestSize.Level1)
+{
+    EXPECT_EQ(ResConfigImpl::ParseDeviceTypeStr(PHONE_STR), DeviceType::DEVICE_PHONE);
+    EXPECT_EQ(ResConfigImpl::ParseDeviceTypeStr(DEFAULT_STR), DeviceType::DEVICE_PHONE);
+    EXPECT_EQ(ResConfigImpl::ParseDeviceTypeStr(TABLET_STR), DeviceType::DEVICE_TABLET);
+    EXPECT_EQ(ResConfigImpl::ParseDeviceTypeStr(CAR_STR), DeviceType::DEVICE_CAR);
+    EXPECT_EQ(ResConfigImpl::ParseDeviceTypeStr(PAD_STR), DeviceType::DEVICE_PAD);
+    EXPECT_EQ(ResConfigImpl::ParseDeviceTypeStr(TV_STR), DeviceType::DEVICE_TV);
+    EXPECT_EQ(ResConfigImpl::ParseDeviceTypeStr(WEARABLE_STR), DeviceType::DEVICE_WEARABLE);
+    EXPECT_EQ(ResConfigImpl::ParseDeviceTypeStr(TWOINONE_STR), DeviceType::DEVICE_TWOINONE);
+    EXPECT_EQ(ResConfigImpl::ParseDeviceTypeStr("unknown"), DeviceType::DEVICE_NOT_SET);
+}
+
+/*
+ * @tc.name: ResConfigImplGetDeviceTypeStrTest001
+ * @tc.desc: Test GetDeviceTypeStr with all device types
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResConfigImplTest, ResConfigImplGetDeviceTypeStrTest001, TestSize.Level1)
+{
+    auto rc = std::make_shared<ResConfigImpl>();
+    rc->SetDeviceType(DeviceType::DEVICE_PHONE);
+    EXPECT_EQ(rc->GetDeviceTypeStr(), std::string(PHONE_STR));
+    rc->SetDeviceType(DeviceType::DEVICE_TABLET);
+    EXPECT_EQ(rc->GetDeviceTypeStr(), std::string(TABLET_STR));
+    rc->SetDeviceType(DeviceType::DEVICE_CAR);
+    EXPECT_EQ(rc->GetDeviceTypeStr(), std::string(CAR_STR));
+    rc->SetDeviceType(DeviceType::DEVICE_PAD);
+    EXPECT_EQ(rc->GetDeviceTypeStr(), std::string(PAD_STR));
+    rc->SetDeviceType(DeviceType::DEVICE_TV);
+    EXPECT_EQ(rc->GetDeviceTypeStr(), std::string(TV_STR));
+    rc->SetDeviceType(DeviceType::DEVICE_WEARABLE);
+    EXPECT_EQ(rc->GetDeviceTypeStr(), std::string(WEARABLE_STR));
+    rc->SetDeviceType(DeviceType::DEVICE_TWOINONE);
+    EXPECT_EQ(rc->GetDeviceTypeStr(), std::string(TWOINONE_STR));
+    rc->SetDeviceType(DeviceType::DEVICE_NOT_SET);
+    EXPECT_TRUE(rc->GetDeviceTypeStr().empty());
+}
+
+/*
+ * @tc.name: ResConfigImplGetCurrentDeviceTypeTest001
+ * @tc.desc: Test GetCurrentDeviceType returns non-empty string
+ * @tc.type: FUNC
+ */
+HWTEST_F(ResConfigImplTest, ResConfigImplGetCurrentDeviceTypeTest001, TestSize.Level1)
+{
+    std::string deviceType = ResConfigImpl::GetCurrentDeviceType();
+    EXPECT_FALSE(deviceType.empty());
+}
 }
