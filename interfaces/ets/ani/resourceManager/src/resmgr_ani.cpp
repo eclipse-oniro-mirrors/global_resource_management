@@ -1074,21 +1074,7 @@ ani_object ResMgrAni::GetSysResourceManager(ani_env* env)
 
 void ResMgrAni::DestoryResMgr(ani_env* env, ani_object jsResMgr)
 {
-    ani_long nativeResMgrPtr;
-    ani_status status = env->Object_GetFieldByName_Long(jsResMgr, "nativeResMgr", &nativeResMgrPtr);
-    if (ANI_OK != status) {
-        RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to get nativeResMgr in DestoryResMgr, status: %{public}d.", status);
-        return;
-    }
-    std::shared_ptr<ResourceManager>* resMgr = reinterpret_cast<std::shared_ptr<ResourceManager>*>(nativeResMgrPtr);
-    if (resMgr != nullptr) {
-        delete resMgr;
-        status = env->Object_SetPropertyByName_Long(jsResMgr, "nativeResMgr", 0);
-        if (ANI_OK != status) {
-            RESMGR_HILOGE(RESMGR_ANI_TAG, "Failed to reset nativeResMgr in DestoryResMgr, status: %{public}d.", status);
-            return;
-        }
-    }
+    AniUtils::DestroyResMgr(env, jsResMgr);
 }
 
 ani_ref ResMgrAni::TransferToDynamicResource(ani_env *env, ani_object etsResMgr)

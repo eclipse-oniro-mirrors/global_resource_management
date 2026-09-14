@@ -158,14 +158,9 @@ void ResourceManagerNapiAsyncImpl::Complete(napi_env env, napi_status status, vo
                 RESMGR_HILOGE(RESMGR_JS_TAG, "napi_call_function failed status=%{public}d", status);
                 break;
             }
-            status = napi_delete_reference(env, dataContext->callbackRef_);
-            if (status != napi_ok) {
-                RESMGR_HILOGE(RESMGR_JS_TAG, "napi_call_function failed status=%{public}d", status);
-                break;
-            }
         } while (false);
     }
-    napi_delete_async_work(env, dataContext->work_);
+    dataContext->Release(env);
     delete dataContext;
 };
 
@@ -179,14 +174,20 @@ napi_value ResourceManagerNapiAsyncImpl::GetResult(napi_env env, std::unique_ptr
         napi_get_undefined(env, &result);
     }
     napi_value resource = nullptr;
-    napi_create_string_utf8(env, name.c_str(), NAPI_AUTO_LENGTH, &resource);
+    if (napi_create_string_utf8(env, name.c_str(), NAPI_AUTO_LENGTH, &resource) != napi_ok) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to create resource name string for %{public}s", name.c_str());
+        dataContext->Release(env);
+        return result;
+    }
     if (napi_create_async_work(env, nullptr, resource, execute, ResourceManagerNapiAsyncImpl::Complete,
         static_cast<void*>(dataContext.get()), &dataContext->work_) != napi_ok) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to create async work for %{public}s", name.c_str());
+        dataContext->Release(env);
         return result;
     }
     if (napi_queue_async_work_with_qos(env, dataContext->work_, napi_qos_user_initiated) != napi_ok) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to queue async work for %{public}s", name.c_str());
+        dataContext->Release(env);
         return result;
     }
     dataContext.release();
@@ -211,6 +212,7 @@ napi_value ResourceManagerNapiAsyncImpl::ProcessNameParamV9(napi_env env, napi_c
             napi_create_reference(env, argv[i], 1, &dataContext->callbackRef_);
             break;
         } else if (i == 1 && ResourceManagerNapiUtils::GetDataType(env, argv[i], dataContext->density_) != SUCCESS) {
+            dataContext->Release(env);
             ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
             return nullptr;
         } else if (i == 2 && valueType == napi_function) { // the third callback param
@@ -244,6 +246,7 @@ napi_value ResourceManagerNapiAsyncImpl::ProcessIdParamV9(napi_env env, napi_cal
             napi_create_reference(env, argv[i], 1, &dataContext->callbackRef_);
             break;
         } else if (i == 1 && ResourceManagerNapiUtils::GetDataType(env, argv[i], dataContext->density_) != SUCCESS) {
+            dataContext->Release(env);
             ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
             return nullptr;
         } else if (i == 2 && valueType == napi_function) { // the third callback param
@@ -284,6 +287,7 @@ napi_value ResourceManagerNapiAsyncImpl::ProcessResourceParamV9(napi_env env, na
             napi_create_reference(env, argv[i], 1, &dataContext->callbackRef_);
             break;
         } else if (i == 1 && ResourceManagerNapiUtils::GetDataType(env, argv[i], dataContext->density_) != SUCCESS) {
+            dataContext->Release(env);
             ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
             return nullptr;
         } else if (i == 2 && valueType == napi_function) { // the third callback param
@@ -341,9 +345,15 @@ napi_value ResourceManagerNapiAsyncImpl::ProcessIdNameParam(napi_env env, napi_c
 
     std::unique_ptr<ResMgrDataContext> dataContext = std::make_unique<ResMgrDataContext>();
     dataContext->addon_ = ResMgrDataContext::GetResourceManagerAddon(env, info);
+    if (dataContext->addon_ == nullptr) {
+        return nullptr;
+    }
     for (size_t i = 0; i < argc; i++) {
         napi_valuetype valueType;
-        napi_typeof(env, argv[i], &valueType);
+        if (napi_typeof(env, argv[i], &valueType) != napi_ok) {
+            RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get argument type in ProcessIdNameParam");
+            return nullptr;
+        }
         if (i == 0 && valueType == napi_number) {
             dataContext->resId_ = ResourceManagerNapiUtils::GetResId(env, argc, argv);
         } else if (i == 0 && valueType == napi_string) {
@@ -394,9 +404,16 @@ napi_value ResourceManagerNapiAsyncImpl::ProcessNoParam(napi_env env, napi_callb
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to unwrap ProcessNoParam");
         return nullptr;
     }
+    if (addonPtr == nullptr) {
+        napi_throw_type_error(env, nullptr, "addon is null");
+        return nullptr;
+    }
     dataContext->addon_ = *addonPtr;
     napi_valuetype valueType;
-    napi_typeof(env, argv[0], &valueType);
+    if (napi_typeof(env, argv[0], &valueType) != napi_ok) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get argument type in ProcessNoParam");
+        return nullptr;
+    }
     if (valueType == napi_function) {
         napi_create_reference(env, argv[0], 1, &dataContext->callbackRef_);
     }
