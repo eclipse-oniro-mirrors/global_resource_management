@@ -56,7 +56,11 @@ private:
 
     int32_t ParseId(uint32_t &offset, std::shared_ptr<ResId> id);
 
+    int32_t ParseIdEntry(uint32_t &offset, std::shared_ptr<ResId> id);
+
     int32_t ParseIdItem(uint32_t &offset, std::shared_ptr<IdItem> idItem);
+
+    void AccumulateParseMemory(const std::shared_ptr<IdItem> &idItem);
 
     int32_t ParseStringArray(uint32_t &offset, std::vector<std::string> &values);
 

@@ -130,6 +130,10 @@ int32_t HapParserV2::ParseHeader(uint32_t &offset)
 int32_t HapParserV2::ParseKeys(uint32_t &offset)
 {
     for (uint32_t i = 0; i < resHeader_.keyCount_; i++) {
+        if (parsedMemory_ > MAX_PARSE_MEMORY) {
+            RESMGR_HILOGE(RESMGR_TAG, "ParseKeys failed, parsed memory exceeds limit.");
+            return SYS_ERROR;
+        }
         std::shared_ptr<KeyInfo> key = std::make_shared<KeyInfo>();
         if (key == nullptr) {
             RESMGR_HILOGE(RESMGR_TAG, "new ResKey failed when ParseResHex");
@@ -150,6 +154,7 @@ int32_t HapParserV2::ParseKeys(uint32_t &offset)
         if (keys_[key->resConfigId_]->GetColorMode() == ColorMode::DARK) {
             hasDarkRes_ = true;
         }
+        parsedMemory_ += static_cast<uint64_t>(sizeof(ResConfigImpl)) + sizeof(std::shared_ptr<ResConfigImpl>);
     }
     return OK;
 }
@@ -243,11 +248,18 @@ int32_t HapParserV2::ParseItem(uint32_t &offset, const TypeInfo &typeInfo)
     resItem.name_ = std::string(reinterpret_cast<const char *>(mMapFile_->mmap_) + offset, resItem.length_);
     offset += resItem.length_;
 
+    if (parsedMemory_ > MAX_PARSE_MEMORY) {
+        RESMGR_HILOGE(RESMGR_TAG, "ParseItem failed, parsed memory exceeds limit.");
+        return SYS_ERROR;
+    }
     std::shared_ptr<IdValuesV2> idValues =
         std::make_shared<IdValuesV2>((ResType)typeInfo.type_, resItem.resId_, resItem.offset_, resItem.name_);
     idValues->SetMMap(mMapFile_);
     typeNameMap_[typeInfo.type_][resItem.name_] = idValues;
     idMap_[resItem.resId_] = idValues;
+    const uint64_t sharedPtrCount = 2;
+    parsedMemory_ += static_cast<uint64_t>(sizeof(IdValuesV2)) + sizeof(std::shared_ptr<IdValuesV2>) * sharedPtrCount;
+    parsedMemory_ += static_cast<uint64_t>(resItem.name_.capacity()) * sharedPtrCount;
     return OK;
 }
 

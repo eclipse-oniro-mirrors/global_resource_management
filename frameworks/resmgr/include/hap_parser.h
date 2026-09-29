@@ -189,6 +189,8 @@ protected:
     uint32_t limitKeyValue_{0};
     
     std::set<std::string> locales_;
+
+    uint64_t parsedMemory_{0};
 };
 } // namespace Resource
 } // namespace Global

@@ -28,10 +28,11 @@ namespace Global {
 namespace Resource {
 static constexpr uint32_t RES_VERSION_LEN = 128;
 static constexpr uint32_t MAX_RES_TYPE_COUNT = 64;
-static constexpr uint32_t MAX_RES_ID_COUNT = 0x01000000;
+static constexpr uint32_t MAX_RES_ID_COUNT = 500000;
 static constexpr uint32_t MAX_RES_KEY_COUNT = MAX_RES_ID_COUNT;
 static constexpr uint32_t MAX_KEY_PARAMS_COUNT = 32;
 static constexpr size_t MAX_INDEX_FILE_SIZE = UINT32_MAX;
+static constexpr uint64_t MAX_PARSE_MEMORY = 2ULL * 1024 * 1024 * 1024;
 
 /**
  * old module resource.index file header

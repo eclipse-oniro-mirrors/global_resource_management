@@ -138,7 +138,7 @@
 - `resources.index` 的二进制格式与 restool 写入端（`developtools/global_resource_tool`）字节布局严格镜像，结构体定义在 `frameworks/resmgr/include/res_desc.h`，不可随意修改。
 - V1 格式（version 以 `"Restool "` 开头）走全量解析；V2 格式走 mmap 懒解析——版本判定在 `HapResourceManager::Load()` 中完成，两条解析路径独立维护。
 - debug 签名的 HAP 可携带畸形 `resources.index`，本模块将其视为**不可信输入**——所有解析步骤必须校验 `offset + len <= bufLen`、count 字段不超上限、`KEYS`/`IDSS`/`DATA` magic tag。
-- 安全上限常量定义在 `res_desc.h`：`MAX_RES_KEY_COUNT`、`MAX_KEY_PARAMS_COUNT=32`、`MAX_RES_TYPE_COUNT=64`、`MAX_RES_ID_COUNT=0x01000000`、`MAX_INDEX_FILE_SIZE=UINT32_MAX`，不可放宽。
+- 安全上限常量定义在 `res_desc.h`：`MAX_RES_KEY_COUNT`、`MAX_KEY_PARAMS_COUNT=32`、`MAX_RES_TYPE_COUNT=64`、`MAX_RES_ID_COUNT=500000`、`MAX_INDEX_FILE_SIZE=UINT32_MAX`、`MAX_PARSE_MEMORY=2GB`，不可放宽。
 - DFX 事件定义（`hisysevent.yaml`）是故障归因的硬性合约，事件名、参数类型、级别不可随意修改。
 - `resmgr.gni` 中的特性标志（`resource_management_support_icu`、`resource_management_api_metrics`）控制编译时行为，默认值变更影响所有下游产品。
 - 系统（ID ≥ `0x7000000`）与应用（ID ≥ `0x1000000`）资源 ID 范围区分，核心引擎按 ID/名称分发到对应资源。
