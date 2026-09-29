@@ -126,6 +126,7 @@ static napi_value getResult(napi_env env, std::unique_ptr<ResMgrDataContext> &as
     if (!InitAsyncContext(env, bundleName, GetGlobalAbility(env), abilityRuntimeContext, *asyncContext)) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "init async context failed");
         ReportInitResourceManagerFail(bundleName, "failed to init async context");
+        asyncContext->Release(env);
         return nullptr;
     }
 
@@ -135,11 +136,13 @@ static napi_value getResult(napi_env env, std::unique_ptr<ResMgrDataContext> &as
         ResourceManagerNapiAsyncImpl::Complete, static_cast<void*>(asyncContext.get()), &asyncContext->work_);
     if (status != napi_ok) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to create async work for getResourceManager %{public}d", status);
+        asyncContext->Release(env);
         return result;
     }
     status = napi_queue_async_work_with_qos(env, asyncContext->work_, napi_qos_user_initiated);
     if (status != napi_ok) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to queue async work for getResourceManager %{public}d", status);
+        asyncContext->Release(env);
         return result;
     }
     asyncContext.release();

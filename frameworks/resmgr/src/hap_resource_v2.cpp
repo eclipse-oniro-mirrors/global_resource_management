@@ -198,7 +198,7 @@ bool HapResourceV2::Init(std::unordered_map<uint32_t, std::shared_ptr<ResConfigI
     }
     resourcePath_ = indexPath_.substr(0, index + 1);
 #endif
-
+    WriteLock lock(mutex_);
     keys_ = std::move(keys);
     idMap_ = std::move(idMap);
     typeNameMap_ = std::move(typeNameMap);
@@ -222,7 +222,12 @@ void HapResourceV2::InitThemeSystemRes()
     }
 
     for (const auto &cfg : configList) {
-        if (cfg->GetIdItem()->value_ == "true") {
+        auto idItem = cfg->GetIdItem();
+        if (idItem == nullptr) {
+            RESMGR_HILOGE(RESMGR_TAG, "GetIdItem failed in InitThemeSystemRes.");
+            continue;
+        }
+        if (idItem->value_ == "true") {
             isThemeSystemResEnable_ = true;
             return;
         }
@@ -237,7 +242,12 @@ int32_t HapResourceV2::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
     }
     ResInfo resInfo;
     uint32_t offset = idValue->GetOffset();
-    int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, idValue->GetMMap()->mmapLen_, idValue->GetMMap()->mmap_);
+    auto mmapFile = idValue->GetMMap();
+    if (mmapFile == nullptr || mmapFile->mmap_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "mmap is null, ParseLimitPaths failed.");
+        return SYS_ERROR;
+    }
+    int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, mmapFile->mmapLen_, mmapFile->mmap_);
     if (ret != OK) {
         return ret;
     }
@@ -250,7 +260,7 @@ int32_t HapResourceV2::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
     std::pair<std::string, std::string> resPath = std::make_pair(indexPath_, resourcePath_);
     for (uint32_t i = 0; i < resInfo.valueCount_; i++) {
         ConfigItem configItem;
-        ret = HapParserV2::ParseConfigItem(offset, configItem, idValue->GetMMap()->mmapLen_, idValue->GetMMap()->mmap_);
+        ret = HapParserV2::ParseConfigItem(offset, configItem, mmapFile->mmapLen_, mmapFile->mmap_);
         if (ret != OK) {
             return ret;
         }
@@ -261,7 +271,7 @@ int32_t HapResourceV2::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
 
         std::shared_ptr<ValueUnderQualifierDirV2> vuqd =
             std::make_shared<ValueUnderQualifierDirV2>(resPath, configItem.offset_, iter->second);
-        vuqd->Init(idValue->GetMMap(), idValue->GetResType(), idValue->GetId(), idValue->GetName());
+        vuqd->Init(mmapFile, idValue->GetResType(), idValue->GetId(), idValue->GetName());
         idValue->AddLimitPath(vuqd);
     }
     idValue->Parse();
@@ -304,7 +314,12 @@ int32_t SystemResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
     }
     ResInfo resInfo;
     uint32_t offset = idValue->GetOffset();
-    int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, idValue->GetMMap()->mmapLen_, idValue->GetMMap()->mmap_);
+    auto mmapFile = idValue->GetMMap();
+    if (mmapFile == nullptr || mmapFile->mmap_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "mmap is null, ParseLimitPaths failed.");
+        return SYS_ERROR;
+    }
+    int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, mmapFile->mmapLen_, mmapFile->mmap_);
     if (ret != OK) {
         return ret;
     }
@@ -316,7 +331,7 @@ int32_t SystemResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
     idValue->ReserveLimitPaths(resInfo.valueCount_);
     for (uint32_t i = 0; i < resInfo.valueCount_; i++) {
         ConfigItem configItem;
-        ret = HapParserV2::ParseConfigItem(offset, configItem, idValue->GetMMap()->mmapLen_, idValue->GetMMap()->mmap_);
+        ret = HapParserV2::ParseConfigItem(offset, configItem, mmapFile->mmapLen_, mmapFile->mmap_);
         if (ret != OK) {
             return ret;
         }
@@ -329,7 +344,7 @@ int32_t SystemResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
         std::pair<std::string, std::string> resPath = std::make_pair(indexPath_, resourcePath_);
         std::shared_ptr<ValueUnderQualifierDirV2> vuqd = std::make_shared<ValueUnderQualifierDirV2>(
             resPath, configItem.offset_, iter->second, false, true);
-        vuqd->Init(idValue->GetMMap(), idValue->GetResType(), idValue->GetId(), idValue->GetName());
+        vuqd->Init(mmapFile, idValue->GetResType(), idValue->GetId(), idValue->GetName());
         idValue->AddLimitPath(vuqd);
     }
     idValue->Parse();
@@ -355,6 +370,9 @@ void OverlayResource::UpdateOverlayInfo(
     std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> &nameTypeId)
 {
     WriteLock lock(mutex_);
+    if (isOverlayUpdated_) {
+        return;
+    }
     std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>> newIdMap;
     newIdMap.reserve(idMap_.size());
     for (auto &item : idMap_) {
@@ -368,6 +386,7 @@ void OverlayResource::UpdateOverlayInfo(
         newIdMap[newId] = item.second;
     }
     idMap_.swap(newIdMap);
+    isOverlayUpdated_ = true;
 }
 
 void OverlayResource::GetLocales(std::set<std::string> &outValue, bool includeSystem)
@@ -383,7 +402,12 @@ int32_t OverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
     }
     ResInfo resInfo;
     uint32_t offset = idValue->GetOffset();
-    int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, idValue->GetMMap()->mmapLen_, idValue->GetMMap()->mmap_);
+    auto mmapFile = idValue->GetMMap();
+    if (mmapFile == nullptr || mmapFile->mmap_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "mmap is null, ParseLimitPaths failed.");
+        return SYS_ERROR;
+    }
+    int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, mmapFile->mmapLen_, mmapFile->mmap_);
     if (ret != OK) {
         return ret;
     }
@@ -391,7 +415,7 @@ int32_t OverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
     idValue->ReserveLimitPaths(resInfo.valueCount_);
     for (uint32_t i = 0; i < resInfo.valueCount_; i++) {
         ConfigItem configItem;
-        ret = HapParserV2::ParseConfigItem(offset, configItem, idValue->GetMMap()->mmapLen_, idValue->GetMMap()->mmap_);
+        ret = HapParserV2::ParseConfigItem(offset, configItem, mmapFile->mmapLen_, mmapFile->mmap_);
         if (ret != OK) {
             return ret;
         }
@@ -404,7 +428,7 @@ int32_t OverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
         std::pair<std::string, std::string> resPath = std::make_pair(indexPath_, resourcePath_);
         std::shared_ptr<ValueUnderQualifierDirV2> vuqd = std::make_shared<ValueUnderQualifierDirV2>(
             resPath, configItem.offset_, iter->second, true, false);
-        vuqd->Init(idValue->GetMMap(), idValue->GetResType(), idValue->GetId(), idValue->GetName());
+        vuqd->Init(mmapFile, idValue->GetResType(), idValue->GetId(), idValue->GetName());
         idValue->AddLimitPath(vuqd);
     }
     idValue->Parse();
@@ -431,7 +455,12 @@ int32_t SystemOverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idVal
     }
     ResInfo resInfo;
     uint32_t offset = idValue->GetOffset();
-    int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, idValue->GetMMap()->mmapLen_, idValue->GetMMap()->mmap_);
+    auto mmapFile = idValue->GetMMap();
+    if (mmapFile == nullptr || mmapFile->mmap_ == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "mmap is null, ParseLimitPaths failed.");
+        return SYS_ERROR;
+    }
+    int32_t ret = HapParserV2::ParseResInfo(offset, resInfo, mmapFile->mmapLen_, mmapFile->mmap_);
     if (ret != OK) {
         return ret;
     }
@@ -439,7 +468,7 @@ int32_t SystemOverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idVal
     idValue->ReserveLimitPaths(resInfo.valueCount_);
     for (uint32_t i = 0; i < resInfo.valueCount_; i++) {
         ConfigItem configItem;
-        ret = HapParserV2::ParseConfigItem(offset, configItem, idValue->GetMMap()->mmapLen_, idValue->GetMMap()->mmap_);
+        ret = HapParserV2::ParseConfigItem(offset, configItem, mmapFile->mmapLen_, mmapFile->mmap_);
         if (ret != OK) {
             return ret;
         }
@@ -452,7 +481,7 @@ int32_t SystemOverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idVal
         std::pair<std::string, std::string> resPath = std::make_pair(indexPath_, resourcePath_);
         std::shared_ptr<ValueUnderQualifierDirV2> vuqd = std::make_shared<ValueUnderQualifierDirV2>(
             resPath, configItem.offset_, iter->second, true, true);
-        vuqd->Init(idValue->GetMMap(), idValue->GetResType(), idValue->GetId(), idValue->GetName());
+        vuqd->Init(mmapFile, idValue->GetResType(), idValue->GetId(), idValue->GetName());
         idValue->AddLimitPath(vuqd);
     }
     idValue->Parse();

@@ -377,10 +377,10 @@ int32_t HapParserV2::ParseKey(uint32_t &offset, std::shared_ptr<KeyInfo> key, bo
             return SYS_ERROR;
         }
         int32_t ret = this->ParseKeyParam(offset, keyParam, match);
-        GetKeyParamsLocales(keyParam, locale, isLocale);
         if (ret != OK) {
             return ret;
         }
+        GetKeyParamsLocales(keyParam, locale, isLocale);
         key->params_.push_back(keyParam);
     }
     if (isLocale) {
@@ -398,6 +398,10 @@ int32_t HapParserV2::ParseKeyParam(uint32_t &offset, std::shared_ptr<KeyParam> k
     errno_t eret = memcpy_s(keyParam.get(), sizeof(KeyParam), mMapFile_->mmap_ + offset, KeyParam::KEYPARAM_LEN);
     if (eret != OK) {
         RESMGR_HILOGE(RESMGR_TAG, "Parse KeyParam failed, memory copy failed.");
+        return SYS_ERROR;
+    }
+    if (static_cast<uint32_t>(keyParam->type_) >= static_cast<uint32_t>(KeyType::KEY_TYPE_MAX)) {
+        RESMGR_HILOGE(RESMGR_TAG, "Parse KeyParam failed, invalid key type.");
         return SYS_ERROR;
     }
     offset += KeyParam::KEYPARAM_LEN;
@@ -418,8 +422,8 @@ int32_t HapParserV2::ParseKeyParam(uint32_t &offset, std::shared_ptr<KeyParam> k
 void HapParserV2::GetLimitKeyValue(KeyType type)
 {
     const uint32_t limitKeysBase = 0x00000001;
-    if (type < KeyType::KEY_TYPE_MAX) {
-        uint32_t typeValue = static_cast<uint32_t>(type);
+    uint32_t typeValue = static_cast<uint32_t>(type);
+    if (typeValue < static_cast<uint32_t>(KeyType::KEY_TYPE_MAX)) {
         limitKeyValue_ |= limitKeysBase << typeValue;
     }
 }
@@ -493,6 +497,15 @@ bool HapParserV2::GetIndexMmapFromIndex(const char *path)
     char indexPath[PATH_MAX + 1] = {0};
     Utils::CanonicalizePath(path, indexPath, PATH_MAX);
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
+    return MmapIndexFile(indexPath);
+#else
+    return ReadIndexFile(indexPath);
+#endif
+}
+
+#if !defined(__WINNT__) && !defined(__IDE_PREVIEW__)
+bool HapParserV2::MmapIndexFile(const char *indexPath)
+{
     mMapFile_->fp_ = fopen(indexPath, "rb");
     if (mMapFile_->fp_ == nullptr) {
         return false;
@@ -506,37 +519,44 @@ bool HapParserV2::GetIndexMmapFromIndex(const char *path)
         RESMGR_HILOGE(RESMGR_TAG, "failed to seek to beginning of file");
         return false;
     }
-    if (fileLen <= 0) {
-        RESMGR_HILOGE(RESMGR_TAG, "file size is zero");
+    if (fileLen <= 0 || static_cast<size_t>(fileLen) > MAX_INDEX_FILE_SIZE) {
+        RESMGR_HILOGE(RESMGR_TAG, "file size is invalid or exceeds limit");
         return false;
     }
     mMapFile_->mmapLen_ = static_cast<size_t>(fileLen);
     mMapFile_->mmap_ = (uint8_t*)mmap(nullptr, mMapFile_->mmapLen_, PROT_READ, MAP_PRIVATE, fileno(mMapFile_->fp_), 0);
     if (mMapFile_->mmap_ == MAP_FAILED) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get mmap data indexFilePath from index");
+        mMapFile_->mmap_ = nullptr;
+        fclose(mMapFile_->fp_);
+        mMapFile_->fp_ = nullptr;
         return false;
     }
+    return true;
+}
 #else
+bool HapParserV2::ReadIndexFile(const char *indexPath)
+{
     std::ifstream inFile(indexPath, std::ios::binary | std::ios::in);
     if (!inFile.good()) {
         return false;
     }
     inFile.seekg(0, std::ios::end);
-    int fileLen = inFile.tellg();
-    if (fileLen <= 0) {
-        RESMGR_HILOGE(RESMGR_TAG, "file size is zero");
+    int64_t fileLen = static_cast<int64_t>(inFile.tellg());
+    if (fileLen <= 0 || fileLen > static_cast<int64_t>(MAX_INDEX_FILE_SIZE)) {
+        RESMGR_HILOGE(RESMGR_TAG, "file size is invalid or exceeds limit");
         inFile.close();
         return false;
     }
     mMapFile_->mmapLen_ = static_cast<size_t>(fileLen);
-    mMapFile_->mmap_ = new uint8_t[fileLen + 1];
+    mMapFile_->mmap_ = new uint8_t[mMapFile_->mmapLen_ + 1];
     inFile.seekg(0, std::ios::beg);
-    inFile.read(reinterpret_cast<char*>(mMapFile_->mmap_), fileLen);
+    inFile.read(reinterpret_cast<char*>(mMapFile_->mmap_), mMapFile_->mmapLen_);
     inFile.close();
-    RESMGR_HILOGD(RESMGR_TAG, "extract success, bufLen:%d", fileLen);
-#endif
+    RESMGR_HILOGD(RESMGR_TAG, "extract success, bufLen:%zu", mMapFile_->mmapLen_);
     return true;
 }
+#endif
 } // namespace Resource
 } // namespace Global
 } // namespace OHOS

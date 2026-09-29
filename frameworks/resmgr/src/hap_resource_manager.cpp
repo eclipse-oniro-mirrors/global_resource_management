@@ -59,7 +59,11 @@ bool IsNewModule(const char *path)
         return false;
     }
 
-    std::string version = std::string(resHeader.version_);
+    size_t verLen = 0;
+    while (verLen < RES_VERSION_LEN && resHeader.version_[verLen] != '\0') {
+        verLen++;
+    }
+    std::string version(resHeader.version_, verLen);
     if (version.substr(0, version.find(" ")) == "Restool") {
         return false;
     }

@@ -106,11 +106,11 @@ bool HapResourceV1::Init(std::shared_ptr<ResConfigImpl> &defaultConfig)
     }
     resourcePath_ = indexPath_.substr(0, index + 1);
 #endif
+    WriteLock lock(mutex_);
     for (int i = 0; i < ResType::MAX_RES_TYPE; ++i) {
         auto mptr = std::make_shared<std::map<std::string, std::shared_ptr<IdValuesV1>>>();
         idValuesNameMap_.push_back(mptr);
     }
-    WriteLock lock(mutex_);
     return InitIdList(defaultConfig);
 }
 
@@ -188,6 +188,9 @@ void HapResourceV1::UpdateOverlayInfo(
     std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> &nameTypeId)
 {
     WriteLock lock(mutex_);
+    if (isOverlay_ && isOverlayUpdated_) {
+        return;
+    }
     std::map<uint32_t, std::shared_ptr<IdValuesV1>> newIdValuesMap;
     for (auto iter = idValuesMap_.begin(); iter != idValuesMap_.end(); iter++) {
         const std::vector<std::shared_ptr<ValueUnderQualifierDir>> &limitPaths = iter->second->GetLimitPathsConst();
@@ -211,6 +214,7 @@ void HapResourceV1::UpdateOverlayInfo(
         }
     }
     idValuesMap_.swap(newIdValuesMap);
+    isOverlayUpdated_ = true;
 }
 
 bool HapResourceV1::InitIdList(std::shared_ptr<ResConfigImpl> &defaultConfig)

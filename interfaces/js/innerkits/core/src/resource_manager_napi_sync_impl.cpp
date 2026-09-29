@@ -161,8 +161,13 @@ napi_value ResourceManagerNapiSyncImpl::GetRawFileListSync(napi_env env, napi_ca
         return nullptr;
     }
 
-    RState state = dataContext->addon_->GetResMgr()->GetRawFileList(dataContext->path_.c_str(),
-        dataContext->arrayValue_);
+    auto resMgr = dataContext->addon_->GetResMgr();
+    if (resMgr == nullptr) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in GetRawFileListSync");
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        return nullptr;
+    }
+    RState state = resMgr->GetRawFileList(dataContext->path_.c_str(), dataContext->arrayValue_);
     if (state != RState::SUCCESS || dataContext->arrayValue_.empty()) {
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get rawfile list");
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_RES_PATH_INVALID);
@@ -511,6 +516,10 @@ int32_t ResourceManagerNapiSyncImpl::ProcessBoolResource(napi_env env, napi_call
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get resMgr in GetBoolean");
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
+    if (resMgr == nullptr) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "resMgr is nullptr in ProcessBoolResource");
+        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
     RState state = resMgr->GetBooleanById(resId, dataContext->bValue_);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to GetBoolean state", true);
@@ -674,7 +683,11 @@ napi_value ResourceManagerNapiSyncImpl::GetPluralStringValueSync(napi_env env, n
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
-    napi_get_value_int32(env, argv[ARRAY_SUBCRIPTOR_ONE], &dataContext->param_);
+    if (napi_get_value_int32(env, argv[ARRAY_SUBCRIPTOR_ONE], &dataContext->param_) != napi_ok) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get int value in GetPluralStringValueSync");
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
 
     state = ProcessPluralStringValueResource(env, info, dataContext);
     if (state != RState::SUCCESS) {
@@ -1139,7 +1152,11 @@ napi_value ResourceManagerNapiSyncImpl::GetPluralStringByNameSync(napi_env env, 
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
         return nullptr;
     }
-    napi_get_value_int32(env, argv[ARRAY_SUBCRIPTOR_ONE], &dataContext->param_);
+    if (napi_get_value_int32(env, argv[ARRAY_SUBCRIPTOR_ONE], &dataContext->param_) != napi_ok) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get int value in GetPluralStringByNameSync");
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
 
     state = ProcessPluralStrResourceByName(env, info, dataContext);
     if (state != RState::SUCCESS) {
@@ -1359,6 +1376,11 @@ napi_value ResourceManagerNapiSyncImpl::GetOverrideResourceManager(napi_env env,
     }
 
     std::shared_ptr<ResourceManager> resMgr = dataContext->addon_->GetResMgr();
+    if (resMgr == nullptr) {
+        dataContext->SetErrorMsg("GetOverrideResourceManager, resMgr is null", false);
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        return nullptr;
+    }
     std::shared_ptr<ResourceManager> overrideResMgr = resMgr->GetOverrideResourceManager(
         dataContext->overrideResConfig_);
     if (overrideResMgr == nullptr) {
@@ -1420,10 +1442,16 @@ napi_value ResourceManagerNapiSyncImpl::UpdateOverrideConfiguration(napi_env env
     }
 
     std::shared_ptr<ResourceManager> resMgr = dataContext->addon_->GetResMgr();
+    if (resMgr == nullptr) {
+        dataContext->SetErrorMsg("UpdateOverrideConfiguration, resMgr is null", false);
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_RES_NOT_FOUND_BY_ID);
+        return nullptr;
+    }
     state = resMgr->UpdateOverrideResConfig(*dataContext->overrideResConfig_);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("UpdateOverrideConfiguration failed due to invalid config", false);
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
     }
     return nullptr;
 }
@@ -1490,7 +1518,11 @@ napi_value ResourceManagerNapiSyncImpl::GetIntPluralStringValueSync(napi_env env
         return nullptr;
     }
     double num =  0;
-    napi_get_value_double(env, argv[ARRAY_SUBCRIPTOR_ONE], &num);
+    if (napi_get_value_double(env, argv[ARRAY_SUBCRIPTOR_ONE], &num) != napi_ok) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get double value in GetIntPluralStringValueSync");
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
     if (num > INT_MAX) {
         num = INT_MAX;
     } else if (num < INT_MIN) {
@@ -1527,7 +1559,11 @@ napi_value ResourceManagerNapiSyncImpl::GetDoublePluralStringValueSync(napi_env 
         return nullptr;
     }
     double num =  0;
-    napi_get_value_double(env, argv[ARRAY_SUBCRIPTOR_ONE], &num);
+    if (napi_get_value_double(env, argv[ARRAY_SUBCRIPTOR_ONE], &num) != napi_ok) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get double value in GetDoublePluralStringValueSync");
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
     dataContext->quantity_ = { false, 0, num };
 
     state = ProcessPluralStringResource(env, info, dataContext);
@@ -1577,7 +1613,11 @@ napi_value ResourceManagerNapiSyncImpl::GetIntPluralStringByNameSync(napi_env en
         return nullptr;
     }
     double num =  0;
-    napi_get_value_double(env, argv[ARRAY_SUBCRIPTOR_ONE], &num);
+    if (napi_get_value_double(env, argv[ARRAY_SUBCRIPTOR_ONE], &num) != napi_ok) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get double value in GetIntPluralStringByNameSync");
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
     if (num > INT_MAX) {
         num = INT_MAX;
     } else if (num < INT_MIN) {
@@ -1619,7 +1659,11 @@ napi_value ResourceManagerNapiSyncImpl::GetDoublePluralStringByNameSync(napi_env
         return nullptr;
     }
     double num = 0.0;
-    napi_get_value_double(env, argv[ARRAY_SUBCRIPTOR_ONE], &num);
+    if (napi_get_value_double(env, argv[ARRAY_SUBCRIPTOR_ONE], &num) != napi_ok) {
+        RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to get double value in GetDoublePluralStringByNameSync");
+        ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_INVALID_INPUT_PARAMETER);
+        return nullptr;
+    }
     dataContext->quantity_ = { false, 0, num };
 
     state = ProcessPluralStringResourceByName(env, info, dataContext);
@@ -1646,7 +1690,13 @@ napi_value ResourceManagerNapiSyncImpl::GetResName(napi_env env, napi_callback_i
         ResourceManagerNapiUtils::NapiThrowBusinessError(env, state);
         return nullptr;
     }
-    state = dataContext->addon_->GetResMgr()->GetResName(dataContext->resId_, dataContext->value_);
+    auto resMgr = dataContext->addon_->GetResMgr();
+    if (resMgr == nullptr) {
+        dataContext->SetErrorMsg("Failed to get resMgr in GetResName", true);
+        ResourceManagerNapiUtils::NapiThrowBusinessError(env, ERROR_CODE_RES_NOT_FOUND_BY_ID, dataContext->resId_);
+        return nullptr;
+    }
+    state = resMgr->GetResName(dataContext->resId_, dataContext->value_);
     if (state != RState::SUCCESS) {
         dataContext->SetErrorMsg("Failed to GetResName", true);
         ResourceManagerNapiUtils::NapiThrowBusinessError(env, state, dataContext->resId_);

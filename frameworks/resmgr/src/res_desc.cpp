@@ -140,19 +140,19 @@ std::string KeyParam::GetMncStr() const
 
 const std::string KeyParam::ConvertToStr() const
 {
+    static_assert(sizeof(value_) == 4, "value_ size must be 4 bytes");
     if ((type_ == KeyType::LANGUAGES) || (type_ == KeyType::REGION) || (type_ == KeyType::SCRIPT)) {
-        char tmp[4];
-        char tmp2[5];
+        char tmp[sizeof(value_)];
+        char tmp2[sizeof(value_) + 1];
         errno_t eret = memcpy_s(tmp, sizeof(tmp), &value_, sizeof(value_));
         if (eret != OK) {
             RESMGR_HILOGE(RESMGR_TAG, "memcpy_s error : %d", eret);
             return std::string();
         }
         int j = 0;
-        // 4 means langauges/region/script key value max length
-        for (int i = 0; i < 4; ++i) {
-            if (tmp[3 - i]) { // 3 means reverse temp value to temp2
-                tmp2[j++] = tmp[3 - i]; // 3 means reverse temp value to temp2
+        for (size_t i = 0; i < sizeof(value_); ++i) {
+            if (tmp[sizeof(value_) - 1 - i]) {
+                tmp2[j++] = tmp[sizeof(value_) - 1 - i];
             }
         }
         tmp2[j] = '\0';

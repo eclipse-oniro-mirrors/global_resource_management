@@ -66,6 +66,18 @@ struct ResMgrDataContext {
         colorValue_(0), createValueFunc_(nullptr), len_(0), deferred_(nullptr), callbackRef_(nullptr), success_(true),
         errCode_(0), density_(0), iconType_(0), symbolValue_(0) {}
 
+    void Release(napi_env env)
+    {
+        if (callbackRef_ != nullptr) {
+            napi_delete_reference(env, callbackRef_);
+            callbackRef_ = nullptr;
+        }
+        if (work_ != nullptr) {
+            napi_delete_async_work(env, work_);
+            work_ = nullptr;
+        }
+    }
+
     void SetErrorMsg(const std::string &msg, bool withResId = false, int32_t errCode = 0)
     {
         errMsg_ = msg;

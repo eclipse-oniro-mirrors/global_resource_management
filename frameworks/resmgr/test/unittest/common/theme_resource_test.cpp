@@ -274,7 +274,7 @@ HWTEST_F(ThemeResourceTest, ThemeResourceLoadThemeIconResourceTest001, TestSize.
 
     iconPath = "abc";
     themeResource = ThemeResource::LoadThemeIconResource(iconPath);
-    EXPECT_TRUE(themeResource != nullptr);
+    EXPECT_TRUE(themeResource == nullptr);
 }
 
 /*
