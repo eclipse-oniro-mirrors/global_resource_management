@@ -369,4 +369,69 @@ HWTEST_F(ThemeResourceTest, ThemeResourceLoadThemeResourceTest001, TestSize.Leve
     themeResource = ThemeResource::LoadThemeResource(rootDir);
     EXPECT_TRUE(themeResource == nullptr);
 }
+
+/*
+ * @tc.name: ThemeResourceGetRelativePathTest001
+ * @tc.desc: Test GetRelativePath with matching basePath.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeResourceTest, ThemeResourceGetRelativePathTest001, TestSize.Level1)
+{
+    std::string path = "/data/themes/a/app/icons/icon_mask.png";
+    std::string basePath = "/data/themes/a";
+    std::string result = ThemeResource::GetRelativePath(path, basePath);
+    EXPECT_EQ(result, "app/icons/icon_mask.png");
+}
+
+/*
+ * @tc.name: ThemeResourceGetRelativePathTest002
+ * @tc.desc: Test GetRelativePath with empty basePath.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeResourceTest, ThemeResourceGetRelativePathTest002, TestSize.Level1)
+{
+    std::string path = "/data/themes/a/app/icons/icon_mask.png";
+    std::string basePath = "";
+    std::string result = ThemeResource::GetRelativePath(path, basePath);
+    EXPECT_EQ(result, "/data/themes/a/app/icons/icon_mask.png");
+}
+
+/*
+ * @tc.name: ThemeResourceGetRelativePathTest003
+ * @tc.desc: Test GetRelativePath when path does not start with basePath.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeResourceTest, ThemeResourceGetRelativePathTest003, TestSize.Level1)
+{
+    std::string path = "/data/themes/b/app/icons/icon_mask.png";
+    std::string basePath = "/data/themes/a";
+    std::string result = ThemeResource::GetRelativePath(path, basePath);
+    EXPECT_EQ(result, "/data/themes/b/app/icons/icon_mask.png");
+}
+
+/*
+ * @tc.name: ThemeResourceGetRelativePathTest004
+ * @tc.desc: Test GetRelativePath when path equals basePath.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeResourceTest, ThemeResourceGetRelativePathTest004, TestSize.Level1)
+{
+    std::string path = "/data/themes/a";
+    std::string basePath = "/data/themes/a";
+    std::string result = ThemeResource::GetRelativePath(path, basePath);
+    EXPECT_EQ(result, "/data/themes/a");
+}
+
+/*
+ * @tc.name: ThemeResourceGetRelativePathTest005
+ * @tc.desc: Test GetRelativePath with empty path.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeResourceTest, ThemeResourceGetRelativePathTest005, TestSize.Level1)
+{
+    std::string path = "";
+    std::string basePath = "/data/themes/a";
+    std::string result = ThemeResource::GetRelativePath(path, basePath);
+    EXPECT_EQ(result, "");
+}
 }

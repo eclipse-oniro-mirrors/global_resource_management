@@ -62,9 +62,11 @@ class ThemeResource {
 public:
     ThemeResource(std::string path);
     ~ThemeResource();
-    static const std::shared_ptr<ThemeResource> LoadThemeResource(const std::string& rootDir);
+    static const std::shared_ptr<ThemeResource> LoadThemeResource(const std::string& rootDir,
+        const std::string &basePath = "");
     static const std::shared_ptr<ThemeResource> LoadThemeIconResource(const std::string& rootDir,
-        bool printLog = false);
+        const std::string &basePath = "", bool printLog = false);
+    static std::string GetRelativePath(const std::string &path, const std::string &basePath);
     class ThemeQualifierValue {
     public:
         inline const std::string GetResValue() const
@@ -113,9 +115,8 @@ public:
      * @param name the resource name
      * @return the theme value vector
      */
-    std::vector<std::shared_ptr<ThemeResource::ThemeValue> >  GetThemeValues(
-        const std::pair<std::string, std::string> &bundInfo,
-        const ResType &resType, const std::string &name);
+    std::vector<std::shared_ptr<ThemeResource::ThemeValue>> GetThemeValues(
+        const std::pair<std::string, std::string> &bundInfo, const ResType &resType, const std::string &name);
 
     /**
      * Get the theme icon related bundlename, modulename and resource name.

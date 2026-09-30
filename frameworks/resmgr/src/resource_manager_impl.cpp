@@ -1532,11 +1532,11 @@ RState ResourceManagerImpl::GetThemeMedia(const std::shared_ptr<IdItem> idItem, 
     GetResConfig(resConfig);
     std::vector<std::shared_ptr<IdItem>> idItems;
     idItems.emplace_back(idItem);
-    std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(
-        bundleInfo, idItems, resConfig, userId);
+    auto themeManager = ThemePackManager::GetThemePackManager();
+    std::string result = themeManager->FindThemeResource(bundleInfo, idItems, resConfig, userId);
     outValue = Utils::LoadResourceFile(result, len);
     if (outValue == nullptr) {
-        RESMGR_HILOGW(RESMGR_TAG, "GetThemeMedia LoadResourceFile null");
+        RESMGR_HILOGW(RESMGR_TAG, "GetThemeMedia null, path=%{public}s", themeManager->GetLogPath(result).c_str());
     }
     return result.empty() ? ERROR_CODE_RES_ID_NOT_FOUND : SUCCESS;
 }
@@ -1735,9 +1735,9 @@ std::string GetSuffix(const std::shared_ptr<IdItem> &idItem)
 RState ResourceManagerImpl::GetThemeIcon(const std::shared_ptr<IdItem> idItem, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue, uint32_t density)
 {
+    auto themeManager = ThemePackManager::GetThemePackManager();
     std::string iconName = idItem->name_;
-    std::string result = ThemePackManager::GetThemePackManager()->FindThemeIconResource(
-        bundleInfo, iconName, userId);
+    std::string result = themeManager->FindThemeIconResource(bundleInfo, iconName, userId);
     if (result.empty()) {
         RESMGR_HILOGD(RESMGR_TAG,
             "GetThemeIcon FAILED bundlename = %{public}s, modulename = %{public}s, iconName = %{public}s",
@@ -1746,7 +1746,7 @@ RState ResourceManagerImpl::GetThemeIcon(const std::shared_ptr<IdItem> idItem, s
     }
     outValue = Utils::LoadResourceFile(result, len);
     if (outValue == nullptr) {
-        RESMGR_HILOGW(RESMGR_TAG, "GetThemeIcon LoadResourceFile null");
+        RESMGR_HILOGW(RESMGR_TAG, "GetThemeIcon null, path=%{public}s", themeManager->GetLogPath(result).c_str());
     }
     return SUCCESS;
 }
@@ -1776,7 +1776,12 @@ RState ResourceManagerImpl::GetDrawableInfoById(uint32_t id, std::string &type, 
         RESMGR_HILOGE(RESMGR_TAG, "GetDrawableInfoById id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
-    type = GetSuffix(qualifierDir->GetIdItem());
+    std::shared_ptr<IdItem> idItem = qualifierDir->GetIdItem();
+    if (idItem == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetDrawableInfoById idItem null, id = %{public}d", id);
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
+    type = GetSuffix(idItem);
     if (type.empty()) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get resourceType");
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
@@ -1800,7 +1805,12 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name, std::string 
         RESMGR_HILOGD(RESMGR_TAG, "GetDrawableInfoByName error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
-    type = GetSuffix(qualifierDir->GetIdItem());
+    std::shared_ptr<IdItem> idItem = qualifierDir->GetIdItem();
+    if (idItem == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetDrawableInfoByName idItem null, name = %{public}s", name);
+        return ERROR_CODE_RES_NAME_NOT_FOUND;
+    }
+    type = GetSuffix(idItem);
     if (type.empty()) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get resourceType");
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
@@ -1821,14 +1831,18 @@ RState ResourceManagerImpl::GetDrawableInfoById(uint32_t id,
         RESMGR_HILOGE(RESMGR_TAG, "GetDrawableInfoById error id = %{public}d", id);
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
-    std::string type = GetSuffix(qualifierDir->GetIdItem());
+    std::shared_ptr<IdItem> idItem = qualifierDir->GetIdItem();
+    if (idItem == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetDrawableInfoById idItem null, id = %{public}d", id);
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
+    std::string type = GetSuffix(idItem);
     if (type.empty()) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get resourceType");
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
     size_t len = 0;
     // find in theme
-    const std::shared_ptr<IdItem> idItem = qualifierDir->GetIdItem();
     std::string themeMask = ThemePackManager::GetThemePackManager()->GetMask();
     if (GetThemeDrawable(idItem, len, outValue, iconType, density) == SUCCESS) {
         drawableInfo = std::make_tuple(type, len, themeMask);
@@ -1857,7 +1871,12 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name,
         RESMGR_HILOGD(RESMGR_TAG, "GetDrawableInfoByName error name = %{public}s", name);
         return ERROR_CODE_RES_NAME_NOT_FOUND;
     }
-    std::string type = GetSuffix(qualifierDir->GetIdItem());
+    std::shared_ptr<IdItem> idItem = qualifierDir->GetIdItem();
+    if (idItem == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "GetDrawableInfoByName idItem null, name = %{public}s", name);
+        return ERROR_CODE_RES_NAME_NOT_FOUND;
+    }
+    std::string type = GetSuffix(idItem);
     if (type.empty()) {
         RESMGR_HILOGE(RESMGR_TAG, "failed to get resourceType");
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
@@ -1865,11 +1884,6 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name,
     size_t len = 0;
     // find in theme
     std::string themeMask = ThemePackManager::GetThemePackManager()->GetMask();
-    const std::shared_ptr<IdItem> idItem = qualifierDir->GetIdItem();
-    if (idItem == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "GetDrawableInfoByName idItem null, name = %{public}s", name);
-        return ERROR_CODE_RES_ID_NOT_FOUND;
-    }
     if (GetThemeDrawable(idItem, len, outValue, iconType, density) == SUCCESS) {
         drawableInfo = std::make_tuple(type, len, themeMask);
         return SUCCESS;
@@ -2075,8 +2089,8 @@ void ResourceManagerImpl::GetLocales(std::vector<std::string> &outValue, bool in
 RState ResourceManagerImpl::GetThemeIconInfo(const std::string &iconName, size_t &len,
     std::unique_ptr<uint8_t[]> &outValue, const std::string &abilityName, bool printLog)
 {
-    std::string result = ThemePackManager::GetThemePackManager()->FindThemeIconResource(
-        bundleInfo, iconName, userId, abilityName);
+    auto themeManager = ThemePackManager::GetThemePackManager();
+    std::string result = themeManager->FindThemeIconResource(bundleInfo, iconName, userId, abilityName);
     if (result.empty()) {
         if (printLog) {
             RESMGR_HILOGE(RESMGR_TAG, "ThemeIcon err. name:%{public}s bundle:%{public}s ability:%{public}s.",
@@ -2087,7 +2101,8 @@ RState ResourceManagerImpl::GetThemeIconInfo(const std::string &iconName, size_t
     outValue = Utils::LoadResourceFile(result, len);
     if (outValue == nullptr) {
         if (printLog) {
-            RESMGR_HILOGE(RESMGR_TAG, "ThemeIcon LoadFile err. name:%{public}s.", iconName.c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "ThemeIcon LoadFile err. name:%{public}s, path:%{public}s.", iconName.c_str(),
+                themeManager->GetLogPath(result).c_str());
         }
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }

@@ -49,7 +49,9 @@ public:
      *
      * @param bundleName the hap bundleName
      * @param moduleName the hap moduleName
-     * @param userId the uesr id
+     * @param userId the user id
+     * @param rootDirs the theme skins dirs output
+     * @param iconDirs the theme icons dirs output
      */
     void LoadSAThemeRes(const std::string &bundleName, const std::string &moduleName,
         int32_t userId, std::vector<std::string> &rootDirs, std::vector<std::string> &iconDirs);
@@ -60,9 +62,11 @@ public:
      * @param bundleName the hap bundleName
      * @param moduleName the hap moduleName
      * @param rootDirs the theme skins dirs
+     * @param userId the user id
+     * @param basePath the base path for relative path conversion
      */
     void LoadThemeSkinResource(const std::string &bundleName, const std::string &moduleName,
-        const std::vector<std::string> &rootDirs, int32_t userId);
+        const std::vector<std::string> &rootDirs, int32_t userId, const std::string &basePath = "");
 
     /**
      * Load the icons dir resource int theme pack.
@@ -70,9 +74,11 @@ public:
      * @param bundleName the bundleName
      * @param moduleName the moduleName
      * @param rootDirs the theme icons dirs
+     * @param userId the user id
+     * @param basePath the base path for relative path conversion
      */
     void LoadThemeIconsResource(const std::string &bundleName, const std::string &moduleName,
-        const std::vector<std::string> &rootDirs, int32_t userId);
+        const std::vector<std::string> &rootDirs, int32_t userId, const std::string &basePath = "");
 
     /**
      * Get the theme resource related to bundlename, modulename, resType, resName and resConfig.
@@ -112,13 +118,20 @@ public:
     const std::string FindThemeIconResource(const std::pair<std::string, std::string> &bundleInfo,
         const std::string &iconName, int32_t userId, const std::string &abilityName = "");
 
+    inline std::string GetBasePath() const
+    {
+        std::lock_guard<std::mutex> lock(this->lockBasePath_);
+        return basePath_;
+    }
+
     inline const std::string GetMask() const
     {
         std::lock_guard<std::mutex> lock(this->lockHighlightIcon_);
-        return themeMask_;
+        return BuildFullPath(themeMask_);
     }
 
     const std::string ReplaceUserIdInPath(const std::string &originalPath, int32_t userId);
+    const std::string GetLogPath(const std::string &path);
 
     bool UpdateThemeId(uint32_t newThemeId);
 
@@ -143,8 +156,8 @@ public:
      * @param userId the user id
      * @return SUCCESS if the theme icon get success, else failed
      */
-    RState GetOtherIconsInfo(const std::string &iconName,
-        std::unique_ptr<uint8_t[]> &outValue, size_t &len, bool isGlobalMask, int32_t userId);
+    RState GetOtherIconsInfo(const std::string &iconName, std::unique_ptr<uint8_t[]> &outValue, size_t &len,
+        bool isGlobalMask, int32_t userId);
 
     /**
      * Get icons info of icon_highlightstroke
@@ -206,17 +219,24 @@ private:
         const std::vector<std::shared_ptr<ThemeResource::ThemeValue> > &candidates,
         const ResConfigImpl &resConfig);
 
-    std::vector<std::string> GetRootDir(const std::string &strCurrentDir);
-    std::vector<std::string> GetThemeSkinRootDir(const std::string &newPath, const std::string &oldPath);
+    std::vector<std::string> GetRootDir(const std::string &strCurrentDir, const std::string &basePath = "");
+    std::vector<std::string> GetThemeSkinRootDir(const std::string &newPath, const std::string &oldPath,
+        const std::string &basePath = "");
     bool IsSameResourceByUserId(const std::string &path, int32_t userId);
+    void UpdateBasePath(int32_t userId);
     void UpdateUserId(int32_t userId);
+    int32_t GetCurrentUserId();
+    std::string BuildFullPath(const std::string &relativePath) const;
+    std::string GetCanonicalBasePath(const std::string &basePath);
     std::mutex lockSkin_;
     std::mutex lockIcon_;
     std::mutex lockThemeId_;
     std::mutex lockIconValue_;
     mutable std::mutex lockHighlightIcon_;
+    mutable std::mutex lockBasePath_;
     std::mutex lockUserId_;
     uint32_t themeId_{0};
+    std::string basePath_;
     bool isFirstCreate = true;
     int32_t currentUserId_ = 0;
     const bool isLogFlag_ = false;
