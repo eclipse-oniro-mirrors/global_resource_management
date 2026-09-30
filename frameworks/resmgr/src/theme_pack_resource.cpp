@@ -133,9 +133,8 @@ void ThemeResource::InitThemeRes(std::pair<std::string, std::string> bundleInfo,
             }
             auto themeValue = std::make_shared<ThemeValue>();
             ThemeKey themeKey = ThemeKey(bundleInfo.first, bundleInfo.second, resType, name->valuestring);
-            auto themeQualifierValue = std::make_shared<ThemeQualifierValue>(themeKey, themeConfig,
-                value->valuestring);
-            themeValue->AddThemeLimitPath(themeQualifierValue);
+            auto qualifier = std::make_shared<ThemeQualifierValue>(themeKey, themeConfig, value->valuestring);
+            themeValue->AddThemeLimitPath(qualifier);
             themeValueVec_.emplace_back(std::make_tuple(resType, name->valuestring, themeValue));
             childValue = childValue->next;
         }
@@ -299,7 +298,16 @@ std::tuple<std::string, std::string> GetBundleInfo(const std::string& rootDir, c
     return bundleInfoTuple;
 }
 
-const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeResource(const std::string& rootDir)
+std::string ThemeResource::GetRelativePath(const std::string &path, const std::string &basePath)
+{
+    if (!basePath.empty() && path.size() > basePath.size() && path.find(basePath) == 0) {
+        return path.substr(basePath.size() + 1);
+    }
+    return path;
+}
+
+const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeResource(const std::string& rootDir,
+    const std::string &basePath)
 {
     if (rootDir.empty()) {
         RESMGR_HILOGE(RESMGR_TAG, "Invalid rootDir in LoadThemeResource = %{public}s", rootDir.c_str());
@@ -320,10 +328,12 @@ const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeResource(const std:
             continue;
         }
         std::string tail = path.substr(pos + 1);
+        std::string bundleName = std::get<FIRST_ELEMENT>(bundleInfo);
+        std::string moduleName = std::get<SECOND_ELEMENT>(bundleInfo);
         if (tail == "json") {
-            themeResource->ParseJson(std::get<FIRST_ELEMENT>(bundleInfo), std::get<SECOND_ELEMENT>(bundleInfo), path);
+            themeResource->ParseJson(bundleName, moduleName, path);
         } else {
-            themeResource->ParseIcon(std::get<FIRST_ELEMENT>(bundleInfo), std::get<SECOND_ELEMENT>(bundleInfo), path);
+            themeResource->ParseIcon(bundleName, moduleName, ThemeResource::GetRelativePath(path, basePath));
         }
     }
     return themeResource;
@@ -360,7 +370,8 @@ void ThemeResource::AddIconValue(const std::string &bundleName, const std::strin
     iconValues_.emplace_back(std::make_pair(themeKey, path));
 }
 
-const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeIconResource(const std::string& iconPath, bool printLog)
+const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeIconResource(const std::string& iconPath,
+    const std::string &basePath, bool printLog)
 {
     if (iconPath.empty()) {
         return nullptr;
@@ -382,31 +393,32 @@ const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeIconResource(const 
             continue;
         }
         std::string iconName = path.substr(pos2 + 1, pos1 - pos2 - 1);
+        std::string relativePath = ThemeResource::GetRelativePath(path, basePath);
         if (path.find(DYNAMIC_ICON) != std::string::npos) {
             auto pos3 = path.find('/', iconPath.length() + 1);
             if (pos3 == std::string::npos || pos3 < iconPath.length() + 1) {
                 continue;
             }
             std::string dynamicBundle = path.substr(iconPath.length() + 1, pos3 - iconPath.length() - 1);
-            themeResource->AddIconValue(bundleName, dynamicBundle, iconName, path);
+            themeResource->AddIconValue(bundleName, dynamicBundle, iconName, relativePath);
             iconList += iconName + ";";
             continue;
         }
 
         auto pos3 = path.find('/', iconPath.length() + 1);
         if (pos3 == std::string::npos || pos3 < iconPath.length() + 1) {
-            themeResource->AddIconValue(bundleName, "", iconName, path);
+            themeResource->AddIconValue(bundleName, "", iconName, relativePath);
             continue;
         }
 
         auto pos4 = path.find('/', pos3 + 1);
         if (pos4 == std::string::npos || pos4 < pos3 + 1 || pos4 != pos2) {
-            themeResource->AddIconValue(bundleName, "", iconName, path);
+            themeResource->AddIconValue(bundleName, "", iconName, relativePath);
             continue;
         }
 
         std::string abilityName = path.substr(pos3 + 1, pos4 - pos3 - 1);
-        themeResource->AddIconValue(bundleName, "", iconName, path, abilityName);
+        themeResource->AddIconValue(bundleName, "", iconName, relativePath, abilityName);
     }
     if (!iconList.empty() && printLog) {
         RESMGR_HILOGI(RESMGR_TAG, "load dynamic icon: %{public}s.", iconList.c_str());

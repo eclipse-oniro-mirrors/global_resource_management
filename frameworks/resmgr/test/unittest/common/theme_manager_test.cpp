@@ -908,4 +908,91 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestFindThemeResourceNullIdItemTest001, T
     std::string result = tm->FindThemeResource(bundleInfo, idItems, resConfig, userId);
     EXPECT_TRUE(result.empty());
 }
+
+/*
+ * @tc.name: ThemeManagerTestLoadThemeSkinResourceWithBasePathTest001
+ * @tc.desc: Test LoadThemeSkinResource with basePath parameter, verify JSON color value not affected by basePath.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceWithBasePathTest001, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    std::vector<std::string> rootDirs;
+    rootDirs.emplace_back("/data/test/theme/skin/ohos.global.test.all");
+    int32_t userId = 100;
+    std::string basePath = "/data/test/theme";
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId, basePath);
+    int id = rmc->GetResId("base_only", ResType::COLOR);
+    uint32_t outValue;
+    rm->GetColorById(id, outValue);
+    ASSERT_EQ(4294967295, outValue); // base_only theme value is #ffffff
+}
+
+/*
+ * @tc.name: ThemeManagerTestLoadThemeIconsResourceWithBasePathTest001
+ * @tc.desc: Test LoadThemeIconsResource with basePath parameter, icons stored as relative path.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeIconsResourceWithBasePathTest001, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    std::vector<std::string> rootDirs;
+    rootDirs.emplace_back("/data/test/theme/icons/ohos.global.test.all");
+    int32_t userId = 100;
+    std::string basePath = "/data/test/theme";
+    // basePath_ is empty in test env (no flag files), so BuildFullPath cannot reconstruct full path.
+    // This test verifies the loading API does not crash with basePath parameter.
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", rootDirs, userId, basePath);
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", {}, userId);
+    SUCCEED();
+}
+
+/*
+ * @tc.name: ThemeManagerTestUpdateThemeIdTest001
+ * @tc.desc: Test UpdateThemeId returns true when themeId changes.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestUpdateThemeIdTest001, TestSize.Level1)
+{
+    bool result = tm->UpdateThemeId(999);
+    EXPECT_TRUE(result);
+    result = tm->UpdateThemeId(999);
+    EXPECT_FALSE(result);
+    result = tm->UpdateThemeId(0);
+    EXPECT_FALSE(result);
+    result = tm->UpdateThemeId(1000);
+    EXPECT_TRUE(result);
+}
+
+/*
+ * @tc.name: ThemeManagerTestGetLogPathTest001
+ * @tc.desc: Test GetLogPath returns original path when basePath_ is empty.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestGetLogPathTest001, TestSize.Level1)
+{
+    std::string path = "/data/themes/a/app/icons/icon_mask.png";
+    std::string result = tm->GetLogPath(path);
+    EXPECT_EQ(result, path); // basePath_ is empty in test env, returns original path
+}
+
+/*
+ * @tc.name: ThemeManagerTestGetMaskTest001
+ * @tc.desc: Test GetMask returns non-empty after loading icons with icon_mask file.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestGetMaskTest001, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    std::vector<std::string> rootDirs;
+    rootDirs.emplace_back("/data/test/theme/icons/ohos.global.test.all");
+    int32_t userId = 100;
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", rootDirs, userId);
+    std::string mask = tm->GetMask();
+    EXPECT_FALSE(mask.empty());
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", {}, userId);
+}
 }

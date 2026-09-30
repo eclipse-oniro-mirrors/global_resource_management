@@ -51,6 +51,11 @@ const std::string ABSOLUTE_THEME_SKIN_B_PATH = "/data/service/el1/public/themes/
 const std::string ABSOLUTE_THEME_ICONS_A = "/data/service/el1/public/themes/<currentUserId>/a/app/icons";
 const std::string ABSOLUTE_THEME_ICONS_B = "/data/service/el1/public/themes/<currentUserId>/b/app/icons";
 const std::string ABSOLUTE_THEME_PATH = "/data/service/el1/public/themes/";
+const std::string THEME_BASE_PATH_A = "/data/themes/a";
+const std::string THEME_BASE_PATH_B = "/data/themes/b";
+const std::string ABSOLUTE_THEME_BASE_PATH_A = "/data/service/el1/public/themes/<currentUserId>/a";
+const std::string ABSOLUTE_THEME_BASE_PATH_B = "/data/service/el1/public/themes/<currentUserId>/b";
+
 ThemePackManager::ThemePackManager() : isLogFlag_(Utils::IsFileExist(ABSOLUTE_THEME_PATH))
 {}
 
@@ -70,7 +75,7 @@ std::shared_ptr<ThemePackManager> ThemePackManager::GetThemePackManager()
     return themeMgr;
 }
 
-std::vector<std::string> ThemePackManager::GetRootDir(const std::string &strCurrentDir)
+std::vector<std::string> ThemePackManager::GetRootDir(const std::string &strCurrentDir, const std::string &basePath)
 {
     std::vector<std::string> vDir;
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
@@ -84,6 +89,8 @@ std::vector<std::string> ThemePackManager::GetRootDir(const std::string &strCurr
         return vDir;
     }
     struct dirent *pDir = nullptr;
+    std::string maskPath;
+    std::string strokePath;
     while ((pDir = readdir(dir.get())) != nullptr) {
         if (strcmp(pDir->d_name, ".") == 0 || strcmp(pDir->d_name, "..") == 0) {
             continue;
@@ -92,24 +99,33 @@ std::vector<std::string> ThemePackManager::GetRootDir(const std::string &strCurr
             vDir.emplace_back(strNextDir);
         } else if (pDir->d_type == 8) { // 8 means file
             std::string filePath = std::string(resolvedPath) + "/" + pDir->d_name;
-            std::lock_guard<std::mutex> lock(this->lockHighlightIcon_);
             if (filePath.find("icon_mask") != std::string::npos) {
-                themeMask_ = filePath;
+                maskPath = ThemeResource::GetRelativePath(filePath, basePath);
             }
             if (filePath.find("icon_highlightstroke") != std::string::npos) {
-                themeStroke_ = filePath;
+                strokePath = ThemeResource::GetRelativePath(filePath, basePath);
             }
+        }
+    }
+    if (!maskPath.empty() || !strokePath.empty()) {
+        std::lock_guard<std::mutex> lock(this->lockHighlightIcon_);
+        if (!maskPath.empty()) {
+            themeMask_ = maskPath;
+        }
+        if (!strokePath.empty()) {
+            themeStroke_ = strokePath;
         }
     }
 #endif
     return vDir;
 }
 
-std::vector<std::string> ThemePackManager::GetThemeSkinRootDir(const std::string &newPath, const std::string &oldPath)
+std::vector<std::string> ThemePackManager::GetThemeSkinRootDir(const std::string &newPath, const std::string &oldPath,
+    const std::string &basePath)
 {
-    std::vector<std::string> result = GetRootDir(newPath);
+    std::vector<std::string> result = GetRootDir(newPath, basePath);
     if (result.empty()) {
-        result = GetRootDir(oldPath);
+        result = GetRootDir(oldPath, basePath);
     }
     return result;
 }
@@ -130,7 +146,7 @@ void ThemePackManager::ClearSkinResource()
 }
 
 void ThemePackManager::LoadThemeSkinResource(const std::string &bundleName, const std::string &moduleName,
-    const std::vector<std::string> &rootDirs, int32_t userId)
+    const std::vector<std::string> &rootDirs, int32_t userId, const std::string &basePath)
 {
     std::lock_guard<std::mutex> lock(this->lockSkin_);
     ChangeSkinResourceStatus(userId);
@@ -148,7 +164,7 @@ void ThemePackManager::LoadThemeSkinResource(const std::string &bundleName, cons
         if (tempBundleName != bundleName && tempBundleName != "systemRes") {
             continue;
         }
-        auto pThemeResource = ThemeResource::LoadThemeResource(dir);
+        auto pThemeResource = ThemeResource::LoadThemeResource(dir, basePath);
         if (pThemeResource != nullptr) {
             this->skinResource_.emplace_back(pThemeResource);
         }
@@ -159,20 +175,22 @@ void ThemePackManager::LoadThemeSkinResource(const std::string &bundleName, cons
 void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::string &moduleName, int32_t userId)
 {
     UpdateUserId(userId);
+    UpdateBasePath(userId);
     ClearHighlightIcon();
     std::vector<std::string> rootDirs;
     std::vector<std::string> iconDirs;
+    std::string basePath = GetBasePath();
     if (Utils::IsFileExist(THEME_FLAG_A)) {
-        rootDirs = GetThemeSkinRootDir(THEME_SKIN_A_PATH, THEME_SKIN_A);
-        iconDirs = GetRootDir(THEME_ICONS_A);
+        rootDirs = GetThemeSkinRootDir(THEME_SKIN_A_PATH, THEME_SKIN_A, basePath);
+        iconDirs = GetRootDir(THEME_ICONS_A, basePath);
     } else if (Utils::IsFileExist(THEME_FLAG_B)) {
-        rootDirs = GetThemeSkinRootDir(THEME_SKIN_B_PATH, THEME_SKIN_B);
-        iconDirs = GetRootDir(THEME_ICONS_B);
+        rootDirs = GetThemeSkinRootDir(THEME_SKIN_B_PATH, THEME_SKIN_B, basePath);
+        iconDirs = GetRootDir(THEME_ICONS_B, basePath);
     } else {
         LoadSAThemeRes(bundleName, moduleName, userId, rootDirs, iconDirs);
     }
-    LoadThemeSkinResource(bundleName, moduleName, rootDirs, userId);
-    LoadThemeIconsResource(bundleName, moduleName, iconDirs, userId);
+    LoadThemeSkinResource(bundleName, moduleName, rootDirs, userId, basePath);
+    LoadThemeIconsResource(bundleName, moduleName, iconDirs, userId, basePath);
     return;
 }
 
@@ -180,59 +198,62 @@ void ThemePackManager::LoadThemeIconRes(const std::string &bundleName, const std
 {
     UpdateUserId(userId);
     ClearHighlightIcon();
+    std::string basePath = GetBasePath();
     std::vector<std::string> iconDirs;
     if (Utils::IsFileExist(THEME_FLAG_A)) {
-        iconDirs = GetRootDir(THEME_ICONS_A);
+        iconDirs = GetRootDir(THEME_ICONS_A, basePath);
     } else if (Utils::IsFileExist(THEME_FLAG_B)) {
-        iconDirs = GetRootDir(THEME_ICONS_B);
+        iconDirs = GetRootDir(THEME_ICONS_B, basePath);
     } else {
         if (Utils::IsFileExist(ReplaceUserIdInPath(ABSOLUTE_THEME_FLAG_A, userId))) {
-            iconDirs = GetRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_ICONS_A, userId));
+            iconDirs = GetRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_ICONS_A, userId), basePath);
         } else if (Utils::IsFileExist(ReplaceUserIdInPath(ABSOLUTE_THEME_FLAG_B, userId))) {
-            iconDirs = GetRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_ICONS_B, userId));
+            iconDirs = GetRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_ICONS_B, userId), basePath);
         } else {
             RESMGR_HILOGE(RESMGR_TAG, "LoadThemesRes failed, userId = %{public}d, bundleName = %{public}s",
                 userId, bundleName.c_str());
         }
     }
-    LoadThemeIconsResource(bundleName, moduleName, iconDirs, userId);
+    LoadThemeIconsResource(bundleName, moduleName, iconDirs, userId, basePath);
 }
 
 void ThemePackManager::LoadThemeSkinRes(const std::string &bundleName, const std::string &moduleName, int32_t userId)
 {
     UpdateUserId(userId);
+    std::string basePath = GetBasePath();
     std::vector<std::string> rootDirs;
     if (Utils::IsFileExist(THEME_FLAG_A)) {
-        rootDirs = GetThemeSkinRootDir(THEME_SKIN_A_PATH, THEME_SKIN_A);
+        rootDirs = GetThemeSkinRootDir(THEME_SKIN_A_PATH, THEME_SKIN_A, basePath);
     } else if (Utils::IsFileExist(THEME_FLAG_B)) {
-        rootDirs = GetThemeSkinRootDir(THEME_SKIN_B_PATH, THEME_SKIN_B);
+        rootDirs = GetThemeSkinRootDir(THEME_SKIN_B_PATH, THEME_SKIN_B, basePath);
     } else {
         if (Utils::IsFileExist(ReplaceUserIdInPath(ABSOLUTE_THEME_FLAG_A, userId))) {
             rootDirs = GetThemeSkinRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_A_PATH, userId),
-                ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_A, userId));
+                ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_A, userId), basePath);
         } else if (Utils::IsFileExist(ReplaceUserIdInPath(ABSOLUTE_THEME_FLAG_B, userId))) {
-                rootDirs = GetThemeSkinRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_B_PATH, userId),
-                    ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_B, userId));
+            rootDirs = GetThemeSkinRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_B_PATH, userId),
+                ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_B, userId), basePath);
         } else {
             RESMGR_HILOGE(RESMGR_TAG, "LoadThemesRes failed, userId = %{public}d, bundleName = %{public}s",
                 userId, bundleName.c_str());
         }
     }
-    LoadThemeSkinResource(bundleName, moduleName, rootDirs, userId);
+    LoadThemeSkinResource(bundleName, moduleName, rootDirs, userId, basePath);
     return;
 }
 
 void ThemePackManager::LoadSAThemeRes(const std::string &bundleName, const std::string &moduleName,
     int32_t userId, std::vector<std::string> &rootDirs, std::vector<std::string> &iconDirs)
 {
+    std::string basePath = GetBasePath();
     if (Utils::IsFileExist(ReplaceUserIdInPath(ABSOLUTE_THEME_FLAG_A, userId))) {
         rootDirs = GetThemeSkinRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_A_PATH, userId),
-            ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_A, userId));
-        iconDirs = GetRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_ICONS_A, userId));
+            ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_A, userId), basePath);
+        iconDirs = GetRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_ICONS_A, userId), basePath);
     } else if (Utils::IsFileExist(ReplaceUserIdInPath(ABSOLUTE_THEME_FLAG_B, userId))) {
         rootDirs = GetThemeSkinRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_B_PATH, userId),
-            ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_B, userId));
-        iconDirs = GetRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_ICONS_B, userId));
+            ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_B, userId), basePath);
+        iconDirs = GetRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_ICONS_B, userId), basePath);
     } else {
         RESMGR_HILOGE(RESMGR_TAG, "LoadThemesRes failed, userId = %{public}d, bundleName = %{public}s",
             userId, bundleName.c_str());
@@ -285,7 +306,11 @@ const std::string ThemePackManager::GetThemeResource(const std::pair<std::string
         RESMGR_HILOGD(RESMGR_TAG, "themeQualifierValue == nullptr");
         return std::string("");
     }
-    return themeQualifierValue->GetResValue();
+    std::string resValue = themeQualifierValue->GetResValue();
+    if (resType == MEDIA) {
+        return BuildFullPath(resValue);
+    }
+    return resValue;
 }
 
 std::vector<std::shared_ptr<ThemeResource::ThemeValue> > ThemePackManager::GetThemeResourceList(
@@ -376,7 +401,7 @@ void ThemePackManager::ClearHighlightIcon()
 }
 
 void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, const std::string &moduleName,
-    const std::vector<std::string> &rootDirs, int32_t userId)
+    const std::vector<std::string> &rootDirs, int32_t userId, const std::string &basePath)
 {
     std::lock_guard<std::mutex> lock(this->lockIcon_);
     ChangeIconResourceStatus(userId);
@@ -392,7 +417,7 @@ void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, con
             continue;
         }
         RESMGR_HILOGW_BY_FLAG(isLogFlag_, RESMGR_TAG, "load img, %{public}s", GetMaskString(dir).c_str());
-        auto pThemeResource = ThemeResource::LoadThemeIconResource(dir, isLogFlag_);
+        auto pThemeResource = ThemeResource::LoadThemeIconResource(dir, basePath, isLogFlag_);
         if (pThemeResource != nullptr) {
             this->iconResource_.emplace_back(pThemeResource);
         }
@@ -416,6 +441,7 @@ const std::string ThemePackManager::FindThemeIconResource(const std::pair<std::s
         }
         result = pThemeResource->GetThemeAppIcon(bundleInfo, iconName, abilityName);
         if (!result.empty()) {
+            result = BuildFullPath(result);
             RESMGR_HILOGW_BY_FLAG(isLogFlag_, RESMGR_TAG, "find img, %{public}s", GetMaskString(result).c_str());
             break;
         }
@@ -429,6 +455,7 @@ bool ThemePackManager::UpdateThemeId(uint32_t newThemeId)
     if (newThemeId != 0 && newThemeId != themeId_) {
         RESMGR_HILOGW(RESMGR_TAG, "update theme, themeId_= %{public}d, newThemeId= %{public}d", themeId_, newThemeId);
         themeId_ = newThemeId;
+        UpdateBasePath(GetCurrentUserId());
         return true;
     }
     return false;
@@ -470,7 +497,7 @@ RState ThemePackManager::GetOtherIconsInfo(const std::string &iconName,
     std::string iconTag;
     if (iconName.find("icon_mask") != std::string::npos && isGlobalMask) {
         std::lock_guard<std::mutex> lock(this->lockHighlightIcon_);
-        iconPath = themeMask_;
+        iconPath = BuildFullPath(themeMask_);
         iconTag = "global_" + iconName;
     } else {
         std::pair<std::string, std::string> bundleInfo;
@@ -522,7 +549,7 @@ RState ThemePackManager::GetHighlightIconInfo(const std::string &iconName, std::
         outValue = std::move(iconInfo);
         return SUCCESS;
     }
-    iconPath = themeStroke_;
+    iconPath = BuildFullPath(themeStroke_);
     if (iconPath.empty()) {
         RESMGR_HILOGD(RESMGR_TAG, "no found, iconTag = %{public}s", iconTag.c_str());
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
@@ -579,23 +606,50 @@ void ThemePackManager::UpdateUserId(int32_t userId)
 {
     std::lock_guard<std::mutex> lock(this->lockUserId_);
     if (userId != 0 && currentUserId_ != userId) {
-        RESMGR_HILOGW(RESMGR_TAG,
-            "update userId, currentUserId_= %{public}d, userId= %{public}d", currentUserId_, userId);
+        RESMGR_HILOGW(RESMGR_TAG, "update userId, %{public}d -> %{public}d", currentUserId_, userId);
         currentUserId_ = userId;
+        UpdateBasePath(userId);
     }
+}
+
+int32_t ThemePackManager::GetCurrentUserId()
+{
+    std::lock_guard<std::mutex> lock(this->lockUserId_);
+    return currentUserId_;
+}
+
+void ThemePackManager::UpdateBasePath(int32_t userId)
+{
+    std::string basePath;
+    if (Utils::IsFileExist(THEME_FLAG_A)) {
+        basePath = GetCanonicalBasePath(THEME_BASE_PATH_A);
+    } else if (Utils::IsFileExist(THEME_FLAG_B)) {
+        basePath = GetCanonicalBasePath(THEME_BASE_PATH_B);
+    } else {
+        std::string flagA = ReplaceUserIdInPath(ABSOLUTE_THEME_FLAG_A, userId);
+        if (Utils::IsFileExist(flagA)) {
+            basePath = GetCanonicalBasePath(ReplaceUserIdInPath(ABSOLUTE_THEME_BASE_PATH_A, userId));
+        } else {
+            std::string flagB = ReplaceUserIdInPath(ABSOLUTE_THEME_FLAG_B, userId);
+            if (Utils::IsFileExist(flagB)) {
+                basePath = GetCanonicalBasePath(ReplaceUserIdInPath(ABSOLUTE_THEME_BASE_PATH_B, userId));
+            }
+        }
+    }
+    std::lock_guard<std::mutex> lock(this->lockBasePath_);
+    basePath_ = basePath;
 }
 
 bool ThemePackManager::IsSameResourceByUserId(const std::string &path, int32_t userId)
 {
-    std::string absolutePath("/data/service/el1/public/themes/");
-    if (path.empty() || path.find(absolutePath) == std::string::npos) {
+    if (path.empty() || path.find(ABSOLUTE_THEME_PATH) == std::string::npos) {
         return true;
     }
-    auto pos = path.find("/", absolutePath.length());
+    auto pos = path.find("/", ABSOLUTE_THEME_PATH.length());
     if (pos == std::string::npos) {
         return true;
     }
-    auto subStr = path.substr(absolutePath.length(), pos - absolutePath.length());
+    auto subStr = path.substr(ABSOLUTE_THEME_PATH.length(), pos - ABSOLUTE_THEME_PATH.length());
     int tmpId = -1;
     if (!Utils::convertToInteger(subStr, tmpId)) {
         return true;
@@ -635,6 +689,46 @@ const std::string ThemePackManager::GetMaskString(const std::string &path)
         return path;
     }
     return path.substr(ABSOLUTE_THEME_PATH.length(), path.length() - ABSOLUTE_THEME_PATH.length());
+}
+
+std::string ThemePackManager::GetCanonicalBasePath(const std::string &basePath)
+{
+    std::string canonicalBasePath;
+    if (!basePath.empty()) {
+        char resolvedBasePath[PATH_MAX] = {0};
+        Utils::CanonicalizePath(basePath.c_str(), resolvedBasePath, PATH_MAX);
+        if (resolvedBasePath[0] != '\0') {
+            canonicalBasePath = std::string(resolvedBasePath);
+        }
+    }
+    return canonicalBasePath;
+}
+
+const std::string ThemePackManager::GetLogPath(const std::string &path)
+{
+    if (path.empty()) {
+        return path;
+    }
+    std::string basePath = GetBasePath();
+    if (basePath.empty() || path.find(basePath) != 0) {
+        return path;
+    }
+    size_t lastSlash = basePath.rfind('/');
+    if (lastSlash == std::string::npos) {
+        return path;
+    }
+    return path.substr(lastSlash + 1);
+}
+
+std::string ThemePackManager::BuildFullPath(const std::string &relativePath) const
+{
+    if (!relativePath.empty() && relativePath.front() != '/') {
+        std::string basePath = GetBasePath();
+        if (!basePath.empty()) {
+            return basePath + "/" + relativePath;
+        }
+    }
+    return relativePath;
 }
 } // namespace Resource
 } // namespace Global
