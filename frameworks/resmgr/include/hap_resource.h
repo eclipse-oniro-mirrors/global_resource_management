@@ -273,6 +273,8 @@ protected:
     bool hasPatch_{false};
 
     bool isOverlayUpdated_{false};
+
+    uint64_t parsedMemory_{0};
 };
 } // namespace Resource
 } // namespace Global

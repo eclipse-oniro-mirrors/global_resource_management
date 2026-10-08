@@ -559,6 +559,22 @@ HWTEST_F(MalformedIndexTest, MalformedV1IndexValidTest001, TestSize.Level1)
 }
 
 /*
+ * @tc.name: MalformedV1IndexMemoryBudgetExceededTest001
+ * @tc.desc: Test V1 parser rejects when parsedMemory_ exceeds MAX_PARSE_MEMORY
+ * @tc.type: FUNC
+ */
+HWTEST_F(MalformedIndexTest, MalformedV1IndexMemoryBudgetExceededTest001, TestSize.Level1)
+{
+    auto buf = BuildValidV1Index();
+    std::shared_ptr<ResConfigImpl> rc = nullptr;
+    HapParserV1 parser(rc, SELECT_ALL, true);
+    SetV1Buffer(parser, buf);
+    parser.parsedMemory_ = MAX_PARSE_MEMORY + 1;
+    int32_t ret = parser.ParseResHex();
+    EXPECT_EQ(ret, SYS_ERROR);
+}
+
+/*
  * @tc.name: MalformedV1IndexFileBasedTest001
  * @tc.desc: Test V1 parser Init with malformed file (empty)
  * @tc.type: FUNC
@@ -774,6 +790,26 @@ HWTEST_F(MalformedIndexTest, MalformedV2IndexIdCountZeroTest001, TestSize.Level1
     uint32_t zero = 0;
     WriteU32(buf, idsOffset + IDSHEADER_IDCOUNT_OFFSET, zero);
     int32_t ret = ParseV2IndexFromBuffer(buf);
+    EXPECT_NE(ret, OK);
+}
+
+/*
+ * @tc.name: MalformedV2IndexMemoryBudgetExceededTest001
+ * @tc.desc: Test V2 parser rejects when parsedMemory_ exceeds MAX_PARSE_MEMORY
+ * @tc.type: FUNC
+ */
+HWTEST_F(MalformedIndexTest, MalformedV2IndexMemoryBudgetExceededTest001, TestSize.Level1)
+{
+    auto buf = BuildValidV2Index();
+    HapParserV2 parser;
+    parser.mMapFile_ = std::make_shared<MmapFile>();
+    parser.mMapFile_->mmapLen_ = buf.size();
+    if (!buf.empty()) {
+        parser.mMapFile_->mmap_ = const_cast<uint8_t *>(buf.data());
+    }
+    parser.parsedMemory_ = MAX_PARSE_MEMORY + 1;
+    int32_t ret = parser.ParseResHex();
+    parser.mMapFile_->mmap_ = nullptr;
     EXPECT_NE(ret, OK);
 }
 
@@ -1182,6 +1218,27 @@ std::shared_ptr<HapResource> LoadV2ResourceFromBuffer(const std::vector<uint8_t>
     return parser.GetHapResource("/data/test/index.index", false, false);
 }
 
+std::vector<uint8_t> BuildV2IndexWithLargeNameAndValueCount(const std::string &resName, uint32_t valueCount)
+{
+    const uint32_t resId = TEST_RES_ID;
+    const uint32_t cfgId = 1;
+    std::vector<uint8_t> buf;
+    V2Pos pos;
+    AppendV2HeaderAndKeys(buf);
+    AppendV2IdsAndItems(buf, resName, resId, pos);
+    FillV2Lengths(buf, pos);
+    WriteU32(buf, pos.nameLenPos - sizeof(uint32_t), static_cast<uint32_t>(buf.size()));
+    PutU32(buf, resId);
+    PutU32(buf, ResInfo::RES_INFO_LEN + valueCount * ConfigItem::CONFIG_ITEM_LEN);
+    PutU32(buf, valueCount);
+    for (uint32_t i = 0; i < valueCount; i++) {
+        PutU32(buf, cfgId);
+        PutU32(buf, PLACEHOLDER_ZERO);
+    }
+    WriteU32(buf, RES_VERSION_LEN, static_cast<uint32_t>(buf.size()));
+    return buf;
+}
+
 /*
  * @tc.name: HapResourceV2GetIdItemWithBadOffsetTest001
  * @tc.desc: Test HapResourceV2 GetIdItem returns nullptr with malformed ConfigItem.offset
@@ -1374,5 +1431,27 @@ HWTEST_F(MalformedIndexTest, HapResourceV2ParseLimitPathsNullMmapFileTest001, Te
 HWTEST_F(MalformedIndexTest, HapResourceV2ParseLimitPathsNullMmapPtrTest001, TestSize.Level1)
 {
     TestParseLimitPathsWithNullMmap(false, true);
+}
+
+/*
+ * @tc.name: HapResourceV2ParseLimitPathsMemoryBudgetExceededTest001
+ * @tc.desc: Test ParseLimitPaths rejects when parsedMemory exceeds MAX_PARSE_MEMORY
+ * @tc.type: FUNC
+ */
+HWTEST_F(MalformedIndexTest, HapResourceV2ParseLimitPathsMemoryBudgetExceededTest001, TestSize.Level1)
+{
+    std::string largeName(50000, 'A');
+    const uint32_t valueCount = 43000;
+    auto buf = BuildV2IndexWithLargeNameAndValueCount(largeName, valueCount);
+    auto pResource = LoadV2ResourceFromBuffer(buf);
+    ASSERT_TRUE(pResource != nullptr);
+    auto v2Resource = (HapResourceV2 *)pResource.get();
+    auto it = v2Resource->idMap_.find(TEST_RES_ID);
+    ASSERT_TRUE(it != v2Resource->idMap_.end());
+    auto idValuesV2 = it->second;
+    ASSERT_TRUE(idValuesV2 != nullptr);
+    ASSERT_FALSE(idValuesV2->IsParsed());
+    int32_t result = v2Resource->ParseLimitPaths(idValuesV2);
+    EXPECT_EQ(result, SYS_ERROR);
 }
 } // namespace
