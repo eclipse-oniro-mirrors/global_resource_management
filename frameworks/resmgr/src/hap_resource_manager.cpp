@@ -70,44 +70,85 @@ bool IsNewModule(const char *path)
     return true;
 }
 
+static std::unique_ptr<HapParser> CreateParser(const char *path, std::shared_ptr<ResConfigImpl> &defaultConfig,
+    bool isSystem, bool isOverlay, uint32_t selectedTypes)
+{
+    if (IsNewModule(path)) {
+        return std::make_unique<HapParserV2>();
+    }
+    return std::make_unique<HapParserV1>(defaultConfig, selectedTypes, isSystem || isOverlay);
+}
+
 const std::shared_ptr<HapResource> HapResourceManager::Load(const char *path,
     std::shared_ptr<ResConfigImpl> &defaultConfig, bool isSystem, bool isOverlay, uint32_t selectedTypes)
 {
-    std::shared_ptr<HapResource> pResource = nullptr;
+    if (path == nullptr) {
+        return nullptr;
+    }
     struct stat fileStat {};
     int ret = stat(path, &fileStat);
     if (ret != 0) {
         fileStat.st_mtime = 0;
     }
+    std::string sPath(path);
+
     if (selectedTypes == SELECT_ALL) {
-        pResource = this->GetHapResource(path);
-        if (pResource != nullptr && ret == 0 && fileStat.st_mtime == pResource->GetLastModTime()) {
+        std::shared_lock<std::shared_mutex> rlock(mutexRw_);
+        auto pResource = GetCachedResource(sPath, fileStat.st_mtime, ret);
+        if (pResource != nullptr) {
+            rlock.unlock();
             pResource->Update(defaultConfig);
             return pResource;
         }
     }
 
-    std::unique_ptr<HapParser> hapParser = nullptr;
-    bool isNewModule = IsNewModule(path);
-    if (isNewModule) {
-        hapParser = std::make_unique<HapParserV2>();
-    } else {
-        hapParser = std::make_unique<HapParserV1>(defaultConfig, selectedTypes, isSystem || isOverlay);
-    }
+    auto hapParser = CreateParser(path, defaultConfig, isSystem, isOverlay, selectedTypes);
     if (hapParser == nullptr || !hapParser->Init(path)) {
         return nullptr;
     }
-    
-    pResource = hapParser->GetHapResource(path, isSystem, isOverlay);
+    auto pResource = hapParser->GetHapResource(path, isSystem, isOverlay);
     if (pResource == nullptr) {
         return nullptr;
     }
 
     if (selectedTypes == SELECT_ALL) {
         pResource->SetLastModTime(fileStat.st_mtime);
-        pResource = this->PutAndGetResource(path, pResource);
+        std::unique_lock<std::shared_mutex> wlock(mutexRw_);
+        auto cached = GetCachedResource(sPath, fileStat.st_mtime, ret);
+        if (cached != nullptr) {
+            pResource = cached;
+        } else {
+            pResource = PutAndGetResourceInternal(sPath, pResource);
+        }
     }
     pResource->Update(defaultConfig);
+    return pResource;
+}
+
+std::shared_ptr<HapResource> HapResourceManager::GetCachedResource(const std::string &path, time_t mtime, int ret)
+{
+    auto iter = hapResourceMap_.find(path);
+    if (iter == hapResourceMap_.end()) {
+        return nullptr;
+    }
+    auto pResource = iter->second.lock();
+    if (pResource != nullptr && ret == 0 && mtime == pResource->GetLastModTime()) {
+        return pResource;
+    }
+    return nullptr;
+}
+
+std::shared_ptr<HapResource> HapResourceManager::PutAndGetResourceInternal(const std::string &path,
+    std::shared_ptr<HapResource> pResource)
+{
+    auto iter = hapResourceMap_.find(path);
+    if (iter != hapResourceMap_.end()) {
+        auto res = iter->second.lock();
+        if (res != nullptr && res->GetLastModTime() == pResource->GetLastModTime()) {
+            return res;
+        }
+    }
+    hapResourceMap_[path] = pResource;
     return pResource;
 }
 
@@ -159,15 +200,7 @@ std::shared_ptr<HapResource> HapResourceManager::PutAndGetResource(const std::st
     std::shared_ptr<HapResource> pResource)
 {
     std::unique_lock<std::shared_mutex> lock(mutexRw_);
-    auto iter = hapResourceMap_.find(path);
-    if (iter != hapResourceMap_.end()) {
-        auto res = iter->second.lock();
-        if (res != nullptr && res->GetLastModTime() == pResource->GetLastModTime()) {
-            return res;
-        }
-    }
-    hapResourceMap_[path] = pResource;
-    return pResource;
+    return PutAndGetResourceInternal(path, pResource);
 }
 
 bool HapResourceManager::PutPatchResource(const std::string &path, const std::string &patchPath)
@@ -182,16 +215,6 @@ bool HapResourceManager::PutPatchResource(const std::string &path, const std::st
         }
     }
     return false;
-}
-
-std::shared_ptr<HapResource> HapResourceManager::GetHapResource(const std::string &path)
-{
-    std::shared_lock<std::shared_mutex> lock(mutexRw_);
-    auto iter = hapResourceMap_.find(path);
-    if (iter != hapResourceMap_.end()) {
-        return iter->second.lock();
-    }
-    return nullptr;
 }
 
 #if defined(__ARKUI_CROSS__)

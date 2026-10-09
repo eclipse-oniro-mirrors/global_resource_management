@@ -323,16 +323,15 @@ HWTEST_F(HapManagerTest, HapManagerGetPluralRulesAndSelectTest001, TestSize.Leve
 }
 
 /*
- * @tc.name: HapManagerGetBestMatchResourceTest001
- * @tc.desc: Test GetBestMatchResource function, file case.
+ * @tc.name: HapManagerFindQualifierValueByIdTest001
+ * @tc.desc: Test FindQualifierValueById function with empty hapResources, file case.
  * @tc.type: FUNC
  */
-HWTEST_F(HapManagerTest, HapManagerGetBestMatchResourceTest001, TestSize.Level1)
+HWTEST_F(HapManagerTest, HapManagerFindQualifierValueByIdTest001, TestSize.Level1)
 {
     std::shared_ptr<HapManager> hapManager = std::make_shared<HapManager>(nullptr, false);
     ASSERT_TRUE(hapManager != nullptr);
-    std::vector<std::shared_ptr<IdValues>> candidates;
-    auto result = hapManager->GetBestMatchResource(candidates, 0, false);
+    auto result = hapManager->FindQualifierValueById(0, false);
     EXPECT_TRUE(result == nullptr);
 }
 

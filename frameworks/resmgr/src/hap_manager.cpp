@@ -119,7 +119,7 @@ std::string HapManager::GetPluralRulesAndSelect(ResourceManager::Quantity quanti
     std::string defaultRet("other");
 #ifdef SUPPORT_GRAPHICS
     WriteLock lock(this->mutex_);
-    std::shared_ptr<ResConfigImpl> config = getCompleteOverrideConfig(isGetOverrideResource);
+    std::shared_ptr<ResConfigImpl> config = GetCompleteOverrideConfig(isGetOverrideResource);
     if (config == nullptr || config->GetResLocale() == nullptr ||
         config->GetResLocale()->GetLanguage() == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "GetPluralRules language is null!");
@@ -188,29 +188,72 @@ const std::shared_ptr<IdItem> HapManager::FindResourceByName(
     return qualifierValue->GetIdItem();
 }
 
+namespace {
+struct BestCandidate {
+    std::shared_ptr<ValueUnderQualifierDir> best;
+    std::shared_ptr<ValueUnderQualifierDir> bestOverlay;
+
+    void Consider(const std::shared_ptr<ValueUnderQualifierDir> &candidate, bool isOverlay,
+        const std::shared_ptr<ResConfigImpl> &config, uint32_t density)
+    {
+        if (candidate == nullptr) {
+            return;
+        }
+        auto &target = isOverlay ? bestOverlay : best;
+        if (target == nullptr || !target->GetResConfig()->IsMoreSuitable(candidate->GetResConfig(), config, density)) {
+            target = candidate;
+        }
+    }
+
+    std::shared_ptr<ValueUnderQualifierDir> GetBest(const std::shared_ptr<ResConfigImpl> &config, uint32_t density)
+    {
+        if (bestOverlay != nullptr && best != nullptr) {
+            if (bestOverlay->GetResConfig()->IsMoreSuitable(best->GetResConfig(), config, density)) {
+                return bestOverlay;
+            }
+        }
+        return best;
+    }
+};
+}
+
 const std::shared_ptr<ValueUnderQualifierDir> HapManager::FindQualifierValueByName(
     const char *name, const ResType resType, bool isGetOverrideResource, uint32_t density)
 {
-    ReadLock lock(this->mutex_);
-    std::vector<std::shared_ptr<IdValues>> candidates = this->GetResourceListByName(name, resType);
-    if (candidates.size() == 0) {
+    if (name == nullptr) {
         return nullptr;
     }
-    return this->GetBestMatchResource(candidates, density, isGetOverrideResource);
+    ReadLock lock(this->mutex_);
+    std::shared_ptr<ResConfigImpl> currentResConfig = GetCompleteOverrideConfig(isGetOverrideResource);
+    if (currentResConfig == nullptr) {
+        return nullptr;
+    }
+    std::string key(name);
+    BestCandidate bc;
+    for (auto it = hapResources_.rbegin(); it != hapResources_.rend(); ++it) {
+        auto candidate = (*it)->FindBestMatchByName(key, resType, currentResConfig, density);
+        bc.Consider(candidate, (*it)->IsOverlayResource(), currentResConfig, density);
+    }
+    return bc.GetBest(currentResConfig, density);
 }
 
 const std::shared_ptr<ValueUnderQualifierDir> HapManager::FindQualifierValueById(uint32_t id,
     bool isGetOverrideResource, uint32_t density)
 {
     ReadLock lock(this->mutex_);
-    std::vector<std::shared_ptr<IdValues>> candidates = this->GetResourceList(id);
-    if (candidates.size() == 0) {
+    std::shared_ptr<ResConfigImpl> currentResConfig = GetCompleteOverrideConfig(isGetOverrideResource);
+    if (currentResConfig == nullptr) {
         return nullptr;
     }
-    return this->GetBestMatchResource(candidates, density, isGetOverrideResource);
+    BestCandidate bc;
+    for (auto it = hapResources_.rbegin(); it != hapResources_.rend(); ++it) {
+        auto candidate = (*it)->FindBestMatch(id, currentResConfig, density);
+        bc.Consider(candidate, (*it)->IsOverlayResource(), currentResConfig, density);
+    }
+    return bc.GetBest(currentResConfig, density);
 }
 
-std::shared_ptr<ResConfigImpl> HapManager::getCompleteOverrideConfig(bool isGetOverrideResource)
+std::shared_ptr<ResConfigImpl> HapManager::GetCompleteOverrideConfig(bool isGetOverrideResource)
 {
     if (!isGetOverrideResource) {
         return this->resConfig_;
@@ -223,13 +266,13 @@ std::shared_ptr<ResConfigImpl> HapManager::getCompleteOverrideConfig(bool isGetO
     }
 
     if (!completeOverrideConfig->Copy(*this->resConfig_, true)) {
-        RESMGR_HILOGE(RESMGR_TAG, "getCompleteOverrideConfig copy failed");
+        RESMGR_HILOGE(RESMGR_TAG, "GetCompleteOverrideConfig copy failed");
         return nullptr;
     }
 
     if (this->overrideResConfig_->isLocaleInfoSet()
         && !completeOverrideConfig->CopyLocaleAndPreferredLocale(*this->overrideResConfig_)) {
-        RESMGR_HILOGE(RESMGR_TAG, "getCompleteOverrideConfig CopyLocaleAndPreferredLocale failed");
+        RESMGR_HILOGE(RESMGR_TAG, "GetCompleteOverrideConfig CopyLocaleAndPreferredLocale failed");
         return nullptr;
     }
     if (this->overrideResConfig_->GetDeviceType() != DEVICE_NOT_SET) {
@@ -254,64 +297,6 @@ std::shared_ptr<ResConfigImpl> HapManager::getCompleteOverrideConfig(bool isGetO
         completeOverrideConfig->SetScreenDensity(this->overrideResConfig_->GetScreenDensity());
     }
     return completeOverrideConfig;
-}
-
-void HapManager::MatchBestResource(std::shared_ptr<ResConfigImpl> &bestResConfig,
-    std::shared_ptr<ValueUnderQualifierDir> &result,
-    const std::vector<std::shared_ptr<ValueUnderQualifierDir>> &paths,
-    uint32_t density, std::shared_ptr<ResConfigImpl> currentResConfig)
-{
-    size_t len = paths.size();
-    size_t i = 0;
-    for (i = 0; i < len; i++) {
-        std::shared_ptr<ValueUnderQualifierDir> path = paths[i];
-        const auto resConfig = path->GetResConfig();
-        if (!currentResConfig->Match(resConfig)) {
-            continue;
-        }
-        if (bestResConfig == nullptr) {
-            bestResConfig = resConfig;
-            result = paths[i];
-            continue;
-        }
-        if (!bestResConfig->IsMoreSuitable(resConfig, currentResConfig, density)) {
-            bestResConfig = resConfig;
-            result = paths[i];
-        }
-    }
-}
-
-const std::shared_ptr<ValueUnderQualifierDir> HapManager::GetBestMatchResource(
-    const std::vector<std::shared_ptr<IdValues>> &candidates, uint32_t density, bool isGetOverrideResource)
-{
-    std::shared_ptr<ResConfigImpl> bestResConfig = nullptr;
-    std::shared_ptr<ResConfigImpl> bestOverlayResConfig = nullptr;
-    std::shared_ptr<ValueUnderQualifierDir> result = nullptr;
-    std::shared_ptr<ValueUnderQualifierDir> overlayResult = nullptr;
-    const std::shared_ptr<ResConfigImpl> currentResConfig = getCompleteOverrideConfig(isGetOverrideResource);
-    if (!currentResConfig) {
-        return nullptr;
-    }
-    // When there are multiple overlays, reverse the search to find the first match resource.
-    for (auto iter = candidates.rbegin(); iter != candidates.rend(); iter++) {
-        const auto &paths = (*iter)->GetLimitPathsConst();
-        if (paths.empty()) {
-            RESMGR_HILOGW(RESMGR_TAG, "GetBestMatchResource limitPaths is empty");
-            continue;
-        }
-        bool isOverlayHapResource = paths[0]->IsOverlayResource();
-        if (isOverlayHapResource) {
-            MatchBestResource(bestOverlayResConfig, overlayResult, paths, density, currentResConfig);
-        } else {
-            MatchBestResource(bestResConfig, result, paths, density, currentResConfig);
-        }
-    }
-    if (bestOverlayResConfig != nullptr && result != nullptr) {
-        if (bestOverlayResConfig->IsMoreSuitable(bestResConfig, currentResConfig, density)) {
-            return overlayResult;
-        }
-    }
-    return result;
 }
 
 RState HapManager::FindRawFileInternal(const std::string &name, std::string &outValue)
@@ -443,7 +428,7 @@ bool HapManager::AddResource(const char *path, const uint32_t &selectedTypes, bo
     if (it != loadedHapPaths_.end()) {
         return false;
     }
-    std::shared_ptr<ResConfigImpl> config = getCompleteOverrideConfig(isOverride_);
+    std::shared_ptr<ResConfigImpl> config = GetCompleteOverrideConfig(isOverride_);
     std::shared_ptr<HapResource> pResource =
         HapResourceManager::GetInstance().Load(path, config, isSystem_, false, selectedTypes);
     if (pResource == nullptr) {
@@ -482,7 +467,7 @@ bool HapManager::AddResource(const std::string &path, const std::vector<std::str
         RESMGR_HILOGI(RESMGR_TAG, "the overlay hap already been loaded");
         return true;
     }
-    std::shared_ptr<ResConfigImpl> config = getCompleteOverrideConfig(isOverride_);
+    std::shared_ptr<ResConfigImpl> config = GetCompleteOverrideConfig(isOverride_);
     std::unordered_map<std::string, std::shared_ptr<HapResource>> result =
         HapResourceManager::GetInstance().LoadOverlays(path, overlayPaths, config, isSystem_);
     if (result.size() == 0) {

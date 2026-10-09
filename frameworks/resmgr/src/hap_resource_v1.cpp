@@ -131,24 +131,54 @@ const std::shared_ptr<IdValues> HapResourceV1::GetIdValues(const uint32_t id)
         RESMGR_HILOGE(RESMGR_TAG, "idValuesMap_ is empty");
         return nullptr;
     }
-    uint32_t uid = id;
-    std::map<uint32_t, std::shared_ptr<IdValuesV1>>::const_iterator iter = idValuesMap_.find(uid);
+    auto iter = idValuesMap_.find(id);
     if (iter == idValuesMap_.end()) {
         return nullptr;
     }
     return iter->second;
 }
 
-const std::shared_ptr<IdValues> HapResourceV1::GetIdValuesByName(
-    const std::string name, const ResType resType)
+const std::shared_ptr<IdValues> HapResourceV1::GetIdValuesByName(const std::string &name, const ResType resType)
 {
     ReadLock lock(mutex_);
+    if (resType >= static_cast<ResType>(idValuesNameMap_.size())) {
+        return nullptr;
+    }
     const auto map = idValuesNameMap_[resType];
-    std::map<std::string, std::shared_ptr<IdValuesV1>>::const_iterator iter = map->find(name);
+    auto iter = map->find(name);
     if (iter == map->end()) {
         return nullptr;
     }
     return iter->second;
+}
+
+const std::shared_ptr<ValueUnderQualifierDir> HapResourceV1::FindBestMatch(uint32_t id,
+    const std::shared_ptr<ResConfigImpl> &requestConfig, uint32_t density)
+{
+    ReadLock lock(mutex_);
+    if (idValuesMap_.empty()) {
+        return nullptr;
+    }
+    auto iter = idValuesMap_.find(id);
+    if (iter == idValuesMap_.end()) {
+        return nullptr;
+    }
+    return DoBestMatch(iter->second, requestConfig, density);
+}
+
+const std::shared_ptr<ValueUnderQualifierDir> HapResourceV1::FindBestMatchByName(const std::string &name,
+    ResType resType, const std::shared_ptr<ResConfigImpl> &requestConfig, uint32_t density)
+{
+    ReadLock lock(mutex_);
+    if (resType >= static_cast<ResType>(idValuesNameMap_.size())) {
+        return nullptr;
+    }
+    const auto map = idValuesNameMap_[resType];
+    auto iter = map->find(name);
+    if (iter == map->end()) {
+        return nullptr;
+    }
+    return DoBestMatch(iter->second, requestConfig, density);
 }
 
 RState HapResourceV1::Update(std::shared_ptr<ResConfigImpl> &defaultConfig)
@@ -160,8 +190,8 @@ std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> HapResour
 {
     ReadLock lock(mutex_);
     std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> result;
-    for (auto iter = idValuesMap_.begin(); iter != idValuesMap_.end(); iter++) {
-        const std::vector<std::shared_ptr<ValueUnderQualifierDir>> &limitPaths = iter->second->GetLimitPathsConst();
+    for (const auto &item : idValuesMap_) {
+        const std::vector<std::shared_ptr<ValueUnderQualifierDir>> &limitPaths = item.second->GetLimitPathsConst();
         if (limitPaths.size() > 0) {
             std::shared_ptr<ValueUnderQualifierDirV1> value =
                 std::static_pointer_cast<ValueUnderQualifierDirV1>(limitPaths[0]);
@@ -207,8 +237,8 @@ void HapResourceV1::UpdateOverlayInfo(
                 continue;
             }
             uint32_t newId = typeId[type];
-            for_each(limitPaths.begin(), limitPaths.end(), [&](auto &item) {
-                item->GetIdItem()->id_ = newId;
+            for_each(limitPaths.begin(), limitPaths.end(), [&](auto &path) {
+                path->GetIdItem()->id_ = newId;
             });
             newIdValuesMap[newId] = iter->second;
         }
@@ -249,7 +279,7 @@ bool HapResourceV1::InitMap(const std::shared_ptr<ResKey> &resKey, const std::pa
     for (size_t j = 0; j < resKey->resId_->idParams_.size(); ++j) {
         std::shared_ptr<IdParam> idParam = resKey->resId_->idParams_[j];
         uint32_t id = idParam->id_;
-        std::map<uint32_t, std::shared_ptr<IdValuesV1>>::iterator iter = idValuesMap_.find(id);
+        auto iter = idValuesMap_.find(id);
         if (iter == idValuesMap_.end()) {
             auto idValues = std::make_shared<IdValuesV1>();
             if (idValues == nullptr) {

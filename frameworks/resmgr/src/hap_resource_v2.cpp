@@ -98,16 +98,32 @@ bool HapResourceV2::IsOverlayResource() const
 
 const std::shared_ptr<IdValues> HapResourceV2::GetIdValues(const uint32_t id)
 {
-    ReadLock lock(mutex_);
+    {
+        ReadLock rlock(mutex_);
+        if (idMap_.empty()) {
+            RESMGR_HILOGE(RESMGR_TAG, "idMap_ is empty");
+            return nullptr;
+        }
+        auto iter = idMap_.find(id);
+        if (iter == idMap_.end() || iter->second == nullptr) {
+            return nullptr;
+        }
+        if (iter->second->IsParsed()) {
+            if (iter->second->GetLimitPathsConst().empty()) {
+                RESMGR_HILOGW(RESMGR_TAG, "by id=%{public}u limitPaths is empty", id);
+                return nullptr;
+            }
+            return iter->second;
+        }
+    }
+    WriteLock wlock(mutex_);
     if (idMap_.empty()) {
-        RESMGR_HILOGE(RESMGR_TAG, "idMap_ is empty");
         return nullptr;
     }
-    std::unordered_map<uint32_t, std::shared_ptr<IdValuesV2>>::const_iterator iter = idMap_.find(id);
+    auto iter = idMap_.find(id);
     if (iter == idMap_.end() || iter->second == nullptr) {
         return nullptr;
     }
-
     if (!iter->second->IsParsed() && ParseLimitPaths(iter->second) != OK) {
         return nullptr;
     }
@@ -118,20 +134,39 @@ const std::shared_ptr<IdValues> HapResourceV2::GetIdValues(const uint32_t id)
     return iter->second;
 }
 
-const std::shared_ptr<IdValues> HapResourceV2::GetIdValuesByName(
-    const std::string name, const ResType resType)
+const std::shared_ptr<IdValues> HapResourceV2::GetIdValuesByName(const std::string &name, const ResType resType)
 {
-    ReadLock lock(mutex_);
+    {
+        ReadLock rlock(mutex_);
+        if (typeNameMap_.empty()) {
+            RESMGR_HILOGE(RESMGR_TAG, "typeNameMap_ is empty");
+            return nullptr;
+        }
+        auto mapIterator = typeNameMap_.find(resType);
+        if (mapIterator == typeNameMap_.end()) {
+            return nullptr;
+        }
+        auto iter = mapIterator->second.find(name);
+        if (iter == mapIterator->second.end() || iter->second == nullptr) {
+            return nullptr;
+        }
+        if (iter->second->IsParsed()) {
+            if (iter->second->GetLimitPathsConst().empty()) {
+                RESMGR_HILOGW(RESMGR_TAG, "by name=%{public}s limitPaths is empty", name.c_str());
+                return nullptr;
+            }
+            return iter->second;
+        }
+    }
+    WriteLock wlock(mutex_);
     if (typeNameMap_.empty()) {
-        RESMGR_HILOGE(RESMGR_TAG, "typeNameMap_ is empty");
         return nullptr;
     }
-    std::unordered_map<uint32_t, std::unordered_map<std::string,
-        std::shared_ptr<IdValuesV2>>>::const_iterator mapIterator = typeNameMap_.find(resType);
+    auto mapIterator = typeNameMap_.find(resType);
     if (mapIterator == typeNameMap_.end()) {
         return nullptr;
     }
-    std::unordered_map<std::string, std::shared_ptr<IdValuesV2>>::const_iterator iter = mapIterator->second.find(name);
+    auto iter = mapIterator->second.find(name);
     if (iter == mapIterator->second.end() || iter->second == nullptr) {
         return nullptr;
     }
@@ -144,6 +179,28 @@ const std::shared_ptr<IdValues> HapResourceV2::GetIdValuesByName(
         return nullptr;
     }
     return iter->second;
+}
+
+const std::shared_ptr<ValueUnderQualifierDir> HapResourceV2::FindBestMatch(uint32_t id,
+    const std::shared_ptr<ResConfigImpl> &requestConfig, uint32_t density)
+{
+    auto idValue = GetIdValues(id);
+    if (idValue == nullptr) {
+        return nullptr;
+    }
+    ReadLock lock(mutex_);
+    return DoBestMatch(idValue, requestConfig, density);
+}
+
+const std::shared_ptr<ValueUnderQualifierDir> HapResourceV2::FindBestMatchByName(const std::string &name,
+    ResType resType, const std::shared_ptr<ResConfigImpl> &requestConfig, uint32_t density)
+{
+    auto idValue = GetIdValuesByName(name, resType);
+    if (idValue == nullptr) {
+        return nullptr;
+    }
+    ReadLock lock(mutex_);
+    return DoBestMatch(idValue, requestConfig, density);
 }
 
 std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> HapResourceV2::BuildNameTypeIdMapping()

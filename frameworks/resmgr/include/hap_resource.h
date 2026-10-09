@@ -121,7 +121,32 @@ public:
      * @param resType the resource type
      * @return the resource value related to resource name
      */
-    virtual const std::shared_ptr<IdValues> GetIdValuesByName(const std::string name, const ResType resType);
+    virtual const std::shared_ptr<IdValues> GetIdValuesByName(const std::string &name, const ResType resType);
+
+    /**
+     * Find the best matched ValueUnderQualifierDir by resource id within this HapResource.
+     * The match logic (config matching + IsMoreSuitable comparison) is encapsulated here,
+     * so callers do not need to reach into IdValues internals.
+     *
+     * @param id the resource id
+     * @param requestConfig the request config to match against
+     * @param density the screen density for matching
+     * @return the best matched ValueUnderQualifierDir, or nullptr if no match
+     */
+    virtual const std::shared_ptr<ValueUnderQualifierDir> FindBestMatch(uint32_t id,
+        const std::shared_ptr<ResConfigImpl> &requestConfig, uint32_t density = 0) = 0;
+
+    /**
+     * Find the best matched ValueUnderQualifierDir by resource name within this HapResource.
+     *
+     * @param name the resource name
+     * @param resType the resource type
+     * @param requestConfig the request config to match against
+     * @param density the screen density for matching
+     * @return the best matched ValueUnderQualifierDir, or nullptr if no match
+     */
+    virtual const std::shared_ptr<ValueUnderQualifierDir> FindBestMatchByName(const std::string &name,
+        ResType resType, const std::shared_ptr<ResConfigImpl> &requestConfig, uint32_t density = 0) = 0;
 
     virtual RState Update(std::shared_ptr<ResConfigImpl> &defaultConfig);
 
@@ -244,7 +269,20 @@ public:
 protected:
     friend class HapResourceManager;
     friend class HapParser;
-    
+
+    /**
+     * Shared best-match logic: iterate limitPaths of the given IdValues,
+     * filter by requestConfig->Match, and pick the most suitable one via IsMoreSuitable.
+     * Called by subclass FindBestMatch/FindBestMatchByName implementations under their own lock.
+     *
+     * @param idValues the IdValues containing candidate limitPaths
+     * @param requestConfig the request config to match against
+     * @param density the screen density for matching
+     * @return the best matched ValueUnderQualifierDir, or nullptr if no match
+     */
+    const std::shared_ptr<ValueUnderQualifierDir> DoBestMatch(const std::shared_ptr<IdValues> &idValues,
+        const std::shared_ptr<ResConfigImpl> &requestConfig, uint32_t density) const;
+
     std::shared_mutex mutex_;
 
     // resources.index file path
