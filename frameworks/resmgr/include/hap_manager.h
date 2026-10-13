@@ -457,20 +457,12 @@ private:
     std::vector<std::shared_ptr<IdValues>> GetResourceListByName(const char *name,
         const ResType resType) const;
 
-    void MatchBestResource(std::shared_ptr<ResConfigImpl> &bestResConfig,
-        std::shared_ptr<ValueUnderQualifierDir> &result,
-        const std::vector<std::shared_ptr<ValueUnderQualifierDir>> &paths,
-        uint32_t density, std::shared_ptr<ResConfigImpl> currentResConfig);
-
-    const std::shared_ptr<ValueUnderQualifierDir> GetBestMatchResource(
-        const std::vector<std::shared_ptr<IdValues>> &candidates,
-        uint32_t density, bool isGetOverrideResource);
 #if defined(__ARKUI_CROSS__)
     void RemoveHapResource(const std::string &path);
 #endif
     static bool Init();
 
-    std::shared_ptr<ResConfigImpl> getCompleteOverrideConfig(bool isGetOverrideResource);
+    std::shared_ptr<ResConfigImpl> GetCompleteOverrideConfig(bool isGetOverrideResource);
 
     RState FindRawFileInternal(const std::string &name, std::string &outValue);
 

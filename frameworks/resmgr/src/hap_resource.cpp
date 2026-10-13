@@ -14,6 +14,7 @@
  */
 
 #include "hap_resource.h"
+#include "hilog_wrapper.h"
 
 using ReadLock = std::shared_lock<std::shared_mutex>;
 using WriteLock = std::unique_lock<std::shared_mutex>;
@@ -60,9 +61,40 @@ const std::shared_ptr<IdValues> HapResource::GetIdValues(const uint32_t id)
     return nullptr;
 }
 
-const std::shared_ptr<IdValues> HapResource::GetIdValuesByName(const std::string name, const ResType resType)
+const std::shared_ptr<IdValues> HapResource::GetIdValuesByName(const std::string &name, const ResType resType)
 {
     return nullptr;
+}
+
+const std::shared_ptr<ValueUnderQualifierDir> HapResource::DoBestMatch(const std::shared_ptr<IdValues> &idValues,
+    const std::shared_ptr<ResConfigImpl> &requestConfig, uint32_t density) const
+{
+    if (idValues == nullptr || requestConfig == nullptr) {
+        return nullptr;
+    }
+    const auto &paths = idValues->GetLimitPathsConst();
+    if (paths.empty()) {
+        RESMGR_HILOGW(RESMGR_TAG, "DoBestMatch limitPaths is empty");
+        return nullptr;
+    }
+    std::shared_ptr<ValueUnderQualifierDir> result;
+    std::shared_ptr<ResConfigImpl> bestResConfig;
+    for (const auto &path : paths) {
+        const auto resConfig = path->GetResConfig();
+        if (!requestConfig->Match(resConfig)) {
+            continue;
+        }
+        if (bestResConfig == nullptr) {
+            bestResConfig = resConfig;
+            result = path;
+            continue;
+        }
+        if (!bestResConfig->IsMoreSuitable(resConfig, requestConfig, density)) {
+            bestResConfig = resConfig;
+            result = path;
+        }
+    }
+    return result;
 }
 
 RState HapResource::Update(std::shared_ptr<ResConfigImpl> &defaultConfig)

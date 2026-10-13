@@ -92,12 +92,10 @@ public:
 private:
     HapResourceManager() = default;
 
-    /**
-     * get resource from map
-     * @param path hap file path
-     * @return the resource if map contain the hap, else nullptr
-     */
-    std::shared_ptr<HapResource> GetHapResource(const std::string &path);
+    std::shared_ptr<HapResource> GetCachedResource(const std::string &path, time_t mtime, int ret);
+
+    std::shared_ptr<HapResource> PutAndGetResourceInternal(const std::string &path,
+        std::shared_ptr<HapResource> pResource);
 
     std::shared_mutex mutexRw_;
     std::unordered_map<std::string, std::weak_ptr<HapResource>> hapResourceMap_;

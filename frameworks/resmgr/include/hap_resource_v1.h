@@ -62,7 +62,11 @@ public:
     virtual bool IsSystemResource() const;
     virtual bool IsOverlayResource() const;
     virtual const std::shared_ptr<IdValues> GetIdValues(const uint32_t id);
-    virtual const std::shared_ptr<IdValues> GetIdValuesByName(const std::string name, const ResType resType);
+    virtual const std::shared_ptr<IdValues> GetIdValuesByName(const std::string &name, const ResType resType);
+    virtual const std::shared_ptr<ValueUnderQualifierDir> FindBestMatch(uint32_t id,
+        const std::shared_ptr<ResConfigImpl> &requestConfig, uint32_t density = 0);
+    virtual const std::shared_ptr<ValueUnderQualifierDir> FindBestMatchByName(const std::string &name,
+        ResType resType, const std::shared_ptr<ResConfigImpl> &requestConfig, uint32_t density = 0);
     virtual RState Update(std::shared_ptr<ResConfigImpl> &defaultConfig);
     virtual std::unordered_map<std::string, std::unordered_map<ResType, uint32_t>> BuildNameTypeIdMapping();
     virtual void GetLocales(std::set<std::string> &outValue, bool includeSystem);
