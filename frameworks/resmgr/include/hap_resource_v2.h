@@ -165,6 +165,8 @@ protected:
     friend class HapParser;
 
     virtual int32_t ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue);
+
+    void AccumulateParseMemory(const size_t &nameCapacity);
     
     std::mutex idValuesMutex_;
 
