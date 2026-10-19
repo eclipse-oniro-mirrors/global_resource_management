@@ -34,6 +34,13 @@ static std::shared_ptr<ThemePackManager> themeMgr = nullptr;
 static std::once_flag themeMgrFlag;
 constexpr uint32_t SYSTEM_ID_BEGIN = 117440512; // 0x07000000
 constexpr uint32_t SYSTEM_ID_END = 134217727; // 0x07FFFFFF
+// Macro overrides for test path injection; production defaults to real SA paths.
+#ifndef SA_THEME_FLAG_PREFIX
+#define SA_THEME_FLAG_PREFIX "data/service/el1/public/themes"
+#endif
+#ifndef SA_THEME_PATH_PREFIX
+#define SA_THEME_PATH_PREFIX "/data/service/el1/public/themes"
+#endif
 const std::string THEME_FLAG_A = "data/themes/a/app/flag";
 const std::string THEME_FLAG_B = "data/themes/b/app/flag";
 const std::string THEME_SKIN_A = "/data/themes/a/app/skin";
@@ -42,19 +49,19 @@ const std::string THEME_SKIN_A_PATH = "/data/themes/a/skin";
 const std::string THEME_SKIN_B_PATH = "/data/themes/b/skin";
 const std::string THEME_ICONS_A = "/data/themes/a/app/icons";
 const std::string THEME_ICONS_B = "/data/themes/b/app/icons";
-const std::string ABSOLUTE_THEME_FLAG_A = "data/service/el1/public/themes/<currentUserId>/a/app/flag";
-const std::string ABSOLUTE_THEME_FLAG_B = "data/service/el1/public/themes/<currentUserId>/b/app/flag";
-const std::string ABSOLUTE_THEME_SKIN_A = "/data/service/el1/public/themes/<currentUserId>/a/app/skin";
-const std::string ABSOLUTE_THEME_SKIN_B = "/data/service/el1/public/themes/<currentUserId>/b/app/skin";
-const std::string ABSOLUTE_THEME_SKIN_A_PATH = "/data/service/el1/public/themes/<currentUserId>/a/skin";
-const std::string ABSOLUTE_THEME_SKIN_B_PATH = "/data/service/el1/public/themes/<currentUserId>/b/skin";
-const std::string ABSOLUTE_THEME_ICONS_A = "/data/service/el1/public/themes/<currentUserId>/a/app/icons";
-const std::string ABSOLUTE_THEME_ICONS_B = "/data/service/el1/public/themes/<currentUserId>/b/app/icons";
-const std::string ABSOLUTE_THEME_PATH = "/data/service/el1/public/themes/";
+const std::string ABSOLUTE_THEME_FLAG_A = SA_THEME_FLAG_PREFIX "/<currentUserId>/a/app/flag";
+const std::string ABSOLUTE_THEME_FLAG_B = SA_THEME_FLAG_PREFIX "/<currentUserId>/b/app/flag";
+const std::string ABSOLUTE_THEME_SKIN_A = SA_THEME_PATH_PREFIX "/<currentUserId>/a/app/skin";
+const std::string ABSOLUTE_THEME_SKIN_B = SA_THEME_PATH_PREFIX "/<currentUserId>/b/app/skin";
+const std::string ABSOLUTE_THEME_SKIN_A_PATH = SA_THEME_PATH_PREFIX "/<currentUserId>/a/skin";
+const std::string ABSOLUTE_THEME_SKIN_B_PATH = SA_THEME_PATH_PREFIX "/<currentUserId>/b/skin";
+const std::string ABSOLUTE_THEME_ICONS_A = SA_THEME_PATH_PREFIX "/<currentUserId>/a/app/icons";
+const std::string ABSOLUTE_THEME_ICONS_B = SA_THEME_PATH_PREFIX "/<currentUserId>/b/app/icons";
+const std::string ABSOLUTE_THEME_PATH = SA_THEME_PATH_PREFIX "/";
 const std::string THEME_BASE_PATH_A = "/data/themes/a";
 const std::string THEME_BASE_PATH_B = "/data/themes/b";
-const std::string ABSOLUTE_THEME_BASE_PATH_A = "/data/service/el1/public/themes/<currentUserId>/a";
-const std::string ABSOLUTE_THEME_BASE_PATH_B = "/data/service/el1/public/themes/<currentUserId>/b";
+const std::string ABSOLUTE_THEME_BASE_PATH_A = SA_THEME_PATH_PREFIX "/<currentUserId>/a";
+const std::string ABSOLUTE_THEME_BASE_PATH_B = SA_THEME_PATH_PREFIX "/<currentUserId>/b";
 
 ThemePackManager::ThemePackManager() : isLogFlag_(Utils::IsFileExist(ABSOLUTE_THEME_PATH))
 {}
@@ -64,7 +71,7 @@ ThemePackManager::~ThemePackManager()
     RESMGR_HILOGW_BY_FLAG(isLogFlag_, RESMGR_TAG, "~ThemePackManager");
     skinResource_.clear();
     iconResource_.clear();
-    iconMaskValues_.clear();
+    iconMaskValuesMap_.clear();
 }
 
 std::shared_ptr<ThemePackManager> ThemePackManager::GetThemePackManager()
@@ -75,7 +82,8 @@ std::shared_ptr<ThemePackManager> ThemePackManager::GetThemePackManager()
     return themeMgr;
 }
 
-std::vector<std::string> ThemePackManager::GetRootDir(const std::string &strCurrentDir, const std::string &basePath)
+std::vector<std::string> ThemePackManager::GetRootDir(const std::string &strCurrentDir,
+    const std::string &basePath, int32_t userId)
 {
     std::vector<std::string> vDir;
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
@@ -110,10 +118,10 @@ std::vector<std::string> ThemePackManager::GetRootDir(const std::string &strCurr
     if (!maskPath.empty() || !strokePath.empty()) {
         std::lock_guard<std::mutex> lock(this->lockHighlightIcon_);
         if (!maskPath.empty()) {
-            themeMask_ = maskPath;
+            themeMaskMap_[userId] = maskPath;
         }
         if (!strokePath.empty()) {
-            themeStroke_ = strokePath;
+            themeStrokeMap_[userId] = strokePath;
         }
     }
 #endif
@@ -121,11 +129,11 @@ std::vector<std::string> ThemePackManager::GetRootDir(const std::string &strCurr
 }
 
 std::vector<std::string> ThemePackManager::GetThemeSkinRootDir(const std::string &newPath, const std::string &oldPath,
-    const std::string &basePath)
+    const std::string &basePath, int32_t userId)
 {
-    std::vector<std::string> result = GetRootDir(newPath, basePath);
+    std::vector<std::string> result = GetRootDir(newPath, basePath, userId);
     if (result.empty()) {
-        result = GetRootDir(oldPath, basePath);
+        result = GetRootDir(oldPath, basePath, userId);
     }
     return result;
 }
@@ -176,16 +184,16 @@ void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::st
 {
     UpdateUserId(userId);
     UpdateBasePath(userId);
-    ClearHighlightIcon();
+    ClearHighlightIcon(userId);
     std::vector<std::string> rootDirs;
     std::vector<std::string> iconDirs;
-    std::string basePath = GetBasePath();
+    std::string basePath = GetBasePath(userId);
     if (Utils::IsFileExist(THEME_FLAG_A)) {
-        rootDirs = GetThemeSkinRootDir(THEME_SKIN_A_PATH, THEME_SKIN_A, basePath);
-        iconDirs = GetRootDir(THEME_ICONS_A, basePath);
+        rootDirs = GetThemeSkinRootDir(THEME_SKIN_A_PATH, THEME_SKIN_A, basePath, userId);
+        iconDirs = GetRootDir(THEME_ICONS_A, basePath, userId);
     } else if (Utils::IsFileExist(THEME_FLAG_B)) {
-        rootDirs = GetThemeSkinRootDir(THEME_SKIN_B_PATH, THEME_SKIN_B, basePath);
-        iconDirs = GetRootDir(THEME_ICONS_B, basePath);
+        rootDirs = GetThemeSkinRootDir(THEME_SKIN_B_PATH, THEME_SKIN_B, basePath, userId);
+        iconDirs = GetRootDir(THEME_ICONS_B, basePath, userId);
     } else {
         LoadSAThemeRes(bundleName, moduleName, userId, rootDirs, iconDirs);
     }
@@ -197,18 +205,18 @@ void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::st
 void ThemePackManager::LoadThemeIconRes(const std::string &bundleName, const std::string &moduleName, int32_t userId)
 {
     UpdateUserId(userId);
-    ClearHighlightIcon();
-    std::string basePath = GetBasePath();
+    ClearHighlightIcon(userId);
+    std::string basePath = GetBasePath(userId);
     std::vector<std::string> iconDirs;
     if (Utils::IsFileExist(THEME_FLAG_A)) {
-        iconDirs = GetRootDir(THEME_ICONS_A, basePath);
+        iconDirs = GetRootDir(THEME_ICONS_A, basePath, userId);
     } else if (Utils::IsFileExist(THEME_FLAG_B)) {
-        iconDirs = GetRootDir(THEME_ICONS_B, basePath);
+        iconDirs = GetRootDir(THEME_ICONS_B, basePath, userId);
     } else {
         if (Utils::IsFileExist(ReplaceUserIdInPath(ABSOLUTE_THEME_FLAG_A, userId))) {
-            iconDirs = GetRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_ICONS_A, userId), basePath);
+            iconDirs = GetRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_ICONS_A, userId), basePath, userId);
         } else if (Utils::IsFileExist(ReplaceUserIdInPath(ABSOLUTE_THEME_FLAG_B, userId))) {
-            iconDirs = GetRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_ICONS_B, userId), basePath);
+            iconDirs = GetRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_ICONS_B, userId), basePath, userId);
         } else {
             RESMGR_HILOGE(RESMGR_TAG, "LoadThemesRes failed, userId = %{public}d, bundleName = %{public}s",
                 userId, bundleName.c_str());
@@ -220,19 +228,19 @@ void ThemePackManager::LoadThemeIconRes(const std::string &bundleName, const std
 void ThemePackManager::LoadThemeSkinRes(const std::string &bundleName, const std::string &moduleName, int32_t userId)
 {
     UpdateUserId(userId);
-    std::string basePath = GetBasePath();
+    std::string basePath = GetBasePath(userId);
     std::vector<std::string> rootDirs;
     if (Utils::IsFileExist(THEME_FLAG_A)) {
-        rootDirs = GetThemeSkinRootDir(THEME_SKIN_A_PATH, THEME_SKIN_A, basePath);
+        rootDirs = GetThemeSkinRootDir(THEME_SKIN_A_PATH, THEME_SKIN_A, basePath, userId);
     } else if (Utils::IsFileExist(THEME_FLAG_B)) {
-        rootDirs = GetThemeSkinRootDir(THEME_SKIN_B_PATH, THEME_SKIN_B, basePath);
+        rootDirs = GetThemeSkinRootDir(THEME_SKIN_B_PATH, THEME_SKIN_B, basePath, userId);
     } else {
         if (Utils::IsFileExist(ReplaceUserIdInPath(ABSOLUTE_THEME_FLAG_A, userId))) {
             rootDirs = GetThemeSkinRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_A_PATH, userId),
-                ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_A, userId), basePath);
+                ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_A, userId), basePath, userId);
         } else if (Utils::IsFileExist(ReplaceUserIdInPath(ABSOLUTE_THEME_FLAG_B, userId))) {
             rootDirs = GetThemeSkinRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_B_PATH, userId),
-                ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_B, userId), basePath);
+                ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_B, userId), basePath, userId);
         } else {
             RESMGR_HILOGE(RESMGR_TAG, "LoadThemesRes failed, userId = %{public}d, bundleName = %{public}s",
                 userId, bundleName.c_str());
@@ -245,15 +253,15 @@ void ThemePackManager::LoadThemeSkinRes(const std::string &bundleName, const std
 void ThemePackManager::LoadSAThemeRes(const std::string &bundleName, const std::string &moduleName,
     int32_t userId, std::vector<std::string> &rootDirs, std::vector<std::string> &iconDirs)
 {
-    std::string basePath = GetBasePath();
+    std::string basePath = GetBasePath(userId);
     if (Utils::IsFileExist(ReplaceUserIdInPath(ABSOLUTE_THEME_FLAG_A, userId))) {
         rootDirs = GetThemeSkinRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_A_PATH, userId),
-            ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_A, userId), basePath);
-        iconDirs = GetRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_ICONS_A, userId), basePath);
+            ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_A, userId), basePath, userId);
+        iconDirs = GetRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_ICONS_A, userId), basePath, userId);
     } else if (Utils::IsFileExist(ReplaceUserIdInPath(ABSOLUTE_THEME_FLAG_B, userId))) {
         rootDirs = GetThemeSkinRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_B_PATH, userId),
-            ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_B, userId), basePath);
-        iconDirs = GetRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_ICONS_B, userId), basePath);
+            ReplaceUserIdInPath(ABSOLUTE_THEME_SKIN_B, userId), basePath, userId);
+        iconDirs = GetRootDir(ReplaceUserIdInPath(ABSOLUTE_THEME_ICONS_B, userId), basePath, userId);
     } else {
         RESMGR_HILOGE(RESMGR_TAG, "LoadThemesRes failed, userId = %{public}d, bundleName = %{public}s",
             userId, bundleName.c_str());
@@ -308,7 +316,7 @@ const std::string ThemePackManager::GetThemeResource(const std::pair<std::string
     }
     std::string resValue = themeQualifierValue->GetResValue();
     if (resType == MEDIA) {
-        return BuildFullPath(resValue);
+        return BuildFullPath(resValue, userId);
     }
     return resValue;
 }
@@ -376,7 +384,7 @@ const std::shared_ptr<ThemeResource::ThemeQualifierValue> ThemePackManager::GetB
     return result;
 }
 
-void ThemePackManager::ClearIconResource()
+void ThemePackManager::ClearIconResource(int32_t userId)
 {
     for (auto it = iconResource_.begin(); it != iconResource_.end();) {
         if ((*it) == nullptr) {
@@ -390,14 +398,14 @@ void ThemePackManager::ClearIconResource()
         }
     }
     std::lock_guard<std::mutex> lock(lockIconValue_);
-    iconMaskValues_.clear();
+    iconMaskValuesMap_.erase(userId);
 }
 
-void ThemePackManager::ClearHighlightIcon()
+void ThemePackManager::ClearHighlightIcon(int32_t userId)
 {
     std::lock_guard<std::mutex> lock(this->lockHighlightIcon_);
-    iconHighlightValue_ = { "", nullptr, 0 };
-    themeStroke_ = "";
+    iconHighlightValueMap_.erase(userId);
+    themeStrokeMap_.erase(userId);
 }
 
 void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, const std::string &moduleName,
@@ -407,7 +415,7 @@ void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, con
     ChangeIconResourceStatus(userId);
     if (rootDirs.empty()) {
         RESMGR_HILOGW(RESMGR_TAG, "theme resources will clean, id %{public}d", userId);
-        ClearIconResource();
+        ClearIconResource(userId);
         return;
     }
     for (const auto &dir : rootDirs) {
@@ -422,7 +430,7 @@ void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, con
             this->iconResource_.emplace_back(pThemeResource);
         }
     }
-    ClearIconResource();
+    ClearIconResource(userId);
     RESMGR_HILOGW_BY_FLAG(isLogFlag_, RESMGR_TAG, "load img end, size is %{public}zu", iconResource_.size());
 }
 
@@ -441,7 +449,7 @@ const std::string ThemePackManager::FindThemeIconResource(const std::pair<std::s
         }
         result = pThemeResource->GetThemeAppIcon(bundleInfo, iconName, abilityName);
         if (!result.empty()) {
-            result = BuildFullPath(result);
+            result = BuildFullPath(result, userId);
             RESMGR_HILOGW_BY_FLAG(isLogFlag_, RESMGR_TAG, "find img, %{public}s", GetMaskString(result).c_str());
             break;
         }
@@ -449,13 +457,19 @@ const std::string ThemePackManager::FindThemeIconResource(const std::pair<std::s
     return result;
 }
 
-bool ThemePackManager::UpdateThemeId(uint32_t newThemeId)
+bool ThemePackManager::UpdateThemeId(uint32_t newThemeId, int32_t userId)
 {
     std::lock_guard<std::mutex> lock(this->lockThemeId_);
-    if (newThemeId != 0 && newThemeId != themeId_) {
-        RESMGR_HILOGW(RESMGR_TAG, "update theme, themeId_= %{public}d, newThemeId= %{public}d", themeId_, newThemeId);
-        themeId_ = newThemeId;
-        UpdateBasePath(GetCurrentUserId());
+    uint32_t oldThemeId = 0;
+    auto it = themeIdMap_.find(userId);
+    if (it != themeIdMap_.end()) {
+        oldThemeId = it->second;
+    }
+    if (newThemeId != 0 && newThemeId != oldThemeId) {
+        RESMGR_HILOGW(RESMGR_TAG, "update theme, userId=%{public}d, %{public}d -> %{public}d", userId, oldThemeId,
+            newThemeId);
+        themeIdMap_[userId] = newThemeId;
+        UpdateBasePath(userId);
         return true;
     }
     return false;
@@ -497,7 +511,10 @@ RState ThemePackManager::GetOtherIconsInfo(const std::string &iconName,
     std::string iconTag;
     if (iconName.find("icon_mask") != std::string::npos && isGlobalMask) {
         std::lock_guard<std::mutex> lock(this->lockHighlightIcon_);
-        iconPath = BuildFullPath(themeMask_);
+        auto it = themeMaskMap_.find(userId);
+        if (it != themeMaskMap_.end()) {
+            iconPath = BuildFullPath(it->second, userId);
+        }
         iconTag = "global_" + iconName;
     } else {
         std::pair<std::string, std::string> bundleInfo;
@@ -520,14 +537,14 @@ RState ThemePackManager::GetOtherIconsInfo(const std::string &iconName,
             return SUCCESS;
         }
         std::lock_guard<std::mutex> lock(this->lockIconValue_);
-        iconMaskValues_.emplace_back(std::make_tuple(iconTag, std::move(tmpInfo), len));
+        iconMaskValuesMap_[userId].emplace_back(std::make_tuple(iconTag, std::move(tmpInfo), len));
         return SUCCESS;
     }
     return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
 }
 
 RState ThemePackManager::GetHighlightIconInfo(const std::string &iconName, std::unique_ptr<uint8_t[]> &outValue,
-    size_t &len, bool isGlobalMask)
+    size_t &len, bool isGlobalMask, int32_t userId)
 {
     std::lock_guard<std::mutex> lock(this->lockHighlightIcon_);
     std::string iconTag;
@@ -535,11 +552,11 @@ RState ThemePackManager::GetHighlightIconInfo(const std::string &iconName, std::
     if (iconName.find("icon_highlightstroke") != std::string::npos && isGlobalMask) {
         iconTag = "global_" + iconName;
     }
-    std::string tag = std::get<FIRST_ELEMENT>(iconHighlightValue_);
-    if (iconTag == tag) {
-        size_t length = std::get<THIRED_ELEMENT>(iconHighlightValue_);
+    auto it = iconHighlightValueMap_.find(userId);
+    if (it != iconHighlightValueMap_.end() && iconTag == std::get<FIRST_ELEMENT>(it->second)) {
+        size_t length = std::get<THIRED_ELEMENT>(it->second);
         auto iconInfo = std::make_unique<uint8_t[]>(length);
-        auto tmpInfo = std::get<SECOND_ELEMENT>(iconHighlightValue_).get();
+        auto tmpInfo = std::get<SECOND_ELEMENT>(it->second).get();
         errno_t ret = memcpy_s(iconInfo.get(), length, tmpInfo, length);
         if (ret != 0) {
             RESMGR_HILOGE(RESMGR_TAG, "get %{public}s info fail, ret = %{public}d", iconTag.c_str(), ret);
@@ -549,7 +566,8 @@ RState ThemePackManager::GetHighlightIconInfo(const std::string &iconName, std::
         outValue = std::move(iconInfo);
         return SUCCESS;
     }
-    iconPath = BuildFullPath(themeStroke_);
+    auto strokeIt = themeStrokeMap_.find(userId);
+    iconPath = (strokeIt != themeStrokeMap_.end()) ? BuildFullPath(strokeIt->second, userId) : "";
     if (iconPath.empty()) {
         RESMGR_HILOGD(RESMGR_TAG, "no found, iconTag = %{public}s", iconTag.c_str());
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
@@ -562,21 +580,22 @@ RState ThemePackManager::GetHighlightIconInfo(const std::string &iconName, std::
             RESMGR_HILOGE(RESMGR_TAG, "save fail, iconName = %{public}s, ret = %{public}d", iconName.c_str(), ret);
             return SUCCESS;
         }
-        iconHighlightValue_ = std::make_tuple(iconTag, std::move(tmpInfo), len);
+        iconHighlightValueMap_[userId] = std::make_tuple(iconTag, std::move(tmpInfo), len);
         return SUCCESS;
     }
     return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
 }
 
 RState ThemePackManager::GetThemeIconFromCache(
-    const std::string &iconTag, std::unique_ptr<uint8_t[]> &outValue, size_t &len)
+    const std::string &iconTag, std::unique_ptr<uint8_t[]> &outValue, size_t &len, int32_t userId)
 {
     std::lock_guard<std::mutex> lock(this->lockIconValue_);
-    if (iconMaskValues_.empty()) {
+    auto it = iconMaskValuesMap_.find(userId);
+    if (it == iconMaskValuesMap_.end() || it->second.empty()) {
         return NOT_FOUND;
     }
 
-    for (const auto &iconValue : iconMaskValues_) {
+    for (const auto &iconValue : it->second) {
         std::string tag = std::get<FIRST_ELEMENT>(iconValue);
         if (iconTag != tag) {
             continue;
@@ -612,12 +631,6 @@ void ThemePackManager::UpdateUserId(int32_t userId)
     }
 }
 
-int32_t ThemePackManager::GetCurrentUserId()
-{
-    std::lock_guard<std::mutex> lock(this->lockUserId_);
-    return currentUserId_;
-}
-
 void ThemePackManager::UpdateBasePath(int32_t userId)
 {
     std::string basePath;
@@ -637,7 +650,7 @@ void ThemePackManager::UpdateBasePath(int32_t userId)
         }
     }
     std::lock_guard<std::mutex> lock(this->lockBasePath_);
-    basePath_ = basePath;
+    basePathMap_[userId] = basePath;
 }
 
 bool ThemePackManager::IsSameResourceByUserId(const std::string &path, int32_t userId)
@@ -704,12 +717,12 @@ std::string ThemePackManager::GetCanonicalBasePath(const std::string &basePath)
     return canonicalBasePath;
 }
 
-const std::string ThemePackManager::GetLogPath(const std::string &path)
+const std::string ThemePackManager::GetLogPath(const std::string &path, int32_t userId)
 {
     if (path.empty()) {
         return path;
     }
-    std::string basePath = GetBasePath();
+    std::string basePath = GetBasePath(userId);
     if (basePath.empty() || path.find(basePath) != 0) {
         return path;
     }
@@ -720,10 +733,10 @@ const std::string ThemePackManager::GetLogPath(const std::string &path)
     return path.substr(lastSlash + 1);
 }
 
-std::string ThemePackManager::BuildFullPath(const std::string &relativePath) const
+std::string ThemePackManager::BuildFullPath(const std::string &relativePath, int32_t userId) const
 {
     if (!relativePath.empty() && relativePath.front() != '/') {
-        std::string basePath = GetBasePath();
+        std::string basePath = GetBasePath(userId);
         if (!basePath.empty()) {
             return basePath + "/" + relativePath;
         }

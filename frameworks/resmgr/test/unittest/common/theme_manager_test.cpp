@@ -17,9 +17,32 @@
 
 #include "resource_manager_test_common.h"
 #include "theme_pack_manager.h"
+#include <cstdio>
 using namespace OHOS::Global::Resource;
 using namespace testing::ext;
 namespace {
+void CreateFlagFile(const std::string &path)
+{
+    FILE *fp = fopen(path.c_str(), "w");
+    if (fp != nullptr) {
+        fclose(fp);
+    }
+}
+
+void SetupTestFlags()
+{
+    CreateFlagFile("/data/test/theme/100/a/app/flag");
+    CreateFlagFile("/data/test/theme/103/a/app/flag");
+    CreateFlagFile("/data/test/theme/100/b/app/flag");
+}
+
+void CleanupTestFlags()
+{
+    if (remove("/data/test/theme/100/a/app/flag") != 0) {}
+    if (remove("/data/test/theme/103/a/app/flag") != 0) {}
+    if (remove("/data/test/theme/100/b/app/flag") != 0) {}
+}
+
 class ThemeManagerTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -532,7 +555,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeIconsResourceTest007, TestSi
 {
     std::vector<std::string> rootDirs;
     std::string rootDir = "/data/test/theme/theme1/icons";
-    rootDirs = tm->GetRootDir(rootDir);
+    rootDirs = tm->GetRootDir(rootDir, "", 100);
     int32_t userId = 100; // userId is 100
     tm->LoadThemeIconsResource("ohos.global.test1", "entry", rootDirs, userId);
     std::pair<std::string, std::string> bundleInfo;
@@ -562,7 +585,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeIconsResourceTest008, TestSi
 {
     std::vector<std::string> rootDirs;
     std::string rootDir = "/data/test/theme/theme1/icons";
-    rootDirs = tm->GetRootDir(rootDir);
+    rootDirs = tm->GetRootDir(rootDir, "", 100);
     int32_t userId = 100; // userId is 100
     tm->LoadThemeIconsResource("ohos.global.test1", "entry", rootDirs, userId);
     std::pair<std::string, std::string> bundleInfo;
@@ -583,7 +606,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeIconsResourceTest008, TestSi
     EXPECT_EQ(iconPath, "");
 
     rootDirs.clear();
-    rootDirs = tm->GetRootDir("/data/test/theme/theme2/icons");
+    rootDirs = tm->GetRootDir("/data/test/theme/theme2/icons", "", 100);
     tm->LoadThemeIconsResource("ohos.global.test2", "entry", rootDirs, userId);
     bundleInfo.first = "ohos.global.test2";
     iconName = "foreground";
@@ -603,7 +626,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestChangeIconResourceStatusTest001, Test
 {
     std::vector<std::string> rootDirs;
     std::string rootDir = "/data/test/theme/theme1/icons";
-    rootDirs = tm->GetRootDir(rootDir);
+    rootDirs = tm->GetRootDir(rootDir, "", 100);
     int32_t userId = 100; // userId is 100
     tm->LoadThemeIconsResource("ohos.global.test1", "entry", rootDirs, userId);
     std::pair<std::string, std::string> bundleInfo;
@@ -616,7 +639,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestChangeIconResourceStatusTest001, Test
     EXPECT_EQ(iconPath, "/data/test/theme/theme1/icons/ohos.global.test1/entry/background.png");
 
     tm->ChangeIconResourceStatus(userId);
-    tm->ClearIconResource();
+    tm->ClearIconResource(100);
 
     iconName = "foreground";
     iconPath = tm->FindThemeIconResource(bundleInfo, iconName, userId);
@@ -679,7 +702,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestGetOtherIconsInfoTest002, TestSize.Le
 {
     std::vector<std::string> rootDirs;
     std::string rootDir = "/data/test/theme/icons/";
-    rootDirs = tm->GetRootDir(rootDir);
+    rootDirs = tm->GetRootDir(rootDir, "", 100);
     int32_t userId = 100; // userId is 100
     tm->LoadThemeIconsResource("other_icons", "", rootDirs, userId);
     std::unique_ptr<uint8_t[]> outValue;
@@ -700,7 +723,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestGetOtherIconsInfoTest003, TestSize.Le
 {
     std::vector<std::string> rootDirs;
     std::string rootDir = "/data/test/theme/icons/";
-    rootDirs = tm->GetRootDir(rootDir);
+    rootDirs = tm->GetRootDir(rootDir, "", 100);
     int32_t userId = 100; // userId is 100
     tm->LoadThemeIconsResource("other_icons", "", rootDirs, userId);
     std::unique_ptr<uint8_t[]> outValue;
@@ -708,7 +731,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestGetOtherIconsInfoTest003, TestSize.Le
     RState state = rm->GetOtherIconsInfo("icon_mask", outValue, len, true);
     EXPECT_EQ(state, SUCCESS);
 
-    RState state1 = tm->GetThemeIconFromCache("global_icon_mask", outValue, len);
+    RState state1 = tm->GetThemeIconFromCache("global_icon_mask", outValue, len, 100);
     EXPECT_EQ(state1, SUCCESS);
 
     RState state2 = rm->GetOtherIconsInfo("icon_mask", outValue, len, true);
@@ -731,11 +754,11 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestGetThemeIconFromCacheTest001, TestSiz
     tm->LoadThemeIconsResource("other_icons", "", rootDirs, userId);
     std::unique_ptr<uint8_t[]> outValue;
     size_t len;
-    RState state = tm->GetThemeIconFromCache("other_icons_background", outValue, len);
+    RState state = tm->GetThemeIconFromCache("other_icons_background", outValue, len, 100);
     EXPECT_EQ(state, NOT_FOUND);
     state = tm->GetOtherIconsInfo("background", outValue, len, false, userId);
     EXPECT_EQ(state, SUCCESS);
-    state = tm->GetThemeIconFromCache("other_icons_background", outValue, len);
+    state = tm->GetThemeIconFromCache("other_icons_background", outValue, len, 100);
     EXPECT_EQ(state, SUCCESS);
 }
 
@@ -755,11 +778,11 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestGetThemeIconFromCacheTest002, TestSiz
     size_t len;
     RState state = tm->GetOtherIconsInfo("background", outValue, len, false, userId);
     EXPECT_EQ(state, SUCCESS);
-    state = tm->GetThemeIconFromCache("global_icon_mask", outValue, len);
+    state = tm->GetThemeIconFromCache("global_icon_mask", outValue, len, 100);
     EXPECT_EQ(state, NOT_FOUND);
     state = tm->GetOtherIconsInfo("icon_mask", outValue, len, true, userId);
     EXPECT_EQ(state, SUCCESS);
-    state = tm->GetThemeIconFromCache("global_icon_mask", outValue, len);
+    state = tm->GetThemeIconFromCache("global_icon_mask", outValue, len, 100);
     EXPECT_EQ(state, SUCCESS);
 }
 
@@ -772,7 +795,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestGetHighlightIconTest001, TestSize.Lev
 {
     std::vector<std::string> rootDirs;
     std::string rootDir = "/data/test/theme/icons/";
-    rootDirs = tm->GetRootDir(rootDir);
+    rootDirs = tm->GetRootDir(rootDir, "", 100);
     int32_t userId = 100; // userId is 100
     tm->LoadThemeIconsResource("other_icons", "", rootDirs, userId);
     std::unique_ptr<uint8_t[]> outValue;
@@ -797,9 +820,9 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestGetHighlightIconTest001, TestSize.Lev
     std::unique_ptr<uint8_t[]> outValue4;
     size_t len4;
     // mock update theme, clear highlight icon
-    tm->ClearHighlightIcon();
+    tm->ClearHighlightIcon(100);
     // this root dir does not contain icon_highlightstroke
-    tm->GetRootDir("/data/test/theme/theme2/icons");
+    tm->GetRootDir("/data/test/theme/theme2/icons", "", 100);
     state = rm->GetOtherIconsInfo("icon_highlightstroke", outValue4, len4, true);
     EXPECT_EQ(len4, 0);
     EXPECT_EQ(state, ERROR_CODE_RES_NOT_FOUND_BY_NAME);
@@ -829,7 +852,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestIsUpdateByUserIdTest001, TestSize.Lev
  */
 HWTEST_F(ThemeManagerTest, ThemeManagerTestIsSameResourceByUserIdTest001, TestSize.Level1)
 {
-    std::string path("/data/service/el1/public/themes/100/a/app/icons/ohos.global.test2/entry/foreground.png");
+    std::string path("/data/test/theme/100/a/app/icons/ohos.global.test2/entry/foreground.png");
     int32_t userId = 100;
     bool result = tm->IsSameResourceByUserId(path, userId);
     EXPECT_TRUE(result == true);
@@ -846,7 +869,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestIsSameResourceByUserIdTest001, TestSi
  */
 HWTEST_F(ThemeManagerTest, ThemeManagerTestIsSameResourceByUserIdTest002, TestSize.Level1)
 {
-    std::string path("/data/service/el1/public/themes/100");
+    std::string path("/data/test/theme/100");
     int32_t userId = 100;
     bool result = tm->IsSameResourceByUserId(path, userId);
     EXPECT_TRUE(result);
@@ -859,7 +882,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestIsSameResourceByUserIdTest002, TestSi
  */
 HWTEST_F(ThemeManagerTest, ThemeManagerTestIsSameResourceByUserIdTest003, TestSize.Level1)
 {
-    std::string path("/data/service/el1/public/themes/abc/");
+    std::string path("/data/test/theme/abc/");
     int32_t userId = 100;
     bool result = tm->IsSameResourceByUserId(path, userId);
     EXPECT_TRUE(result);
@@ -872,13 +895,13 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestIsSameResourceByUserIdTest003, TestSi
  */
 HWTEST_F(ThemeManagerTest, ThemeManagerTestGetMaskStringTest001, TestSize.Level1)
 {
-    std::string path("/data/service/el1/public/themes/100/a/app/icons/ohos.global.test2/entry/foreground.png");
+    std::string path("/data/test/theme/100/a/app/icons/ohos.global.test2/entry/foreground.png");
     std::string maskPath = tm->GetMaskString(path);
     EXPECT_EQ(maskPath, "100/a/app/icons/ohos.global.test2/entry/foreground.png");
 
     path = "/data/test/theme/theme2/icons/ohos.global.test2/entry/foreground.png";
     maskPath = tm->GetMaskString(path);
-    EXPECT_EQ(maskPath, path);
+    EXPECT_EQ(maskPath, "theme2/icons/ohos.global.test2/entry/foreground.png");
 }
 
 /*
@@ -888,7 +911,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestGetMaskStringTest001, TestSize.Level1
  */
 HWTEST_F(ThemeManagerTest, ThemeManagerTestGetRootDirBadPathTest001, TestSize.Level1)
 {
-    std::vector<std::string> rootDirs = tm->GetRootDir("/nonexistent/path/xyz");
+    std::vector<std::string> rootDirs = tm->GetRootDir("/nonexistent/path/xyz", "", 100);
     EXPECT_TRUE(rootDirs.empty());
 }
 
@@ -911,42 +934,52 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestFindThemeResourceNullIdItemTest001, T
 
 /*
  * @tc.name: ThemeManagerTestLoadThemeSkinResourceWithBasePathTest001
- * @tc.desc: Test LoadThemeSkinResource with basePath parameter, verify JSON color value not affected by basePath.
+ * @tc.desc: Test LoadThemeSkinResource with basePath, resources stored as relative path and reconstructed correctly.
  * @tc.type: FUNC
  */
 HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceWithBasePathTest001, TestSize.Level1)
 {
+    SetupTestFlags();
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     ASSERT_TRUE(ret);
+    tm->UpdateBasePath(100);
+    std::string basePath = tm->GetBasePath(100);
+    ASSERT_FALSE(basePath.empty());
     std::vector<std::string> rootDirs;
-    rootDirs.emplace_back("/data/test/theme/skin/ohos.global.test.all");
+    rootDirs.emplace_back(basePath + "/skin/ohos.global.test.all");
     int32_t userId = 100;
-    std::string basePath = "/data/test/theme";
     tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId, basePath);
     int id = rmc->GetResId("base_only", ResType::COLOR);
     uint32_t outValue;
     rm->GetColorById(id, outValue);
+    CleanupTestFlags();
     ASSERT_EQ(4294967295, outValue); // base_only theme value is #ffffff
 }
 
 /*
  * @tc.name: ThemeManagerTestLoadThemeIconsResourceWithBasePathTest001
- * @tc.desc: Test LoadThemeIconsResource with basePath parameter, icons stored as relative path.
+ * @tc.desc: Test LoadThemeIconsResource with basePath, icons stored as relative path and reconstructed correctly.
  * @tc.type: FUNC
  */
 HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeIconsResourceWithBasePathTest001, TestSize.Level1)
 {
+    SetupTestFlags();
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     ASSERT_TRUE(ret);
+    tm->UpdateBasePath(100);
+    std::string basePath = tm->GetBasePath(100);
+    ASSERT_FALSE(basePath.empty());
     std::vector<std::string> rootDirs;
-    rootDirs.emplace_back("/data/test/theme/icons/ohos.global.test.all");
+    rootDirs.emplace_back(basePath + "/app/icons/ohos.global.test.all");
     int32_t userId = 100;
-    std::string basePath = "/data/test/theme";
-    // basePath_ is empty in test env (no flag files), so BuildFullPath cannot reconstruct full path.
-    // This test verifies the loading API does not crash with basePath parameter.
     tm->LoadThemeIconsResource("ohos.global.test.all", "entry", rootDirs, userId, basePath);
+    uint32_t resId = 16777306;
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> foregroundInfo;
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> backgroundInfo;
+    RState state = rm->GetThemeIcons(resId, foregroundInfo, backgroundInfo);
+    EXPECT_TRUE(state == SUCCESS);
+    CleanupTestFlags();
     tm->LoadThemeIconsResource("ohos.global.test.all", "entry", {}, userId);
-    SUCCEED();
 }
 
 /*
@@ -956,43 +989,214 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeIconsResourceWithBasePathTes
  */
 HWTEST_F(ThemeManagerTest, ThemeManagerTestUpdateThemeIdTest001, TestSize.Level1)
 {
-    bool result = tm->UpdateThemeId(999);
+    SetupTestFlags();
+    bool result = tm->UpdateThemeId(999, 100);
     EXPECT_TRUE(result);
-    result = tm->UpdateThemeId(999);
+    result = tm->UpdateThemeId(999, 100);
     EXPECT_FALSE(result);
-    result = tm->UpdateThemeId(0);
+    result = tm->UpdateThemeId(0, 100);
     EXPECT_FALSE(result);
-    result = tm->UpdateThemeId(1000);
+    result = tm->UpdateThemeId(1000, 100);
+    CleanupTestFlags();
     EXPECT_TRUE(result);
+}
+
+/*
+ * @tc.name: ThemeManagerTestMultiUserThemeIdTest001
+ * @tc.desc: Test per-user themeIdMap_ isolation: same themeId for different users should not block each other.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestMultiUserThemeIdTest001, TestSize.Level1)
+{
+    SetupTestFlags();
+    // User 100 sets theme 999
+    bool result100 = tm->UpdateThemeId(999, 100);
+    EXPECT_TRUE(result100);
+    // User 103 sets same theme 999 — should still be true (themeIdMap_[103] was 0, not 999)
+    bool result103 = tm->UpdateThemeId(999, 103);
+    EXPECT_TRUE(result103);
+    // User 100 sets same theme again — false (no change for user 100)
+    result100 = tm->UpdateThemeId(999, 100);
+    EXPECT_FALSE(result100);
+    // User 100 changes to 1000
+    result100 = tm->UpdateThemeId(1000, 100);
+    EXPECT_TRUE(result100);
+    // User 103 sets 1000 — should be true (themeIdMap_[103] is 999, not 1000)
+    result103 = tm->UpdateThemeId(1000, 103);
+    EXPECT_TRUE(result103);
+    // User 100 sets 1000 again — false
+    result100 = tm->UpdateThemeId(1000, 100);
+    CleanupTestFlags();
+    EXPECT_FALSE(result100);
+}
+
+/*
+ * @tc.name: ThemeManagerTestMultiUserBasePathTest001
+ * @tc.desc: Test per-user basePathMap_ isolation: different users have independent basePath values.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestMultiUserBasePathTest001, TestSize.Level1)
+{
+    SetupTestFlags();
+    tm->UpdateBasePath(100);
+    tm->UpdateBasePath(103);
+    std::string basePath100 = tm->GetBasePath(100);
+    std::string basePath103 = tm->GetBasePath(103);
+    ASSERT_FALSE(basePath100.empty());
+    ASSERT_FALSE(basePath103.empty());
+    // SA path includes userId, different users get different basePaths
+    EXPECT_NE(basePath100, basePath103);
+    EXPECT_NE(basePath100.find("/100/"), std::string::npos);
+    EXPECT_NE(basePath103.find("/103/"), std::string::npos);
+    // User 200 has no basePath (never updated)
+    std::string basePath200 = tm->GetBasePath(200);
+    CleanupTestFlags();
+    EXPECT_TRUE(basePath200.empty());
+}
+
+/*
+ * @tc.name: ThemeManagerTestMultiUserResourceAccessTest001
+ * @tc.desc: Test multi-user resource access isolation.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestMultiUserResourceAccessTest001, TestSize.Level1)
+{
+    SetupTestFlags();
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    // User 100 loads skin resources
+    tm->UpdateBasePath(100);
+    std::string basePath100 = tm->GetBasePath(100);
+    ASSERT_FALSE(basePath100.empty());
+    std::vector<std::string> rootDirs100;
+    rootDirs100.emplace_back(basePath100 + "/skin/ohos.global.test.all");
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs100, 100, basePath100);
+    // User 103 loads skin resources (different basePath)
+    tm->UpdateBasePath(103);
+    std::string basePath103 = tm->GetBasePath(103);
+    ASSERT_FALSE(basePath103.empty());
+    EXPECT_NE(basePath100, basePath103);
+    std::vector<std::string> rootDirs103;
+    rootDirs103.emplace_back(basePath103 + "/skin/ohos.global.test.all");
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs103, 103, basePath103);
+    // User 100 still gets correct color value (not affected by user 103's load)
+    int id = rmc->GetResId("base_only", ResType::COLOR);
+    uint32_t outValue;
+    rm->GetColorById(id, outValue);
+    ASSERT_EQ(4294967295, outValue); // base_only theme value is #ffffff
+    // User 100 loads icon resources
+    std::vector<std::string> iconDirs100;
+    iconDirs100.emplace_back(basePath100 + "/app/icons/ohos.global.test.all");
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", iconDirs100, 100, basePath100);
+    // User 103 loads icon resources
+    std::vector<std::string> iconDirs103;
+    iconDirs103.emplace_back(basePath103 + "/app/icons/ohos.global.test.all");
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", iconDirs103, 103, basePath103);
+    // User 100 still gets correct icons (not affected by user 103's load)
+    uint32_t resId = 16777306;
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> foregroundInfo;
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> backgroundInfo;
+    RState state = rm->GetThemeIcons(resId, foregroundInfo, backgroundInfo);
+    EXPECT_TRUE(state == SUCCESS);
+    // Cleanup
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", {}, 100);
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", {}, 100);
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", {}, 103);
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", {}, 103);
+    CleanupTestFlags();
 }
 
 /*
  * @tc.name: ThemeManagerTestGetLogPathTest001
- * @tc.desc: Test GetLogPath returns original path when basePath_ is empty.
+ * @tc.desc: Test GetLogPath strips basePath correctly with flag file set.
  * @tc.type: FUNC
  */
 HWTEST_F(ThemeManagerTest, ThemeManagerTestGetLogPathTest001, TestSize.Level1)
 {
-    std::string path = "/data/themes/a/app/icons/icon_mask.png";
-    std::string result = tm->GetLogPath(path);
-    EXPECT_EQ(result, path); // basePath_ is empty in test env, returns original path
+    SetupTestFlags();
+    tm->UpdateBasePath(100);
+    std::string basePath = tm->GetBasePath(100);
+    ASSERT_FALSE(basePath.empty());
+    std::string path = basePath + "/app/icons/icon_mask.png";
+    std::string result = tm->GetLogPath(path, 100);
+    CleanupTestFlags();
+    EXPECT_EQ(result, "a/app/icons/icon_mask.png");
 }
 
 /*
  * @tc.name: ThemeManagerTestGetMaskTest001
- * @tc.desc: Test GetMask returns non-empty after loading icons with icon_mask file.
+ * @tc.desc: Test GetMask returns non-empty after loading icons with flag file and basePath set.
  * @tc.type: FUNC
  */
 HWTEST_F(ThemeManagerTest, ThemeManagerTestGetMaskTest001, TestSize.Level1)
 {
+    SetupTestFlags();
     bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
     ASSERT_TRUE(ret);
-    std::vector<std::string> rootDirs;
-    rootDirs.emplace_back("/data/test/theme/icons/ohos.global.test.all");
+    tm->UpdateBasePath(100);
+    std::string basePath = tm->GetBasePath(100);
+    ASSERT_FALSE(basePath.empty());
     int32_t userId = 100;
-    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", rootDirs, userId);
-    std::string mask = tm->GetMask();
+    // LoadThemeIconRes calls GetRootDir with basePath, sets themeMask_ as relative path
+    tm->LoadThemeIconRes("ohos.global.test.all", "entry", userId);
+    std::string mask = tm->GetMask(100);
     EXPECT_FALSE(mask.empty());
+    EXPECT_NE(mask.find(basePath), std::string::npos);
     tm->LoadThemeIconsResource("ohos.global.test.all", "entry", {}, userId);
+    CleanupTestFlags();
+}
+
+/*
+ * @tc.name: ThemeManagerTestThemeSwitchABTest001
+ * @tc.desc: Test theme directory switch from a to b: basePath updates and resources accessible after switch.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestThemeSwitchABTest001, TestSize.Level1)
+{
+    SetupTestFlags();
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    int32_t userId = 100;
+    // Step 1: flag at a, basePath points to a
+    tm->UpdateBasePath(userId);
+    std::string basePathA = tm->GetBasePath(userId);
+    ASSERT_FALSE(basePathA.empty());
+    EXPECT_NE(basePathA.find("/a"), std::string::npos);
+    // Load skin resources from a
+    std::vector<std::string> rootDirsA;
+    rootDirsA.emplace_back(basePathA + "/skin/ohos.global.test.all");
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirsA, userId, basePathA);
+    int id = rmc->GetResId("base_only", ResType::COLOR);
+    uint32_t outValue;
+    rm->GetColorById(id, outValue);
+    ASSERT_EQ(4294967295, outValue); // #ffffff
+
+    // Step 2: simulate theme switch a->b: remove a flag, UpdateBasePath falls to b
+    if (remove("/data/test/theme/100/a/app/flag") != 0) {}
+    tm->UpdateBasePath(userId);
+    std::string basePathB = tm->GetBasePath(userId);
+    ASSERT_FALSE(basePathB.empty());
+    EXPECT_NE(basePathB.find("/b"), std::string::npos);
+    EXPECT_NE(basePathA, basePathB);
+    // Load skin resources from b (relative paths stored, reconstructed with new basePath)
+    std::vector<std::string> rootDirsB;
+    rootDirsB.emplace_back(basePathB + "/skin/ohos.global.test.all");
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirsB, userId, basePathB);
+    rm->GetColorById(id, outValue);
+    ASSERT_EQ(4294967295, outValue); // still #ffffff
+
+    // Step 3: load icons from b
+    std::vector<std::string> iconDirsB;
+    iconDirsB.emplace_back(basePathB + "/app/icons/ohos.global.test.all");
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", iconDirsB, userId, basePathB);
+    uint32_t resId = 16777306;
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> foregroundInfo;
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> backgroundInfo;
+    RState state = rm->GetThemeIcons(resId, foregroundInfo, backgroundInfo);
+    EXPECT_TRUE(state == SUCCESS);
+
+    // Cleanup
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", {}, userId);
+    CleanupTestFlags();
 }
 }

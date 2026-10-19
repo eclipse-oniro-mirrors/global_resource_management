@@ -118,22 +118,27 @@ public:
     const std::string FindThemeIconResource(const std::pair<std::string, std::string> &bundleInfo,
         const std::string &iconName, int32_t userId, const std::string &abilityName = "");
 
-    inline std::string GetBasePath() const
+    inline std::string GetBasePath(int32_t userId) const
     {
         std::lock_guard<std::mutex> lock(this->lockBasePath_);
-        return basePath_;
+        auto it = basePathMap_.find(userId);
+        return it != basePathMap_.end() ? it->second : "";
     }
 
-    inline const std::string GetMask() const
+    inline const std::string GetMask(int32_t userId) const
     {
         std::lock_guard<std::mutex> lock(this->lockHighlightIcon_);
-        return BuildFullPath(themeMask_);
+        auto it = themeMaskMap_.find(userId);
+        if (it == themeMaskMap_.end()) {
+            return "";
+        }
+        return BuildFullPath(it->second, userId);
     }
 
     const std::string ReplaceUserIdInPath(const std::string &originalPath, int32_t userId);
-    const std::string GetLogPath(const std::string &path);
+    const std::string GetLogPath(const std::string &path, int32_t userId);
 
-    bool UpdateThemeId(uint32_t newThemeId);
+    bool UpdateThemeId(uint32_t newThemeId, int32_t userId);
 
     bool IsFirstLoadResource();
 
@@ -166,10 +171,11 @@ public:
      * @param outValue the obtain resource wirte to
      * @param len the data len wirte to
      * @param isGlobalMask true if the global mask, else other icons
+     * @param userId the user id
      * @return SUCCESS if the theme icon get success, else failed
      */
     RState GetHighlightIconInfo(const std::string &iconName, std::unique_ptr<uint8_t[]> &outValue, size_t &len,
-        bool isGlobalMask);
+        bool isGlobalMask, int32_t userId);
 
     /**
      * Get the theme icon from cache
@@ -179,7 +185,8 @@ public:
      * @param len the data len wirte to
      * @return SUCCESS if the theme icon get success, else failed
      */
-    RState GetThemeIconFromCache(const std::string &iconTag, std::unique_ptr<uint8_t[]> &outValue, size_t &len);
+    RState GetThemeIconFromCache(const std::string &iconTag, std::unique_ptr<uint8_t[]> &outValue, size_t &len,
+        int32_t userId);
 
     /**
      * Whether to update theme by the user id
@@ -195,18 +202,20 @@ public:
 
 private:
     ThemePackManager();
-    std::string themeMask_;
-    std::string themeStroke_;
+    std::unordered_map<int32_t, std::string> themeMaskMap_;
+    std::unordered_map<int32_t, std::string> themeStrokeMap_;
     void ChangeSkinResourceStatus(int32_t userId);
     void ChangeIconResourceStatus(int32_t userId);
     void ClearSkinResource();
-    void ClearIconResource();
-    void ClearHighlightIcon();
+    void ClearIconResource(int32_t userId);
+    void ClearHighlightIcon(int32_t userId);
     const std::string GetMaskString(const std::string &path);
     std::vector<std::shared_ptr<ThemeResource>> skinResource_;
     std::vector<std::shared_ptr<ThemeResource>> iconResource_;
-    std::vector<std::tuple<std::string, std::unique_ptr<uint8_t[]>, size_t>> iconMaskValues_;
-    std::tuple<std::string, std::unique_ptr<uint8_t[]>, size_t> iconHighlightValue_;
+    std::unordered_map<int32_t, std::vector<std::tuple<std::string, std::unique_ptr<uint8_t[]>, size_t>>>
+        iconMaskValuesMap_;
+    std::unordered_map<int32_t, std::tuple<std::string, std::unique_ptr<uint8_t[]>, size_t>>
+        iconHighlightValueMap_;
     std::vector<std::shared_ptr<ThemeResource::ThemeValue> > GetThemeResourceList(
         const std::pair<std::string, std::string> &bundInfo, const ResType &resType, const std::string &resName,
         int32_t userId);
@@ -219,14 +228,13 @@ private:
         const std::vector<std::shared_ptr<ThemeResource::ThemeValue> > &candidates,
         const ResConfigImpl &resConfig);
 
-    std::vector<std::string> GetRootDir(const std::string &strCurrentDir, const std::string &basePath = "");
+    std::vector<std::string> GetRootDir(const std::string &strCurrentDir, const std::string &basePath, int32_t userId);
     std::vector<std::string> GetThemeSkinRootDir(const std::string &newPath, const std::string &oldPath,
-        const std::string &basePath = "");
+        const std::string &basePath, int32_t userId);
     bool IsSameResourceByUserId(const std::string &path, int32_t userId);
     void UpdateBasePath(int32_t userId);
     void UpdateUserId(int32_t userId);
-    int32_t GetCurrentUserId();
-    std::string BuildFullPath(const std::string &relativePath) const;
+    std::string BuildFullPath(const std::string &relativePath, int32_t userId) const;
     std::string GetCanonicalBasePath(const std::string &basePath);
     std::mutex lockSkin_;
     std::mutex lockIcon_;
@@ -235,8 +243,8 @@ private:
     mutable std::mutex lockHighlightIcon_;
     mutable std::mutex lockBasePath_;
     std::mutex lockUserId_;
-    uint32_t themeId_{0};
-    std::string basePath_;
+    std::unordered_map<int32_t, uint32_t> themeIdMap_;
+    std::unordered_map<int32_t, std::string> basePathMap_;
     bool isFirstCreate = true;
     int32_t currentUserId_ = 0;
     const bool isLogFlag_ = false;

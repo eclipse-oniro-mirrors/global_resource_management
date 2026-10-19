@@ -1416,7 +1416,7 @@ RState ResourceManagerImpl::UpdateFakeLocaleFlag(ResConfig &resConfig)
 void ResourceManagerImpl::UpdateTheme(ResConfig &resConfig)
 {
     auto themePackManager = ThemePackManager::GetThemePackManager();
-    if (!themePackManager->UpdateThemeId(resConfig.GetThemeId())) {
+    if (!themePackManager->UpdateThemeId(resConfig.GetThemeId(), userId)) {
         return;
     }
     if (resConfig.GetThemeIcon()) {
@@ -1536,7 +1536,8 @@ RState ResourceManagerImpl::GetThemeMedia(const std::shared_ptr<IdItem> idItem, 
     std::string result = themeManager->FindThemeResource(bundleInfo, idItems, resConfig, userId);
     outValue = Utils::LoadResourceFile(result, len);
     if (outValue == nullptr) {
-        RESMGR_HILOGW(RESMGR_TAG, "GetThemeMedia null, path=%{public}s", themeManager->GetLogPath(result).c_str());
+        RESMGR_HILOGW(RESMGR_TAG, "GetThemeMedia null, path=%{public}s",
+            themeManager->GetLogPath(result, userId).c_str());
     }
     return result.empty() ? ERROR_CODE_RES_ID_NOT_FOUND : SUCCESS;
 }
@@ -1746,7 +1747,8 @@ RState ResourceManagerImpl::GetThemeIcon(const std::shared_ptr<IdItem> idItem, s
     }
     outValue = Utils::LoadResourceFile(result, len);
     if (outValue == nullptr) {
-        RESMGR_HILOGW(RESMGR_TAG, "GetThemeIcon null, path=%{public}s", themeManager->GetLogPath(result).c_str());
+        RESMGR_HILOGW(RESMGR_TAG, "GetThemeIcon null, path=%{public}s",
+            themeManager->GetLogPath(result, userId).c_str());
     }
     return SUCCESS;
 }
@@ -1843,7 +1845,7 @@ RState ResourceManagerImpl::GetDrawableInfoById(uint32_t id,
     }
     size_t len = 0;
     // find in theme
-    std::string themeMask = ThemePackManager::GetThemePackManager()->GetMask();
+    std::string themeMask = ThemePackManager::GetThemePackManager()->GetMask(userId);
     if (GetThemeDrawable(idItem, len, outValue, iconType, density) == SUCCESS) {
         drawableInfo = std::make_tuple(type, len, themeMask);
         return SUCCESS;
@@ -1883,7 +1885,7 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name,
     }
     size_t len = 0;
     // find in theme
-    std::string themeMask = ThemePackManager::GetThemePackManager()->GetMask();
+    std::string themeMask = ThemePackManager::GetThemePackManager()->GetMask(userId);
     if (GetThemeDrawable(idItem, len, outValue, iconType, density) == SUCCESS) {
         drawableInfo = std::make_tuple(type, len, themeMask);
         return SUCCESS;
@@ -2102,7 +2104,7 @@ RState ResourceManagerImpl::GetThemeIconInfo(const std::string &iconName, size_t
     if (outValue == nullptr) {
         if (printLog) {
             RESMGR_HILOGE(RESMGR_TAG, "ThemeIcon LoadFile err. name:%{public}s, path:%{public}s.", iconName.c_str(),
-                themeManager->GetLogPath(result).c_str());
+                themeManager->GetLogPath(result, userId).c_str());
         }
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
@@ -2139,7 +2141,7 @@ RState ResourceManagerImpl::GetDynamicIcon(const std::string &resName,
 
 std::string ResourceManagerImpl::GetThemeMask()
 {
-    return ThemePackManager::GetThemePackManager()->GetMask();
+    return ThemePackManager::GetThemePackManager()->GetMask(userId);
 }
 
 bool ResourceManagerImpl::HasIconInTheme(const std::string &bundleName)
@@ -2152,7 +2154,7 @@ RState ResourceManagerImpl::GetOtherIconsInfo(const std::string &iconName,
 {
     auto themeManager = ThemePackManager::GetThemePackManager();
     if (iconName.find("icon_highlightstroke") != std::string::npos && isGlobalMask) {
-        return themeManager->GetHighlightIconInfo(iconName, outValue, len, isGlobalMask);
+        return themeManager->GetHighlightIconInfo(iconName, outValue, len, isGlobalMask, userId);
     }
     std::string iconTag;
     if (iconName.find("icon_mask") != std::string::npos && isGlobalMask) {
@@ -2160,7 +2162,7 @@ RState ResourceManagerImpl::GetOtherIconsInfo(const std::string &iconName,
     } else {
         iconTag = "other_icons_" + iconName;
     }
-    RState result = themeManager->GetThemeIconFromCache(iconTag, outValue, len);
+    RState result = themeManager->GetThemeIconFromCache(iconTag, outValue, len, userId);
     if (result == SUCCESS) {
         return SUCCESS;
     }
