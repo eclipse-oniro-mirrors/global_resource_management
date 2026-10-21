@@ -234,6 +234,12 @@ void HapResourceV2::InitThemeSystemRes()
     }
 }
 
+void HapResourceV2::AccumulateParseMemory(const size_t &nameCapacity)
+{
+    parsedMemory_ += static_cast<uint64_t>(nameCapacity) + indexPath_.capacity() + resourcePath_.capacity();
+    parsedMemory_ += sizeof(ValueUnderQualifierDirV2) + sizeof(std::shared_ptr<ValueUnderQualifierDirV2>);
+}
+
 int32_t HapResourceV2::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
 {
     std::unique_lock<std::mutex> lock(idValuesMutex_);
@@ -259,6 +265,10 @@ int32_t HapResourceV2::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
     idValue->ReserveLimitPaths(resInfo.valueCount_);
     std::pair<std::string, std::string> resPath = std::make_pair(indexPath_, resourcePath_);
     for (uint32_t i = 0; i < resInfo.valueCount_; i++) {
+        if (parsedMemory_ > MAX_PARSE_MEMORY) {
+            RESMGR_HILOGE(RESMGR_TAG, "ParseLimitPaths failed, parsed memory exceeds limit.");
+            return SYS_ERROR;
+        }
         ConfigItem configItem;
         ret = HapParserV2::ParseConfigItem(offset, configItem, mmapFile->mmapLen_, mmapFile->mmap_);
         if (ret != OK) {
@@ -273,6 +283,7 @@ int32_t HapResourceV2::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
             std::make_shared<ValueUnderQualifierDirV2>(resPath, configItem.offset_, iter->second);
         vuqd->Init(mmapFile, idValue->GetResType(), idValue->GetId(), idValue->GetName());
         idValue->AddLimitPath(vuqd);
+        AccumulateParseMemory(idValue->GetName().capacity());
     }
     idValue->Parse();
     return OK;
@@ -330,6 +341,10 @@ int32_t SystemResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
 
     idValue->ReserveLimitPaths(resInfo.valueCount_);
     for (uint32_t i = 0; i < resInfo.valueCount_; i++) {
+        if (parsedMemory_ > MAX_PARSE_MEMORY) {
+            RESMGR_HILOGE(RESMGR_TAG, "ParseLimitPaths failed, parsed memory exceeds limit.");
+            return SYS_ERROR;
+        }
         ConfigItem configItem;
         ret = HapParserV2::ParseConfigItem(offset, configItem, mmapFile->mmapLen_, mmapFile->mmap_);
         if (ret != OK) {
@@ -346,6 +361,7 @@ int32_t SystemResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
             resPath, configItem.offset_, iter->second, false, true);
         vuqd->Init(mmapFile, idValue->GetResType(), idValue->GetId(), idValue->GetName());
         idValue->AddLimitPath(vuqd);
+        AccumulateParseMemory(idValue->GetName().capacity());
     }
     idValue->Parse();
     return OK;
@@ -414,6 +430,10 @@ int32_t OverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
 
     idValue->ReserveLimitPaths(resInfo.valueCount_);
     for (uint32_t i = 0; i < resInfo.valueCount_; i++) {
+        if (parsedMemory_ > MAX_PARSE_MEMORY) {
+            RESMGR_HILOGE(RESMGR_TAG, "ParseLimitPaths failed, parsed memory exceeds limit.");
+            return SYS_ERROR;
+        }
         ConfigItem configItem;
         ret = HapParserV2::ParseConfigItem(offset, configItem, mmapFile->mmapLen_, mmapFile->mmap_);
         if (ret != OK) {
@@ -430,6 +450,7 @@ int32_t OverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idValue)
             resPath, configItem.offset_, iter->second, true, false);
         vuqd->Init(mmapFile, idValue->GetResType(), idValue->GetId(), idValue->GetName());
         idValue->AddLimitPath(vuqd);
+        AccumulateParseMemory(idValue->GetName().capacity());
     }
     idValue->Parse();
     return OK;
@@ -467,6 +488,10 @@ int32_t SystemOverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idVal
 
     idValue->ReserveLimitPaths(resInfo.valueCount_);
     for (uint32_t i = 0; i < resInfo.valueCount_; i++) {
+        if (parsedMemory_ > MAX_PARSE_MEMORY) {
+            RESMGR_HILOGE(RESMGR_TAG, "ParseLimitPaths failed, parsed memory exceeds limit.");
+            return SYS_ERROR;
+        }
         ConfigItem configItem;
         ret = HapParserV2::ParseConfigItem(offset, configItem, mmapFile->mmapLen_, mmapFile->mmap_);
         if (ret != OK) {
@@ -483,6 +508,7 @@ int32_t SystemOverlayResource::ParseLimitPaths(std::shared_ptr<IdValuesV2> idVal
             resPath, configItem.offset_, iter->second, true, true);
         vuqd->Init(mmapFile, idValue->GetResType(), idValue->GetId(), idValue->GetName());
         idValue->AddLimitPath(vuqd);
+        AccumulateParseMemory(idValue->GetName().capacity());
     }
     idValue->Parse();
     return OK;

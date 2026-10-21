@@ -298,34 +298,60 @@ int32_t HapParserV1::ParseId(uint32_t &offset, std::shared_ptr<ResId> id)
         return SYS_ERROR;
     }
     for (uint32_t i = 0; i < id->count_; ++i) {
-        std::shared_ptr<IdParam> ip = std::make_shared<IdParam>();
-        if (ip == nullptr) {
-            RESMGR_HILOGE(RESMGR_TAG, "new IdParam failed when ParseId");
+        if (parsedMemory_ > MAX_PARSE_MEMORY) {
+            RESMGR_HILOGE(RESMGR_TAG, "ParseId failed, parsed memory exceeds limit.");
             return SYS_ERROR;
         }
-        if ((uint64_t)offset + (uint64_t)ResId::IDPARAM_HEADER_LEN > (uint64_t)bufLen_) {
-            RESMGR_HILOGE(RESMGR_TAG, "Parse IdParam failed, the offset will be out of bounds");
-            return SYS_ERROR;
-        }
-        errno_t eret = memcpy_s(ip.get(), sizeof(IdParam), buffer_.get() + offset, ResId::IDPARAM_HEADER_LEN);
-        if (eret != OK) {
-            return SYS_ERROR;
-        }
-        offset += ResId::IDPARAM_HEADER_LEN;
-        std::shared_ptr<IdItem> idItem = std::make_shared<IdItem>();
-        if (idItem == nullptr) {
-            RESMGR_HILOGE(RESMGR_TAG, "new IdItem failed when ParseId");
-            return SYS_ERROR;
-        }
-        uint32_t ipOffset = ip->offset_;
-        int32_t ret = ParseIdItem(ipOffset, idItem);
+        int32_t ret = ParseIdEntry(offset, id);
         if (ret != OK) {
             return ret;
         }
-        ip->idItem_ = idItem;
-        id->idParams_.push_back(ip);
     }
     return OK;
+}
+
+int32_t HapParserV1::ParseIdEntry(uint32_t &offset, std::shared_ptr<ResId> id)
+{
+    std::shared_ptr<IdParam> ip = std::make_shared<IdParam>();
+    if (ip == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "new IdParam failed when ParseId");
+        return SYS_ERROR;
+    }
+    if ((uint64_t)offset + (uint64_t)ResId::IDPARAM_HEADER_LEN > (uint64_t)bufLen_) {
+        RESMGR_HILOGE(RESMGR_TAG, "Parse IdParam failed, the offset will be out of bounds");
+        return SYS_ERROR;
+    }
+    errno_t eret = memcpy_s(ip.get(), sizeof(IdParam), buffer_.get() + offset, ResId::IDPARAM_HEADER_LEN);
+    if (eret != OK) {
+        return SYS_ERROR;
+    }
+    offset += ResId::IDPARAM_HEADER_LEN;
+    std::shared_ptr<IdItem> idItem = std::make_shared<IdItem>();
+    if (idItem == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "new IdItem failed when ParseId");
+        return SYS_ERROR;
+    }
+    uint32_t ipOffset = ip->offset_;
+    int32_t ret = ParseIdItem(ipOffset, idItem);
+    if (ret != OK) {
+        return ret;
+    }
+    ip->idItem_ = idItem;
+    id->idParams_.push_back(ip);
+    AccumulateParseMemory(idItem);
+    return OK;
+}
+
+void HapParserV1::AccumulateParseMemory(const std::shared_ptr<IdItem> &idItem)
+{
+    uint64_t valuesMem = 0;
+    for (const auto &v : idItem->values_) {
+        valuesMem += v.capacity();
+    }
+    parsedMemory_ += valuesMem + idItem->values_.capacity();
+    parsedMemory_ += static_cast<uint64_t>(sizeof(IdParam)) + sizeof(IdItem);
+    parsedMemory_ += static_cast<uint64_t>(idItem->value_.capacity()) + idItem->name_.capacity();
+    parsedMemory_ += sizeof(std::shared_ptr<IdParam>);
 }
 
 uint32_t ConvertType(ResType type)
