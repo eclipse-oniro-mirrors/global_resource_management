@@ -27,6 +27,8 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
+static constexpr char OHOS_MODULE_VARIANT_COLOR[] = "ohos_module_variant_color";
+
 /**
  * Describe limitpath and value under the path
  */

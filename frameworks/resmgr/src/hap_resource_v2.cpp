@@ -267,12 +267,12 @@ void HapResourceV2::InitThemeSystemRes()
 {
     std::shared_ptr<IdValues> themeSystemRes = nullptr;
     std::vector<std::shared_ptr<ValueUnderQualifierDir>> configList;
-    themeSystemRes = GetIdValuesByName("system_color_change", ResType::STRING);
+    themeSystemRes = GetIdValuesByName(OHOS_MODULE_VARIANT_COLOR, ResType::STRING);
     if (themeSystemRes != nullptr) {
         std::vector<std::shared_ptr<ValueUnderQualifierDir>> configs = themeSystemRes->GetLimitPathsConst();
         configList.insert(configList.end(), configs.begin(), configs.end());
     }
-    themeSystemRes = GetIdValuesByName("system_color_change", ResType::BOOLEAN);
+    themeSystemRes = GetIdValuesByName(OHOS_MODULE_VARIANT_COLOR, ResType::BOOLEAN);
     if (themeSystemRes != nullptr) {
         std::vector<std::shared_ptr<ValueUnderQualifierDir>> configs = themeSystemRes->GetLimitPathsConst();
         configList.insert(configList.end(), configs.begin(), configs.end());

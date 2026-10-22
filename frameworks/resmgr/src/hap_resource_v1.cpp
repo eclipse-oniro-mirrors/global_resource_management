@@ -297,7 +297,7 @@ bool HapResourceV1::InitMap(const std::shared_ptr<ResKey> &resKey, const std::pa
             idValuesMap_.insert(std::make_pair(id, idValues));
             std::string name = std::string(idParam->idItem_->name_);
             idValuesNameMap_[idParam->idItem_->resType_]->insert(std::make_pair(name, idValues));
-            if (name == "system_color_change" && idParam->idItem_->value_ == "true") {
+            if (name == OHOS_MODULE_VARIANT_COLOR && idParam->idItem_->value_ == "true") {
                 isThemeSystemResEnable_ = true;
             }
         } else {

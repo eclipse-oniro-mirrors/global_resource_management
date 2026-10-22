@@ -1332,7 +1332,7 @@ HWTEST_F(MalformedIndexTest, HapResourceV2ParseLimitPathsResIdMismatchTest001, T
  */
 HWTEST_F(MalformedIndexTest, HapResourceV2InitThemeSystemResWithBadDataTest001, TestSize.Level1)
 {
-    auto buf = BuildV2IndexWithDataBlock("system_color_change", BAD_OFFSET);
+    auto buf = BuildV2IndexWithDataBlock(OHOS_MODULE_VARIANT_COLOR, BAD_OFFSET);
     auto pResource = LoadV2ResourceFromBuffer(buf);
     ASSERT_TRUE(pResource != nullptr);
     EXPECT_FALSE(pResource->isThemeSystemResEnable_);
