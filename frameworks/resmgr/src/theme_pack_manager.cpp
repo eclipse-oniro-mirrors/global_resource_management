@@ -296,6 +296,10 @@ const std::string ThemePackManager::FindThemeResource(const std::pair<std::strin
             }
             std::pair<std::string, std::string> tempInfo("systemRes", "entry");
             result = GetThemeResource(tempInfo, resType, resName, resConfig, userId);
+            if (result.empty()) {
+                tempInfo = std::make_pair("systemRes", "feature");
+                result = GetThemeResource(tempInfo, resType, resName, resConfig, userId);
+            }
         } else {
             result = GetThemeResource(bundleInfo, resType, resName, resConfig, userId);
         }
