@@ -17,6 +17,7 @@
 #include "system_resource_manager.h"
 
 #include <fcntl.h>
+#include "brand_color_manager.h"
 #include "res_config.h"
 #include "resource_manager_test_common.h"
 
@@ -1360,4 +1361,198 @@ HWTEST_F(ResourceManagerDeviceTest, ResourceManagerGetStringByIdForInputDeviceTe
     rState = rm->GetStringById(id, outValue);
     ASSERT_EQ(SUCCESS, rState);
     ASSERT_EQ("default device test", outValue);
+}
+
+// ==================== Brand Color Integration Tests ====================
+
+static void SetupBrandColor(const std::vector<std::string> &names, uint32_t brandColor)
+{
+    auto &bcm = BrandColorManager::GetInstance();
+    bcm.overrideList_.clear();
+    for (const auto &name : names) {
+        bcm.overrideList_.insert(name);
+    }
+    bcm.loaded_.store(true, std::memory_order_release);
+}
+
+static void SetBrandColorOnRm(ResourceManager *rm, uint32_t brandColor)
+{
+    auto *impl = (ResourceManagerImpl *)rm;
+    impl->hasBrandColor_.store(true, std::memory_order_relaxed);
+    impl->brandColor_.store(brandColor, std::memory_order_relaxed);
+}
+
+static void ClearBrandColorOnRm(ResourceManager *rm)
+{
+    auto *impl = (ResourceManagerImpl *)rm;
+    impl->hasBrandColor_.store(false, std::memory_order_relaxed);
+    impl->brandColor_.store(0, std::memory_order_relaxed);
+}
+
+static void ResetBrandColorManager()
+{
+    auto &bcm = BrandColorManager::GetInstance();
+    bcm.overrideList_.clear();
+    bcm.loaded_.store(false, std::memory_order_relaxed);
+}
+
+// GetColorById: divider_color #10000000 + brand #FFFF0000 → #10FF0000
+HWTEST_F(ResourceManagerDeviceTest, BrandColorGetColorByIdReplaceRgb, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId("divider_color", ResType::COLOR);
+    ASSERT_TRUE(id > 0);
+    SetupBrandColor({"divider_color"}, 0xFFFF0000);
+    SetBrandColorOnRm(rm, 0xFFFF0000);
+    uint32_t outValue;
+    EXPECT_EQ(SUCCESS, rm->GetColorById(id, outValue));
+    EXPECT_EQ(0x10FF0000u, outValue);
+    ClearBrandColorOnRm(rm);
+    ResetBrandColorManager();
+}
+
+// GetColorByName: same via name
+HWTEST_F(ResourceManagerDeviceTest, BrandColorGetColorByNameReplaceRgb, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    SetupBrandColor({"divider_color"}, 0xFFFF0000);
+    SetBrandColorOnRm(rm, 0xFFFF0000);
+    uint32_t outValue;
+    EXPECT_EQ(SUCCESS, rm->GetColorByName("divider_color", outValue));
+    EXPECT_EQ(0x10FF0000u, outValue);
+    ClearBrandColorOnRm(rm);
+    ResetBrandColorManager();
+}
+
+// Name not in list → no replacement
+HWTEST_F(ResourceManagerDeviceTest, BrandColorGetColorByIdNotInList, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId("divider_color", ResType::COLOR);
+    ASSERT_TRUE(id > 0);
+    SetupBrandColor({"other_color"}, 0xFFFF0000);
+    SetBrandColorOnRm(rm, 0xFFFF0000);
+    uint32_t outValue;
+    EXPECT_EQ(SUCCESS, rm->GetColorById(id, outValue));
+    EXPECT_EQ(0x10000000u, outValue);
+    ClearBrandColorOnRm(rm);
+    ResetBrandColorManager();
+}
+
+// Brand color not set → no replacement
+HWTEST_F(ResourceManagerDeviceTest, BrandColorGetColorByIdNotSet, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId("divider_color", ResType::COLOR);
+    ASSERT_TRUE(id > 0);
+    SetupBrandColor({"divider_color"}, 0xFFFF0000);
+    uint32_t outValue;
+    EXPECT_EQ(SUCCESS, rm->GetColorById(id, outValue));
+    EXPECT_EQ(0x10000000u, outValue);
+    ResetBrandColorManager();
+}
+
+// Clear brand color → back to original
+HWTEST_F(ResourceManagerDeviceTest, BrandColorGetColorByIdClear, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    int id = rmc->GetResId("divider_color", ResType::COLOR);
+    ASSERT_TRUE(id > 0);
+    SetupBrandColor({"divider_color"}, 0xFFFF0000);
+    SetBrandColorOnRm(rm, 0xFFFF0000);
+    uint32_t outValue;
+    rm->GetColorById(id, outValue);
+    EXPECT_EQ(0x10FF0000u, outValue);
+    ClearBrandColorOnRm(rm);
+    EXPECT_EQ(SUCCESS, rm->GetColorById(id, outValue));
+    EXPECT_EQ(0x10000000u, outValue);
+    ResetBrandColorManager();
+}
+
+// Multiple colors in list: each replaced
+HWTEST_F(ResourceManagerDeviceTest, BrandColorMultipleColorsInList, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    SetupBrandColor({"divider_color", "color_aboutPage_title_primary", "base_only"}, 0xFFFF0000);
+    SetBrandColorOnRm(rm, 0xFFFF0000);
+    uint32_t outValue;
+    int id = rmc->GetResId("divider_color", ResType::COLOR);
+    rm->GetColorById(id, outValue);
+    EXPECT_EQ(0x10FF0000u, outValue);
+    id = rmc->GetResId("color_aboutPage_title_primary", ResType::COLOR);
+    rm->GetColorById(id, outValue);
+    EXPECT_EQ(0xFFFF0000u, outValue);
+    rm->GetColorByName("base_only", outValue);
+    EXPECT_EQ(0x00FF0000u, outValue);
+    ClearBrandColorOnRm(rm);
+    ResetBrandColorManager();
+}
+
+// SetBrandColor/GetBrandColor API
+HWTEST_F(ResourceManagerDeviceTest, BrandColorSetAndGet, TestSize.Level1)
+{
+    EXPECT_EQ(SUCCESS, rm->SetBrandColor("#FFFF0000"));
+    EXPECT_EQ("#FFFF0000", rm->GetBrandColor());
+    rm->SetBrandColor("");
+    EXPECT_EQ("", rm->GetBrandColor());
+}
+
+HWTEST_F(ResourceManagerDeviceTest, BrandColorSetInvalidFormat, TestSize.Level1)
+{
+    EXPECT_EQ(INVALID_FORMAT, rm->SetBrandColor("invalid"));
+    EXPECT_EQ("", rm->GetBrandColor());
+}
+
+HWTEST_F(ResourceManagerDeviceTest, BrandColorSetVariousFormats, TestSize.Level1)
+{
+    EXPECT_EQ(SUCCESS, rm->SetBrandColor("#F00"));
+    EXPECT_EQ("#F00", rm->GetBrandColor());
+    EXPECT_EQ(SUCCESS, rm->SetBrandColor("#FF0000"));
+    EXPECT_EQ("#FF0000", rm->GetBrandColor());
+    EXPECT_EQ(SUCCESS, rm->SetBrandColor("#FFFF0000"));
+    EXPECT_EQ("#FFFF0000", rm->GetBrandColor());
+    rm->SetBrandColor("");
+    EXPECT_EQ("", rm->GetBrandColor());
+}
+
+// Override RM inherits brand color
+HWTEST_F(ResourceManagerDeviceTest, BrandColorOverrideRmInherit, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    rm->SetBrandColor("#FFFF0000");
+    SetupBrandColor({"divider_color"}, 0xFFFF0000);
+    auto overrideConfig = std::make_shared<ResConfigImpl>();
+    auto overrideRm = rm->GetOverrideResourceManager(overrideConfig);
+    ASSERT_NE(nullptr, overrideRm);
+    EXPECT_EQ("#FFFF0000", overrideRm->GetBrandColor());
+    int id = rmc->GetResId("divider_color", ResType::COLOR);
+    uint32_t outValue;
+    overrideRm->GetColorById(id, outValue);
+    EXPECT_EQ(0x10FF0000u, outValue);
+    ClearBrandColorOnRm(rm);
+    ResetBrandColorManager();
+}
+
+// Override RM: parent not set → override also not set
+HWTEST_F(ResourceManagerDeviceTest, BrandColorOverrideRmParentNotSet, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    SetupBrandColor({"divider_color"}, 0xFFFF0000);
+    auto overrideConfig = std::make_shared<ResConfigImpl>();
+    auto overrideRm = rm->GetOverrideResourceManager(overrideConfig);
+    ASSERT_NE(nullptr, overrideRm);
+    EXPECT_EQ("", overrideRm->GetBrandColor());
+    int id = rmc->GetResId("divider_color", ResType::COLOR);
+    uint32_t outValue;
+    overrideRm->GetColorById(id, outValue);
+    EXPECT_EQ(0x10000000u, outValue);
+    ResetBrandColorManager();
 }

@@ -1,0 +1,26 @@
+{
+    "colors": [
+        "brand",
+        "brand_font",
+        "brand05",
+        "brand10",
+        "brand15",
+        "brand20",
+        "brand30",
+        "brand40",
+        "brand50",
+        "brand60",
+        "brand70",
+        "brand80",
+        "brand90",
+        "brand_contrary",
+        "brand_contrary60",
+        "brand_contrary40",
+        "brand_light",
+        "brand_light40",
+        "brand_dark",
+        "brand_dark60",
+        "brand_dark40",
+        "brand_dark30"
+    ]
+}

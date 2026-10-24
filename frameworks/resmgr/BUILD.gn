@@ -78,7 +78,10 @@ ohos_shared_library("global_resmgr") {
     "zlib:shared_libz",
   ]
 
-  deps = [":resmgr_abc"]
+  deps = [
+    ":brand_color_override_json",
+    ":resmgr_abc",
+  ]
 
   if (resource_management_support_icu) {
     external_deps += [
@@ -341,6 +344,14 @@ ohos_abc("resmgr_abc") {
   output_name = "resmgr"
   install_images = [ "system" ]
   module_install_dir = "etc/abc/global"
+  subsystem_name = "global"
+  part_name = "resource_management"
+}
+
+ohos_prebuilt_etc("brand_color_override_json") {
+  source = "config/brand_color_override.json"
+  module_install_dir = "etc"
+  install_images = [ "system" ]
   subsystem_name = "global"
   part_name = "resource_management"
 }
