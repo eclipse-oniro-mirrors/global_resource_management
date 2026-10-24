@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -291,6 +291,29 @@ public:
         std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams) = 0;
 
     virtual RState GetResName(uint32_t id, std::string &outValue) = 0;
+
+    /**
+     * Set the brand color for this ResourceManager instance.
+     * Color resources in the brand color replacement list will have their RGB
+     * replaced with this brand color's RGB.
+     *
+     * @param brandColor the brand color string (e.g. "#FF000000", "#RRGGBB").
+     *        Pass an empty string to clear the previously set brand color;
+     *        after clearing, color resources in the replacement list are no
+     *        longer overridden.
+     * @return SUCCESS if the brand color was set or cleared, INVALID_FORMAT
+     *         if the color string is non-empty but invalid, NOT_SUPPORT_SEP
+     *         if this ResourceManager does not implement brand color override.
+     */
+    virtual RState SetBrandColor(const std::string &brandColor) { return NOT_SUPPORT_SEP; }
+
+    /**
+     * Get the brand color of this ResourceManager instance.
+     *
+     * @return the brand color string (e.g. "#FF000000"), empty if not set or
+     *         not supported by this ResourceManager.
+     */
+    virtual std::string GetBrandColor() const { return ""; }
 };
 
 EXPORT_FUNC ResourceManager *CreateResourceManager(bool includeSystemRes = true);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "brand_color_manager.h"
 #if !defined(__WINNT__) && !defined(__IDE_PREVIEW__) && !defined(__ARKUI_CROSS__)
 #include "hitrace_meter.h"
 #endif
@@ -95,6 +96,7 @@ bool ResourceManagerImpl::Init(bool isSystem)
     }
     hapManager_->SetOverride(isOverrideResMgr_);
     isSystemResMgr_ = isSystem;
+    BrandColorManager::GetInstance().LoadConfig();
     return true;
 }
 
@@ -119,180 +121,8 @@ bool ResourceManagerImpl::Init(std::shared_ptr<HapManager> hapManager)
     hapManager_->SetOverride(isOverrideResMgr_);
     hapManager_->UpdateAppConfigForSysResManager(
         resConfig->GetAppDarkRes(), hapManager->IsThemeSystemResEnableHap());
+    BrandColorManager::GetInstance().LoadConfig();
     return true;
-}
-
-RState ResourceManagerImpl::GetStringById(uint32_t id, std::string &outValue)
-{
-    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
-    if (idItem == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "GetStringById error id = %{public}d", id);
-        return ERROR_CODE_RES_ID_NOT_FOUND;
-    }
-    RState state = GetString(idItem, outValue);
-    if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
-        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
-    }
-    return state;
-}
-
-RState ResourceManagerImpl::GetStringByName(const char *name, std::string &outValue)
-{
-    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::STRING, isOverrideResMgr_);
-    if (idItem == nullptr) {
-        RESMGR_HILOGD(RESMGR_TAG, "GetStringByName error name = %{public}s", name);
-        return ERROR_CODE_RES_NAME_NOT_FOUND;
-    }
-    RState state = GetString(idItem, outValue);
-    if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
-        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
-    }
-    return state;
-}
-
-RState ResourceManagerImpl::GetStringFormatById(std::string &outValue, uint32_t id, ...)
-{
-    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
-    std::string temp;
-    RState rState = GetString(idItem, temp);
-    if (rState != SUCCESS) {
-        return rState;
-    }
-    va_list args;
-    va_start(args, id);
-    outValue = FormatString(temp.c_str(), args);
-    va_end(args);
-    return SUCCESS;
-}
-
-RState ResourceManagerImpl::GetStringFormatByName(std::string &outValue, const char *name, ...)
-{
-    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::STRING, isOverrideResMgr_);
-    std::string temp;
-    RState rState = GetString(idItem, temp);
-    if (rState != SUCCESS) {
-        return rState;
-    }
-    va_list args;
-    va_start(args, name);
-    outValue = FormatString(temp.c_str(), args);
-    va_end(args);
-    return SUCCESS;
-}
-
-RState ResourceManagerImpl::GetStringFormatById(std::string &outValue, uint32_t id, va_list args)
-{
-    RState state = GetStringById(id, outValue);
-    if (state != SUCCESS) {
-        return state;
-    }
-    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams;
-    if (ParseArgs(outValue, args, jsParams)) {
-        ResConfigImpl resConfig;
-        GetResConfig(resConfig);
-        if (!ReplacePlaceholderWithParams(outValue, resConfig, jsParams)) {
-            return ERROR_CODE_RES_ID_FORMAT_ERROR;
-        }
-        return SUCCESS;
-    }
-    return ERROR_CODE_INVALID_INPUT_PARAMETER;
-}
-
-RState ResourceManagerImpl::GetStringFormatByName(std::string &outValue, const char *name, va_list args)
-{
-    RState state = GetStringByName(name, outValue);
-    if (state != SUCCESS) {
-        return state;
-    }
-    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> jsParams;
-    if (ParseArgs(outValue, args, jsParams)) {
-        ResConfigImpl resConfig;
-        GetResConfig(resConfig);
-        if (!ReplacePlaceholderWithParams(outValue, resConfig, jsParams)) {
-            return ERROR_CODE_RES_NAME_FORMAT_ERROR;
-        }
-        return SUCCESS;
-    }
-    return ERROR_CODE_INVALID_INPUT_PARAMETER;
-}
-
-RState ResourceManagerImpl::GetString(const std::shared_ptr<IdItem> idItem, std::string &outValue)
-{
-    // not found or type invalid
-    if (idItem == nullptr || idItem->resType_ != ResType::STRING) {
-        return NOT_FOUND;
-    }
-    RState ret = ResolveReference(idItem->value_, outValue);
-    if (isFakeLocale) {
-        ProcessPsuedoTranslate(outValue);
-    }
-    if (isBidirectionFakeLocale) {
-        outValue = psueManager_->BidirectionConvert(outValue);
-    }
-    if (ret != SUCCESS) {
-        return ret;
-    }
-    return SUCCESS;
-}
-
-RState ResourceManagerImpl::GetStringArrayById(uint32_t id, std::vector<std::string> &outValue)
-{
-    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
-    if (idItem == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "GetStringArrayById error id = %{public}d", id);
-        return ERROR_CODE_RES_ID_NOT_FOUND;
-    }
-    RState state = GetStringArray(idItem, outValue);
-    if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
-        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
-    }
-    return state;
-}
-
-RState ResourceManagerImpl::GetStringArrayByName(const char *name, std::vector<std::string> &outValue)
-{
-    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(
-        name, ResType::STRINGARRAY, isOverrideResMgr_);
-    if (idItem == nullptr) {
-        RESMGR_HILOGD(RESMGR_TAG, "GetStringArrayByName error name = %{public}s", name);
-        return ERROR_CODE_RES_NAME_NOT_FOUND;
-    }
-    RState state = GetStringArray(idItem, outValue);
-    if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
-        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
-    }
-    return state;
-}
-
-RState ResourceManagerImpl::GetStringArray(const std::shared_ptr<IdItem> idItem, std::vector<std::string> &outValue)
-{
-    // not found or type invalid
-    if (idItem == nullptr || idItem->resType_ != ResType::STRINGARRAY) {
-        return NOT_FOUND;
-    }
-    outValue.clear();
-
-    for (size_t i = 0; i < idItem->values_.size(); ++i) {
-        std::string resolvedValue;
-        RState rrRet = ResolveReference(idItem->values_[i], resolvedValue);
-        if (rrRet != SUCCESS) {
-            RESMGR_HILOGD(RESMGR_TAG,
-                "GetStringArray ResolveReference failed, value:%{public}s", idItem->values_[i].c_str());
-            return rrRet;
-        }
-        outValue.push_back(resolvedValue);
-    }
-    if (isFakeLocale) {
-        for (auto &iter : outValue) {
-            ProcessPsuedoTranslate(iter);
-        }
-    }
-    if (isBidirectionFakeLocale) {
-        for (auto &iter : outValue) {
-            iter = psueManager_->BidirectionConvert(iter);
-        }
-    }
-    return SUCCESS;
 }
 
 RState ResourceManagerImpl::GetPatternById(uint32_t id, std::map<std::string, std::string> &outValue)
@@ -375,113 +205,6 @@ RState ResourceManagerImpl::GetPatternData(const std::shared_ptr<IdItem> idItem,
     return ResolveResData(idItem, outValue);
 }
 
-RState ResourceManagerImpl::GetPluralStringById(uint32_t id, int quantity, std::string &outValue)
-{
-    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
-    Quantity intQuantity = { true, quantity, 0.0 };
-    return GetPluralString(idItem, intQuantity, outValue);
-}
-
-RState ResourceManagerImpl::GetPluralStringByName(const char *name, int quantity, std::string &outValue)
-{
-    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::PLURALS, isOverrideResMgr_);
-    Quantity intQuantity = { true, quantity, 0.0 };
-    return GetPluralString(idItem, intQuantity, outValue);
-}
-
-RState ResourceManagerImpl::GetPluralStringByIdFormat(std::string &outValue, uint32_t id, int quantity, ...)
-{
-    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
-    if (idItem == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "GetPluralStringByIdFormat error id = %{public}d", id);
-        return ERROR_CODE_RES_ID_NOT_FOUND;
-    }
-    std::string temp;
-    Quantity intQuantity = { true, quantity, 0.0 };
-    RState rState = GetPluralString(idItem, intQuantity, temp);
-    if (rState == ERROR_CODE_RES_REF_TOO_MUCH) {
-        return rState;
-    }
-    if (rState != SUCCESS) {
-        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
-    }
-
-    va_list args;
-    va_start(args, quantity);
-    outValue = FormatString(temp.c_str(), args);
-    va_end(args);
-
-    return SUCCESS;
-}
-
-RState ResourceManagerImpl::GetPluralStringByNameFormat(std::string &outValue, const char *name, int quantity, ...)
-{
-    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::PLURALS, isOverrideResMgr_);
-    if (idItem == nullptr) {
-        RESMGR_HILOGD(RESMGR_TAG, "GetPluralStringByNameFormat error name = %{public}s", name);
-        return ERROR_CODE_RES_NAME_NOT_FOUND;
-    }
-    std::string temp;
-    Quantity intQuantity = { true, quantity, 0.0 };
-    RState rState = GetPluralString(idItem, intQuantity, temp);
-    if (rState == ERROR_CODE_RES_REF_TOO_MUCH) {
-        return rState;
-    }
-    if (rState != SUCCESS) {
-        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
-    }
-
-    va_list args;
-    va_start(args, quantity);
-    outValue = FormatString(temp.c_str(), args);
-    va_end(args);
-
-    return SUCCESS;
-}
-
-RState ResourceManagerImpl::GetPluralString(const std::shared_ptr<IdItem> &idItem,
-    Quantity quantity, std::string &outValue)
-{
-    if (idItem == nullptr || idItem->resType_ != ResType::PLURALS) {
-        return NOT_FOUND;
-    }
-    std::map<std::string, std::string> map;
-
-    size_t startIdx = 0;
-    size_t loop = idItem->values_.size() / 2;
-    for (size_t i = 0; i < loop; ++i) {
-        std::string key(idItem->values_[startIdx + i * 2]); // 2 means keyappear in pairs
-        std::string value(idItem->values_[startIdx + i * 2 + 1]); // 2 means value appear in pairs
-        auto iter = map.find(key);
-        if (iter == map.end()) {
-            std::string resolvedValue;
-            RState rrRet = ResolveReference(value, resolvedValue);
-            if (rrRet != SUCCESS) {
-                RESMGR_HILOGD(RESMGR_TAG, "ResolveReference failed, value:%{public}s", value.c_str());
-                return rrRet;
-            }
-            map[key] = resolvedValue;
-        }
-    }
-
-    std::string converted = hapManager_->GetPluralRulesAndSelect(quantity, isOverrideResMgr_);
-    auto mapIter = map.find(converted);
-    if (mapIter == map.end()) {
-        mapIter = map.find("other");
-        if (mapIter == map.end()) {
-            return NOT_FOUND;
-        }
-    }
-    outValue = mapIter->second;
-    if (isFakeLocale) {
-        ProcessPsuedoTranslate(outValue);
-    }
-    if (isBidirectionFakeLocale) {
-        outValue = psueManager_->BidirectionConvert(outValue);
-    }
-    return SUCCESS;
-}
-
 RState ResourceManagerImpl::ResolveReference(const std::string value, std::string &outValue)
 {
     uint32_t id;
@@ -489,15 +212,16 @@ RState ResourceManagerImpl::ResolveReference(const std::string value, std::strin
     bool isRef = true;
     int count = 0;
     std::string refStr(value);
+    std::vector<std::shared_ptr<IdItem>> idItems;
     while (isRef) {
         isRef = IdItem::IsRef(refStr, resType, id);
         if (!isRef || resType == ResType::PLURALS) {
             outValue = refStr;
+            ApplyBrandColorByIdItems(idItems, outValue);
             return SUCCESS;
         }
 
         if (IdItem::IsArrayOfType(resType)) {
-            // can't be array
             RESMGR_HILOGD(RESMGR_TAG, "ref %{public}s can't be array", refStr.c_str());
             return ERROR;
         }
@@ -506,13 +230,13 @@ RState ResourceManagerImpl::ResolveReference(const std::string value, std::strin
             RESMGR_HILOGE(RESMGR_TAG, "ref %s id not found", refStr.c_str());
             return ERROR;
         }
-        // unless compile bug
         if (resType != idItem->resType_) {
             RESMGR_HILOGE(RESMGR_TAG,
                 "impossible. ref %s type mismatch, found type: %d", refStr.c_str(), idItem->resType_);
             return ERROR;
         }
 
+        idItems.emplace_back(idItem);
         refStr = idItem->value_;
 
         if (++count > MAX_DEPTH_REF_SEARCH) {
@@ -531,6 +255,7 @@ RState ResourceManagerImpl::ResolveDataReference(const std::string key, const st
     bool isRef = true;
     int count = 0;
     std::string refStr(value);
+    std::vector<std::shared_ptr<IdItem>> idItems;
     while (isRef) {
         ResType realType = resType;
         isRef = IdItem::IsRef(refStr, resType, id);
@@ -538,7 +263,9 @@ RState ResourceManagerImpl::ResolveDataReference(const std::string key, const st
             if (realType == ResType::MAX_RES_TYPE) {
                 realType = ResType::STRING;
             }
-            outValue[key] = { .resType = realType, .value = refStr };
+            std::string resolvedValue = refStr;
+            ApplyBrandColorByIdItems(idItems, resolvedValue);
+            outValue[key] = { .resType = realType, .value = resolvedValue };
             return SUCCESS;
         }
 
@@ -552,13 +279,13 @@ RState ResourceManagerImpl::ResolveDataReference(const std::string key, const st
             RESMGR_HILOGE(RESMGR_TAG, "ref %s id not found", refStr.c_str());
             return ERROR;
         }
-        // unless compile bug
         if (resType != idItem->resType_) {
             RESMGR_HILOGE(RESMGR_TAG,
                 "impossible. ref %s type mismatch, found type: %d", refStr.c_str(), idItem->resType_);
             return ERROR;
         }
 
+        idItems.emplace_back(idItem);
         refStr = idItem->value_;
 
         if (++count > MAX_DEPTH_REF_SEARCH) {
@@ -578,7 +305,14 @@ RState ResourceManagerImpl::GetThemeValues(const std::string &value, std::string
     }
     outValue = ThemePackManager::GetThemePackManager()->FindThemeResource(bundleInfo, idItems, resConfig, userId,
         hapManager_->IsThemeSystemResEnableHap());
-    return outValue.empty() ? NOT_FOUND : SUCCESS;
+    if (outValue.empty()) {
+        return NOT_FOUND;
+    }
+    // If the reference chain contains a COLOR resource, apply brand color
+    // override using the first name in the brand color list found in the
+    // chain (similar to FindThemeResource which returns the first match).
+    ApplyBrandColorByIdItems(idItems, outValue);
+    return SUCCESS;
 }
 
 RState ResourceManagerImpl::ResolveParentReference(const std::shared_ptr<IdItem> idItem, std::map<std::string,
@@ -1030,7 +764,94 @@ RState ResourceManagerImpl::GetThemeColor(const std::shared_ptr<IdItem> idItem, 
     if (result.empty()) {
         return ERROR_CODE_RES_ID_NOT_FOUND;
     }
+    // Apply brand color using the first name in the brand color list found
+    // in the reference chain (similar to FindThemeResource which returns the
+    // first match).
+    ApplyBrandColorByIdItems(idItems, result);
     return state == SUCCESS ? Utils::ConvertColorToUInt32(result.c_str(), outValue) : state;
+}
+
+bool ResourceManagerImpl::ApplyBrandColor(const std::string &name, uint32_t &outValue)
+{
+    if (!hasBrandColor_.load(std::memory_order_relaxed)) {
+        return false;
+    }
+    uint32_t brandColor = brandColor_.load(std::memory_order_relaxed);
+    return BrandColorManager::GetInstance().ApplyBrandColor(name, brandColor, outValue);
+}
+
+void ResourceManagerImpl::ApplyBrandColorByIdItems(const std::vector<std::shared_ptr<IdItem>> &idItems,
+    std::string &colorStr)
+{
+    if (idItems.empty() || colorStr.empty()) {
+        return;
+    }
+    if (idItems.back()->resType_ != ResType::COLOR) {
+        return;
+    }
+    // Find the first name in the reference chain that is in the brand color
+    // list (similar to FindThemeResource which returns the first match).
+    // Falls back to the last name if none is in the list.
+    std::string applyName;
+    for (const auto &item : idItems) {
+        if (item == nullptr || item->resType_ != ResType::COLOR) {
+            continue;
+        }
+        if (BrandColorManager::GetInstance().IsBrandColorName(item->name_)) {
+            applyName = item->name_;
+            break;
+        }
+    }
+    if (applyName.empty()) {
+        applyName = idItems.back()->name_;
+    }
+    // Convert color string to uint32, apply brand color override, convert back.
+    // Only normalize the format when brand color was actually applied; keep
+    // the original format otherwise (e.g. "#F5F5F5" stays "#F5F5F5").
+    uint32_t color = 0;
+    if (Utils::ConvertColorToUInt32(colorStr.c_str(), color) != SUCCESS) {
+        return;
+    }
+    if (!ApplyBrandColor(applyName, color)) {
+        return;
+    }
+    char buf[16] = {0};
+    if (snprintf_s(buf, sizeof(buf), sizeof(buf) - 1, "#%08X", color) < 0) {
+        return;
+    }
+    colorStr = buf;
+}
+
+RState ResourceManagerImpl::SetBrandColor(const std::string &brandColor)
+{
+    if (brandColor.empty()) {
+        hasBrandColor_.store(false, std::memory_order_relaxed);
+        brandColor_.store(0, std::memory_order_relaxed);
+        std::lock_guard<std::mutex> lock(brandColorMutex_);
+        brandColorStr_.clear();
+        return SUCCESS;
+    }
+    uint32_t color = 0;
+    RState state = Utils::ConvertColorToUInt32(brandColor.c_str(), color);
+    if (state != SUCCESS) {
+        RESMGR_HILOGE(RESMGR_TAG, "SetBrandColor invalid format: %{public}s", brandColor.c_str());
+        return state;
+    }
+    brandColor_.store(color, std::memory_order_relaxed);
+    hasBrandColor_.store(true, std::memory_order_relaxed);
+    std::lock_guard<std::mutex> lock(brandColorMutex_);
+    brandColorStr_ = brandColor;
+    RESMGR_HILOGI(RESMGR_TAG, "brand color set to 0x%{public}08x", color);
+    return SUCCESS;
+}
+
+std::string ResourceManagerImpl::GetBrandColor() const
+{
+    if (!hasBrandColor_.load(std::memory_order_relaxed)) {
+        return "";
+    }
+    std::lock_guard<std::mutex> lock(brandColorMutex_);
+    return brandColorStr_;
 }
 
 RState ResourceManagerImpl::GetColorById(uint32_t id, uint32_t &outValue)
@@ -1049,6 +870,10 @@ RState ResourceManagerImpl::GetColorById(uint32_t id, uint32_t &outValue)
     RState state = GetColor(idItem, outValue);
     if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
+    }
+    // Only apply brand color override when outValue is actually populated.
+    if (state == SUCCESS) {
+        ApplyBrandColor(idItem->name_, outValue);
     }
     return state;
 }
@@ -1069,6 +894,10 @@ RState ResourceManagerImpl::GetColorByName(const char *name, uint32_t &outValue)
     RState state = GetColor(idItem, outValue);
     if (state != SUCCESS && state != ERROR_CODE_RES_REF_TOO_MUCH) {
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
+    }
+    // Only apply brand color override when outValue is actually populated.
+    if (state == SUCCESS) {
+        ApplyBrandColor(idItem->name_, outValue);
     }
     return state;
 }
@@ -1311,15 +1140,6 @@ RState ResourceManagerImpl::GetRawFileDescriptor(const std::string &name, RawFil
 RState ResourceManagerImpl::CloseRawFileDescriptor(const std::string &name)
 {
     return hapManager_->CloseRawFileDescriptor(name);
-}
-
-void ResourceManagerImpl::ProcessPsuedoTranslate(std::string &outValue)
-{
-    std::string src = outValue;
-    std::string resultMsg = psueManager_->Convert(src, outValue);
-    if (resultMsg != "") {
-        RESMGR_HILOGE(RESMGR_TAG, "Psuedo translate failed, value:%s", src.c_str());
-    }
 }
 
 ResourceManagerImpl::~ResourceManagerImpl()
@@ -1896,163 +1716,6 @@ RState ResourceManagerImpl::GetDrawableInfoByName(const char *name,
     return state;
 }
 
-RState ResourceManagerImpl::GetStringFormatById(uint32_t id, std::string &outValue,
-    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
-{
-    RState state = GetStringById(id, outValue);
-    if (state != SUCCESS) {
-        return state;
-    }
-    ResConfigImpl resConfig;
-    GetResConfig(resConfig);
-    if (!ReplacePlaceholderWithParams(outValue, resConfig, jsParams)) {
-        return ERROR_CODE_RES_ID_FORMAT_ERROR;
-    }
-    return SUCCESS;
-}
-
-RState ResourceManagerImpl::GetStringFormatByName(const char *name, std::string &outValue,
-    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
-{
-    RState state = GetStringByName(name, outValue);
-    if (state != SUCCESS) {
-        return state;
-    }
-    ResConfigImpl resConfig;
-    GetResConfig(resConfig);
-    if (!ReplacePlaceholderWithParams(outValue, resConfig, jsParams)) {
-        return ERROR_CODE_RES_NAME_FORMAT_ERROR;
-    }
-    return SUCCESS;
-}
-
-RState ResourceManagerImpl::GetFormatPluralStringById(std::string &outValue, uint32_t id, int quantity,
-    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
-{
-    Quantity intqQantity = { true, quantity, 0.0 };
-    return GetFormatPluralStringById(outValue, id, intqQantity, jsParams);
-}
-
-RState ResourceManagerImpl::GetFormatPluralStringByName(std::string &outValue, const char *name, int quantity,
-    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
-{
-    Quantity intQuantity = { true, quantity, 0.0 };
-    return GetFormatPluralStringByName(outValue, name, intQuantity, jsParams);
-}
-
-RState ResourceManagerImpl::GetFormatPluralStringById(std::string &outValue, uint32_t id, Quantity quantity,
-    va_list args)
-{
-    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
-    if (idItem == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "GetFormatPluralStringById error id = %{public}d", id);
-        return ERROR_CODE_RES_ID_NOT_FOUND;
-    }
-    RState rState = GetPluralString(idItem, quantity, outValue);
-    if (rState == ERROR_CODE_RES_REF_TOO_MUCH) {
-        RESMGR_HILOGE(RESMGR_TAG, "find too much ref by plural id = %{public}d", id);
-        return rState;
-    }
-    if (rState != SUCCESS) {
-        RESMGR_HILOGE(RESMGR_TAG, "plural res not found, id = %{public}d", id);
-        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
-    }
-
-    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
-    if (ParseArgs(outValue, args, params)) {
-        ResConfigImpl resConfig;
-        GetResConfig(resConfig);
-        if (!ReplacePlaceholderWithParams(outValue, resConfig, params)) {
-            RESMGR_HILOGE(RESMGR_TAG, "format plural string error, id = %{public}d", id);
-            return ERROR_CODE_RES_ID_FORMAT_ERROR;
-        }
-        return SUCCESS;
-    }
-    return ERROR_CODE_INVALID_INPUT_PARAMETER;
-}
-
-RState ResourceManagerImpl::GetFormatPluralStringByName(std::string &outValue, const char *name, Quantity quantity,
-    va_list args)
-{
-    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::PLURALS, isOverrideResMgr_);
-    if (idItem == nullptr) {
-        RESMGR_HILOGD(RESMGR_TAG, "GetFormatPluralStringByName error name = %{public}s", name);
-        return ERROR_CODE_RES_NAME_NOT_FOUND;
-    }
-    RState rState = GetPluralString(idItem, quantity, outValue);
-    if (rState == ERROR_CODE_RES_REF_TOO_MUCH) {
-        RESMGR_HILOGE(RESMGR_TAG, "find too much ref by plural name = %{public}s", name);
-        return rState;
-    }
-    if (rState != SUCCESS) {
-        RESMGR_HILOGE(RESMGR_TAG, "plural res not found, name = %{public}s", name);
-        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
-    }
-    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> params;
-    if (ParseArgs(outValue, args, params)) {
-        ResConfigImpl resConfig;
-        GetResConfig(resConfig);
-        if (!ReplacePlaceholderWithParams(outValue, resConfig, params)) {
-            RESMGR_HILOGE(RESMGR_TAG, "format plural string error, name = %{public}s", name);
-            return ERROR_CODE_RES_NAME_FORMAT_ERROR;
-        }
-        return SUCCESS;
-    }
-    return ERROR_CODE_INVALID_INPUT_PARAMETER;
-}
-
-RState ResourceManagerImpl::GetFormatPluralStringById(std::string &outValue, uint32_t id, Quantity quantity,
-    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
-{
-    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
-    if (idItem == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "GetFormatPluralStringById error id = %{public}d", id);
-        return ERROR_CODE_RES_ID_NOT_FOUND;
-    }
-    RState rState = GetPluralString(idItem, quantity, outValue);
-    if (rState == ERROR_CODE_RES_REF_TOO_MUCH) {
-        RESMGR_HILOGE(RESMGR_TAG, "find too much ref by plural id = %{public}d", id);
-        return rState;
-    }
-    if (rState != SUCCESS) {
-        RESMGR_HILOGE(RESMGR_TAG, "plural res not found, id = %{public}d", id);
-        return ERROR_CODE_RES_NOT_FOUND_BY_ID;
-    }
-    ResConfigImpl resConfig;
-    GetResConfig(resConfig);
-    if (!ReplacePlaceholderWithParams(outValue, resConfig, jsParams)) {
-        RESMGR_HILOGE(RESMGR_TAG, "format plural string error, id = %{public}d", id);
-        return ERROR_CODE_RES_ID_FORMAT_ERROR;
-    }
-    return SUCCESS;
-}
-
-RState ResourceManagerImpl::GetFormatPluralStringByName(std::string &outValue, const char *name, Quantity quantity,
-    std::vector<std::tuple<ResourceManager::NapiValueType, std::string>> &jsParams)
-{
-    const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceByName(name, ResType::PLURALS, isOverrideResMgr_);
-    if (idItem == nullptr) {
-        RESMGR_HILOGD(RESMGR_TAG, "GetFormatPluralStringByName error name = %{public}s", name);
-        return ERROR_CODE_RES_NAME_NOT_FOUND;
-    }
-    RState rState = GetPluralString(idItem, quantity, outValue);
-    if (rState == ERROR_CODE_RES_REF_TOO_MUCH) {
-        RESMGR_HILOGE(RESMGR_TAG, "find too much ref by plural name = %{public}s", name);
-        return rState;
-    }
-    if (rState != SUCCESS) {
-        RESMGR_HILOGE(RESMGR_TAG, "plural res not found, name = %{public}s", name);
-        return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
-    }
-    ResConfigImpl resConfig;
-    GetResConfig(resConfig);
-    if (!ReplacePlaceholderWithParams(outValue, resConfig, jsParams)) {
-        RESMGR_HILOGE(RESMGR_TAG, "format plural string error, name = %{public}s", name);
-        return ERROR_CODE_RES_NAME_FORMAT_ERROR;
-    }
-    return SUCCESS;
-}
-
 RState ResourceManagerImpl::GetResName(uint32_t id, std::string &outValue)
 {
     const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
@@ -2212,6 +1875,7 @@ std::shared_ptr<ResourceManager> ResourceManagerImpl::GetOverrideResourceManager
 
     overrideResMgr->bundleInfo.first = this->bundleInfo.first;
     overrideResMgr->bundleInfo.second = this->bundleInfo.second;
+    overrideResMgr->SetBrandColor(this->GetBrandColor());
     if (overrideResConfig && overrideResMgr->UpdateOverrideResConfig(*overrideResConfig) != SUCCESS) {
         RESMGR_HILOGE(RESMGR_TAG, "GetOverrideResourceManager UpdateOverrideResConfig failed bundleName = %{public}s, \
             moduleName = %{public}s", this->bundleInfo.first.c_str(), this->bundleInfo.second.c_str());

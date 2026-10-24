@@ -64,6 +64,7 @@ ohos_unittest("resmgr_test") {
 
   sources = resmgr_test_common_sources + manager_sources + [
     "../../../dfx/hisysevent_adapter/hisysevent_adapter.cpp",
+    "unittest/common/brand_color_manager_test.cpp",
     "unittest/common/hap_manager_test.cpp",
     "unittest/common/hap_parser_test.cpp",
     "unittest/common/hap_resource_test.cpp",

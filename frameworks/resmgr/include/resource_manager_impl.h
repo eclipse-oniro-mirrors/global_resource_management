@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
 #ifndef OHOS_RESOURCE_MANAGER_RESOURCEMANAGERIMPL_H
 #define OHOS_RESOURCE_MANAGER_RESOURCEMANAGERIMPL_H
 
+#include <atomic>
 #include <map>
 #include <memory>
 #include <string>
@@ -873,6 +874,18 @@ public:
      */
     bool IsOverride();
 
+    /**
+     * Set the brand color for this ResourceManager instance.
+     * @param brandColor the brand color string (e.g. "#FF0A59F7").
+     */
+    RState SetBrandColor(const std::string &brandColor);
+
+    /**
+     * Get the brand color of this ResourceManager instance.
+     * @return the brand color string (e.g. "#FF0A59F7"), empty if not set.
+     */
+    std::string GetBrandColor() const;
+
 private:
     RState GetString(const std::shared_ptr<IdItem> idItem, std::string &outValue);
 
@@ -909,6 +922,14 @@ private:
     bool IsDensityValid(uint32_t density);
 
     RState GetThemeColor(const std::shared_ptr<IdItem> idItem, uint32_t &outValue);
+
+    bool ApplyBrandColor(const std::string &name, uint32_t &outValue);
+
+    // Apply brand color using the first name in the brand color list found
+    // in the idItems reference chain (similar to FindThemeResource which
+    // returns the first match). Falls back to the last name if none is in
+    // the list. No-op if brand color is unset or idItems is empty/not COLOR.
+    void ApplyBrandColorByIdItems(const std::vector<std::shared_ptr<IdItem>> &idItems, std::string &colorStr);
 
     RState GetThemeFloat(const std::shared_ptr<IdItem> idItem, float &outValue);
 
@@ -970,6 +991,18 @@ private:
     bool isOverrideResMgr_ = false;
 
     bool isSystemResMgr_ = false;
+
+    // Brand color state. Hot path (ApplyBrandColor) checks hasBrandColor_
+    // (atomic<bool>, lock-free) + brandColor_ (atomic<uint32_t>). String
+    // value brandColorStr_ is accessed only in SetBrandColor/GetBrandColor
+    // (non-hot path) via brandColorMutex_.
+    std::atomic<bool> hasBrandColor_ = false;
+
+    std::atomic<uint32_t> brandColor_ = 0;
+
+    std::string brandColorStr_;
+
+    mutable std::mutex brandColorMutex_;
 
     static constexpr int CONFIG_LEN = 128;
 
