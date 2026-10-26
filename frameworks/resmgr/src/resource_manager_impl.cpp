@@ -1354,12 +1354,15 @@ RState ResourceManagerImpl::GetThemeMedia(const std::shared_ptr<IdItem> idItem, 
     idItems.emplace_back(idItem);
     auto themeManager = ThemePackManager::GetThemePackManager();
     std::string result = themeManager->FindThemeResource(bundleInfo, idItems, resConfig, userId);
+    if (result.empty()) {
+        return ERROR_CODE_RES_ID_NOT_FOUND;
+    }
     outValue = Utils::LoadResourceFile(result, len);
     if (outValue == nullptr) {
         RESMGR_HILOGW(RESMGR_TAG, "GetThemeMedia null, path=%{public}s",
             themeManager->GetLogPath(result, userId).c_str());
     }
-    return result.empty() ? ERROR_CODE_RES_ID_NOT_FOUND : SUCCESS;
+    return SUCCESS;
 }
 
 RState ResourceManagerImpl::GetMediaDataById(uint32_t id, size_t &len, std::unique_ptr<uint8_t[]> &outValue,

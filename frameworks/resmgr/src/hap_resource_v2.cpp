@@ -110,7 +110,6 @@ const std::shared_ptr<IdValues> HapResourceV2::GetIdValues(const uint32_t id)
         }
         if (iter->second->IsParsed()) {
             if (iter->second->GetLimitPathsConst().empty()) {
-                RESMGR_HILOGW(RESMGR_TAG, "by id=%{public}u limitPaths is empty", id);
                 return nullptr;
             }
             return iter->second;
@@ -152,7 +151,6 @@ const std::shared_ptr<IdValues> HapResourceV2::GetIdValuesByName(const std::stri
         }
         if (iter->second->IsParsed()) {
             if (iter->second->GetLimitPathsConst().empty()) {
-                RESMGR_HILOGW(RESMGR_TAG, "by name=%{public}s limitPaths is empty", name.c_str());
                 return nullptr;
             }
             return iter->second;
