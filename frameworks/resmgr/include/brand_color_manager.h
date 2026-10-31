@@ -62,7 +62,9 @@ public:
      * the brand color's RGB, keeping the original alpha channel.
      * Lock-free on the read path (atomic<bool> load + unordered_set find).
      * @param name the color resource name.
-     * @param brandColor the brand color value (0xaarrggbb).
+     * @param brandColor the brand color value (0xaarrggbb); MUST be non-zero
+     *        (0 is the "not set" sentinel in ResourceManagerImpl and is never
+     *        passed through to here).
      * @param color the original color value (0xaarrggbb), replaced on output if applicable.
      * @return true if the color was replaced with brand color.
      */

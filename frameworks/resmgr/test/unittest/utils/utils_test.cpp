@@ -48,6 +48,30 @@ HWTEST_F(UtilsTest, TestConvertColorToUInt32Func001, TestSize.Level1)
 }
 
 /*
+ * @tc.name: TestIsSystemResource001
+ * @tc.desc: Test IsSystemResource function
+ * @tc.type: FUNC
+ */
+HWTEST_F(UtilsTest, TestIsSystemResource001, TestSize.Level1)
+{
+    // System resource range: [0x07000000, 0x07FFFFFF]
+    EXPECT_TRUE(Utils::IsSystemResource(0x07000000));   // lower bound
+    EXPECT_TRUE(Utils::IsSystemResource(0x07FFFFFF));   // upper bound
+    EXPECT_TRUE(Utils::IsSystemResource(0x07000001));   // inside
+    EXPECT_TRUE(Utils::IsSystemResource(0x0700ABCD));   // inside
+
+    // App resource range: below 0x07000000
+    EXPECT_FALSE(Utils::IsSystemResource(0x01000000));  // app resource lower bound
+    EXPECT_FALSE(Utils::IsSystemResource(0x06FFFFFF));  // just below system range
+    EXPECT_FALSE(Utils::IsSystemResource(0x00000000));  // zero
+    EXPECT_FALSE(Utils::IsSystemResource(0x00000001));  // small id
+
+    // Above system range
+    EXPECT_FALSE(Utils::IsSystemResource(0x08000000));  // just above
+    EXPECT_FALSE(Utils::IsSystemResource(0xFFFFFFFF));  // max uint32
+}
+
+/*
  * @tc.name: TestGetMediaBase64Data001
  * @tc.desc: Test GetMediaBase64Data function
  * @tc.type: FUNC

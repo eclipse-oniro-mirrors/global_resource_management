@@ -771,13 +771,23 @@ RState ResourceManagerImpl::GetThemeColor(const std::shared_ptr<IdItem> idItem, 
     return state == SUCCESS ? Utils::ConvertColorToUInt32(result.c_str(), outValue) : state;
 }
 
-bool ResourceManagerImpl::ApplyBrandColor(const std::string &name, uint32_t &outValue)
+bool ResourceManagerImpl::ApplyBrandColor(const std::shared_ptr<IdItem> &idItem, uint32_t &outValue)
 {
-    if (!hasBrandColor_.load(std::memory_order_relaxed)) {
+    if (idItem == nullptr) {
         return false;
     }
-    uint32_t brandColor = brandColor_.load(std::memory_order_relaxed);
-    return BrandColorManager::GetInstance().ApplyBrandColor(name, brandColor, outValue);
+    // Brand color only applies to system resources (ID ≥ 0x07000000).
+    // This guard ensures any caller — including future ones — is protected.
+    if (!Utils::IsSystemResource(idItem->id_)) {
+        return false;
+    }
+    // Single acquire load: 0 means "not set" (clear), non-zero is the brand
+    // color. No flag/data desync possible — the sentinel itself decides.
+    uint32_t brandColor = brandColor_.load(std::memory_order_acquire);
+    if (brandColor == 0) {
+        return false;
+    }
+    return BrandColorManager::GetInstance().ApplyBrandColor(idItem->name_, brandColor, outValue);
 }
 
 void ResourceManagerImpl::ApplyBrandColorByIdItems(const std::vector<std::shared_ptr<IdItem>> &idItems,
@@ -789,21 +799,26 @@ void ResourceManagerImpl::ApplyBrandColorByIdItems(const std::vector<std::shared
     if (idItems.back()->resType_ != ResType::COLOR) {
         return;
     }
-    // Find the first name in the reference chain that is in the brand color
-    // list (similar to FindThemeResource which returns the first match).
-    // Falls back to the last name if none is in the list.
-    std::string applyName;
+    // Find the first SYSTEM resource in the reference chain whose name is in
+    // the brand color list. Brand color only applies to system resources, not
+    // app resources — an app resource with the same name as a system brand
+    // color resource must not be replaced. If no system resource in the chain
+    // is in the brand color list, skip replacement entirely.
+    std::shared_ptr<IdItem> applyItem;
     for (const auto &item : idItems) {
         if (item == nullptr || item->resType_ != ResType::COLOR) {
             continue;
         }
+        if (!Utils::IsSystemResource(item->id_)) {
+            continue;  // app resource — skip
+        }
         if (BrandColorManager::GetInstance().IsBrandColorName(item->name_)) {
-            applyName = item->name_;
+            applyItem = item;
             break;
         }
     }
-    if (applyName.empty()) {
-        applyName = idItems.back()->name_;
+    if (applyItem == nullptr) {
+        return;  // no system brand color resource in chain
     }
     // Convert color string to uint32, apply brand color override, convert back.
     // Only normalize the format when brand color was actually applied; keep
@@ -812,7 +827,7 @@ void ResourceManagerImpl::ApplyBrandColorByIdItems(const std::vector<std::shared
     if (Utils::ConvertColorToUInt32(colorStr.c_str(), color) != SUCCESS) {
         return;
     }
-    if (!ApplyBrandColor(applyName, color)) {
+    if (!ApplyBrandColor(applyItem, color)) {
         return;
     }
     char buf[16] = {0};
@@ -824,11 +839,14 @@ void ResourceManagerImpl::ApplyBrandColorByIdItems(const std::vector<std::shared
 
 RState ResourceManagerImpl::SetBrandColor(const std::string &brandColor)
 {
+    // Option B (mutex-first): update brandColorStr_ inside the mutex, then
+    // publish brandColor_ last via release store. A reader that observes the
+    // new atomic value via acquire is guaranteed to see the already-updated
+    // string, eliminating the store-before-mutex consistency window.
     if (brandColor.empty()) {
-        hasBrandColor_.store(false, std::memory_order_relaxed);
-        brandColor_.store(0, std::memory_order_relaxed);
         std::lock_guard<std::mutex> lock(brandColorMutex_);
         brandColorStr_.clear();
+        brandColor_.store(0, std::memory_order_release);
         return SUCCESS;
     }
     uint32_t color = 0;
@@ -837,19 +855,28 @@ RState ResourceManagerImpl::SetBrandColor(const std::string &brandColor)
         RESMGR_HILOGE(RESMGR_TAG, "SetBrandColor invalid format: %{public}s", brandColor.c_str());
         return state;
     }
-    brandColor_.store(color, std::memory_order_relaxed);
-    hasBrandColor_.store(true, std::memory_order_relaxed);
+    // A fully transparent color that parses to 0 (only #argb/#aarrggbb with
+    // all-zero digits, e.g. "#0000", "#00000000") is treated as "clear":
+    // the old behavior would apply brandColor=0, replacing system resource
+    // RGB with black 0x000000 (visible — alpha preserved, RGB zeroed);
+    // treating it as clear avoids this and aligns with the
+    // "empty string = clear" contract. The contract doc (resource_manager.h
+    // SetBrandColor @param) has been updated to document this.
+    // To set near-transparent, use a non-zero alpha (e.g. "#01000000").
     std::lock_guard<std::mutex> lock(brandColorMutex_);
-    brandColorStr_ = brandColor;
-    RESMGR_HILOGI(RESMGR_TAG, "brand color set to 0x%{public}08x", color);
+    if (color == 0) {
+        brandColorStr_.clear();
+        RESMGR_HILOGD(RESMGR_TAG, "brand color %{public}s parses to 0, treated as clear", brandColor.c_str());
+    } else {
+        brandColorStr_ = brandColor;
+        RESMGR_HILOGI(RESMGR_TAG, "brand color set to 0x%{public}08x", color);
+    }
+    brandColor_.store(color, std::memory_order_release);
     return SUCCESS;
 }
 
 std::string ResourceManagerImpl::GetBrandColor() const
 {
-    if (!hasBrandColor_.load(std::memory_order_relaxed)) {
-        return "";
-    }
     std::lock_guard<std::mutex> lock(brandColorMutex_);
     return brandColorStr_;
 }
@@ -872,8 +899,9 @@ RState ResourceManagerImpl::GetColorById(uint32_t id, uint32_t &outValue)
         return ERROR_CODE_RES_NOT_FOUND_BY_ID;
     }
     // Only apply brand color override when outValue is actually populated.
+    // ApplyBrandColor internally checks system resource ID.
     if (state == SUCCESS) {
-        ApplyBrandColor(idItem->name_, outValue);
+        ApplyBrandColor(idItem, outValue);
     }
     return state;
 }
@@ -896,8 +924,9 @@ RState ResourceManagerImpl::GetColorByName(const char *name, uint32_t &outValue)
         return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
     }
     // Only apply brand color override when outValue is actually populated.
+    // ApplyBrandColor internally checks system resource ID.
     if (state == SUCCESS) {
-        ApplyBrandColor(idItem->name_, outValue);
+        ApplyBrandColor(idItem, outValue);
     }
     return state;
 }

@@ -32,8 +32,6 @@ constexpr int SECOND_ELEMENT = 1;
 constexpr int THIRED_ELEMENT = 2;
 static std::shared_ptr<ThemePackManager> themeMgr = nullptr;
 static std::once_flag themeMgrFlag;
-constexpr uint32_t SYSTEM_ID_BEGIN = 117440512; // 0x07000000
-constexpr uint32_t SYSTEM_ID_END = 134217727; // 0x07FFFFFF
 // Macro overrides for test path injection; production defaults to real SA paths.
 #ifndef SA_THEME_FLAG_PREFIX
 #define SA_THEME_FLAG_PREFIX "data/service/el1/public/themes"
@@ -290,7 +288,7 @@ const std::string ThemePackManager::FindThemeResource(const std::pair<std::strin
         std::string resName = idItems[i]->name_;
         uint32_t id = idItems[i]->id_;
         ResType resType = idItems[i]->resType_;
-        if (id >= SYSTEM_ID_BEGIN && id <= SYSTEM_ID_END) {
+        if (Utils::IsSystemResource(id)) {
             if (resType == ResType::COLOR && !isThemeSystemResEnable) {
                 break;
             }

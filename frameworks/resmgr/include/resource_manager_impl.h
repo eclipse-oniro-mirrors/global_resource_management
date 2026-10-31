@@ -923,12 +923,12 @@ private:
 
     RState GetThemeColor(const std::shared_ptr<IdItem> idItem, uint32_t &outValue);
 
-    bool ApplyBrandColor(const std::string &name, uint32_t &outValue);
+    bool ApplyBrandColor(const std::shared_ptr<IdItem> &idItem, uint32_t &outValue);
 
-    // Apply brand color using the first name in the brand color list found
-    // in the idItems reference chain (similar to FindThemeResource which
-    // returns the first match). Falls back to the last name if none is in
-    // the list. No-op if brand color is unset or idItems is empty/not COLOR.
+    // Apply brand color using the first system resource name in the brand
+    // color list found in the idItems reference chain. App resources (id <
+    // 0x07000000) are skipped. No-op if brand color is unset, idItems is
+    // empty/not COLOR, or no system brand color resource is in the chain.
     void ApplyBrandColorByIdItems(const std::vector<std::shared_ptr<IdItem>> &idItems, std::string &colorStr);
 
     RState GetThemeFloat(const std::shared_ptr<IdItem> idItem, float &outValue);
@@ -992,12 +992,13 @@ private:
 
     bool isSystemResMgr_ = false;
 
-    // Brand color state. Hot path (ApplyBrandColor) checks hasBrandColor_
-    // (atomic<bool>, lock-free) + brandColor_ (atomic<uint32_t>). String
-    // value brandColorStr_ is accessed only in SetBrandColor/GetBrandColor
-    // (non-hot path) via brandColorMutex_.
-    std::atomic<bool> hasBrandColor_ = false;
-
+    // Brand color state. A single atomic<uint32_t> encodes both the flag and
+    // the value: 0 means "not set" (clear), any non-zero value is the brand
+    // color. Hot path (ApplyBrandColor) does one acquire load + compare; no
+    // flag/data desync is possible because the sentinel itself carries the
+    // "do not apply" semantics. brandColorStr_ (original format string) is
+    // accessed only in SetBrandColor/GetBrandColor (non-hot path) via
+    // brandColorMutex_.
     std::atomic<uint32_t> brandColor_ = 0;
 
     std::string brandColorStr_;
