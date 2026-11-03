@@ -1378,15 +1378,14 @@ static void SetupBrandColor(const std::vector<std::string> &names, uint32_t bran
 static void SetBrandColorOnRm(ResourceManager *rm, uint32_t brandColor)
 {
     auto *impl = (ResourceManagerImpl *)rm;
-    impl->hasBrandColor_.store(true, std::memory_order_relaxed);
-    impl->brandColor_.store(brandColor, std::memory_order_relaxed);
+    // Single atomic: 0 = not set, non-zero = brand color.
+    impl->brandColor_.store(brandColor, std::memory_order_release);
 }
 
 static void ClearBrandColorOnRm(ResourceManager *rm)
 {
     auto *impl = (ResourceManagerImpl *)rm;
-    impl->hasBrandColor_.store(false, std::memory_order_relaxed);
-    impl->brandColor_.store(0, std::memory_order_relaxed);
+    impl->brandColor_.store(0, std::memory_order_release);
 }
 
 static void ResetBrandColorManager()
@@ -1396,8 +1395,10 @@ static void ResetBrandColorManager()
     bcm.loaded_.store(false, std::memory_order_relaxed);
 }
 
-// GetColorById: divider_color #10000000 + brand #FFFF0000 → #10FF0000
-HWTEST_F(ResourceManagerDeviceTest, BrandColorGetColorByIdReplaceRgb, TestSize.Level1)
+// GetColorById: app resources (ID < 0x07000000) are NOT brand-color-replaced,
+// even if the name is in the brand color list. Brand color only applies to
+// system resources.
+HWTEST_F(ResourceManagerDeviceTest, BrandColorGetColorByIdAppResourceNotReplaced, TestSize.Level1)
 {
     bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
     ASSERT_TRUE(ret);
@@ -1407,13 +1408,13 @@ HWTEST_F(ResourceManagerDeviceTest, BrandColorGetColorByIdReplaceRgb, TestSize.L
     SetBrandColorOnRm(rm, 0xFFFF0000);
     uint32_t outValue;
     EXPECT_EQ(SUCCESS, rm->GetColorById(id, outValue));
-    EXPECT_EQ(0x10FF0000u, outValue);
+    EXPECT_EQ(0x10000000u, outValue);  // original, not replaced
     ClearBrandColorOnRm(rm);
     ResetBrandColorManager();
 }
 
-// GetColorByName: same via name
-HWTEST_F(ResourceManagerDeviceTest, BrandColorGetColorByNameReplaceRgb, TestSize.Level1)
+// GetColorByName: same — app resource not replaced.
+HWTEST_F(ResourceManagerDeviceTest, BrandColorGetColorByNameAppResourceNotReplaced, TestSize.Level1)
 {
     bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
     ASSERT_TRUE(ret);
@@ -1421,7 +1422,7 @@ HWTEST_F(ResourceManagerDeviceTest, BrandColorGetColorByNameReplaceRgb, TestSize
     SetBrandColorOnRm(rm, 0xFFFF0000);
     uint32_t outValue;
     EXPECT_EQ(SUCCESS, rm->GetColorByName("divider_color", outValue));
-    EXPECT_EQ(0x10FF0000u, outValue);
+    EXPECT_EQ(0x10000000u, outValue);  // original, not replaced
     ClearBrandColorOnRm(rm);
     ResetBrandColorManager();
 }
@@ -1456,7 +1457,7 @@ HWTEST_F(ResourceManagerDeviceTest, BrandColorGetColorByIdNotSet, TestSize.Level
     ResetBrandColorManager();
 }
 
-// Clear brand color → back to original
+// Clear brand color → still original (app resource was never replaced)
 HWTEST_F(ResourceManagerDeviceTest, BrandColorGetColorByIdClear, TestSize.Level1)
 {
     bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
@@ -1467,14 +1468,14 @@ HWTEST_F(ResourceManagerDeviceTest, BrandColorGetColorByIdClear, TestSize.Level1
     SetBrandColorOnRm(rm, 0xFFFF0000);
     uint32_t outValue;
     rm->GetColorById(id, outValue);
-    EXPECT_EQ(0x10FF0000u, outValue);
+    EXPECT_EQ(0x10000000u, outValue);  // app resource — not replaced
     ClearBrandColorOnRm(rm);
     EXPECT_EQ(SUCCESS, rm->GetColorById(id, outValue));
     EXPECT_EQ(0x10000000u, outValue);
     ResetBrandColorManager();
 }
 
-// Multiple colors in list: each replaced
+// Multiple colors in list: app resources not replaced (system-only guard)
 HWTEST_F(ResourceManagerDeviceTest, BrandColorMultipleColorsInList, TestSize.Level1)
 {
     bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
@@ -1484,17 +1485,59 @@ HWTEST_F(ResourceManagerDeviceTest, BrandColorMultipleColorsInList, TestSize.Lev
     uint32_t outValue;
     int id = rmc->GetResId("divider_color", ResType::COLOR);
     rm->GetColorById(id, outValue);
-    EXPECT_EQ(0x10FF0000u, outValue);
+    EXPECT_EQ(0x10000000u, outValue);  // original, not replaced
     id = rmc->GetResId("color_aboutPage_title_primary", ResType::COLOR);
     rm->GetColorById(id, outValue);
-    EXPECT_EQ(0xFFFF0000u, outValue);
+    EXPECT_EQ(0xFF191919u, outValue);  // original, not replaced
     rm->GetColorByName("base_only", outValue);
-    EXPECT_EQ(0x00FF0000u, outValue);
+    EXPECT_EQ(0x00000000u, outValue);  // original, not replaced
     ClearBrandColorOnRm(rm);
     ResetBrandColorManager();
 }
 
-// SetBrandColor/GetBrandColor API
+// Positive coverage: ApplyBrandColor called directly (bypasses the
+// GetColorById/ByName entry points) verifies the replacement logic itself
+// works — RGB replaced, alpha preserved. A system-range ID is passed so the
+// internal system-resource guard passes; an app-range ID is also tested to
+// verify the guard rejects it.
+HWTEST_F(ResourceManagerDeviceTest, BrandColorApplyDirectlyReplacesRgb, TestSize.Level1)
+{
+    SetupBrandColor({"divider_color"}, 0xFFFF0000);
+    SetBrandColorOnRm(rm, 0xFFFF0000);
+    auto *impl = (ResourceManagerImpl *)rm;
+    // Helper: build a minimal IdItem for testing.
+    auto makeItem = [](const std::string &name, uint32_t id) {
+        auto item = std::make_shared<IdItem>();
+        item->name_ = name;
+        item->id_ = id;
+        item->resType_ = ResType::COLOR;
+        return item;
+    };
+    constexpr uint32_t sysId = 0x07000001;
+    constexpr uint32_t appId = 0x01000001;
+    // system resource: alpha=0x10 preserved, RGB=000000 → FF0000 (brand)
+    uint32_t outValue = 0x10000000;
+    EXPECT_TRUE(impl->ApplyBrandColor(makeItem("divider_color", sysId), outValue));
+    EXPECT_EQ(0x10FF0000u, outValue);
+    // system resource: alpha=0xFF preserved
+    outValue = 0xFF191919;
+    EXPECT_TRUE(impl->ApplyBrandColor(makeItem("divider_color", sysId), outValue));
+    EXPECT_EQ(0xFFFF0000u, outValue);
+    // system resource but name not in list → not replaced
+    outValue = 0x10000000;
+    EXPECT_FALSE(impl->ApplyBrandColor(makeItem("other_color", sysId), outValue));
+    EXPECT_EQ(0x10000000u, outValue);
+    // app resource (ID < 0x07000000) → not replaced even if name in list
+    outValue = 0x10000000;
+    EXPECT_FALSE(impl->ApplyBrandColor(makeItem("divider_color", appId), outValue));
+    EXPECT_EQ(0x10000000u, outValue);
+    // nullptr → not replaced
+    outValue = 0x10000000;
+    EXPECT_FALSE(impl->ApplyBrandColor(nullptr, outValue));
+    EXPECT_EQ(0x10000000u, outValue);
+    ClearBrandColorOnRm(rm);
+    ResetBrandColorManager();
+}
 HWTEST_F(ResourceManagerDeviceTest, BrandColorSetAndGet, TestSize.Level1)
 {
     EXPECT_EQ(SUCCESS, rm->SetBrandColor("#FFFF0000"));
@@ -1521,7 +1564,48 @@ HWTEST_F(ResourceManagerDeviceTest, BrandColorSetVariousFormats, TestSize.Level1
     EXPECT_EQ("", rm->GetBrandColor());
 }
 
-// Override RM inherits brand color
+// H2: Fully transparent colors (#00000000 / #0000) parse to 0 and are
+// treated as "clear" (brandColor_==0 sentinel). Goes through the public
+// SetBrandColor(string) + ConvertColorToUInt32 end-to-end path, not the
+// atom-poking helper, to cover the if(color==0) branch.
+HWTEST_F(ResourceManagerDeviceTest, BrandColorTransparentTreatedAsClear, TestSize.Level1)
+{
+    // #00000000 (8-digit aarrggbb, all zero) → parses to 0 → treated as clear.
+    EXPECT_EQ(SUCCESS, rm->SetBrandColor("#00000000"));
+    EXPECT_EQ("", rm->GetBrandColor());
+    // #0000 (4-digit argb, all zero) → parses to 0 → treated as clear.
+    EXPECT_EQ(SUCCESS, rm->SetBrandColor("#0000"));
+    EXPECT_EQ("", rm->GetBrandColor());
+}
+
+// H2 non-regression guard: #000000 (6-digit rrggbb) has 0xFF alpha default
+// (utils.cpp ConvertColorSixRgbToUInt32 |= 0xFF000000), so it parses to
+// 0xFF000000 (non-zero) → treated as "set to black". Must NOT be clear.
+HWTEST_F(ResourceManagerDeviceTest, BrandColorOpaqueBlackNotTreatedAsClear, TestSize.Level1)
+{
+    EXPECT_EQ(SUCCESS, rm->SetBrandColor("#000000"));
+    EXPECT_EQ("#000000", rm->GetBrandColor());
+    rm->SetBrandColor("");
+    EXPECT_EQ("", rm->GetBrandColor());
+}
+
+// L3: Override RM transparent color propagation — parent sets #00000000
+// (treated as clear) → override RM inherits "" (clear).
+HWTEST_F(ResourceManagerDeviceTest, BrandColorOverrideRmTransparentPropagate, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
+    ASSERT_TRUE(ret);
+    rm->SetBrandColor("#00000000");
+    EXPECT_EQ("", rm->GetBrandColor());
+    auto overrideConfig = std::make_shared<ResConfigImpl>();
+    auto overrideRm = rm->GetOverrideResourceManager(overrideConfig);
+    ASSERT_NE(nullptr, overrideRm);
+    EXPECT_EQ("", overrideRm->GetBrandColor());
+    ResetBrandColorManager();
+}
+
+// Override RM inherits brand color; app resource still not replaced
+// (system-only guard applies to override RM too).
 HWTEST_F(ResourceManagerDeviceTest, BrandColorOverrideRmInherit, TestSize.Level1)
 {
     bool ret = rm->AddResource(FormatFullPath(g_resFilePath).c_str());
@@ -1535,7 +1619,7 @@ HWTEST_F(ResourceManagerDeviceTest, BrandColorOverrideRmInherit, TestSize.Level1
     int id = rmc->GetResId("divider_color", ResType::COLOR);
     uint32_t outValue;
     overrideRm->GetColorById(id, outValue);
-    EXPECT_EQ(0x10FF0000u, outValue);
+    EXPECT_EQ(0x10000000u, outValue);  // app resource — not replaced
     ClearBrandColorOnRm(rm);
     ResetBrandColorManager();
 }

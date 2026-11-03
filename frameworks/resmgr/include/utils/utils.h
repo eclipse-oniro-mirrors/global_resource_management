@@ -123,6 +123,8 @@ public:
 
     static bool IsSystemPath(const std::string& path);
 
+    static bool IsSystemResource(uint32_t id);
+
     EXPORT_FUNC static std::string GetSystemParameter(const std::string& paramKey);
 
     EXPORT_FUNC static bool SupportSingleLayerThemeIcon();

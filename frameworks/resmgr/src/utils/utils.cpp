@@ -43,6 +43,8 @@ namespace OHOS {
 namespace Global {
 namespace Resource {
 constexpr int CONVERT_BASE = 10;
+constexpr uint32_t SYSTEM_ID_BEGIN = 0x07000000;
+constexpr uint32_t SYSTEM_ID_END = 0x07FFFFFF;
 
 const std::set<std::string> Utils::tailSet {
     ".hap",
@@ -434,6 +436,11 @@ RState Utils::ConvertColorToUInt32(const char *s, uint32_t &outValue)
     }
     outValue = color;
     return parseState;
+}
+
+bool Utils::IsSystemResource(uint32_t id)
+{
+    return id >= SYSTEM_ID_BEGIN && id <= SYSTEM_ID_END;
 }
 
 bool Utils::endWithTail(const std::string& path, const std::string& tail)

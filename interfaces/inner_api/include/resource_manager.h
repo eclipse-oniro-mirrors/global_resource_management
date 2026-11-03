@@ -294,13 +294,20 @@ public:
 
     /**
      * Set the brand color for this ResourceManager instance.
-     * Color resources in the brand color replacement list will have their RGB
-     * replaced with this brand color's RGB.
+     * System color resources whose name is in the brand color replacement list will have their RGB replaced with
+     * this brand color's RGB. Application resources are not affected, even if their name coincidentally matches a
+     * system brand color resource name.
      *
      * @param brandColor the brand color string (e.g. "#FF000000", "#RRGGBB").
      *        Pass an empty string to clear the previously set brand color;
      *        after clearing, color resources in the replacement list are no
-     *        longer overridden.
+     *        longer overridden. A fully transparent color that parses to a
+     *        zero value (e.g. "#00000000", "#0000") is also treated as clear,
+     *        since the old behavior of applying a zero-RGB brand color would
+     *        replace system resource RGB with black (visible); treating it as
+     *        clear avoids this and aligns with the "empty string = clear"
+     *        contract. To set a near-transparent brand color, use a
+     *        non-zero alpha (e.g. "#01000000").
      * @return SUCCESS if the brand color was set or cleared, INVALID_FORMAT
      *         if the color string is non-empty but invalid, NOT_SUPPORT_SEP
      *         if this ResourceManager does not implement brand color override.
@@ -310,8 +317,11 @@ public:
     /**
      * Get the brand color of this ResourceManager instance.
      *
-     * @return the brand color string (e.g. "#FF000000"), empty if not set or
-     *         not supported by this ResourceManager.
+     * @return the brand color string (e.g. "#FF000000"). Returns an empty
+     *         string if no brand color is set, if a fully transparent color
+     *         (parses to 0, e.g. "#00000000") was passed (treated as clear —
+     *         see SetBrandColor), or if this ResourceManager does not
+     *         implement brand color override.
      */
     virtual std::string GetBrandColor() const { return ""; }
 };
