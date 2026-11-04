@@ -878,4 +878,38 @@ HWTEST_F(HapManagerTest, HapManagerGetLocalesTest001, TestSize.Level1)
     hapManager->GetLocales(outValue, false);
     EXPECT_TRUE(outValue.size() == 0);
 }
+
+/*
+ * @tc.name: HapManagerThemeSystemResEnableInheritTest001
+ * @tc.desc: The 4-argument constructor must inherit isThemeSystemResEnable_ from the
+ *     parent HapManager so that the override HapManager can resolve themed system
+ *     resources via FindThemeResource.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapManagerTest, HapManagerThemeSystemResEnableInheritTest001, TestSize.Level1)
+{
+    auto resConfig = std::make_shared<ResConfigImpl>();
+
+    // Parent system HapManager with theme system resource enabled.
+    auto parent = std::make_shared<HapManager>(resConfig, true);
+    ASSERT_TRUE(parent != nullptr);
+    parent->UpdateAppConfigForSysResManager(false, true);
+    EXPECT_TRUE(parent->IsThemeSystemResEnableHap());
+
+    // Override HapManager inherits isThemeSystemResEnable_ via the constructor.
+    auto overrideEnabled = std::make_shared<HapManager>(resConfig, parent->GetHapResource(),
+        parent->GetLoadedHapPaths(), parent->IsSystem(), parent->IsThemeSystemResEnableHap());
+    ASSERT_TRUE(overrideEnabled != nullptr);
+    EXPECT_TRUE(overrideEnabled->IsThemeSystemResEnableHap());
+
+    // When the parent has it disabled, the override HapManager must also be disabled.
+    auto parentDisabled = std::make_shared<HapManager>(resConfig, true);
+    ASSERT_TRUE(parentDisabled != nullptr);
+    EXPECT_FALSE(parentDisabled->IsThemeSystemResEnableHap());
+    auto overrideDisabled = std::make_shared<HapManager>(resConfig, parentDisabled->GetHapResource(),
+        parentDisabled->GetLoadedHapPaths(), parentDisabled->IsSystem(),
+        parentDisabled->IsThemeSystemResEnableHap());
+    ASSERT_TRUE(overrideDisabled != nullptr);
+    EXPECT_FALSE(overrideDisabled->IsThemeSystemResEnableHap());
+}
 }

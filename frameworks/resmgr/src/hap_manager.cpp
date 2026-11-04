@@ -72,8 +72,10 @@ HapManager::HapManager(std::shared_ptr<ResConfigImpl> resConfig, bool isSystem)
 }
 
 HapManager::HapManager(std::shared_ptr<ResConfigImpl> resConfig, std::vector<std::shared_ptr<HapResource>> hapResources,
-    std::unordered_map<std::string, std::vector<std::string>> loadedHapPaths, bool isSystem)
-    : resConfig_(resConfig), hapResources_(hapResources), loadedHapPaths_(loadedHapPaths), isSystem_(isSystem)
+    std::unordered_map<std::string, std::vector<std::string>> loadedHapPaths, bool isSystem,
+    bool isThemeSystemResEnable)
+    : resConfig_(resConfig), hapResources_(hapResources), loadedHapPaths_(loadedHapPaths), isSystem_(isSystem),
+      isThemeSystemResEnable_(isThemeSystemResEnable)
 {
     overrideResConfig_->SetColorMode(COLOR_MODE_NOT_SET);
 }
