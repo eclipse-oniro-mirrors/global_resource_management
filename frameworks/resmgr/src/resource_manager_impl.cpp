@@ -113,7 +113,7 @@ bool ResourceManagerImpl::Init(std::shared_ptr<HapManager> hapManager)
     }
     hapManager->GetResConfig(*resConfig);
     hapManager_ = std::make_shared<HapManager>(resConfig, hapManager->GetHapResource(),
-        hapManager->GetLoadedHapPaths(), hapManager->IsSystem());
+        hapManager->GetLoadedHapPaths(), hapManager->IsSystem(), hapManager->IsThemeSystemResEnableHap());
     if (hapManager_ == nullptr) {
         RESMGR_HILOGE(RESMGR_TAG, "new HapManager failed from hapManager");
         return false;

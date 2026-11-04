@@ -45,9 +45,12 @@ public:
      * @param hapResources hap resources
      * @param loadedHapPaths loaded hap paths
      * @param isSystem system resource flag, default value is false
+     * @param isThemeSystemResEnable whether theme system resource is enabled, inherited from the
+     *     parent HapManager so that the override HapManager can resolve themed system resources.
     */
     HapManager(std::shared_ptr<ResConfigImpl> resConfig, std::vector<std::shared_ptr<HapResource>> hapResources,
-        std::unordered_map<std::string, std::vector<std::string>> loadedHapPaths, bool isSystem = false);
+        std::unordered_map<std::string, std::vector<std::string>> loadedHapPaths, bool isSystem = false,
+        bool isThemeSystemResEnable = false);
 
     /**
      * The destructor of HapManager
