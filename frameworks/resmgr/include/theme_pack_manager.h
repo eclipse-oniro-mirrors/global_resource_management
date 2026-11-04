@@ -231,6 +231,8 @@ private:
     std::vector<std::string> GetRootDir(const std::string &strCurrentDir, const std::string &basePath, int32_t userId);
     std::vector<std::string> GetThemeSkinRootDir(const std::string &newPath, const std::string &oldPath,
         const std::string &basePath, int32_t userId);
+    std::vector<std::string> GetSystemResRootDirs(int32_t userId);
+    void UpdateSystemResRootDirs(std::vector<std::string> &rootDirs, int32_t userId);
     bool IsSameResourceByUserId(const std::string &path, int32_t userId);
     void UpdateBasePath(int32_t userId);
     void UpdateUserId(int32_t userId);

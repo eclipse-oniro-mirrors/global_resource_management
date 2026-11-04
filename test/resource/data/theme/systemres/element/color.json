@@ -1,0 +1,14 @@
+{
+  "color": [
+    {
+      "name": "system_res_theme_color",
+      "value": "#FF0000FF"
+    }
+  ],
+  "float": [
+    {
+      "name": "system_res_theme_float",
+      "value": "100vp"
+    }
+  ]
+}
