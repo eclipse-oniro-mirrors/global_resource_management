@@ -483,12 +483,12 @@ void Utils::CanonicalizePath(const char *path, char *outPath, size_t len)
     }
 #ifdef __WINNT__
     if (!PathCanonicalizeA(outPath, path)) {
-        RESMGR_HILOGE(RESMGR_TAG, "failed to canonicalize the path");
+        RESMGR_HILOGD(RESMGR_TAG, "failed to canonicalize the path");
         return;
     }
 #else
     if (realpath(path, outPath) == nullptr) {
-        RESMGR_HILOGE(RESMGR_TAG, "failed to realpath the path, errno:%{public}d", errno);
+        RESMGR_HILOGD(RESMGR_TAG, "failed to realpath the path, errno:%{public}d", errno);
         return;
     }
 #endif
