@@ -227,12 +227,12 @@ RState ResourceManagerImpl::ResolveReference(const std::string value, std::strin
         }
         const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
         if (idItem == nullptr) {
-            RESMGR_HILOGE(RESMGR_TAG, "ref %s id not found", refStr.c_str());
+            RESMGR_HILOGD(RESMGR_TAG, "ref %{public}s id not found", refStr.c_str());
             return ERROR;
         }
         if (resType != idItem->resType_) {
             RESMGR_HILOGE(RESMGR_TAG,
-                "impossible. ref %s type mismatch, found type: %d", refStr.c_str(), idItem->resType_);
+                "impossible. ref %{public}s type mismatch, found type: %{public}d", refStr.c_str(), idItem->resType_);
             return ERROR;
         }
 
@@ -240,7 +240,7 @@ RState ResourceManagerImpl::ResolveReference(const std::string value, std::strin
         refStr = idItem->value_;
 
         if (++count > MAX_DEPTH_REF_SEARCH) {
-            RESMGR_HILOGE(RESMGR_TAG, "ref %s has re-ref too much", value.c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "ref %{public}s has re-ref too much", value.c_str());
             return ERROR_CODE_RES_REF_TOO_MUCH;
         }
     }
@@ -276,12 +276,12 @@ RState ResourceManagerImpl::ResolveDataReference(const std::string key, const st
         }
         const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
         if (idItem == nullptr) {
-            RESMGR_HILOGE(RESMGR_TAG, "ref %s id not found", refStr.c_str());
+            RESMGR_HILOGD(RESMGR_TAG, "ref %{public}s id not found", refStr.c_str());
             return ERROR;
         }
         if (resType != idItem->resType_) {
             RESMGR_HILOGE(RESMGR_TAG,
-                "impossible. ref %s type mismatch, found type: %d", refStr.c_str(), idItem->resType_);
+                "impossible. ref %{public}s type mismatch, found type: %{public}d", refStr.c_str(), idItem->resType_);
             return ERROR;
         }
 
@@ -289,7 +289,7 @@ RState ResourceManagerImpl::ResolveDataReference(const std::string key, const st
         refStr = idItem->value_;
 
         if (++count > MAX_DEPTH_REF_SEARCH) {
-            RESMGR_HILOGE(RESMGR_TAG, "ref %s has re-ref too much", value.c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "ref %{public}s has re-ref too much", value.c_str());
             return ERROR_CODE_RES_REF_TOO_MUCH;
         }
     }
@@ -362,13 +362,13 @@ RState ResourceManagerImpl::ResolveParentReference(const std::shared_ptr<IdItem>
             }
             currItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
             if (currItem == nullptr) {
-                RESMGR_HILOGE(RESMGR_TAG, "ref %s id not found", idItem->values_[0].c_str());
+                RESMGR_HILOGD(RESMGR_TAG, "ref %{public}s id not found", idItem->values_[0].c_str());
                 return ERROR;
             }
         }
 
         if (++count > MAX_DEPTH_REF_SEARCH) {
-            RESMGR_HILOGE(RESMGR_TAG, " %u has too many parents", idItem->id_);
+            RESMGR_HILOGE(RESMGR_TAG, " %{public}u has too many parents", idItem->id_);
             return ERROR;
         }
     } while (haveParent);
@@ -439,7 +439,7 @@ RState ResourceManagerImpl::ResolveResData(const std::shared_ptr<IdItem> idItem,
             }
             currItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
             if (currItem == nullptr) {
-                RESMGR_HILOGE(RESMGR_TAG, "ref %s id not found", idItem->values_[0].c_str());
+                RESMGR_HILOGD(RESMGR_TAG, "ref %{public}s id not found", idItem->values_[0].c_str());
                 outValue.clear();
                 return ERROR;
             }
@@ -731,21 +731,21 @@ RState ResourceManagerImpl::ProcessReference(const std::string value,
         }
         const std::shared_ptr<IdItem> idItem = hapManager_->FindResourceById(id, isOverrideResMgr_);
         if (idItem == nullptr) {
-            RESMGR_HILOGE(RESMGR_TAG, "ref %s id not found", refStr.c_str());
+            RESMGR_HILOGD(RESMGR_TAG, "ref %{public}s id not found", refStr.c_str());
             return ERROR;
         }
         idItems.emplace_back(idItem);
         // unless compile bug
         if (resType != idItem->resType_) {
             RESMGR_HILOGE(RESMGR_TAG,
-                "impossible. ref %s type mismatch, found type: %d", refStr.c_str(), idItem->resType_);
+                "impossible. ref %{public}s type mismatch, found type: %{public}d", refStr.c_str(), idItem->resType_);
             return ERROR;
         }
 
         refStr = idItem->value_;
 
         if (++count > MAX_DEPTH_REF_SEARCH) {
-            RESMGR_HILOGE(RESMGR_TAG, "ref %s has re-ref too much", value.c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "ref %{public}s has re-ref too much", value.c_str());
             return ERROR_CODE_RES_REF_TOO_MUCH;
         }
     }

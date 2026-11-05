@@ -670,7 +670,11 @@ void ThemePackManager::UpdateUserId(int32_t userId)
 {
     std::lock_guard<std::mutex> lock(this->lockUserId_);
     if (userId != 0 && currentUserId_ != userId) {
-        RESMGR_HILOGW(RESMGR_TAG, "update userId, %{public}d -> %{public}d", currentUserId_, userId);
+        if (currentUserId_ == 0) {
+            RESMGR_HILOGD(RESMGR_TAG, "init userId, %{public}d -> %{public}d", currentUserId_, userId);
+        } else {
+            RESMGR_HILOGW(RESMGR_TAG, "update userId, %{public}d -> %{public}d", currentUserId_, userId);
+        }
         currentUserId_ = userId;
         UpdateBasePath(userId);
     }
