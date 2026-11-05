@@ -1199,4 +1199,102 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestThemeSwitchABTest001, TestSize.Level1
     tm->LoadThemeIconsResource("ohos.global.test.all", "entry", {}, userId);
     CleanupTestFlags();
 }
+
+/*
+ * @tc.name: ThemeManagerTestGetSystemResRootDirsTest001
+ * @tc.desc: Test GetSystemResRootDirs returns systemRes dir from app/skin_system_res path (not skin path).
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestGetSystemResRootDirsTest001, TestSize.Level1)
+{
+    SetupTestFlags();
+    int32_t userId = 100;
+    tm->UpdateBasePath(userId);
+    std::string basePath = tm->GetBasePath(userId);
+    ASSERT_FALSE(basePath.empty());
+    std::vector<std::string> sysResDirs = tm->GetSystemResRootDirs(userId);
+    ASSERT_FALSE(sysResDirs.empty());
+    // SA path resolves to /data/test/theme/100/a/app/skin_system_res
+    bool foundSystemRes = false;
+    for (const auto &dir : sysResDirs) {
+        if (dir.find("app/skin_system_res") != std::string::npos) {
+            foundSystemRes = true;
+            break;
+        }
+    }
+    EXPECT_TRUE(foundSystemRes);
+    CleanupTestFlags();
+}
+
+/*
+ * @tc.name: ThemeManagerTestLoadSystemResFromAppSkinSystemResTest001
+ * @tc.desc: Test LoadThemeSkinRes loads systemRes from app/skin_system_res path and is queryable.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadSystemResFromAppSkinSystemResTest001, TestSize.Level1)
+{
+    SetupTestFlags();
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    int32_t userId = 100;
+    tm->UpdateBasePath(userId);
+    std::string basePath = tm->GetBasePath(userId);
+    ASSERT_FALSE(basePath.empty());
+    // clear any previous skin resources for this user
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", {}, userId);
+    // LoadThemeSkinRes collects systemRes from app/skin_system_res path
+    tm->LoadThemeSkinRes("ohos.global.test.all", "entry", userId);
+    // verify skinResource_ contains a resource loaded from app/skin_system_res
+    bool foundSystemRes = false;
+    for (size_t i = 0; i < tm->skinResource_.size(); ++i) {
+        auto &res = tm->skinResource_[i];
+        if (res != nullptr && res->GetThemePath().find("app/skin_system_res") != std::string::npos) {
+            foundSystemRes = true;
+            break;
+        }
+    }
+    EXPECT_TRUE(foundSystemRes);
+    // verify systemRes color resource is queryable by ("skin_system_res","entry")
+    std::pair<std::string, std::string> bundleInfo("skin_system_res", "entry");
+    auto colorList = tm->GetThemeResourceList(bundleInfo, ResType::COLOR, "system_res_theme_color", userId);
+    EXPECT_FALSE(colorList.empty());
+    // verify systemRes float resource is queryable by ("skin_system_res","entry")
+    auto floatList = tm->GetThemeResourceList(bundleInfo, ResType::FLOAT, "system_res_theme_float", userId);
+    EXPECT_FALSE(floatList.empty());
+    // cleanup
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", {}, userId);
+    CleanupTestFlags();
+}
+
+/*
+ * @tc.name: ThemeManagerTestUpdateSystemResRootDirsTest001
+ * @tc.desc: Test UpdateSystemResRootDirs appends new path while keeping old systemRes as fallback.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestUpdateSystemResRootDirsTest001, TestSize.Level1)
+{
+    SetupTestFlags();
+    int32_t userId = 100;
+    tm->UpdateBasePath(userId);
+    std::vector<std::string> rootDirs;
+    rootDirs.emplace_back("/data/test/theme/100/a/skin/ohos.global.test.all");
+    rootDirs.emplace_back("/data/test/theme/100/a/app/skin/systemRes");
+    size_t sizeBefore = rootDirs.size();
+    tm->UpdateSystemResRootDirs(rootDirs, userId);
+    // new path appended, old systemRes kept as fallback
+    EXPECT_EQ(rootDirs.size(), sizeBefore + 1);
+    bool foundNew = false;
+    bool keptOld = false;
+    for (const auto &dir : rootDirs) {
+        if (dir.find("skin_system_res") != std::string::npos) {
+            foundNew = true;
+        }
+        if (dir.find("skin/systemRes") != std::string::npos) {
+            keptOld = true;
+        }
+    }
+    EXPECT_TRUE(foundNew);
+    EXPECT_TRUE(keptOld);
+    CleanupTestFlags();
+}
 }

@@ -32,6 +32,8 @@ constexpr int SECOND_ELEMENT = 1;
 constexpr int THIRED_ELEMENT = 2;
 static std::shared_ptr<ThemePackManager> themeMgr = nullptr;
 static std::once_flag themeMgrFlag;
+const std::string SYSTEM_RES_BUNDLE_NAME = "skin_system_res";
+const std::string OLD_SYSTEM_RES_BUNDLE_NAME = "systemRes";
 // Macro overrides for test path injection; production defaults to real SA paths.
 #ifndef SA_THEME_FLAG_PREFIX
 #define SA_THEME_FLAG_PREFIX "data/service/el1/public/themes"
@@ -47,6 +49,8 @@ const std::string THEME_SKIN_A_PATH = "/data/themes/a/skin";
 const std::string THEME_SKIN_B_PATH = "/data/themes/b/skin";
 const std::string THEME_ICONS_A = "/data/themes/a/app/icons";
 const std::string THEME_ICONS_B = "/data/themes/b/app/icons";
+const std::string THEME_SYSTEM_RES_A = "/data/themes/a/app/skin_system_res";
+const std::string THEME_SYSTEM_RES_B = "/data/themes/b/app/skin_system_res";
 const std::string ABSOLUTE_THEME_FLAG_A = SA_THEME_FLAG_PREFIX "/<currentUserId>/a/app/flag";
 const std::string ABSOLUTE_THEME_FLAG_B = SA_THEME_FLAG_PREFIX "/<currentUserId>/b/app/flag";
 const std::string ABSOLUTE_THEME_SKIN_A = SA_THEME_PATH_PREFIX "/<currentUserId>/a/app/skin";
@@ -55,6 +59,8 @@ const std::string ABSOLUTE_THEME_SKIN_A_PATH = SA_THEME_PATH_PREFIX "/<currentUs
 const std::string ABSOLUTE_THEME_SKIN_B_PATH = SA_THEME_PATH_PREFIX "/<currentUserId>/b/skin";
 const std::string ABSOLUTE_THEME_ICONS_A = SA_THEME_PATH_PREFIX "/<currentUserId>/a/app/icons";
 const std::string ABSOLUTE_THEME_ICONS_B = SA_THEME_PATH_PREFIX "/<currentUserId>/b/app/icons";
+const std::string ABSOLUTE_THEME_SYSTEM_RES_A = SA_THEME_PATH_PREFIX "/<currentUserId>/a/app/skin_system_res";
+const std::string ABSOLUTE_THEME_SYSTEM_RES_B = SA_THEME_PATH_PREFIX "/<currentUserId>/b/app/skin_system_res";
 const std::string ABSOLUTE_THEME_PATH = SA_THEME_PATH_PREFIX "/";
 const std::string THEME_BASE_PATH_A = "/data/themes/a";
 const std::string THEME_BASE_PATH_B = "/data/themes/b";
@@ -133,7 +139,34 @@ std::vector<std::string> ThemePackManager::GetThemeSkinRootDir(const std::string
     if (result.empty()) {
         result = GetRootDir(oldPath, basePath, userId);
     }
+    // Append new systemRes path app/skin_system_res alongside old skin/systemRes
+    // FindThemeResource queries new bundleName first, falls back to old when new misses
+    UpdateSystemResRootDirs(result, userId);
     return result;
+}
+
+std::vector<std::string> ThemePackManager::GetSystemResRootDirs(int32_t userId)
+{
+    std::vector<std::string> rootDirs;
+    if (Utils::IsFileExist(THEME_FLAG_A)) {
+        rootDirs.push_back(THEME_SYSTEM_RES_A);
+    } else if (Utils::IsFileExist(THEME_FLAG_B)) {
+        rootDirs.push_back(THEME_SYSTEM_RES_B);
+    } else {
+        if (Utils::IsFileExist(ReplaceUserIdInPath(ABSOLUTE_THEME_FLAG_A, userId))) {
+            rootDirs.push_back(ReplaceUserIdInPath(ABSOLUTE_THEME_SYSTEM_RES_A, userId));
+        } else if (Utils::IsFileExist(ReplaceUserIdInPath(ABSOLUTE_THEME_FLAG_B, userId))) {
+            rootDirs.push_back(ReplaceUserIdInPath(ABSOLUTE_THEME_SYSTEM_RES_B, userId));
+        }
+    }
+    return rootDirs;
+}
+
+void ThemePackManager::UpdateSystemResRootDirs(std::vector<std::string> &rootDirs, int32_t userId)
+{
+    std::vector<std::string> sysResDirs = GetSystemResRootDirs(userId);
+    // append new path; old skin/systemRes kept as fallback, FindThemeResource queries new first
+    rootDirs.insert(rootDirs.end(), sysResDirs.begin(), sysResDirs.end());
 }
 
 void ThemePackManager::ClearSkinResource()
@@ -167,7 +200,8 @@ void ThemePackManager::LoadThemeSkinResource(const std::string &bundleName, cons
             continue;
         }
         std::string tempBundleName = dir.substr(pos + 1);
-        if (tempBundleName != bundleName && tempBundleName != "systemRes") {
+        if (tempBundleName != bundleName && tempBundleName != SYSTEM_RES_BUNDLE_NAME
+            && tempBundleName != OLD_SYSTEM_RES_BUNDLE_NAME) {
             continue;
         }
         auto pThemeResource = ThemeResource::LoadThemeResource(dir, basePath);
@@ -292,10 +326,19 @@ const std::string ThemePackManager::FindThemeResource(const std::pair<std::strin
             if (resType == ResType::COLOR && !isThemeSystemResEnable) {
                 break;
             }
-            std::pair<std::string, std::string> tempInfo("systemRes", "entry");
+            std::pair<std::string, std::string> tempInfo(SYSTEM_RES_BUNDLE_NAME, "entry");
             result = GetThemeResource(tempInfo, resType, resName, resConfig, userId);
             if (result.empty()) {
-                tempInfo = std::make_pair("systemRes", "feature");
+                tempInfo = std::make_pair(SYSTEM_RES_BUNDLE_NAME, "feature");
+                result = GetThemeResource(tempInfo, resType, resName, resConfig, userId);
+            }
+            // fallback to old bundleName when new bundleName query misses
+            if (result.empty()) {
+                tempInfo = std::make_pair(OLD_SYSTEM_RES_BUNDLE_NAME, "entry");
+                result = GetThemeResource(tempInfo, resType, resName, resConfig, userId);
+            }
+            if (result.empty()) {
+                tempInfo = std::make_pair(OLD_SYSTEM_RES_BUNDLE_NAME, "feature");
                 result = GetThemeResource(tempInfo, resType, resName, resConfig, userId);
             }
         } else {
