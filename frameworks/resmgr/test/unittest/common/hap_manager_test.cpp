@@ -912,4 +912,59 @@ HWTEST_F(HapManagerTest, HapManagerThemeSystemResEnableInheritTest001, TestSize.
     ASSERT_TRUE(overrideDisabled != nullptr);
     EXPECT_FALSE(overrideDisabled->IsThemeSystemResEnableHap());
 }
+
+/*
+ * @tc.name: HapManagerGetCompleteResConfigTest001
+ * @tc.desc: GetCompleteResConfig must return the local resConfig merged with
+ *     override fields when isGetOverrideResource is true, so that theme/override
+ *     resource lookups match with the overridden device configuration (e.g.
+ *     color mode). Guards the fix where an override resource manager could not
+ *     obtain dark theme resources when the local config was light but override
+ *     set dark: the theme path used GetResConfig (local light) while the normal
+ *     resource path already used the merged config.
+ * @tc.type: FUNC
+ */
+HWTEST_F(HapManagerTest, HapManagerGetCompleteResConfigTest001, TestSize.Level1)
+{
+    auto hapManager = std::make_shared<HapManager>(std::make_shared<ResConfigImpl>());
+    ASSERT_TRUE(hapManager != nullptr);
+
+    // local config: light + vertical
+    auto localRc = std::make_shared<ResConfigImpl>();
+    localRc->SetColorMode(LIGHT);
+    localRc->SetDirection(DIRECTION_VERTICAL);
+    ASSERT_EQ(hapManager->UpdateResConfig(*localRc), SUCCESS);
+
+    // override config: only color mode = dark (direction not overridden)
+    auto overrideRc = std::make_shared<ResConfigImpl>();
+    overrideRc->SetColorMode(DARK);
+    ASSERT_EQ(hapManager->UpdateOverrideResConfig(*overrideRc), SUCCESS);
+
+    // GetCompleteResConfig(true): merged config — override color mode applies,
+    // local direction kept. This is the complete config theme lookups must use.
+    ResConfigImpl completeRc;
+    hapManager->GetCompleteResConfig(completeRc, true);
+    EXPECT_EQ(completeRc.GetColorMode(), DARK);
+    EXPECT_EQ(completeRc.GetDirection(), DIRECTION_VERTICAL);
+
+    // GetCompleteResConfig(false): local config — light, vertical
+    ResConfigImpl localOut;
+    hapManager->GetCompleteResConfig(localOut, false);
+    EXPECT_EQ(localOut.GetColorMode(), LIGHT);
+    EXPECT_EQ(localOut.GetDirection(), DIRECTION_VERTICAL);
+
+    // GetResConfig: local config unchanged — light (the value the theme path
+    // incorrectly used before the fix).
+    ResConfigImpl resConfigOut;
+    hapManager->GetResConfig(resConfigOut);
+    EXPECT_EQ(resConfigOut.GetColorMode(), LIGHT);
+
+    // GetOverrideResConfig: override-only config — dark, but NOT complete
+    // (direction is NOT_SET since override did not set it). This is why the
+    // theme path cannot use GetOverrideResConfig directly.
+    ResConfigImpl overrideOut;
+    hapManager->GetOverrideResConfig(overrideOut);
+    EXPECT_EQ(overrideOut.GetColorMode(), DARK);
+    EXPECT_EQ(overrideOut.GetDirection(), DIRECTION_NOT_SET);
+}
 }

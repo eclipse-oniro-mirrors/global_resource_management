@@ -327,7 +327,7 @@ RState ResourceManagerImpl::ResolveParentReference(const std::shared_ptr<IdItem>
     int count = 0;
     std::shared_ptr<IdItem> currItem = idItem;
     ResConfigImpl resConfig;
-    GetResConfig(resConfig);
+    GetCompleteResConfig(resConfig);
     do {
         haveParent = currItem->HaveParent();
         size_t startIdx = haveParent ? 1 : 0;
@@ -383,7 +383,7 @@ RState ResourceManagerImpl::ProcessItem(std::shared_ptr<IdItem> idItem,
     // this make sure child covers parent
     size_t loop = idItem->values_.size() / 2;
     ResConfigImpl resConfig;
-    GetResConfig(resConfig);
+    GetCompleteResConfig(resConfig);
     for (size_t i = 0; i < loop; ++i) {
         std::string key(idItem->values_[startIdx + i * 2]); // 2 means key appear in pairs
         std::string value(idItem->values_[startIdx + i * 2 + 1]); // 2 means value appear in pairs
@@ -507,7 +507,7 @@ RState ResourceManagerImpl::GetBoolean(const std::shared_ptr<IdItem> idItem, boo
 RState ResourceManagerImpl::GetThemeFloat(const std::shared_ptr<IdItem> idItem, float &outValue)
 {
     ResConfigImpl resConfig;
-    GetResConfig(resConfig);
+    GetCompleteResConfig(resConfig);
     std::vector<std::shared_ptr<IdItem>> idItems;
     idItems.emplace_back(idItem);
     ProcessReference(idItem->value_, idItems);
@@ -524,7 +524,7 @@ RState ResourceManagerImpl::GetThemeFloat(const std::shared_ptr<IdItem> idItem, 
 RState ResourceManagerImpl::GetThemeFloat(const std::shared_ptr<IdItem> idItem, float &outValue, std::string &unit)
 {
     ResConfigImpl resConfig;
-    GetResConfig(resConfig);
+    GetCompleteResConfig(resConfig);
     std::vector<std::shared_ptr<IdItem>> idItems;
     idItems.emplace_back(idItem);
     ProcessReference(idItem->value_, idItems);
@@ -755,7 +755,7 @@ RState ResourceManagerImpl::ProcessReference(const std::string value,
 RState ResourceManagerImpl::GetThemeColor(const std::shared_ptr<IdItem> idItem, uint32_t &outValue)
 {
     ResConfigImpl resConfig;
-    GetResConfig(resConfig);
+    GetCompleteResConfig(resConfig);
     std::vector<std::shared_ptr<IdItem> > idItems;
     idItems.emplace_back(idItem);
     RState state = ProcessReference(idItem->value_, idItems);
@@ -1327,6 +1327,11 @@ void ResourceManagerImpl::GetResConfig(ResConfig &resConfig)
     this->hapManager_->GetResConfig(resConfig);
 }
 
+void ResourceManagerImpl::GetCompleteResConfig(ResConfig &resConfig)
+{
+    this->hapManager_->GetCompleteResConfig(resConfig, isOverrideResMgr_);
+}
+
 RState ResourceManagerImpl::GetResConfigById(uint32_t resId, ResConfig &resConfig, uint32_t density)
 {
     if (!IsDensityValid(density)) {
@@ -1378,7 +1383,7 @@ RState ResourceManagerImpl::GetThemeMedia(const std::shared_ptr<IdItem> idItem, 
     std::unique_ptr<uint8_t[]> &outValue, uint32_t density)
 {
     ResConfigImpl resConfig;
-    GetResConfig(resConfig);
+    GetCompleteResConfig(resConfig);
     std::vector<std::shared_ptr<IdItem>> idItems;
     idItems.emplace_back(idItem);
     auto themeManager = ThemePackManager::GetThemePackManager();
@@ -1456,7 +1461,7 @@ RState ResourceManagerImpl::GetMediaDataByName(const char *name, size_t &len, st
 RState ResourceManagerImpl::GetThemeMediaBase64(const std::shared_ptr<IdItem> idItem, std::string &outValue)
 {
     ResConfigImpl resConfig;
-    GetResConfig(resConfig);
+    GetCompleteResConfig(resConfig);
     std::vector<std::shared_ptr<IdItem>> idItems;
     idItems.emplace_back(idItem);
     std::string result = ThemePackManager::GetThemePackManager()->FindThemeResource(

@@ -966,6 +966,8 @@ private:
 
     RState ProcessItem(std::shared_ptr<IdItem> idItem, std::map<std::string, ResData> &outValue);
 
+    void GetCompleteResConfig(ResConfig &resConfig);
+
     void UpdateSystemResourceResConfig();
 
     void UpdateTheme(ResConfig &resConfig);
