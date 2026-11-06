@@ -110,6 +110,17 @@ public:
     void GetOverrideResConfig(ResConfig &resConfig);
 
     /**
+     * Get the complete resConfig used for resource matching. When
+     * isGetOverrideResource is true, the local resConfig is used as the base
+     * and every field set in the override resConfig overrides it, so that
+     * theme/override lookups match with the overridden device configuration
+     * (e.g. color mode). When false, the local resConfig is returned.
+     * @param resConfig the output complete resource config
+     * @param isGetOverrideResource override resource flag, default value is false
+     */
+    void GetCompleteResConfig(ResConfig &resConfig, bool isGetOverrideResource = false);
+
+    /**
      * Add resource path to hap paths
      * @param path the resource path
      * @param selectedTypes the selected resource types to add, defined in res_common.h,

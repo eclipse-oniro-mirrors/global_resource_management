@@ -416,6 +416,16 @@ void HapManager::GetOverrideResConfig(ResConfig &resConfig)
     resConfig.Copy(*(this->overrideResConfig_));
 }
 
+void HapManager::GetCompleteResConfig(ResConfig &resConfig, bool isGetOverrideResource)
+{
+    ReadLock lock(this->mutex_);
+    std::shared_ptr<ResConfigImpl> completeConfig = GetCompleteOverrideConfig(isGetOverrideResource);
+    if (completeConfig == nullptr) {
+        return;
+    }
+    resConfig.Copy(*completeConfig, true);
+}
+
 bool HapManager::AddResource(const char *path, const uint32_t &selectedTypes, bool forceReload)
 {
     WriteLock lock(this->mutex_);
