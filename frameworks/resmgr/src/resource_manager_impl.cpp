@@ -1824,10 +1824,10 @@ RState ResourceManagerImpl::GetThemeIcons(uint32_t resId, std::pair<std::unique_
         return SUCCESS;
     }
 
-    if (foreState == SUCCESS && Utils::SupportSingleLayerThemeIcon()) {
-        RESMGR_HILOGW(RESMGR_TAG,
-            "GetThemeIcons bundlename = %{public}s, abilityName = %{public}s, fLen = %{public}zu",
-            bundleInfo.first.c_str(), abilityName.c_str(), foregroundInfo.second);
+    if (foreState == SUCCESS) {
+        RESMGR_HILOGW(RESMGR_TAG, "GetThemeIcons single-layer icon, bundlename = %{public}s, abilityName = %{public}s,"
+            " fLen = %{public}zu, backState = %{public}d", bundleInfo.first.c_str(), abilityName.c_str(),
+            foregroundInfo.second, backState);
         return SUCCESS;
     }
     return ERROR_CODE_RES_ID_NOT_FOUND;

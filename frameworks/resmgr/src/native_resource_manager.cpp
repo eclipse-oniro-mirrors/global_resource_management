@@ -24,7 +24,6 @@
 #include "hilog_wrapper.h"
 #include "resource_manager_impl.h"
 #include "rstate.h"
-#include "utils/utils.h"
 
 using namespace OHOS::Global::Resource;
 using namespace OHOS::Ace::Napi;
@@ -272,8 +271,7 @@ ResourceManager_ErrorCode ProcessThemeIcon(const std::shared_ptr<ResourceManager
     std::pair<std::unique_ptr<uint8_t[]>, size_t> &foregroundInfo,
     std::pair<std::unique_ptr<uint8_t[]>, size_t> &backgroundInfo, std::string &themeMask)
 {
-    if (backgroundInfo.first == nullptr &&
-        Utils::GetSystemParameter("const.global.support_single_icon_theme") == "true") {
+    if (backgroundInfo.first == nullptr) {
         auto descriptor = std::make_unique<DrawableDescriptor>(std::move(foregroundInfo.first), foregroundInfo.second);
         *drawableDescriptor = OH_ArkUI_CreateFromNapiDrawable(descriptor.get());
         return (*drawableDescriptor != nullptr) ? ResourceManager_ErrorCode::SUCCESS :
