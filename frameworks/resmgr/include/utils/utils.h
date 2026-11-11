@@ -126,8 +126,6 @@ public:
     static bool IsSystemResource(uint32_t id);
 
     EXPORT_FUNC static std::string GetSystemParameter(const std::string& paramKey);
-
-    EXPORT_FUNC static bool SupportSingleLayerThemeIcon();
 private:
     static bool IsValidValue(const char* end, const std::string& str);
 

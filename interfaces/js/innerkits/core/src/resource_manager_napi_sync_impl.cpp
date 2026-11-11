@@ -23,7 +23,6 @@
 #include "drawable_descriptor/js_drawable_descriptor.h"
 #include "resource_manager_napi_utils.h"
 #include "resource_manager_addon.h"
-#include "utils/utils.h"
 
 namespace OHOS {
 namespace Global {
@@ -993,8 +992,7 @@ napi_value ResourceManagerNapiSyncImpl::ProcessThemeIcon(napi_env env, std::uniq
     std::pair<std::unique_ptr<uint8_t[]>, size_t> &backgroundInfo, std::string &themeMask)
 {
     Ace::Napi::DrawableDescriptor::DrawableType drawableType = Ace::Napi::DrawableDescriptor::DrawableType::BASE;
-    if (backgroundInfo.first == nullptr &&
-        Utils::GetSystemParameter("const.global.support_single_icon_theme") == "true") {
+    if (backgroundInfo.first == nullptr) {
         auto drawableDescriptor = std::make_unique<Ace::Napi::DrawableDescriptor>(std::move(foregroundInfo.first),
             foregroundInfo.second);
         return Ace::Napi::JsDrawableDescriptor::ToNapi(env, drawableDescriptor.release(), drawableType);

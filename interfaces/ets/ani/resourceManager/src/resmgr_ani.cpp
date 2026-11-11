@@ -36,7 +36,6 @@
 #include "ani_signature.h"
 #include "hilog_wrapper.h"
 #include "resourceManager.h"
-#include "utils/utils.h"
 #include "resource_manager_impl.h"
 #include "resource_manager_addon.h"
 #include "system_resource_manager.h"
@@ -724,7 +723,7 @@ RState CreateThemeIcon(ani_env *env, Ace::Ani::DrawableInfo &drawableInfo, ani_o
     if (state == SUCCESS) {
         drawableInfo.firstBuffer.data = std::move(foregroundInfo.first);
         drawableInfo.firstBuffer.len = foregroundInfo.second;
-        if (Utils::SupportSingleLayerThemeIcon() && backgroundInfo.first == nullptr) {
+        if (backgroundInfo.first == nullptr) {
             *drawable = Ace::Ani::DrawableDescriptorAni::CreateDrawableDescriptor(env, drawableInfo);
             return SUCCESS;
         }

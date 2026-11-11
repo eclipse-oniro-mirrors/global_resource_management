@@ -460,6 +460,74 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeIconsResourceTest003, TestSi
 }
 
 /*
+ * @tc.name: ThemeManagerTestGetThemeIconsForegroundOnlyTest001
+ * @tc.desc: Test GetThemeIcons returns SUCCESS when only foreground icon exists (single-layer support).
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestGetThemeIconsForegroundOnlyTest001, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    std::vector<std::string> rootDirs;
+    rootDirs.emplace_back("/data/test/theme/icons/foreground_only/ohos.global.test.all");
+    int32_t userId = 100; // userId is 100
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", rootDirs, userId);
+    uint32_t resId = 16777306;
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> foregroundInfo;
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> backgroundInfo;
+    RState state = rm->GetThemeIcons(resId, foregroundInfo, backgroundInfo);
+    EXPECT_EQ(state, SUCCESS);
+    EXPECT_NE(foregroundInfo.first, nullptr);
+    EXPECT_GT(foregroundInfo.second, 0);
+    EXPECT_EQ(backgroundInfo.first, nullptr);
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", {}, userId);
+}
+
+/*
+ * @tc.name: ThemeManagerTestGetThemeIconsBackgroundOnlyTest001
+ * @tc.desc: Test GetThemeIcons returns NOT_FOUND when only background icon exists (no foreground).
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestGetThemeIconsBackgroundOnlyTest001, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    std::vector<std::string> rootDirs;
+    rootDirs.emplace_back("/data/test/theme/icons/background_only/ohos.global.test.all");
+    int32_t userId = 100; // userId is 100
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", rootDirs, userId);
+    uint32_t resId = 16777306;
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> foregroundInfo;
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> backgroundInfo;
+    RState state = rm->GetThemeIcons(resId, foregroundInfo, backgroundInfo);
+    EXPECT_EQ(state, ERROR_CODE_RES_ID_NOT_FOUND);
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", {}, userId);
+}
+
+/*
+ * @tc.name: ThemeManagerTestGetThemeIconsWrongNameTest001
+ * @tc.desc: Test GetThemeIcons returns NOT_FOUND when icon files exist but have wrong names.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestGetThemeIconsWrongNameTest001, TestSize.Level1)
+{
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    std::vector<std::string> rootDirs;
+    rootDirs.emplace_back("/data/test/theme/icons/wrong_name/ohos.global.test.all");
+    int32_t userId = 100; // userId is 100
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", rootDirs, userId);
+    uint32_t resId = 16777306;
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> foregroundInfo;
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> backgroundInfo;
+    RState state = rm->GetThemeIcons(resId, foregroundInfo, backgroundInfo);
+    EXPECT_EQ(state, ERROR_CODE_RES_ID_NOT_FOUND);
+    EXPECT_EQ(foregroundInfo.first, nullptr);
+    EXPECT_EQ(backgroundInfo.first, nullptr);
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", {}, userId);
+}
+
+/*
  * @tc.name: ThemeManagerTestLoadThemeIconsResourceTest004
  * @tc.desc: Test FindThemeIconResource function, file case.
  * @tc.type: FUNC
