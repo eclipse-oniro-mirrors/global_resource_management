@@ -1,7 +1,6 @@
 {
     "colors": [
         "brand",
-        "brand_font",
         "brand05",
         "brand10",
         "brand15",
@@ -13,14 +12,19 @@
         "brand70",
         "brand80",
         "brand90",
+        "brand_active",
         "brand_contrary",
-        "brand_contrary60",
         "brand_contrary40",
-        "brand_light",
-        "brand_light40",
+        "brand_contrary60",
         "brand_dark",
-        "brand_dark60",
+        "brand_dark30",
         "brand_dark40",
-        "brand_dark30"
+        "brand_dark60",
+        "brand_font",
+        "brand_font_contrary",
+        "brand_icon",
+        "brand_light",
+        "brand_light_01",
+        "brand_light40"
     ]
 }
