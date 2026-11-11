@@ -296,11 +296,13 @@ int OH_ResourceManager_ReadRawFile(const RawFile *rawFile, void *buf, size_t len
 
 int OH_ResourceManager_SeekRawFile(const RawFile *rawFile, long offset, int whence)
 {
-    if (rawFile == nullptr || rawFile->actualOffset == nullptr || abs(offset) > rawFile->length) {
+    if (rawFile == nullptr || rawFile->actualOffset == nullptr || (whence == SEEK_SET && offset < 0) ||
+        abs(offset) > rawFile->length) {
         return -1;
     }
 
     int origin = 0;
+    int64_t prevOffset = rawFile->actualOffset->offset;
     switch (whence) {
         case SEEK_SET:
             origin = SEEK_SET;
@@ -319,6 +321,7 @@ int OH_ResourceManager_SeekRawFile(const RawFile *rawFile, long offset, int when
     }
 
     if (rawFile->actualOffset->offset < 0 || rawFile->actualOffset->offset > rawFile->length) {
+        rawFile->actualOffset->offset = prevOffset;
         return -1;
     }
 
@@ -336,8 +339,11 @@ long OH_ResourceManager_GetRawFileSize(RawFile *rawFile)
 
 long OH_ResourceManager_GetRawFileRemainingLength(const RawFile *rawFile)
 {
-    if (rawFile == nullptr || rawFile->actualOffset == nullptr ||
-        rawFile->length < rawFile->actualOffset->offset) {
+    if (rawFile == nullptr || rawFile->actualOffset == nullptr) {
+        return 0;
+    }
+    if (rawFile->actualOffset->offset < 0 || rawFile->length < rawFile->actualOffset->offset) {
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "invalid offset in GetRawFileRemainingLength");
         return 0;
     }
 
@@ -515,7 +521,14 @@ RawFile64 *OH_ResourceManager_OpenRawFile64(const NativeResourceManager *mgr, co
 
 int64_t OH_ResourceManager_ReadRawFile64(const RawFile64 *rawFile, void *buf, int64_t length)
 {
-    if (rawFile == nullptr || rawFile->raw == nullptr || buf == nullptr || length == 0) {
+    if (rawFile == nullptr || rawFile->raw == nullptr || buf == nullptr) {
+        return 0;
+    }
+    if (length < 0) {
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "ReadRawFile64 invalid length");
+        return 0;
+    }
+    if (length == 0) {
         return 0;
     }
     int64_t len = OH_ResourceManager_GetRawFileRemainingLength64(rawFile);
@@ -533,12 +546,14 @@ int64_t OH_ResourceManager_ReadRawFile64(const RawFile64 *rawFile, void *buf, in
 
 int OH_ResourceManager_SeekRawFile64(const RawFile64 *rawFile, int64_t offset, int whence)
 {
-    if (rawFile == nullptr || rawFile->raw == nullptr || abs(offset) > rawFile->raw->length) {
+    if (rawFile == nullptr || rawFile->raw == nullptr || (whence == SEEK_SET && offset < 0) ||
+        abs(offset) > rawFile->raw->length) {
         return -1;
     }
 
     int origin = 0;
     int64_t actualOffset = 0;
+    int64_t prevOffset = rawFile->raw->offset;
     switch (whence) {
         case SEEK_SET:
             origin = SEEK_SET;
@@ -560,6 +575,7 @@ int OH_ResourceManager_SeekRawFile64(const RawFile64 *rawFile, int64_t offset, i
     }
 
     if (rawFile->raw->offset < 0 || rawFile->raw->offset > rawFile->raw->length) {
+        rawFile->raw->offset = prevOffset;
         return -1;
     }
 
@@ -577,8 +593,11 @@ int64_t OH_ResourceManager_GetRawFileSize64(RawFile64 *rawFile)
 
 int64_t OH_ResourceManager_GetRawFileRemainingLength64(const RawFile64 *rawFile)
 {
-    if (rawFile == nullptr || rawFile->raw == nullptr ||
-        rawFile->raw->length < rawFile->raw->offset) {
+    if (rawFile == nullptr || rawFile->raw == nullptr) {
+        return 0;
+    }
+    if (rawFile->raw->offset < 0 || rawFile->raw->length < rawFile->raw->offset) {
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "invalid offset in GetRawFileRemainingLength64");
         return 0;
     }
 

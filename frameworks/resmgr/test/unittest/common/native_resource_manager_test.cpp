@@ -21,6 +21,8 @@
 
 #include "resource_manager.h"
 #include "ohresmgr.h"
+#include "raw_file.h"
+#include "raw_file_manager.h"
 #include "resmgr_common.h"
 #include "resource_manager_impl.h"
 #include "test_common.h"
@@ -65,6 +67,32 @@ public:
             return 0;
         }
         return idValues[0]->GetLimitPathsConst()[0]->GetIdItem()->id_;
+    }
+
+    ResourceManager *rm = nullptr;
+    NativeResourceManager nativeMgr;
+};
+
+class NativeRawFileHapTest : public testing::Test {
+public:
+    void SetUp() override
+    {
+        rm = CreateResourceManager(false);
+        ASSERT_NE(rm, nullptr);
+        auto rc = CreateResConfig();
+        rc->SetLocaleInfo("en", nullptr, "US");
+        rm->UpdateResConfig(*rc);
+        delete rc;
+        bool ret = rm->AddResource(FormatFullPath(g_newModuleHapPath).c_str());
+        ASSERT_TRUE(ret);
+        nativeMgr.resManager = std::shared_ptr<ResourceManager>(rm, [](ResourceManager *) {});
+    }
+
+    void TearDown() override
+    {
+        nativeMgr.resManager.reset();
+        delete rm;
+        rm = nullptr;
     }
 
     ResourceManager *rm = nullptr;
@@ -923,4 +951,77 @@ HWTEST_F(NativeResourceManagerTest, Native_GetLocalesWrapperTest001, TestSize.Le
     EXPECT_EQ(ret, ResourceManager_ErrorCode::SUCCESS);
     ASSERT_NE(result, nullptr);
     OH_ResourceManager_ReleaseStringArray(&result, resultLen);
+}
+
+/*
+ * @tc.name: Native_SeekRawFileNegativeOffset001
+ * @tc.desc: Test SeekRawFile rejects negative SEEK_SET offset and rolls back state on
+ *           out-of-bounds SEEK_CUR, verifying no negative offset persists in actualOffset.
+ *           Uses HAP mode (buffer != nullptr) so ReadRawFile advances actualOffset.
+ * @tc.type: FUNC
+ */
+HWTEST_F(NativeRawFileHapTest, Native_SeekRawFileNegativeOffset001, TestSize.Level1)
+{
+    NativeResourceManager *mgr = &nativeMgr;
+    RawFile *rawFile = OH_ResourceManager_OpenRawFile(mgr, "test_rawfile.txt");
+    ASSERT_NE(rawFile, nullptr);
+    long fileSize = OH_ResourceManager_GetRawFileSize(rawFile);
+    ASSERT_GT(fileSize, 0);
+
+    // SEEK_SET negative must be rejected at guard
+    int ret = OH_ResourceManager_SeekRawFile(rawFile, -5, SEEK_SET);
+    EXPECT_EQ(ret, -1);
+
+    // State not corrupted: offset still 0, remaining length not inflated
+    EXPECT_EQ(OH_ResourceManager_GetRawFileOffset(rawFile), 0);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileRemainingLength(rawFile), fileSize);
+
+    // Read 3 bytes — HAP mode advances actualOffset via memcpy_s path
+    char buf[32] = {0};
+    int bytesRead = OH_ResourceManager_ReadRawFile(rawFile, buf, 3);
+    EXPECT_EQ(bytesRead, 3);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileOffset(rawFile), 3);
+
+    // SEEK_CUR resulting in negative must be rejected and state rolled back
+    ret = OH_ResourceManager_SeekRawFile(rawFile, -4, SEEK_CUR);
+    EXPECT_EQ(ret, -1);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileOffset(rawFile), 3);
+
+    // SEEK_CUR with valid backward (within bounds) should succeed
+    ret = OH_ResourceManager_SeekRawFile(rawFile, -2, SEEK_CUR);
+    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileOffset(rawFile), 1);
+
+    OH_ResourceManager_CloseRawFile(rawFile);
+}
+
+/*
+ * @tc.name: Native_ReadRawFile64NegativeLength001
+ * @tc.desc: Test ReadRawFile64 rejects negative length without crash or state corruption
+ * @tc.type: FUNC
+ */
+HWTEST_F(NativeRawFileHapTest, Native_ReadRawFile64NegativeLength001, TestSize.Level1)
+{
+    NativeResourceManager *mgr = &nativeMgr;
+    RawFile64 *rawFile = OH_ResourceManager_OpenRawFile64(mgr, "test_rawfile.txt");
+    ASSERT_NE(rawFile, nullptr);
+
+    char buf[32] = {0};
+
+    // Negative length returns 0 (invalid parameter, logged), not crash
+    int64_t ret = OH_ResourceManager_ReadRawFile64(rawFile, buf, -1);
+    EXPECT_EQ(ret, 0);
+
+    // Zero length returns 0 (EOF / empty read, unchanged)
+    ret = OH_ResourceManager_ReadRawFile64(rawFile, buf, 0);
+    EXPECT_EQ(ret, 0);
+
+    // Offset unchanged after rejected calls
+    EXPECT_EQ(OH_ResourceManager_GetRawFileOffset64(rawFile), 0);
+
+    // Positive length works normally (regression)
+    ret = OH_ResourceManager_ReadRawFile64(rawFile, buf, 3);
+    EXPECT_EQ(ret, 3);
+
+    OH_ResourceManager_CloseRawFile64(rawFile);
 }

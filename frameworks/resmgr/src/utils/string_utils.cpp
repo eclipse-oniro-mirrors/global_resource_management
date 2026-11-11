@@ -73,7 +73,8 @@ std::string FormatString(const char *fmt, va_list args)
         va_copy(tmpArgs, args);
         int nLength = vsnprintf(nullptr, 0, fmt, tmpArgs); // compute buffer size
         va_end(tmpArgs);
-        if (nLength < 0) {
+        if (nLength < 0 || nLength >= std::numeric_limits<int>::max()) {
+            RESMGR_HILOGE(RESMGR_TAG, "FormatString rejected invalid nLength: %{public}d", nLength);
             return strResult;
         }
         std::vector<char> vBuffer(nLength + 1, '\0');
