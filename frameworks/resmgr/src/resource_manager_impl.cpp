@@ -1912,6 +1912,7 @@ std::shared_ptr<ResourceManager> ResourceManagerImpl::GetOverrideResourceManager
 
     overrideResMgr->bundleInfo.first = this->bundleInfo.first;
     overrideResMgr->bundleInfo.second = this->bundleInfo.second;
+    overrideResMgr->userId = this->userId;
     overrideResMgr->SetBrandColor(this->GetBrandColor());
     if (overrideResConfig && overrideResMgr->UpdateOverrideResConfig(*overrideResConfig) != SUCCESS) {
         RESMGR_HILOGE(RESMGR_TAG, "GetOverrideResourceManager UpdateOverrideResConfig failed bundleName = %{public}s, \

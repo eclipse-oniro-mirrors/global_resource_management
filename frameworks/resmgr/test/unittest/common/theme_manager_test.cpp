@@ -1365,4 +1365,53 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestUpdateSystemResRootDirsTest001, TestS
     EXPECT_TRUE(keptOld);
     CleanupTestFlags();
 }
+
+/*
+ * @tc.name: ThemeManagerTestOverrideResourceManagerUserIdTest001
+ * @tc.desc: Test override manager inherits userId and can access theme resources.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestOverrideResourceManagerUserIdTest001, TestSize.Level1)
+{
+    SetupTestFlags();
+    bool ret = rm->AddResource(FormatFullPath(g_hapPath).c_str());
+    ASSERT_TRUE(ret);
+    int32_t userId = 100;
+    // Load theme icons so basePathMap_[100] and themeMaskMap_[100] are populated
+    tm->UpdateBasePath(userId);
+    std::string basePath = tm->GetBasePath(userId);
+    ASSERT_FALSE(basePath.empty());
+    tm->LoadThemeIconRes("ohos.global.test.all", "entry", userId);
+    // Load theme skin so color resources are available
+    std::vector<std::string> skinDirs;
+    skinDirs.emplace_back(basePath + "/skin/ohos.global.test.all");
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", skinDirs, userId, basePath);
+    // Create override manager with dark color mode
+    auto overrideConfig = std::make_shared<ResConfigImpl>();
+    overrideConfig->SetColorMode(DARK);
+    auto overrideRm = rm->GetOverrideResourceManager(overrideConfig);
+    ASSERT_TRUE(overrideRm != nullptr);
+    // Verify override manager inherits userId from parent
+    EXPECT_EQ(overrideRm->userId, rm->userId);
+    EXPECT_EQ(overrideRm->userId, userId);
+    // Verify override manager can access theme mask
+    std::string mask = ThemePackManager::GetThemePackManager()->GetMask(overrideRm->userId);
+    EXPECT_FALSE(mask.empty());
+    // Verify override manager can get theme color (base_only = #ffffff)
+    int id = rmc->GetResId("base_only", ResType::COLOR);
+    uint32_t outValue;
+    RState state = overrideRm->GetColorById(id, outValue);
+    EXPECT_TRUE(state == SUCCESS);
+    ASSERT_EQ(4294967295, outValue); // #ffffff
+    // Verify override manager can get theme icons
+    uint32_t resId = 16777306;
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> foregroundInfo;
+    std::pair<std::unique_ptr<uint8_t[]>, size_t> backgroundInfo;
+    state = overrideRm->GetThemeIcons(resId, foregroundInfo, backgroundInfo);
+    EXPECT_TRUE(state == SUCCESS);
+    // Cleanup
+    tm->LoadThemeIconsResource("ohos.global.test.all", "entry", {}, userId);
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", {}, userId);
+    CleanupTestFlags();
+}
 }

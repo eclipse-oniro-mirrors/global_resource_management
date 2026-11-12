@@ -46,6 +46,7 @@ ResourceManager *CreateResourceManager(bool includeSystemRes)
         delete (impl);
         return nullptr;
     }
+    impl->userId = DEFAULT_USER_ID;
     if (includeSystemRes) {
         SystemResourceManager::AddSystemResource(impl);
     }
