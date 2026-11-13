@@ -140,6 +140,10 @@ public:
 
     bool UpdateThemeId(uint32_t newThemeId, int32_t userId);
 
+    bool UpdateThemeIcon(uint32_t newThemeIcon, int32_t userId);
+
+    bool UpdateThemeSkin(uint32_t newThemeSkin, int32_t userId);
+
     bool IsFirstLoadResource();
 
     /**
@@ -234,18 +238,22 @@ private:
     std::vector<std::string> GetSystemResRootDirs(int32_t userId);
     void UpdateSystemResRootDirs(std::vector<std::string> &rootDirs, int32_t userId);
     bool IsSameResourceByUserId(const std::string &path, int32_t userId);
+    bool UpdateThemeValue(std::unordered_map<int32_t, uint32_t> &themeMap, uint32_t newValue, int32_t userId,
+        const std::string &tag);
     void UpdateBasePath(int32_t userId);
     void UpdateUserId(int32_t userId);
     std::string BuildFullPath(const std::string &relativePath, int32_t userId) const;
     std::string GetCanonicalBasePath(const std::string &basePath);
     std::mutex lockSkin_;
     std::mutex lockIcon_;
-    std::mutex lockThemeId_;
+    std::mutex lockThemeMaps_;
     std::mutex lockIconValue_;
     mutable std::mutex lockHighlightIcon_;
     mutable std::mutex lockBasePath_;
     std::mutex lockUserId_;
     std::unordered_map<int32_t, uint32_t> themeIdMap_;
+    std::unordered_map<int32_t, uint32_t> themeIconMap_;
+    std::unordered_map<int32_t, uint32_t> themeSkinMap_;
     std::unordered_map<int32_t, std::string> basePathMap_;
     bool isFirstCreate = true;
     int32_t currentUserId_ = 0;

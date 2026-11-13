@@ -1268,12 +1268,14 @@ void ResourceManagerImpl::UpdateTheme(ResConfig &resConfig)
     if (!themePackManager->UpdateThemeId(resConfig.GetThemeId(), userId)) {
         return;
     }
-    if (resConfig.GetThemeIcon()) {
-        RESMGR_HILOGD(RESMGR_TAG, "The themeIcon enabled");
+    bool themeIconChanged = themePackManager->UpdateThemeIcon(resConfig.GetThemeIcon(), userId);
+    bool themeSkinChanged = themePackManager->UpdateThemeSkin(resConfig.GetThemeSkin(), userId);
+    if (themeIconChanged) {
+        RESMGR_HILOGD(RESMGR_TAG, "The themeIcon changed");
         themePackManager->LoadThemeIconRes(bundleInfo.first, bundleInfo.second, userId);
     }
-    if (resConfig.GetThemeSkin()) {
-        RESMGR_HILOGD(RESMGR_TAG, "The themeSkin enabled");
+    if (themeSkinChanged) {
+        RESMGR_HILOGD(RESMGR_TAG, "The themeSkin changed");
         themePackManager->LoadThemeSkinRes(bundleInfo.first, bundleInfo.second, userId);
     }
 }

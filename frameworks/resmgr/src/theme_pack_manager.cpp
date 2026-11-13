@@ -502,22 +502,41 @@ const std::string ThemePackManager::FindThemeIconResource(const std::pair<std::s
     return result;
 }
 
+bool ThemePackManager::UpdateThemeValue(std::unordered_map<int32_t, uint32_t> &themeMap, uint32_t newValue,
+    int32_t userId, const std::string &tag)
+{
+    std::lock_guard<std::mutex> lock(this->lockThemeMaps_);
+    uint32_t oldValue = 0;
+    auto it = themeMap.find(userId);
+    if (it != themeMap.end()) {
+        oldValue = it->second;
+    }
+    if (newValue != 0 && newValue != oldValue) {
+        RESMGR_HILOGI(RESMGR_TAG, "update %{public}s, userId=%{public}d, %{public}d -> %{public}d", tag.c_str(),
+            userId, oldValue, newValue);
+        themeMap[userId] = newValue;
+        return true;
+    }
+    return false;
+}
+
 bool ThemePackManager::UpdateThemeId(uint32_t newThemeId, int32_t userId)
 {
-    std::lock_guard<std::mutex> lock(this->lockThemeId_);
-    uint32_t oldThemeId = 0;
-    auto it = themeIdMap_.find(userId);
-    if (it != themeIdMap_.end()) {
-        oldThemeId = it->second;
-    }
-    if (newThemeId != 0 && newThemeId != oldThemeId) {
-        RESMGR_HILOGW(RESMGR_TAG, "update theme, userId=%{public}d, %{public}d -> %{public}d", userId, oldThemeId,
-            newThemeId);
-        themeIdMap_[userId] = newThemeId;
+    if (UpdateThemeValue(themeIdMap_, newThemeId, userId, "theme")) {
         UpdateBasePath(userId);
         return true;
     }
     return false;
+}
+
+bool ThemePackManager::UpdateThemeIcon(uint32_t newThemeIcon, int32_t userId)
+{
+    return UpdateThemeValue(themeIconMap_, newThemeIcon, userId, "themeIcon");
+}
+
+bool ThemePackManager::UpdateThemeSkin(uint32_t newThemeSkin, int32_t userId)
+{
+    return UpdateThemeValue(themeSkinMap_, newThemeSkin, userId, "themeSkin");
 }
 
 bool ThemePackManager::IsFirstLoadResource()
