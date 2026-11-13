@@ -154,7 +154,7 @@ group("win_resmgr") {
 }
 
 ohos_shared_library("global_resmgr_mac") {
-  if (resource_management_support_icu) {
+  if (is_mac && resource_management_support_icu) {
     defines = [ "__IDE_PREVIEW__" ]
     cflags = [
       "-std=c++17",
