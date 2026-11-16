@@ -142,6 +142,9 @@ ohos_shared_library("global_resmgr_win") {
     ]
 
     libs = [ "shlwapi" ]
+
+    branch_protector_ret = "pac_ret"
+    stack_protector_ret = true
   }
   subsystem_name = "global"
   part_name = "resource_management"
@@ -177,6 +180,9 @@ ohos_shared_library("global_resmgr_mac") {
         "icu:static_icuuc",
       ]
     }
+
+    branch_protector_ret = "pac_ret"
+    stack_protector_ret = true
   }
   subsystem_name = "global"
   part_name = "resource_management"
@@ -213,6 +219,9 @@ ohos_shared_library("global_resmgr_linux") {
       "zlib:shared_libz",
       "icu:shared_icuuc",
     ]
+
+    branch_protector_ret = "pac_ret"
+    stack_protector_ret = true
   }
   subsystem_name = "global"
   part_name = "resource_management"
