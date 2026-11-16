@@ -1099,6 +1099,92 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestMultiUserThemeIdTest001, TestSize.Lev
 }
 
 /*
+ * @tc.name: ThemeManagerTestUpdateThemeIconTest001
+ * @tc.desc: Test UpdateThemeIcon returns true only when a non-zero id changes; 0 is invalid (not set).
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestUpdateThemeIconTest001, TestSize.Level1)
+{
+    SetupTestFlags();
+    bool result = tm->UpdateThemeIcon(999, 100);
+    EXPECT_TRUE(result);
+    result = tm->UpdateThemeIcon(999, 100);
+    EXPECT_FALSE(result);
+    // 0 is invalid (not set / not updated), should not trigger refresh even if different from last
+    result = tm->UpdateThemeIcon(0, 100);
+    EXPECT_FALSE(result);
+    result = tm->UpdateThemeIcon(1000, 100);
+    EXPECT_TRUE(result);
+    CleanupTestFlags();
+}
+
+/*
+ * @tc.name: ThemeManagerTestUpdateThemeIconZeroInvalidTest001
+ * @tc.desc: Test 0 as invalid value: valid id -> 0 does not refresh, 0 -> new valid id refreshes.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestUpdateThemeIconZeroInvalidTest001, TestSize.Level1)
+{
+    SetupTestFlags();
+    // first 0 is invalid, no refresh
+    bool result = tm->UpdateThemeIcon(0, 101);
+    EXPECT_FALSE(result);
+    // 0 -> 9 is a valid change, refresh
+    result = tm->UpdateThemeIcon(9, 101);
+    EXPECT_TRUE(result);
+    // 9 -> 0: 0 is invalid (not updated), should not refresh, map keeps 9
+    result = tm->UpdateThemeIcon(0, 101);
+    EXPECT_FALSE(result);
+    // 0(not updated) -> 10: 10 != 0 && 10 != 9(old), refresh
+    result = tm->UpdateThemeIcon(10, 101);
+    EXPECT_TRUE(result);
+    CleanupTestFlags();
+}
+
+/*
+ * @tc.name: ThemeManagerTestUpdateThemeSkinTest001
+ * @tc.desc: Test UpdateThemeSkin returns true only when a non-zero id changes; 0 is invalid (not set).
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestUpdateThemeSkinTest001, TestSize.Level1)
+{
+    SetupTestFlags();
+    bool result = tm->UpdateThemeSkin(888, 100);
+    EXPECT_TRUE(result);
+    result = tm->UpdateThemeSkin(888, 100);
+    EXPECT_FALSE(result);
+    // 0 is invalid (not set / not updated), should not trigger refresh
+    result = tm->UpdateThemeSkin(0, 100);
+    EXPECT_FALSE(result);
+    result = tm->UpdateThemeSkin(889, 100);
+    EXPECT_TRUE(result);
+    CleanupTestFlags();
+}
+
+/*
+ * @tc.name: ThemeManagerTestMultiUserThemeIconTest001
+ * @tc.desc: Test per-user themeIconMap_ isolation: same themeIcon id for different users should not block each other.
+ * @tc.type: FUNC
+ */
+HWTEST_F(ThemeManagerTest, ThemeManagerTestMultiUserThemeIconTest001, TestSize.Level1)
+{
+    SetupTestFlags();
+    bool result100 = tm->UpdateThemeIcon(999, 100);
+    EXPECT_TRUE(result100);
+    bool result103 = tm->UpdateThemeIcon(999, 103);
+    EXPECT_TRUE(result103);
+    result100 = tm->UpdateThemeIcon(999, 100);
+    EXPECT_FALSE(result100);
+    result100 = tm->UpdateThemeIcon(1000, 100);
+    EXPECT_TRUE(result100);
+    result103 = tm->UpdateThemeIcon(1000, 103);
+    EXPECT_TRUE(result103);
+    result100 = tm->UpdateThemeIcon(1000, 100);
+    EXPECT_FALSE(result100);
+    CleanupTestFlags();
+}
+
+/*
  * @tc.name: ThemeManagerTestMultiUserBasePathTest001
  * @tc.desc: Test per-user basePathMap_ isolation: different users have independent basePath values.
  * @tc.type: FUNC

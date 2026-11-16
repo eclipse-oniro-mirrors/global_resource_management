@@ -117,15 +117,15 @@ public:
 
     /**
      * Set resConfig themeIcon
-     * @param isIcon the resConfig themeIcon flag
+     * @param themeIcon the resConfig themeIcon id, refresh when different from last value
      */
-    void SetThemeIcon(bool isIcon);
+    void SetThemeIcon(uint32_t themeIcon);
 
     /**
      * Set resConfig themeSkin
-     * @param isSkin the resConfig themeSkin flag
+     * @param themeSkin the resConfig themeSkin id, refresh when different from last value
      */
-    void SetThemeSkin(bool isSkin);
+    void SetThemeSkin(uint32_t themeSkin);
 
 #ifdef SUPPORT_GRAPHICS
     const ResLocale *GetResPreferredLocale() const;
@@ -155,9 +155,9 @@ public:
 
     uint32_t GetThemeId() const;
 
-    bool GetThemeIcon() const;
+    uint32_t GetThemeIcon() const;
 
-    bool GetThemeSkin() const;
+    uint32_t GetThemeSkin() const;
 
     DeviceType GetDeviceType() const;
 
@@ -300,8 +300,8 @@ private:
     bool isCompletedScript_;
     bool isAppColorMode_;
     bool isAppDarkRes_;
-    bool isThemeIcon_;
-    bool isThemeSkin_;
+    uint32_t themeIcon_;
+    uint32_t themeSkin_;
 };
 } // namespace Resource
 } // namespace Global
