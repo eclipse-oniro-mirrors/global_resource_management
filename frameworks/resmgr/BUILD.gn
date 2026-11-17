@@ -115,7 +115,7 @@ ohos_shared_library("global_resmgr") {
 }
 
 ohos_shared_library("global_resmgr_win") {
-  if (resource_management_support_icu) {
+  if (is_mingw && resource_management_support_icu) {
     defines = [
       "__WINNT__",
       "__EXPORT_MGR__",
@@ -195,7 +195,7 @@ group("mac_resmgr") {
 }
 
 ohos_shared_library("global_resmgr_linux") {
-  if (resource_management_support_icu) {
+  if (is_linux && resource_management_support_icu) {
     defines = [
       "__IDE_PREVIEW__",
       "__LINUX__",
