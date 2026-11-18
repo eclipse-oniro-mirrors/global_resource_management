@@ -541,11 +541,8 @@ bool ThemePackManager::UpdateThemeSkin(uint32_t newThemeSkin, int32_t userId)
 
 bool ThemePackManager::IsFirstLoadResource()
 {
-    if (isFirstCreate) {
-        isFirstCreate = false;
-        return true;
-    }
-    return false;
+    bool expected = true;
+    return isFirstCreate_.compare_exchange_strong(expected, false);
 }
 
 bool ThemePackManager::HasIconInTheme(const std::string &bundleName, int32_t userId)

@@ -15,6 +15,7 @@
 #ifndef OHOS_THEME_PACK_MANAGER_H
 #define OHOS_THEME_PACK_MANAGER_H
 
+#include <atomic>
 #include <mutex>
 #include <unordered_map>
 
@@ -255,7 +256,7 @@ private:
     std::unordered_map<int32_t, uint32_t> themeIconMap_;
     std::unordered_map<int32_t, uint32_t> themeSkinMap_;
     std::unordered_map<int32_t, std::string> basePathMap_;
-    bool isFirstCreate = true;
+    std::atomic<bool> isFirstCreate_{ true };
     int32_t currentUserId_ = 0;
     const bool isLogFlag_ = false;
 };
