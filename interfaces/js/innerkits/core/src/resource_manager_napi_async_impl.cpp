@@ -404,7 +404,7 @@ napi_value ResourceManagerNapiAsyncImpl::ProcessNoParam(napi_env env, napi_callb
         RESMGR_HILOGE(RESMGR_JS_TAG, "Failed to unwrap ProcessNoParam");
         return nullptr;
     }
-    if (addonPtr == nullptr) {
+    if (addonPtr == nullptr || *addonPtr == nullptr) {
         napi_throw_type_error(env, nullptr, "addon is null");
         return nullptr;
     }

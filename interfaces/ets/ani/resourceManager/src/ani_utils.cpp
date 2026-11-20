@@ -108,6 +108,10 @@ void AniUtils::ThrowAniError(ani_env *env, ani_int code, const std::string &mess
 
 void AniUtils::AniThrow(ani_env *env, int32_t errCode)
 {
+    if (env == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "AniThrow invalid parameter, env is null");
+        return;
+    }
     std::string errMsg = FindErrMsg(errCode);
     if (errMsg != "") {
         ThrowAniError(env, errCode, errMsg);
@@ -116,6 +120,10 @@ void AniUtils::AniThrow(ani_env *env, int32_t errCode)
 
 std::shared_ptr<ResourceManager> AniUtils::GetResourceManager(ani_env* env, ani_object jsResMgr)
 {
+    if (env == nullptr || jsResMgr == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetResourceManager invalid parameter, env or jsResMgr is null");
+        return nullptr;
+    }
     std::lock_guard<std::mutex> lock(g_resMgrMutex);
     ani_long nativePtr;
     ani_status status = env->Object_GetFieldByName_Long(jsResMgr, "nativeResMgr", &nativePtr);
@@ -136,6 +144,10 @@ std::shared_ptr<ResourceManager> AniUtils::GetResourceManager(ani_env* env, ani_
 
 void AniUtils::DestroyResMgr(ani_env* env, ani_object jsResMgr)
 {
+    if (env == nullptr || jsResMgr == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "DestroyResMgr invalid parameter, env or jsResMgr is null");
+        return;
+    }
     std::lock_guard<std::mutex> lock(g_resMgrMutex);
     ani_long nativeResMgrPtr;
     ani_status status = env->Object_GetFieldByName_Long(jsResMgr, "nativeResMgr", &nativeResMgrPtr);
@@ -228,6 +240,10 @@ ani_object AniUtils::CreateAniRawFileDescriptor(ani_env *env, const ResourceMana
 RState AniUtils::ConfigurationToResConfig(ani_env *env, ani_object configuration,
     std::shared_ptr<ResConfig> &resConfig)
 {
+    if (env == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "ConfigurationToResConfig env is null");
+        return ERROR;
+    }
     ani_boolean isUndefined;
     ani_status status = env->Reference_IsUndefined(configuration, &isUndefined);
     if (ANI_OK != status) {
@@ -255,26 +271,38 @@ RState AniUtils::ConfigurationToResConfig(ani_env *env, ani_object configuration
     return SUCCESS;
 }
 
-ani_object AniUtils::CreateConfig(ani_env* env, std::unique_ptr<ResConfig> &cfg)
+bool AniUtils::CreateConfigObject(ani_env* env, ani_object& obj)
 {
     ani_class cls;
     ani_status status = env->FindClass(AniSignature::CONFIGURATION, &cls);
     if (ANI_OK != status) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find class Configuration failed, status: %{public}d.", status);
-        return nullptr;
+        return false;
     }
 
     ani_method ctor;
     status = env->Class_FindMethod(cls, "<ctor>", ":", &ctor);
     if (ANI_OK != status) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Find method <ctor> in Configuration failed, status: %{public}d.", status);
-        return nullptr;
+        return false;
     }
 
-    ani_object obj;
     status = env->Object_New(cls, ctor, &obj);
     if (ANI_OK != status) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Create Configuration failed, status: %{public}d.", status);
+        return false;
+    }
+    return true;
+}
+
+ani_object AniUtils::CreateConfig(ani_env* env, std::unique_ptr<ResConfig> &cfg)
+{
+    if (env == nullptr || cfg == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "CreateConfig invalid parameter, env or cfg is null");
+        return nullptr;
+    }
+    ani_object obj;
+    if (!CreateConfigObject(env, obj)) {
         return nullptr;
     }
 
@@ -292,7 +320,7 @@ ani_object AniUtils::CreateConfig(ani_env* env, std::unique_ptr<ResConfig> &cfg)
         return nullptr;
     }
 
-    status = env->Object_SetPropertyByName_Int(obj, "mcc", static_cast<int>(cfg->GetMcc()));
+    ani_status status = env->Object_SetPropertyByName_Int(obj, "mcc", static_cast<int>(cfg->GetMcc()));
     if (ANI_OK != status) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Set Configuration property 'mcc' failed, status: %{public}d.", status);
         return nullptr;
@@ -370,6 +398,10 @@ bool AniUtils::GetEnumMember(ani_env *env, ani_object options, const std::string
 
 bool AniUtils::GetLocaleOfConfig(ani_env* env, std::shared_ptr<ResConfig> configPtr, ani_object configuration)
 {
+    if (env == nullptr || configPtr == nullptr || configuration == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetLocaleOfConfig invalid parameter");
+        return false;
+    }
 #ifdef SUPPORT_GRAPHICS
     ani_ref ret;
     ani_status status = env->Object_GetPropertyByName_Ref(configuration, "locale", &ret);
@@ -420,6 +452,10 @@ bool AniUtils::SetEnumMember(ani_env *env, ani_object obj, const char* memberNam
 std::string AniUtils::GetLocale(std::unique_ptr<ResConfig> &cfg)
 {
     std::string result;
+    if (cfg == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "GetLocale invalid parameter, cfg is null");
+        return result;
+    }
 #ifdef SUPPORT_GRAPHICS
     const icu::Locale *localeInfo = cfg->GetLocaleInfo();
     if (localeInfo == nullptr) {
@@ -490,6 +526,10 @@ ani_object AniUtils::CreateAniArray(ani_env *env, const std::vector<std::string>
 
 ani_object AniUtils::CreateAniUint8Array(ani_env* env, std::unique_ptr<uint8_t[]> &mediaData, size_t len)
 {
+    if (env == nullptr || (len > 0 && mediaData == nullptr)) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "CreateAniUint8Array invalid parameter, env or mediaData is null");
+        return nullptr;
+    }
     ani_class cls;
     ani_status status = env->FindClass(AniSignature::ANI_UINT8ARRAY, &cls);
     if (ANI_OK != status) {
@@ -627,6 +667,10 @@ bool AniUtils::GetToDoubleMethod(ani_env *env, ani_class &doubleCls, ani_method 
 
 ani_object AniUtils::CreateDeviceCapability(ani_env *env, std::unique_ptr<ResConfig> &cfg)
 {
+    if (env == nullptr || cfg == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "CreateDeviceCapability invalid parameter, env or cfg is null");
+        return nullptr;
+    }
     ani_class cls;
     ani_status status = env->FindClass(AniSignature::DEVICE_CAPABILITY, &cls);
     if (ANI_OK != status) {

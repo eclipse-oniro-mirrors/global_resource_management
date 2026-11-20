@@ -1198,6 +1198,10 @@ bool ResourceManagerImpl::AddResource(const char *path, const uint32_t &selected
 
 bool ResourceManagerImpl::AddPatchResource(const char *path, const char *patchPath)
 {
+    if (path == nullptr || patchPath == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "AddPatchResource path or patchPath is null");
+        return false;
+    }
     return this->hapManager_->AddPatchResource(path, patchPath);
 }
 

@@ -1212,9 +1212,17 @@ ani_status ResMgrAni::BindContext(ani_env* env)
 
 ANI_EXPORT ani_status ANI_Constructor(ani_vm* vm, uint32_t* result)
 {
+    if (vm == nullptr || result == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "ANI_Constructor invalid parameter, vm or result is null");
+        return (ani_status)ANI_ERROR;
+    }
     ani_env* env;
     if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
         RESMGR_HILOGE(RESMGR_ANI_TAG, "Unsupported ANI_VERSION_1");
+        return (ani_status)ANI_ERROR;
+    }
+    if (env == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "ANI_Constructor failed to get ani env");
         return (ani_status)ANI_ERROR;
     }
 

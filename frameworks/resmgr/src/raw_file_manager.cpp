@@ -93,20 +93,28 @@ struct RawFile {
 
 NativeResourceManager *OH_ResourceManager_InitNativeResourceManager(napi_env env, napi_value jsResMgr)
 {
+    if (env == nullptr || jsResMgr == nullptr) {
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "invalid parameter, env or jsResMgr is null");
+        return nullptr;
+    }
     napi_valuetype valueType;
-    napi_typeof(env, jsResMgr, &valueType);
+    napi_status status = napi_typeof(env, jsResMgr, &valueType);
+    if (status != napi_ok) {
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "Failed to get jsResMgr type");
+        return nullptr;
+    }
     if (valueType != napi_object) {
         RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "jsResMgr is not an object");
         return nullptr;
     }
     std::shared_ptr<ResourceManagerAddon> *addonPtr = nullptr;
-    napi_status status = napi_unwrap(env, jsResMgr, reinterpret_cast<void **>(&addonPtr));
+    status = napi_unwrap(env, jsResMgr, reinterpret_cast<void **>(&addonPtr));
     if (status != napi_ok) {
         RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "Failed to get native resourcemanager");
         return nullptr;
     }
-    if (addonPtr == nullptr) {
-        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "Failed to unwrap, addonPtr is null");
+    if (addonPtr == nullptr || *addonPtr == nullptr) {
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "Failed to unwrap, addon is null");
         return nullptr;
     }
     std::unique_ptr<NativeResourceManager> result = std::make_unique<NativeResourceManager>();
@@ -391,7 +399,7 @@ bool OH_ResourceManager_GetRawFileDescriptor(const RawFile *rawFile, RawFileDesc
 
 bool OH_ResourceManager_GetRawFileDescriptorData(const RawFile *rawFile, RawFileDescriptor *descriptor)
 {
-    if (rawFile == nullptr || rawFile->actualOffset == nullptr) {
+    if (rawFile == nullptr || rawFile->actualOffset == nullptr || descriptor == nullptr) {
         return false;
     }
     if (rawFile->resMgr != nullptr) {
@@ -425,6 +433,10 @@ bool OH_ResourceManager_ReleaseRawFileDescriptor(const RawFileDescriptor &descri
 
 bool OH_ResourceManager_ReleaseRawFileDescriptorData(const RawFileDescriptor *descriptor)
 {
+    if (descriptor == nullptr) {
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "descriptor is null in ReleaseRawFileDescriptorData");
+        return false;
+    }
     if (descriptor->fd > 0) {
         return close(descriptor->fd) == 0;
     }
@@ -641,7 +653,7 @@ static bool GetRawFileDescriptorFromHap64(const RawFile64 *rawFile, RawFileDescr
 
 bool OH_ResourceManager_GetRawFileDescriptor64(const RawFile64 *rawFile, RawFileDescriptor64 *descriptor)
 {
-    if (rawFile == nullptr || rawFile->raw == nullptr) {
+    if (rawFile == nullptr || rawFile->raw == nullptr || descriptor == nullptr) {
         return false;
     }
     if (rawFile->raw->resMgr != nullptr) {
@@ -672,6 +684,10 @@ bool OH_ResourceManager_GetRawFileDescriptor64(const RawFile64 *rawFile, RawFile
 
 bool OH_ResourceManager_ReleaseRawFileDescriptor64(const RawFileDescriptor64 *descriptor)
 {
+    if (descriptor == nullptr) {
+        RESMGR_HILOGE(RESMGR_RAWFILE_TAG, "descriptor is null in ReleaseRawFileDescriptor64");
+        return false;
+    }
     if (descriptor->fd > 0) {
         return close(descriptor->fd) == 0;
     }

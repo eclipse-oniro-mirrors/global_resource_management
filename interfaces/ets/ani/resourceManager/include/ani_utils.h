@@ -54,6 +54,7 @@ private:
     static bool GetEnumParamOfConfig(ani_env* env, std::shared_ptr<ResConfig> configPtr, ani_object configuration);
     static bool GetEnumMember(ani_env *env, ani_object options, const std::string name, int& member);
     static bool GetLocaleOfConfig(ani_env* env, std::shared_ptr<ResConfig> configPtr, ani_object configuration);
+    static bool CreateConfigObject(ani_env* env, ani_object& obj);
     static bool SetEnumMember(ani_env *env, ani_object obj, const char* memberName, const char* enumName,
         const int index);
     static std::string GetLocale(std::unique_ptr<ResConfig> &cfg);

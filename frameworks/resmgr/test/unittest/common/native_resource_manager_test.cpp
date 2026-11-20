@@ -668,6 +668,36 @@ HWTEST_F(NativeResourceManagerTest, Native_ReleaseStringArrayTest001, TestSize.L
 }
 
 /*
+ * @tc.name: Native_GetStringArrayNullResultLenTest001
+ * @tc.desc: OH_ResourceManager_GetStringArray rejects resultValueLen==nullptr
+ * @tc.type: SECURITY
+ */
+HWTEST_F(NativeResourceManagerTest, Native_GetStringArrayNullResultLenTest001, TestSize.Level1)
+{
+    NativeResourceManager *mgr = &nativeMgr;
+    uint32_t id = GetResId("size", ResType::STRINGARRAY);
+    ASSERT_TRUE(id > 0);
+    char **result = nullptr;
+    EXPECT_EQ(OH_ResourceManager_GetStringArray(mgr, id, &result, nullptr),
+        ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER);
+    EXPECT_EQ(result, nullptr);
+
+    uint32_t resultLen = 0;
+    EXPECT_EQ(OH_ResourceManager_GetStringArray(mgr, id, nullptr, &resultLen),
+        ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER);
+}
+
+/*
+ * @tc.name: Native_InitResourceManagerNullParamTest001
+ * @tc.desc: OH_ResourceManager_InitNativeResourceManager rejects null env or jsResMgr
+ * @tc.type: SECURITY
+ */
+HWTEST_F(NativeResourceManagerTest, Native_InitResourceManagerNullParamTest001, TestSize.Level1)
+{
+    EXPECT_EQ(OH_ResourceManager_InitNativeResourceManager(nullptr, nullptr), nullptr);
+}
+
+/*
  * @tc.name: Native_NotFoundIdTest001
  * @tc.desc: Test APIs with non-existent resource id
  * @tc.type: FUNC
@@ -1024,4 +1054,46 @@ HWTEST_F(NativeRawFileHapTest, Native_ReadRawFile64NegativeLength001, TestSize.L
     EXPECT_EQ(ret, 3);
 
     OH_ResourceManager_CloseRawFile64(rawFile);
+}
+
+/*
+ * @tc.name: Native_NullDescriptorTest001
+ * @tc.desc: Descriptor get/release APIs reject null descriptor or raw file input,
+ *           and valid descriptor get/release is verified as control
+ * @tc.type: SECURITY
+ */
+HWTEST_F(NativeRawFileHapTest, Native_NullDescriptorTest001, TestSize.Level1)
+{
+    NativeResourceManager *mgr = &nativeMgr;
+    RawFile *rawFile = OH_ResourceManager_OpenRawFile(mgr, "test_rawfile.txt");
+    ASSERT_NE(rawFile, nullptr);
+    RawFile64 *rawFile64 = OH_ResourceManager_OpenRawFile64(mgr, "test_rawfile.txt");
+    if (rawFile64 == nullptr) {
+        OH_ResourceManager_CloseRawFile(rawFile);
+        ASSERT_NE(rawFile64, nullptr);
+    }
+
+    EXPECT_FALSE(OH_ResourceManager_GetRawFileDescriptorData(rawFile, nullptr));
+    EXPECT_FALSE(OH_ResourceManager_GetRawFileDescriptor64(rawFile64, nullptr));
+    EXPECT_FALSE(OH_ResourceManager_GetRawFileDescriptorData(nullptr, nullptr));
+    EXPECT_FALSE(OH_ResourceManager_GetRawFileDescriptor64(nullptr, nullptr));
+
+    RawFileDescriptor nullRawFileDescriptor = {};
+    EXPECT_FALSE(OH_ResourceManager_GetRawFileDescriptorData(nullptr, &nullRawFileDescriptor));
+    RawFileDescriptor64 nullRawFileDescriptor64 = {};
+    EXPECT_FALSE(OH_ResourceManager_GetRawFileDescriptor64(nullptr, &nullRawFileDescriptor64));
+
+    EXPECT_FALSE(OH_ResourceManager_ReleaseRawFileDescriptorData(nullptr));
+    EXPECT_FALSE(OH_ResourceManager_ReleaseRawFileDescriptor64(nullptr));
+
+    RawFileDescriptor descriptor = {};
+    EXPECT_TRUE(OH_ResourceManager_GetRawFileDescriptorData(rawFile, &descriptor));
+    EXPECT_TRUE(OH_ResourceManager_ReleaseRawFileDescriptorData(&descriptor));
+
+    RawFileDescriptor64 descriptor64 = {};
+    EXPECT_TRUE(OH_ResourceManager_GetRawFileDescriptor64(rawFile64, &descriptor64));
+    EXPECT_TRUE(OH_ResourceManager_ReleaseRawFileDescriptor64(&descriptor64));
+
+    OH_ResourceManager_CloseRawFile(rawFile);
+    OH_ResourceManager_CloseRawFile64(rawFile64);
 }

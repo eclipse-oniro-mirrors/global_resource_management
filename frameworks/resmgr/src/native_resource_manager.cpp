@@ -454,7 +454,7 @@ ResourceManager_ErrorCode OH_ResourceManager_GetResourceConfiguration(const Nati
 ResourceManager_ErrorCode OH_ResourceManager_GetStringArray(const NativeResourceManager *mgr,
     uint32_t resId, char ***resultValue, uint32_t *resultValueLen)
 {
-    if (mgr == nullptr || resultValue == nullptr || mgr->resManager == nullptr) {
+    if (mgr == nullptr || resultValue == nullptr || resultValueLen == nullptr || mgr->resManager == nullptr) {
         return ResourceManager_ErrorCode::ERROR_CODE_INVALID_INPUT_PARAMETER;
     }
     std::vector<std::string> tempResultValue;
