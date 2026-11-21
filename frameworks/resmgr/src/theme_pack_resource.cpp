@@ -29,7 +29,7 @@ constexpr int THIRED_ELEMENT = 2;
 const std::string DYNAMIC_ICON = "dynamic_icons";
 static constexpr long MAX_THEME_JSON_SIZE = 1024 * 1024 * 1024;
 static constexpr int MAX_GET_FILES_DEPTH = 100;
-ThemeResource::ThemeResource(std::string path) : themePath_(path)
+ThemeResource::ThemeResource()
 {}
 
 ThemeResource::~ThemeResource()
@@ -313,7 +313,7 @@ const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeResource(const std:
         RESMGR_HILOGE(RESMGR_TAG, "Invalid rootDir in LoadThemeResource = %{public}s", rootDir.c_str());
         return nullptr;
     }
-    auto themeResource = std::make_shared<ThemeResource>(rootDir);
+    auto themeResource = std::make_shared<ThemeResource>();
     char resolvedRoot[PATH_MAX] = {0};
     Utils::CanonicalizePath(rootDir.c_str(), resolvedRoot, PATH_MAX);
     if (resolvedRoot[0] == '\0') {
@@ -337,17 +337,6 @@ const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeResource(const std:
         }
     }
     return themeResource;
-}
-
-std::string ThemeResource::GetThemeResBundleName(const std::string &themePath)
-{
-    auto pos = themePath.rfind('/');
-    if (pos == std::string::npos) {
-        RESMGR_HILOGE(RESMGR_TAG, "invalid themePath");
-        return std::string("");
-    }
-    std::string bundleName = themePath.substr(pos + 1);
-    return bundleName;
 }
 
 std::string GetIconsBundleName(const std::string& iconPath)
@@ -376,7 +365,7 @@ const std::shared_ptr<ThemeResource> ThemeResource::LoadThemeIconResource(const 
     if (iconPath.empty()) {
         return nullptr;
     }
-    auto themeResource = std::make_shared<ThemeResource>(iconPath);
+    auto themeResource = std::make_shared<ThemeResource>();
     std::string bundleName = GetIconsBundleName(iconPath);
     char resolvedIcon[PATH_MAX] = {0};
     Utils::CanonicalizePath(iconPath.c_str(), resolvedIcon, PATH_MAX);

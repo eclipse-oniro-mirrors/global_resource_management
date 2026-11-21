@@ -91,6 +91,11 @@ void ThemeManagerTest::SetUp(void)
 void ThemeManagerTest::TearDown(void)
 {
     RESMGR_HILOGD(RESMGR_TAG, "ThemeManagerTest teardown");
+    if (tm != nullptr) {
+        std::unique_lock<std::shared_mutex> lock(tm->lockSkin_);
+        tm->skinResource_.clear();
+        tm->systemSkinResource_.clear();
+    }
 }
 
 /*
@@ -109,8 +114,13 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadThemeSkinResourceTest001, TestSiz
     std::string rootDir = "/data/test/theme/skin/ohos.global.test.all";
     rootDirs.emplace_back(rootDir);
     int32_t userId = 100; // userId is 100
-    // the bundlename is invalid
-    tm->LoadThemeSkinResource("ohos.global.test", "entry", rootDirs, userId);
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", rootDirs, userId);
+    rm->GetColorById(id, outValue);
+    ASSERT_EQ(4294967295, outValue); // base_only theme value is #ffffff(4294967295)
+
+    // an empty rootDirs means the theme skin was removed: alive holders are cleared
+    std::vector<std::string> emptyDirs;
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", emptyDirs, userId);
     rm->GetColorById(id, outValue);
     ASSERT_EQ(0, outValue); // base_only APP value is #000000
 }
@@ -160,8 +170,8 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestChangeSkinResourceStatusTest001, Test
     rm->GetColorById(id, outValue);
     ASSERT_EQ(4294967295, outValue); // base_only theme value is #ffffff(4294967295)
 
-    tm->ChangeSkinResourceStatus(userId);
-    tm->ClearSkinResource();
+    std::vector<std::string> emptyDirs;
+    tm->LoadThemeSkinResource("ohos.global.test.all", "entry", emptyDirs, userId);
 
     rm->GetColorById(id, outValue);
     ASSERT_EQ(0, outValue); // base_only APP value is #000000
@@ -706,7 +716,6 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestChangeIconResourceStatusTest001, Test
     iconPath = tm->FindThemeIconResource(bundleInfo, iconName, userId);
     EXPECT_EQ(iconPath, "/data/test/theme/theme1/icons/ohos.global.test1/entry/background.png");
 
-    tm->ChangeIconResourceStatus(userId);
     tm->ClearIconResource(100);
 
     iconName = "foreground";
@@ -918,43 +927,7 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestIsUpdateByUserIdTest001, TestSize.Lev
  * @tc.desc: Test IsSameResourceByUserId function, file case.
  * @tc.type: FUNC
  */
-HWTEST_F(ThemeManagerTest, ThemeManagerTestIsSameResourceByUserIdTest001, TestSize.Level1)
-{
-    std::string path("/data/test/theme/100/a/app/icons/ohos.global.test2/entry/foreground.png");
-    int32_t userId = 100;
-    bool result = tm->IsSameResourceByUserId(path, userId);
-    EXPECT_TRUE(result == true);
 
-    userId = 101;
-    result = tm->IsSameResourceByUserId(path, userId);
-    EXPECT_TRUE(result == false);
-}
-
-/*
- * @tc.name: ThemeManagerTestIsSameResourceByUserIdTest002
- * @tc.desc: Test IsSameResourceByUserId function, file case.
- * @tc.type: FUNC
- */
-HWTEST_F(ThemeManagerTest, ThemeManagerTestIsSameResourceByUserIdTest002, TestSize.Level1)
-{
-    std::string path("/data/test/theme/100");
-    int32_t userId = 100;
-    bool result = tm->IsSameResourceByUserId(path, userId);
-    EXPECT_TRUE(result);
-}
-
-/*
- * @tc.name: ThemeManagerTestIsSameResourceByUserIdTest003
- * @tc.desc: Test IsSameResourceByUserId function, file case.
- * @tc.type: FUNC
- */
-HWTEST_F(ThemeManagerTest, ThemeManagerTestIsSameResourceByUserIdTest003, TestSize.Level1)
-{
-    std::string path("/data/test/theme/abc/");
-    int32_t userId = 100;
-    bool result = tm->IsSameResourceByUserId(path, userId);
-    EXPECT_TRUE(result);
-}
 
 /*
  * @tc.name: ThemeManagerTestGetMaskStringTest001
@@ -1398,14 +1371,11 @@ HWTEST_F(ThemeManagerTest, ThemeManagerTestLoadSystemResFromAppSkinSystemResTest
     tm->LoadThemeSkinResource("ohos.global.test.all", "entry", {}, userId);
     // LoadThemeSkinRes collects systemRes from app/skin_system_res path
     tm->LoadThemeSkinRes("ohos.global.test.all", "entry", userId);
-    // verify skinResource_ contains a resource loaded from app/skin_system_res
+    // verify systemSkinResource_ contains a resource loaded from app/skin_system_res
     bool foundSystemRes = false;
-    for (size_t i = 0; i < tm->skinResource_.size(); ++i) {
-        auto &res = tm->skinResource_[i];
-        if (res != nullptr && res->GetThemePath().find("app/skin_system_res") != std::string::npos) {
-            foundSystemRes = true;
-            break;
-        }
+    auto systemIt = tm->systemSkinResource_.find(userId);
+    if (systemIt != tm->systemSkinResource_.end()) {
+        foundSystemRes = systemIt->second.count("skin_system_res") > 0;
     }
     EXPECT_TRUE(foundSystemRes);
     // verify systemRes color resource is queryable by ("skin_system_res","entry")

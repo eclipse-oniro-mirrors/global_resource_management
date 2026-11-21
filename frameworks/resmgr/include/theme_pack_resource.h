@@ -60,7 +60,7 @@ struct HashTk {
 
 class ThemeResource {
 public:
-    ThemeResource(std::string path);
+    ThemeResource();
     ~ThemeResource();
     static const std::shared_ptr<ThemeResource> LoadThemeResource(const std::string& rootDir,
         const std::string &basePath = "");
@@ -137,33 +137,8 @@ public:
      * @param name the resource name
      * @return the theme value vector
      */
-    std::string GetThemeResBundleName(const std::string &themePath);
-
-    /**
-     * Whether an icon exists in the theme
-     *
-     * @param bundleName the hap bundleName
-     * @return true if icon exists, else no exists
-     */
     bool HasIconInTheme(const std::string &bundleName);
 
-    inline std::string GetThemePath()
-    {
-        return themePath_;
-    }
-
-    inline bool IsNewResource()
-    {
-        return isNewResource_;
-    }
-
-    inline void SetNewResource(bool isNew)
-    {
-        isNewResource_ = isNew;
-    }
-
-    std::string themePath_;
-    bool isNewResource_ = true;
 private:
     std::vector<std::tuple<ResType, std::string, std::shared_ptr<ThemeValue>> > themeValueVec_;
     std::vector<std::pair<ThemeKey, std::string> > iconValues_;

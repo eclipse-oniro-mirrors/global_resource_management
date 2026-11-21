@@ -14,6 +14,7 @@
  */
 #include "theme_pack_manager.h"
 
+#include <algorithm>
 #include <dirent.h>
 #include <cstdio>
 #include <cstdlib>
@@ -74,6 +75,7 @@ ThemePackManager::~ThemePackManager()
 {
     RESMGR_HILOGW_BY_FLAG(isLogFlag_, RESMGR_TAG, "~ThemePackManager");
     skinResource_.clear();
+    systemSkinResource_.clear();
     iconResource_.clear();
     iconMaskValuesMap_.clear();
 }
@@ -169,50 +171,99 @@ void ThemePackManager::UpdateSystemResRootDirs(std::vector<std::string> &rootDir
     rootDirs.insert(rootDirs.end(), sysResDirs.begin(), sysResDirs.end());
 }
 
-void ThemePackManager::ClearSkinResource()
+std::vector<std::string> ThemePackManager::ClearSkinResource(int32_t userId)
 {
-    for (auto it = skinResource_.begin(); it != skinResource_.end();) {
-        if ((*it) == nullptr) {
-            continue;
-        }
-        // 1 means get the enable theme
-        if (!(*it)->IsNewResource()) {
-            it = skinResource_.erase(it);
-        } else {
-            ++it;
+    std::vector<std::string> aliveBundles;
+    auto userIt = skinResource_.find(userId);
+    if (userIt != skinResource_.end()) {
+        for (auto it = userIt->second.begin(); it != userIt->second.end();) {
+            auto container = it->second.lock();
+            if (container != nullptr) {
+                aliveBundles.emplace_back(it->first);
+                container->resource.reset();
+                ++it;
+            } else {
+                it = userIt->second.erase(it);
+            }
         }
     }
+    auto systemIt = systemSkinResource_.find(userId);
+    if (systemIt != systemSkinResource_.end()) {
+        for (auto &[bundle, container] : systemIt->second) {
+            container->resource.reset();
+        }
+    }
+    return aliveBundles;
 }
 
-void ThemePackManager::LoadThemeSkinResource(const std::string &bundleName, const std::string &moduleName,
+std::shared_ptr<ThemeBundleResource> ThemePackManager::LoadThemeSkinResource(const std::string &bundleName,
+    const std::string &moduleName, const std::vector<std::string> &rootDirs, int32_t userId,
+    const std::string &basePath)
+{
+    std::unique_lock<std::shared_mutex> lock(this->lockSkin_);
+    std::vector<std::string> aliveBundles = ClearSkinResource(userId);
+    if (std::find(aliveBundles.begin(), aliveBundles.end(), bundleName) == aliveBundles.end()) {
+        aliveBundles.push_back(bundleName);
+    }
+    if (rootDirs.empty()) {
+        return nullptr;
+    }
+    // Hold the triggering bundle's container before the scan. The manager only keeps a
+    // weak_ptr, so a temporary returned by GetOrCreateSkinContainerLocked inside
+    // LoadSkinResourcesLocked would be destroyed immediately together with the resource
+    // assigned to it.
+    auto resource = GetOrCreateSkinContainerLocked(userId, bundleName);
+    LoadSkinResourcesLocked(aliveBundles, rootDirs, userId, basePath);
+    return resource;
+}
+
+namespace {
+bool IsSystemBundle(const std::string &bundleName)
+{
+    return bundleName == SYSTEM_RES_BUNDLE_NAME || bundleName == OLD_SYSTEM_RES_BUNDLE_NAME;
+}
+} // namespace
+
+void ThemePackManager::LoadSkinResourcesLocked(const std::vector<std::string> &bundles,
     const std::vector<std::string> &rootDirs, int32_t userId, const std::string &basePath)
 {
-    std::lock_guard<std::mutex> lock(this->lockSkin_);
-    ChangeSkinResourceStatus(userId);
-    if (rootDirs.empty()) {
-        ClearSkinResource();
-        return;
-    }
+    bool systemResLoaded = IsSysResourcesLoaded(userId);
     for (const auto &dir : rootDirs) {
         auto pos = dir.rfind('/');
         if (pos == std::string::npos) {
-            RESMGR_HILOGE(RESMGR_TAG, "invalid dir = %{public}s in LoadThemeSkinResource", dir.c_str());
+            RESMGR_HILOGE(RESMGR_TAG, "invalid dir = %{public}s in LoadSkinResourcesLocked", dir.c_str());
             continue;
         }
         std::string tempBundleName = dir.substr(pos + 1);
-        if (tempBundleName != bundleName && tempBundleName != SYSTEM_RES_BUNDLE_NAME
-            && tempBundleName != OLD_SYSTEM_RES_BUNDLE_NAME) {
+        bool isSystemResource = IsSystemBundle(tempBundleName);
+        if (isSystemResource && systemResLoaded) {
+            continue;
+        }
+        if (!isSystemResource && std::find(bundles.begin(), bundles.end(), tempBundleName) == bundles.end()) {
             continue;
         }
         auto pThemeResource = ThemeResource::LoadThemeResource(dir, basePath);
         if (pThemeResource != nullptr) {
-            this->skinResource_.emplace_back(pThemeResource);
+            GetOrCreateSkinContainerLocked(userId, tempBundleName)->resource = std::move(pThemeResource);
         }
     }
-    ClearSkinResource();
 }
 
-void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::string &moduleName, int32_t userId)
+std::shared_ptr<ThemeBundleResource> ThemePackManager::AppendThemeSkinResource(const std::string &bundleName,
+    const std::vector<std::string> &rootDirs, int32_t userId, const std::string &basePath)
+{
+    // Keep the container alive across LoadSkinResourcesLocked; the manager only stores a
+    // weak_ptr, so the temporary otherwise dies before the scan can assign the resource.
+    auto resource = GetOrCreateSkinContainerLocked(userId, bundleName);
+    std::vector<std::string> bundles { bundleName };
+    LoadSkinResourcesLocked(bundles, rootDirs, userId, basePath);
+    // The theme may have no dir for this bundle. Still return its (possibly empty) container so
+    // the ResourceManager holding it stays registered for the next theme switch.
+    return resource;
+}
+
+std::shared_ptr<ThemeBundleResource> ThemePackManager::LoadThemeRes(const std::string &bundleName,
+    const std::string &moduleName, int32_t userId)
 {
     UpdateUserId(userId);
     UpdateBasePath(userId);
@@ -227,11 +278,107 @@ void ThemePackManager::LoadThemeRes(const std::string &bundleName, const std::st
         rootDirs = GetThemeSkinRootDir(THEME_SKIN_B_PATH, THEME_SKIN_B, basePath, userId);
         iconDirs = GetRootDir(THEME_ICONS_B, basePath, userId);
     } else {
-        LoadSAThemeRes(bundleName, moduleName, userId, rootDirs, iconDirs);
+        LoadSAThemeRes(bundleName, userId, rootDirs, iconDirs);
     }
-    LoadThemeSkinResource(bundleName, moduleName, rootDirs, userId, basePath);
+    auto resource = LoadThemeSkinResource(bundleName, moduleName, rootDirs, userId, basePath);
     LoadThemeIconsResource(bundleName, moduleName, iconDirs, userId, basePath);
-    return;
+    return resource;
+}
+
+std::shared_ptr<ThemeBundleResource> ThemePackManager::LoadThemeBundleSkinResource(const std::string &bundleName,
+    int32_t userId)
+{
+    {
+        std::shared_lock<std::shared_mutex> lock(this->lockSkin_);
+        auto resource = GetThemeSkinResourceLocked(userId, bundleName);
+        if (resource != nullptr) {
+            return resource;
+        }
+    }
+    UpdateUserId(userId);
+    UpdateBasePath(userId);
+    std::string basePath = GetBasePath(userId);
+    std::vector<std::string> rootDirs;
+    if (Utils::IsFileExist(THEME_FLAG_A)) {
+        rootDirs = GetThemeSkinRootDir(THEME_SKIN_A_PATH, THEME_SKIN_A, basePath, userId);
+    } else if (Utils::IsFileExist(THEME_FLAG_B)) {
+        rootDirs = GetThemeSkinRootDir(THEME_SKIN_B_PATH, THEME_SKIN_B, basePath, userId);
+    } else {
+        std::vector<std::string> iconDirs;
+        LoadSAThemeRes(bundleName, userId, rootDirs, iconDirs);
+    }
+    std::unique_lock<std::shared_mutex> lock(this->lockSkin_);
+    return AppendThemeSkinResource(bundleName, rootDirs, userId, basePath);
+}
+
+void ThemePackManager::RemoveThemeBundleSkinResource(const std::string &bundleName, int32_t userId)
+{
+    std::unique_lock<std::shared_mutex> lock(this->lockSkin_);
+    auto userIt = skinResource_.find(userId);
+    if (userIt == skinResource_.end()) {
+        return;
+    }
+    auto it = userIt->second.find(bundleName);
+    if (it != userIt->second.end() && it->second.expired()) {
+        userIt->second.erase(it);
+    }
+}
+
+std::shared_ptr<ThemeBundleResource> ThemePackManager::GetThemeSkinResourceLocked(int32_t userId,
+    const std::string &bundleName)
+{
+    auto userIt = skinResource_.find(userId);
+    if (userIt != skinResource_.end()) {
+        auto it = userIt->second.find(bundleName);
+        if (it != userIt->second.end()) {
+            auto resource = it->second.lock();
+            if (resource != nullptr) {
+                return resource;
+            }
+        }
+    }
+    auto systemIt = systemSkinResource_.find(userId);
+    if (systemIt != systemSkinResource_.end()) {
+        auto it = systemIt->second.find(bundleName);
+        if (it != systemIt->second.end()) {
+            return it->second;
+        }
+    }
+    return nullptr;
+}
+
+std::shared_ptr<ThemeBundleResource> ThemePackManager::GetOrCreateSkinContainerLocked(int32_t userId,
+    const std::string &bundleName)
+{
+    if (IsSystemBundle(bundleName)) {
+        auto &systemResource = systemSkinResource_[userId][bundleName];
+        if (systemResource == nullptr) {
+            systemResource = std::make_shared<ThemeBundleResource>();
+        }
+        return systemResource;
+    }
+    auto &weakResource = skinResource_[userId][bundleName];
+    auto resource = weakResource.lock();
+    if (resource == nullptr) {
+        resource = std::make_shared<ThemeBundleResource>();
+        weakResource = resource;
+    }
+    return resource;
+}
+
+bool ThemePackManager::IsSysResourcesLoaded(int32_t userId)
+{
+    // The caller holds lockSkin_.
+    auto userIt = systemSkinResource_.find(userId);
+    if (userIt == systemSkinResource_.end()) {
+        return false;
+    }
+    for (const auto &[bundle, resource] : userIt->second) {
+        if (resource != nullptr && resource->resource != nullptr) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void ThemePackManager::LoadThemeIconRes(const std::string &bundleName, const std::string &moduleName, int32_t userId)
@@ -279,11 +426,10 @@ void ThemePackManager::LoadThemeSkinRes(const std::string &bundleName, const std
         }
     }
     LoadThemeSkinResource(bundleName, moduleName, rootDirs, userId, basePath);
-    return;
 }
 
-void ThemePackManager::LoadSAThemeRes(const std::string &bundleName, const std::string &moduleName,
-    int32_t userId, std::vector<std::string> &rootDirs, std::vector<std::string> &iconDirs)
+void ThemePackManager::LoadSAThemeRes(const std::string &bundleName, int32_t userId,
+    std::vector<std::string> &rootDirs, std::vector<std::string> &iconDirs)
 {
     std::string basePath = GetBasePath(userId);
     if (Utils::IsFileExist(ReplaceUserIdInPath(ABSOLUTE_THEME_FLAG_A, userId))) {
@@ -370,23 +516,12 @@ std::vector<std::shared_ptr<ThemeResource::ThemeValue> > ThemePackManager::GetTh
     const std::pair<std::string, std::string> &bundInfo, const ResType &resType, const std::string &resName,
     int32_t userId)
 {
-    std::lock_guard<std::mutex> lock(this->lockSkin_);
-    std::vector<std::shared_ptr<ThemeResource::ThemeValue> > result;
-    for (size_t i = 0; i < skinResource_.size(); ++i) {
-        auto pThemeResource = skinResource_[i];
-        if (pThemeResource == nullptr) {
-            continue;
-        }
-        if (!IsSameResourceByUserId(pThemeResource->GetThemePath(), userId)) {
-            continue;
-        }
-        std::string bundleName = pThemeResource->GetThemeResBundleName(pThemeResource->themePath_);
-        if (bundleName != bundInfo.first) {
-            continue;
-        }
-        result = pThemeResource->GetThemeValues(bundInfo, resType, resName);
+    std::shared_lock<std::shared_mutex> lock(this->lockSkin_);
+    auto resource = GetThemeSkinResourceLocked(userId, bundInfo.first);
+    if (resource == nullptr || resource->resource == nullptr) {
+        return {};
     }
-    return result;
+    return resource->resource->GetThemeValues(bundInfo, resType, resName);
 }
 
 const std::shared_ptr<ThemeResource::ThemeQualifierValue> ThemePackManager::GetThemeQualifierValue(
@@ -431,16 +566,9 @@ const std::shared_ptr<ThemeResource::ThemeQualifierValue> ThemePackManager::GetB
 
 void ThemePackManager::ClearIconResource(int32_t userId)
 {
-    for (auto it = iconResource_.begin(); it != iconResource_.end();) {
-        if ((*it) == nullptr) {
-            continue;
-        }
-        // 1 means get the enable theme
-        if (!(*it)->IsNewResource()) {
-            it = iconResource_.erase(it);
-        } else {
-            ++it;
-        }
+    auto it = iconResource_.find(userId);
+    if (it != iconResource_.end()) {
+        it->second.clear();
     }
     std::lock_guard<std::mutex> lock(lockIconValue_);
     iconMaskValuesMap_.erase(userId);
@@ -457,12 +585,12 @@ void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, con
     const std::vector<std::string> &rootDirs, int32_t userId, const std::string &basePath)
 {
     std::lock_guard<std::mutex> lock(this->lockIcon_);
-    ChangeIconResourceStatus(userId);
+    ClearIconResource(userId);
     if (rootDirs.empty()) {
         RESMGR_HILOGW(RESMGR_TAG, "theme resources will clean, id %{public}d", userId);
-        ClearIconResource(userId);
         return;
     }
+    auto &icons = iconResource_[userId];
     for (const auto &dir : rootDirs) {
         auto pos = dir.rfind('/');
         if (pos == std::string::npos) {
@@ -472,11 +600,10 @@ void ThemePackManager::LoadThemeIconsResource(const std::string &bundleName, con
         RESMGR_HILOGW_BY_FLAG(isLogFlag_, RESMGR_TAG, "load img, %{public}s", GetMaskString(dir).c_str());
         auto pThemeResource = ThemeResource::LoadThemeIconResource(dir, basePath, isLogFlag_);
         if (pThemeResource != nullptr) {
-            this->iconResource_.emplace_back(pThemeResource);
+            icons.emplace_back(pThemeResource);
         }
     }
-    ClearIconResource(userId);
-    RESMGR_HILOGW_BY_FLAG(isLogFlag_, RESMGR_TAG, "load img end, size is %{public}zu", iconResource_.size());
+    RESMGR_HILOGW_BY_FLAG(isLogFlag_, RESMGR_TAG, "load img end, size is %{public}zu", icons.size());
 }
 
 const std::string ThemePackManager::FindThemeIconResource(const std::pair<std::string, std::string> &bundleInfo,
@@ -484,12 +611,13 @@ const std::string ThemePackManager::FindThemeIconResource(const std::pair<std::s
 {
     std::lock_guard<std::mutex> lock(this->lockIcon_);
     std::string result;
-    for (size_t i = 0; i < iconResource_.size(); i++) {
-        auto pThemeResource = iconResource_[i];
+    auto it = iconResource_.find(userId);
+    if (it == iconResource_.end()) {
+        return result;
+    }
+    for (size_t i = 0; i < it->second.size(); i++) {
+        auto pThemeResource = it->second[i];
         if (pThemeResource == nullptr) {
-            continue;
-        }
-        if (!IsSameResourceByUserId(pThemeResource->GetThemePath(), userId)) {
             continue;
         }
         result = pThemeResource->GetThemeAppIcon(bundleInfo, iconName, abilityName);
@@ -549,12 +677,13 @@ bool ThemePackManager::HasIconInTheme(const std::string &bundleName, int32_t use
 {
     std::lock_guard<std::mutex> lock(this->lockIcon_);
     bool result = false;
-    for (size_t i = 0; i < iconResource_.size(); i++) {
-        auto pThemeResource = iconResource_[i];
+    auto it = iconResource_.find(userId);
+    if (it == iconResource_.end()) {
+        return false;
+    }
+    for (size_t i = 0; i < it->second.size(); i++) {
+        auto pThemeResource = it->second[i];
         if (pThemeResource == nullptr) {
-            continue;
-        }
-        if (!IsSameResourceByUserId(pThemeResource->GetThemePath(), userId)) {
             continue;
         }
         result = pThemeResource->HasIconInTheme(bundleName);
@@ -565,8 +694,8 @@ bool ThemePackManager::HasIconInTheme(const std::string &bundleName, int32_t use
     return result;
 }
 
-RState ThemePackManager::GetOtherIconsInfo(const std::string &iconName,
-    std::unique_ptr<uint8_t[]> &outValue, size_t &len, bool isGlobalMask, int32_t userId)
+RState ThemePackManager::GetOtherIconsInfo(const std::string &iconName, std::unique_ptr<uint8_t[]> &outValue,
+    size_t &len, bool isGlobalMask, int32_t userId)
 {
     std::string iconPath;
     std::string iconTag;
@@ -647,8 +776,8 @@ RState ThemePackManager::GetHighlightIconInfo(const std::string &iconName, std::
     return ERROR_CODE_RES_NOT_FOUND_BY_NAME;
 }
 
-RState ThemePackManager::GetThemeIconFromCache(
-    const std::string &iconTag, std::unique_ptr<uint8_t[]> &outValue, size_t &len, int32_t userId)
+RState ThemePackManager::GetThemeIconFromCache(const std::string &iconTag, std::unique_ptr<uint8_t[]> &outValue,
+    size_t &len, int32_t userId)
 {
     std::lock_guard<std::mutex> lock(this->lockIconValue_);
     auto it = iconMaskValuesMap_.find(userId);
@@ -716,49 +845,6 @@ void ThemePackManager::UpdateBasePath(int32_t userId)
     }
     std::lock_guard<std::mutex> lock(this->lockBasePath_);
     basePathMap_[userId] = basePath;
-}
-
-bool ThemePackManager::IsSameResourceByUserId(const std::string &path, int32_t userId)
-{
-    if (path.empty() || path.find(ABSOLUTE_THEME_PATH) == std::string::npos) {
-        return true;
-    }
-    auto pos = path.find("/", ABSOLUTE_THEME_PATH.length());
-    if (pos == std::string::npos) {
-        return true;
-    }
-    auto subStr = path.substr(ABSOLUTE_THEME_PATH.length(), pos - ABSOLUTE_THEME_PATH.length());
-    int tmpId = -1;
-    if (!Utils::convertToInteger(subStr, tmpId)) {
-        return true;
-    }
-    return tmpId == userId;
-}
-
-void ThemePackManager::ChangeSkinResourceStatus(int32_t userId)
-{
-    for (size_t i = 0; i < skinResource_.size(); ++i) {
-        auto pThemeResource = skinResource_[i];
-        if (pThemeResource == nullptr) {
-            continue;
-        }
-        if (IsSameResourceByUserId(pThemeResource->GetThemePath(), userId)) {
-            pThemeResource->SetNewResource(false);
-        }
-    }
-}
-
-void ThemePackManager::ChangeIconResourceStatus(int32_t userId)
-{
-    for (size_t i = 0; i < iconResource_.size(); ++i) {
-        auto pThemeResource = iconResource_[i];
-        if (pThemeResource == nullptr) {
-            continue;
-        }
-        if (IsSameResourceByUserId(pThemeResource->GetThemePath(), userId)) {
-            pThemeResource->SetNewResource(false);
-        }
-    }
 }
 
 const std::string ThemePackManager::GetMaskString(const std::string &path)

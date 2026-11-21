@@ -83,6 +83,7 @@ ohos_unittest("resmgr_test") {
     "unittest/common/resource_manager_v1_v2_test.cpp",
     "unittest/common/string_utils_test.cpp",
     "unittest/common/system_resource_manager_test.cpp",
+    "unittest/common/theme_bundle_skin_test.cpp",
     "unittest/common/theme_config_test.cpp",
     "unittest/common/theme_manager_test.cpp",
     "unittest/common/theme_resource_test.cpp",

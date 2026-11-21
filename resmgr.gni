@@ -55,6 +55,7 @@ manager_sources = [
   "//base/global/resource_management/frameworks/resmgr/src/theme_pack_config.cpp",
   "//base/global/resource_management/frameworks/resmgr/src/theme_pack_manager.cpp",
   "//base/global/resource_management/frameworks/resmgr/src/theme_pack_resource.cpp",
+  "//base/global/resource_management/frameworks/resmgr/src/theme_skin_ref.cpp",
   "//base/global/resource_management/frameworks/resmgr/src/utils/psue_manager.cpp",
   "//base/global/resource_management/frameworks/resmgr/src/utils/string_utils.cpp",
   "//base/global/resource_management/frameworks/resmgr/src/utils/utils.cpp",

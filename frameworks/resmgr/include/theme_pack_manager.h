@@ -16,7 +16,9 @@
 #define OHOS_THEME_PACK_MANAGER_H
 
 #include <atomic>
+#include <memory>
 #include <mutex>
+#include <shared_mutex>
 #include <unordered_map>
 
 #include "hap_resource.h"
@@ -30,6 +32,18 @@
 namespace OHOS {
 namespace Global {
 namespace Resource {
+/**
+ * Theme skin resources of one bundle.
+ *
+ * For app bundles the owner is the ResourceManagerImpl (through ThemeSkinRef), and
+ * ThemePackManager keeps only a weak index entry, so the resource is released together
+ * with the last owner. For system bundles no ResourceManager owns the container:
+ * ThemePackManager keeps a strong reference in systemSkinResource_ for the process lifetime.
+ */
+struct ThemeBundleResource {
+    std::shared_ptr<ThemeResource> resource;
+};
+
 class ThemePackManager {
 public:
     static std::shared_ptr<ThemePackManager> GetThemePackManager();
@@ -41,33 +55,62 @@ public:
      *
      * @param bundleName the hap bundleName
      * @param moduleName the hap moduleName
-     * @param userId the uesr id
+     * @param userId the user id
+     * @return the skin resource container of the bundle, null when no skin is loaded
      */
-    void LoadThemeRes(const std::string &bundleName, const std::string &moduleName, int32_t userId);
+    std::shared_ptr<ThemeBundleResource> LoadThemeRes(const std::string &bundleName, const std::string &moduleName,
+        int32_t userId);
+
+    /**
+     * Load the theme skin resources of one bundle.
+     *
+     * Returns the container already held for the bundle, or loads it on first use.
+     * The caller holds the returned container; ThemePackManager keeps only a weak
+     * reference, so the resources are released when the last holder is destroyed.
+     *
+     * @param bundleName the hap bundleName
+     * @param userId the user id
+     * @return the skin resource container, never null
+     */
+    std::shared_ptr<ThemeBundleResource> LoadThemeBundleSkinResource(const std::string &bundleName, int32_t userId);
+
+    /**
+     * Remove the weak index entry of a bundle after its last ResourceManager released it.
+     * Called by ThemeSkinRef's destructor; the entry is erased only when the weak_ptr is
+     * expired, so a container still shared by another ResourceManager is kept.
+     *
+     * @param bundleName the hap bundleName
+     * @param userId the user id
+     */
+    void RemoveThemeBundleSkinResource(const std::string &bundleName, int32_t userId);
 
     /**
      * Load the theme resource.
      *
      * @param bundleName the hap bundleName
-     * @param moduleName the hap moduleName
      * @param userId the user id
      * @param rootDirs the theme skins dirs output
      * @param iconDirs the theme icons dirs output
      */
-    void LoadSAThemeRes(const std::string &bundleName, const std::string &moduleName,
-        int32_t userId, std::vector<std::string> &rootDirs, std::vector<std::string> &iconDirs);
+    void LoadSAThemeRes(const std::string &bundleName, int32_t userId,
+        std::vector<std::string> &rootDirs, std::vector<std::string> &iconDirs);
 
     /**
      * Load the skin dir resource in theme pack.
+     *
+     * Clears the old resources of all alive bundles and reloads them from rootDirs.
+     * The triggering bundle is always included in the alive list.
      *
      * @param bundleName the hap bundleName
      * @param moduleName the hap moduleName
      * @param rootDirs the theme skins dirs
      * @param userId the user id
      * @param basePath the base path for relative path conversion
+     * @return the skin resource container of the triggering bundle, null when rootDirs is empty
      */
-    void LoadThemeSkinResource(const std::string &bundleName, const std::string &moduleName,
-        const std::vector<std::string> &rootDirs, int32_t userId, const std::string &basePath = "");
+    std::shared_ptr<ThemeBundleResource> LoadThemeSkinResource(const std::string &bundleName,
+        const std::string &moduleName, const std::vector<std::string> &rootDirs, int32_t userId,
+        const std::string &basePath = "");
 
     /**
      * Load the icons dir resource int theme pack.
@@ -90,8 +133,8 @@ public:
      * @param resConfig the resource config
      * @param userId the user id
      */
-    const std::string GetThemeResource(const std::pair<std::string, std::string> &bundleInfo,
-        const ResType &resType, const std::string &resName, const ResConfigImpl &resConfig, int32_t userId);
+    const std::string GetThemeResource(const std::pair<std::string, std::string> &bundleInfo, const ResType &resType,
+        const std::string &resName, const ResConfigImpl &resConfig, int32_t userId);
 
     /**
      * Find the best theme resource related to bundlename, modulename, idItems and resConfig.
@@ -209,14 +252,28 @@ private:
     ThemePackManager();
     std::unordered_map<int32_t, std::string> themeMaskMap_;
     std::unordered_map<int32_t, std::string> themeStrokeMap_;
-    void ChangeSkinResourceStatus(int32_t userId);
-    void ChangeIconResourceStatus(int32_t userId);
-    void ClearSkinResource();
+    // The following methods require the caller to hold lockSkin_.
+    std::vector<std::string> ClearSkinResource(int32_t userId);
+    // Scans rootDirs once and writes the resources of the given bundles (plus system resources
+    // when they are not loaded yet) into their containers.
+    void LoadSkinResourcesLocked(const std::vector<std::string> &bundles, const std::vector<std::string> &rootDirs,
+        int32_t userId, const std::string &basePath);
+    // Loads the bundle's skin dirs (plus system resources) and writes them into the bundle's
+    // container, creating the container when no ResourceManager holds it yet.
+    // Returns the container of bundleName.
+    std::shared_ptr<ThemeBundleResource> AppendThemeSkinResource(const std::string &bundleName,
+        const std::vector<std::string> &rootDirs, int32_t userId, const std::string &basePath);
+    bool IsSysResourcesLoaded(int32_t userId);
+    std::shared_ptr<ThemeBundleResource> GetThemeSkinResourceLocked(int32_t userId, const std::string &bundleName);
+    std::shared_ptr<ThemeBundleResource> GetOrCreateSkinContainerLocked(int32_t userId, const std::string &bundleName);
     void ClearIconResource(int32_t userId);
     void ClearHighlightIcon(int32_t userId);
     const std::string GetMaskString(const std::string &path);
-    std::vector<std::shared_ptr<ThemeResource>> skinResource_;
-    std::vector<std::shared_ptr<ThemeResource>> iconResource_;
+    // owner = ResourceManagerImpl (through ThemeSkinRef); ThemePackManager keeps a weak index.
+    std::map<int32_t, std::map<std::string, std::weak_ptr<ThemeBundleResource>>> skinResource_;
+    // System skin resources have no ResourceManager owner, so the manager keeps them alive.
+    std::map<int32_t, std::map<std::string, std::shared_ptr<ThemeBundleResource>>> systemSkinResource_;
+    std::map<int32_t, std::vector<std::shared_ptr<ThemeResource>>> iconResource_;
     std::unordered_map<int32_t, std::vector<std::tuple<std::string, std::unique_ptr<uint8_t[]>, size_t>>>
         iconMaskValuesMap_;
     std::unordered_map<int32_t, std::tuple<std::string, std::unique_ptr<uint8_t[]>, size_t>>
@@ -238,14 +295,13 @@ private:
         const std::string &basePath, int32_t userId);
     std::vector<std::string> GetSystemResRootDirs(int32_t userId);
     void UpdateSystemResRootDirs(std::vector<std::string> &rootDirs, int32_t userId);
-    bool IsSameResourceByUserId(const std::string &path, int32_t userId);
     bool UpdateThemeValue(std::unordered_map<int32_t, uint32_t> &themeMap, uint32_t newValue, int32_t userId,
         const std::string &tag);
     void UpdateBasePath(int32_t userId);
     void UpdateUserId(int32_t userId);
     std::string BuildFullPath(const std::string &relativePath, int32_t userId) const;
     std::string GetCanonicalBasePath(const std::string &basePath);
-    std::mutex lockSkin_;
+    std::shared_mutex lockSkin_;
     std::mutex lockIcon_;
     std::mutex lockThemeMaps_;
     std::mutex lockIconValue_;
