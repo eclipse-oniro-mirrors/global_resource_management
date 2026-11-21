@@ -1067,6 +1067,18 @@ HWTEST_F(ResourceManagerDeviceTest, AddPatchResourcePathTest001, TestSize.Level1
 }
 
 /*
+ * @tc.name: AddPatchResourceNullParamTest001
+ * @tc.desc: Test AddPatchResource rejects null path or patchPath
+ * @tc.type: SECURITY
+ */
+HWTEST_F(ResourceManagerDeviceTest, AddPatchResourceNullParamTest001, TestSize.Level1)
+{
+    EXPECT_FALSE(rm->AddPatchResource(nullptr, "testPatch"));
+    EXPECT_FALSE(rm->AddPatchResource("testPatch", nullptr));
+    EXPECT_FALSE(rm->AddPatchResource(nullptr, nullptr));
+}
+
+/*
  * @tc.name: ReleaseSystemResourceManagerTest001
  * @tc.desc: Test ReleaseSystemResourceManager function
  * @tc.type: FUNC

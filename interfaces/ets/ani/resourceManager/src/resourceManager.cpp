@@ -52,6 +52,10 @@ ani_object ResMgrAddon::WrapResourceManager(ani_env* env, std::shared_ptr<Resour
 
 bool ResMgrAddon::Init(ani_env* env)
 {
+    if (env == nullptr) {
+        RESMGR_HILOGE(RESMGR_ANI_TAG, "Init invalid parameter, env is null");
+        return false;
+    }
     std::lock_guard<std::mutex> lock(g_initMutex);
     if (g_ctor && g_clsRef) {
         return true;
