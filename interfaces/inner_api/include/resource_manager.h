@@ -312,7 +312,7 @@ public:
      *         if the color string is non-empty but invalid, NOT_SUPPORT_SEP
      *         if this ResourceManager does not implement brand color override.
      */
-    virtual RState SetBrandColor(const std::string &brandColor) { return NOT_SUPPORT_SEP; }
+    virtual RState SetBrandColor(const std::string &brandColor);
 
     /**
      * Get the brand color of this ResourceManager instance.
@@ -323,8 +323,18 @@ public:
      *         see SetBrandColor), or if this ResourceManager does not
      *         implement brand color override.
      */
-    virtual std::string GetBrandColor() const { return ""; }
+    virtual std::string GetBrandColor() const;
 };
+
+inline RState ResourceManager::SetBrandColor(const std::string &brandColor)
+{
+    return NOT_SUPPORT_SEP;
+}
+
+inline std::string ResourceManager::GetBrandColor() const
+{
+    return "";
+}
 
 EXPORT_FUNC ResourceManager *CreateResourceManager(bool includeSystemRes = true);
 

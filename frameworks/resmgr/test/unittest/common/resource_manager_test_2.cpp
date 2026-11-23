@@ -1576,6 +1576,15 @@ HWTEST_F(ResourceManagerDeviceTest, BrandColorSetVariousFormats, TestSize.Level1
     EXPECT_EQ("", rm->GetBrandColor());
 }
 
+HWTEST_F(ResourceManagerDeviceTest, BrandColorBaseDefaultImpl, TestSize.Level1)
+{
+    EXPECT_EQ(SUCCESS, rm->SetBrandColor("#FFFF0000"));
+    EXPECT_EQ("#FFFF0000", rm->GetBrandColor());
+    EXPECT_EQ(NOT_SUPPORT_SEP, rm->ResourceManager::SetBrandColor("#FF00FF00"));
+    EXPECT_EQ("", rm->ResourceManager::GetBrandColor());
+    EXPECT_EQ("#FFFF0000", rm->GetBrandColor());
+}
+
 // H2: Fully transparent colors (#00000000 / #0000) parse to 0 and are
 // treated as "clear" (brandColor_==0 sentinel). Goes through the public
 // SetBrandColor(string) + ConvertColorToUInt32 end-to-end path, not the

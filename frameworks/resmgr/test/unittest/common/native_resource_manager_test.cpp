@@ -13,11 +13,13 @@
  * limitations under the License.
  */
 
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <gtest/gtest.h>
 #include <memory>
 #include <securec.h>
+#include <vector>
 
 #include "resource_manager.h"
 #include "ohresmgr.h"
@@ -1093,6 +1095,309 @@ HWTEST_F(NativeRawFileHapTest, Native_NullDescriptorTest001, TestSize.Level1)
     RawFileDescriptor64 descriptor64 = {};
     EXPECT_TRUE(OH_ResourceManager_GetRawFileDescriptor64(rawFile64, &descriptor64));
     EXPECT_TRUE(OH_ResourceManager_ReleaseRawFileDescriptor64(&descriptor64));
+
+    OH_ResourceManager_CloseRawFile(rawFile);
+    OH_ResourceManager_CloseRawFile64(rawFile64);
+}
+
+/*
+ * @tc.name: Native_RawFileNullParamTest001
+ * @tc.desc: Rawfile/rawdir APIs reject null pointers and a manager without a resource manager
+ * @tc.type: SECURITY
+ */
+HWTEST_F(NativeResourceManagerTest, Native_RawFileNullParamTest001, TestSize.Level1)
+{
+    NativeResourceManager *mgr = &nativeMgr;
+    NativeResourceManager emptyMgr;
+    char buf[8] = {0};
+    RawFileDescriptor descriptor = {};
+    RawFileDescriptor64 descriptor64 = {};
+
+    EXPECT_EQ(OH_ResourceManager_OpenRawDir(nullptr, "rawfile"), nullptr);
+    EXPECT_EQ(OH_ResourceManager_OpenRawDir(mgr, nullptr), nullptr);
+    EXPECT_EQ(OH_ResourceManager_OpenRawDir(&emptyMgr, "rawfile"), nullptr);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileCount(nullptr), 0);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileName(nullptr, 0), nullptr);
+    OH_ResourceManager_CloseRawDir(nullptr);
+
+    EXPECT_EQ(OH_ResourceManager_OpenRawFile(nullptr, "test_rawfile.txt"), nullptr);
+    EXPECT_EQ(OH_ResourceManager_OpenRawFile(mgr, nullptr), nullptr);
+    EXPECT_EQ(OH_ResourceManager_OpenRawFile(&emptyMgr, "test_rawfile.txt"), nullptr);
+    EXPECT_EQ(OH_ResourceManager_OpenRawFile64(nullptr, "test_rawfile.txt"), nullptr);
+    EXPECT_EQ(OH_ResourceManager_OpenRawFile64(mgr, nullptr), nullptr);
+    EXPECT_EQ(OH_ResourceManager_OpenRawFile64(&emptyMgr, "test_rawfile.txt"), nullptr);
+
+    EXPECT_EQ(OH_ResourceManager_ReadRawFile(nullptr, buf, sizeof(buf)), 0);
+    EXPECT_EQ(OH_ResourceManager_SeekRawFile(nullptr, 0, SEEK_SET), -1);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileSize(nullptr), 0);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileRemainingLength(nullptr), 0);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileOffset(nullptr), 0);
+    OH_ResourceManager_CloseRawFile(nullptr);
+
+    EXPECT_EQ(OH_ResourceManager_ReadRawFile64(nullptr, buf, sizeof(buf)), 0);
+    EXPECT_EQ(OH_ResourceManager_SeekRawFile64(nullptr, 0, SEEK_SET), -1);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileSize64(nullptr), 0);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileRemainingLength64(nullptr), 0);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileOffset64(nullptr), 0);
+    OH_ResourceManager_CloseRawFile64(nullptr);
+
+    EXPECT_FALSE(OH_ResourceManager_GetRawFileDescriptorData(nullptr, &descriptor));
+    EXPECT_FALSE(OH_ResourceManager_GetRawFileDescriptor(nullptr, descriptor));
+    EXPECT_TRUE(OH_ResourceManager_ReleaseRawFileDescriptor(descriptor));
+    EXPECT_FALSE(OH_ResourceManager_GetRawFileDescriptor64(nullptr, &descriptor64));
+    EXPECT_FALSE(OH_ResourceManager_ReleaseRawFileDescriptor64(nullptr));
+
+    EXPECT_EQ(OH_ResourceManager_InitNativeResourceManager(nullptr, nullptr), nullptr);
+    OH_ResourceManager_ReleaseNativeResourceManager(nullptr);
+
+    EXPECT_FALSE(OH_ResourceManager_IsRawDir(nullptr, "rawfile"));
+    EXPECT_FALSE(OH_ResourceManager_IsRawDir(mgr, nullptr));
+    EXPECT_FALSE(OH_ResourceManager_IsRawDir(&emptyMgr, "rawfile"));
+}
+
+/*
+ * @tc.name: Native_RawDirFromIndexTest001
+ * @tc.desc: RawDir traversal on an uncompressed (index) manager
+ * @tc.type: FUNC
+ */
+HWTEST_F(NativeResourceManagerTest, Native_RawDirFromIndexTest001, TestSize.Level1)
+{
+    NativeResourceManager *mgr = &nativeMgr;
+
+    RawDir *rawDir = OH_ResourceManager_OpenRawDir(mgr, "");
+    EXPECT_NE(rawDir, nullptr);
+    int rawFileCount = OH_ResourceManager_GetRawFileCount(rawDir);
+    EXPECT_GT(rawFileCount, 0);
+    bool foundRawFile = false;
+    bool foundSubDir = false;
+    for (int i = 0; i < rawFileCount; i++) {
+        const char *name = OH_ResourceManager_GetRawFileName(rawDir, i);
+        EXPECT_NE(name, nullptr);
+        if (name == nullptr) {
+            continue;
+        }
+        if (strstr(name, "test_rawfile.txt") != nullptr) {
+            foundRawFile = true;
+        }
+        if (strstr(name, "test_dir") != nullptr) {
+            foundSubDir = true;
+        }
+    }
+    EXPECT_TRUE(foundRawFile);
+    EXPECT_TRUE(foundSubDir);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileName(rawDir, -1), nullptr);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileName(rawDir, rawFileCount), nullptr);
+    OH_ResourceManager_CloseRawDir(rawDir);
+
+    RawDir *subDir = OH_ResourceManager_OpenRawDir(mgr, "test_dir");
+    EXPECT_NE(subDir, nullptr);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileCount(subDir), 1);
+    OH_ResourceManager_CloseRawDir(subDir);
+
+    RawDir *missingDir = OH_ResourceManager_OpenRawDir(mgr, "no_such_dir");
+    EXPECT_NE(missingDir, nullptr);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileCount(missingDir), 0);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileName(missingDir, 0), nullptr);
+    OH_ResourceManager_CloseRawDir(missingDir);
+}
+
+/*
+ * @tc.name: Native_RawFileFromIndexTest001
+ * @tc.desc: RawFile read/seek/descriptor on an uncompressed (index) manager
+ * @tc.type: FUNC
+ */
+HWTEST_F(NativeResourceManagerTest, Native_RawFileFromIndexTest001, TestSize.Level1)
+{
+    NativeResourceManager *mgr = &nativeMgr;
+    EXPECT_EQ(OH_ResourceManager_OpenRawFile(mgr, "no_such_file.txt"), nullptr);
+
+    RawFile *rawFile = OH_ResourceManager_OpenRawFile(mgr, "test_rawfile.txt");
+    EXPECT_NE(rawFile, nullptr);
+    long fileSize = OH_ResourceManager_GetRawFileSize(rawFile);
+    EXPECT_GE(fileSize, 4);
+
+    RawFileDescriptor descriptor = {};
+    EXPECT_TRUE(OH_ResourceManager_GetRawFileDescriptor(rawFile, descriptor));
+    EXPECT_GT(descriptor.fd, 0);
+    EXPECT_EQ(descriptor.length, fileSize);
+    EXPECT_EQ(descriptor.start, 0);
+    EXPECT_TRUE(OH_ResourceManager_ReleaseRawFileDescriptor(descriptor));
+
+    char buf[32] = {0};
+    EXPECT_EQ(OH_ResourceManager_ReadRawFile(rawFile, nullptr, 4), 0);
+    EXPECT_EQ(OH_ResourceManager_ReadRawFile(rawFile, buf, 0), 0);
+    EXPECT_EQ(OH_ResourceManager_ReadRawFile(rawFile, buf, 4), 4);
+
+    EXPECT_EQ(OH_ResourceManager_SeekRawFile(rawFile, 4, SEEK_SET), 0);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileOffset(rawFile), 4);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileRemainingLength(rawFile), fileSize - 4);
+    EXPECT_EQ(OH_ResourceManager_SeekRawFile(rawFile, fileSize, SEEK_CUR), -1);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileOffset(rawFile), 4);
+
+    EXPECT_EQ(OH_ResourceManager_SeekRawFile(rawFile, -1, SEEK_SET), -1);
+    EXPECT_EQ(OH_ResourceManager_SeekRawFile(rawFile, 0, 0xFF), -1);
+    EXPECT_EQ(OH_ResourceManager_SeekRawFile(rawFile, fileSize + 1, SEEK_SET), -1);
+    EXPECT_EQ(OH_ResourceManager_SeekRawFile(rawFile, -fileSize, SEEK_END), 0);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileOffset(rawFile), 0);
+
+    OH_ResourceManager_CloseRawFile(rawFile);
+}
+
+/*
+ * @tc.name: Native_RawFile64FromIndexTest001
+ * @tc.desc: RawFile64 read/seek/descriptor on an uncompressed (index) manager
+ * @tc.type: FUNC
+ */
+HWTEST_F(NativeResourceManagerTest, Native_RawFile64FromIndexTest001, TestSize.Level1)
+{
+    NativeResourceManager *mgr = &nativeMgr;
+    EXPECT_EQ(OH_ResourceManager_OpenRawFile64(mgr, "no_such_file.txt"), nullptr);
+
+    RawFile64 *rawFile = OH_ResourceManager_OpenRawFile64(mgr, "test_rawfile.txt");
+    EXPECT_NE(rawFile, nullptr);
+    int64_t fileSize = OH_ResourceManager_GetRawFileSize64(rawFile);
+    EXPECT_GE(fileSize, 4);
+
+    RawFileDescriptor64 descriptor = {};
+    EXPECT_TRUE(OH_ResourceManager_GetRawFileDescriptor64(rawFile, &descriptor));
+    EXPECT_GT(descriptor.fd, 0);
+    EXPECT_EQ(descriptor.length, fileSize);
+    EXPECT_TRUE(OH_ResourceManager_ReleaseRawFileDescriptor64(&descriptor));
+
+    char buf[32] = {0};
+    EXPECT_EQ(OH_ResourceManager_ReadRawFile64(rawFile, nullptr, 4), 0);
+    EXPECT_EQ(OH_ResourceManager_SeekRawFile64(rawFile, -1, SEEK_SET), -1);
+    EXPECT_EQ(OH_ResourceManager_SeekRawFile64(rawFile, 0, 0xFF), -1);
+    EXPECT_EQ(OH_ResourceManager_SeekRawFile64(rawFile, fileSize + 1, SEEK_SET), -1);
+
+    EXPECT_EQ(OH_ResourceManager_SeekRawFile64(rawFile, 0, SEEK_SET), 0);
+    EXPECT_EQ(OH_ResourceManager_ReadRawFile64(rawFile, buf, 4), 4);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileOffset64(rawFile), 4);
+    EXPECT_EQ(OH_ResourceManager_SeekRawFile64(rawFile, -1, SEEK_CUR), 0);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileOffset64(rawFile), 3);
+
+    EXPECT_EQ(OH_ResourceManager_SeekRawFile64(rawFile, -4, SEEK_CUR), -1);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileOffset64(rawFile), 3);
+    EXPECT_EQ(OH_ResourceManager_SeekRawFile64(rawFile, fileSize, SEEK_CUR), -1);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileOffset64(rawFile), 3);
+    EXPECT_EQ(OH_ResourceManager_SeekRawFile64(rawFile, -3, SEEK_END), 0);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileOffset64(rawFile), fileSize - 3);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileRemainingLength64(rawFile), 3);
+
+    std::vector<char> bigBuffer(static_cast<size_t>(fileSize) * 2, 0);
+    EXPECT_EQ(OH_ResourceManager_SeekRawFile64(rawFile, 0, SEEK_SET), 0);
+    EXPECT_EQ(OH_ResourceManager_ReadRawFile64(rawFile, bigBuffer.data(), fileSize * 2), fileSize);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileOffset64(rawFile), fileSize);
+    EXPECT_EQ(OH_ResourceManager_ReadRawFile64(rawFile, buf, 4), 0);
+
+    OH_ResourceManager_CloseRawFile64(rawFile);
+}
+
+/*
+ * @tc.name: Native_IsRawDirFromIndexTest001
+ * @tc.desc: IsRawDir on an uncompressed (index) manager, which resolves the given path directly
+ * @tc.type: FUNC
+ */
+HWTEST_F(NativeResourceManagerTest, Native_IsRawDirFromIndexTest001, TestSize.Level1)
+{
+    NativeResourceManager *mgr = &nativeMgr;
+
+    EXPECT_TRUE(OH_ResourceManager_IsRawDir(mgr,
+        FormatFullPath("all/assets/entry/resources/rawfile").c_str()));
+    EXPECT_FALSE(OH_ResourceManager_IsRawDir(mgr,
+        FormatFullPath("all/assets/entry/resources/rawfile/test_rawfile.txt").c_str()));
+    EXPECT_FALSE(OH_ResourceManager_IsRawDir(mgr,
+        FormatFullPath("all/assets/entry/resources/rawfile/no_such_dir").c_str()));
+    EXPECT_FALSE(OH_ResourceManager_IsRawDir(mgr, ""));
+}
+
+/*
+ * @tc.name: Native_ReleaseNativeResourceManager001
+ * @tc.desc: ReleaseNativeResourceManager accepts null/heap manager and keeps the original manager usable
+ * @tc.type: FUNC
+ */
+HWTEST_F(NativeResourceManagerTest, Native_ReleaseNativeResourceManager001, TestSize.Level1)
+{
+    OH_ResourceManager_ReleaseNativeResourceManager(nullptr);
+
+    NativeResourceManager *mgr = new NativeResourceManager();
+    mgr->resManager = nativeMgr.resManager;
+    OH_ResourceManager_ReleaseNativeResourceManager(mgr);
+
+    RawFile *rawFile = OH_ResourceManager_OpenRawFile(&nativeMgr, "test_rawfile.txt");
+    EXPECT_NE(rawFile, nullptr);
+    EXPECT_GT(OH_ResourceManager_GetRawFileSize(rawFile), 0);
+    OH_ResourceManager_CloseRawFile(rawFile);
+}
+
+/*
+ * @tc.name: Native_RawDirFromHapTest001
+ * @tc.desc: RawDir traversal on a HAP manager, empty dirName lists the rawfile root
+ * @tc.type: FUNC
+ */
+HWTEST_F(NativeRawFileHapTest, Native_RawDirFromHapTest001, TestSize.Level1)
+{
+    NativeResourceManager *mgr = &nativeMgr;
+
+    RawDir *rawDir = OH_ResourceManager_OpenRawDir(mgr, "");
+    EXPECT_NE(rawDir, nullptr);
+    int rawFileCount = OH_ResourceManager_GetRawFileCount(rawDir);
+    EXPECT_GT(rawFileCount, 0);
+    EXPECT_EQ(OH_ResourceManager_GetRawFileName(rawDir, rawFileCount), nullptr);
+    OH_ResourceManager_CloseRawDir(rawDir);
+
+    EXPECT_EQ(OH_ResourceManager_OpenRawDir(mgr, "no_such_dir"), nullptr);
+}
+
+/*
+ * @tc.name: Native_RawPathFromHapTest001
+ * @tc.desc: HAP mode: existing raw file opens, missing raw file and non-directory paths are rejected
+ * @tc.type: FUNC
+ */
+HWTEST_F(NativeRawFileHapTest, Native_RawPathFromHapTest001, TestSize.Level1)
+{
+    NativeResourceManager *mgr = &nativeMgr;
+
+    RawFile *rawFile = OH_ResourceManager_OpenRawFile(mgr, "test_rawfile.txt");
+    EXPECT_NE(rawFile, nullptr);
+    EXPECT_GT(OH_ResourceManager_GetRawFileSize(rawFile), 0);
+    OH_ResourceManager_CloseRawFile(rawFile);
+
+    EXPECT_EQ(OH_ResourceManager_OpenRawFile(mgr, "no_such_file.txt"), nullptr);
+    EXPECT_EQ(OH_ResourceManager_OpenRawFile64(mgr, "no_such_file.txt"), nullptr);
+    EXPECT_FALSE(OH_ResourceManager_IsRawDir(mgr, "rawfile/test_rawfile.txt"));
+    EXPECT_FALSE(OH_ResourceManager_IsRawDir(mgr, "rawfile/no_such_dir"));
+    EXPECT_FALSE(OH_ResourceManager_IsRawDir(mgr, ""));
+}
+
+/*
+ * @tc.name: Native_RawFileDescriptorFromHapFailTest001
+ * @tc.desc: Descriptor query returns false when the hap can no longer provide the file after the handle is opened,
+ *           and succeeds again once the patch is recovered
+ * @tc.type: FUNC
+ */
+HWTEST_F(NativeRawFileHapTest, Native_RawFileDescriptorFromHapFailTest001, TestSize.Level1)
+{
+    NativeResourceManager *mgr = &nativeMgr;
+    std::string hapPath = FormatFullPath(g_newModuleHapPath);
+
+    RawFile *rawFile = OH_ResourceManager_OpenRawFile(mgr, "test_rawfile.txt");
+    EXPECT_NE(rawFile, nullptr);
+    RawFile64 *rawFile64 = OH_ResourceManager_OpenRawFile64(mgr, "test_rawfile.txt");
+    EXPECT_NE(rawFile64, nullptr);
+
+    // A patch path that cannot be opened makes GetRawFdNdkFromHap fail while the handles stay valid.
+    EXPECT_TRUE(rm->AddPatchResource(hapPath.c_str(), "/data/test/no_such_patch.hap"));
+    RawFileDescriptor descriptor = {};
+    EXPECT_FALSE(OH_ResourceManager_GetRawFileDescriptorData(rawFile, &descriptor));
+    RawFileDescriptor64 descriptor64 = {};
+    EXPECT_FALSE(OH_ResourceManager_GetRawFileDescriptor64(rawFile64, &descriptor64));
+
+    EXPECT_TRUE(rm->AddPatchResource(hapPath.c_str(), ""));
+    RawFileDescriptor recovered = {};
+    EXPECT_TRUE(OH_ResourceManager_GetRawFileDescriptorData(rawFile, &recovered));
+    EXPECT_GT(recovered.fd, 0);
+    EXPECT_TRUE(OH_ResourceManager_ReleaseRawFileDescriptorData(&recovered));
 
     OH_ResourceManager_CloseRawFile(rawFile);
     OH_ResourceManager_CloseRawFile64(rawFile64);
