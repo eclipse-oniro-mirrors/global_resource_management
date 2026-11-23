@@ -23,6 +23,7 @@
 #include "hap_manager.h"
 #include "resource_manager.h"
 #include "res_config_impl.h"
+#include "theme_skin_ref.h"
 #include "utils/psue_manager.h"
 
 namespace OHOS {
@@ -886,7 +887,22 @@ public:
      */
     std::string GetBrandColor() const;
 
+    /**
+     * Initialize the theme skin reference of this instance.
+     * Called by the resource manager factory after bundleInfo and userId are set.
+     * The reference is released by ~ThemeSkinRef, which also removes the weak index
+     * entry when this is the last holder, so no manual release is needed.
+     *
+     * @param preloaded the preloaded skin resource, null to load it from ThemePackManager
+     */
+    void InitSkinRef(const std::shared_ptr<ThemeBundleResource> &preloaded = nullptr);
+
 private:
+    // Keeps the theme skin resources of this bundle alive for the lifetime of this
+    // instance; ThemePackManager only keeps a weak reference. Its destructor releases
+    // the container and unregisters the bundle when this is the last holder.
+    ThemeSkinRef skinRef_;
+
     RState GetString(const std::shared_ptr<IdItem> idItem, std::string &outValue);
 
     RState GetStringArray(const std::shared_ptr<IdItem> idItem, std::vector<std::string> &outValue);

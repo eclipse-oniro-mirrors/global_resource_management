@@ -39,7 +39,7 @@ void ThemeResourceTest::TearDown()
  */
 HWTEST_F(ThemeResourceTest, ThemeResourceInitThemeResTest001, TestSize.Level1)
 {
-    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>("");
+    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>();
     EXPECT_TRUE(themeResource != nullptr);
     std::pair<std::string, std::string> bundleInfo;
     cJSON *root = nullptr;
@@ -56,7 +56,7 @@ HWTEST_F(ThemeResourceTest, ThemeResourceInitThemeResTest001, TestSize.Level1)
  */
 HWTEST_F(ThemeResourceTest, ThemeResourceInitThemeResTest002, TestSize.Level1)
 {
-    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>("");
+    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>();
     ASSERT_TRUE(themeResource != nullptr);
     std::pair<std::string, std::string> bundleInfo;
     cJSON *root = cJSON_CreateObject();
@@ -80,7 +80,7 @@ HWTEST_F(ThemeResourceTest, ThemeResourceInitThemeResTest002, TestSize.Level1)
  */
 HWTEST_F(ThemeResourceTest, ThemeResourceInitThemeResTest003, TestSize.Level1)
 {
-    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>("");
+    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>();
     ASSERT_TRUE(themeResource != nullptr);
     std::pair<std::string, std::string> bundleInfo;
     cJSON *root = cJSON_CreateObject();
@@ -105,7 +105,7 @@ HWTEST_F(ThemeResourceTest, ThemeResourceInitThemeResTest003, TestSize.Level1)
  */
 HWTEST_F(ThemeResourceTest, ThemeResourceInitThemeResTest004, TestSize.Level1)
 {
-    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>("");
+    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>();
     ASSERT_TRUE(themeResource != nullptr);
     std::pair<std::string, std::string> bundleInfo;
     cJSON *root = cJSON_CreateObject();
@@ -124,7 +124,7 @@ HWTEST_F(ThemeResourceTest, ThemeResourceInitThemeResTest004, TestSize.Level1)
  */
 HWTEST_F(ThemeResourceTest, ThemeResourceParseJsonTest001, TestSize.Level1)
 {
-    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>("");
+    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>();
     EXPECT_TRUE(themeResource != nullptr);
     std::string bundleName = "ohos.global.test.all";
     std::string moduleName = "entry";
@@ -140,7 +140,7 @@ HWTEST_F(ThemeResourceTest, ThemeResourceParseJsonTest001, TestSize.Level1)
  */
 HWTEST_F(ThemeResourceTest, ThemeResourceParseJsonTest002, TestSize.Level1)
 {
-    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>("");
+    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>();
     EXPECT_TRUE(themeResource != nullptr);
     std::string bundleName = "ohos.global.test.all";
     std::string moduleName = "entry";
@@ -156,7 +156,7 @@ HWTEST_F(ThemeResourceTest, ThemeResourceParseJsonTest002, TestSize.Level1)
  */
 HWTEST_F(ThemeResourceTest, ThemeResourceParseJsonTest003, TestSize.Level1)
 {
-    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>("");
+    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>();
     EXPECT_TRUE(themeResource != nullptr);
     std::string bundleName = "ohos.global.test.all";
     std::string moduleName = "entry";
@@ -172,7 +172,7 @@ HWTEST_F(ThemeResourceTest, ThemeResourceParseJsonTest003, TestSize.Level1)
  */
 HWTEST_F(ThemeResourceTest, ThemeResourceParseJsonTest004, TestSize.Level1)
 {
-    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>("");
+    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>();
     EXPECT_TRUE(themeResource != nullptr);
     std::string bundleName = "ohos.global.test.all";
     std::string moduleName = "entry";
@@ -188,7 +188,7 @@ HWTEST_F(ThemeResourceTest, ThemeResourceParseJsonTest004, TestSize.Level1)
  */
 HWTEST_F(ThemeResourceTest, ThemeResourceParseJsonTest005, TestSize.Level1)
 {
-    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>("");
+    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>();
     EXPECT_TRUE(themeResource != nullptr);
     std::string bundleName = "ohos.global.test.all";
     std::string moduleName = "entry";
@@ -204,7 +204,7 @@ HWTEST_F(ThemeResourceTest, ThemeResourceParseJsonTest005, TestSize.Level1)
  */
 HWTEST_F(ThemeResourceTest, ThemeResourceParseIconTest001, TestSize.Level1)
 {
-    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>("");
+    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>();
     EXPECT_TRUE(themeResource != nullptr);
     std::string bundleName = "ohos.global.test.all";
     std::string moduleName = "entry";
@@ -220,7 +220,7 @@ HWTEST_F(ThemeResourceTest, ThemeResourceParseIconTest001, TestSize.Level1)
  */
 HWTEST_F(ThemeResourceTest, ThemeResourceParseIconTest002, TestSize.Level1)
 {
-    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>("");
+    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>();
     EXPECT_TRUE(themeResource != nullptr);
     std::string bundleName = "ohos.global.test.all";
     std::string moduleName = "entry";
@@ -236,7 +236,7 @@ HWTEST_F(ThemeResourceTest, ThemeResourceParseIconTest002, TestSize.Level1)
  */
 HWTEST_F(ThemeResourceTest, ThemeResourceParseIconTest003, TestSize.Level1)
 {
-    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>("");
+    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>();
     EXPECT_TRUE(themeResource != nullptr);
     std::string bundleName = "ohos.global.test.all";
     std::string moduleName = "entry";
@@ -252,7 +252,7 @@ HWTEST_F(ThemeResourceTest, ThemeResourceParseIconTest003, TestSize.Level1)
  */
 HWTEST_F(ThemeResourceTest, ThemeResourceGetThemeValuesTest001, TestSize.Level1)
 {
-    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>("");
+    std::shared_ptr<ThemeResource> themeResource = std::make_shared<ThemeResource>();
     EXPECT_TRUE(themeResource != nullptr);
     std::pair<std::string, std::string> bundInfo;
     ResType resType = ResType::VALUES;

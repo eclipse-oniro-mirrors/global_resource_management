@@ -77,12 +77,19 @@ std::shared_ptr<ResourceManager> CreateResourceManagerDef(
     }
     uint32_t currentId = resConfig.GetThemeId();
     auto themePackManager = ThemePackManager::GetThemePackManager();
+    if (themePackManager == nullptr) {
+        RESMGR_HILOGE(RESMGR_TAG, "CreateResourceManagerDef themePackManager is null");
+        return resourceManagerImpl;
+    }
+    std::shared_ptr<ThemeBundleResource> skinResource;
     if (themePackManager->IsFirstLoadResource() ||
         themePackManager->UpdateThemeId(currentId, resourceManagerImpl->userId) ||
         themePackManager->IsUpdateByUserId(resourceManagerImpl->userId)) {
         RESMGR_HILOGD(RESMGR_TAG, "CreateResourceManagerDef LoadThemeRes");
-        themePackManager->LoadThemeRes(bundleName, moduleName, resourceManagerImpl->userId);
+        skinResource = themePackManager->LoadThemeRes(bundleName, moduleName, resourceManagerImpl->userId);
     }
+    // CreateResourceManager() always constructs a ResourceManagerImpl.
+    static_cast<ResourceManagerImpl *>(resourceManagerImpl.get())->InitSkinRef(skinResource);
     return resourceManagerImpl;
 }
 

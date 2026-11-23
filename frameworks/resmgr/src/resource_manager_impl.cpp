@@ -1171,6 +1171,19 @@ RState ResourceManagerImpl::CloseRawFileDescriptor(const std::string &name)
     return hapManager_->CloseRawFileDescriptor(name);
 }
 
+void ResourceManagerImpl::InitSkinRef(const std::shared_ptr<ThemeBundleResource> &preloaded)
+{
+    if (bundleInfo.first.empty()) {
+        return;
+    }
+    skinRef_.Bind(userId, bundleInfo.first);
+    if (preloaded != nullptr) {
+        skinRef_.Assign(preloaded);
+        return;
+    }
+    skinRef_.Load();
+}
+
 ResourceManagerImpl::~ResourceManagerImpl()
 {}
 
@@ -1919,6 +1932,9 @@ std::shared_ptr<ResourceManager> ResourceManagerImpl::GetOverrideResourceManager
     overrideResMgr->bundleInfo.first = this->bundleInfo.first;
     overrideResMgr->bundleInfo.second = this->bundleInfo.second;
     overrideResMgr->userId = this->userId;
+    // Keep the same skin container alive independently of this manager, so the override
+    // manager can still resolve theme resources after the parent manager is destroyed.
+    impl->InitSkinRef();
     overrideResMgr->SetBrandColor(this->GetBrandColor());
     if (overrideResConfig && overrideResMgr->UpdateOverrideResConfig(*overrideResConfig) != SUCCESS) {
         RESMGR_HILOGE(RESMGR_TAG, "GetOverrideResourceManager UpdateOverrideResConfig failed bundleName = %{public}s, \
