@@ -62,6 +62,14 @@ bool HapParser::Init(const char *path)
     return true;
 }
 
+bool HapParser::IsValidDescriptor(uint64_t offset, uint64_t length)
+{
+    const uint64_t maxInt64 = static_cast<uint64_t>(INT64_MAX);
+    // Short-circuit guarantees offset <= maxInt64 first, so (maxInt64 - offset) cannot underflow;
+    // length <= maxInt64 - offset is equivalent to offset + length <= INT64_MAX without overflow.
+    return offset <= maxInt64 && length <= maxInt64 - offset;
+}
+
 int32_t HapParser::ParseResHex()
 {
     return OK;
@@ -333,13 +341,17 @@ RState HapParser::ReadRawFileDescriptor(const char *hapPath, const char *patchPa
         RESMGR_HILOGE(RESMGR_TAG, "failed to get rawFileDescriptor rawfilePath");
         return NOT_FOUND;
     }
+    if (!IsValidDescriptor(fileInfo.offset, fileInfo.length)) {
+        RESMGR_HILOGE(RESMGR_TAG, "rawFileDescriptor exceeds int64 range");
+        return NOT_FOUND;
+    }
     int zipFd = open(info.outPath, O_RDONLY);
     if (zipFd < 0) {
         RESMGR_HILOGE(RESMGR_TAG, "failed open file by path");
         return NOT_FOUND;
     }
-    descriptor.offset = static_cast<long>(fileInfo.offset);
-    descriptor.length = static_cast<long>(fileInfo.length);
+    descriptor.offset = static_cast<int64_t>(fileInfo.offset);
+    descriptor.length = static_cast<int64_t>(fileInfo.length);
     descriptor.fd = zipFd;
 #endif
     return SUCCESS;
