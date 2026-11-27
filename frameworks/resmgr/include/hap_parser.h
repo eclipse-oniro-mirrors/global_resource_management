@@ -191,6 +191,15 @@ protected:
     std::set<std::string> locales_;
 
     uint64_t parsedMemory_{0};
+
+private:
+    /**
+     * Check whether the rawfile offset and length from the extractor fit int64_t.
+     * @param offset the rawfile offset in the archive
+     * @param length the rawfile length
+     * @return true when offset + length does not exceed INT64_MAX
+     */
+    static bool IsValidDescriptor(uint64_t offset, uint64_t length);
 };
 } // namespace Resource
 } // namespace Global

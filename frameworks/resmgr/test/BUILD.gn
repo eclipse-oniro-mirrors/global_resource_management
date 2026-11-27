@@ -87,6 +87,8 @@ ohos_unittest("resmgr_test") {
     "unittest/common/theme_config_test.cpp",
     "unittest/common/theme_manager_test.cpp",
     "unittest/common/theme_resource_test.cpp",
+    "unittest/common/zip64_hap_test.cpp",
+    "unittest/common/zip64_hap_test_util.cpp",
     "unittest/utils/psue_manaer_test.cpp",
     "unittest/utils/utils_test.cpp",
   ]
@@ -152,6 +154,8 @@ ohos_unittest("resmgr_native_test") {
 
   sources = resmgr_test_common_sources + [
     "unittest/common/native_resource_manager_test.cpp",
+    "unittest/common/zip64_hap_test_util.cpp",
+    "unittest/common/zip64_rawfile_legacy_test.cpp",
   ]
 
   if (resource_management_support_icu) {
