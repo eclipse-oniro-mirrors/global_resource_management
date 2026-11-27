@@ -32,7 +32,6 @@ static std::unordered_map<napi_env, napi_ref> g_constructorMap;
 static std::mutex constructorMutex;
 static std::shared_ptr<ResourceManager> g_sysResMgr = nullptr;
 static std::mutex g_sysMgrMutex;
-static bool g_sysResMgrInit = false;
 
 napi_value ResourceManagerAddon::Create(
     napi_env env, const std::string& bundleName, const std::shared_ptr<ResourceManager>& resMgr,
@@ -100,23 +99,24 @@ napi_value ResourceManagerAddon::WrapResourceManager(napi_env env, std::shared_p
 
 napi_value ResourceManagerAddon::GetSystemResMgr(napi_env env)
 {
+    std::shared_ptr<ResourceManager> current;
     {
         std::lock_guard<std::mutex> lock(g_sysMgrMutex);
-        if (!g_sysResMgrInit) {
+        if (g_sysResMgr == nullptr) {
             std::shared_ptr<Global::Resource::ResourceManager> tmpMgr(Global::Resource::GetSystemResourceManager());
             if (tmpMgr != nullptr) {
                 g_sysResMgr = tmpMgr;
-                g_sysResMgrInit = true;
             } else {
                 RESMGR_HILOGE(RESMGR_JS_TAG, "GetSystemResourceManager returned nullptr, will retry on next call");
             }
         }
+        current = g_sysResMgr;
     }
-    if (g_sysResMgr == nullptr) {
+    if (current == nullptr) {
         ResourceManagerNapiUtils::NapiThrow(env, ERROR_CODE_SYSTEM_RES_MANAGER_GET_FAILED);
         return nullptr;
     }
-    std::shared_ptr<ResourceManagerAddon> addon = std::make_shared<ResourceManagerAddon>(g_sysResMgr, true);
+    std::shared_ptr<ResourceManagerAddon> addon = std::make_shared<ResourceManagerAddon>(current, true);
     return WrapResourceManager(env, addon);
 }
 
